@@ -3,6 +3,8 @@
 
 import argparse
 from collections import deque
+import hashlib
+import json
 import os
 from pathlib import Path
 import re
@@ -59,10 +61,18 @@ def relocate(root, arch):
     libraries = root / "opt/X11/lib"
     queue = deque([(executable, executable), (compiler, compiler)])
     staged = {}
+    inventory = {}
     required = {"arm64", "x86_64"} if arch == "universal" else {arch}
     while queue:
         original, image = queue.popleft()
         output("lipo", image, "-verify_arch", *sorted(required))
+        inventory[image.relative_to(root).as_posix()] = {
+            "input_sha256": hashlib.sha256(original.read_bytes()).hexdigest(),
+            "input_path": str(original) if original != image else None,
+            "minimum_macos": re.findall(
+                r"\bminos (\d+(?:\.\d+)+)", output("xcrun", "vtool", "-show-build", image)
+            ),
+        }
         image.chmod(0o755)
         ids = load_names(original, "-D")
         paths = rpaths(original)
@@ -97,6 +107,7 @@ def relocate(root, arch):
                     raise ValueError(f"Relocated dependency escapes private lib directory: {name}")
         output("codesign", "--force", "--sign", "-", image)
         output("codesign", "--verify", "--strict", image)
+    (root / "DEPENDENCIES.json").write_text(json.dumps(inventory, indent=2, sort_keys=True) + "\n")
 
 
 if __name__ == "__main__":
