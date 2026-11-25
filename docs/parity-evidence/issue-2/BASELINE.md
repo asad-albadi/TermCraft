@@ -22,6 +22,7 @@ Recorded on 2026-11-25 from branch `issue-2-macos` at the current worktree.
 - `cargo +1.96.1 fmt --all -- --check`: passed after formatting.
 - `cargo +1.96.1 test --locked --lib --no-fail-fast`: passed, 276/276, with 3 ignored.
 - `cargo +1.96.1 test --locked --all-targets --no-fail-fast`: the library target passed 276/276; broader GUI/integration targets compiled but 26 targets reported environment-sensitive failures, including unavailable external SSH helpers and concurrent local-socket/resource limits.
+- The macOS release workflow setup block is syntactically valid Bash and runs the locked RDP helper suite before packaging; its contract test passed alongside the packaging/evidence checks.
 
 ## macOS fixture compatibility repairs
 
