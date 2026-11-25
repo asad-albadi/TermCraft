@@ -343,6 +343,7 @@
       "remaining": "Reviewed native printer/smartcard, Linux RXCHAR/BREAK/ERR events and per-open statistics, Windows per-open statistics and bounded native serial owners are merged. Exact general POSIX COMMSTATUS/properties/modem events and opened-object rename/delete remain explicit platform/architecture limitations; native Windows/macOS/device/original qualification remains.",
       "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; actual RDP native/admin/drive/device/clipboard/security/original interoperability remains unverified. Publication follow-up: hosted CI run45636600121 reports81helper tests passed/1failed in drive_allocation_is_released_on_last_remote_close_and_disconnect. Root cause unconfirmed; no green hosted CI claim.",
       "evidence": [
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/D02/providers/host-full.log",
         "docs/parity-evidence/execution/d02-engine-green.log",
         "docs/parity-evidence/parallel-rdp-serial/README.md",
@@ -414,6 +415,7 @@
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/X01/implementation.md",
         "docs/parity-evidence/X01/review.md",
         "docs/parity-evidence/parallel-integration-reviewed/result.json",
@@ -468,6 +470,7 @@
       "validation_remaining": "Genuine source22bb/full398d traced and untraced strict-auth chooser/clipboard/keyboard/cancel checks passed. Current32 source retains identical XDMCP paths and native engine; native Windows/macOS and original workflows remain unverified.",
       "evidence": [
         "PARITY_PROGRESS.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/X04/hostnames/root-integration.json",
         "docs/parity-evidence/X04/clipboard-lifecycle/root-integration.json",
         "docs/parity-evidence/X04/keyboard-chooser/root-integration.json",
@@ -625,11 +628,12 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS installer/build/upgrade hosts. Signing identities are needed only if a signed release is chosen, not for unsigned native qualification.",
+      "dependency": "Clean Windows upgrade and protocol-integration fixture, native macOS installer/build/upgrade hosts and remaining runtime payloads. Signing identities are needed only if a signed release is chosen.",
       "remaining": "Current source32e512 genuine full Linux archive d8cec and Debian12 core4628/revision3 are built and independently audited. Native Windows/macOS installers/lifecycle remain; full optional Debian runtime closure is not claimed.",
-      "validation_remaining": "Current Linux full3372hashes/actualGUI37checks and native Debian1074hashes/43commands/16bytepairs/5inventories pass. Native Windows/macOS installers and additional platform/original behavior remain unverified.",
+      "validation_remaining": "Current Linux full3372hashes/actualGUI37checks and native Debian1074hashes/43commands/16bytepairs/5inventories pass. An unsigned native Windows x64 ZIP passed relocated startup and controlled per-user install/uninstall. Clean upgrade, activation, optional runtimes and macOS/original verification remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/parallel-packaging/review.md",
         "docs/parity-evidence/parallel-packaging/reviewed-artifact.json",
         "docs/parity-evidence/P01/combined-release-verification.json",
@@ -936,11 +940,12 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS build runners with interactive desktop access; source/type checks do not establish native runtime behavior.",
-      "remaining": "Run native Windows and macOS builds and interactive workflows. Windows cross-target `cargo check` proves compilation only.",
-      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "dependency": "Native desktop, endpoint and device fixtures for remaining Windows/macOS qualification.",
+      "remaining": "Complete interactive Windows desktop, clean-account, device redirection, providers and macOS qualification.",
+      "validation_remaining": "Windows x64 native build, packaged launch, ConPTY, workspace IPC and controlled protocol fixtures have partial evidence. The full regression suite and broader desktop, provider and original workflows remain open.",
       "evidence": [
-        "PARITY_PROGRESS.md"
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },

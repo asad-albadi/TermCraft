@@ -9,7 +9,7 @@ Platform-specific identifies a platform adapter needing native validation.
 
 | Capability | Status | Platforms / dependency | Evidence and remaining differences |
 | --- | --- | --- | --- |
-| Local terminal | Implemented | Linux PTY; Windows ConPTY; macOS PTY | Linux shell execution tested. Windows 10 1809+ required. macOS runtime unverified. |
+| Local terminal | Implemented | Linux PTY; Windows ConPTY; macOS PTY | Linux shell execution tested. Windows PowerShell Unicode input/output, resize and exit passed through real ConPTY. Windows 10 1809+ required. Broader Windows GUI and macOS runtime checks remain open. |
 | ANSI / VT terminal emulation | Partial | All | Unicode/wide cells, indexed bounded history and VT regression cases are tested. Negotiated SGR/legacy mouse reporting has codec, viewport and owned PTY coverage. Full PuTTY/original and native platform conformance remain pending. |
 | Terminal search, export and logging | Implemented | All | Local terminal output; original file formats and timing unverified. |
 | Tabs, split terminals, MultiExec | Partial | All | Stable-ID tabs, resizable two-column/two-row/four-pane layouts and explicit MultiExec target selection, paged target views and failure reports. Layout and real-PTY broadcast tests pass; native/original comparison pending. Detach/reattach, custom tab titles and reversible fullscreen implemented; native window-manager comparison pending. |
@@ -53,8 +53,12 @@ Platform-specific identifies a platform adapter needing native validation.
 
 Local tests exercise PTY command execution, terminal parsing, launch argument
 preservation, store persistence, path handling and headless UI rendering.
-A Linux build or Windows cargo check does not establish native Windows or macOS
-runtime behavior. Owned OpenSSH, FTP/FTPS, RDP, VNC, Telnet, HTTP and other protocol fixtures now run locally. Physical serial hardware, native Windows/macOS and the original application runtime remain unavailable. See MECHANICS.md for decompilation evidence and estimated values.
+Owned OpenSSH, FTP/FTPS, RDP, VNC, Telnet, HTTP and other protocol fixtures run
+locally. Windows also has [native x64 evidence](docs/parity-evidence/execution/2026-11-25-windows-native.md)
+for locked RDP helper tests, ConPTY, loopback XDMCP discovery, relocated package
+startup and per-user installer smoke. Physical serial workflows, broader native
+Windows/macOS runtime coverage and the original application runtime remain open.
+See MECHANICS.md for decompilation evidence and estimated values.
 
 Public references (reviewed 2026-11-23):
 - https://mobaxterm.mobatek.net/documentation.html

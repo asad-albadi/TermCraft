@@ -54,7 +54,12 @@ build host is distinct from validation on a clean target system.
 Linux menu registration is optional. The package includes its install and
 uninstall commands. The Windows ZIP supports portable launch and a built-in
 PowerShell installer with a versioned per-user program directory and Start
-menu shortcut. On macOS, extract using Finder or `ditto` to preserve executable
+menu shortcut. The [Windows x64 qualification checkpoint](../docs/parity-evidence/execution/2026-11-25-windows-native.md)
+covers an unsigned candidate's relocated startup and versioned installer
+smoke. For a local candidate, run `python scripts/package-check-startup.py <zip> --evidence <new-directory>`
+and `pwsh -File tests/windows-package-lifecycle.ps1 -Archive <zip>`.
+The installer test creates and removes uniquely named per-user versions.
+On macOS, extract using Finder or `ditto` to preserve executable
 permissions. The bundles are unsigned. Move the app to the chosen Applications
 directory, and use the same location or a new versioned location for upgrades.
 

@@ -78,6 +78,8 @@ External launch adapters exist. Integration and options remain incomplete. [Remo
 
 **Current implementation:** Linux owns and manages its bundled X server, authorization, display and per-session SSH forwarding. Native Windows/macOS engines and their runtime validation remain open. See [progress](PARITY_PROGRESS.md).
 
+Windows x64 now has verified VcXsrv source preparation and native loopback XDMCP discovery tests. The private engine build and GUI workflows remain open. [Windows evidence](docs/parity-evidence/execution/2026-11-25-windows-native.md).
+
 ## P2 — Protocols, tools, and packaging
 
 - [ ] **P01 · Partial:** Supply and integrate required protocol clients instead of depending on users to install every client separately. Validate a clean-machine setup.
@@ -126,6 +128,8 @@ Existing adapters must not be classified as absent solely because endpoints were
 - [ ] **V08 · Reviewed implementation checkpoint:** Current Debian12 core clean install, actual version upgrade, replacement, removal/reinstall and complete workspace/test-vault/corrupt-original preservation pass independent review. Full optional Arch artifact closure, other native platforms and original evidence remain open. See [qualification review](docs/parity-evidence/V08/current-core-qualification/review.md).
 
 ## Completion rule and execution guidance
+
+The [Windows x64 qualification checkpoint](docs/parity-evidence/execution/2026-11-25-windows-native.md) records partial D02, P08 and V05 evidence, including native helper tests, packaged GUI startup and controlled per-user install/uninstall. Platform and original-product acceptance remain open.
 
 The full plan is approved. Use native workflows, meaningful targeted regressions and the single [durable queue](PARITY_EXECUTION_QUEUE.json). Work by actual dependencies and continue after each passing increment. Historical Superpowers strict-order/stop-after-increment instructions are superseded by the user’s 2026-11-24 execution amendment. Full/host gates are batched at subsystem boundaries.
 
