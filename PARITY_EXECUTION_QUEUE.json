@@ -509,9 +509,10 @@
       ],
       "dependency": "Native Windows/macOS required-client payload builds and clean-runtime hosts. Declared Arch-compatible Linux optional closure and Debian12 core scopes are qualified separately.",
       "remaining": "Linux optional protocol/runtime bundle is integrated and qualified for declared Arch x86_64 ABI, with actual empty-client-PATH Mosh SSH/UDP and sandboxed embedded Chromium. Debian12 core deliberately omits these optional native payloads. Native Windows/macOS required-client payloads and clean-runtime qualification remain.",
-      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "validation_remaining": "Windows x64 core package startup passed with empty PATH. The optional pinned BusyBox-w32 inputs verified, but the reconstructed archive differed from its approval hash and was rejected. Windows Chromium/Mosh and other optional native payloads remain open.",
       "evidence": [
-        "PARITY_PROGRESS.md"
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },

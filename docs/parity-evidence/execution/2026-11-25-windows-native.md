@@ -32,6 +32,18 @@ The 990-file ZIP passed the same relocated startup probe.
 | Packaged RDP helper | `b7be54b2c03eeab5a96927eccd5d46ffd6f74ed7d23bfe96dae24175a978688e` |
 | Unsigned Windows x64 ZIP | `96f650ab028099abe1100b11318fc8475620098b97dd65671a5b00f2ff54e52d` |
 
+The release candidate for code revision
+`2b88d9c46ab5a8c6bcea8dfa7758cdbb08b20e6b` passed relocated startup and
+installed GUI startup, both with private workspaces. The package retains
+990 payload hashes and the independently locked helper.
+
+| Current release input or artifact | SHA-256 |
+| --- | --- |
+| Frozen package inputs | `2c586e943745695655bf5e38ccab85136beaa8d78c072fa04b66f30e4f0e7282` |
+| Packaged GUI | `42db176b2656296c55ce6dd4eb8c111f50ff7983d58aef386722c6ee8cf9c2d3` |
+| Packaged RDP helper | `fb78b95d3928b70a82d5f1f2d2d9c2d8d804394607d35b45a2d2d7f9409cdc0b` |
+| Unsigned Windows x64 ZIP | `334e9b9ce06b6de3b58160c8da3233d4d9206abfe99896d4787a02ada4171d44` |
+
 ## Verified locally
 
 - The first native helper run had 31 passes and four failures. Commit
@@ -54,15 +66,24 @@ The 990-file ZIP passed the same relocated startup probe.
   removed after the file was taken out. This exercised side-by-side install
   and removal on the build host. Clean-account upgrades, activation registration
   and preservation of real pre-existing Harbor data still require coverage.
+  The second build also opened the installed GUI and emitted a screenshot
+  from a private workspace before both test installs were removed.
 - Native tests passed for PowerShell through ConPTY with redirected parent
   stdio, Unicode input/output, resize and normal child exit (1), private
   workspace dispatch (4), VNC application protocol behavior (12), and desktop
   gateway routing and cancellation (10). These use controlled software peers.
+- In the second packaged GUI, System used the current desktop appearance,
+  explicit Light and Dark repainted the main window, and Ctrl+Shift+B hid
+  the sidebar. Normal window close persisted Dark and the hidden sidebar in
+  the private workspace. This used the current native desktop scale.
 - Ten opt-in native RDP integration cases passed against the separately locked
   IronRDP software endpoint with OpenSSL fixture certificates. They cover
   rendering, resize, pointer, cursor, authentication/trust prompts, carrier
-  identity and cancellation. The run used the Windows MSVC debug helper and
-  the Windows build of the fixture.
+  identity and cancellation. The tests also passed with the exact extracted
+  release helper whose hash is recorded above.
+- Native scratch-registry integration tests passed, including ownership and
+  uninstall-guard checks. They do not establish clean-account protocol
+  activation or upgrade behavior for an actual installed version.
 - The pinned VcXsrv source archive and patch matched SHA-256
   `a73b30db3eb6b60efd181a1cd7fa39bc6df8f0d4c973d6c8416a856b0bf55b28`
   and `d647860419fca13a17cb2765e8d30a1c521016d66969f8fb297b6f46e3c4f8bb`.
@@ -72,11 +93,13 @@ The 990-file ZIP passed the same relocated startup probe.
 
 ## Outstanding evidence
 
-- The full Windows regression gate remains open. The first executable root run
-  reported 557 passes, 47 failures and 9 ignored checks. The 9525814 run
-  reported 597 passes, 7 failures and 9 ignored checks. Failures were in Cron
-  system-local DST, FTPS protected download shutdown, three FTP workspace
-  workflows, unavailable Windows packaged Iperf and unused-port classification.
+- The first executable root run reported 557 passes, 46 failures and 9 ignored
+  checks. Revision 9525814 reported 597 passes, 7 failures and 9 ignored checks.
+  The 2b88d9c locked root run reported 606 passes, zero failures and 19 ignored
+  checks. Ten of those ignored cases are the independently executed native RDP
+  software fixture. Windows system-local Cron scheduling was tested using the
+  host timezone. The fixed New York DST subprocess fixture still requires a host
+  where that timezone can be selected without changing the user's settings.
 - The native VcXsrv build still requires the upstream Cygwin tool set and
   Strawberry Perl, staging the matching DLLs/fonts/XKB, MSVC redistribution
   notices, and native engine qualification. The build host has MSVC and its SDK.
@@ -91,3 +114,14 @@ The 990-file ZIP passed the same relocated startup probe.
 - Windows bundled Chromium needs an audited native payload and resource pins.
   Native capture/control, Pageant, vault recovery and permission workflows
   retain their separate qualification gates.
+- The optional BusyBox-w32 inputs passed the upstream binary, source and license
+  checksum checks. Python 3.10.11 and 3.11.9 both produced assembly SHA-256
+  `4649824ec37541b1939b0c18805b6475adba268bbbd743525413e033803cf081`
+  against the existing archive pin
+  `778b85b95d82d510e77703306e2a9d80fa11af43d1048b96338ff351eab5b7b2`.
+  Staging rejected the result. The current release omits this optional payload.
+- The publisher lists the portable Home Edition 26.6 and distinguishes Home
+  from Professional Customizer in its [edition comparison](https://mobaxterm.mobatek.net/download.html)
+  and [version listing](https://mobaxterm.mobatek.net/download-home-edition.html).
+  This is publisher documentation. The supplied original executable was
+  unavailable for this local run.
