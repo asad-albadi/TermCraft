@@ -12,4 +12,4 @@ The private builder:
 - relocates non-system Mach-O dependencies and ad-hoc signs staged images;
 - records source/archive, SDK, architecture, and file hashes in `NATIVE-BUILD.json`.
 
-Native qualification remains open because this host currently has no Meson/Ninja/pkg-config installation and no pinned source archive in the workspace. The compiled `macos_pin()` gate remains closed until the complete dependency/resource closure and the authenticated inherited-listener, process-group, cancellation, graphics, and XDMCP workflows are actually qualified.
+Native qualification remains open. The pinned xorg-server archive was fetched and matched `36db027489d6370ec5b1b6d07c8155c547193c2a6914fd617eb4311fb029257f`; a native Meson configure reached Apple clang 17.0.0/arm64, then stopped because `pkg-config` and the pinned `xorgproto` subproject closure are not installed on this host. The compiled `macos_pin()` gate remains closed until the complete dependency/resource closure and the authenticated inherited-listener, process-group, cancellation, graphics, and XDMCP workflows are actually qualified.

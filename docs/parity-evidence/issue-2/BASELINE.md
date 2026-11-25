@@ -34,3 +34,9 @@ These failures are baseline/environment evidence, not native macOS qualification
 
 - `cargo test --locked --manifest-path engines/rdp/Cargo.toml`: passed, 27/27.
 - The macOS preallocation test now verifies logical EOF, idempotence, and data preservation without assuming a particular filesystem's physical block accounting.
+
+## Native XQuartz feasibility probe
+
+- The pinned xorg-server archive matched `36db027489d6370ec5b1b6d07c8155c547193c2a6914fd617eb4311fb029257f`.
+- Native Meson configuration reached Apple clang 17.0.0 on arm64 with the private-entry patch applied.
+- Configuration stopped before compilation because `pkg-config` and the pinned `xorgproto` subproject closure are absent. This is an environment/toolchain blocker, not native qualification evidence.

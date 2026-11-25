@@ -19,6 +19,8 @@ class PrivateXQuartzBuildContract(unittest.TestCase):
             "-Dxvfb=false",
             "-Dxcsecurity=true",
             "-Dbundle-id-prefix=org.termcraft.private",
+            "-Dsparkle-feed-url=",
+            "-Dsparkle-public-edkey=",
             "meson compile",
             "install_name_tool",
             "codesign",

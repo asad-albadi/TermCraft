@@ -43,7 +43,7 @@ build_one() {
     --buildtype=release --wrap-mode=nodownload \
     -Dxquartz=true -Dxorg=false -Dxephyr=false -Dxnest=false -Dxvfb=false \
     -Dxcsecurity=true -Dbundle-id-prefix=org.termcraft.private \
-    -Dsparkle_feed_url= -Dsparkle_public_key= \
+    -Dsparkle-feed-url= -Dsparkle-public-edkey= \
     -Dc_args="-arch $target -isysroot $sdk" \
     -Dcpp_args="-arch $target -isysroot $sdk" \
     -Dobjc_args="-arch $target -isysroot $sdk"
