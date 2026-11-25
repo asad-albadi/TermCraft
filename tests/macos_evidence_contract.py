@@ -66,6 +66,13 @@ class MacOSEvidenceContractTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("artifacts[0].sha256", result.stderr)
 
+    def test_qualified_record_requires_artifacts_and_completed_workflows(self):
+        value = record(status="qualified", unavailable=[])
+        result = self.run_validator(value)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("qualified record requires artifacts", result.stderr)
+        self.assertIn("workflows[0]", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

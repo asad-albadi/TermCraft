@@ -70,6 +70,12 @@ def validate(value):
     workflows = required(value, "workflows", "record")
     if not isinstance(workflows, list) or not workflows:
         errors.append("workflows must be a non-empty list")
+    elif value.get("status") == "qualified":
+        if not artifacts:
+            errors.append("qualified record requires artifacts")
+        for index, workflow in enumerate(workflows):
+            if not isinstance(workflow, dict) or workflow.get("result") in {"not-run", "blocked"}:
+                errors.append(f"workflows[{index}] must have a completed result")
     unavailable = required(value, "unavailable", "record")
     if not isinstance(unavailable, list):
         errors.append("unavailable must be a list")
