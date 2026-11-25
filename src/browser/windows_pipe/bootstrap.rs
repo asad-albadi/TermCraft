@@ -4,11 +4,14 @@ use std::{fs::File, io::Read, os::windows::io::IntoRawHandle};
 
 const CONTROL_PIPE: &str = "TERMCRAFT_BROWSER_CONTROL_PIPE";
 const CONTROL_SERVER: &str = "TERMCRAFT_BROWSER_CONTROL_PID";
+const BROWSER_IMAGE: &str = "TERMCRAFT_BROWSER_IMAGE";
+const PROFILE_ROOT: &str = "TERMCRAFT_BROWSER_PROFILE_ROOT";
 const ENTRY: &str = "windows_browser_bootstrap_entry";
 const MAX_PROXY: usize = 8192;
 
 pub(super) fn start(
     profile: &Path,
+    chromium: &Path,
     security: &OwnerSecurity,
     read: &OwnedHandle,
     write: &OwnedHandle,
@@ -17,7 +20,16 @@ pub(super) fn start(
 ) -> io::Result<Process> {
     let app = std::env::current_exe()?;
     let args = ["--exact".into(), ENTRY.into()];
-    let (process, control) = connect(&app, &args, profile, security, &[], cancel)?;
+    // Resolve known folders in the parent. Windows shell folder discovery can
+    // fail once USERPROFILE and LOCALAPPDATA point to the private profile.
+    let root = profile
+        .parent()
+        .ok_or_else(|| io::Error::other(START_ERROR))?;
+    let paths = [
+        (BROWSER_IMAGE, chromium.as_os_str().to_owned()),
+        (PROFILE_ROOT, root.as_os_str().to_owned()),
+    ];
+    let (process, control) = connect(&app, &args, profile, security, &paths, cancel)?;
     if let Err(error) = send(&process, &control, read, write, proxy, cancel) {
         process.stop();
         return Err(error);
@@ -232,7 +244,9 @@ pub(in crate::browser) fn run_if_requested() -> Option<i32> {
 fn launch_browser() -> io::Result<()> {
     let (read, write, proxy) = receive()?;
     let profile = std::env::current_dir()?;
-    let local = super::super::native_windows::local_app_data()?;
+    let local = std::env::var_os(PROFILE_ROOT)
+        .map(PathBuf::from)
+        .ok_or_else(|| io::Error::other(START_ERROR))?;
     let name = profile
         .file_name()
         .and_then(OsStr::to_str)
@@ -248,7 +262,10 @@ fn launch_browser() -> io::Result<()> {
     {
         return Err(io::Error::other(START_ERROR));
     }
-    let chromium = installed_chromium().map_err(io::Error::other)?;
+    let chromium = std::env::var_os(BROWSER_IMAGE)
+        .map(PathBuf::from)
+        .ok_or_else(|| io::Error::other(START_ERROR))?;
+    super::super::native_windows::verified_install_image(&chromium)?;
     let stdio = open_null()?;
     let read = read.as_raw_handle();
     let write = write.as_raw_handle();

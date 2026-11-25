@@ -44,7 +44,7 @@ fn ineligible() -> io::Error {
 #[cfg(windows)]
 use platform::{fixed_drive, known_folder};
 #[cfg(windows)]
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 #[cfg(windows)]
 use windows_sys::Win32::UI::Shell::{
     FOLDERID_LocalAppData, FOLDERID_ProgramFiles, FOLDERID_ProgramFilesX64,
@@ -58,11 +58,6 @@ pub(super) fn local_app_data() -> io::Result<PathBuf> {
 
 #[cfg(windows)]
 pub(crate) fn installed() -> Option<PathBuf> {
-    let machine = match std::env::consts::ARCH {
-        "x86_64" => 0x8664,
-        "aarch64" => 0xaa64,
-        _ => return None,
-    };
     [
         &FOLDERID_ProgramFiles,
         &FOLDERID_ProgramFilesX64,
@@ -77,16 +72,23 @@ pub(crate) fn installed() -> Option<PathBuf> {
             root.join("Chromium/Application/chrome.exe"),
         ]
     })
-    .find_map(|path| {
-        // Reject install files redirected away from the selected local directory.
-        let image = path.canonicalize().ok()?;
-        let directory = path.parent()?.canonicalize().ok()?;
-        if !fixed_drive(&image) || image.parent()? != directory {
-            return None;
-        }
-        verify(&mut std::fs::File::open(image).ok()?, machine).ok()?;
-        Some(path)
-    })
+    .find(|path| verified_install_image(path).is_ok())
+}
+
+#[cfg(windows)]
+pub(super) fn verified_install_image(path: &Path) -> io::Result<()> {
+    let machine = match std::env::consts::ARCH {
+        "x86_64" => 0x8664,
+        "aarch64" => 0xaa64,
+        _ => return Err(ineligible()),
+    };
+    // Reject install files redirected away from the selected local directory.
+    let image = path.canonicalize()?;
+    let directory = path.parent().ok_or_else(ineligible)?.canonicalize()?;
+    if !fixed_drive(&image) || image.parent() != Some(directory.as_path()) {
+        return Err(ineligible());
+    }
+    verify(&mut std::fs::File::open(image)?, machine)
 }
 
 #[cfg(windows)]

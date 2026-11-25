@@ -50,7 +50,7 @@ impl Pipe {
         if runtime == super::Runtime::BundledChromium {
             return Err("No qualified bundled Chromium payload for Windows".into());
         }
-        installed_chromium()?;
+        let chromium = installed_chromium()?;
         let security =
             OwnerSecurity::new().map_err(|_| "Could not secure the private browser profile.")?;
         let profile =
@@ -59,6 +59,7 @@ impl Pipe {
         let (reader, browser_writer) = pipe_pair(true, &security).map_err(|_| CONNECTION_ERROR)?;
         let process = bootstrap::start(
             &profile.path,
+            &chromium,
             &security,
             &browser_reader,
             &browser_writer,

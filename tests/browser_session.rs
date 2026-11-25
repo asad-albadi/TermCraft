@@ -292,6 +292,7 @@ fn chromium_routes_through_configured_proxy_and_signs_in_only_after_consent() {
     assert!(origin.requests.lock().unwrap().is_empty());
 }
 
+#[track_caller]
 fn wait_until(session: &Session, mut condition: impl FnMut() -> bool) {
     // Debug builds verify the complete 429MB bundle before starting Chromium.
     let startup_budget = if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
