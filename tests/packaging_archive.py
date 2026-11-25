@@ -3,6 +3,7 @@ import importlib.util
 import io
 import json
 import hashlib
+import os
 from pathlib import Path
 import stat
 import tarfile
@@ -42,6 +43,13 @@ class PortableArchive(unittest.TestCase):
     def calls(self):
         return (self.debian.extract_portable, self.startup.extract)
 
+    def link_directory(self, target, link):
+        if os.name == "nt":
+            import _winapi
+            _winapi.CreateJunction(str(target), str(link))
+        else:
+            link.symlink_to(target, target_is_directory=True)
+
     def test_valid_payload_and_special_modes(self):
         files = {'harbor-workspace': b'app', 'termcraft-rdp-engine': b'helper'}
         manifest = {'platform': 'linux', 'profile': 'release', 'files': {
@@ -55,7 +63,10 @@ class PortableArchive(unittest.TestCase):
             call(self.archive, out)
             self.assertEqual((out / 'TermCraft/harbor-workspace').read_bytes(), b'app')
             for item in out.rglob('*'):
-                self.assertEqual(stat.S_IMODE(item.stat().st_mode), 0o755)
+                if os.name == "nt":
+                    self.assertTrue(item.stat().st_mode & stat.S_IWRITE)
+                else:
+                    self.assertEqual(stat.S_IMODE(item.stat().st_mode), 0o755)
 
     def test_reject_paths_duplicates_links_and_special_types_without_partial_output(self):
         regular = ('TermCraft/ok', tarfile.REGTYPE, b'ok', 0o644)
@@ -90,7 +101,7 @@ class PortableArchive(unittest.TestCase):
         outside = self.root / 'outside'
         outside.mkdir()
         link = self.root / 'link'
-        link.symlink_to(outside, target_is_directory=True)
+        self.link_directory(outside, link)
         for call in self.calls():
             for out in (link, link / 'child'):
                 with self.assertRaises(ValueError):
@@ -102,7 +113,7 @@ class PortableArchive(unittest.TestCase):
         real = self.root / 'real-temp-root'
         real.mkdir()
         alias = self.root / 'platform-temp-alias'
-        alias.symlink_to(real, target_is_directory=True)
+        self.link_directory(real, alias)
         # smoke() resolves its own freshly created trusted root before passing
         # the destination; arbitrary unresolved symlink paths remain rejected.
         self.startup.extract(self.archive, alias.resolve() / 'package files')

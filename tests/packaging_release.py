@@ -25,6 +25,55 @@ def module_at(name, path):
     return module
 
 
+class WindowsPackage(unittest.TestCase):
+    @unittest.skipUnless(os.name == "nt", "Windows Cargo cache junction")
+    def test_isolated_cargo_home_uses_cache_without_symlink_privilege(self):
+        package = module_at("package_release", SCRIPT)
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary).resolve()
+            cache = base / "cache"
+            registry = cache / "registry"
+            registry.mkdir(parents=True)
+            (registry / "marker").write_bytes(b"keep")
+            with tempfile.TemporaryDirectory(dir=base) as state, patch.dict(
+                os.environ, {"CARGO_HOME": str(cache)}
+            ), patch.object(Path, "symlink_to", side_effect=PermissionError):
+                settings = package.cargo_invocation(Path(state))
+                home = Path(settings["env"]["CARGO_HOME"])
+                self.assertTrue((home / "registry").samefile(registry))
+                self.assertFalse((home / "config.toml").exists())
+            self.assertEqual((registry / "marker").read_bytes(), b"keep")
+
+    def test_zip_includes_project_license_and_privacy_policy(self):
+        package = module_at("package_release", SCRIPT)
+        with tempfile.TemporaryDirectory(prefix="Windows package ") as temporary:
+            root = Path(temporary).resolve()
+            app, helper = root / "app.exe", root / "helper.exe"
+            header = bytearray(256)
+            header[:2] = b"MZ"
+            struct.pack_into("<I", header, 60, 128)
+            header[128:132] = b"PE\0\0"
+            struct.pack_into("<H", header, 132, 0x8664)
+            app.write_bytes(header)
+            helper.write_bytes(header)
+            with patch.object(package, "cargo_notices", return_value=[]), patch.object(
+                package, "native_libraries", return_value={"libraries": []}
+            ):
+                archive = package.package_release("windows", root / "out", app, helper)
+            with zipfile.ZipFile(archive) as zipped:
+                prefix = archive.stem + "/"
+                manifest = json.loads(zipped.read(prefix + "PACKAGE-MANIFEST.json"))
+                self.assertEqual(manifest["licenses"]["project"], "LICENSE")
+                for name in ("LICENSE", "PRIVACY.md"):
+                    with self.subTest(name=name):
+                        expected = (ROOT / name).read_bytes()
+                        self.assertEqual(zipped.read(prefix + name), expected)
+                        self.assertEqual(manifest["files"][name], package.sha256(ROOT / name))
+                        self.assertEqual(
+                            manifest["build"]["source_inputs"][name], manifest["files"][name]
+                        )
+
+
 @unittest.skipUnless(sys.platform.startswith("linux") and shutil.which("cc"), "Linux and cc required")
 class PortablePackage(unittest.TestCase):
     def test_archive_relocates_with_empty_path_and_keeps_workspace_data(self):

@@ -95,7 +95,7 @@ def source_inputs(root):
     paths = [
         *PACKAGES, *(p.with_name("Cargo.lock") for p in PACKAGES),
         Path("engines/wayland/Cargo.toml"), Path("engines/wayland/Cargo.lock"),
-        Path("CREDITS.md"), Path("FEATURE_PARITY.md"),
+        Path("CREDITS.md"), Path("FEATURE_PARITY.md"), Path("LICENSE"), Path("PRIVACY.md"),
         Path("scripts/package-release.py"), Path("scripts/package-debian.py"),
         Path("scripts/package-check-startup.py"), Path("scripts/portable_archive.py"),
         Path("scripts/build-release.sh"), *ASSETS,
@@ -190,6 +190,8 @@ def cargo_invocation(state):
             except OSError:
                 if os.name != "nt":
                     raise
+                import _winapi
+                _winapi.CreateJunction(str(cache / name), str(home / name))
     return {"cwd": cwd, "env": {**variables, "CARGO_HOME": str(home), "CARGO_BUILD_JOBS": "2"}}
 
 
@@ -608,6 +610,9 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         vnc_browser = stage_vnc_browser(source, resources)
         copy_release_assets(source, resources / "assets")
         shutil.copyfile(source / "CREDITS.md", resources / "CREDITS.md")
+        if target == "windows":
+            for name in ("LICENSE", "PRIVACY.md"):
+                shutil.copyfile(regular_source(source, Path(name)), resources / name)
         for cargo in PACKAGES:
             relative = cargo.with_name("Cargo.lock")
             destination = resources / "build-source" / relative
@@ -668,7 +673,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
                 "cargo": capture("cargo", "--version", **cargo_settings).strip() if build_inputs is not None else None,
                 "rustc": capture("rustc", "--version", **cargo_settings).strip() if build_inputs is not None else None,
             },
-            "licenses": {"project": None, "credits": (resources / "CREDITS.md").relative_to(root).as_posix(),
+            "licenses": {"project": "LICENSE" if target == "windows" else None,
+                         "credits": (resources / "CREDITS.md").relative_to(root).as_posix(),
                          "crate_notice_paths_relative_to": resources.relative_to(root).as_posix(),
                          "crates": notices},
             "files": {p.relative_to(root).as_posix(): sha256(p) for p in sorted(root.rglob("*")) if p.is_file()},

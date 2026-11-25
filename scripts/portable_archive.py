@@ -15,10 +15,11 @@ def _directory_path(path):
     """Reject symlinks in every existing component, including the destination."""
     for component in (*reversed(path.parents), path):
         try:
-            mode = component.lstat().st_mode
+            metadata = component.lstat()
         except FileNotFoundError:
             continue
-        if not stat.S_ISDIR(mode):
+        if (not stat.S_ISDIR(metadata.st_mode)
+                or getattr(metadata, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT):
             raise ValueError(f"Extraction path is not a real directory: {component}")
 
 
@@ -77,4 +78,17 @@ def extract_tar(archive, directory):
                     target.chmod(0o755)
             staged.chmod(0o755)
             _directory_path(destination)
-            os.replace(staged, destination)
+            if os.name == "nt" and destination.exists():
+                # Windows cannot replace even an empty directory. Keep the
+                # original in staging so it can be restored if publication fails.
+                previous = Path(temporary) / "previous"
+                if any(destination.iterdir()):
+                    raise ValueError("Extraction directory must be empty.")
+                destination.rename(previous)
+                try:
+                    staged.rename(destination)
+                except OSError:
+                    previous.rename(destination)
+                    raise
+            else:
+                os.replace(staged, destination)

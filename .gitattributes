@@ -1,0 +1,5 @@
+# These files are verified against byte-for-byte SHA-256 pins.
+/vendor/noVNC/** -text
+/packaging/browser/THIRD-PARTY-NOTICES.html -text
+/packaging/x11/native/*.patch -text
+/runtime/linux-x86_64/*-LICENSE -text
