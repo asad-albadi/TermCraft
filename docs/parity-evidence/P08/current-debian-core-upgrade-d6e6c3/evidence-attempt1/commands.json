@@ -1,0 +1,266 @@
+[
+  {
+    "label": "runtime-image",
+    "command": [
+      "docker",
+      "image",
+      "inspect",
+      "debian:bookworm",
+      "--format",
+      "{{.Id}}"
+    ],
+    "exit_code": 0,
+    "seconds": 0.041
+  },
+  {
+    "label": "create",
+    "command": [
+      "docker",
+      "run",
+      "-d",
+      "--name",
+      "termcraft-current-debian-runtime",
+      "--label",
+      "org.termcraft.validation=current-debian-upgrade",
+      "--cpuset-cpus",
+      "0",
+      "--pids-limit",
+      "256",
+      "--memory",
+      "3g",
+      "--security-opt",
+      "no-new-privileges",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/input,dst=/input,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/build,dst=/current,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/p08-debian-native/qualification/out,dst=/old,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/scripts,dst=/driver,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/evidence,dst=/evidence",
+      "sha256:1d04200c2ece1d4d75a2a6f8e11ebce7d86a2ae28b34bb2c9cbb3ee9f4953e75",
+      "sleep",
+      "infinity"
+    ],
+    "exit_code": 0,
+    "seconds": 0.461
+  },
+  {
+    "label": "baseline",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "sh",
+      "-ec",
+      "cat /etc/os-release; dpkg-query -W; test ! -e /opt/termcraft; test ! -e /usr/bin/termcraft"
+    ],
+    "exit_code": 0,
+    "seconds": 0.069
+  },
+  {
+    "label": "apt-update",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "apt-get",
+      "update"
+    ],
+    "exit_code": 0,
+    "seconds": 3.623
+  },
+  {
+    "label": "clean-install",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "apt-get",
+      "install",
+      "-y",
+      "--no-install-recommends",
+      "/current/out/termcraft_0.1.0-1_amd64.deb"
+    ],
+    "exit_code": 0,
+    "seconds": 14.712
+  },
+  {
+    "label": "clean-dependency-audit",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "sh",
+      "-ec",
+      "dpkg-query -s termcraft; dpkg --audit; dpkg -V termcraft; ldd /usr/bin/termcraft; ldd /opt/termcraft/termcraft-rdp-engine; sha256sum /opt/termcraft/harbor-workspace /opt/termcraft/PACKAGE-MANIFEST.json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.46
+  },
+  {
+    "label": "test-tools",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "apt-get",
+      "install",
+      "-y",
+      "--no-install-recommends",
+      "python3",
+      "python3-pil",
+      "xvfb",
+      "xauth",
+      "fonts-dejavu-core",
+      "fontconfig"
+    ],
+    "exit_code": 0,
+    "seconds": 14.735
+  },
+  {
+    "label": "disconnect",
+    "command": [
+      "docker",
+      "network",
+      "disconnect",
+      "bridge",
+      "termcraft-current-debian-runtime"
+    ],
+    "exit_code": 0,
+    "seconds": 0.093
+  },
+  {
+    "label": "network-state",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "sh",
+      "-ec",
+      "cat /proc/net/route; cat /proc/net/dev"
+    ],
+    "exit_code": 0,
+    "seconds": 0.058
+  },
+  {
+    "label": "isolation",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "sh",
+      "-ec",
+      "mkdir -p /tmp/qualification-home /tmp/qualification-runtime; chmod 700 /tmp/qualification-runtime; chown -R 1000:1000 /tmp/qualification-home /tmp/qualification-runtime /evidence; setpriv --reuid=1000 --regid=1000 --clear-groups sh -c \"Xvfb :99 -screen 0 1280x800x24 -nolisten tcp > /evidence/xvfb.log 2>&1 &\""
+    ],
+    "exit_code": 0,
+    "seconds": 0.071
+  },
+  {
+    "label": "create-real-fixture",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "/current/persistence-fixture",
+      "create",
+      "/tmp/qualification-home/workspace"
+    ],
+    "exit_code": 0,
+    "seconds": 0.544
+  },
+  {
+    "label": "corrupt-fixture",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "sh",
+      "-ec",
+      "mkdir /tmp/qualification-home/corrupt; printf \"owned deliberately corrupt workspace {\" > /tmp/qualification-home/corrupt/workspace.json; printf \"TCVAULT1-owned-corrupt-vault\" > /tmp/qualification-home/corrupt/credentials.vault; chmod 600 /tmp/qualification-home/corrupt/*; chown -R 1000:1000 /tmp/qualification-home/corrupt"
+    ],
+    "exit_code": 0,
+    "seconds": 0.1
+  },
+  {
+    "label": "check-corrupt",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "/current/persistence-fixture",
+      "corrupt",
+      "/tmp/qualification-home/corrupt"
+    ],
+    "exit_code": 0,
+    "seconds": 0.073
+  },
+  {
+    "label": "clean-installed-startup",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "python3",
+      "/driver/runtime-smoke.py",
+      "clean-installed",
+      "d6e6c3aca99a068aedc0479cb376a7d0927a4b2847ef3b0aed8e7d6d88a2e7d9"
+    ],
+    "exit_code": 1,
+    "seconds": 3.226
+  },
+  {
+    "label": "cleanup",
+    "command": [
+      "docker",
+      "rm",
+      "-f",
+      "termcraft-current-debian-runtime"
+    ],
+    "exit_code": 0,
+    "seconds": 0.723
+  },
+  {
+    "label": "cleanup-inventory",
+    "command": [
+      "docker",
+      "ps",
+      "-a",
+      "--filter",
+      "label=org.termcraft.validation=current-debian-upgrade",
+      "--format",
+      "{{.ID}} {{.Names}}"
+    ],
+    "exit_code": 0,
+    "seconds": 0.019
+  }
+]

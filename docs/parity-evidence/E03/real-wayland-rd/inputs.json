@@ -1,0 +1,37 @@
+{
+  "git_head": "0de3e0d097b3e782bb0c05522bf304fa19d95d14",
+  "private_component": "real-wayland-rd-provider-private 0.1.0-real-rd.1 normal src/main.rs",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "build_command": "CARGO_BUILD_JOBS=2 CARGO_TARGET_DIR=<app>/target cargo build --offline --manifest-path target/agent-work/real-wayland-rd/source/Cargo.toml --bin real-wayland-rd-provider-private",
+  "native_packages": "xdg-desktop-portal 1.22.1-2.1\npipewire 1:1.6.11-1\nwireplumber 0.5.19-1.1\nmesa 3:26.2.6-1\ngtk4 1:4.24.1-1.1\nlibei 1.6.0-2.1\npython-gobject 3.58.1-1\n",
+  "signed_official_arch_packages": {
+    "mutter-51.1-1-x86_64.pkg.tar.zst": {
+      "sha256": "aeed82eb1346b2422613b29b10b1599e3e055528cd47a48170c85ee12cfa739e",
+      "signature_sha256": "a1b1bae714fb72a32c35f51b7e44402193f6f6d9e95ce2786568d03200de0f66",
+      "url": "https://fastly.mirror.pkgbuild.com/extra/os/x86_64/mutter-51.1-1-x86_64.pkg.tar.zst"
+    },
+    "xdg-desktop-portal-gnome-51.0-2-x86_64.pkg.tar.zst": {
+      "sha256": "87dfb6b56ad641aa7e31ae5f4444258fd60fa9204ed2adfe9f465f8c9d326658",
+      "signature_sha256": "78b713a4b7e04f0e65c7c72da2a4bc559e08d732d211eac79ec5480e2c055a02",
+      "url": "https://fastly.mirror.pkgbuild.com/extra/os/x86_64/xdg-desktop-portal-gnome-51.0-2-x86_64.pkg.tar.zst"
+    },
+    "gnome-desktop-4-1:51.0-1-x86_64.pkg.tar.zst": {
+      "sha256": "43feb36157d574f94a71a77d4909a9d4d4dbc5d5f2281ddde2916259f9461db4",
+      "signature_sha256": "a42ae4f5dc72e3fb1e73e542298d848400aca337e7bf9b99269156a74536df97",
+      "url": "https://fastly.mirror.pkgbuild.com/extra/os/x86_64/gnome-desktop-4-1:51.0-1-x86_64.pkg.tar.zst"
+    },
+    "startup-notification-0.12-9-x86_64.pkg.tar.zst": {
+      "sha256": "ead2ea9178863a2477d69db564013eb5123f6381b388ddcd62d73b03018c7b63",
+      "signature_sha256": "acde3949949e3a6a70ac374d78521b5888c2d8676bcbf558eca2aa036ad6395d",
+      "url": "https://fastly.mirror.pkgbuild.com/extra/os/x86_64/startup-notification-0.12-9-x86_64.pkg.tar.zst"
+    }
+  },
+  "verification_keyring_sha256": "f7af717a90821803e5c366032f3135c236c4100962716b3c1ed352f8b9330f51",
+  "primary_references": [
+    "https://github.com/GNOME/mutter/blob/main/doc/building-and-running.md",
+    "https://github.com/GNOME/xdg-desktop-portal-gnome/blob/main/src/remotedesktop.c",
+    "https://github.com/GNOME/xdg-desktop-portal-gnome/blob/main/src/remotedesktopdialog.ui",
+    "https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.RemoteDesktop.html"
+  ],
+  "limitations": "Configured native private headless GNOME/Mutter platform, source harness, not application release GUI or physical GPU desktop; no Windows/macOS claim."
+}

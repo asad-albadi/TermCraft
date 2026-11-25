@@ -1,0 +1,102 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ click 739 470
++ xdotool mousemove --sync 739 470 click 1
++ sleep .35
++ sleep .5
++ shot 29-native-close-keep-playing
++ import -window root /evidence/29-native-close-keep-playing.png
++ same /tmp/legacy.termcraft-game /home/validation/Games/close.termcraft-game
+++ digest /tmp/legacy.termcraft-game
+++ sha256sum /tmp/legacy.termcraft-game
+++ cut '-d ' -f1
+++ digest /home/validation/Games/close.termcraft-game
+++ sha256sum /home/validation/Games/close.termcraft-game
+++ cut '-d ' -f1
++ test 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6 = 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6
++ same /tmp/expected.termcraft-game /home/validation/Games/existing.termcraft-game
+++ digest /tmp/expected.termcraft-game
+++ sha256sum /tmp/expected.termcraft-game
+++ cut '-d ' -f1
+++ digest /home/validation/Games/existing.termcraft-game
+++ sha256sum /home/validation/Games/existing.termcraft-game
+++ cut '-d ' -f1
++ test cc81281280fbbbe3e4ae8ac62f513a7acf964b677f0d488bb9721620b9baa5eb = cc81281280fbbbe3e4ae8ac62f513a7acf964b677f0d488bb9721620b9baa5eb
++ no_temps
+++ find /home/validation/Games -maxdepth 1 -type f -name '.termcraft-*' -print
++ [[ -z '' ]]
++ sha256sum /home/validation/Games/close.termcraft-game /home/validation/Games/existing.termcraft-game /home/validation/Games/invalid.termcraft-game /home/validation/Games/legacy.termcraft-game /home/validation/Games/race.old /home/validation/Games/race.termcraft-game
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 290 31
++ xdotool mousemove --sync 290 31 click 1
++ sleep .35
++ wait_gtk 1
++ local count=1 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 1 ]]
++ return 0
++ gtk_focus
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ tail -1
++ xdotool windowfocus --sync 6310267
++ click 150 27
++ xdotool mousemove --sync 150 27 click 1
++ sleep .35
++ xdotool key ctrl+a
++ xdotool type --clearmodifiers /home/validation/Games/final-state.termcraft-game
++ sleep .5
++ xdotool key Return
++ wait_gtk 0
++ local count=0 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=0
++ :
++ [[ 0 == 0 ]]
++ return 0
++ sleep .8
++ xdotool mousemove --sync 100 100
++ shot 30-final-state-saved
++ import -window root /evidence/30-final-state-saved.png
++ cp /home/validation/Games/final-state.termcraft-game /evidence/final-state.termcraft-game
++ no_temps
+++ find /home/validation/Games -maxdepth 1 -type f -name '.termcraft-*' -print
++ [[ -z '' ]]

@@ -1,0 +1,41 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ sha256sum /home/validation/Games/close.termcraft-game /home/validation/Games/existing.termcraft-game /home/validation/Games/legacy.termcraft-game /home/validation/Games/race.old /home/validation/Games/race.termcraft-game
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 290 31
++ xdotool mousemove --sync 290 31 click 1
++ sleep .35
++ wait_gtk 1
++ local count=1 n j
++ for j in {1..40}
+++ wc -l
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
++ n=1
++ [[ 1 == 1 ]]
++ return 0
++ gtk_focus
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ tail -1
++ xdotool windowfocus --sync 6304068
++ xdotool key Escape
++ wait_gtk 0
++ local count=0 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=0
++ :
++ [[ 0 == 0 ]]
++ return 0
++ sleep .8
++ shot 21-save-chooser-canceled
++ import -window root /evidence/21-save-chooser-canceled.png
++ sha256sum /home/validation/Games/close.termcraft-game /home/validation/Games/existing.termcraft-game /home/validation/Games/legacy.termcraft-game /home/validation/Games/race.old /home/validation/Games/race.termcraft-game
++ cmp /evidence/21-before-cancel-files.sha256 /evidence/21-after-cancel-files.sha256
+/evidence/step-09.sh: line 12: cmp: command not found

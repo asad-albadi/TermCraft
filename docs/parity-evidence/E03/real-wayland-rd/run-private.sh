@@ -1,0 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+base=$(cd "$(dirname "$0")" && pwd)
+app=$(cd "$base/../../.." && pwd)
+export REAL_HOST_NET=$(readlink /proc/self/ns/net)
+exec bwrap --unshare-net --unshare-pid --die-with-parent --ro-bind / / --dev /dev --proc /proc --tmpfs /home --ro-bind "$app" "$app" --bind "$base" "$base" --tmpfs /run --perms 01777 --tmpfs /tmp --perms 0700 --dir /tmp/real-runtime --setenv XDG_RUNTIME_DIR /tmp/real-runtime --setenv XDG_CONFIG_HOME /tmp/real-config --setenv XDG_CONFIG_DIRS /tmp/empty --setenv XDG_DATA_HOME /tmp/real-data --setenv HOME /tmp/real-home --unsetenv GDK_BACKEND --unsetenv DISPLAY --unsetenv WAYLAND_DISPLAY --unsetenv WAYLAND_SOCKET --unsetenv XAUTHORITY --unsetenv SWAYSOCK --unsetenv DBUS_SESSION_BUS_ADDRESS --unsetenv PIPEWIRE_REMOTE --setenv LIBGL_ALWAYS_SOFTWARE 1 --setenv XDG_CURRENT_DESKTOP GNOME --setenv MUTTER_DEBUG_DUMMY_MODE_SPECS 800x600 --setenv GSETTINGS_BACKEND memory --setenv GSETTINGS_SCHEMA_DIR /tmp/schemas --setenv NO_AT_BRIDGE 1 --setenv MESA_LOADER_DRIVER_OVERRIDE llvmpipe --setenv PATH "$base/tools/usr/bin:/usr/bin" --setenv LD_LIBRARY_PATH "$base/tools/usr/lib:$base/tools/usr/lib/mutter-51" --setenv XDG_DATA_DIRS "$base/tools/usr/share:/usr/share" -- dbus-run-session -- python -I "$base/matrix.py"

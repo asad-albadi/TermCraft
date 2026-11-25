@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/driver/runtime-smoke.py", line 24, in <module>
+    assert before==after,(name,before,after)
+           ^^^^^^^^^^^^^
+AssertionError: ('workspace', {'credentials.vault': '3cd77a27447e4cdae7fc9acb308564d3932881839fb57426b13ab07f93bdabcd', 'workspace.json': '71c26d99fc99c6548ccc7ad7792f07c213e01d036452789608fc4d066a640f4f'}, {'credentials.vault': '3cd77a27447e4cdae7fc9acb308564d3932881839fb57426b13ab07f93bdabcd', 'workspace.json': 'a59559c214f085d441a0ef58c87ca4cec85d72a59263bfeca90fb16787b3adfc'})

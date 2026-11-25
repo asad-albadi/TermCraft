@@ -1,0 +1,8 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ sleep 2
++ shot 26-current-state
++ import -window root /evidence/26-current-state.png
++ xdotool search --onlyvisible --name . getwindowname
++ ps -eo pid,comm,args

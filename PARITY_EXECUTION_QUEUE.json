@@ -340,8 +340,8 @@
         "S05"
       ],
       "dependency": "",
-      "remaining": "Reviewed native printer/smartcard source, Unix RXCHAR/per-open Linux statistics and Windows serial mask-reset queue admission are merged. Further serial status/properties/event families, Windows statistics candidate review, bounded Windows data cancellation, POSIX identity-safe mutations and native/device/original qualification remain.",
-      "validation_remaining": "Current host full suite plus native RDP admin/drive/device/clipboard/security and original workflow comparison.",
+      "remaining": "Reviewed native printer/smartcard, Linux RXCHAR/BREAK/ERR events and per-open statistics, Windows per-open statistics and bounded native serial owners are merged. Exact general POSIX COMMSTATUS/properties/modem events and opened-object rename/delete remain explicit platform/architecture limitations; native Windows/macOS/device/original qualification remains.",
+      "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; actual RDP native/admin/drive/device/clipboard/security/original interoperability remains unverified.",
       "evidence": [
         "docs/parity-evidence/D02/providers/host-full.log",
         "docs/parity-evidence/execution/d02-engine-green.log",
@@ -355,9 +355,14 @@
         "docs/parity-evidence/parallel-integration-native-printer/result.json",
         "docs/parity-evidence/D02/unix-event-controls/root-integration.json",
         "docs/parity-evidence/D02/windows-mask-credit/root-integration.json",
-        "docs/parity-evidence/parallel-integration-clipboard-serial-package/result.json"
+        "docs/parity-evidence/parallel-integration-clipboard-serial-package/result.json",
+        "docs/parity-evidence/D02/windows-statistics/root-integration.json",
+        "docs/parity-evidence/D02/windows-native-owner/root-integration.json",
+        "docs/parity-evidence/D02/windows-native-owner/fixture-FIX1/review.md",
+        "docs/parity-evidence/D02/unix-extra-events/root-integration.json",
+        "docs/parity-evidence/parallel-integration-local-completion-helper/result.json"
       ],
-      "next_action": "Finish locally implementable serial controls, independently review Windows statistics FIX1 and qualify the combined app/helper. Do not weaken opened-object identity guarantees or count unavailable devices as passing."
+      "next_action": "Retain honest POSIX limitations; complete native Windows/macOS/physical-device and original RDP qualification in supported environments."
     },
     {
       "id": "D03",
@@ -616,14 +621,17 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "",
-      "remaining": "Qualified Linux archive eb8145/sourceb589 has3372 entries including full Mosh dependency closure and advanced games; native Debian12 core package lifecycle is separately qualified on older source4726eebad. Latest keyboard/chooser/overwrite/Windows-mask source awaits genuine release qualification. Other distributions, Windows/macOS lifecycle and signing remain.",
+      "remaining": "Qualified current Debian12 core source d6e6c3 native ordinary release, real0.1.0\u21920.1.0-1 packaging revision upgrade/replacement/remove/reinstall and complete testworkspace/vault/corrupt-byte preservation. Source-current full optional Arch artifact is building after a compiler crash; other distributions, Windows/macOS installers/lifecycle/signing remain.",
       "validation_remaining": "Exact Arch-compatible Linux archive integrity, isolated clean startup/helper and configured-host packaged XDMCP are qualified for b589 only. New source, native Windows/macOS and newer Debian lifecycle remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/parallel-packaging/review.md",
         "docs/parity-evidence/parallel-packaging/reviewed-artifact.json",
         "docs/parity-evidence/P01/combined-release-verification.json",
-        "docs/parity-evidence/P08/debian-native/qualification/evidence-summary.md"
+        "docs/parity-evidence/P08/debian-native/qualification/evidence-summary.md",
+        "docs/parity-evidence/P08/debian-revision/review.md",
+        "docs/parity-evidence/P08/current-debian-core-upgrade-d6e6c3/evidence-summary.md",
+        "docs/parity-evidence/V08/current-core-qualification/review.md"
       ],
       "next_action": "After current source integration gate, qualify the next coherent release; preserve measured Debian/default13game and Arch/optional payload scopes. Finish native Windows/macOS packaging and signing in their supported environments.",
       "interface_prerequisite_note": "Pinned Linux runtime/package manifests already exist and qualified immutable artifacts demonstrate the packaging interface; remaining full P01/native closure is separate from further Linux package validation."
@@ -786,7 +794,7 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "",
-      "remaining": "Reviewed Cron/NFS/VNC/native provider source and offline noVNC viewer are merged. Exact Linux production provider now passes real private Sway/ScreenCast/wlr/PipeWire view-only pixel, denial/cancel/revocation/drop checks. Current release GUI, native remote control/backend compatibility, physical consent/GPU/monitors, Windows/macOS and original services remain.",
+      "remaining": "Reviewed Cron/NFS/VNC/native provider source and offline noVNC viewer are merged. Real private Linux ScreenCast/wlr and GNOME/Mutter RemoteDesktop exact-production providers now pass capture, actual keyboard/pointer, held-input Release/Stop, view-only/denial/cancel and cleanup checks with independent review. Current full-bundle GUI, physical consent/GPU/monitors, Windows/macOS and original services remain separate.",
       "validation_remaining": "Native Windows/Linux/macOS and original runtime comparisons remain pending; static exact-target and official scope evidence established.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -797,9 +805,11 @@
         "docs/parity-evidence/parallel-integration-native-clipboard/result.json",
         "docs/parity-evidence/E03/vnc-composition-review.md",
         "docs/parity-evidence/E03/composition-integration/root-browser-qualified.json",
-        "docs/parity-evidence/E03/real-wayland-portal/HANDOFF.md"
+        "docs/parity-evidence/E03/real-wayland-portal/HANDOFF.md",
+        "docs/parity-evidence/E03/real-wayland-rd/HANDOFF.md",
+        "docs/parity-evidence/E03/real-wayland-rd/review.md"
       ],
-      "next_action": "Preserve real configured-headless capture scope; qualify the current genuine release and retain unsupported wlr RemoteDesktop input, physical/native/original cells explicitly."
+      "next_action": "Finish current optional Linux artifact qualification; retain exact headless native control scope and external physical/native/original evidence gaps."
     },
     {
       "id": "E04",
@@ -952,19 +962,22 @@
     },
     {
       "id": "V08",
-      "state": "Implementation remaining",
-      "implementation_checkpoint": false,
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
       "requires": [
         "B04",
         "B05"
       ],
       "dependency": "",
-      "remaining": "Exercise packaged builds on clean machines, including absent dependencies, upgrades, and persisted settings.",
-      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "remaining": "Reviewed clean native Debian12 current-core scenario now covers declared dependencies, real0.1.0\u21920.1.0-1 upgrade, replacement/removal/reinstall, full workspace/encrypted-test-vault/corrupt-original preservation, actual app/sealed-helper startup and configured native GTK game files. Full optional Arch payload closure, other native platforms and original evidence remain separate.",
+      "validation_remaining": "Current Debian core and configured GTK artifact qualified by independent review; full optional Arch artifact, Windows/macOS and original cells remain unverified.",
       "evidence": [
-        "PARITY_PROGRESS.md"
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/P08/current-debian-core-upgrade-d6e6c3/evidence-summary.md",
+        "docs/parity-evidence/B06/native-overwrite-current-core/REPORT.md",
+        "docs/parity-evidence/V08/current-core-qualification/review.md"
       ],
-      "next_action": "Exercise packaged builds on clean machines, including absent dependencies, upgrades, and persisted settings.",
+      "next_action": "Continue current full optional Linux artifact qualification, retain scoped Debian12 current-core evidence, then run unavailable native/original cells on their supported machines.",
       "interface_prerequisite_note": "Qualified immutable Linux packages already supply the validation input. Outstanding native distributions in P08 do not block controlled clean Linux/upgrade/persistence tests."
     }
   ]

@@ -1,0 +1,9 @@
+libmutter-Message: 13:26:37.141: Running Mutter (using mutter 51.1) as a Wayland display server
+libmutter-Message: 13:26:37.269: Created surfaceless renderer without GPU
+libmutter-Message: 13:26:37.307: Added virtual monitor Meta-0
+libmutter-Message: 13:26:37.310: Using Wayland display name 'wayland-0'
+
+(mutter:6): mutter-WARNING **: 13:26:37.312: Failed to acquire org.freedesktop.locale1 proxy: Could not connect: No such file or directory
+
+(mutter:6): libmutter-WARNING **: 13:26:37.313: Failed to connect to colord daemon: Could not connect: No such file or directory
+libmutter-Message: 13:26:44.604: Removed virtual monitor Meta-0

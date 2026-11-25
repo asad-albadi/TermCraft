@@ -1,0 +1,26 @@
+[
+  {
+    "label": "package-info",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "dpkg-deb",
+      "--info",
+      "/current/out/termcraft_0.1.0-1_amd64.deb"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "package-contents",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-current-debian-runtime",
+      "dpkg-deb",
+      "--contents",
+      "/current/out/termcraft_0.1.0-1_amd64.deb"
+    ],
+    "exit_code": 0
+  }
+]

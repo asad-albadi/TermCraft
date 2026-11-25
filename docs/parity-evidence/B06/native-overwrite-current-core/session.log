@@ -1,0 +1,80 @@
+dbus-daemon[36]: [session uid=1000 pid=36 pidfd=5] Connection :1.0 (uid=1000 pid=38 comm="dbus-monitor --session") became a monitor.
+dbus-daemon[36]: [session uid=1000 pid=36 pidfd=5] Activating service name='org.freedesktop.portal.Desktop' requested by ':1.1' (uid=1000 pid=39 comm="/opt/termcraft/harbor-workspace --data-dir /tmp/st")
+dbus-daemon[36]: [session uid=1000 pid=36 pidfd=5] Activating service name='org.freedesktop.impl.portal.PermissionStore' requested by ':1.2' (uid=1000 pid=85 comm="/usr/lib/xdg-desktop-portal")
+dbus-daemon[36]: [session uid=1000 pid=36 pidfd=5] Successfully activated service 'org.freedesktop.impl.portal.PermissionStore'
+dbus-daemon[36]: [session uid=1000 pid=36 pidfd=5] Activating service name='org.freedesktop.portal.Documents' requested by ':1.2' (uid=1000 pid=85 comm="/usr/lib/xdg-desktop-portal")
+dbus-daemon[36]: [session uid=1000 pid=36 pidfd=5] Successfully activated service 'org.freedesktop.portal.Documents'
+fuse: device /dev/fuse not found. Kernel module not loaded?
+error: fuse init failed: Can't mount path /tmp/runtime/doc
+
+(/usr/lib/xdg-desktop-portal:85): xdg-desktop-portal-WARNING **: 09:20:44.459: Document portal fuse mount point unknown: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name :1.4 was not provided by any .service files
+dbus-daemon[36]: [session uid=1000 pid=36 pidfd=5] Activating service name='org.freedesktop.impl.portal.desktop.gtk' requested by ':1.2' (uid=1000 pid=85 comm="/usr/lib/xdg-desktop-portal")
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:20:44.526: error: Could not connect: No such file or directory
+
+dbus-daemon[36]: [session uid=1000 pid=36 pidfd=5] Successfully activated service 'org.freedesktop.impl.portal.desktop.gtk'
+
+(/usr/lib/xdg-desktop-portal:85): xdg-desktop-portal-WARNING **: 09:20:44.594: Failed to create RealtimeKit proxy: Could not connect: No such file or directory
+[E] pw.loop [loop.c:70 pw_loop_new()] 0x560ca0f8b0e0: can't make support.system handle: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:85): xdg-desktop-portal-WARNING **: 09:20:44.601: Failed to connect to PipeWire: Couldn't create PipeWire main loop
+dbus-daemon[36]: [session uid=1000 pid=36 pidfd=5] Successfully activated service 'org.freedesktop.portal.Desktop'
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:20:53.953: Unhandled parent window type 
+
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:20:53.953: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gtk:104): Gtk-CRITICAL **: 09:20:54.457: gtk_widget_event: assertion 'WIDGET_REALIZED_FOR_EVENT (widget, event)' failed
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:21:07.487: Unhandled parent window type 
+
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:21:07.487: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:21:22.817: Unhandled parent window type 
+
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:21:22.818: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:21:37.498: Unhandled parent window type 
+
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:21:37.498: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:21:57.483: Unhandled parent window type 
+
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:21:57.483: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gtk:104): Gtk-CRITICAL **: 09:21:57.971: gtk_widget_event: assertion 'WIDGET_REALIZED_FOR_EVENT (widget, event)' failed
+
+(xdg-desktop-portal-gtk:104): Gtk-CRITICAL **: 09:21:57.977: gtk_widget_event: assertion 'WIDGET_REALIZED_FOR_EVENT (widget, event)' failed
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:22:13.097: Unhandled parent window type 
+
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:22:13.097: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:22:39.052: Unhandled parent window type 
+
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:22:39.052: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:23:14.821: Unhandled parent window type 
+
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:23:14.821: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gtk:104): Gtk-CRITICAL **: 09:23:15.319: gtk_widget_event: assertion 'WIDGET_REALIZED_FOR_EVENT (widget, event)' failed
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:23:23.517: Unhandled parent window type 
+
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:23:23.517: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:23:41.732: Unhandled parent window type 
+
+
+(xdg-desktop-portal-gtk:104): xdg-desktop-portal-gtk-WARNING **: 09:23:41.732: Failed to associate portal window with parent window 
+dbus-daemon[36]: [session uid=1000 pid=36 pidfd=5] Monitoring connection :1.0 closed.

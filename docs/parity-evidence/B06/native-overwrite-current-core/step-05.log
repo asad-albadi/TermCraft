@@ -1,0 +1,29 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ click 640 470
++ xdotool mousemove --sync 640 470 click 1
++ sleep .35
++ sleep .8
++ shot 11-race-target-rejected
++ import -window root /evidence/11-race-target-rejected.png
++ same /evidence/race-second-writer.txt /home/validation/Games/race.termcraft-game
+++ digest /evidence/race-second-writer.txt
+++ sha256sum /evidence/race-second-writer.txt
+++ cut '-d ' -f1
+++ digest /home/validation/Games/race.termcraft-game
+++ sha256sum /home/validation/Games/race.termcraft-game
+++ cut '-d ' -f1
++ test 302dfa3876e1b98de8edcb6460d630e5bb4124845c5c33dfeafce8c404f2663d = 302dfa3876e1b98de8edcb6460d630e5bb4124845c5c33dfeafce8c404f2663d
++ same /tmp/legacy.termcraft-game /home/validation/Games/race.old
+++ digest /tmp/legacy.termcraft-game
+++ sha256sum /tmp/legacy.termcraft-game
+++ cut '-d ' -f1
+++ digest /home/validation/Games/race.old
+++ sha256sum /home/validation/Games/race.old
+++ cut '-d ' -f1
++ test 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6 = 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6
++ no_temps
+++ find /home/validation/Games -maxdepth 1 -type f -name '.termcraft-*' -print
++ [[ -z '' ]]
++ sha256sum /home/validation/Games/close.termcraft-game /home/validation/Games/existing.termcraft-game /home/validation/Games/legacy.termcraft-game /home/validation/Games/race.old /home/validation/Games/race.termcraft-game

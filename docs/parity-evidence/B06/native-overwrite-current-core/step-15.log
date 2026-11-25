@@ -1,0 +1,120 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ overwrite_path close
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 290 31
++ xdotool mousemove --sync 290 31 click 1
++ sleep .35
++ wait_gtk 1
++ local count=1 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 1 ]]
++ return 0
++ gtk_focus
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ tail -1
++ xdotool windowfocus --sync 6307630
++ click 150 27
++ xdotool mousemove --sync 150 27 click 1
++ sleep .35
++ xdotool key ctrl+a
++ xdotool type --clearmodifiers /home/validation/Games/close.termcraft-game
++ sleep .8
++ xdotool key Return
++ wait_gtk 2
++ local count=2 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 2 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 2 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=2
++ [[ 2 == 2 ]]
++ return 0
++ gtk_replace
++ gtk_focus
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ tail -1
++ xdotool windowfocus --sync 6309617
++ click 751 503
++ xdotool mousemove --sync 751 503 click 1
++ sleep .35
++ wait_gtk 0
++ local count=0 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=0
++ :
++ [[ 0 == 0 ]]
++ return 0
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ sleep .5
++ shot 19-app-close-overwrite-modal
++ import -window root /evidence/19-app-close-overwrite-modal.png
++ same /tmp/legacy.termcraft-game /home/validation/Games/close.termcraft-game
+++ digest /tmp/legacy.termcraft-game
+++ sha256sum /tmp/legacy.termcraft-game
+++ cut '-d ' -f1
+++ digest /home/validation/Games/close.termcraft-game
+++ cut '-d ' -f1
+++ sha256sum /home/validation/Games/close.termcraft-game
++ test 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6 = 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
+++ head -1 /evidence/appwin
++ python /tmp/native-close.py 2097156
+Sent WM_DELETE_WINDOW to owned window 2097156
++ sleep .8
++ shot 20-native-close-changes-guard
++ import -window root /evidence/20-native-close-changes-guard.png
++ same /tmp/legacy.termcraft-game /home/validation/Games/close.termcraft-game
+++ digest /tmp/legacy.termcraft-game
+++ sha256sum /tmp/legacy.termcraft-game
+++ cut '-d ' -f1
+++ digest /home/validation/Games/close.termcraft-game
+++ cut '-d ' -f1
+++ sha256sum /home/validation/Games/close.termcraft-game
++ test 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6 = 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6
++ ps -eo pid,comm,args
++ for ns in user pid net ipc mnt
++ printf '%s ' user
++ readlink /proc/self/ns/user
++ for ns in user pid net ipc mnt
++ printf '%s ' pid
++ readlink /proc/self/ns/pid
++ for ns in user pid net ipc mnt
++ printf '%s ' net
++ readlink /proc/self/ns/net
++ for ns in user pid net ipc mnt
++ printf '%s ' ipc
++ readlink /proc/self/ns/ipc
++ for ns in user pid net ipc mnt
++ printf '%s ' mnt
++ readlink /proc/self/ns/mnt

@@ -1,0 +1,19 @@
+
+** (xdg-desktop-portal-gnome:72): WARNING **: 13:27:35.125: error: Could not connect: No such file or directory
+
+
+** (xdg-desktop-portal-gnome:72): WARNING **: 13:27:41.053: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gnome:72): Gtk-CRITICAL **: 13:27:41.190: Unable to connect to the accessibility bus at 'unix:path=/tmp/real-runtime/at-spi/bus': Could not connect: Connection refused
+
+** (xdg-desktop-portal-gnome:72): WARNING **: 13:27:47.769: Failed to associate portal window with parent window 
+
+** (xdg-desktop-portal-gnome:72): WARNING **: 13:27:50.948: Failed to associate portal window with parent window 
+
+** (xdg-desktop-portal-gnome:72): WARNING **: 13:27:52.676: Failed to associate portal window with parent window 
+
+** (xdg-desktop-portal-gnome:72): WARNING **: 13:27:53.759: Failed to stop screen cast session: GDBus.Error:org.freedesktop.DBus.Error.Failed: Session not started
+
+** (xdg-desktop-portal-gnome:72): WARNING **: 13:27:54.407: Failed to associate portal window with parent window 
+
+** (xdg-desktop-portal-gnome:72): WARNING **: 13:27:55.198: Failed to stop screen cast session: GDBus.Error:org.freedesktop.DBus.Error.Failed: Session not started

@@ -1,0 +1,3 @@
+Window 2097156
+  Position: 0,0 (screen: 0)
+  Geometry: 1360x880

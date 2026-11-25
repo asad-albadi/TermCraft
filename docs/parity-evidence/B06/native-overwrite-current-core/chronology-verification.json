@@ -1,0 +1,23 @@
+{
+  "approved_bytes": 345,
+  "approved_sha256": "cc81281280fbbbe3e4ae8ac62f513a7acf964b677f0d488bb9721620b9baa5eb",
+  "final_bytes": 359,
+  "final_actions": [
+    {
+      "Input": {
+        "Puzzle": {
+          "Move": {
+            "vertex": 2,
+            "x": 181,
+            "y": 654
+          }
+        }
+      }
+    },
+    "Undo",
+    "Redo",
+    "Undo",
+    "Redo"
+  ],
+  "same_integrity": true
+}

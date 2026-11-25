@@ -1,0 +1,11 @@
+{
+  "image": "sha256:1ab61a2bb16febd0a86829a43c26849b06ca82aca31be8385880cc7a3570c79d",
+  "owned_container": "termcraft-v08-clean-ns-213224fe159d",
+  "container_id": "3e2668b11e803494d4531b6558aa362c74d92466485798baa7d8fbb94bdac8ff",
+  "owned_container_removed": true,
+  "export_sha256": "6353fa53c015793f83ee64ae1a335fe2e6cf5ff1649af3696d6269165ed61798",
+  "extracted_regular_files": 27304,
+  "skipped_special_files": [],
+  "rootfs": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/v08-clean-namespace/rootfs",
+  "ownership": "extractor UID/GID; setuid/setgid stripped; special files skipped; absolute symlinks rewritten within root"
+}

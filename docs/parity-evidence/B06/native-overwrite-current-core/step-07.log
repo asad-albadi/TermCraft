@@ -1,0 +1,22 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ click 651 479
++ xdotool mousemove --sync 651 479 click 1
++ sleep .35
++ sleep .8
++ shot 14-approved-overwrite-saved
++ import -window root /evidence/14-approved-overwrite-saved.png
++ same /tmp/expected.termcraft-game /home/validation/Games/existing.termcraft-game
+++ digest /tmp/expected.termcraft-game
+++ sha256sum /tmp/expected.termcraft-game
+++ cut '-d ' -f1
+++ digest /home/validation/Games/existing.termcraft-game
+++ sha256sum /home/validation/Games/existing.termcraft-game
+++ cut '-d ' -f1
++ test cc81281280fbbbe3e4ae8ac62f513a7acf964b677f0d488bb9721620b9baa5eb = cc81281280fbbbe3e4ae8ac62f513a7acf964b677f0d488bb9721620b9baa5eb
++ cp /home/validation/Games/existing.termcraft-game /evidence/approved.termcraft-game
++ no_temps
+++ find /home/validation/Games -maxdepth 1 -type f -name '.termcraft-*' -print
++ [[ -z '' ]]
++ sha256sum /home/validation/Games/close.termcraft-game /home/validation/Games/existing.termcraft-game /home/validation/Games/legacy.termcraft-game /home/validation/Games/race.old /home/validation/Games/race.termcraft-game

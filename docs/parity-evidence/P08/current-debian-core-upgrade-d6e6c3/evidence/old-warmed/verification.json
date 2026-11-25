@@ -1,0 +1,9 @@
+{
+  "profile": "release",
+  "source_sha256": "4726eebadb56a15c2e9ed9f4018a63ffe9a55e9834ad927fea5472f2f2c29b53",
+  "manifest_files_verified": 1074,
+  "workspace_and_corrupt_bytes_preserved": true,
+  "native_gui_screenshots": true,
+  "helper_ready_and_sealed_child": true,
+  "uid": 1000
+}

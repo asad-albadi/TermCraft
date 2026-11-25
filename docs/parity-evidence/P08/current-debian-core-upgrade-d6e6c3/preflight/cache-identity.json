@@ -1,0 +1,14 @@
+{
+  "harbor-workspace": {
+    "copied_cache_file": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/build/package-app/release/harbor-workspace",
+    "sha256": "8e5923e7e48b402916d2953b8230bb00343d05370daef56a33e15a391fa06e65",
+    "sealed_old_native_manifest_sha256": "8e5923e7e48b402916d2953b8230bb00343d05370daef56a33e15a391fa06e65",
+    "match": true
+  },
+  "termcraft-rdp-engine": {
+    "copied_cache_file": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/build/package-helper/release/termcraft-rdp-engine",
+    "sha256": "3b8c82fb1c920cc473e0a0172e7e8e9dc62256539a690a1f847ada21ea04e883",
+    "sealed_old_native_manifest_sha256": "3b8c82fb1c920cc473e0a0172e7e8e9dc62256539a690a1f847ada21ea04e883",
+    "match": true
+  }
+}

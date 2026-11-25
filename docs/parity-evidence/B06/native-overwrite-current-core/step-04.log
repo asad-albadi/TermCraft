@@ -1,0 +1,93 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ overwrite_path race
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 290 31
++ xdotool mousemove --sync 290 31 click 1
++ sleep .35
++ wait_gtk 1
++ local count=1 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 1 ]]
++ return 0
++ gtk_focus
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ tail -1
++ xdotool windowfocus --sync 6296205
++ click 150 27
++ xdotool mousemove --sync 150 27 click 1
++ sleep .35
++ xdotool key ctrl+a
++ xdotool type --clearmodifiers /home/validation/Games/race.termcraft-game
++ sleep .8
++ xdotool key Return
++ wait_gtk 2
++ local count=2 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 2 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 2 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=2
++ [[ 2 == 2 ]]
++ return 0
++ shot 09-gtk-race-target-confirm
++ import -window root /evidence/09-gtk-race-target-confirm.png
++ gtk_replace
++ gtk_focus
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ tail -1
++ xdotool windowfocus --sync 6298093
++ click 751 503
++ xdotool mousemove --sync 751 503 click 1
++ sleep .35
++ wait_gtk 0
++ local count=0 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=0
++ :
++ [[ 0 == 0 ]]
++ return 0
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ sleep .5
++ shot 10-app-race-overwrite-modal
++ import -window root /evidence/10-app-race-overwrite-modal.png
++ same /tmp/legacy.termcraft-game /home/validation/Games/race.termcraft-game
+++ digest /tmp/legacy.termcraft-game
+++ sha256sum /tmp/legacy.termcraft-game
+++ cut '-d ' -f1
+++ digest /home/validation/Games/race.termcraft-game
+++ sha256sum /home/validation/Games/race.termcraft-game
+++ cut '-d ' -f1
++ test 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6 = 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6
++ mv -- /home/validation/Games/race.termcraft-game /home/validation/Games/race.old
++ printf 'Owned second writer changed the target while consent was pending.\n'
++ cp -- /home/validation/Games/race.termcraft-game /evidence/race-second-writer.txt
++ sha256sum /home/validation/Games/race.termcraft-game /home/validation/Games/race.old

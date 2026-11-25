@@ -1,0 +1,20 @@
+N 13:26:37.504962 wp-internal-comp-l ../wireplumber/lib/wp/private/internal-comp-loader.c:589:on_component_loaded: <WpCore:0x565108866390> optional component 'support.system-dbus [module: libwireplumber-module-dbus-connection]' failed to load: Failed to connect to bus: Could not connect: No such file or directory
+N 13:26:37.505038 wp-internal-comp-l ../wireplumber/lib/wp/private/internal-comp-loader.c:641:wp_component_array_load_task_execute_step: <WpCore:0x565108866390> skipping component 'support.modem-manager [module: libwireplumber-module-modem-manager]' because some of its dependencies were not loaded
+N 13:26:37.505049 wp-internal-comp-l ../wireplumber/lib/wp/private/internal-comp-loader.c:641:wp_component_array_load_task_execute_step: <WpCore:0x565108866390> skipping component 'hooks.device.profile.find-voice-call [script/lua: device/find-voice-call-profile.lua]' because some of its dependencies were not loaded
+N 13:26:37.538666 wp-internal-comp-l ../wireplumber/lib/wp/private/internal-comp-loader.c:589:on_component_loaded: <WpCore:0x565108866390> optional component 'support.logind [module: libwireplumber-module-logind]' failed to load: failed to start systemd logind monitor: -2 (No such file or directory)
+N 13:26:37.538721 wp-internal-comp-l ../wireplumber/lib/wp/private/internal-comp-loader.c:641:wp_component_array_load_task_execute_step: <WpCore:0x565108866390> skipping component 'monitor.bluez.seat-monitoring [virtual]' because some of its dependencies were not loaded
+E 13:26:37.543788           spa.dbus ../pipewire/spa/plugins/support/dbus.c:357:impl_connection_get: Failed to connect to system bus: Failed to connect to socket /run/dbus/system_bus_socket: No such file or directory
+E 13:26:37.543820         spa.bluez5 ../pipewire/spa/plugins/bluez5/bluez5-dbus.c:7489:impl_init: failed to get dbus connection
+N 13:26:37.544440          wp-device ../wireplumber/lib/wp/device.c:1035:wp_spa_device_new_from_spa_factory: SPA handle 'api.bluez5.enum.dbus' could not be loaded: Input/output error
+N 13:26:37.544475   s-monitors-bluez enumerate-device.lua:47:createMonitor: PipeWire's BlueZ SPA plugin is missing or broken. Bluetooth devices will not be supported.
+E 13:26:37.545048    spa.bluez5.midi ../pipewire/spa/plugins/bluez5/midi-enum.c:806:impl_init: Creating GDBus connection failed: Could not connect: No such file or directory
+N 13:26:37.545066          wp-device ../wireplumber/lib/wp/device.c:1035:wp_spa_device_new_from_spa_factory: SPA handle 'api.bluez5.midi.enum' could not be loaded: No such file or directory
+N 13:26:37.545080         s-monitors bluez-midi.lua:95:createMonitor: PipeWire's BlueZ MIDI SPA missing or broken. Bluetooth not supported.
+E 13:26:37.545233 spa.bluez5.midi.no ../pipewire/spa/plugins/bluez5/midi-node.c:1977:impl_init: failed to get dbus connection: Could not connect: No such file or directory
+E 13:26:37.545274        pw.resource ../pipewire/src/pipewire/resource.c:255:pw_resource_errorf_id: can't create node: Input/output error
+N 13:26:37.545284            wp-node ../wireplumber/lib/wp/node.c:998:wp_impl_node_new_from_pw_factory: failed to create node from factory 'spa-node-factory': Input/output error
+N 13:26:37.545297         s-monitors bluez-midi.lua:130:createServers: Failed to create BLE MIDI server.
+N 13:26:37.545687 wp-internal-comp-l ../wireplumber/lib/wp/private/internal-comp-loader.c:641:wp_component_array_load_task_execute_step: <WpCore:0x565108866390> skipping component 'monitor.camera.seat-monitoring [virtual]' because some of its dependencies were not loaded
+N 13:26:37.551783          wp-device ../wireplumber/lib/wp/device.c:1035:wp_spa_device_new_from_spa_factory: SPA handle 'api.libcamera.enum.manager' could not be loaded: No such file or directory
+N 13:26:37.551830 s-monitors-libcame enumerate-device.lua:33:createMonitor: PipeWire's libcamera SPA plugin is missing or broken. Some camera types may not be supported.
+W 13:26:44.593930  wp-client-context ../wireplumber/lib/wp/private/client-context.c:215:core_error: <WpClientContext:0x565108959a10> client context connection error: connection error

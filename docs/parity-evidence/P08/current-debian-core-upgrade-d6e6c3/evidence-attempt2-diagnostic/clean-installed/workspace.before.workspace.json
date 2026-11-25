@@ -1,0 +1,237 @@
+{
+  "sessions": [
+    {
+      "id": "owned-offline-profile",
+      "credential_ref": "owned-debian-fixture",
+      "gateway_credential_ref": null,
+      "name": "Owned upgrade fixture",
+      "ssh_engine": "Embedded",
+      "remote_backend": "Sftp",
+      "folder": "My sessions",
+      "protocol": "SSH",
+      "host": "127.0.0.1",
+      "user": "",
+      "port": 22,
+      "key": "",
+      "jump": "",
+      "x11": false,
+      "compression": true,
+      "command": "",
+      "directory": "",
+      "mosh_ssh_port": 22,
+      "baud": 9600,
+      "serial_device": "",
+      "fullscreen": false,
+      "view_only": false,
+      "width": 1280,
+      "height": 800,
+      "highlight_enabled": null,
+      "terminal": {
+        "font_family": null,
+        "font_size": null,
+        "light_palette": null,
+        "dark_palette": null,
+        "encoding": null,
+        "backspace": null,
+        "dimensions": null
+      }
+    }
+  ],
+  "shared_sources": [],
+  "tunnels": [],
+  "macros": [],
+  "preferences": {
+    "font_size": 19.0,
+    "terminal": null,
+    "highlight_enabled": true,
+    "highlight_rules": [],
+    "clipboard": {
+      "copy_on_select": false,
+      "right_click": "ContextMenu",
+      "word_delimiters": " \t./\\()[]{}<>:;,\"'`|"
+    },
+    "paste": {
+      "confirm_multiline": true,
+      "line_delay_ms": 0
+    },
+    "confirm_session_close": true,
+    "scrollback": 360000,
+    "appearance": "System",
+    "shell": "",
+    "downloads": "/tmp/qualification-home",
+    "sidebar_visible": true,
+    "sidebar_width": 226.0,
+    "layout": {
+      "preset": "Single",
+      "ratios": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "shortcuts": {
+      "bindings": [
+        {
+          "action": "NewSession",
+          "chord": {
+            "key": "N",
+            "command": true,
+            "ctrl": false,
+            "shift": false,
+            "alt": false
+          }
+        },
+        {
+          "action": "NewTerminal",
+          "chord": {
+            "key": "T",
+            "command": true,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "ToggleSidebar",
+          "chord": {
+            "key": "B",
+            "command": true,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "NextTab",
+          "chord": {
+            "key": "PageDown",
+            "command": true,
+            "ctrl": false,
+            "shift": false,
+            "alt": false
+          }
+        },
+        {
+          "action": "PreviousTab",
+          "chord": {
+            "key": "PageUp",
+            "command": true,
+            "ctrl": false,
+            "shift": false,
+            "alt": false
+          }
+        },
+        {
+          "action": "CloseTab",
+          "chord": {
+            "key": "W",
+            "command": true,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "Find",
+          "chord": {
+            "key": "F",
+            "command": true,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "Copy",
+          "chord": {
+            "key": "C",
+            "command": true,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "Paste",
+          "chord": {
+            "key": "V",
+            "command": true,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "LineUp",
+          "chord": {
+            "key": "Up",
+            "command": true,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "LineDown",
+          "chord": {
+            "key": "Down",
+            "command": true,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "PageUp",
+          "chord": {
+            "key": "PageUp",
+            "command": false,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "PageDown",
+          "chord": {
+            "key": "PageDown",
+            "command": false,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "HistoryStart",
+          "chord": {
+            "key": "Home",
+            "command": false,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "HistoryEnd",
+          "chord": {
+            "key": "End",
+            "command": false,
+            "ctrl": false,
+            "shift": true,
+            "alt": false
+          }
+        },
+        {
+          "action": "Fullscreen",
+          "chord": {
+            "key": "F11",
+            "command": false,
+            "ctrl": false,
+            "shift": false,
+            "alt": false
+          }
+        }
+      ]
+    }
+  }
+}

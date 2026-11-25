@@ -1,0 +1,12 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ xdotool mousemove --sync 120 100
++ sleep 2
++ shot 27-redraw
++ import -window root /evidence/27-redraw.png
+++ head -1 /evidence/appwin
++ xdotool getwindowgeometry 2097156

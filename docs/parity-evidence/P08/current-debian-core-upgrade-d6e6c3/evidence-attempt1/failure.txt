@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/scripts/run-qualification.py", line 28, in <module>
+    ex('clean-installed-startup',common+['python3','/driver/runtime-smoke.py','clean-installed',source])
+    ~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/scripts/run-qualification.py", line 13, in ex
+    def ex(key,args,check=True):return run(key,['docker','exec',name,*args],check)
+                                       ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/scripts/run-qualification.py", line 7, in run
+    if check and p.returncode:raise RuntimeError(key)
+                              ^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: clean-installed-startup

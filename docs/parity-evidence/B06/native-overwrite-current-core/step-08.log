@@ -1,0 +1,92 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 60 70
++ xdotool mousemove --sync 60 70 click 1
++ sleep .35
++ sleep .8
++ shot 15-seed2-after-new
++ import -window root /evidence/15-seed2-after-new.png
++ open_game existing
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 360 31
++ xdotool mousemove --sync 360 31 click 1
++ sleep .35
++ wait_gtk 1
++ local count=1 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 1 ]]
++ return 0
++ gtk_focus
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ tail -1
++ xdotool windowfocus --sync 6301969
++ xdotool key ctrl+l
++ sleep .3
++ xdotool type --clearmodifiers /home/validation/Games/existing.termcraft-game
++ sleep .6
++ xdotool key Return
++ wait_gtk 0
++ local count=0 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ wc -l
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=0
++ :
++ [[ 0 == 0 ]]
++ return 0
++ sleep .8
++ shot 16-overwritten-game-loaded
++ import -window root /evidence/16-overwritten-game-loaded.png
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 202 70
++ xdotool mousemove --sync 202 70 click 1
++ sleep .35
++ shot 17-overwritten-game-undo
++ import -window root /evidence/17-overwritten-game-undo.png
++ click 263 70
++ xdotool mousemove --sync 263 70 click 1
++ sleep .35
++ shot 18-overwritten-game-redo-dirty
++ import -window root /evidence/18-overwritten-game-redo-dirty.png

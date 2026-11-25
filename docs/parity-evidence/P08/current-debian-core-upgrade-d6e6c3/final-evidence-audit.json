@@ -1,0 +1,22 @@
+{
+  "result": "pass",
+  "all_runtime_commands_exit_zero": 40,
+  "independent_before_after_file_comparisons": 16,
+  "lifecycle_hash_list_equality": [
+    "userdata-initial",
+    "clean-remove-preserved",
+    "userdata-old-baseline",
+    "removed-preserved",
+    "userdata-final"
+  ],
+  "owned_container_inventory_empty": true,
+  "inventory_command": [
+    "docker",
+    "ps",
+    "-a",
+    "--filter",
+    "label=org.termcraft.validation=current-debian-upgrade",
+    "--format",
+    "{{.ID}} {{.Names}}"
+  ]
+}

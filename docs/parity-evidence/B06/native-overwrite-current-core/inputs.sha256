@@ -1,0 +1,19 @@
+73ebdf5d695ad2d3a84c3522aacbc1b13046619378ea25ed601055523ac45ae9  /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/build/out/TermCraft-0.1.0-linux-x86_64.tar.gz
+488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6  /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/native-game-overwrite-verification/legacy.termcraft-game
+cc81281280fbbbe3e4ae8ac62f513a7acf964b677f0d488bb9721620b9baa5eb  /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/native-game-overwrite-verification/expected.termcraft-game
+26b82706c068c8de1263f60b0448869adb0dcc501cb6b078ccdcbd30cba58de5  /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-current-debian-core-qualified/73ebdf5d695ad2d3a84c3522aacbc1b13046619378ea25ed601055523ac45ae9/TermCraft-0.1.0-linux-x86_64/harbor-workspace
+bc5af437d7888afe5f17c5764a83e97794c446b21b61fb57fa0c3f4099676561  /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-current-debian-core-qualified/73ebdf5d695ad2d3a84c3522aacbc1b13046619378ea25ed601055523ac45ae9/TermCraft-0.1.0-linux-x86_64/PACKAGE-MANIFEST.json
+68d288d1fc8c5ad684cf6f122e4bbabf2afc8135654e70a814e37aa9ca42f333  /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/v08-clean-namespace/rootfs/usr/bin/Xvfb
+14e9829742c6aa3db54ed18a4a73e113458d70f6eb03f5b0a0f3dee9070ca0d9  /usr/lib/xdg-desktop-portal
+0eda6ee6327e0c3886cd4edba7517baa8c85a5df40c161b07325ad05a8354ec8  /usr/lib/xdg-desktop-portal-gtk
+65898e4f5c523e85631515c17bf40270d169797214233bb036de276f9ddde9be  /usr/lib/xdg-permission-store
+6885c23b96e63309008b960e1c65836432ac5b5485c91737d25d0e54b937fa3a  /usr/lib/xdg-document-portal
+21ca2b7e07e15a4ca953e9ca5f9891f12ce5e1422a54eb78c4a712e9a7ebf0e5  /usr/lib/libpipewire-0.3.so.0
+e7a1a52555f6963674fe86674df6dd5c7ae6bbf82b9176b757ba20d6e7939533  /usr/lib/libfuse3.so.4
+6c31d85adc3d252b1b22d42d1ada203f2346cc06d40850879e633396bbe2a3c9  /usr/lib/liburing.so.2
+847c5f5afbe586c2a7592c344080caf3268846af1f3be90175447e12791fad51  /usr/lib/libnuma.so.1
+14638c2f8c9b42e6d1d1556c390bbc8c1f85bdea8000ba5d90a6d05f59efb399  /usr/share/dbus-1/services/org.freedesktop.portal.Desktop.service
+5be03b6510e8cd64a152fdadb250fd54061a1a82abf094b66d3ac48347308802  /usr/share/dbus-1/services/org.freedesktop.portal.Documents.service
+5060e4115876d5fbbf4916ab28bc85e3c4b0524726efe3464ed3dbd7ef219a77  /usr/share/dbus-1/services/org.freedesktop.impl.portal.PermissionStore.service
+0d09b9b9bf1495c336ad86d371a05004485246c8822c0260f3b5492ca6d201ac  /usr/share/dbus-1/services/org.freedesktop.impl.portal.desktop.gtk.service
+7b39a5f7f27c8c8ceb82c2937a981e58bdd6081cd332417285f8acadb13af495  /usr/share/xdg-desktop-portal/portals/gtk.portal

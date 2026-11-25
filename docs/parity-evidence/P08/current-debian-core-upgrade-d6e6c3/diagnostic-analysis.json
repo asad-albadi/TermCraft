@@ -1,0 +1,11 @@
+{
+  "only_json_difference": {
+    "path": "preferences.sidebar_width",
+    "before": 226.0,
+    "after": 277.0
+  },
+  "all_other_json_values_equal": true,
+  "vault_before_after_equal": true,
+  "product_change_required": false,
+  "final_assertions_still_strict_byte_equality": true
+}

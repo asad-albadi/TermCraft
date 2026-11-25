@@ -1,0 +1,96 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 252 58
++ xdotool mousemove --sync 252 58 click 1
++ sleep .35
++ shot 01-games-menu
++ import -window root /evidence/01-games-menu.png
++ click 263 551
++ xdotool mousemove --sync 263 551 click 1
++ sleep .35
++ shot 02-seed1-before-load
++ import -window root /evidence/02-seed1-before-load.png
++ open_game legacy
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 360 31
++ xdotool mousemove --sync 360 31 click 1
++ sleep .35
++ wait_gtk 1
++ local count=1 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 1 ]]
++ return 0
++ gtk_focus
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ tail -1
++ xdotool windowfocus --sync 6291464
++ xdotool key ctrl+l
++ sleep .3
++ xdotool type --clearmodifiers /home/validation/Games/legacy.termcraft-game
++ sleep .6
++ xdotool key Return
++ wait_gtk 0
++ local count=0 n j
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
+++ wc -l
++ n=1
++ [[ 1 == 0 ]]
++ sleep .15
++ for j in {1..40}
+++ gtk
+++ wc -l
+++ xdotool search --onlyvisible --class xdg-desktop-portal-gtk
++ n=0
++ :
++ [[ 0 == 0 ]]
++ return 0
++ sleep .8
++ shot 03-legacy-game-loaded
++ import -window root /evidence/03-legacy-game-loaded.png
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 202 70
++ xdotool mousemove --sync 202 70 click 1
++ sleep .35
++ shot 04-legacy-undo
++ import -window root /evidence/04-legacy-undo.png
++ click 263 70
++ xdotool mousemove --sync 263 70 click 1
++ sleep .35
++ shot 05-legacy-redo-dirty
++ import -window root /evidence/05-legacy-redo-dirty.png

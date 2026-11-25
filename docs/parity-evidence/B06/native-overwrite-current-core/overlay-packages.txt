@@ -1,0 +1,13 @@
+/usr/lib/xdg-desktop-portal is owned by xdg-desktop-portal 1.22.1-2.1
+/usr/lib/xdg-desktop-portal-gtk is owned by xdg-desktop-portal-gtk 1.15.3-2.1
+/usr/lib/xdg-permission-store is owned by xdg-desktop-portal 1.22.1-2.1
+/usr/lib/xdg-document-portal is owned by xdg-desktop-portal 1.22.1-2.1
+/usr/lib/libpipewire-0.3.so.0 is owned by libpipewire 1:1.6.11-1
+/usr/lib/libfuse3.so.4 is owned by fuse3 3.18.3-1.1
+/usr/lib/liburing.so.2 is owned by liburing 2.15-1.1
+/usr/lib/libnuma.so.1 is owned by numactl 2.0.19-1
+/usr/share/dbus-1/services/org.freedesktop.portal.Desktop.service is owned by xdg-desktop-portal 1.22.1-2.1
+/usr/share/dbus-1/services/org.freedesktop.portal.Documents.service is owned by xdg-desktop-portal 1.22.1-2.1
+/usr/share/dbus-1/services/org.freedesktop.impl.portal.PermissionStore.service is owned by xdg-desktop-portal 1.22.1-2.1
+/usr/share/dbus-1/services/org.freedesktop.impl.portal.desktop.gtk.service is owned by xdg-desktop-portal-gtk 1.15.3-2.1
+/usr/share/xdg-desktop-portal/portals/gtk.portal is owned by xdg-desktop-portal-gtk 1.15.3-2.1

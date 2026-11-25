@@ -1,0 +1,21 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ click 511 470
++ xdotool mousemove --sync 511 470 click 1
++ sleep .35
++ sleep .8
++ shot 08-keep-existing-canceled
++ import -window root /evidence/08-keep-existing-canceled.png
++ same /tmp/legacy.termcraft-game /home/validation/Games/existing.termcraft-game
+++ digest /tmp/legacy.termcraft-game
+++ sha256sum /tmp/legacy.termcraft-game
+++ cut '-d ' -f1
+++ digest /home/validation/Games/existing.termcraft-game
+++ sha256sum /home/validation/Games/existing.termcraft-game
+++ cut '-d ' -f1
++ test 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6 = 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6
++ no_temps
+++ find /home/validation/Games -maxdepth 1 -type f -name '.termcraft-*' -print
++ [[ -z '' ]]
++ sha256sum /home/validation/Games/close.termcraft-game /home/validation/Games/existing.termcraft-game /home/validation/Games/legacy.termcraft-game /home/validation/Games/race.termcraft-game

@@ -1,0 +1,19 @@
+{
+  "result": "pass",
+  "archive_sha256": "73ebdf5d695ad2d3a84c3522aacbc1b13046619378ea25ed601055523ac45ae9",
+  "manifest_files_independently_hashed": 1074,
+  "source_sha256": "d6e6c3aca99a068aedc0479cb376a7d0927a4b2847ef3b0aed8e7d6d88a2e7d9",
+  "runtime_manifest_keys": [
+    "artifact_declarations",
+    "linked_libraries",
+    "linux_display_libraries",
+    "managed_vnc_browser",
+    "optional_installed_clients",
+    "optional_native_providers",
+    "platform_requirements",
+    "remote_requirements"
+  ],
+  "app_sha256": "26b82706c068c8de1263f60b0448869adb0dcc501cb6b078ccdcbd30cba58de5",
+  "helper_sha256": "3c98e3ec640424ac7b847aafa03792c39d1c7400ada1a8ba5fbe2225819b06eb",
+  "all_runtime_commands_exit_zero": true
+}

@@ -2,7 +2,7 @@
 
 Reviewed: 2026-11-23. Baseline: the supplied MobaXterm Personal 26.6 target, TermCraft's current source, and MobaXterm's public documentation. Public documentation is not pinned to 26.6; version-sensitive requirements need original-runtime confirmation.
 
-This began as the 2026-11-23 gap inventory. Current reviewed implementation and evidence are recorded in PARITY_PROGRESS.md and FEATURE_PARITY.md; 45/60 implementation checkpoints (75.0%) are present, while full native/original parity remains unverified. Unchecked outcomes retain their outstanding scope rather than erasing implemented subsets.
+This began as the 2026-11-23 gap inventory. Current reviewed implementation and evidence are recorded in PARITY_PROGRESS.md and FEATURE_PARITY.md; 46/60 implementation checkpoints (76.7%) are present, while full native/original parity remains unverified. Unchecked outcomes retain their outstanding scope rather than erasing implemented subsets.
 
 Execution status and evidence: [PARITY_PROGRESS.md](PARITY_PROGRESS.md).
 

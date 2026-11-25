@@ -1,0 +1,4 @@
+73ebdf5d695ad2d3a84c3522aacbc1b13046619378ea25ed601055523ac45ae9
+d6e6c3aca99a068aedc0479cb376a7d0927a4b2847ef3b0aed8e7d6d88a2e7d9
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/current-debian-upgrade/build/out/TermCraft-0.1.0-linux-x86_64.tar.gz
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-current-debian-core-qualified/73ebdf5d695ad2d3a84c3522aacbc1b13046619378ea25ed601055523ac45ae9/TermCraft-0.1.0-linux-x86_64

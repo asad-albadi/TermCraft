@@ -122,7 +122,7 @@ Read [Parity contracts](2026-11-23-parity-contracts.md) before any subsystem pla
 | V05 | [Native Windows and macOS workflows](2026-11-23-10-validation.md#task-v05-native-windows-and-macos-workflows) | Planned; not implemented |
 | V06 | [Linux X11/Wayland, scale, clipboard and live theme](2026-11-23-10-validation.md#task-v06-linux-x11wayland-scale-clipboard-and-live-theme) | Planned; not implemented |
 | V07 | [Original Personal 26.6 comparison](2026-11-23-10-validation.md#task-v07-original-personal-266-comparison) | Planned; not implemented |
-| V08 | [Clean-machine packaging, upgrades and persistence](2026-11-23-10-validation.md#task-v08-clean-machine-packaging-upgrades-and-persistence) | Planned; not implemented |
+| V08 | [Clean-machine packaging, upgrades and persistence](2026-11-23-10-validation.md#task-v08-clean-machine-packaging-upgrades-and-persistence) | Reviewed implementation checkpoint; native/original validation pending |
 
 ## Execution record per point
 

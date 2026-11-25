@@ -1,0 +1,153 @@
+XDP: load portals from /tmp/real-data/xdg-desktop-portal/portals
+XDP: loading /tmp/real-data/xdg-desktop-portal/portals/gnome.portal
+XDP: portal implementation supports org.freedesktop.impl.portal.Access
+XDP: portal implementation supports org.freedesktop.impl.portal.Account
+XDP: portal implementation supports org.freedesktop.impl.portal.AppChooser
+XDP: portal implementation supports org.freedesktop.impl.portal.Background
+XDP: portal implementation supports org.freedesktop.impl.portal.Clipboard
+XDP: portal implementation supports org.freedesktop.impl.portal.DynamicLauncher
+XDP: portal implementation supports org.freedesktop.impl.portal.FileChooser
+XDP: portal implementation supports org.freedesktop.impl.portal.GlobalShortcuts
+XDP: portal implementation supports org.freedesktop.impl.portal.InputCapture
+XDP: portal implementation supports org.freedesktop.impl.portal.Lockdown
+XDP: portal implementation supports org.freedesktop.impl.portal.Notification
+XDP: portal implementation supports org.freedesktop.impl.portal.Print
+XDP: portal implementation supports org.freedesktop.impl.portal.RemoteDesktop
+XDP: portal implementation supports org.freedesktop.impl.portal.ScreenCast
+XDP: portal implementation supports org.freedesktop.impl.portal.Screenshot
+XDP: portal implementation supports org.freedesktop.impl.portal.Settings
+XDP: portal implementation supports org.freedesktop.impl.portal.Usb
+XDP: portal implementation supports org.freedesktop.impl.portal.Wallpaper
+XDP: Looking for portals configuration in '/tmp/real-data/xdg-desktop-portal/portals/gnome-portals.conf'
+XDP: Looking for portals configuration in '/tmp/real-data/xdg-desktop-portal/portals/portals.conf'
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.532: Document portal fuse mount point unknown: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name :1.11 was not provided by any .service files
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.532: Choosing gnome.portal for org.freedesktop.impl.portal.Lockdown via the deprecated UseIn key
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.532: The preferred method to match portal implementations to desktop environments is to use the portals.conf(5) configuration file
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Lockdown in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.534: Choosing gnome.portal for org.freedesktop.impl.portal.Access via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Access in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.MemoryMonitor
+XDP: Providing portal org.freedesktop.portal.PowerProfileMonitor
+XDP: Providing portal org.freedesktop.portal.NetworkMonitor
+XDP: Providing portal org.freedesktop.portal.ProxyResolver
+XDP: Providing portal org.freedesktop.portal.Trash
+XDP: Providing portal org.freedesktop.portal.GameMode
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.543: Failed to create RealtimeKit proxy: Could not connect: No such file or directory
+XDP: Providing portal org.freedesktop.portal.Realtime
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.543: Choosing gnome.portal for org.freedesktop.impl.portal.Settings via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Settings in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Settings
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.544: Choosing gnome.portal for org.freedesktop.impl.portal.FileChooser via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.FileChooser in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.FileChooser
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.545: Choosing gnome.portal for org.freedesktop.impl.portal.AppChooser via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.AppChooser in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.OpenURI
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.546: Choosing gnome.portal for org.freedesktop.impl.portal.Print via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Print in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Print
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.547: Choosing gnome.portal for org.freedesktop.impl.portal.Notification via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Notification in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Notification
+XDP: Providing portal org.freedesktop.portal.Location
+XDP: Providing portal org.freedesktop.portal.Camera
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.551: Choosing gnome.portal for org.freedesktop.impl.portal.Screenshot via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Screenshot in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Screenshot
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.552: Choosing gnome.portal for org.freedesktop.impl.portal.Background via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Background in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Background
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.553: Choosing gnome.portal for org.freedesktop.impl.portal.Wallpaper via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Wallpaper in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Wallpaper
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.554: Choosing gnome.portal for org.freedesktop.impl.portal.Account via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Account in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Account
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.555: Choosing gnome.portal for org.freedesktop.impl.portal.GlobalShortcuts via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.GlobalShortcuts in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.GlobalShortcuts
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.556: Choosing gnome.portal for org.freedesktop.impl.portal.DynamicLauncher via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.DynamicLauncher in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.DynamicLauncher
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.556: Choosing gnome.portal for org.freedesktop.impl.portal.ScreenCast via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.ScreenCast in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.ScreenCast
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.557: Choosing gnome.portal for org.freedesktop.impl.portal.RemoteDesktop via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.RemoteDesktop in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.RemoteDesktop
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.558: Choosing gnome.portal for org.freedesktop.impl.portal.Clipboard via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Clipboard in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Clipboard
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.559: Choosing gnome.portal for org.freedesktop.impl.portal.InputCapture via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.InputCapture in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.InputCapture
+
+(/usr/lib/xdg-desktop-portal:92): xdg-desktop-portal-WARNING **: 13:25:47.560: Choosing gnome.portal for org.freedesktop.impl.portal.Usb via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Usb in gnome (fallback)
+XDP: [usb] Initializing USB portal
+XDP: Assigned unique ID EP_RhR3p_xmrVzsDTofU4g to USB device /sys/devices/pci0000:00/0000:00:02.2/0000:02:00.4/usb2
+XDP: Assigned unique ID vPuqlWzIoZqr7vVGBcsbng to USB device /sys/devices/pci0000:00/0000:00:02.7/0000:06:00.0/usb6
+XDP: Assigned unique ID 8rW_9K9tVClF5d_cbQGNyw to USB device /sys/devices/pci0000:00/0000:00:02.7/0000:06:00.0/usb6/6-2
+XDP: Assigned unique ID WYEI9H0JpnfaOs14yhjeCA to USB device /sys/devices/pci0000:00/0000:00:02.7/0000:06:00.0/usb7
+XDP: Assigned unique ID MXf9L6RtKGBSO6bEOJy4VQ to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.3/usb1
+XDP: Assigned unique ID y3P6FD5rSsjFsWla395LyA to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.3/usb1/1-2
+XDP: Assigned unique ID 5SgfllxMB9N_qdLShv6r4w to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.3/usb1/1-4
+XDP: Assigned unique ID MMUBflnpNYzEeYwczDYGzw to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.3/usb3
+XDP: Assigned unique ID eax8hQZTMzHDde_CrI2sHw to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.4/usb4
+XDP: Assigned unique ID 5t0EPCO86qdt8s_Z5gD3gw to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.4/usb4/4-3
+XDP: Assigned unique ID pp6BPLp9K1oOduuSg19ntw to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.4/usb4/4-4
+XDP: Assigned unique ID sR44GCKAGoMz4YYbzfegog to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.4/usb5
+XDP: Providing portal org.freedesktop.portal.Usb
+XDP: Providing portal org.freedesktop.host.portal.Registry
+XDP: org.freedesktop.portal.Desktop acquired
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.18
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.20
+XDP: remote desktop session owned by ':1.20' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: remote desktop session owned by ':1.20' started
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.20
+XDP: remote desktop session owned by ':1.20' closed
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.20
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.22
+XDP: screen cast session owned by ':1.22' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.22
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.22

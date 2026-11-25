@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/driver/runtime-smoke.py", line 19, in <module>
+    after={p.name:smoke.sha256(p) for p in directory.iterdir() if p.name in ('workspace.json','credentials.vault')};assert before==after,(name,before,after)
+                                                                                                                           ^^^^^^^^^^^^^
+AssertionError: ('workspace', {'credentials.vault': '0b9598f59161c1a3c268b9f22abc19350f3f11b63df1b980cf3bb7281b9c7de1', 'workspace.json': '71c26d99fc99c6548ccc7ad7792f07c213e01d036452789608fc4d066a640f4f'}, {'credentials.vault': '0b9598f59161c1a3c268b9f22abc19350f3f11b63df1b980cf3bb7281b9c7de1', 'workspace.json': 'a59559c214f085d441a0ef58c87ca4cec85d72a59263bfeca90fb16787b3adfc'})

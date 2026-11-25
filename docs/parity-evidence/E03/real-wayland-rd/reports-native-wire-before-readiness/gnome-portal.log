@@ -1,0 +1,9 @@
+
+** (xdg-desktop-portal-gnome:70): WARNING **: 13:25:46.800: error: Could not connect: No such file or directory
+
+
+** (xdg-desktop-portal-gnome:70): WARNING **: 13:25:52.351: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gnome:70): Gtk-CRITICAL **: 13:25:52.478: Unable to connect to the accessibility bus at 'unix:path=/tmp/real-runtime/at-spi/bus': Could not connect: Connection refused
+
+** (xdg-desktop-portal-gnome:70): WARNING **: 13:25:59.105: Failed to associate portal window with parent window 

@@ -1,0 +1,23 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ same /evidence/21-before-cancel-files.sha256 /evidence/21-after-cancel-files.sha256
+++ digest /evidence/21-before-cancel-files.sha256
+++ sha256sum /evidence/21-before-cancel-files.sha256
+++ cut '-d ' -f1
+++ digest /evidence/21-after-cancel-files.sha256
+++ sha256sum /evidence/21-after-cancel-files.sha256
+++ cut '-d ' -f1
++ test 810a9529ea83a830ac825c5640f9cc71bf5ec31d41552528f2aea5b3cb03fd52 = 810a9529ea83a830ac825c5640f9cc71bf5ec31d41552528f2aea5b3cb03fd52
++ no_temps
+++ find /home/validation/Games -maxdepth 1 -type f -name '.termcraft-*' -print
++ [[ -z '' ]]
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
++ click 361 31
++ xdotool mousemove --sync 361 31 click 1
++ sleep .35
++ sleep .5
++ shot 22-load-unsaved-guard
++ import -window root /evidence/22-load-unsaved-guard.png

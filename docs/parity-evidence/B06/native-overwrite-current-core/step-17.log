@@ -1,0 +1,49 @@
++ source /tmp/actions.sh
+++ set -euo pipefail
+++ owned=/home/validation/Games
++ sha256sum /home/validation/Games/close.termcraft-game /home/validation/Games/existing.termcraft-game /home/validation/Games/final-state.termcraft-game /home/validation/Games/invalid.termcraft-game /home/validation/Games/legacy.termcraft-game /home/validation/Games/race.old /home/validation/Games/race.termcraft-game
++ for ns in user pid net ipc mnt
++ printf '%s ' user
++ readlink /proc/self/ns/user
++ for ns in user pid net ipc mnt
++ printf '%s ' pid
++ readlink /proc/self/ns/pid
++ for ns in user pid net ipc mnt
++ printf '%s ' net
++ readlink /proc/self/ns/net
++ for ns in user pid net ipc mnt
++ printf '%s ' ipc
++ readlink /proc/self/ns/ipc
++ for ns in user pid net ipc mnt
++ printf '%s ' mnt
++ readlink /proc/self/ns/mnt
++ ps -eo pid,comm,args
++ app
+++ head -1 /evidence/appwin
++ xdotool windowfocus --sync 2097156
+++ head -1 /evidence/appwin
++ python /tmp/native-close.py 2097156
+Sent WM_DELETE_WINDOW to owned window 2097156
++ sleep 1
++ xdotool search --onlyvisible --name 'TermCraft — Remote workspace'
++ shot 31-clean-native-close
++ import -window root /evidence/31-clean-native-close.png
++ same /tmp/legacy.termcraft-game /home/validation/Games/close.termcraft-game
+++ digest /tmp/legacy.termcraft-game
+++ sha256sum /tmp/legacy.termcraft-game
+++ cut '-d ' -f1
+++ digest /home/validation/Games/close.termcraft-game
+++ sha256sum /home/validation/Games/close.termcraft-game
+++ cut '-d ' -f1
++ test 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6 = 488408ad1b4164a564d097374b5fcbc7c90c93bd0564925723669b070d908fb6
++ same /tmp/expected.termcraft-game /home/validation/Games/existing.termcraft-game
+++ digest /tmp/expected.termcraft-game
+++ sha256sum /tmp/expected.termcraft-game
+++ cut '-d ' -f1
+++ digest /home/validation/Games/existing.termcraft-game
+++ sha256sum /home/validation/Games/existing.termcraft-game
+++ cut '-d ' -f1
++ test cc81281280fbbbe3e4ae8ac62f513a7acf964b677f0d488bb9721620b9baa5eb = cc81281280fbbbe3e4ae8ac62f513a7acf964b677f0d488bb9721620b9baa5eb
++ no_temps
+++ find /home/validation/Games -maxdepth 1 -type f -name '.termcraft-*' -print
++ [[ -z '' ]]
