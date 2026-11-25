@@ -1,0 +1,31 @@
+   Compiling final-wayland-idle-helper-private v0.1.0-idle-fix.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-packaged-wayland-vnc/idle-fix-source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.88s
+     Running unittests src/lib.rs (target/debug/deps/termcraft_wayland_engine-4a8877ec910e0641)
+
+running 4 tests
+test capture::tests::missing_initial_frame_still_times_out ... ok
+test capture::tests::finished_worker_never_reuses_cached_pixels ... FAILED
+test capture::tests::native_stream_failure_never_reuses_cached_pixels ... ok
+test capture::tests::idle_damage_driven_stream_keeps_last_valid_frame ... FAILED
+
+failures:
+
+---- capture::tests::finished_worker_never_reuses_cached_pixels stdout ----
+
+thread 'capture::tests::finished_worker_never_reuses_cached_pixels' (235434) panicked at src/capture.rs:376:9:
+transport worker exit must invalidate cached video
+
+---- capture::tests::idle_damage_driven_stream_keeps_last_valid_frame stdout ----
+
+thread 'capture::tests::idle_damage_driven_stream_keeps_last_valid_frame' (235435) panicked at src/capture.rs:354:37:
+unchanged screen is not a failed stream: Custom { kind: Other, error: "Selected portal video stream timed out" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    capture::tests::finished_worker_never_reuses_cached_pixels
+    capture::tests::idle_damage_driven_stream_keeps_last_valid_frame
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

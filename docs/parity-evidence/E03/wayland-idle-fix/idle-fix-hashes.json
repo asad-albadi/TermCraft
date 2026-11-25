@@ -1,0 +1,6 @@
+{
+  "original_sha256": "b64f62718a1b9ee03f67cbb8ffd491ad86e2594990cce8deacf398168b3bec95",
+  "candidate_sha256": "b39b189a8bd14025c5f0042563b046fa691ce9568151ad2d6789e33e0e3f40b6",
+  "production_changed": false,
+  "candidate_version": "0.1.0-idle-fix.1"
+}

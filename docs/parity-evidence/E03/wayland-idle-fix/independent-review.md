@@ -1,0 +1,25 @@
+# Scoped Wayland static-desktop idle fix review
+
+SPEC: ACCEPT. QUALITY: ACCEPT. No actionable finding in this one-file candidate. This approves mechanical integration of the reviewed capture.rs bytes; it does not qualify a newly built helper, final package or actual GUI Stop/backend-loss behavior. The still-open genuine packaged VNC workflow remains local work. Implementation count46/60 (76.7%) and strict parity0/60 are unchanged.
+
+Candidate: target/agent-work/final-packaged-wayland-vnc/idle-fix-source/src/capture.rs, SHA256 **b39b189a8bd14025c5f0042563b046fa691ce9568151ad2d6789e33e0e3f40b6**. Current MAIN preimage engines/wayland/src/capture.rs remains **b64f62718a1b9ee03f67cbb8ffd491ad86e2594990cce8deacf398168b3bec95**. MAIN not edited. No additional agents or fix implementation.
+
+## Correctness and scope
+
+At candidate lines48–69, native Slot.error or an exited owned worker is rejected before cached pixels can be returned. The existing latest-slot bounds and decoded-frame validity are unchanged. Five-second no-initial-frame acquisition error remains at66–68. After a valid frame, an unchanged revision is not a transport failure: retaining the last valid pixels correctly accommodates a compositor emitting only on damage. Revision/clock tracking is otherwise unchanged. No arbitrary timeout extension, fake frame or unbounded history was added.
+
+An exited worker was previously able to leave apparently usable cached pixels when run returned Ok on cancellation; the new is_finished check closes that stale-worker case. The check also detects normal completion and panic (subject to existing poisoned-Mutex panic behavior, which terminates rather than publishing an unchecked frame). Native stream/core error callbacks still set Slot.error; no error is cleared. As with any asynchronous liveness observation, this is not a guarantee that a worker cannot fail immediately after the check. The fix does not claim such a guarantee.
+
+Cancellation/drop remains bounded through existing run-loop stop/cancel/error checks with20ms native iteration and Drop's owned-worker join. No new wait, retained thread or descriptor was introduced. At the actual integration boundary, normal helper main.rs lines37–45 emits a valid cached TVF1 frame every33ms even when native damage ceases; therefore app-side frame IPC still gets updates and its existing five-second frame-receipt bounds are not disabled. App helper Child::try_wait, malformed/EOF IPC errors, kill/wait and reader cancellation remain unchanged. Source::capture calls portal.ensure_active before every frame retrieval (src/services/vnc/wayland.rs95); portal session-closed and cancellation checks remain authoritative before returning video. Parent Stop/session revocation is not replaced by a pixel-age inference.
+
+A totally silent live transport with no error or session closure is indistinguishable from a healthy static desktop using these signals. Removing the damage-age false positive is appropriate; a new damage-age failure would reproduce the proven bug. Detecting a genuinely wedged but otherwise silent native backend would require an independent liveness protocol and is outside this correction. Actual final backend loss/revocation, idle>5s and GUI Stop must still be executed with the integrated genuine helper.
+
+## Independent verification
+
+- Rehashed all **723** RED-EVIDENCE-SHA256 entries successfully, including source, patch, test logs, genuine idle reproduction and reported screenshots/traces. Recomputed both declared original/candidate hashes.
+- Applied exact idle-fix.patch to a private copy of current MAIN preimage; result equals candidate byte-for-byte. Only src/capture.rs differs between private and production engine src trees. Private package/bin identity changes are separate harness metadata.
+- Inspected RED log:2 passed /2 failed. The failures are exactly healthy static cached-frame timeout and finished-worker cache acceptance; the no-initial-frame timeout and native-error rejection controls already pass.
+- Independently compiled and ran the complete candidate engine library suite in a reviewer-only target directory: `CARGO_BUILD_JOBS=2 cargo test --manifest-path .../idle-fix-source/Cargo.toml --target-dir .../wayland-idle-review/build --lib --offline --locked -j 2`. Exit0, **6 passed,0 failed,0 ignored**. Fresh output retained in fresh-tests.log. This is a candidate library build, not a release/helper/native-GUI execution.
+- Read genuine packaged GUI RED report and independent7.000s static-target reproduction: exact old helper exits1 while compositor/target stay alive. The initial screenshot filename collision is explicitly disclosed and not treated as retained RFB-pixel evidence. Actual RFB negotiation success and helper exit remain distinct observations.
+
+No broad application/native matrix was repeated. The owner must now build/package the genuine corrected helper, retain new helper/source/artifact identities, and finish actual GUI sharing idle/input/Stop/session-loss qualification before overall completion. The old398d artifact and helper26c3495 remain immutable RED evidence, not relabeled as fixed.

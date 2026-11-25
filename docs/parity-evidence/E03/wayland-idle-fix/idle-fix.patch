@@ -1,0 +1,99 @@
+--- a/engines/wayland/src/capture.rs
++++ b/engines/wayland/src/capture.rs
+@@ -47,7 +47,12 @@
+     }
+     pub fn frame(&mut self) -> io::Result<Option<Frame>> {
+         let slot = self.slot.lock().unwrap();
+-        if slot.error {
++        if slot.error
++            || self
++                .worker
++                .as_ref()
++                .is_some_and(|worker| worker.is_finished())
++        {
+             return Err(io::Error::other(
+                 "Selected portal video stream ended or is unsupported",
+             ));
+@@ -56,7 +61,9 @@
+             self.revision = slot.revision;
+             self.last = Instant::now();
+         }
+-        if self.last.elapsed() > Duration::from_secs(5) {
++        // Compositors may emit buffers only on damage. Bound initial acquisition,
++        // then retain valid pixels while the transport worker/session remains alive.
++        if slot.frame.is_none() && self.last.elapsed() > Duration::from_secs(5) {
+             return Err(io::Error::other("Selected portal video stream timed out"));
+         }
+         Ok(slot.frame.clone())
+@@ -324,3 +331,71 @@
+ fn err(_: impl std::fmt::Display) -> io::Error {
+     io::Error::other("Could not connect selected portal video stream")
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    fn capture_with_frame(frame: bool) -> Capture {
++        let stop = Arc::new(AtomicBool::new(false));
++        let stopped = stop.clone();
++        let worker = thread::spawn(move || {
++            while !stopped.load(Ordering::Acquire) {
++                thread::sleep(Duration::from_millis(1));
++            }
++        });
++        Capture {
++            slot: Arc::new(Mutex::new(Slot {
++                frame: frame.then(|| Frame {
++                    width: 1,
++                    height: 1,
++                    rgba: vec![7, 11, 13, 255],
++                }),
++                error: false,
++                revision: 0,
++            })),
++            stop,
++            worker: Some(worker),
++            last: Instant::now() - Duration::from_secs(6),
++            revision: 0,
++        }
++    }
++    #[test]
++    fn idle_damage_driven_stream_keeps_last_valid_frame() {
++        let mut capture = capture_with_frame(true);
++        let frame = capture
++            .frame()
++            .expect("unchanged screen is not a failed stream")
++            .unwrap();
++        assert_eq!(frame.rgba, [7, 11, 13, 255]);
++    }
++    #[test]
++    fn missing_initial_frame_still_times_out() {
++        let mut capture = capture_with_frame(false);
++        assert!(
++            capture
++                .frame()
++                .unwrap_err()
++                .to_string()
++                .contains("timed out")
++        );
++    }
++    #[test]
++    fn native_stream_failure_never_reuses_cached_pixels() {
++        let mut capture = capture_with_frame(true);
++        capture.slot.lock().unwrap().error = true;
++        assert!(capture.frame().is_err());
++    }
++    #[test]
++    fn finished_worker_never_reuses_cached_pixels() {
++        let mut capture = capture_with_frame(true);
++        capture.last = Instant::now();
++        capture.stop.store(true, Ordering::Release);
++        while !capture.worker.as_ref().unwrap().is_finished() {
++            thread::yield_now();
++        }
++        assert!(
++            capture.frame().is_err(),
++            "transport worker exit must invalidate cached video"
++        );
++    }
++}
