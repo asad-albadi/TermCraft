@@ -59,7 +59,7 @@
 - [x] **Step 2:** Run the focused native-component tests and confirm the new cases fail for the missing contract.
 - [x] **Step 3:** Implement minimal manifest validation and architecture/resource checks using existing `VerifiedSnapshot` and runtime-manifest patterns.
 - [x] **Step 4:** Run native-component tests and host-side manifest checks; keep `macos_pin()` closed until a real artifact is available.
-- [ ] **Step 5:** Commit `feat: define macOS native artifact acceptance contract`.
+- [x] **Step 5:** Commit the native artifact acceptance contract (`a92bdd9`).
 
 ### Task 3: Private XQuartz Build, Relocation, and Trust Pinning
 
@@ -79,7 +79,7 @@
 - [x] **Step 3:** Implement the smallest script and manifest changes needed to prepare, relocate, sign, inventory, and hash the staged tree without executing upstream installers.
 - [x] **Step 4:** On the available native host, run the bounded contract checks and preserve unavailable native-builder/Intel evidence as open.
 - [ ] **Step 5:** Enable `macos_pin()` only when the exact staged artifact satisfies the acceptance contract; otherwise retain the gate and record the reason.
-- [ ] **Step 6:** Commit `feat: complete private macOS XQuartz packaging contract`.
+- [x] **Step 6:** Commit the private macOS XQuartz packaging contract (`a92bdd9`, `1aecbd1`, `c357238`, `43d8850`).
 
 ### Task 4: `.app` Packaging and Desktop Lifecycle
 
@@ -97,7 +97,7 @@
 - [x] **Step 2:** Run the focused Python tests and confirm the gaps.
 - [x] **Step 3:** Implement minimal launcher and integration fixes, including safe argument handling and lifecycle receipt validation.
 - [x] **Step 4:** Run package manifest/lifecycle tests and record unavailable native launcher checks.
-- [ ] **Step 5:** Commit `feat: harden macOS app lifecycle packaging`.
+- [x] **Step 5:** Commit the macOS app lifecycle packaging hardening (`99d9516`).
 
 ### Task 5: Browser, RDP, Capture, Clipboard, and Input Qualification
 
@@ -116,7 +116,7 @@
 - [x] **Step 2:** Run focused tests and confirm expected failures.
 - [x] **Step 3:** Implement only the missing ownership, validation, or error-propagation behavior.
 - [x] **Step 4:** Run focused Rust tests plus the RDP helper suite; record physical consent/GPU/device gaps without substituting synthetic passes.
-- [ ] **Step 5:** Commit `feat: qualify macOS provider lifecycle contracts`.
+- [x] **Step 5:** Commit the macOS provider lifecycle and fixture qualification (`c44d23e`, `7c280ed`).
 
 ### Task 6: Native Architecture and Package Evidence
 
@@ -145,4 +145,4 @@
 - [x] **Step 2:** Run the current evidence/hash/integrity review and inspect the complete diff; retain known failures and unavailable native checks as open.
 - [x] **Step 3:** Update issue #2 with completed items, remaining evidence gaps, exact commands, and artifact identifiers.
 - [x] **Step 4:** Commit final documentation/evidence synchronization.
-- [ ] **Step 5:** Perform final whole-branch review before claiming completion.
+- [x] **Step 5:** Perform final whole-branch review before claiming completion; native artifact and interactive qualification gates remain explicitly open.
