@@ -411,7 +411,7 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS builders and interactive engine hosts to compile, approve hashes and qualify the reviewed owned-engine candidates.",
-      "remaining": "Reviewed Windows owned-job/loopback/PID/authentication and macOS private-socket/process-group source candidates are merged, with pinned upstream patches and offline source preparation. Native built engines, compiled checksum approvals and redistribution/runtime qualification remain unavailable; production gates reject stock engines. Linux owned Xwayland remains implemented.",
+      "remaining": "Windows pinned private VcXsrv built locally with adjacent DLLs, fonts and XKB data. A native candidate probe passed occupied-display, loopback ownership, cookie and listener cleanup checks. Windows redistribution and broader runtime qualification, the private macOS build and compiled shipping checksum approvals are open. Linux owned Xwayland remains implemented.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -433,7 +433,7 @@
         "F01"
       ],
       "dependency": "Qualified native Windows/macOS owned engines from X01 and interactive SSH/X authentication, clipboard and display workflows on those systems.",
-      "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. Complete Windows/macOS owned-engine integration, native clipboard/display behavior and native/original qualification.",
+      "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. A real owned Windows candidate mapped a window through a controlled embedded SSH fixture and refused an incorrect forwarding cookie. Complete native shipping integration, installed-client SSH, clipboard/display behavior and original qualification.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -631,7 +631,7 @@
       "requires": [],
       "dependency": "Clean Windows upgrade and protocol-integration fixture, native macOS installer/build/upgrade hosts and remaining runtime payloads. Signing identities are needed only if a signed release is chosen.",
       "remaining": "Current source32e512 genuine full Linux archive d8cec and Debian12 core4628/revision3 are built and independently audited. Native Windows/macOS installers/lifecycle remain; full optional Debian runtime closure is not claimed.",
-      "validation_remaining": "Current Linux full3372hashes/actualGUI37checks and native Debian1074hashes/43commands/16bytepairs/5inventories pass. An unsigned native Windows x64 ZIP passed relocated startup and controlled per-user install/uninstall. Clean upgrade, activation, optional runtimes and macOS/original verification remain open.",
+      "validation_remaining": "Current Linux full3372hashes/actualGUI37checks and native Debian1074hashes/43commands/16bytepairs/5inventories pass. An unsigned native Windows x64 ZIP passed relocated startup with the exact adjacent RDP child. Two distinct installed Windows GUI revisions preserved the same isolated workspace through side-by-side installation and uninstall. Clean-account version upgrade, activation, optional runtimes and macOS/original verification remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/execution/2026-11-25-windows-native.md",

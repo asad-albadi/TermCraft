@@ -78,7 +78,7 @@ External launch adapters exist. Integration and options remain incomplete. [Remo
 
 **Current implementation:** Linux owns and manages its bundled X server, authorization, display and per-session SSH forwarding. Native Windows/macOS engines and their runtime validation remain open. See [progress](PARITY_PROGRESS.md).
 
-Windows x64 now has verified VcXsrv source preparation and native loopback XDMCP discovery tests. The private engine build and GUI workflows remain open. [Windows evidence](docs/parity-evidence/execution/2026-11-25-windows-native.md).
+Windows x64 has a locally built private VcXsrv candidate with adjacent DLLs, fonts and XKB data. A controlled native probe verified occupied-display refusal, loopback socket ownership, cookie authentication and listener removal. An independent SSH fixture mapped a real forwarded X window. Loopback XDMCP discovery was independently exercised. Distribution approval and installed-client SSH, XDMCP, clipboard, keyboard and graphics workflows remain open. [Windows evidence](docs/parity-evidence/execution/2026-11-25-windows-native.md).
 
 ## P2 — Protocols, tools, and packaging
 

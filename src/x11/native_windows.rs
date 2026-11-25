@@ -211,6 +211,19 @@ fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
 mod candidate_qualification {
     use super::*;
     use std::path::PathBuf;
+    use x11rb::{
+        connection::Connection,
+        protocol::xproto::{ConnectionExt, CreateWindowAux, MapState, WindowClass},
+    };
+
+    #[allow(dead_code)]
+    mod ssh_fixture {
+        use crate as harbor_workspace;
+        include!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/tests/support/x11_ssh.rs"
+        ));
+    }
 
     #[test]
     #[ignore = "requires the privately rebuilt Windows X engine and its review inventory"]
@@ -243,6 +256,40 @@ mod candidate_qualification {
         assert!(owns_listener(pid, address).unwrap());
         assert!(!native_transport::setup(address, None, &flag).unwrap());
         assert!(!native_transport::setup(address, Some(&[0; 16]), &flag).unwrap());
+        let fixture = ssh_fixture::Fixture::start();
+        let (ssh, request) = fixture.connect(1, &lease);
+        assert!(fixture.x_client(&request, false).is_err());
+        let client = fixture.x_client(&request, true).unwrap();
+        let screen = &client.setup().roots[0];
+        let window = client.generate_id().unwrap();
+        client
+            .create_window(
+                x11rb::COPY_DEPTH_FROM_PARENT,
+                window,
+                screen.root,
+                24,
+                24,
+                150,
+                80,
+                0,
+                WindowClass::INPUT_OUTPUT,
+                screen.root_visual,
+                &CreateWindowAux::new().background_pixel(screen.white_pixel),
+            )
+            .unwrap()
+            .check()
+            .unwrap();
+        client.map_window(window).unwrap().check().unwrap();
+        assert_eq!(
+            client
+                .get_window_attributes(window)
+                .unwrap()
+                .reply()
+                .unwrap()
+                .map_state,
+            MapState::VIEWABLE
+        );
+        drop(ssh);
         lease.stop_owned().unwrap();
         assert!(!owns_listener(pid, address).unwrap());
         assert!(!runtime.exists());
