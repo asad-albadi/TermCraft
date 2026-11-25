@@ -6,7 +6,8 @@ mod fixture;
 use harbor_workspace::desktop::{
     DesktopEvent, DesktopInput, DesktopSession, rdp_options::ClipboardPolicy, vnc::Security,
 };
-use rustls::pki_types::{CertificateDer, PrivateKeyDer, pem::PemObject};
+#[path = "support/tls.rs"]
+mod tls_fixture;
 use std::{
     net::{TcpListener, TcpStream},
     sync::Arc,
@@ -14,46 +15,7 @@ use std::{
 };
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
-fn certificate(root: &std::path::Path) -> Arc<rustls::ServerConfig> {
-    let key = root.join("key.pem");
-    let cert = root.join("cert.pem");
-    let output = std::process::Command::new("openssl")
-        .args([
-            "req",
-            "-x509",
-            "-newkey",
-            "rsa:2048",
-            "-nodes",
-            "-days",
-            "1",
-            "-subj",
-            "/CN=localhost",
-            "-addext",
-            "subjectAltName=DNS:localhost",
-            "-addext",
-            "basicConstraints=critical,CA:FALSE",
-            "-keyout",
-        ])
-        .arg(&key)
-        .arg("-out")
-        .arg(&cert)
-        .output()
-        .unwrap();
-    assert!(output.status.success());
-    Arc::new(
-        rustls::ServerConfig::builder_with_provider(Arc::new(
-            rustls::crypto::ring::default_provider(),
-        ))
-        .with_safe_default_protocol_versions()
-        .unwrap()
-        .with_no_client_auth()
-        .with_single_cert(
-            vec![CertificateDer::from_pem_file(cert).unwrap()],
-            PrivateKeyDer::from_pem_file(key).unwrap(),
-        )
-        .unwrap(),
-    )
-}
+use tls_fixture::localhost_server as certificate;
 async fn bytes(s: &mut (impl tokio::io::AsyncRead + Unpin), n: usize) -> Vec<u8> {
     let mut b = vec![0; n];
     s.read_exact(&mut b).await.unwrap();
@@ -88,7 +50,7 @@ fn vnc_tls_password_real_tcp_pixels_input_and_cleanup() {
     config.session.host = "localhost".into();
     config.session.vnc_options.security = Security::TlsPassword;
     config.session.vnc_options.allow_unencrypted = false;
-    config.session.vnc_options.certificate_authority = Some(root.path().join("cert.pem"));
+    config.session.vnc_options.certificate_authority = Some(root.path().join("ca.pem"));
     let (input_seen, input_observed) = std::sync::mpsc::channel();
     let server = std::thread::spawn(move || {
         tokio::runtime::Runtime::new().unwrap().block_on(async {
@@ -186,7 +148,7 @@ fn vnc_untrusted_tls_real_tcp_never_prompts_for_password() {
     config.session.host = "localhost".into();
     config.session.vnc_options.security = Security::TlsPassword;
     config.session.vnc_options.allow_unencrypted = false;
-    config.session.vnc_options.certificate_authority = Some(other.path().join("cert.pem"));
+    config.session.vnc_options.certificate_authority = Some(other.path().join("ca.pem"));
     let server = std::thread::spawn(move || {
         tokio::runtime::Runtime::new().unwrap().block_on(async {
             assert!(tls(listener, tls_config).await.is_err());

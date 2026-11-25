@@ -28,7 +28,9 @@ def fd_path(fd):
     except OSError:
         try:
             import fcntl
-            return fcntl.fcntl(fd, fcntl.F_GETPATH, bytes(4096)).split(b'\0', 1)[0]
+            # Darwin's F_GETPATH writes MAXPATHLEN bytes. Python's fcntl
+            # bytes interface rejects buffers larger than 1024 bytes.
+            return fcntl.fcntl(fd, fcntl.F_GETPATH, bytes(1024)).split(b'\0', 1)[0]
         except (OSError, AttributeError, ImportError): return None
 
 def no_replace(source_dir, source, target_dir, target):

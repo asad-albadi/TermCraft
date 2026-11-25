@@ -2,11 +2,11 @@ use harbor_workspace::{
     credentials::Secret,
     protocols::ftp::{FtpDataMode, FtpOptions, FtpTlsMode},
 };
-use rustls::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
+#[path = "tls.rs"]
+mod tls;
 use std::{
     collections::{HashMap, HashSet},
     net::{IpAddr, Ipv4Addr, SocketAddr},
-    path::PathBuf,
     sync::{Arc, Mutex},
     time::Duration,
 };
@@ -90,6 +90,7 @@ impl Files {
 pub struct Endpoint {
     address: SocketAddr,
     tls: FtpTlsMode,
+    tls_fixture: Option<Arc<TlsFixture>>,
     evidence: Arc<Mutex<Evidence>>,
     files: Arc<Mutex<Files>>,
     task: JoinHandle<()>,
@@ -100,6 +101,8 @@ impl Endpoint {
         let listener = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).await.unwrap();
         let address = listener.local_addr().unwrap();
         let tls = options.tls;
+        let tls_fixture = (tls != FtpTlsMode::Plain).then(|| Arc::new(tls_fixture()));
+        let worker_tls = tls_fixture.clone();
         let evidence = Arc::new(Mutex::new(Evidence::default()));
         let files = Arc::new(Mutex::new(Files::default()));
         let worker_evidence = evidence.clone();
@@ -111,7 +114,7 @@ impl Endpoint {
                 tokio::select! {
                     accepted = listener.accept() => {
                         let Ok((control, _)) = accepted else { break };
-                        clients.spawn(serve(control, options.clone(), worker_evidence.clone(), worker_files.clone()));
+                        clients.spawn(serve(control, options.clone(), worker_evidence.clone(), worker_files.clone(), worker_tls.clone()));
                     }
                     _ = clients.join_next(), if !clients.is_empty() => {}
                 }
@@ -120,6 +123,7 @@ impl Endpoint {
         Self {
             address,
             tls,
+            tls_fixture,
             evidence,
             files,
             task,
@@ -176,9 +180,10 @@ impl Endpoint {
             tls: self.tls,
             protect_data: tls,
             data_mode: FtpDataMode::Passive,
-            certificate_authority: tls.then(|| {
-                PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/support/ftp_tls/ca.pem")
-            }),
+            certificate_authority: self
+                .tls_fixture
+                .as_ref()
+                .map(|fixture| fixture.root.path().join("ca.pem")),
             timeout: Duration::from_secs(4),
         }
     }
@@ -198,20 +203,57 @@ trait Channel: AsyncRead + AsyncWrite + Unpin + Send {}
 impl<T: AsyncRead + AsyncWrite + Unpin + Send> Channel for T {}
 type Stream = Box<dyn Channel>;
 
-fn tls_acceptor() -> tokio_rustls::TlsAcceptor {
-    let certificate = CertificateDer::from(include_bytes!("ftp_tls/server.der").to_vec());
-    let key = PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(
-        include_bytes!("ftp_tls/server.key.der").to_vec(),
-    ));
-    let config = rustls::ServerConfig::builder_with_provider(Arc::new(
-        rustls::crypto::ring::default_provider(),
+const FOREIGN_LOOPBACK: Ipv4Addr = Ipv4Addr::new(127, 0, 0, 2);
+
+fn foreign_address() -> std::io::Result<Ipv4Addr> {
+    if std::net::TcpListener::bind((FOREIGN_LOOPBACK, 0)).is_ok() {
+        return Ok(FOREIGN_LOOPBACK);
+    }
+    #[cfg(unix)]
+    {
+        // Darwin only permits configured source addresses. Use another address
+        // on this host while still connecting to the fixture's loopback listener.
+        let mut interfaces = std::ptr::null_mut();
+        if unsafe { libc::getifaddrs(&mut interfaces) } != 0 {
+            return Err(std::io::Error::last_os_error());
+        }
+        let mut entry = interfaces;
+        let mut address = None;
+        while !entry.is_null() {
+            let interface = unsafe { &*entry };
+            if interface.ifa_flags & libc::IFF_UP as u32 != 0
+                && !interface.ifa_addr.is_null()
+                && unsafe { (*interface.ifa_addr).sa_family as i32 } == libc::AF_INET
+            {
+                let socket = unsafe { &*interface.ifa_addr.cast::<libc::sockaddr_in>() };
+                let ip = Ipv4Addr::from(socket.sin_addr.s_addr.to_ne_bytes());
+                if ip != Ipv4Addr::LOCALHOST && !ip.is_unspecified() {
+                    address = Some(ip);
+                    break;
+                }
+            }
+            entry = interface.ifa_next;
+        }
+        unsafe { libc::freeifaddrs(interfaces) };
+        if let Some(address) = address {
+            return Ok(address);
+        }
+    }
+    Err(std::io::Error::new(
+        std::io::ErrorKind::AddrNotAvailable,
+        "active FTP fixture requires a second local IPv4 source address",
     ))
-    .with_safe_default_protocol_versions()
-    .unwrap()
-    .with_no_client_auth()
-    .with_single_cert(vec![certificate], key)
-    .unwrap();
-    tokio_rustls::TlsAcceptor::from(Arc::new(config))
+}
+
+struct TlsFixture {
+    root: tempfile::TempDir,
+    acceptor: tokio_rustls::TlsAcceptor,
+}
+
+fn tls_fixture() -> TlsFixture {
+    let root = tempfile::tempdir().expect("FTPS fixture directory");
+    let acceptor = tokio_rustls::TlsAcceptor::from(tls::localhost_server(root.path()));
+    TlsFixture { root, acceptor }
 }
 
 async fn reply(control: &mut BufReader<Stream>, line: &str) -> std::io::Result<()> {
@@ -223,8 +265,9 @@ async fn serve(
     options: Arc<ServerOptions>,
     evidence: Arc<Mutex<Evidence>>,
     files: Arc<Mutex<Files>>,
+    tls_fixture: Option<Arc<TlsFixture>>,
 ) -> std::io::Result<()> {
-    let acceptor = tls_acceptor();
+    let acceptor = tls_fixture.as_ref().map(|fixture| &fixture.acceptor);
     let channel: Stream = match options.tls {
         FtpTlsMode::Plain => Box::new(socket),
         FtpTlsMode::Explicit => {
@@ -247,7 +290,7 @@ async fn serve(
                 return Ok(());
             }
             socket.write_all(b"234 Ready for TLS\r\n").await?;
-            Box::new(acceptor.accept(socket).await?)
+            Box::new(acceptor.unwrap().accept(socket).await?)
         }
         FtpTlsMode::Implicit => {
             let mut first_bytes = [0; 5];
@@ -258,7 +301,7 @@ async fn serve(
             {
                 evidence.lock().unwrap().login_attempts += 1;
             }
-            Box::new(acceptor.accept(socket).await?)
+            Box::new(acceptor.unwrap().accept(socket).await?)
         }
     };
     let mut control = BufReader::new(channel);
@@ -373,7 +416,7 @@ async fn serve(
                     let address = active.take().unwrap();
                     if options.foreign_active_peer {
                         let wrong = TcpSocket::new_v4()?;
-                        wrong.bind(([127, 0, 0, 2], 0).into())?;
+                        wrong.bind((foreign_address()?, 0).into())?;
                         let mut wrong = wrong.connect(address).await?;
                         wrong.write_all(b"foreign bytes").await?;
                         evidence.lock().unwrap().foreign_active_connections += 1;
@@ -384,7 +427,7 @@ async fn serve(
                 };
                 evidence.lock().unwrap().data_connections += 1;
                 let mut data: Stream = if protected && !options.force_clear_data {
-                    let tls = acceptor.accept(socket).await?;
+                    let tls = acceptor.unwrap().accept(socket).await?;
                     evidence.lock().unwrap().encrypted_data_connections += 1;
                     Box::new(tls)
                 } else {

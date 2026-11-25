@@ -457,8 +457,13 @@ fn iperf_missing_or_tampered_package_fails_closed() {
     let supervisor = ServiceSupervisor::default();
     let config = IperfServiceConfig::local(IperfVersion::Three, root.path().into());
     assert!(supervisor.start_iperf(config).is_err());
-    std::fs::create_dir_all(root.path().join("runtime/linux-x86_64")).unwrap();
-    std::fs::write(root.path().join("runtime/linux-x86_64/iperf3"), b"replaced").unwrap();
+    let runtime = root.path().join(format!(
+        "runtime/{}-{}",
+        std::env::consts::OS,
+        std::env::consts::ARCH
+    ));
+    std::fs::create_dir_all(&runtime).unwrap();
+    std::fs::write(runtime.join("iperf3"), b"replaced").unwrap();
     let config = IperfServiceConfig::local(IperfVersion::Three, root.path().into());
     assert!(supervisor.start_iperf(config).is_err());
     let mut config = IperfServiceConfig::local(IperfVersion::Three, root.path().into());

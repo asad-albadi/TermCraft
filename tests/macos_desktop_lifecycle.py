@@ -36,7 +36,8 @@ class DesktopLifecycle(unittest.TestCase):
                 "bundles": [str(bundle.resolve())],
             }))
             integration = integration_module.DesktopIntegration(bundle, receipt)
-            integration._run = lambda *args: ""
+            integration._run = lambda *args: f"path: {bundle.resolve()} (0x2520)\n"
+            self.assertTrue(integration.status())
             (contents / "Info.plist").write_bytes(plistlib.dumps({
                 "CFBundleIdentifier": "org.termcraft.TermCraft",
                 "CFBundleExecutable": "different-launcher",

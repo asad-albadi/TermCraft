@@ -11,13 +11,15 @@ __termcraft_osc7_install() {
         return 1
     fi
     __termcraft_osc7() {
-        local __tc_status=$? __tc_url='' __tc_c __tc_hex __tc_i
+        local __tc_status=$? __tc_url='' __tc_c __tc_hex __tc_i __tc_byte
         local LC_ALL=C
         for ((__tc_i=0; __tc_i<${#PWD}; __tc_i++)); do
             __tc_c=${PWD:__tc_i:1}
             case $__tc_c in
                 [a-zA-Z0-9/._~-]) __tc_url+=$__tc_c ;;
-                *) printf -v __tc_hex '%%%02X' "'$__tc_c"; __tc_url+=$__tc_hex ;;
+                *) printf -v __tc_byte '%d' "'$__tc_c"
+                   printf -v __tc_hex '%%%02X' "$((__tc_byte & 255))"
+                   __tc_url+=$__tc_hex ;;
             esac
         done
         printf '\033]7;file://%s%s\007' @TERMCRAFT_HOST@ "$__tc_url"
@@ -44,11 +46,14 @@ __termcraft_osc7_install() {
                 fi
             fi
         else
-            if [[ $PROMPT_COMMAND != *'; __termcraft_osc7' ]]; then
+            if [[ $PROMPT_COMMAND == __termcraft_osc7 ]]; then
+                PROMPT_COMMAND=''
+            elif [[ $PROMPT_COMMAND == *'; __termcraft_osc7' ]]; then
+                PROMPT_COMMAND=${PROMPT_COMMAND%'; __termcraft_osc7'}
+            else
                 printf '%s\n' 'TermCraft: the prompt hook changed; leaving its function available. Close this shell to remove the integration.' >&2
                 return 1
             fi
-            PROMPT_COMMAND=${PROMPT_COMMAND%'; __termcraft_osc7'}
             if [[ ${__termcraft_osc7_was_unset-} == 1 && -z $PROMPT_COMMAND ]]; then unset PROMPT_COMMAND; fi
         fi
         unset __termcraft_osc7_installed __termcraft_osc7_was_unset __termcraft_osc7_was_array __termcraft_osc7_original
@@ -67,7 +72,7 @@ __termcraft_osc7_install() {
                 if [[ $__termcraft_osc7_was_unset == 1 ]]; then PROMPT_COMMAND=(__termcraft_osc7)
                 else PROMPT_COMMAND=("$__termcraft_osc7_original" __termcraft_osc7); fi
             else
-                PROMPT_COMMAND="${PROMPT_COMMAND-}; __termcraft_osc7"
+                PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }__termcraft_osc7"
             fi
         fi
         __termcraft_osc7_installed=1

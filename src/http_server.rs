@@ -317,6 +317,9 @@ fn serve_request(
     share: &Share,
     stop: &AtomicBool,
 ) -> io::Result<&'static str> {
+    // Darwin can inherit O_NONBLOCK from the listening socket. The request
+    // worker uses blocking reads and writes with explicit bounded timeouts.
+    stream.set_nonblocking(false)?;
     stream.set_read_timeout(Some(Duration::from_millis(200).min(share.timeout)))?;
     stream.set_write_timeout(Some(Duration::from_secs(3).min(share.timeout)))?;
     let deadline = Instant::now() + share.timeout;

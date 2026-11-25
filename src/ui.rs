@@ -2974,17 +2974,11 @@ mod gui_tests {
         }
         let initial = workspace.tabs[0].browser.as_ref().unwrap().path.clone();
         let script = integration_script(ShellFlavor::Bash, "127.0.0.1").unwrap();
-        workspace.tabs[0].send(
-            format!(
-                "cd -- {}
-{script}
-cd -- {}
-",
-                quoted(&server.root),
-                quoted(&child)
-            )
-            .as_bytes(),
-        );
+        // Source the exact generated hook from the owned fixture. Dumping the
+        // complete script into an interactive Darwin PTY can overrun its input queue.
+        let hook = server.root.join("directory-hook.sh");
+        fs::write(&hook, format!("{script}\ncd -- {}\n", quoted(&child))).unwrap();
+        workspace.tabs[0].send(format!("source {}\n", quoted(&hook)).as_bytes());
         let deadline = Instant::now() + Duration::from_secs(8);
         loop {
             workspace.tabs[0].poll();
@@ -2998,8 +2992,9 @@ cd -- {}
             }
             assert!(
                 Instant::now() < deadline,
-                "No shell directory notice: {}",
-                workspace.tabs[0].error
+                "No shell directory notice: {latest:?}; {}\n{}",
+                workspace.tabs[0].error,
+                workspace.tabs[0].screen.plain()
             );
             std::thread::sleep(Duration::from_millis(5));
         }
@@ -3602,9 +3597,8 @@ cd -- {}
         let mut w = Workspace::new_context(&ctx, None, root.clone());
         frame(&ctx, &mut w, vec![]);
         let modifiers = Modifiers {
-            ctrl: true,
             shift: true,
-            ..Default::default()
+            ..Modifiers::COMMAND
         };
         let mut output = ctx.run_ui(
             RawInput {

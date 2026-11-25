@@ -90,6 +90,26 @@ def linux_rdp_helper_matches(image, expected_digest):
         return False
 
 
+def macos_rdp_helper_matches(parent_pid, expected_digest):
+    import ctypes
+
+    libproc = ctypes.CDLL("/usr/lib/libproc.dylib")
+    libproc.proc_pidpath.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_uint32]
+    libproc.proc_pidpath.restype = ctypes.c_int
+    children = subprocess.run(
+        ["/usr/bin/pgrep", "-P", str(parent_pid)],
+        text=True, capture_output=True, timeout=5,
+    )
+    for pid in children.stdout.split():
+        path = ctypes.create_string_buffer(4096)
+        if libproc.proc_pidpath(int(pid), path, len(path)) <= 0:
+            continue
+        executable = Path(os.fsdecode(path.value))
+        if executable.name == "termcraft-rdp-engine" and sha256(executable) == expected_digest:
+            return True
+    return False
+
+
 def rdp_session_probe(executable, helper_digest, isolated, environment, evidence):
     workspace = isolated / "RDP test workspace"
     workspace.mkdir()
@@ -130,6 +150,9 @@ def rdp_session_probe(executable, helper_digest, isolated, environment, evidence
                                 for pid in children
                             ):
                                 raise ValueError("RDP session did not start the verified package helper.")
+                        elif platform.system() == "Darwin":
+                            if not macos_rdp_helper_matches(app.pid, helper_digest):
+                                raise ValueError("RDP session did not start the verified macOS helper.")
             finally:
                 if app.poll() is None:
                     app.terminate()
@@ -195,7 +218,8 @@ def smoke(archive, evidence, display):
                 if json.loads(result[5:end]) != {"Ready": {"version": 1}}:
                     raise ValueError("RDP helper returned an unexpected handshake.")
         screenshot = evidence / "startup.png"
-        run([executable, "--data-dir", isolated / "workspace data", "--screenshot", screenshot],
+        launcher = bindir / "termcraft-desktop-launcher" if host == "macos" else executable
+        run([launcher, "--data-dir", isolated / "workspace data", "--screenshot", screenshot],
             isolated, environment, evidence / "startup.log")
         with Image.open(screenshot) as image:
             stats = ImageStat.Stat(image.convert("RGB"))
@@ -213,7 +237,7 @@ def smoke(archive, evidence, display):
             "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
             "screen_size": size, "rdp_helper_wire_version": 1,
             "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
-            "rdp_helper_child_location_verified": host == "linux",
+            "rdp_helper_child_location_verified": host in {"linux", "macos"},
         }, indent=2) + "\n")
 
 

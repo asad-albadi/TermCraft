@@ -78,9 +78,8 @@ fn key_aliases_are_canonical_and_bare_typing_is_rejected() {
             &KeyChord::from_key(
                 Key::ArrowUp,
                 Modifiers {
-                    ctrl: true,
                     shift: true,
-                    ..Default::default()
+                    ..Modifiers::COMMAND
                 }
             ),
             FocusContext::Terminal

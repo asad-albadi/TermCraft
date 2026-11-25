@@ -1,5 +1,5 @@
-# FTP test certificates
+# Untrusted HTTPS test identity
 
-The loopback fixture uses a locally generated test CA and a one-day certificate
-for `localhost`, matching macOS's TLS certificate validity requirements. The
-included server private key is public test data. The CA signing key is omitted.
+The browser's negative trust fixture uses the checked-in `localhost` identity.
+The private key is public test data. Tests that require successful trust
+generate a fresh, one-day CA and leaf through `tests/support/tls.rs` instead.

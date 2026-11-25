@@ -46,6 +46,8 @@ fn vim_redraw_resize_and_exit_restore_the_primary_screen() {
         "NONE",
         "-n",
         "--noplugin",
+        "-c",
+        "set ruler",
         path.to_str().unwrap(),
     ]
     .map(str::to_owned);
@@ -140,7 +142,7 @@ fn htop_owned_pid_redraw_resize_and_exit_restore_the_primary_screen() {
         }
     }
     let sleeper = OwnedChild(
-        std::process::Command::new("/usr/bin/sleep")
+        std::process::Command::new("sleep")
             .arg("30")
             .spawn()
             .unwrap(),

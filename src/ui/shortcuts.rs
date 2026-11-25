@@ -159,9 +159,8 @@ mod tests {
                     pressed: true,
                     repeat: false,
                     modifiers: Modifiers {
-                        ctrl: true,
                         shift: true,
-                        ..Default::default()
+                        ..Modifiers::COMMAND
                     },
                 }],
                 ..Default::default()

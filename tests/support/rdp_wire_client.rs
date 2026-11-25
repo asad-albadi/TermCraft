@@ -48,7 +48,7 @@ impl Client {
             width: 800,
             height: 600,
             timeout_secs: 10,
-            certificate_authority: Some(server.root.path().join("cert.pem")),
+            certificate_authority: Some(server.root.path().join("ca.pem")),
             remembered_certificate: None,
         }));
         client

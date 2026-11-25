@@ -96,8 +96,10 @@ impl SourceDir {
         tokio::task::spawn_blocking(move || {
             use rustix::fs::{AtFlags, FileType, Mode, OFlags};
             use std::os::unix::fs::MetadataExt;
-            if FileType::from_raw_mode(rustix_mode(entry.mode)?.as_raw_mode()) == FileType::Symlink
-            {
+            // Mode describes permissions only and strips the file-type bits.
+            let raw_mode = u16::try_from(entry.mode)
+                .map_err(|_| "POSIX mode does not fit the platform raw mode type")?;
+            if FileType::from_raw_mode(raw_mode.into()) == FileType::Symlink {
                 let target = rustix::fs::readlinkat(&*root, &entry.name, Vec::new())
                     .map_err(err)?
                     .into_bytes();

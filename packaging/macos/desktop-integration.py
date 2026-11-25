@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import plistlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -27,10 +28,16 @@ class DesktopIntegration:
     def _run(self,*args):
         if sys.platform!='darwin': raise ValueError('Native macOS LaunchServices is unavailable on this host.')
         return subprocess.run([REGISTER,*args],check=True,text=True,capture_output=True).stdout
-    def status(self):
-        if str(self.bundle) not in self._owned(): return False
+    def _registered(self):
         dump=self._run('-dump')
-        return any(line.partition(':')[0].strip()=='path' and line.partition(':')[2].strip()==str(self.bundle) for line in dump.splitlines())
+        paths = set()
+        for line in dump.splitlines():
+            field, _, value = line.partition(':')
+            if field.strip() == 'path':
+                paths.add(re.sub(r' \(0x[0-9a-fA-F]+\)$', '', value.strip()))
+        return paths
+    def status(self):
+        return str(self.bundle) in self._owned() and str(self.bundle) in self._registered()
     def install_user(self):
         owned=self._owned();self._run('-f',str(self.bundle));self.receipt.parent.mkdir(parents=True,exist_ok=True)
         if str(self.bundle) not in owned: owned.append(str(self.bundle))
@@ -48,7 +55,9 @@ class DesktopIntegration:
                 if (info.get('CFBundleIdentifier')!=OWNER or
                     info.get('CFBundleExecutable')!='termcraft-desktop-launcher'):
                     raise ValueError('An owned registration path now contains a different application.')
-        for name in owned: self._run('-u',name)
+        registered = self._registered() if owned else set()
+        for name in owned:
+            if name in registered: self._run('-u',name)
         if owned:self.receipt.unlink()
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['install','uninstall','status']);args=parser.parse_args()
