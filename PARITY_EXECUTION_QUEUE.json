@@ -333,15 +333,15 @@
     },
     {
       "id": "D02",
-      "state": "Blocked",
+      "state": "Implementation remaining",
       "implementation_checkpoint": false,
       "requires": [
         "D01",
         "S05"
       ],
-      "dependency": "Native Windows/macOS RDP/redirection endpoints and physical printer, smartcard and serial fixtures. POSIX lacks the required opened-object rename/delete and general COMMSTATUS/properties/modem-event semantics; additional Linux hardware alone cannot supply missing OS APIs.",
+      "dependency": "",
       "remaining": "Reviewed native printer/smartcard, Linux RXCHAR/BREAK/ERR events and per-open statistics, Windows per-open statistics and bounded native serial owners are merged. Exact general POSIX COMMSTATUS/properties/modem events and opened-object rename/delete remain explicit platform/architecture limitations; native Windows/macOS/device/original qualification remains.",
-      "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; actual RDP native/admin/drive/device/clipboard/security/original interoperability remains unverified.",
+      "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; actual RDP native/admin/drive/device/clipboard/security/original interoperability remains unverified. Publication follow-up: hosted CI run45636600121 reports81helper tests passed/1failed in drive_allocation_is_released_on_last_remote_close_and_disconnect. Root cause unconfirmed; no green hosted CI claim.",
       "evidence": [
         "docs/parity-evidence/D02/providers/host-full.log",
         "docs/parity-evidence/execution/d02-engine-green.log",
@@ -360,10 +360,12 @@
         "docs/parity-evidence/D02/windows-native-owner/root-integration.json",
         "docs/parity-evidence/D02/windows-native-owner/fixture-FIX1/review.md",
         "docs/parity-evidence/D02/unix-extra-events/root-integration.json",
-        "docs/parity-evidence/parallel-integration-local-completion-helper/result.json"
+        "docs/parity-evidence/parallel-integration-local-completion-helper/result.json",
+        "https://github.com/asad-albadi/TermCraft/actions/runs/45636600121"
       ],
-      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
-      "platform_limitations": "Opened-object mutation and general POSIX COMMSTATUS/properties/modem events remain unavailable by design where no identity-safe native API exists. They are not marked implemented or assumed fixable by another Linux machine."
+      "next_action": "Diagnose the first hosted Ubuntu24.04 CI allocation-cleanup failure linked in GitHub issue3. Establish whether implementation cleanup or a nonportable test assumption is wrong, fix with evidence, and rerun required checks. Native device/platform work remains separately dependent on supported hosts and hardware.",
+      "platform_limitations": "Opened-object mutation and general POSIX COMMSTATUS/properties/modem events remain unavailable by design where no identity-safe native API exists. They are not marked implemented or assumed fixable by another Linux machine.",
+      "native_dependency": "Native Windows/macOS RDP/redirection endpoints and physical printer, smartcard and serial fixtures. POSIX lacks the required opened-object rename/delete and general COMMSTATUS/properties/modem-event semantics; additional Linux hardware alone cannot supply missing OS APIs."
     },
     {
       "id": "D03",
@@ -1012,6 +1014,16 @@
     "debian_core_archive_sha256": "4628e1c5e58f50fc6bec4f31140a65567138c589b020d7be74abde769f32e8af",
     "debian_revision3_sha256": "9a7c2b80deaa3f062c783fa4a49cd3f926681bf3de31238f608a0b238860f337",
     "final_independent_artifact_review": "docs/parity-evidence/parallel-integration-tigervnc-clipboard-fix-release/final-independent-review.md",
-    "scope_note": "Remaining implementation and validation requires stated native/equipment/original environments; documented POSIX architecture limitations remain explicit, not hardware-only or complete."
+    "scope_note": "Remaining implementation and validation requires stated native/equipment/original environments; documented POSIX architecture limitations remain explicit, not hardware-only or complete.",
+    "publication_follow_up": {
+      "repository": "https://github.com/asad-albadi/TermCraft",
+      "windows_issue": "https://github.com/asad-albadi/TermCraft/issues/1",
+      "macos_issue": "https://github.com/asad-albadi/TermCraft/issues/2",
+      "ci_release_issue": "https://github.com/asad-albadi/TermCraft/issues/3",
+      "initial_hosted_ci": "https://github.com/asad-albadi/TermCraft/actions/runs/45636600121",
+      "hosted_helper_passed": 81,
+      "hosted_helper_failed": 1,
+      "cause": "Unconfirmed; D02 investigation is actionable again. Prior local qualification is retained as historical evidence."
+    }
   }
 }

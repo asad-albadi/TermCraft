@@ -173,7 +173,13 @@ The latest recorded Linux regression baseline passed **986 tests, zero failures,
 
 Remaining work includes native Windows/macOS engine and provider implementation, browser/runtime packaging, installers, original Personal 26.6 measurements and physical-device/graphics checks. Some POSIX file/serial operations remain explicitly unsupported because equivalent safe APIs are unavailable; another Linux machine or added hardware does not resolve that architecture gap.
 
-Track work in the [parity checklist](PARITY_CHECKLIST.md), [durable queue](PARITY_EXECUTION_QUEUE.json), [progress log](PARITY_PROGRESS.md) and [GitHub issues](https://github.com/asad-albadi/TermCraft/issues). Native platform and desktop-release issues will link back to those records.
+The first hosted [GitHub CI run](https://github.com/asad-albadi/TermCraft/actions/runs/45636600121) found an RDP helper allocation-cleanup test failure (81 passed, 1 failed). The root cause is not yet established; GitHub CI is not green. This is tracked in the CI/release issue below, separately from the recorded local baseline.
+
+- [Windows native implementation, packaging and qualification — #1](https://github.com/asad-albadi/TermCraft/issues/1)
+- [macOS Apple Silicon and Intel implementation and delivery — #2](https://github.com/asad-albadi/TermCraft/issues/2)
+- [Desktop CI and GitHub releases, modeled after PixelCraft without Android — #3](https://github.com/asad-albadi/TermCraft/issues/3)
+
+The [parity checklist](PARITY_CHECKLIST.md), [durable queue](PARITY_EXECUTION_QUEUE.json) and [progress log](PARITY_PROGRESS.md) retain the detailed implementation and evidence records.
 
 ## License and credits
 

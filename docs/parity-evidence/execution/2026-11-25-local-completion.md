@@ -4,7 +4,7 @@
 
 ## Completed local work
 
-Current source `32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad`, source commit `7b04c58`, local branch `parity-implementation`. No remote or GitHub upload is configured. The XDMCP reset, Wayland idle-screen disconnect and TigerVNC clipboard compression defects have independently reviewed fixes. Original failures, intermediate artifacts and immutable evidence remain preserved.
+Current source `32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad`, source commit `7b04c58`, local branch `parity-implementation`. This qualification was captured before the initial GitHub publication. The repository is now published at [asad-albadi/TermCraft](https://github.com/asad-albadi/TermCraft). The first hosted CI run subsequently failed one RDP allocation-cleanup test (81 helper tests passed, 1 failed); see [CI/release issue #3](https://github.com/asad-albadi/TermCraft/issues/3). That new result remains open and does not overwrite the earlier local evidence. The XDMCP reset, Wayland idle-screen disconnect and TigerVNC clipboard compression defects have independently reviewed fixes. Original failures, intermediate artifacts and immutable evidence remain preserved.
 
 The fresh root gate completed0:986passed/0failed/73ignored across71outer targets,750source/test inputs unchanged. Five new clipboard regressions are discovered by the ordinary suite; six optional Wayland engine tests pass separately. Root parent/compiler affinity stayedCPU0; only the recorded owned library/UI test processes moved toCPU2 to avoid contention. No tests were skipped as a speed workaround. Formatting passes.
 
@@ -28,7 +28,7 @@ Verified copies are retained under `dist/snapshots/<archive-sha>/`; each has a q
 
 | IDs | Required environment/work |
 |---|---|
-| D02 | Native Windows/macOS RDP/device endpoints and printer/smartcard/serial fixtures; supported native APIs for remaining device/file semantics |
+| D02 | New hosted allocation-cleanup test failure needs investigation; native Windows/macOS RDP/device endpoints and printer/smartcard/serial fixtures remain required for broader coverage |
 | X01–X04 | Build and qualify reviewed native Windows/macOS engines, authentication/clipboard/display workflows; physical graphics/monitor and original comparisons |
 | P01,P08,E01 | Native Windows/macOS client/browser payloads, installers, clean runtime and upgrade workflows; signing identities only if signed releases are chosen |
 | E03 | Native Windows/macOS services/capture/control, physical desktop/GPU/consent fixtures and original service measurements |
@@ -50,4 +50,4 @@ The46implemented checkpoints also retain outstanding native/original comparisons
 - [Independent RDP scope](../V03/independent-rdp-server/README.md)
 - [Authoritative queue](../../../PARITY_EXECUTION_QUEUE.json)
 
-All currently identified reproducible local defects and the concrete local cells from the final audit are addressed within these declared scopes. Remaining environments and platform limitations stay open; no full-parity, universal-Linux or original-runtime signoff is implied. Final independent artifact/metadata review is recorded alongside the current release packet.
+At the recorded pre-publication qualification checkpoint, the locally reproduced defects and listed audit cells were addressed within these declared scopes. The subsequent hosted allocation-cleanup failure described above is new open work, and D02 investigation is actionable again. Remaining environments and platform limitations stay open; no full-parity, universal-Linux or original-runtime signoff is implied. Final independent artifact/metadata review is recorded alongside the current release packet.
