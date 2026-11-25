@@ -29,6 +29,12 @@ executable hash matched the packaged helper. The application preserved the
 saved session and checked workspace preferences. See [desktop lifecycle](app-lifecycle.md)
 for the native registration, replacement, vault and event observations.
 
+Three packaged startup runs used isolated workspace preferences for System,
+Light and Dark. All produced 1360×880 frames. Mean grayscale luminance was
+31.14, 243.85 and 31.13 respectively. System followed Dark on this desktop.
+This covers startup appearance on this host. Live OS theme transitions,
+detached windows and physical display scaling still need separate evidence.
+
 ## Software qualification
 
 - `cargo +1.96.1 test --locked --all-targets --no-fail-fast` on the native
