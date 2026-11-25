@@ -39,6 +39,7 @@ fn launch(
     flag: &AtomicBool,
     pin: &native_policy::NativePin,
 ) -> Result<XServerLease, String> {
+    native_transport::cancelled(flag)?;
     let image = VerifiedSnapshot::create(&root.join("x11/macos-universal-private1"), pin.files)?;
     let runtime = tempfile::Builder::new()
         .prefix("termcraft-x11-")
@@ -105,14 +106,20 @@ fn launch(
         .spawn()
         .map_err(|e| format!("Could not start private XQuartz image: {e}"))?;
     let mut process = super::engine::OwnedProcess::new(child);
-    let deadline = Instant::now() + Duration::from_secs(8);
+    let deadline = Instant::now() + Duration::from_secs(12);
+    let mut last_error = None;
     loop {
         native_transport::cancelled(flag)?;
         if !process.is_running().map_err(|e| e.to_string())? {
             return Err("Private XQuartz exited before authenticated readiness".into());
         }
         if Instant::now() >= deadline {
-            return Err("Private XQuartz timed out opening its inherited display socket".into());
+            return Err(format!(
+                "Private XQuartz timed out opening its inherited display socket{}",
+                last_error
+                    .as_ref()
+                    .map_or_else(String::new, |error| format!(": {error}"))
+            ));
         }
         match native_transport::setup_unix(&socket, None, flag) {
             Ok(true) => return Err("Private XQuartz inherited listener bypassed Xauthority".into()),
@@ -121,7 +128,7 @@ fn launch(
                     break;
                 }
             }
-            Err(_) => {}
+            Err(error) => last_error = Some(error),
         }
         std::thread::sleep(Duration::from_millis(15));
     }
@@ -135,4 +142,64 @@ fn launch(
         _native_image: image,
         _runtime: runtime,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sha2::{Digest, Sha256};
+
+    #[test]
+    #[ignore = "requires an explicitly staged local XQuartz candidate and a macOS desktop"]
+    fn local_candidate_uses_verified_snapshot_and_cleans_up() {
+        let root = std::path::PathBuf::from(
+            std::env::var_os("TERMCRAFT_TEST_XQUARTZ_ROOT")
+                .expect("set the explicit fixture resource root"),
+        );
+        let candidate = root.join("x11/macos-universal-private1");
+        let manifest_path = candidate.join("NATIVE-BUILD.json");
+        let bytes = std::fs::read(manifest_path).unwrap();
+        let expected = std::env::var("TERMCRAFT_TEST_XQUARTZ_MANIFEST_SHA256").unwrap();
+        let digest: String = Sha256::digest(&bytes)
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect();
+        assert_eq!(digest, expected);
+        let manifest: &'static serde_json::Value =
+            Box::leak(Box::new(serde_json::from_slice(&bytes).unwrap()));
+        let files = manifest["files"]
+            .as_object()
+            .unwrap()
+            .iter()
+            .map(|(path, hash)| (path.as_str(), hash.as_str().unwrap()))
+            .collect::<Vec<_>>();
+        // Fixture-only pins have no path to the compiled runtime policy.
+        let pin = native_policy::NativePin {
+            files: Box::leak(files.into_boxed_slice()),
+            executable: "XQuartz.app/Contents/MacOS/X11.bin",
+            version: "local qualification fixture",
+        };
+        assert!(native_policy::macos_pin().is_err());
+        let cancelled = AtomicBool::new(true);
+        assert!(
+            launch(&root, &cancelled, &pin)
+                .err()
+                .unwrap()
+                .contains("cancel")
+        );
+        let lease = launch(&root, &AtomicBool::new(false), &pin).unwrap();
+        let pid = lease.process.id().unwrap() as libc::pid_t;
+        assert_eq!(unsafe { libc::getpgid(pid) }, pid);
+        let display = std::path::PathBuf::from(&lease.display);
+        let authority = lease.authority_path.clone();
+        let snapshot = lease._native_image.root().to_path_buf();
+        assert!(display.exists() && authority.exists() && snapshot.exists());
+        drop(lease);
+        assert!(!display.exists() && !authority.exists() && !snapshot.exists());
+        assert_eq!(unsafe { libc::kill(pid, 0) }, -1);
+        assert_eq!(
+            std::io::Error::last_os_error().raw_os_error(),
+            Some(libc::ESRCH)
+        );
+    }
 }
