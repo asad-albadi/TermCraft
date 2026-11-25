@@ -376,7 +376,8 @@ async fn hung_native_callback_times_out_and_reaps_only_owned_process() {
 }
 
 #[test]
-fn parent_death_watchdog_reaps_in_disposable_subreaper() {
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+fn parent_death_watchdog_retires_owned_worker() {
     let result = command("")
         .arg("--fixture-watchdog-audit")
         .output()

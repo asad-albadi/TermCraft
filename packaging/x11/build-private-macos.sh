@@ -32,7 +32,7 @@ root=$(cd -- "$script_dir/../.." && pwd)
 work=$(mktemp -d "${TMPDIR:-/tmp}/termcraft-private-xquartz.XXXXXXXX")
 trap 'rm -rf -- "$work"' EXIT
 sdk=$(xcrun --sdk macosx --show-sdk-path)
-quartz_headers=$(pkg-config --cflags xfont2 x11)
+quartz_headers=$(pkg-config --cflags xfont2 x11 gl)
 
 build_one() {
   local target=$1
@@ -87,6 +87,9 @@ mkdir -p "$destination/CORRESPONDING-SOURCE"
 cp -- "$source_archive" "$destination/CORRESPONDING-SOURCE/xorg-server.tar.gz"
 cp -- "$script_dir/native/xquartz-private-entry.patch" "$destination/CORRESPONDING-SOURCE/"
 cp -- "$work/source-$resource_arch/COPYING" "$destination/CORRESPONDING-SOURCE/xorg-server-COPYING"
+if [[ -d "$dependency_prefix/share/termcraft/CORRESPONDING-SOURCE" ]]; then
+  cp -R -- "$dependency_prefix/share/termcraft/CORRESPONDING-SOURCE/." "$destination/CORRESPONDING-SOURCE/"
+fi
 cp -- "$dependency_prefix/bin/xkbcomp" "$runtime/bin/xkbcomp"
 cp -R -- "$dependency_prefix/share/X11/xkb" "$runtime/share/X11/"
 cp -R -- "$dependency_prefix/share/fonts/X11" "$runtime/share/fonts/"

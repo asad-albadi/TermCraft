@@ -17,7 +17,7 @@ import time
 PROTOCOL = b"MIT-MAGIC-COOKIE-1"
 
 
-def setup(path, cookie=None):
+def setup(path, cookie=None, query_extensions=False):
     name = PROTOCOL if cookie else b""
     packet = struct.pack("<BxHHHHxx", ord("l"), 11, 0, len(name), len(cookie or b""))
     if cookie:
@@ -33,6 +33,25 @@ def setup(path, cookie=None):
                 raise ValueError("Invalid X setup reply")
             if status == 1 and (major, minor) != (11, 0):
                 raise ValueError("Unexpected X protocol version")
+            if query_extensions and status == 1:
+                # Core X11 ListExtensions on the same authenticated connection.
+                client.sendall(struct.pack("<BxH", 99, 1))
+                header = response.read(32)
+                if len(header) != 32 or header[0] != 1:
+                    raise ValueError("XQuartz did not reply to ListExtensions")
+                payload_size = struct.unpack_from("<I", header, 4)[0] * 4
+                if payload_size > 65536:
+                    raise ValueError("XQuartz extension payload exceeds the probe limit")
+                payload = response.read(payload_size)
+                extensions = []
+                offset = 0
+                for _ in range(header[1]):
+                    if offset >= len(payload) or offset + 1 + payload[offset] > len(payload):
+                        raise ValueError("Truncated XQuartz extension name")
+                    end = offset + 1 + payload[offset]
+                    extensions.append(payload[offset + 1:end].decode("ascii"))
+                    offset = end
+                return sorted(extensions)
             return status == 1
 
 
@@ -79,8 +98,11 @@ def probe(root, evidence):
                             raise
                 else:
                     raise RuntimeError(f"XQuartz exited before readiness ({child.returncode})")
-                if anonymous or setup(path, bytes(a ^ 0xff for a in cookie)) or not setup(path, cookie):
+                extensions = setup(path, cookie, query_extensions=True)
+                if anonymous or setup(path, bytes(a ^ 0xff for a in cookie)) or not extensions:
                     raise ValueError("Private XQuartz did not enforce the owned cookie")
+                if not {"RENDER", "XKEYBOARD"} <= set(extensions) or "Composite" in extensions:
+                    raise ValueError("Unexpected private XQuartz extension set")
                 if os.getpgid(child.pid) != child.pid:
                     raise ValueError("XQuartz did not retain its dedicated process group")
             finally:
@@ -97,6 +119,7 @@ def probe(root, evidence):
             "executable_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
             "anonymous": "rejected", "incorrect_cookie": "rejected", "owned_cookie": "accepted",
             "owned_process_group_reaped": child.poll() is not None,
+            "advertised_extensions": extensions,
         }
     if home.exists():
         raise ValueError("Private XQuartz workspace was not removed")
