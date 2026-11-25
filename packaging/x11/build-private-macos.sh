@@ -68,18 +68,18 @@ case "$arch" in
     ;;
 esac
 
-mkdir -p "$destination/bin" "$destination/resources"
-cp -- "$work/binaries/$arch/X11.bin" "$destination/bin/X11.bin"
-chmod 0555 "$destination/bin/X11.bin"
+mkdir -p "$destination/opt/X11/bin" "$destination/opt/X11/lib" "$destination/opt/X11/share"
+cp -- "$work/binaries/$arch/X11.bin" "$destination/opt/X11/bin/X11.bin"
+chmod 0555 "$destination/opt/X11/bin/X11.bin"
 
 # Copy and relocate the complete non-system Mach-O dependency closure.
 declare -A copied
-queue=("$destination/bin/X11.bin")
+queue=("$destination/opt/X11/bin/X11.bin")
 while ((${#queue[@]})); do
   image=${queue[0]}
   queue=("${queue[@]:1}")
-  if [[ "$image" == "$destination/bin/X11.bin" ]]; then
-    loader_prefix='@loader_path/../resources'
+  if [[ "$image" == "$destination/opt/X11/bin/X11.bin" ]]; then
+    loader_prefix='@loader_path/../lib'
   else
     loader_prefix='@loader_path'
   fi
@@ -89,7 +89,7 @@ while ((${#queue[@]})); do
       /opt/X11/*) echo 'XQuartz system-prefix dependency detected.' >&2; exit 1 ;;
       /*)
         name=$(basename "$dependency")
-        target="$destination/resources/$name"
+        target="$destination/opt/X11/lib/$name"
         if [[ ! -e "$target" ]]; then
           [[ -f "$dependency" ]] || { echo "Missing Mach-O dependency: $dependency" >&2; exit 1; }
           cp -- "$dependency" "$target"
@@ -106,12 +106,12 @@ while ((${#queue[@]})); do
   done < <(otool -L "$image" | tail -n +2 | sed -E 's/^\s+([^ ]+) \(.*/\1/')
 done
 
-if otool -L "$destination/bin/X11.bin" "$destination/resources"/* 2>/dev/null | grep -F '/opt/X11/' >/dev/null; then
+if otool -L "$destination/opt/X11/bin/X11.bin" "$destination/opt/X11/lib"/* 2>/dev/null | grep -F '/opt/X11/' >/dev/null; then
   echo 'Relocation left an /opt/X11 dependency.' >&2
   exit 1
 fi
 
-for image in "$destination/bin/X11.bin" "$destination/resources"/*; do
+for image in "$destination/opt/X11/bin/X11.bin" "$destination/opt/X11/lib"/*; do
   [[ -f "$image" ]] || continue
   codesign --force --sign - "$image" >/dev/null
 done
@@ -125,7 +125,7 @@ def digest(path):
     with path.open('rb') as f:
         for chunk in iter(lambda:f.read(1024*1024), b''): h.update(chunk)
     return h.hexdigest()
-binary=destination/'bin/X11.bin'
+binary=destination/'opt/X11/bin/X11.bin'
 info={
     'schema': 1,
     'status': 'unqualified private native build; native lifecycle and graphics evidence required',
