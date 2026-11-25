@@ -1,8 +1,15 @@
 [CmdletBinding()]
-param([Parameter(Mandatory)][string]$Archive)
+param(
+    [Parameter(Mandatory)][string]$Archive,
+    [string]$PreviousArchive
+)
 
 $ErrorActionPreference = 'Stop'
 $zip = (Resolve-Path -LiteralPath $Archive).Path
+$archives = @($zip, $zip)
+if ($PreviousArchive) {
+    $archives[0] = (Resolve-Path -LiteralPath $PreviousArchive).Path
+}
 $scratch = New-Item -ItemType Directory -Path (Join-Path ([IO.Path]::GetTempPath()) ("TermCraft package " + [guid]::NewGuid().ToString('N')))
 $local = [Environment]::GetFolderPath('LocalApplicationData')
 $menu = [Environment]::GetFolderPath('Programs')
@@ -11,10 +18,31 @@ $fixtureName = 'qualification.' + [guid]::NewGuid().ToString('N')
 
 $shell = New-Object -ComObject WScript.Shell
 $installed = @()
+$appHashes = @()
+$workingData = Join-Path $scratch.FullName 'installed workspace'
+$null = New-Item -ItemType Directory -Path $workingData
+$config = Join-Path $workingData 'workspace.json'
+$userFile = Join-Path $workingData 'unrelated.txt'
+[IO.File]::WriteAllText($config, '{"sessions":[{"id":"upgrade-fixture","name":"Keep this session","protocol":"SSH","host":"example.test","port":22}],"preferences":{"appearance":"Dark"}}')
+[IO.File]::WriteAllText($userFile, 'keep this file across installs and uninstall')
+$userHash = (Get-FileHash -LiteralPath $userFile).Hash
+
+function Assert-WorkspacePreserved {
+    $workspace = Get-Content -LiteralPath $config -Raw | ConvertFrom-Json
+    $session = @($workspace.sessions)
+    if ($session.Count -ne 1 -or $session[0].id -cne 'upgrade-fixture' -or
+        $session[0].name -cne 'Keep this session' -or $session[0].protocol -cne 'SSH' -or
+        $session[0].host -cne 'example.test' -or $session[0].port -ne 22 -or
+        $workspace.preferences.appearance -cne 'Dark' -or
+        (Get-FileHash -LiteralPath $userFile).Hash -ne $userHash) {
+        throw 'The package lifecycle changed the shared workspace fixture.'
+    }
+}
+
 try {
     foreach ($revision in 1, 2) {
         $expanded = Join-Path $scratch.FullName "version $revision"
-        Expand-Archive -LiteralPath $zip -DestinationPath $expanded
+        Expand-Archive -LiteralPath $archives[$revision - 1] -DestinationPath $expanded
         $root = @(Get-ChildItem -LiteralPath $expanded -Directory)
         if ($root.Count -ne 1) { throw 'Expected a single package root.' }
         $manifestPath = Join-Path $root[0].FullName 'PACKAGE-MANIFEST.json'
@@ -40,17 +68,20 @@ try {
                 throw "Installed executable differs from the package: $file"
             }
         }
+        $appHashes += (Get-FileHash -LiteralPath $program).Hash
+        $startup = Join-Path $scratch.FullName "installed-startup-$revision.png"
+        & $program --data-dir $workingData --screenshot $startup
+        if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $startup -PathType Leaf) -or
+            (Get-Item -LiteralPath $startup).Length -lt 5000) {
+            throw 'The installed GUI did not produce its startup screenshot.'
+        }
+        Assert-WorkspacePreserved
+    }
+    if ($PreviousArchive -and $appHashes[0] -eq $appHashes[1]) {
+        throw 'PreviousArchive must contain a distinct GUI executable.'
     }
 
     $first = $installed[0]
-    $program = Join-Path $first.Path 'harbor-workspace.exe'
-    $startup = Join-Path $scratch.FullName 'installed-startup.png'
-    $workingData = Join-Path $scratch.FullName 'installed workspace'
-    & $program --data-dir $workingData --screenshot $startup
-    if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $startup -PathType Leaf) -or
-        (Get-Item -LiteralPath $startup).Length -lt 5000) {
-        throw 'The installed GUI did not produce its startup screenshot.'
-    }
     $extra = Join-Path $first.Path 'additional-file.txt'
     [IO.File]::WriteAllText($extra, 'must survive refusal')
     try {
@@ -75,7 +106,9 @@ try {
             throw 'An installed version or Start menu shortcut remained after uninstall.'
         }
     }
-    Write-Output 'Verified per-user side-by-side installation, installed GUI startup, shortcuts, extra-file refusal, and uninstall.'
+    Assert-WorkspacePreserved
+    Write-Output 'Verified per-user side-by-side installation, both installed GUI startups, shortcuts, extra-file refusal, workspace preservation, and uninstall.'
+    Write-Output "Installed GUI SHA-256, in execution order: $($appHashes -join ', ')"
 } finally {
     foreach ($entry in $installed) {
         if (Test-Path -LiteralPath $entry.Path) { & $entry.Installer -Action Uninstall }

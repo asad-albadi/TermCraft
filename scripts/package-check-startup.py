@@ -90,7 +90,30 @@ def linux_rdp_helper_matches(image, expected_digest):
         return False
 
 
-def rdp_session_probe(executable, helper_digest, isolated, environment, evidence):
+def windows_rdp_child(parent_pid, helper, expected_digest):
+    """Observe the Windows process image while its loopback connection is open."""
+    powershell = Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe"
+    # Windows PowerShell 5.1 has no -AsArray parameter. Wrap the query results
+    # and pass them as a single value to ConvertTo-Json.
+    command = (
+        "[Console]::OutputEncoding = [Text.Encoding]::UTF8; "
+        f"$children = @(Get-CimInstance Win32_Process -Filter 'ParentProcessId = {parent_pid}' "
+        "| Select-Object ProcessId,ExecutablePath); "
+        "ConvertTo-Json -InputObject $children -Compress"
+    )
+    completed = subprocess.run(
+        [powershell, "-NoProfile", "-NonInteractive", "-Command", command],
+        check=True, capture_output=True, text=True, encoding="utf-8-sig", timeout=15,
+    )
+    for child in json.loads(completed.stdout):
+        if child["ExecutablePath"]:
+            actual = Path(child["ExecutablePath"])
+            if actual == helper and sha256(actual) == expected_digest:
+                return child["ProcessId"]
+    raise ValueError("RDP session did not start the verified adjacent Windows package helper.")
+
+
+def rdp_session_probe(executable, helper, helper_digest, isolated, environment, evidence):
     workspace = isolated / "RDP test workspace"
     workspace.mkdir()
     config = workspace / "workspace.json"
@@ -118,7 +141,10 @@ def rdp_session_probe(executable, helper_digest, isolated, environment, evidence
                         header = incoming.read(4)
                         if len(header) != 4 or header[:2] != b"\x03\x00":
                             raise ValueError("Packaged RDP session did not send a TPKT header.")
-                        if platform.system() == "Linux":
+                        host = platform.system()
+                        if host == "Windows":
+                            windows_rdp_child(app.pid, helper, helper_digest)
+                        elif host == "Linux":
                             threads = Path(f"/proc/{app.pid}/task")
                             children = {
                                 pid for thread in threads.iterdir()
@@ -203,7 +229,7 @@ def smoke(archive, evidence, display):
                 raise ValueError("Screenshot is too small or blank.")
             size = image.size
         helper_digest = manifest["files"][helper.relative_to(root).as_posix()]
-        rdp_session_probe(executable, helper_digest, isolated, environment, evidence)
+        rdp_session_probe(executable, helper, helper_digest, isolated, environment, evidence)
         (evidence / "verification.json").write_text(json.dumps({
             "archive": archive.name, "archive_sha256": sha256(archive),
             "manifest_schema": manifest["schema_version"], "platform": host,
@@ -213,7 +239,7 @@ def smoke(archive, evidence, display):
             "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
             "screen_size": size, "rdp_helper_wire_version": 1,
             "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
-            "rdp_helper_child_location_verified": host == "linux",
+            "rdp_helper_child_location_verified": host in ("linux", "windows"),
         }, indent=2) + "\n")
 
 

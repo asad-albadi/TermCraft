@@ -7,11 +7,15 @@ use super::{
 use std::{
     ffi::OsString,
     net::{SocketAddr, TcpListener},
-    path::Path,
+    os::windows::ffi::OsStringExt,
+    path::{Path, PathBuf},
     sync::atomic::AtomicBool,
     time::{Duration, Instant},
 };
-use windows_sys::Win32::{NetworkManagement::IpHelper::*, Networking::WinSock::AF_INET};
+use windows_sys::Win32::{
+    NetworkManagement::IpHelper::*, Networking::WinSock::AF_INET,
+    System::SystemInformation::GetSystemDirectoryW,
+};
 pub(super) fn bundled_runtime(root: &Path) -> Result<(std::path::PathBuf, String), String> {
     let pin = native_policy::windows_pin()?;
     let package = root.join("x11/windows-x86_64-private1");
@@ -40,7 +44,7 @@ fn launch(
     root: &Path,
     options: XServerOptions,
     flag: &AtomicBool,
-    pin: &native_policy::NativePin,
+    pin: &native_policy::NativePin<'_>,
 ) -> Result<XServerLease, String> {
     let image = VerifiedSnapshot::create(&root.join("x11/windows-x86_64-private1"), pin.files)?;
     let runtime = tempfile::Builder::new()
@@ -63,8 +67,12 @@ fn launch(
     let mut arguments: Vec<OsString> = [
         format!(":{display}"),
         "-noreset".into(),
+        "-silent-dup-error".into(),
         "-nolisten".into(),
         "inet6".into(),
+        "-nolisten".into(),
+        "hyperv".into(),
+        "-nopn".into(),
         "-listen".into(),
         "tcp".into(),
         "-iglx".into(),
@@ -84,6 +92,8 @@ fn launch(
         ("PATH".into(), image.root().as_os_str().into()),
         ("TEMP".into(), runtime.path().as_os_str().into()),
         ("TMP".into(), runtime.path().as_os_str().into()),
+        ("HOME".into(), runtime.path().as_os_str().into()),
+        ("COMSPEC".into(), system_command_interpreter()?),
     ];
     for name in ["SystemRoot", "WINDIR"] {
         if let Some(value) = std::env::var_os(name) {
@@ -141,6 +151,20 @@ fn launch(
         _runtime: runtime,
     })
 }
+
+fn system_command_interpreter() -> Result<OsString, String> {
+    let mut buffer = [0u16; 260];
+    let len = unsafe { GetSystemDirectoryW(buffer.as_mut_ptr(), buffer.len() as u32) } as usize;
+    if len == 0 || len >= buffer.len() {
+        return Err("Could not locate the Windows system command interpreter for XKB.".into());
+    }
+    // The pinned X server uses the Windows command interpreter for xkbcomp.
+    // Keep application-local DLL lookup independent of the inherited PATH.
+    Ok(PathBuf::from(OsString::from_wide(&buffer[..len]))
+        .join("cmd.exe")
+        .into_os_string())
+}
+
 fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
     let mut size = 0;
     unsafe {
@@ -199,4 +223,46 @@ fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
         return Ok(found);
     }
     Err("Native listener ownership table kept changing".into())
+}
+
+#[cfg(test)]
+mod candidate_qualification {
+    use super::*;
+
+    #[test]
+    #[ignore = "requires the privately rebuilt Windows X engine and its review inventory"]
+    fn privately_built_engine_owns_listener_and_stops_cleanly() {
+        let root = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_WINDOWS_X11_ROOT").unwrap());
+        let inventory = PathBuf::from(
+            std::env::var_os("TERMCRAFT_TEST_WINDOWS_X11_INVENTORY").unwrap(),
+        );
+        let report: serde_json::Value =
+            serde_json::from_reader(std::fs::File::open(inventory).unwrap()).unwrap();
+        let files = report["files"].as_object().unwrap();
+        let entries: Vec<_> = files
+            .iter()
+            .map(|(path, hash)| (path.as_str(), hash.as_str().unwrap()))
+            .collect();
+        let pin = native_policy::NativePin {
+            files: &entries,
+            executable: "vcxsrv.exe",
+            version: "local qualification",
+        };
+        let options = XServerOptions {
+            artifact_id: native_policy::WINDOWS_ARTIFACT.into(),
+            ..Default::default()
+        };
+        let flag = AtomicBool::new(false);
+        let lease = launch(&root, options, &flag, &pin).unwrap();
+        let pid = lease.process_id().unwrap();
+        let display: u16 = lease.display().split_once(':').unwrap().1.parse().unwrap();
+        let address: SocketAddr = ([127, 0, 0, 1], display + 6000).into();
+        let runtime = lease.authority_path().parent().unwrap().to_owned();
+        assert!(owns_listener(pid, address).unwrap());
+        assert!(!native_transport::setup(address, None, &flag).unwrap());
+        assert!(!native_transport::setup(address, Some(&[0; 16]), &flag).unwrap());
+        lease.stop_owned().unwrap();
+        assert!(!owns_listener(pid, address).unwrap());
+        assert!(!runtime.exists());
+    }
 }

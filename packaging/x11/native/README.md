@@ -13,9 +13,32 @@ This validates the archive, safely extracts it, applies the exact private patch,
 
 ## Windows native build recipe
 
-Use a Windows x86_64 native worker with the upstream pinned source's `HOW_TO_BUILD.txt` prerequisites: Visual Studio 2022/VC143, the Windows SDK, Cygwin tools, Strawberry Perl and Python lxml/mako. In the freshly prepared tree, upstream's `buildall.sh 1 2 R` builds the 64-bit release with two jobs; its final NSIS step only produces installer archives, which must never be executed. The server output is `xorg-server/obj64/servrelease/vcxsrv.exe`. The DLLs, fonts, xkbcomp and xkbdata must come from that same native build and have their own complete pinned inventory. Do not combine an arbitrary rebuilt executable with PATH DLLs. Preserve corresponding source, this patch, exact SDK/tool versions, compiler options, PE import inventory and MSVC redistribution notices. Upstream scripts have not been run here: Windows native build/SDK tooling is unavailable.
+Use a Windows x86_64 native worker with Visual Studio 2022/VC143 and the Windows SDK. The pinned source's `buildall.sh` includes host-specific tool paths and an upstream NSIS installer step. On a native x64 Developer PowerShell, the underlying release build can run directly in the prepared source tree:
 
-The transport patch changes listener binds to IPv4/IPv6 loopback, replaces Windows SO_REUSEADDR with checked SO_EXCLUSIVEADDRUSE, and rejects a missing explicit display or displayfd scanning. The Rust provider reserves exactly one OS-selected loopback port, creates a suspended process with no inherited handles, assigns it to a kill-on-close job, releases the reservation, resumes, checks IP Helper ownership of the exact listener and requires anonymous rejection plus cookie-authenticated setup. A collision fails without scanning or altering the competing server. Snapshot PE/DLL handles deny write/delete sharing for the entire lease. The old upstream checksum is never an approval for this changed output.
+```powershell
+$env:IS64 = '1'
+$env:CFLAGS = '-FS'
+$env:CL = '/FS'
+$env:MHMAKECONF = (Get-Location).Path
+$env:PYTHON3 = (Get-Command python.exe).Source
+msbuild freetype/MSBuild.sln -t:Build -p:Configuration=Release -p:Platform=x64 -m:2
+New-Item -ItemType Directory -Path openssl/release64
+Push-Location openssl/release64
+perl.exe ../Configure VC-WIN64A --release
+jom.exe /J 4
+Pop-Location
+Push-Location pthreads
+nmake.exe VC-static EXTRAVERSION=64
+Pop-Location
+msbuild tools/mhmake/mhmakevc10.sln -t:Build -p:Configuration=Release -p:Platform=x64 -m:2
+tools/mhmake/Release64/mhmake.exe -P4 -C xorg-server MAKESERVER=1
+```
+
+Make NASM, Jom, Strawberry Perl, WinFlexBison, Python with lxml, Mako, PyYAML, Meson and Ninja, and GNU gperf available in this shell. Resolve the pinned tree's hard-coded WinFlexBison and Python launcher paths through that shell's PATH, and use Git Bash for the two upstream `wsl ./` recipes in `xorg-server/dix/makefile` and `xorg-server/xkeyboard-config/makefile`. Keep MSVC's executable directories ahead of Git's Unix tools so the build uses the MSVC linker. Preserve the native backslash form of `MHMAKECONF` because mhmake compares directory prefixes literally. Use a build directory with no spaces.
+
+Stage the server, `xorg-server/obj64/servrelease/vcxsrv.exe`, with the matching DLLs, fonts, xkbcomp and XKB data from the same build. The upstream x64 NSIS recipe lists the runtime files. Record exact PE imports, file hashes, toolchain versions, compiler options, corresponding source, the TermCraft patch and the MSVC redistribution notices before approving a payload.
+
+The transport patch changes listener binds to IPv4/IPv6 loopback, configures checked SO_EXCLUSIVEADDRUSE on Windows, and rejects a missing explicit display or displayfd scanning. The Windows SDK expands SO_EXCLUSIVEADDRUSE through SO_REUSEADDR, so the patch keeps the header's constant defined and excludes its reuse branch on Windows. The Rust provider reserves exactly one OS-selected loopback port, creates a suspended process with no inherited handles, assigns it to a kill-on-close job, releases the reservation, resumes, checks IP Helper ownership of the exact listener and requires anonymous rejection plus cookie-authenticated setup. A collision fails without scanning or altering the competing server. Snapshot PE/DLL handles deny write/delete sharing for the entire lease. The old upstream checksum is never an approval for this changed output.
 
 ## macOS native build recipe
 
