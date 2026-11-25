@@ -84,6 +84,13 @@ installed GUI startup, both with private workspaces. The package retains
 - Native scratch-registry integration tests passed, including ownership and
   uninstall-guard checks. They do not establish clean-account protocol
   activation or upgrade behavior for an actual installed version.
+- Normal startup and exit of the exact packaged GUI preserved two deliberately
+  corrupt inputs in a private workspace. Before and after SHA-256 matched
+  `aa511d8895eaacbd6dbc23190b08965ce2eddee3429b3e26929b96af3572e296`
+  for synthetic malformed `workspace.json`, and
+  `da997eec34a3d467c1603a1b4fe208d3122e095980f4b76a7d42cb9b75e4dff1`
+  for synthetic malformed `credentials.vault`. This checked byte preservation
+  at startup, separately from vault unlock and recovery.
 - The pinned VcXsrv source archive and patch matched SHA-256
   `a73b30db3eb6b60efd181a1cd7fa39bc6df8f0d4c973d6c8416a856b0bf55b28`
   and `d647860419fca13a17cb2765e8d30a1c521016d66969f8fb297b6f46e3c4f8bb`.
