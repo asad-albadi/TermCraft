@@ -410,7 +410,7 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS builders and interactive engine hosts to compile, approve hashes and qualify the reviewed owned-engine candidates.",
-      "remaining": "Reviewed Windows owned-job/loopback/PID/authentication and macOS private-socket/process-group source candidates are merged, with pinned upstream patches and offline source preparation. Native built engines, compiled checksum approvals and redistribution/runtime qualification remain unavailable; production gates reject stock engines. Linux owned Xwayland remains implemented.",
+      "remaining": "Reviewed Windows owned-job/loopback/PID/authentication and macOS private-socket/process-group source candidates are merged, with pinned upstream patches and offline source preparation. The macOS private builder now has recursive Mach-O relocation, runtime-aligned opt/X11 staging, and machine-checked evidence contracts; native built engines, compiled checksum approvals and redistribution/runtime qualification remain unavailable. Production gates reject stock engines. Linux owned Xwayland remains implemented.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -419,7 +419,10 @@
         "docs/parity-evidence/parallel-integration-reviewed/result.json",
         "docs/parity-evidence/X01/native-providers.md",
         "docs/parity-evidence/X01/native-providers-review.md",
-        "docs/parity-evidence/parallel-integration-native-clipboard/result.json"
+        "docs/parity-evidence/parallel-integration-native-clipboard/result.json",
+        "docs/parity-evidence/issue-2/artifact-contract.md",
+        "docs/parity-evidence/issue-2/xquartz-build.md",
+        "docs/parity-evidence/issue-2/evidence-schema.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
@@ -431,12 +434,14 @@
         "F01"
       ],
       "dependency": "Qualified native Windows/macOS owned engines from X01 and interactive SSH/X authentication, clipboard and display workflows on those systems.",
-      "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. Complete Windows/macOS owned-engine integration, native clipboard/display behavior and native/original qualification.",
+      "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. The macOS provider lifecycle and authenticated inherited-listener contracts are documented, but complete Windows/macOS owned-engine integration, native clipboard/display behavior and native/original qualification remain open.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/X02/review.md",
-        "docs/parity-evidence/parallel-integration-clean/result.json"
+        "docs/parity-evidence/parallel-integration-clean/result.json",
+        "docs/parity-evidence/issue-2/xquartz-build.md",
+        "docs/parity-evidence/issue-2/providers.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
       "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
@@ -731,13 +736,14 @@
       ],
       "dependency": "",
       "remaining": "",
-      "validation_remaining": "Native macOS compilation, URL/file events, Finder Services/registration and Linux desktop variants/original comparisons remain unverified.",
+      "validation_remaining": "Native macOS compilation, URL/file events, Finder Services/registration and Linux desktop variants/original comparisons remain unverified. Bundle ownership/removal checks are covered by the issue #2 lifecycle contract; moved-app and native event forwarding still require a built `.app` smoke run.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/B05/implementation.md",
         "docs/parity-evidence/B05/review-fixes.md",
         "docs/parity-evidence/B05/merged-python-final.log",
-        "docs/parity-evidence/parallel-integration-platform-services/result.json"
+        "docs/parity-evidence/parallel-integration-platform-services/result.json",
+        "docs/parity-evidence/issue-2/app-lifecycle.md"
       ],
       "next_action": "Retain reviewed owned Linux integration and native Mac launcher source candidate; collect native qualification without changing defaults."
     },
@@ -937,10 +943,12 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS build runners with interactive desktop access; source/type checks do not establish native runtime behavior.",
-      "remaining": "Run native Windows and macOS builds and interactive workflows. Windows cross-target `cargo check` proves compilation only.",
+      "remaining": "Run native Windows and macOS builds and interactive workflows. The macOS release matrix records SDK/toolchain metadata and runs the locked RDP helper suite, but native package and interactive evidence remain open. Windows cross-target `cargo check` proves compilation only.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
-        "PARITY_PROGRESS.md"
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/issue-2/BASELINE.md",
+        "docs/parity-evidence/issue-2/evidence-schema.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
