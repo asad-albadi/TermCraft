@@ -19,7 +19,20 @@ The transport patch changes listener binds to IPv4/IPv6 loopback, replaces Windo
 
 ## macOS native build recipe
 
-A native arm64 and x86_64 worker needs the Xcode macOS SDK, meson/ninja/pkg-config/bison/flex/mig, and the complete pinned XQuartz dependency source/build closure. The release `.pkg` is an inspection/dependency input; never execute its installation scripts. Configure patched xserver with `--wrap-mode=nodownload`, `-Dxquartz=true -Dxorg=false -Dxephyr=false -Dxnest=false -Dxvfb=false -Dxcsecurity=true`, an application-specific `-Dbundle-id-prefix=org.termcraft.private`, and empty Sparkle feed/key options. Use private prefix, XKB and font data paths. Build `hw/xquartz/mach-startup/X11.bin` plus the generated bundle resources. Do **not** run `meson install`: upstream's bundle install hook attempts root ownership. Copy only the build outputs, nib/resources, private xkbcomp/data/fonts and matching dependency dylibs into a fresh staging tree.
+A native worker needs the Xcode macOS SDK, Meson, Ninja, pkg-config, Bison,
+Flex and MIG. Use the distribution gitlinks in `source-contract.json` for
+xorgproto, Mesa, xkbcomp, XKB data and the core bitmap fonts. Mesa 22.2.5's
+configure still uses Python's `distutils`. Python 3.11 with Mako provides a
+working build environment. Set both `TERMCRAFT_XQUARTZ_DEPS` and
+`PKG_CONFIG_PATH` for the private dependency prefix. Install the font
+data with an explicit `FONTROOTDIR` under that prefix, since font-util can
+otherwise select its own absolute directory.
+
+The builder compiles the patched server and stages its generated plist, nibs,
+defaults, xkbcomp, XKB data and fonts into a fresh tree. Upstream's XQuartz
+installer hooks request root ownership. The builder skips these hooks and
+stages the built files directly. To collect bounded desktop evidence, run
+`python3 packaging/x11/native/probe-macos.py CANDIDATE EVIDENCE_DIRECTORY`.
 
 Relocate every non-system Mach-O dependency and install name to app-relative `@loader_path`/`@executable_path` paths, verify both architecture slices contain no `/opt/X11` references, and sign leaf dylibs/frameworks followed by the private app. Snapshot and pin the final signed tree including resources and code-signature files. The current `/opt/X11` release payload cannot substitute for that output. No relocated/signed native build or native build execution exists in this evidence.
 

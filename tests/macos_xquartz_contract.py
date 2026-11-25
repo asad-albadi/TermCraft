@@ -22,7 +22,7 @@ class PrivateXQuartzBuildContract(unittest.TestCase):
             "-Dsparkle-feed-url=",
             "-Dsparkle-public-edkey=",
             "meson compile",
-            "install_name_tool",
+            "relocate-macos.py",
             "codesign",
         ):
             self.assertIn(flag, text)
@@ -37,11 +37,12 @@ class PrivateXQuartzBuildContract(unittest.TestCase):
         self.assertIn("arm64", text)
 
     def test_private_builder_walks_the_complete_macho_dependency_closure(self):
-        text = (ROOT / "packaging/x11/build-private-macos.sh").read_text()
-        self.assertIn('queue=("$destination/opt/X11/bin/X11.bin")', text)
-        self.assertIn("while ((${#queue[@]})); do", text)
-        self.assertIn('queue+=("$target")', text)
-        self.assertIn("Missing Mach-O dependency", text)
+        text = (ROOT / "packaging/x11/native/relocate-macos.py").read_text()
+        self.assertIn("while queue:", text)
+        self.assertIn("queue.append((source, target))", text)
+        self.assertIn("lipo", text)
+        self.assertIn("install_name_tool", text)
+        self.assertIn("Missing or ambiguous Mach-O dependency", text)
 
 
 if __name__ == "__main__":

@@ -43,7 +43,7 @@ fn launch(
     let runtime = tempfile::Builder::new()
         .prefix("termcraft-x11-")
         .permissions(std::fs::Permissions::from_mode(0o700))
-        .tempdir()
+        .tempdir_in("/private/tmp")
         .map_err(|e| e.to_string())?;
     let socket = runtime.path().join("display:0");
     let listener = UnixListener::bind(&socket).map_err(|e| e.to_string())?;
@@ -71,6 +71,8 @@ fn launch(
             "-auth",
         ])
         .arg(&authority_path)
+        .arg("-fp")
+        .arg(image.root().join("opt/X11/share/fonts/X11/misc"))
         .env_clear()
         .env("HOME", runtime.path())
         .env("TMPDIR", runtime.path())

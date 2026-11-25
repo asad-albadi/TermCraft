@@ -32,22 +32,26 @@ root=$(cd -- "$script_dir/../.." && pwd)
 work=$(mktemp -d "${TMPDIR:-/tmp}/termcraft-private-xquartz.XXXXXXXX")
 trap 'rm -rf -- "$work"' EXIT
 sdk=$(xcrun --sdk macosx --show-sdk-path)
+quartz_headers=$(pkg-config --cflags xfont2 x11)
 
 build_one() {
   local target=$1
   local prepared=$work/source-$target
   local build=$work/build-$target
   python3 "$script_dir/native/prepare-source.py" --platform macos \
-    --source-archive "$source_archive" --destination "$prepared"
+    --source-archive "$source_archive" --destination "$prepared" >&2 || return
   meson setup "$build" "$prepared" \
-    --buildtype=release --wrap-mode=nodownload \
+    --buildtype=release --wrap-mode=nodownload --prefix "$work/prefix-$target" \
     -Dxquartz=true -Dxorg=false -Dxephyr=false -Dxnest=false -Dxvfb=false \
-    -Dxcsecurity=true -Dbundle-id-prefix=org.termcraft.private \
+    -Dxcsecurity=true -Dsecure-rpc=false -Dbundle-id-prefix=org.termcraft.private \
     -Dsparkle-feed-url= -Dsparkle-public-edkey= \
-    -Dc_args="-arch $target -isysroot $sdk" \
+    -Dc_args="-arch $target -isysroot $sdk -DTERMCRAFT_PRIVATE_XQUARTZ $quartz_headers" \
     -Dcpp_args="-arch $target -isysroot $sdk" \
-    -Dobjc_args="-arch $target -isysroot $sdk"
-  meson compile -C "$build"
+    -Dobjc_args="-arch $target -isysroot $sdk" \
+    -Dc_link_args="-arch $target -Wl,-headerpad_max_install_names" \
+    -Dcpp_link_args="-arch $target -Wl,-headerpad_max_install_names" \
+    -Dobjc_link_args="-arch $target -Wl,-headerpad_max_install_names" >&2 || return
+  meson compile -C "$build" >&2 || return
   local binary="$build/hw/xquartz/mach-startup/X11.bin"
   [[ -f "$binary" ]] || { echo "XQuartz direct-entry binary was not produced for $target." >&2; exit 1; }
   printf '%s\n' "$binary"
@@ -56,84 +60,63 @@ build_one() {
 mkdir -p "$work/binaries"
 case "$arch" in
   universal)
-    arm_binary=$(build_one arm64 | tail -n 1)
-    intel_binary=$(build_one x86_64 | tail -n 1)
+    arm_binary=$(build_one arm64)
+    intel_binary=$(build_one x86_64)
     mkdir -p "$work/binaries/universal"
     lipo -create "$arm_binary" "$intel_binary" -output "$work/binaries/universal/X11.bin"
     ;;
   *)
-    binary=$(build_one "$arch" | tail -n 1)
+    binary=$(build_one "$arch")
     mkdir -p "$work/binaries/$arch"
     cp -- "$binary" "$work/binaries/$arch/X11.bin"
     ;;
 esac
 
-mkdir -p "$destination/opt/X11/bin" "$destination/opt/X11/lib" "$destination/opt/X11/share"
-cp -- "$work/binaries/$arch/X11.bin" "$destination/opt/X11/bin/X11.bin"
-chmod 0555 "$destination/opt/X11/bin/X11.bin"
-
-# Copy and relocate the complete non-system Mach-O dependency closure.
-declare -A copied
-queue=("$destination/opt/X11/bin/X11.bin")
-while ((${#queue[@]})); do
-  image=${queue[0]}
-  queue=("${queue[@]:1}")
-  if [[ "$image" == "$destination/opt/X11/bin/X11.bin" ]]; then
-    loader_prefix='@loader_path/../lib'
-  else
-    loader_prefix='@loader_path'
-  fi
-  while IFS= read -r dependency; do
-    case "$dependency" in
-      /System/Library/*|/usr/lib/*) continue ;;
-      /opt/X11/*) echo 'XQuartz system-prefix dependency detected.' >&2; exit 1 ;;
-      /*)
-        name=$(basename "$dependency")
-        target="$destination/opt/X11/lib/$name"
-        if [[ ! -e "$target" ]]; then
-          [[ -f "$dependency" ]] || { echo "Missing Mach-O dependency: $dependency" >&2; exit 1; }
-          cp -- "$dependency" "$target"
-          install_name_tool -id "@loader_path/$name" "$target"
-        fi
-        install_name_tool -change "$dependency" "$loader_prefix/$name" "$image"
-        if [[ -z "${copied[$target]+set}" ]]; then
-          copied["$target"]=1
-          queue+=("$target")
-        fi
-        ;;
-      *) echo "Unexpected non-absolute Mach-O dependency: $dependency" >&2; exit 1 ;;
-    esac
-  done < <(otool -L "$image" | tail -n +2 | sed -E 's/^\s+([^ ]+) \(.*/\1/')
-done
-
-if otool -L "$destination/opt/X11/bin/X11.bin" "$destination/opt/X11/lib"/* 2>/dev/null | grep -F '/opt/X11/' >/dev/null; then
-  echo 'Relocation left an /opt/X11 dependency.' >&2
-  exit 1
-fi
-
-for image in "$destination/opt/X11/bin/X11.bin" "$destination/opt/X11/lib"/*; do
-  [[ -f "$image" ]] || continue
-  codesign --force --sign - "$image" >/dev/null
-done
+dependency_prefix=${TERMCRAFT_XQUARTZ_DEPS:?Set TERMCRAFT_XQUARTZ_DEPS to the private dependency prefix}
+resource_arch=$arch
+[[ "$arch" != universal ]] || resource_arch=arm64
+bundle="$destination/XQuartz.app/Contents"
+runtime="$destination/opt/X11"
+mkdir -p "$bundle/MacOS" "$bundle/Resources" "$runtime/bin" "$runtime/lib" "$runtime/share/X11" "$runtime/share/fonts"
+cp -- "$work/binaries/$arch/X11.bin" "$bundle/MacOS/X11.bin"
+cp -- "$work/build-$resource_arch/hw/xquartz/bundle/Info.plist" "$bundle/Info.plist"
+/usr/libexec/PlistBuddy -c 'Set :CFBundleExecutable X11.bin' "$bundle/Info.plist"
+cp -R -- "$work/source-$resource_arch/hw/xquartz/bundle/Resources/." "$bundle/Resources/"
+cp -- "$work/source-$resource_arch/hw/xquartz/defaults.plist" "$bundle/Resources/defaults.plist"
+mkdir -p "$destination/CORRESPONDING-SOURCE"
+cp -- "$source_archive" "$destination/CORRESPONDING-SOURCE/xorg-server.tar.gz"
+cp -- "$script_dir/native/xquartz-private-entry.patch" "$destination/CORRESPONDING-SOURCE/"
+cp -- "$work/source-$resource_arch/COPYING" "$destination/CORRESPONDING-SOURCE/xorg-server-COPYING"
+cp -- "$dependency_prefix/bin/xkbcomp" "$runtime/bin/xkbcomp"
+cp -R -- "$dependency_prefix/share/X11/xkb" "$runtime/share/X11/"
+cp -R -- "$dependency_prefix/share/fonts/X11" "$runtime/share/fonts/"
+test -s "$runtime/share/fonts/X11/misc/fonts.dir"
+python3 "$script_dir/native/relocate-macos.py" "$destination" "$arch"
+codesign --force --sign - "$destination/XQuartz.app"
+codesign --verify --strict "$destination/XQuartz.app"
 
 python3 - "$destination" "$source_archive" "$sdk" "$arch" <<'PY'
-import hashlib, json, os, plistlib, subprocess, sys
+import hashlib, json, os, subprocess, sys
 from pathlib import Path
-destination, source_archive, sdk, arch = map(Path, sys.argv[1:])
+destination, source_archive, sdk = map(Path, sys.argv[1:4])
+arch = sys.argv[4]
 def digest(path):
     h=hashlib.sha256()
     with path.open('rb') as f:
         for chunk in iter(lambda:f.read(1024*1024), b''): h.update(chunk)
     return h.hexdigest()
-binary=destination/'opt/X11/bin/X11.bin'
+binary=destination/'XQuartz.app/Contents/MacOS/X11.bin'
 info={
     'schema': 1,
     'status': 'unqualified private native build; native lifecycle and graphics evidence required',
     'architecture': arch,
+    'deployment_target': os.environ.get('MACOSX_DEPLOYMENT_TARGET', 'toolchain default'),
     'sdk': str(sdk),
+    'sdk_version': subprocess.check_output(['xcrun', '--sdk', 'macosx', '--show-sdk-version'], text=True).strip(),
+    'compiler': subprocess.check_output(['xcrun', 'clang', '--version'], text=True).splitlines()[0],
     'source_archive_sha256': digest(source_archive),
     'files': {str(p.relative_to(destination)): digest(p) for p in sorted(destination.rglob('*')) if p.is_file()},
-    'executable': {'path': 'bin/X11.bin', 'sha256': digest(binary)},
+    'executable': {'path': binary.relative_to(destination).as_posix(), 'sha256': digest(binary)},
 }
 (destination/'NATIVE-BUILD.json').write_text(json.dumps(info, indent=2)+'\n')
 PY

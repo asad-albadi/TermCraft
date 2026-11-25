@@ -32,7 +32,16 @@
     "distribution_source_sha256": "d534c1dbb9736e044eff8beaa895fa90dd05a3fc987dd9d0dddb6b4400c6e12b",
     "xserver_source_url": "https://codeload.github.com/XQuartz/xorg-server/tar.gz/0f7f5eb17c2e22528ecd2cf7feff11da85c7dcbc",
     "xserver_source_sha256": "36db027489d6370ec5b1b6d07c8155c547193c2a6914fd617eb4311fb029257f",
-    "patch_sha256": "5e1e42e50c918ed28f9d782e743c6e6708278b84e069badbeb9b06c2630b98ff",
+    "distribution_gitlinks": {
+      "src/xorg/proto/xorgproto": "04482cdee458445eab7c6a0b6d4ea64b74387401",
+      "src/mesa/mesa": "f21688aeda07c74cdad2506691ad53fa8a4fed5c",
+      "src/xorg/app/xkbcomp": "2c7789785981ad1fce3858c726615b49293f7de0",
+      "src/xkeyboard-config": "7bbd9af0dabf1dac30fe4bf728e18ffe34a7f9f4",
+      "src/xorg/font/misc-misc": "c4e2af05583764fae3d0b2aa20d5c93b031cbcbf",
+      "src/xorg/font/cursor-misc": "73b2095391d5bcf326c903946de48d0710daa169",
+      "src/xorg/font/alias": "ebeee85f070dc12197ad98d1c849786f8e3be124"
+    },
+    "patch_sha256": "901aaa59e77b566388d4728d63ec3afa4bafba9b92445962676d6d958ecf8d2e",
     "private_executable_sha256": null,
     "native_build_inputs": [
       "macOS SDK/Xcode clang and Objective-C/AppKit/CoreFoundation",

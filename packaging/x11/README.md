@@ -24,7 +24,8 @@ The managed engine opens a separate compositor window with the X desktop inside 
 The source-backed private build path is separate from that inspection candidate:
 
 ```sh
-packaging/x11/build-private-macos.sh \
+TERMCRAFT_XQUARTZ_DEPS=/path/to/private-prefix \
+bash packaging/x11/build-private-macos.sh \
   --source-archive /offline/XQuartz-xorg-server-source.tar.gz \
   --destination /tmp/termcraft-xquartz-private \
   --arch universal

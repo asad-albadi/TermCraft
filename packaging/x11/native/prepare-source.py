@@ -21,6 +21,10 @@ def prepare(platform, archive, destination):
     destination=Path(destination);archive=Path(archive)
     if destination.exists() or destination.is_symlink():raise FileExistsError('Source destination already exists')
     expected,patch=SOURCES[platform]
+    contract=json.loads((ROOT/'source-contract.json').read_text())[platform]
+    patch_sha=checksum(ROOT/patch)
+    if patch_sha!=contract['patch_sha256']:
+        raise ValueError('Pinned native source patch checksum mismatch')
     with archive.open('rb') as source:
         data=source.read(128*1024*1024+1)
     if len(data)>128*1024*1024 or hashlib.sha256(data).hexdigest()!=expected:
@@ -38,7 +42,7 @@ def prepare(platform, archive, destination):
         (source/'CORRESPONDING-SOURCE.tar.gz').write_bytes(data)
         shutil.copy2(ROOT/patch,source/patch)
         manifest={'schema':1,'platform':platform,'status':'unqualified private source candidate; never a runnable release',
-                  'source_archive_sha256':expected,'patch_sha256':checksum(ROOT/patch),
+                  'source_archive_sha256':expected,'patch_sha256':patch_sha,
                   'files':{str(p.relative_to(source)):checksum(p) for p in sorted(source.rglob('*')) if p.is_file() and not p.is_symlink()}}
         (source/'PREPARED-SOURCE.json').write_text(json.dumps(manifest,indent=2)+'\n')
         shutil.copytree(source,destination,symlinks=True)
