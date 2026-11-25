@@ -21,6 +21,17 @@ The managed engine opens a separate compositor window with the X desktop inside 
 - VcXsrv requires review of the PE/DLL imports, runtime redistribution notices, license coverage and corresponding source, and a native owned-display and authority test after Windows lifecycle support is implemented. The script reads the exact NSIS payload with 7-Zip.
 - XQuartz still needs a private app-relative relocation of executable, dylibs, data, and frameworks, followed by signing and native tests on arm64 and x86_64. The script expands the upstream package with `pkgutil` and records the engine's current library references. It does not run package installation scripts or install system launch agents.
 
+The source-backed private build path is separate from that inspection candidate:
+
+```sh
+packaging/x11/build-private-macos.sh \
+  --source-archive /offline/XQuartz-xorg-server-source.tar.gz \
+  --destination /tmp/termcraft-xquartz-private \
+  --arch universal
+```
+
+It requires a native Xcode SDK and Meson/Ninja dependency closure, applies the pinned direct-entry patch through `prepare-source.py`, uses the authenticated-listener build flags, relocates non-system Mach-O dependencies, ad-hoc signs the staged tree, and writes `NATIVE-BUILD.json`. The resulting candidate remains unqualified until native lifecycle, authority, graphics, permission, and package evidence is recorded; it is not accepted by the compiled runtime trust gate automatically.
+
 ## Linux qualification
 
 The ordinary Rust tests cover missing, invalid, and unsupported engine inputs. The live test runner requires Bubblewrap, a Cage compositor with Xwayland support, and Python 3. It isolates `/tmp`, network and process namespaces, uses a headless Wayland output, and gives the compositor a separate display :0. Use the executable path reported by the first command.
