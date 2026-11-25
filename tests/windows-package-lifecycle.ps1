@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$Archive,
-    [string]$PreviousArchive
+    [string]$PreviousArchive,
+    [string]$VaultFixture
 )
 
 $ErrorActionPreference = 'Stop'
@@ -26,6 +27,12 @@ $userFile = Join-Path $workingData 'unrelated.txt'
 [IO.File]::WriteAllText($config, '{"sessions":[{"id":"upgrade-fixture","name":"Keep this session","protocol":"SSH","host":"example.test","port":22}],"preferences":{"appearance":"Dark"}}')
 [IO.File]::WriteAllText($userFile, 'keep this file across installs and uninstall')
 $userHash = (Get-FileHash -LiteralPath $userFile).Hash
+$vaultPath = Join-Path $workingData 'credentials.vault'
+$vaultHash = $null
+if ($VaultFixture) {
+    Copy-Item -LiteralPath (Resolve-Path -LiteralPath $VaultFixture).Path -Destination $vaultPath
+    $vaultHash = (Get-FileHash -LiteralPath $vaultPath).Hash
+}
 
 function Assert-WorkspacePreserved {
     $workspace = Get-Content -LiteralPath $config -Raw | ConvertFrom-Json
@@ -36,6 +43,9 @@ function Assert-WorkspacePreserved {
         $workspace.preferences.appearance -cne 'Dark' -or
         (Get-FileHash -LiteralPath $userFile).Hash -ne $userHash) {
         throw 'The package lifecycle changed the shared workspace fixture.'
+    }
+    if ($vaultHash -and (Get-FileHash -LiteralPath $vaultPath).Hash -ne $vaultHash) {
+        throw 'The package lifecycle changed the encrypted vault fixture.'
     }
 }
 

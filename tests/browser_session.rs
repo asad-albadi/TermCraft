@@ -96,6 +96,11 @@ fn chromium_renders_and_submits_browser_input() {
               }
             </script>"#,
         ),
+        "/scroll" => Response::html(
+            r#"<title>Scroll fixture</title><body style="margin:0;height:1500px;background:red">
+            <button aria-label="Below fold" style="position:absolute;top:600px;width:100%;height:900px;border:0;background:lime"
+                onclick="fetch('/scroll-hit')"></button></body>"#,
+        ),
         _ => Response::html(
             "<title>Fixture</title><body style='margin:0;background:red'>\
              <form action='/submit'><input name='note' autofocus style='width:140px;height:30px'>\
@@ -168,6 +173,40 @@ fn chromium_renders_and_submits_browser_input() {
         let report = format!("/viewport?width={width}&height={height}&dpr=1&restored=true");
         wait_until(&session, || fixture.saw(&report));
     }
+    session
+        .send(Command::Navigate(format!("{}/scroll", fixture.origin)))
+        .unwrap();
+    let pixel = 4 * (460 * 90 + 50);
+    wait_until(&session, || {
+        session.state().title == "Scroll fixture"
+            && session.take_frame().is_some_and(|frame| {
+                frame.size == [460, 320] && frame.rgba[pixel] > 200 && frame.rgba[pixel + 1] < 40
+            })
+    });
+    session
+        .send(Command::Wheel {
+            x: 50.,
+            y: 90.,
+            dx: 0.,
+            dy: 700.,
+        })
+        .unwrap();
+    wait_until(&session, || {
+        session.take_frame().is_some_and(|frame| {
+            frame.size == [460, 320] && frame.rgba[pixel] < 40 && frame.rgba[pixel + 1] > 200
+        })
+    });
+    for kind in ["mousePressed", "mouseReleased"] {
+        session
+            .send(Command::Pointer {
+                kind,
+                button: "left",
+                x: 50.,
+                y: 90.,
+            })
+            .unwrap();
+    }
+    wait_until(&session, || fixture.saw("/scroll-hit"));
     session
         .send(Command::Navigate("file:///etc/passwd".into()))
         .unwrap();

@@ -8,7 +8,7 @@
     "upstream_archive_sha256": "dea6c7d67d3d15b4ed45c87b63a83c88f4aceaaef5425630f0e97a0bad70d620",
     "source_archive_url": "https://codeload.github.com/marchaesen/vcxsrv/tar.gz/b1c7712a2584b263f44fa24e8c493f4f59c472ea",
     "source_archive_sha256": "a73b30db3eb6b60efd181a1cd7fa39bc6df8f0d4c973d6c8416a856b0bf55b28",
-    "patch_sha256": "84338e9b4d583735a8591dc2bacf4eb021d355bac37f03cf11a68873a3dd8c4d",
+    "patch_sha256": "5a474ac9381b2dd6b9ff887bb133fcd58713d47efc13e7b0040fa6b669de202b",
     "private_executable_sha256": null,
     "native_build_inputs": [
       "Windows x86_64",

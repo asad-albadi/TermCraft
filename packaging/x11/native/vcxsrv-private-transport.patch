@@ -68,3 +68,43 @@
      if (NoListenAll) {
          ListenTransCount = 0;
      }
+--- a/xorg-server/xkb/ddxLoad.c
++++ b/xorg-server/xkb/ddxLoad.c
+@@ -57,0 +58 @@
++#include <windows.h>
+@@ -104,0 +106,32 @@
++
++#ifdef WIN32
++/* Invoke the adjacent compiler within the server's job, without a command shell. */
++static Bool
++RunWindowsXkbComp(const char *directory, const char *separator, char *command)
++{
++    char executable[PATH_MAX];
++    STARTUPINFOA startup = {sizeof(startup)};
++    PROCESS_INFORMATION child;
++    DWORD status;
++    size_t length = strlen(command);
++    int result = snprintf(executable, sizeof(executable), "%s%sxkbcomp.exe",
++                          directory, separator);
++    if (result < 0 || result >= sizeof(executable) || length < 2 ||
++        command[0] != '"' || command[length - 1] != '"')
++        return FALSE;
++
++    /* The formatting below wraps the command in an extra pair of shell quotes. */
++    command[length - 1] = '\0';
++    if (!CreateProcessA(executable, command + 1, NULL, NULL, FALSE,
++                        CREATE_NO_WINDOW, NULL, NULL, &startup, &child)) {
++        command[length - 1] = '"';
++        return FALSE;
++    }
++    command[length - 1] = '"';
++    CloseHandle(child.hThread);
++    Bool success = WaitForSingleObject(child.hProcess, INFINITE) == WAIT_OBJECT_0 &&
++        GetExitCodeProcess(child.hProcess, &status) && status == 0;
++    CloseHandle(child.hProcess);
++    return success;
++}
++#endif
+@@ -188 +221 @@
+-        if (fclose(out) == 0 && system(buf) >= 0)
++        if (fclose(out) == 0 && RunWindowsXkbComp(xkbbindir, xkbbindirsep, buf))

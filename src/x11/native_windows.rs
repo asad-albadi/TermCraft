@@ -7,15 +7,11 @@ use super::{
 use std::{
     ffi::OsString,
     net::{SocketAddr, TcpListener},
-    os::windows::ffi::OsStringExt,
-    path::{Path, PathBuf},
+    path::Path,
     sync::atomic::AtomicBool,
     time::{Duration, Instant},
 };
-use windows_sys::Win32::{
-    NetworkManagement::IpHelper::*, Networking::WinSock::AF_INET,
-    System::SystemInformation::GetSystemDirectoryW,
-};
+use windows_sys::Win32::{NetworkManagement::IpHelper::*, Networking::WinSock::AF_INET};
 pub(super) fn bundled_runtime(root: &Path) -> Result<(std::path::PathBuf, String), String> {
     let pin = native_policy::windows_pin()?;
     let package = root.join("x11/windows-x86_64-private1");
@@ -93,7 +89,6 @@ fn launch(
         ("TEMP".into(), runtime.path().as_os_str().into()),
         ("TMP".into(), runtime.path().as_os_str().into()),
         ("HOME".into(), runtime.path().as_os_str().into()),
-        ("COMSPEC".into(), system_command_interpreter()?),
     ];
     for name in ["SystemRoot", "WINDIR"] {
         if let Some(value) = std::env::var_os(name) {
@@ -150,19 +145,6 @@ fn launch(
         _runtime_guard: runtime_guard,
         _runtime: runtime,
     })
-}
-
-fn system_command_interpreter() -> Result<OsString, String> {
-    let mut buffer = [0u16; 260];
-    let len = unsafe { GetSystemDirectoryW(buffer.as_mut_ptr(), buffer.len() as u32) } as usize;
-    if len == 0 || len >= buffer.len() {
-        return Err("Could not locate the Windows system command interpreter for XKB.".into());
-    }
-    // The pinned X server uses the Windows command interpreter for xkbcomp.
-    // Keep application-local DLL lookup independent of the inherited PATH.
-    Ok(PathBuf::from(OsString::from_wide(&buffer[..len]))
-        .join("cmd.exe")
-        .into_os_string())
 }
 
 fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
@@ -228,14 +210,14 @@ fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
 #[cfg(test)]
 mod candidate_qualification {
     use super::*;
+    use std::path::PathBuf;
 
     #[test]
     #[ignore = "requires the privately rebuilt Windows X engine and its review inventory"]
     fn privately_built_engine_owns_listener_and_stops_cleanly() {
         let root = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_WINDOWS_X11_ROOT").unwrap());
-        let inventory = PathBuf::from(
-            std::env::var_os("TERMCRAFT_TEST_WINDOWS_X11_INVENTORY").unwrap(),
-        );
+        let inventory =
+            PathBuf::from(std::env::var_os("TERMCRAFT_TEST_WINDOWS_X11_INVENTORY").unwrap());
         let report: serde_json::Value =
             serde_json::from_reader(std::fs::File::open(inventory).unwrap()).unwrap();
         let files = report["files"].as_object().unwrap();

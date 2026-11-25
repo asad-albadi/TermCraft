@@ -360,13 +360,11 @@ impl Browser<'_> {
     }
 
     fn request_frame(&mut self) -> Result<(), String> {
-        let mut options = json!({"format":"jpeg","quality":78,"captureBeyondViewport":false});
-        if cfg!(windows) {
-            let [width, height] = self.size;
-            options["captureBeyondViewport"] = json!(true);
-            options["clip"] = json!({"x":0,"y":0,"width":width,"height":height,"scale":1});
-        }
-        let id = self.issue(true, "Page.captureScreenshot", options)?;
+        let id = self.issue(
+            true,
+            "Page.captureScreenshot",
+            json!({"format":"jpeg","quality":78,"captureBeyondViewport":false}),
+        )?;
         self.capture = Some(Capture {
             id,
             deadline: Instant::now() + REQUEST_TIMEOUT,
