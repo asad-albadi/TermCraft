@@ -59,9 +59,16 @@ async fn copy<H: russh::client::Handler + 'static>(
             if existing.is_some() && *policy != ConflictPolicy::Overwrite {
                 return Ok(if *policy == ConflictPolicy::Skip { TransferOutcome::Skipped } else { TransferOutcome::Conflict });
             }
+            #[cfg(windows)]
+            let selected = if existing.as_ref().is_some_and(|metadata| metadata.is_dir()) {
+                Some(super::local_stage::LocalStage::pin_merge_target(local.clone()).await?)
+            } else {
+                None
+            };
             let prepared = backend.prepare_download(remote.clone()).await?;
             if prepared.folder {
-                #[cfg(any(unix, windows))] { return download_tree(job, backend, prepared, local.clone(), *policy, existing).await; }
+                #[cfg(unix)] { return download_tree(job, backend, prepared, local.clone(), *policy, existing).await; }
+                #[cfg(windows)] { return download_tree(job, backend, prepared, local.clone(), *policy, existing, selected).await; }
                 #[cfg(not(any(unix, windows)))] { return Err("Anchored SCP folder downloads are not available on this local platform".into()); }
             }
             if existing.as_ref().is_some_and(|m| m.is_dir()) { return Err("SCP file download cannot replace a directory".into()); }
@@ -100,14 +107,22 @@ async fn download_tree<H: russh::client::Handler + 'static>(
     local: std::path::PathBuf,
     policy: ConflictPolicy,
     existing: Option<std::fs::Metadata>,
+    #[cfg(windows)] selected: Option<std::fs::File>,
 ) -> Result<TransferOutcome, String> {
     if existing.as_ref().is_some_and(|m| !m.is_dir()) {
         return Err("A folder cannot overwrite a non-directory or a link".into());
     }
     let (mut stage, root, mut archive) =
         super::local_stage::LocalStage::create_tree(local.clone()).await?;
+    #[cfg(unix)]
     let target = if let Some(existing) = existing {
         Some(stage.attach_merge_target(existing).await?)
+    } else {
+        None
+    };
+    #[cfg(windows)]
+    let target = if let Some(selected) = selected {
+        Some(stage.attach_merge_target(selected).await?)
     } else {
         None
     };

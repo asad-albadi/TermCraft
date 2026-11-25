@@ -268,16 +268,15 @@ fn rename_windows(
     destination: &OsStr,
 ) -> io::Result<()> {
     use cap_std::fs::OpenOptionsExt as _;
-    use std::os::windows::{ffi::OsStrExt, io::AsRawHandle};
     use windows_sys::Win32::Storage::FileSystem::{
-        DELETE, FILE_FLAG_BACKUP_SEMANTICS, FILE_RENAME_INFO, FILE_SHARE_DELETE, FILE_SHARE_READ,
-        FILE_SHARE_WRITE, FileRenameInfo, SetFileInformationByHandle,
+        DELETE, FILE_FLAG_BACKUP_SEMANTICS, FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE,
+        SYNCHRONIZE,
     };
 
     let mut options = OpenOptions::new();
     options.follow(FollowSymlinks::No);
     options
-        .access_mode(DELETE)
+        .access_mode(DELETE | SYNCHRONIZE)
         .share_mode(FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE)
         .custom_flags(FILE_FLAG_BACKUP_SEMANTICS);
     let file = source_dir.open_with(source, &options)?;
@@ -285,31 +284,5 @@ fn rename_windows(
     if !(metadata.is_file() || metadata.is_dir()) {
         return Err(io::ErrorKind::PermissionDenied.into());
     }
-    let name: Vec<_> = destination.encode_wide().collect();
-    let offset = std::mem::offset_of!(FILE_RENAME_INFO, FileName);
-    let len = std::mem::size_of::<FILE_RENAME_INFO>().max(offset + name.len() * 2);
-    let mut buffer = vec![0usize; len.div_ceil(std::mem::size_of::<usize>())];
-    // SAFETY: both handles are live. The allocation holds the aligned structure and UTF-16 basename.
-    let renamed = unsafe {
-        let info = buffer.as_mut_ptr().cast::<FILE_RENAME_INFO>();
-        (*info).Anonymous.ReplaceIfExists = false;
-        (*info).RootDirectory = destination_dir.as_raw_handle();
-        (*info).FileNameLength = (name.len() * 2) as u32;
-        std::ptr::copy_nonoverlapping(
-            name.as_ptr(),
-            buffer.as_mut_ptr().cast::<u8>().add(offset).cast::<u16>(),
-            name.len(),
-        );
-        SetFileInformationByHandle(
-            file.as_raw_handle(),
-            FileRenameInfo,
-            info.cast(),
-            len as u32,
-        )
-    };
-    if renamed != 0 {
-        Ok(())
-    } else {
-        Err(io::Error::last_os_error())
-    }
+    crate::platform::windows_rename::rename(&file, destination_dir, destination, false)
 }

@@ -1,4 +1,4 @@
-#![cfg(unix)]
+#![cfg(any(unix, windows))]
 #[path = "support/rdp_server.rs"]
 mod rdp_server;
 use harbor_workspace::desktop::{DesktopEvent, DesktopInput, DesktopSession, TrustDecision};
@@ -29,6 +29,10 @@ fn authenticate(session: &DesktopSession, id: u64) {
         .unwrap();
 }
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn rdp_frame_updates_render_inside_workspace() {
     let server = rdp_server::Server::start();
     let mut session = DesktopSession::connect(server.config(8001)).unwrap();
@@ -87,6 +91,10 @@ fn rdp_frame_updates_render_inside_workspace() {
     session.close();
 }
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn rdp_certificate_change_requires_resolution() {
     let server = rdp_server::Server::start();
     let mut cfg = server.config(8002);
@@ -166,6 +174,10 @@ fn rdp_certificate_change_requires_resolution() {
     assert!(!replacement.observations().contains("key:"));
 }
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn closing_rdp_releases_transport() {
     let server = rdp_server::Server::start();
     let mut session = DesktopSession::connect(server.config(8003)).unwrap();
@@ -192,6 +204,10 @@ fn closing_rdp_releases_transport() {
 }
 
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn remote_cursor_and_focus_release_reach_real_connection() {
     let server = rdp_server::Server::with_cursor();
     let mut session = DesktopSession::connect(server.config(8010)).unwrap();
@@ -259,6 +275,10 @@ fn remote_cursor_and_focus_release_reach_real_connection() {
     session.close();
 }
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn server_display_resize_renegotiates_the_framebuffer() {
     let server = rdp_server::Server::with_resize();
     let mut session = DesktopSession::connect(server.config(8011)).unwrap();
@@ -288,6 +308,10 @@ fn server_display_resize_renegotiates_the_framebuffer() {
     session.close();
 }
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn wheel_input_reaches_remote_desktop() {
     let server = rdp_server::Server::start();
     let mut session = DesktopSession::connect(server.config(8012)).unwrap();
@@ -320,6 +344,10 @@ fn wheel_input_reaches_remote_desktop() {
 }
 
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn cancelling_certificate_prompt_reaps_the_helper() {
     let server = rdp_server::Server::start();
     let mut cfg = server.config(8003);
@@ -337,6 +365,10 @@ fn cancelling_certificate_prompt_reaps_the_helper() {
     assert!(session.poll().is_empty());
 }
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn disconnect_retires_sign_in_without_waiting_for_a_password() {
     let mut server = rdp_server::Server::start();
     let mut session = DesktopSession::connect(server.config(8013)).unwrap();
@@ -362,6 +394,10 @@ fn disconnect_retires_sign_in_without_waiting_for_a_password() {
 #[path = "support/rdp_wire_client.rs"]
 mod rdp_wire_client;
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn queued_pointer_input_survives_a_server_shrink() {
     use rdp_wire_client::wire::Input;
     let server = rdp_server::Server::with_shrink();
@@ -412,6 +448,10 @@ fn queued_pointer_input_survives_a_server_shrink() {
 }
 
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn supplied_rdp_carrier_preserves_logical_tls_and_auth_endpoint() {
     let server = rdp_server::Server::start();
     let mut config = server.config(8411);

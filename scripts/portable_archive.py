@@ -79,16 +79,13 @@ def extract_tar(archive, directory):
             staged.chmod(0o755)
             _directory_path(destination)
             if os.name == "nt" and destination.exists():
-                # Windows cannot replace even an empty directory. Keep the
-                # original in staging so it can be restored if publication fails.
-                previous = Path(temporary) / "previous"
-                if any(destination.iterdir()):
-                    raise ValueError("Extraction directory must be empty.")
-                destination.rename(previous)
+                # rmdir refuses a nonempty destination even if contents
+                # arrived after preflight. Never move it into recursive cleanup.
+                destination.rmdir()
                 try:
                     staged.rename(destination)
                 except OSError:
-                    previous.rename(destination)
+                    destination.mkdir(exist_ok=True)
                     raise
             else:
                 os.replace(staged, destination)

@@ -58,6 +58,8 @@ pub enum Binding {
 }
 pub struct InstanceBroker {
     record: Record,
+    #[cfg(windows)]
+    record_path: std::path::PathBuf,
 }
 pub struct Primary {
     rx: Receiver<DispatchRequest>,
@@ -211,7 +213,11 @@ impl InstanceBroker {
                         {
                             return Err("Invalid workspace dispatch metadata.".into());
                         }
-                        return Ok(Binding::Secondary(Self { record }));
+                        return Ok(Binding::Secondary(Self {
+                            record,
+                            #[cfg(windows)]
+                            record_path,
+                        }));
                     }
                     if Instant::now() >= end {
                         return Err("Existing workspace is still starting; retry shortly.".into());
@@ -231,10 +237,17 @@ impl InstanceBroker {
             return Err("Invalid request ID.".into());
         }
         action.validate()?;
+        if serde_json::to_vec(&action).map_err(ioerr)?.len() > MAX_FRAME {
+            return Err("Dispatch request is too large.".into());
+        }
+        #[cfg(not(windows))]
+        let (mut stream, record) = (connect(&self.record)?, &self.record);
+        #[cfg(windows)]
+        let (mut stream, record) = self.connect_current()?;
         let envelope = Envelope {
             version: 1,
-            workspace: self.record.workspace.clone(),
-            token: self.record.token.clone(),
+            workspace: record.workspace.clone(),
+            token: record.token.clone(),
             id: id.into(),
             action,
         };
@@ -242,14 +255,6 @@ impl InstanceBroker {
         if bytes.len() > MAX_FRAME {
             return Err("Dispatch request is too large.".into());
         }
-        let name = self
-            .record
-            .name
-            .as_str()
-            .to_ns_name::<GenericNamespaced>()
-            .map_err(ioerr)?;
-        let mut stream = Stream::connect(name)
-            .map_err(|_| "Could not connect to the existing workspace.".to_string())?;
         if !peer_is_user(&stream) {
             return Err("Workspace peer belongs to another user.".into());
         }
@@ -265,6 +270,40 @@ impl InstanceBroker {
         }
         Ok(receipt)
     }
+
+    #[cfg(windows)]
+    fn connect_current(&self) -> Result<(Stream, Record), String> {
+        let end = Instant::now() + Duration::from_secs(2);
+        loop {
+            if let Ok(file) = crate::platform::private_file::open(&self.record_path, false) {
+                let mut bytes = Vec::new();
+                file.take(16385).read_to_end(&mut bytes).map_err(ioerr)?;
+                if let Ok(record) = serde_json::from_slice::<Record>(&bytes) {
+                    if record.version == 1
+                        && record.workspace == self.record.workspace
+                        && record.token.len() == 64
+                        && record.name.len() <= 100
+                    {
+                        if let Ok(stream) = connect(&record) {
+                            return Ok((stream, record));
+                        }
+                    }
+                }
+            }
+            if Instant::now() >= end {
+                return Err("Could not connect to the existing workspace. Retry shortly.".into());
+            }
+            std::thread::sleep(Duration::from_millis(10));
+        }
+    }
+}
+fn connect(record: &Record) -> Result<Stream, String> {
+    let name = record
+        .name
+        .as_str()
+        .to_ns_name::<GenericNamespaced>()
+        .map_err(ioerr)?;
+    Stream::connect(name).map_err(|_| "Could not connect to the existing workspace.".into())
 }
 fn peer_is_user(stream: &Stream) -> bool {
     #[cfg(unix)]
@@ -296,7 +335,25 @@ fn transfer(stream: &mut Stream, buf: &mut [u8], write: bool, end: Instant) -> R
             // A nonblocking Windows named pipe can report zero bytes while
             // the other end is still preparing its frame.
             #[cfg(windows)]
-            Ok(0) => std::thread::sleep(Duration::from_millis(2)),
+            Ok(0) => {
+                use std::os::windows::io::{AsHandle, AsRawHandle};
+                use windows_sys::Win32::System::Pipes::PeekNamedPipe;
+                let Stream::NamedPipe(pipe) = stream;
+                let result = unsafe {
+                    PeekNamedPipe(
+                        pipe.as_handle().as_raw_handle(),
+                        std::ptr::null_mut(),
+                        0,
+                        std::ptr::null_mut(),
+                        std::ptr::null_mut(),
+                        std::ptr::null_mut(),
+                    )
+                };
+                if result == 0 {
+                    return Err("Dispatch peer closed the connection.".into());
+                }
+                std::thread::sleep(Duration::from_millis(2));
+            }
             #[cfg(not(windows))]
             Ok(0) => return Err("Dispatch peer closed the connection.".into()),
             Ok(n) => done += n,

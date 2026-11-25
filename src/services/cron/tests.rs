@@ -161,6 +161,7 @@ fn utc_day_rules_leap_and_dst_dates() {
     );
 }
 #[test]
+#[cfg(unix)]
 fn local_dst_gaps_and_repeated_instants() {
     const FLAG: &str = "TERMCRAFT_CRON_DST_FIXTURE";
     if std::env::var_os(FLAG).is_none() {
@@ -196,6 +197,21 @@ fn local_dst_gaps_and_repeated_instants() {
         Some(1_710_138_600)
     );
     assert!(Schedule::parse("0 9 * JAN-MAR MON-FRI").is_ok());
+}
+#[cfg(windows)]
+#[test]
+fn native_windows_local_schedule_reaches_the_next_minute() {
+    // Windows Local reads the system timezone. Changing a child process's TZ
+    // cannot install a particular historical timezone fixture there.
+    let every_minute = Schedule::parse("* * * * *").unwrap();
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    assert_eq!(
+        every_minute.next_in(now, CronTimezone::SystemLocal),
+        Some((now / 60 + 1) * 60)
+    );
 }
 #[cfg(unix)]
 #[test]

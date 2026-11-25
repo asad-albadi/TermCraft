@@ -29,6 +29,7 @@ fn powershell_round_trips_unicode_after_conpty_resize() {
                   [Console]::OutputEncoding=[Text.Encoding]::UTF8; \
                   [Console]::WriteLine('TC_READY'); \
                   $line=[Console]::ReadLine(); \
+                  [Console]::WriteLine('TC_SIZE:'+([Console]::WindowWidth)+'x'+([Console]::WindowHeight)); \
                   [Console]::WriteLine('TC_REPLY:'+$line)";
     let args = [
         "-NoLogo",
@@ -50,6 +51,7 @@ fn powershell_round_trips_unicode_after_conpty_resize() {
     wait_for(&process, &mut output, "TC_READY");
     process.resize(100, 32);
     process.write("café 日本\r".as_bytes()).unwrap();
+    wait_for(&process, &mut output, "TC_SIZE:100x32");
     wait_for(&process, &mut output, "TC_REPLY:café 日本");
     let deadline = Instant::now() + Duration::from_secs(5);
     while !process.exited && Instant::now() < deadline {

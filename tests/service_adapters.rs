@@ -452,11 +452,18 @@ fn iperf_udp_clients_reach_selected_version() {
     }
 }
 #[test]
-fn iperf_missing_or_tampered_package_fails_closed() {
+fn iperf_missing_package_fails_closed() {
     let root = tempfile::tempdir().unwrap();
     let supervisor = ServiceSupervisor::default();
     let config = IperfServiceConfig::local(IperfVersion::Three, root.path().into());
     assert!(supervisor.start_iperf(config).is_err());
+}
+
+#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+#[test]
+fn iperf_tampered_package_fails_closed() {
+    let root = tempfile::tempdir().unwrap();
+    let supervisor = ServiceSupervisor::default();
     std::fs::create_dir_all(root.path().join("runtime/linux-x86_64")).unwrap();
     std::fs::write(root.path().join("runtime/linux-x86_64/iperf3"), b"replaced").unwrap();
     let config = IperfServiceConfig::local(IperfVersion::Three, root.path().into());

@@ -5,31 +5,24 @@ use std::{
     fs::File,
     io,
     os::windows::{
-        ffi::OsStrExt,
         fs::{MetadataExt, OpenOptionsExt},
         io::AsRawHandle,
     },
     path::{Path, PathBuf},
-    sync::Arc,
+    sync::{Arc, Mutex},
 };
-use windows_sys::{
-    Wdk::Storage::FileSystem::{
-        FILE_RENAME_INFORMATION, FileRenameInformation, NtSetInformationFile,
-    },
-    Win32::{
-        Foundation::{ERROR_ALREADY_EXISTS, ERROR_FILE_EXISTS, HANDLE, RtlNtStatusToDosError},
-        Storage::FileSystem::{
-            BY_HANDLE_FILE_INFORMATION, FILE_ATTRIBUTE_REPARSE_POINT, FILE_FLAG_BACKUP_SEMANTICS,
-            FILE_FLAG_OPEN_REPARSE_POINT, FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE,
-            GetFileInformationByHandle, GetFinalPathNameByHandleW,
-        },
-        System::IO::IO_STATUS_BLOCK,
+use windows_sys::Win32::{
+    Foundation::{ERROR_ALREADY_EXISTS, ERROR_FILE_EXISTS, HANDLE},
+    Storage::FileSystem::{
+        BY_HANDLE_FILE_INFORMATION, FILE_ATTRIBUTE_REPARSE_POINT, FILE_FLAG_BACKUP_SEMANTICS,
+        FILE_FLAG_OPEN_REPARSE_POINT, FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE,
+        GetFileInformationByHandle, GetFinalPathNameByHandleW,
     },
 };
 #[derive(Clone)]
 pub(super) struct WindowsStage {
     parent: Arc<File>,
-    file: Arc<File>,
+    file: Arc<Mutex<Option<File>>>,
     parent_path: PathBuf,
     target: std::ffi::OsString,
     tree: Option<TreeHandles>,
@@ -38,7 +31,7 @@ pub(super) struct WindowsStage {
 struct TreeHandles {
     container: Arc<File>,
     container_name: std::ffi::OsString,
-    archive: Arc<File>,
+    archive: Arc<Mutex<Option<File>>>,
     merge_target: Option<Arc<File>>,
 }
 fn info(file: &File) -> io::Result<BY_HANDLE_FILE_INFORMATION> {
@@ -96,6 +89,15 @@ fn validate_directory(file: File) -> io::Result<File> {
     Ok(file)
 }
 impl WindowsStage {
+    pub(super) fn pin_merge_target(path: &Path) -> io::Result<File> {
+        validate_directory(
+            std::fs::OpenOptions::new()
+                .read(true)
+                .share_mode(FILE_SHARE_READ | FILE_SHARE_WRITE)
+                .custom_flags(DIRECTORY_FLAGS)
+                .open(path)?,
+        )
+    }
     pub(super) fn create(target: PathBuf) -> io::Result<(Self, PathBuf, File)> {
         let name = target
             .file_name()
@@ -141,7 +143,7 @@ impl WindowsStage {
         Ok((
             Self {
                 parent: Arc::new(parent),
-                file: Arc::new(file),
+                file: Arc::new(Mutex::new(Some(file))),
                 parent_path: parent_path.clone(),
                 target: name,
                 tree: None,
@@ -185,7 +187,7 @@ impl WindowsStage {
         let container = cap_std::fs::Dir::from_std_file(child_directory(
             &capability,
             &container_name,
-            0x80000000,
+            0x80000000 | 0x00010000,
         )?);
         container.create_dir("tree")?;
         let root = child_directory(&container, "tree", 0x80000000)?;
@@ -204,17 +206,18 @@ impl WindowsStage {
             .write(true)
             .create_new(true)
             .follow(FollowSymlinks::No)
+            .access_mode(0x80000000 | 0x40000000 | 0x00010000)
             .share_mode(FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE);
         let archive = container.open_with("archive", &options)?.into_std();
         let stage = Self {
             parent: Arc::new(parent),
-            file: Arc::new(rename_root),
+            file: Arc::new(Mutex::new(Some(rename_root))),
             parent_path,
             target: name,
             tree: Some(TreeHandles {
                 container: Arc::new(container.into_std_file()),
                 container_name,
-                archive: Arc::new(archive.try_clone()?),
+                archive: Arc::new(Mutex::new(Some(archive.try_clone()?))),
                 merge_target: None,
             }),
         };
@@ -245,7 +248,11 @@ impl WindowsStage {
         if tree_needed {
             let container = cap_std::fs::Dir::from_std_file(tree.container.try_clone()?);
             let named = child_directory(&container, "tree", 0x80000000)?;
-            if identity(&named)? != identity(&self.file)? {
+            let file = self.file.lock().unwrap();
+            let held = file
+                .as_ref()
+                .ok_or_else(|| io::Error::other("Owned tree was already closed"))?;
+            if identity(&named)? != identity(held)? {
                 return Err(io::Error::other(
                     "Owned staged tree changed; publication stopped",
                 ));
@@ -253,14 +260,19 @@ impl WindowsStage {
         }
         Ok(())
     }
-    pub(super) fn attach_merge_target(&mut self) -> io::Result<File> {
+    pub(super) fn attach_merge_target(&mut self, pinned: File) -> io::Result<File> {
         self.validate_container(true)?;
         let parent = cap_std::fs::Dir::from_std_file(self.parent.try_clone()?);
         let selected = child_directory(&parent, &self.target, 0x80000000)?;
+        if identity(&selected)? != identity(&pinned)? {
+            return Err(io::Error::other(
+                "Selected merge root changed before staging",
+            ));
+        }
         self.tree
             .as_mut()
             .ok_or_else(|| io::Error::other("Missing folder staging"))?
-            .merge_target = Some(Arc::new(selected.try_clone()?));
+            .merge_target = Some(Arc::new(pinned));
         Ok(selected)
     }
     pub(super) fn validate_merge_root(&self) -> io::Result<()> {
@@ -288,29 +300,41 @@ impl WindowsStage {
         let mut options = cap_std::fs::OpenOptions::new();
         options.read(true).follow(FollowSymlinks::No);
         let named = container.open_with("archive", &options)?.into_std();
-        if identity(&named)? != identity(&tree.archive)? {
+        let mut archive = tree.archive.lock().unwrap();
+        let owned = archive
+            .as_ref()
+            .ok_or_else(|| io::Error::other("Archive cleanup already started"))?;
+        if identity(&named)? != identity(owned)? {
             return Err(io::Error::other(
                 "Owned archive changed; no unrelated cleanup attempted",
             ));
         }
+        crate::platform::windows_rename::remove_opened(owned)?;
         drop(named);
-        container.remove_file("archive")?;
-        let parent = cap_std::fs::Dir::from_std_file(self.parent.try_clone()?);
-        parent.remove_dir(&tree.container_name)
+        drop(archive.take());
+        drop(container);
+        crate::platform::windows_rename::remove_opened(&*tree.container)
     }
     pub(super) fn clean_merged_tree(&self) -> io::Result<()> {
         self.validate_merge_root()?;
-        let tree = self.tree.as_ref().unwrap();
-        let container = cap_std::fs::Dir::from_std_file(tree.container.try_clone()?);
-        container.remove_dir("tree")?;
+        {
+            let mut file = self.file.lock().unwrap();
+            let held = file
+                .as_ref()
+                .ok_or_else(|| io::Error::other("Owned tree was already closed"))?;
+            crate::platform::windows_rename::remove_opened(held)?;
+            drop(file.take());
+        }
         self.clean_tree_container()
     }
     pub(super) fn recovery_path(&self) -> io::Result<PathBuf> {
-        let file = self
-            .tree
-            .as_ref()
-            .map(|tree| &tree.container)
-            .unwrap_or(&self.file);
+        let file = self.file.lock().unwrap();
+        let file = if let Some(tree) = &self.tree {
+            &*tree.container
+        } else {
+            file.as_ref()
+                .ok_or_else(|| io::Error::other("Owned staging file was already closed"))?
+        };
         if info(file)?.nNumberOfLinks == 0 {
             return Err(io::Error::other(
                 "The staging file has been unlinked; its former path is not recoverable",
@@ -346,34 +370,19 @@ impl WindowsStage {
         if self.tree.is_some() {
             self.validate_container(true)?;
         }
-        let name = self.target.encode_wide().collect::<Vec<_>>();
-        let length = size_of::<FILE_RENAME_INFORMATION>() + name.len() * size_of::<u16>();
-        let mut buffer = vec![0usize; length.div_ceil(std::mem::size_of::<usize>())];
-        let mut result = IO_STATUS_BLOCK::default();
-        // SAFETY: usize allocation provides pointer alignment; allocation holds the entire variable-size
-        // FILE_RENAME_INFORMATION, including its UTF-16 tail. Both handles stay owned throughout.
-        let status = unsafe {
-            let information = buffer.as_mut_ptr().cast::<FILE_RENAME_INFORMATION>();
-            (*information).Anonymous.ReplaceIfExists = overwrite;
-            (*information).RootDirectory = self.parent.as_raw_handle() as HANDLE;
-            (*information).FileNameLength = (name.len() * 2) as u32;
-            std::ptr::copy_nonoverlapping(
-                name.as_ptr(),
-                std::ptr::addr_of_mut!((*information).FileName).cast(),
-                name.len(),
-            );
-            NtSetInformationFile(
-                self.file.as_raw_handle() as HANDLE,
-                &mut result,
-                information.cast(),
-                length as u32,
-                FileRenameInformation,
-            )
+        let file = self.file.lock().unwrap();
+        let file = file
+            .as_ref()
+            .ok_or_else(|| io::Error::other("Owned staging file was already closed"))?;
+        let error = match crate::platform::windows_rename::rename(
+            file,
+            &*self.parent,
+            &self.target,
+            overwrite,
+        ) {
+            Ok(()) => return Ok(true),
+            Err(error) => error,
         };
-        if status >= 0 {
-            return Ok(true);
-        }
-        let error = io::Error::from_raw_os_error(unsafe { RtlNtStatusToDosError(status) } as i32);
         if !overwrite
             && matches!(error.raw_os_error(), Some(code) if code == ERROR_ALREADY_EXISTS as i32 || code == ERROR_FILE_EXISTS as i32)
         {
@@ -442,6 +451,26 @@ mod tests {
 mod tree_tests {
     use super::*;
     #[test]
+    fn merged_tree_cleanup_removes_only_the_owned_staging_directory() {
+        let temporary = tempfile::tempdir().unwrap();
+        let destination = temporary.path().join("destination");
+        std::fs::create_dir(&destination).unwrap();
+        std::fs::write(destination.join("retained"), b"keep").unwrap();
+        let selected = WindowsStage::pin_merge_target(&destination).unwrap();
+        let (mut stage, path, root, archive) =
+            WindowsStage::create_tree(destination.clone()).unwrap();
+        drop(root);
+        drop(archive);
+        drop(stage.attach_merge_target(selected).unwrap());
+        stage.clean_merged_tree().unwrap();
+        drop(stage);
+        assert!(!path.parent().unwrap().exists());
+        assert_eq!(
+            std::fs::read(destination.join("retained")).unwrap(),
+            b"keep"
+        );
+    }
+    #[test]
     fn native_tree_stage_keeps_root_and_archive_ownership_through_publication() {
         use std::io::Write;
         let temporary = tempfile::tempdir().unwrap();
@@ -457,6 +486,7 @@ mod tree_tests {
         assert!(stage.commit(false).unwrap());
         assert_eq!(std::fs::read(destination.join("file")).unwrap(), b"content");
         stage.clean_tree_container().unwrap();
+        drop(stage);
         assert!(!path.parent().unwrap().exists());
     }
     #[test]
@@ -467,11 +497,12 @@ mod tree_tests {
         let (mut stage, path, _root, archive) =
             WindowsStage::create_tree(destination.clone()).unwrap();
         drop(archive);
-        let target = stage.attach_merge_target().unwrap();
+        let target = stage
+            .attach_merge_target(WindowsStage::pin_merge_target(&destination).unwrap())
+            .unwrap();
         drop(target);
-        std::fs::rename(&destination, temporary.path().join("moved")).unwrap();
-        std::fs::create_dir(&destination).unwrap();
-        assert!(stage.validate_merge_root().is_err());
+        assert!(std::fs::rename(&destination, temporary.path().join("moved")).is_err());
+        stage.validate_merge_root().unwrap();
         let container = path.parent().unwrap();
         std::fs::rename(container.join("archive"), container.join("owned-archive")).unwrap();
         std::fs::write(container.join("archive"), b"unrelated").unwrap();

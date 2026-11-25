@@ -18,13 +18,21 @@ fn desktop_launch_preserves_arguments_and_workspace() {
             exit_when_done: false
         }
     );
-    assert_eq!(
-        Cli::parse(
-            ["--open-url", "termcraft://cwd?path=%2Ftmp%2Fa%20%24%28x%29"].map(str::to_owned)
+    let (folder_url, folder) = if cfg!(windows) {
+        (
+            "termcraft://cwd?path=C%3A%5Ctmp%5Ca%20%24%28x%29",
+            r"C:\tmp\a $(x)",
         )
-        .unwrap(),
+    } else {
+        (
+            "termcraft://cwd?path=%2Ftmp%2Fa%20%24%28x%29",
+            "/tmp/a $(x)",
+        )
+    };
+    assert_eq!(
+        Cli::parse(["--open-url", folder_url].map(str::to_owned)).unwrap(),
         CliAction::OpenFolder {
-            path: "/tmp/a $(x)".into(),
+            path: folder.into(),
             exit_when_done: false
         }
     );

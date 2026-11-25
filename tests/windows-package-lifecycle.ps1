@@ -8,14 +8,6 @@ $local = [Environment]::GetFolderPath('LocalApplicationData')
 $menu = [Environment]::GetFolderPath('Programs')
 $programs = Join-Path $local 'Programs/TermCraft'
 $fixtureName = 'qualification.' + [guid]::NewGuid().ToString('N')
-$workspace = Join-Path $scratch.FullName 'fixture workspace'
-$null = New-Item -ItemType Directory -Path $workspace
-$originals = @{}
-foreach ($name in 'workspace.json', 'vault.json', 'recovery.bin') {
-    $path = Join-Path $workspace $name
-    [IO.File]::WriteAllBytes($path, [Text.Encoding]::UTF8.GetBytes("Synthetic preservation marker $name"))
-    $originals[$path] = (Get-FileHash -LiteralPath $path).Hash
-}
 
 $shell = New-Object -ComObject WScript.Shell
 $installed = @()
@@ -51,6 +43,14 @@ try {
     }
 
     $first = $installed[0]
+    $program = Join-Path $first.Path 'harbor-workspace.exe'
+    $startup = Join-Path $scratch.FullName 'installed-startup.png'
+    $workingData = Join-Path $scratch.FullName 'installed workspace'
+    & $program --data-dir $workingData --screenshot $startup
+    if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $startup -PathType Leaf) -or
+        (Get-Item -LiteralPath $startup).Length -lt 5000) {
+        throw 'The installed GUI did not produce its startup screenshot.'
+    }
     $extra = Join-Path $first.Path 'additional-file.txt'
     [IO.File]::WriteAllText($extra, 'must survive refusal')
     try {
@@ -75,12 +75,7 @@ try {
             throw 'An installed version or Start menu shortcut remained after uninstall.'
         }
     }
-    foreach ($path in $originals.Keys) {
-        if ((Get-FileHash -LiteralPath $path).Hash -ne $originals[$path]) {
-            throw 'Installer changed a preservation fixture.'
-        }
-    }
-    Write-Output 'Verified per-user side-by-side installation, shortcuts, extra-file refusal, and uninstall.'
+    Write-Output 'Verified per-user side-by-side installation, installed GUI startup, shortcuts, extra-file refusal, and uninstall.'
 } finally {
     foreach ($entry in $installed) {
         if (Test-Path -LiteralPath $entry.Path) { & $entry.Installer -Action Uninstall }

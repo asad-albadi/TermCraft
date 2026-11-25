@@ -1,6 +1,8 @@
 pub mod shortcuts;
 
 pub(crate) mod private_file;
+#[cfg(windows)]
+pub(crate) mod windows_rename;
 
 #[allow(dead_code)]
 #[path = "../remote_files/transfer/operations/commit.rs"]

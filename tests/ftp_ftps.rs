@@ -314,7 +314,9 @@ async fn protected_download_acknowledges_data_close_before_control_completion() 
     })
     .await;
     let mut options = server.options();
-    options.timeout = Duration::from_secs(1);
+    // This case tests reciprocal TLS close, independent of the control-login
+    // timeout. Permit the same startup window as the other local TLS fixtures.
+    options.timeout = Duration::from_secs(5);
     let mut ftp = FtpBackend::connect(options).await.unwrap();
     assert_eq!(
         ftp.read(&path(b"/seed"), FtpTransferType::Binary, 128)
