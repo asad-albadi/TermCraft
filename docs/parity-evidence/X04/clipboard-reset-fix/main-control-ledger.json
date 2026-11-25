@@ -1,0 +1,34 @@
+{
+  "src/x11/xdmcp_clipboard.rs": {
+    "baseline": "7e43e8e8dd6e1cbdf624faa14a781e28ae4df8dbc4b744b000580d37f46c9c25",
+    "current_main": "7e43e8e8dd6e1cbdf624faa14a781e28ae4df8dbc4b744b000580d37f46c9c25"
+  },
+  "src/x11/xdmcp_clipboard/transport.rs": {
+    "baseline": "e5f6c67ca54979eec274e2e8a141a6c82cebf21fd33cd9356610a3922cd845d3",
+    "current_main": "e5f6c67ca54979eec274e2e8a141a6c82cebf21fd33cd9356610a3922cd845d3"
+  },
+  "src/x11/xdmcp_clipboard/deadline_tests.rs": {
+    "baseline": "4e83adfe9caebc88e13157107cb399e7203354a1588590c8b577cf8f96e05486",
+    "current_main": "4e83adfe9caebc88e13157107cb399e7203354a1588590c8b577cf8f96e05486"
+  },
+  "src/x11/xdmcp_engine.rs": {
+    "baseline": "fd6931cc199d24ba69da6a9543fcb03c7099d4a7137de3fe115cba6165d86e34",
+    "current_main": "fd6931cc199d24ba69da6a9543fcb03c7099d4a7137de3fe115cba6165d86e34"
+  },
+  "packaging/x11/xdmcp/manifest.json": {
+    "baseline": "c4dd5b743e201cdfbdc0d8d9ba84bd7c12c1e2e880b087342bf6fe002c4c6156",
+    "current_main": "c4dd5b743e201cdfbdc0d8d9ba84bd7c12c1e2e880b087342bf6fe002c4c6156"
+  },
+  "packaging/x11/xdmcp/readiness/xephyr.patch": {
+    "baseline": "2d03a69b2f3a0aee25141890b98b9524082de39af350a6df56e586c15fd9a344",
+    "current_main": "2d03a69b2f3a0aee25141890b98b9524082de39af350a6df56e586c15fd9a344"
+  },
+  "packaging/x11/xdmcp/readiness/Xephyr-session-ready.xz": {
+    "baseline": "90256d9c41e451c402b8deff69cc589d976b20340ef5d4e0452d508214b9b875",
+    "current_main": "90256d9c41e451c402b8deff69cc589d976b20340ef5d4e0452d508214b9b875"
+  },
+  "packaging/x11/xdmcp/readiness/executable.sha256.bin": {
+    "baseline": "beea9e6728556e5ed0419a72fd512d635319c5d4ae16207eef0a1de81756bee2",
+    "current_main": "beea9e6728556e5ed0419a72fd512d635319c5d4ae16207eef0a1de81756bee2"
+  }
+}

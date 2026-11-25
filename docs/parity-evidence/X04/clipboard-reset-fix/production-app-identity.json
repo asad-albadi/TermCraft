@@ -1,0 +1,32 @@
+{
+  "profile": "private experimental ordinary debug; NOT genuine release package",
+  "app": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation-rust1961/debug/termcraft-xdmcp-reset981",
+  "app_sha256": "edef4919d431ff3c4b05c1b2ff64c7345a57d6acc1a07188e623c14371bddec2",
+  "version": "0.1.981",
+  "normal_bin": "termcraft-xdmcp-reset981",
+  "source": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/xdmcp-clipboard-reset-fix/source",
+  "source_map": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/xdmcp-clipboard-reset-fix/source-final-capture-map.json",
+  "source_map_sha256": "716e1ad5651ced1cd0e7a2bfafc8d6c7ece1016e613d244c6fc4c7d8d6c2f8f9",
+  "cargo_command_file": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/xdmcp-clipboard-reset-fix/evidence/production-app-command.json",
+  "cargo_result": {
+    "exit_code": 0,
+    "elapsed": 159.534385459001
+  },
+  "engine": {
+    "artifact_id": "xephyr-21.1.26-session-ready-xkb-clipboard-lifecycle-v3-linux-x86_64",
+    "entry_point": "x11/linux-x86_64/Xephyr-session-ready",
+    "executable_sha256": "81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e",
+    "compressed_sha256": "95201c0d7d93ae1f27d94f0cf2806f8db0d52f8d38330257d1062f48345037c3",
+    "patch_sha256": "6de42a3d543e69a8220fc52cd26f69d339c86e4c4befaa847c14025a6e2b31c8",
+    "xtrans_headers_sha256": "f00c6c854e9f08bd40de10b0278d942d6d7e48bad08e93415487e199a286d6e6",
+    "license": "x11/linux-x86_64/XEPHYR_COPYING",
+    "source_sha256": "c8609f9cdafde14de7ec7cb406dac9507add1d536df8d3c3e3d3d9c1cd864066",
+    "readiness": "display number, then session-ready-v1 after XDMCP session socket selection, then EOF",
+    "xtrans_license": "x11/linux-x86_64/XTRANS_COPYING",
+    "xtrans_license_sha256": "af61583b470afb73de1bc704a34e593183c1e8ae76882991ea54a64b6d846c0d",
+    "build_inputs": "packaging/x11/xdmcp/readiness",
+    "keyboard": "Single registered evdev layout ID, applied to the nested master and KDrive keyboard each generation. Uses the installed xorg-xkbcomp and xkeyboard-config. Host inheritance when omitted.",
+    "lifecycle": "Explicit bidirectional-clipboard option excludes only authenticated local clients with exact live launching-parent PID and UID from XDMCP first-client session ownership; pidfd plus current parent identity retained. All native authorization and ordinary client accounting remain enabled."
+  },
+  "base_git_head": "480e5e9bec721765719bdcf86845826b8cd86479"
+}

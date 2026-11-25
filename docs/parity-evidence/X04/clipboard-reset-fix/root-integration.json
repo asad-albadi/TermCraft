@@ -1,0 +1,40 @@
+{
+  "files": {
+    "src/x11/xdmcp_clipboard.rs": {
+      "base_sha256": "7e43e8e8dd6e1cbdf624faa14a781e28ae4df8dbc4b744b000580d37f46c9c25",
+      "new_sha256": "446bbb74ec5098297206884458c4333504c119b5aa568a729463a5155709de83"
+    },
+    "src/x11/xdmcp_clipboard/transport.rs": {
+      "base_sha256": "e5f6c67ca54979eec274e2e8a141a6c82cebf21fd33cd9356610a3922cd845d3",
+      "new_sha256": "101d129a99cf740fdf61eea6b704f22ed244471e5ef85924567eef167b03074c"
+    },
+    "src/x11/xdmcp_clipboard/deadline_tests.rs": {
+      "base_sha256": "4e83adfe9caebc88e13157107cb399e7203354a1588590c8b577cf8f96e05486",
+      "new_sha256": "a06871de20364dc7b6fbfed385e2051f8069f762f49978a1732e950028d6fc20"
+    },
+    "src/x11/xdmcp_engine.rs": {
+      "base_sha256": "fd6931cc199d24ba69da6a9543fcb03c7099d4a7137de3fe115cba6165d86e34",
+      "new_sha256": "c06b7eea1d6bbb29b3d10236fd09aa100dfc052e2b2faa8417b118cff57fca0b"
+    },
+    "packaging/x11/xdmcp/manifest.json": {
+      "base_sha256": "c4dd5b743e201cdfbdc0d8d9ba84bd7c12c1e2e880b087342bf6fe002c4c6156",
+      "new_sha256": "ca8d8ad63b0962bfd660c635f646ee17f9bf5d0f7e9e8efd1a43180d71f47f99"
+    },
+    "packaging/x11/xdmcp/readiness/xephyr.patch": {
+      "base_sha256": "2d03a69b2f3a0aee25141890b98b9524082de39af350a6df56e586c15fd9a344",
+      "new_sha256": "6de42a3d543e69a8220fc52cd26f69d339c86e4c4befaa847c14025a6e2b31c8"
+    },
+    "packaging/x11/xdmcp/readiness/Xephyr-session-ready.xz": {
+      "base_sha256": "90256d9c41e451c402b8deff69cc589d976b20340ef5d4e0452d508214b9b875",
+      "new_sha256": "95201c0d7d93ae1f27d94f0cf2806f8db0d52f8d38330257d1062f48345037c3"
+    },
+    "packaging/x11/xdmcp/readiness/executable.sha256.bin": {
+      "base_sha256": "beea9e6728556e5ed0419a72fd512d635319c5d4ae16207eef0a1de81756bee2",
+      "new_sha256": "e7c16a2e294a96d9fac08728a4401a01004db36e409ab02ef1e287c91f818143"
+    }
+  },
+  "source_implementation": "exact eight reviewed payloads",
+  "native_production_sha256": "81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e",
+  "before_after_scope": "old genuinef024 traced RED; private normaldebug production981 and separate diagnostic982 four AFTER passes; root genuine final release still required",
+  "raw_auth_traces": "retained in private target evidence; only sanitized timelines copied"
+}

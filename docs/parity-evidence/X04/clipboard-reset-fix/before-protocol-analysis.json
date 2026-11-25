@@ -1,0 +1,852 @@
+[
+  {
+    "case": {
+      "case": "untraced-00",
+      "exit_code": 0,
+      "pending_hold": 0,
+      "selected_hold": 0,
+      "traced": false,
+      "elapsed": 5.232972145080566,
+      "evidence": [
+        "evidence.clzK4u7r"
+      ]
+    },
+    "selected_identity": [
+      "113",
+      "154",
+      "8cf61e9f10f5c797c249eae12a36f8cc0f43ca51ceda89c62bc663593f30f460"
+    ],
+    "pam_flood_messages": 0,
+    "selected_request_count": 2,
+    "selected_manage_count": 2,
+    "choice_expirations": 0,
+    "observation_seconds": [
+      0.09279359499851125
+    ]
+  },
+  {
+    "case": {
+      "case": "traced-110",
+      "exit_code": 1,
+      "pending_hold": 11,
+      "selected_hold": 0,
+      "traced": true,
+      "elapsed": 14.110581874847412,
+      "evidence": [
+        "evidence.OTJz9PYJ"
+      ]
+    },
+    "selected_identity": [
+      "115",
+      "156",
+      "8cf61e9f10f5c797c249eae12a36f8cc0f43ca51ceda89c62bc663593f30f460"
+    ],
+    "pam_flood_messages": 0,
+    "selected_request_count": 1,
+    "selected_manage_count": 1,
+    "choice_expirations": 0,
+    "observation_seconds": [],
+    "engine_protocol_headers_only": [
+      {
+        "wall": 1795601030.481242,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601030.546438,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 5,
+        "payload_length": 34,
+        "return": "40",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601030.546538,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 7,
+        "payload_length": 60,
+        "return": "66",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601030.547429,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 8,
+        "payload_length": 46,
+        "return": "52",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601030.547529,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 10,
+        "payload_length": 23,
+        "return": "29",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601030.61891,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      }
+    ],
+    "selected_willing_received": false,
+    "selected_request_sent": false
+  },
+  {
+    "case": {
+      "case": "untraced-011",
+      "exit_code": 0,
+      "pending_hold": 0,
+      "selected_hold": 11,
+      "traced": false,
+      "elapsed": 16.22383451461792,
+      "evidence": [
+        "evidence.CXJhbIix"
+      ]
+    },
+    "selected_identity": [
+      "113",
+      "154",
+      "8cf61e9f10f5c797c249eae12a36f8cc0f43ca51ceda89c62bc663593f30f460"
+    ],
+    "pam_flood_messages": 0,
+    "selected_request_count": 2,
+    "selected_manage_count": 2,
+    "choice_expirations": 0,
+    "observation_seconds": [
+      0.09544913900026586
+    ]
+  },
+  {
+    "case": {
+      "case": "traced-1111",
+      "exit_code": 1,
+      "pending_hold": 11,
+      "selected_hold": 11,
+      "traced": true,
+      "elapsed": 25.137189865112305,
+      "evidence": [
+        "evidence.8bFVMQM5"
+      ]
+    },
+    "selected_identity": [
+      "115",
+      "156",
+      "8cf61e9f10f5c797c249eae12a36f8cc0f43ca51ceda89c62bc663593f30f460"
+    ],
+    "pam_flood_messages": 0,
+    "selected_request_count": 1,
+    "selected_manage_count": 1,
+    "choice_expirations": 0,
+    "observation_seconds": [],
+    "engine_protocol_headers_only": [
+      {
+        "wall": 1795601060.80647,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601060.892694,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 5,
+        "payload_length": 34,
+        "return": "40",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601060.892776,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 7,
+        "payload_length": 60,
+        "return": "66",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601060.893392,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 8,
+        "payload_length": 46,
+        "return": "52",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601060.893454,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 10,
+        "payload_length": 23,
+        "return": "29",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601072.008245,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      }
+    ],
+    "selected_willing_received": false,
+    "selected_request_sent": false
+  },
+  {
+    "case": {
+      "case": "traced-00",
+      "exit_code": 1,
+      "pending_hold": 0,
+      "selected_hold": 0,
+      "traced": true,
+      "elapsed": 78.69095706939697,
+      "evidence": [
+        "evidence.BWIRaaYM"
+      ]
+    },
+    "selected_identity": [
+      "115",
+      "156",
+      "8cf61e9f10f5c797c249eae12a36f8cc0f43ca51ceda89c62bc663593f30f460"
+    ],
+    "pam_flood_messages": 0,
+    "selected_request_count": 4,
+    "selected_manage_count": 4,
+    "choice_expirations": 0,
+    "observation_seconds": [
+      75.02826985799948
+    ],
+    "engine_protocol_headers_only": [
+      {
+        "wall": 1795601074.974258,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601075.044318,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 5,
+        "payload_length": 34,
+        "return": "40",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601075.044398,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 7,
+        "payload_length": 60,
+        "return": "66",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601075.045062,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 8,
+        "payload_length": 46,
+        "return": "52",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601075.045124,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 10,
+        "payload_length": 23,
+        "return": "29",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601075.107418,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601075.159907,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 5,
+        "payload_length": 34,
+        "return": "40",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.159991,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 7,
+        "payload_length": 60,
+        "return": "66",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.160276,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 8,
+        "payload_length": 46,
+        "return": "52",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.160355,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 10,
+        "payload_length": 23,
+        "return": "29",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.171003,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601075.221988,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 5,
+        "payload_length": 34,
+        "return": "40",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.222042,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 7,
+        "payload_length": 60,
+        "return": "66",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.222288,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 8,
+        "payload_length": 46,
+        "return": "52",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.222322,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 10,
+        "payload_length": 23,
+        "return": "29",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.231786,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601075.278042,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 5,
+        "payload_length": 34,
+        "return": "40",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.278082,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 7,
+        "payload_length": 60,
+        "return": "66",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.27846,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 8,
+        "payload_length": 46,
+        "return": "52",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601075.278492,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 10,
+        "payload_length": 23,
+        "return": "29",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      }
+    ],
+    "selected_willing_received": true,
+    "selected_request_sent": true,
+    "willing_to_request_seconds": 8.392333984375e-05
+  },
+  {
+    "case": {
+      "case": "untraced-110",
+      "exit_code": 0,
+      "pending_hold": 11,
+      "selected_hold": 0,
+      "traced": false,
+      "elapsed": 16.369014263153076,
+      "evidence": [
+        "evidence.c79fH4im"
+      ]
+    },
+    "selected_identity": [
+      "113",
+      "154",
+      "8cf61e9f10f5c797c249eae12a36f8cc0f43ca51ceda89c62bc663593f30f460"
+    ],
+    "pam_flood_messages": 0,
+    "selected_request_count": 2,
+    "selected_manage_count": 2,
+    "choice_expirations": 0,
+    "observation_seconds": [
+      0.09323489900089044
+    ]
+  },
+  {
+    "case": {
+      "case": "traced-011",
+      "exit_code": 1,
+      "pending_hold": 0,
+      "selected_hold": 11,
+      "traced": true,
+      "elapsed": 89.6177875995636,
+      "evidence": [
+        "evidence.HeBm4oYc"
+      ]
+    },
+    "selected_identity": [
+      "115",
+      "156",
+      "8cf61e9f10f5c797c249eae12a36f8cc0f43ca51ceda89c62bc663593f30f460"
+    ],
+    "pam_flood_messages": 0,
+    "selected_request_count": 4,
+    "selected_manage_count": 4,
+    "choice_expirations": 0,
+    "observation_seconds": [
+      75.02312972999971
+    ],
+    "engine_protocol_headers_only": [
+      {
+        "wall": 1795601170.000703,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601170.059843,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 5,
+        "payload_length": 34,
+        "return": "40",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601170.059898,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 7,
+        "payload_length": 60,
+        "return": "66",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601170.060561,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 8,
+        "payload_length": 46,
+        "return": "52",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601170.060641,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 10,
+        "payload_length": 23,
+        "return": "29",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601181.149922,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601181.205104,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 5,
+        "payload_length": 34,
+        "return": "40",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.205151,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 7,
+        "payload_length": 60,
+        "return": "66",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.205327,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 8,
+        "payload_length": 46,
+        "return": "52",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.205366,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 10,
+        "payload_length": 23,
+        "return": "29",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.212697,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601181.262906,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 5,
+        "payload_length": 34,
+        "return": "40",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.262952,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 7,
+        "payload_length": 60,
+        "return": "66",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.26322,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 8,
+        "payload_length": 46,
+        "return": "52",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.263253,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 10,
+        "payload_length": 23,
+        "return": "29",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.270054,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      },
+      {
+        "wall": 1795601181.320071,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 5,
+        "payload_length": 34,
+        "return": "40",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.320142,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 7,
+        "payload_length": 60,
+        "return": "66",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.320528,
+        "syscall": "recvfrom",
+        "fd": 13,
+        "opcode": 8,
+        "payload_length": 46,
+        "return": "52",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.320599,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 10,
+        "payload_length": 23,
+        "return": "29",
+        "peer": [
+          "177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x32"
+        ]
+      },
+      {
+        "wall": 1795601181.326744,
+        "syscall": "sendto",
+        "fd": 13,
+        "opcode": 3,
+        "payload_length": 1,
+        "return": "7",
+        "peer": [
+          "1177",
+          "\\x31\\x32\\x37\\x2e\\x30\\x2e\\x30\\x2e\\x31"
+        ]
+      }
+    ],
+    "selected_willing_received": true,
+    "selected_request_sent": true,
+    "willing_to_request_seconds": 4.696846008300781e-05
+  },
+  {
+    "case": {
+      "case": "untraced-1111",
+      "exit_code": 0,
+      "pending_hold": 11,
+      "selected_hold": 11,
+      "traced": false,
+      "elapsed": 27.505574941635132,
+      "evidence": [
+        "evidence.G7b1YFPA"
+      ]
+    },
+    "selected_identity": [
+      "113",
+      "154",
+      "8cf61e9f10f5c797c249eae12a36f8cc0f43ca51ceda89c62bc663593f30f460"
+    ],
+    "pam_flood_messages": 0,
+    "selected_request_count": 2,
+    "selected_manage_count": 2,
+    "choice_expirations": 0,
+    "observation_seconds": [
+      0.0963287289996515
+    ]
+  }
+]

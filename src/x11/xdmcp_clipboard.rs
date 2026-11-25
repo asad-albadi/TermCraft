@@ -222,15 +222,15 @@ impl Endpoint {
     fn new(conn: Conn, peer: Option<i32>, deadline: Instant) -> io::Result<Self> {
         transport::initialize_until(&conn, deadline)?;
         conn.xfixes_query_version(2, 0)
-            .map_err(error)?
+            .map_err(transport::x11_error)?
             .reply()
-            .map_err(error)?;
+            .map_err(transport::x11_error)?;
         let atom = |n: &[u8]| -> io::Result<u32> {
             Ok(conn
                 .intern_atom(false, n)
-                .map_err(error)?
+                .map_err(transport::x11_error)?
                 .reply()
-                .map_err(error)?
+                .map_err(transport::x11_error)?
                 .atom)
         };
         let atoms = Atoms {
@@ -249,14 +249,14 @@ impl Endpoint {
                 | SelectionEventMask::SELECTION_WINDOW_DESTROY
                 | SelectionEventMask::SELECTION_CLIENT_CLOSE,
         )
-        .map_err(error)?
+        .map_err(transport::x11_error)?
         .check()
-        .map_err(error)?;
+        .map_err(transport::x11_error)?;
         let owner = conn
             .get_selection_owner(atoms.selection)
-            .map_err(error)?
+            .map_err(transport::x11_error)?
             .reply()
-            .map_err(error)?
+            .map_err(transport::x11_error)?
             .owner;
         let mut result = Self {
             conn,
@@ -294,9 +294,9 @@ impl Endpoint {
                 self.atoms.property,
                 time,
             )
-            .map_err(error)?
+            .map_err(transport::x11_error)?
             .check()
-            .map_err(error)?;
+            .map_err(transport::x11_error)?;
         self.incoming = Some(Incoming {
             window,
             owner,
@@ -756,7 +756,7 @@ impl Endpoint {
 }
 // Dropping the connection destroys only this client's selection/request windows.
 fn create_window(conn: &Conn) -> io::Result<u32> {
-    let window = conn.generate_id().map_err(error)?;
+    let window = conn.generate_id().map_err(transport::x11_error)?;
     let root = conn
         .setup()
         .roots
@@ -776,10 +776,63 @@ fn create_window(conn: &Conn) -> io::Result<u32> {
         0,
         &CreateWindowAux::new().event_mask(EventMask::PROPERTY_CHANGE),
     )
-    .map_err(error)?
+    .map_err(transport::x11_error)?
     .check()
-    .map_err(error)?;
+    .map_err(transport::x11_error)?;
     Ok(window)
+}
+// A manager may reset the display during any initialization request, including
+// GetSelectionOwner. Rebuild the entire endpoint within this ONE recovery budget;
+// failed partial endpoints never escape or acquire another two-second allowance.
+fn recover_endpoint(
+    socket: &std::path::Path,
+    cookie: &[u8],
+    pid: u32,
+    pidfd: &std::os::fd::OwnedFd,
+    stop: &Arc<AtomicBool>,
+    deadline: Instant,
+) -> io::Result<Endpoint> {
+    use std::os::fd::AsRawFd;
+    let live = || -> io::Result<()> {
+        let mut fd = libc::pollfd {
+            fd: pidfd.as_raw_fd(),
+            events: libc::POLLIN,
+            revents: 0,
+        };
+        if unsafe { libc::poll(&mut fd, 1, 0) } != 0 {
+            return Err(error("Owned clipboard engine exited"));
+        }
+        Ok(())
+    };
+    loop {
+        live()?;
+        let stream =
+            super::xdmcp_engine::connect_ready_socket(socket, deadline, stop).map_err(error)?;
+        if transport::peer(&stream)?.pid != pid as i32 {
+            return Err(error("Nested clipboard reset peer identity mismatch"));
+        }
+        live()?;
+        let attempt = transport::connect(
+            stream,
+            0,
+            (b"MIT-MAGIC-COOKIE-1".to_vec(), cookie.to_vec()),
+            stop.clone(),
+            deadline,
+        )
+        .and_then(|conn| Endpoint::new(conn, None, deadline));
+        match attempt {
+            Ok(endpoint) => return Ok(endpoint),
+            Err(e)
+                if matches!(
+                    e.kind(),
+                    io::ErrorKind::UnexpectedEof
+                        | io::ErrorKind::ConnectionReset
+                        | io::ErrorKind::BrokenPipe
+                        | io::ErrorKind::ConnectionAborted
+                ) => {}
+            Err(e) => return Err(e),
+        }
+    }
 }
 fn run(
     mut parent: Endpoint,
@@ -790,7 +843,6 @@ fn run(
     pid: u32,
     pidfd: &std::os::fd::OwnedFd,
 ) -> io::Result<()> {
-    use std::os::fd::AsRawFd;
     let mut resets = std::collections::VecDeque::new();
     let mut nested_error = None;
     while !stop.load(Ordering::Relaxed) {
@@ -816,38 +868,9 @@ fn run(
                     return Err(error(format!("Nested clipboard reset limit reached: {e}")));
                 }
                 resets.push_back(now);
-                // xdm SecureDisplay/pseudoReset kills clients with windows. A fresh
-                // connection is permitted only while the retained child pidfd is live,
-                // with a new SO_PEERCRED check before sending the private cookie.
-                let live = || -> io::Result<()> {
-                    let mut fd = libc::pollfd {
-                        fd: pidfd.as_raw_fd(),
-                        events: libc::POLLIN,
-                        revents: 0,
-                    };
-                    if unsafe { libc::poll(&mut fd, 1, 0) } != 0 {
-                        return Err(error("Owned clipboard engine exited"));
-                    }
-                    Ok(())
-                };
-                live()?;
                 let recovery_deadline = now + Duration::from_secs(2);
                 parent.clear_for_recovery(recovery_deadline)?;
-                let stream =
-                    super::xdmcp_engine::connect_ready_socket(socket, recovery_deadline, stop)
-                        .map_err(error)?;
-                if transport::peer(&stream)?.pid != pid as i32 {
-                    return Err(error("Nested clipboard reset peer identity mismatch"));
-                }
-                live()?;
-                let conn = transport::connect(
-                    stream,
-                    0,
-                    (b"MIT-MAGIC-COOKIE-1".to_vec(), cookie.to_vec()),
-                    stop.clone(),
-                    recovery_deadline,
-                )?;
-                nested = Endpoint::new(conn, None, recovery_deadline)?;
+                nested = recover_endpoint(socket, cookie, pid, pidfd, stop, recovery_deadline)?;
                 // Resample only a current external parent selection. Old nested text
                 // is never carried across a display-manager reset/login boundary.
                 transport::begin_recovery_request(&parent.conn, recovery_deadline)?;

@@ -1,0 +1,1808 @@
+{
+  "evidence.BWIRaaYM": [
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 3,
+      "return": "7",
+      "wall": 1795601074.974258,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 5,
+      "return": "40",
+      "wall": 1795601075.044318,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 7,
+      "return": "66",
+      "wall": 1795601075.044398,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 8,
+      "return": "52",
+      "wall": 1795601075.045062,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 10,
+      "return": "29",
+      "wall": 1795601075.045124,
+      "tid": 156
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "1",
+      "wall": 1795601075.047222,
+      "tid": 156
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "3",
+      "wall": 1795601075.052478,
+      "tid": 156
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "14",
+      "wall": 1795601075.074013,
+      "tid": 156
+    },
+    {
+      "call": "accept",
+      "transport": "AF_UNIX",
+      "return": "15",
+      "wall": 1795601075.074878,
+      "tid": 156
+    },
+    {
+      "call": "connect",
+      "fd": 20,
+      "return": "0",
+      "wall": 1795601075.079848,
+      "tid": 160
+    },
+    {
+      "call": "getsockopt",
+      "fd": 20,
+      "peer": "owned PID156 UID0 GID0",
+      "return": "0",
+      "wall": 1795601075.079907,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 108,
+      "return": "12",
+      "wall": 1795601075.080225,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 108,
+      "return": "48",
+      "wall": 1795601075.080884,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 98,
+      "return": "16",
+      "wall": 1795601075.081594,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 138,
+      "return": "12",
+      "wall": 1795601075.081855,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.082105,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.082351,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "16",
+      "wall": 1795601075.082587,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "12",
+      "wall": 1795601075.082816,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "32",
+      "wall": 1795601075.083054,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.083308,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 1,
+      "return": "40",
+      "wall": 1795601075.083769,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 138,
+      "return": "20",
+      "wall": 1795601075.084136,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601075.08469,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 98,
+      "return": "16",
+      "wall": 1795601075.084989,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "12",
+      "wall": 1795601075.085392,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.085754,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.086027,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "16",
+      "wall": 1795601075.086304,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "12",
+      "wall": 1795601075.086578,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "32",
+      "wall": 1795601075.08682,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.087053,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 1,
+      "return": "40",
+      "wall": 1795601075.087457,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "20",
+      "wall": 1795601075.090111,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601075.090609,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "14",
+      "wall": 1795601075.101463,
+      "tid": 156
+    },
+    {
+      "call": "recvmsg",
+      "fd": 15,
+      "return": "0",
+      "wall": 1795601075.107109,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601075.10725,
+      "tid": 160
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 3,
+      "return": "7",
+      "wall": 1795601075.107418,
+      "tid": 156
+    },
+    {
+      "call": "connect",
+      "fd": 16,
+      "return": "0",
+      "wall": 1795601075.107538,
+      "tid": 160
+    },
+    {
+      "call": "getsockopt",
+      "fd": 16,
+      "peer": "owned PID156 UID0 GID0",
+      "return": "0",
+      "wall": 1795601075.107596,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 108,
+      "return": "48",
+      "wall": 1795601075.10786,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_UNIX",
+      "return": "1",
+      "wall": 1795601075.159484,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 5,
+      "return": "40",
+      "wall": 1795601075.159907,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 7,
+      "return": "66",
+      "wall": 1795601075.159991,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 8,
+      "return": "52",
+      "wall": 1795601075.160276,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 10,
+      "return": "29",
+      "wall": 1795601075.160355,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 98,
+      "return": "16",
+      "wall": 1795601075.160983,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "12",
+      "wall": 1795601075.161281,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.161551,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.1618,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "16",
+      "wall": 1795601075.162042,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "12",
+      "wall": 1795601075.16227,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "3",
+      "wall": 1795601075.162318,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "32",
+      "wall": 1795601075.162714,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.162995,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 1,
+      "return": "40",
+      "wall": 1795601075.163392,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "20",
+      "wall": 1795601075.163632,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601075.163885,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601075.164166,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "14",
+      "wall": 1795601075.167398,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 3,
+      "return": "7",
+      "wall": 1795601075.171003,
+      "tid": 156
+    },
+    {
+      "call": "recvmsg",
+      "fd": 16,
+      "return": "0",
+      "wall": 1795601075.174827,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601075.174993,
+      "tid": 160
+    },
+    {
+      "call": "connect",
+      "fd": 15,
+      "return": "0",
+      "wall": 1795601075.175237,
+      "tid": 160
+    },
+    {
+      "call": "getsockopt",
+      "fd": 15,
+      "peer": "owned PID156 UID0 GID0",
+      "return": "0",
+      "wall": 1795601075.175282,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 108,
+      "return": "48",
+      "wall": 1795601075.175421,
+      "tid": 160
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 5,
+      "return": "40",
+      "wall": 1795601075.221988,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 7,
+      "return": "66",
+      "wall": 1795601075.222042,
+      "tid": 156
+    },
+    {
+      "call": "accept",
+      "transport": "AF_UNIX",
+      "return": "1",
+      "wall": 1795601075.222096,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 8,
+      "return": "52",
+      "wall": 1795601075.222288,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 10,
+      "return": "29",
+      "wall": 1795601075.222322,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 98,
+      "return": "16",
+      "wall": 1795601075.22272,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "12",
+      "wall": 1795601075.222956,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.223198,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.223504,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "16",
+      "wall": 1795601075.223748,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "12",
+      "wall": 1795601075.223997,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "32",
+      "wall": 1795601075.224269,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "3",
+      "wall": 1795601075.224307,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.224791,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 1,
+      "return": "40",
+      "wall": 1795601075.226112,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "20",
+      "wall": 1795601075.226472,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601075.226746,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601075.227032,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "14",
+      "wall": 1795601075.229606,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 3,
+      "return": "7",
+      "wall": 1795601075.231786,
+      "tid": 156
+    },
+    {
+      "call": "recvmsg",
+      "fd": 15,
+      "return": "0",
+      "wall": 1795601075.232415,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601075.232516,
+      "tid": 160
+    },
+    {
+      "call": "connect",
+      "fd": 16,
+      "return": "0",
+      "wall": 1795601075.232704,
+      "tid": 160
+    },
+    {
+      "call": "getsockopt",
+      "fd": 16,
+      "peer": "owned PID156 UID0 GID0",
+      "return": "0",
+      "wall": 1795601075.232747,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 108,
+      "return": "48",
+      "wall": 1795601075.232902,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_UNIX",
+      "return": "1",
+      "wall": 1795601075.277817,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 5,
+      "return": "40",
+      "wall": 1795601075.278042,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 7,
+      "return": "66",
+      "wall": 1795601075.278082,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 8,
+      "return": "52",
+      "wall": 1795601075.27846,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 10,
+      "return": "29",
+      "wall": 1795601075.278492,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 98,
+      "return": "16",
+      "wall": 1795601075.278649,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "12",
+      "wall": 1795601075.279043,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.279471,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.28004,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "3",
+      "wall": 1795601075.281026,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "16",
+      "wall": 1795601075.282766,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "12",
+      "wall": 1795601075.284234,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "32",
+      "wall": 1795601075.285491,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601075.286294,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 1,
+      "return": "40",
+      "wall": 1795601075.286872,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "14",
+      "wall": 1795601075.286931,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "20",
+      "wall": 1795601075.287788,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601075.288998,
+      "tid": 160
+    },
+    {
+      "call": "recvmsg",
+      "fd": 16,
+      "return": "0",
+      "wall": 1795601075.289412,
+      "tid": 160
+    },
+    {
+      "call": "kill",
+      "target": 156,
+      "signal": "SIGTERM",
+      "return": "0",
+      "wall": 1795601075.302671,
+      "tid": 154
+    },
+    {
+      "call": "signal_received",
+      "signal": "SIGTERM",
+      "si_pid": 115,
+      "wall": 1795601075.302723,
+      "tid": 156
+    },
+    {
+      "call": "exit",
+      "description": "exit_group0 or exited0",
+      "wall": 1795601075.304378,
+      "tid": 156
+    },
+    {
+      "call": "exit",
+      "description": "exit_group0 or exited0",
+      "wall": 1795601075.306657,
+      "tid": 156
+    }
+  ],
+  "evidence.HeBm4oYc": [
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 3,
+      "return": "7",
+      "wall": 1795601170.000703,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 5,
+      "return": "40",
+      "wall": 1795601170.059843,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 7,
+      "return": "66",
+      "wall": 1795601170.059898,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 8,
+      "return": "52",
+      "wall": 1795601170.060561,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 10,
+      "return": "29",
+      "wall": 1795601170.060641,
+      "tid": 156
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "1",
+      "wall": 1795601170.063006,
+      "tid": 156
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "3",
+      "wall": 1795601170.06855,
+      "tid": 156
+    },
+    {
+      "call": "accept",
+      "transport": "AF_UNIX",
+      "return": "14",
+      "wall": 1795601170.085074,
+      "tid": 156
+    },
+    {
+      "call": "connect",
+      "fd": 20,
+      "return": "0",
+      "wall": 1795601170.08932,
+      "tid": 160
+    },
+    {
+      "call": "getsockopt",
+      "fd": 20,
+      "peer": "owned PID156 UID0 GID0",
+      "return": "0",
+      "wall": 1795601170.089361,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 108,
+      "return": "12",
+      "wall": 1795601170.08955,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 108,
+      "return": "48",
+      "wall": 1795601170.089832,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "15",
+      "wall": 1795601170.090133,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 98,
+      "return": "16",
+      "wall": 1795601170.090183,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 138,
+      "return": "12",
+      "wall": 1795601170.090384,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601170.090574,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601170.090755,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "16",
+      "wall": 1795601170.090947,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "12",
+      "wall": 1795601170.09115,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "32",
+      "wall": 1795601170.091344,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601170.091532,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 1,
+      "return": "40",
+      "wall": 1795601170.091753,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 138,
+      "return": "20",
+      "wall": 1795601170.091939,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601170.092092,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 98,
+      "return": "16",
+      "wall": 1795601170.092258,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "12",
+      "wall": 1795601170.092507,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601170.092731,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601170.092991,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "16",
+      "wall": 1795601170.093221,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "12",
+      "wall": 1795601170.093461,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "32",
+      "wall": 1795601170.093714,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601170.093956,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 1,
+      "return": "40",
+      "wall": 1795601170.094227,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "20",
+      "wall": 1795601170.094508,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601170.094763,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "15",
+      "wall": 1795601181.143312,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 3,
+      "return": "7",
+      "wall": 1795601181.149922,
+      "tid": 156
+    },
+    {
+      "call": "recvmsg",
+      "fd": 15,
+      "return": "0",
+      "wall": 1795601181.150814,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601181.151212,
+      "tid": 160
+    },
+    {
+      "call": "connect",
+      "fd": 16,
+      "return": "0",
+      "wall": 1795601181.151694,
+      "tid": 160
+    },
+    {
+      "call": "getsockopt",
+      "fd": 16,
+      "peer": "owned PID156 UID0 GID0",
+      "return": "0",
+      "wall": 1795601181.151758,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 108,
+      "return": "48",
+      "wall": 1795601181.151951,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_UNIX",
+      "return": "1",
+      "wall": 1795601181.204869,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 5,
+      "return": "40",
+      "wall": 1795601181.205104,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 7,
+      "return": "66",
+      "wall": 1795601181.205151,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 8,
+      "return": "52",
+      "wall": 1795601181.205327,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 10,
+      "return": "29",
+      "wall": 1795601181.205366,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 98,
+      "return": "16",
+      "wall": 1795601181.205764,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "12",
+      "wall": 1795601181.205987,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601181.206205,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601181.206435,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "16",
+      "wall": 1795601181.206696,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "12",
+      "wall": 1795601181.206919,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "32",
+      "wall": 1795601181.207124,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "3",
+      "wall": 1795601181.207335,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601181.207353,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 1,
+      "return": "40",
+      "wall": 1795601181.207843,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "20",
+      "wall": 1795601181.208297,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601181.209027,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601181.209259,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "14",
+      "wall": 1795601181.210036,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 3,
+      "return": "7",
+      "wall": 1795601181.212697,
+      "tid": 156
+    },
+    {
+      "call": "recvmsg",
+      "fd": 16,
+      "return": "0",
+      "wall": 1795601181.214568,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601181.214696,
+      "tid": 160
+    },
+    {
+      "call": "connect",
+      "fd": 15,
+      "return": "0",
+      "wall": 1795601181.214872,
+      "tid": 160
+    },
+    {
+      "call": "getsockopt",
+      "fd": 15,
+      "peer": "owned PID156 UID0 GID0",
+      "return": "0",
+      "wall": 1795601181.214909,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 108,
+      "return": "48",
+      "wall": 1795601181.215014,
+      "tid": 160
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 5,
+      "return": "40",
+      "wall": 1795601181.262906,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 7,
+      "return": "66",
+      "wall": 1795601181.262952,
+      "tid": 156
+    },
+    {
+      "call": "accept",
+      "transport": "AF_UNIX",
+      "return": "1",
+      "wall": 1795601181.263012,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 8,
+      "return": "52",
+      "wall": 1795601181.26322,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 10,
+      "return": "29",
+      "wall": 1795601181.263253,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 98,
+      "return": "16",
+      "wall": 1795601181.263656,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "12",
+      "wall": 1795601181.263865,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601181.264073,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601181.264295,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "16",
+      "wall": 1795601181.264558,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "12",
+      "wall": 1795601181.26479,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "3",
+      "wall": 1795601181.265162,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "32",
+      "wall": 1795601181.265234,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601181.265924,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 1,
+      "return": "40",
+      "wall": 1795601181.267019,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "20",
+      "wall": 1795601181.267242,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 15,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601181.267424,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601181.267627,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "14",
+      "wall": 1795601181.267861,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 3,
+      "return": "7",
+      "wall": 1795601181.270054,
+      "tid": 156
+    },
+    {
+      "call": "recvmsg",
+      "fd": 15,
+      "return": "0",
+      "wall": 1795601181.27305,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601181.273299,
+      "tid": 160
+    },
+    {
+      "call": "connect",
+      "fd": 16,
+      "return": "0",
+      "wall": 1795601181.273672,
+      "tid": 160
+    },
+    {
+      "call": "getsockopt",
+      "fd": 16,
+      "peer": "owned PID156 UID0 GID0",
+      "return": "0",
+      "wall": 1795601181.27377,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 108,
+      "return": "48",
+      "wall": 1795601181.274049,
+      "tid": 160
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 5,
+      "return": "40",
+      "wall": 1795601181.320071,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 7,
+      "return": "66",
+      "wall": 1795601181.320142,
+      "tid": 156
+    },
+    {
+      "call": "accept",
+      "transport": "AF_UNIX",
+      "return": "1",
+      "wall": 1795601181.320229,
+      "tid": 156
+    },
+    {
+      "call": "recvfrom",
+      "fd": 13,
+      "protocol_opcode": 8,
+      "return": "52",
+      "wall": 1795601181.320528,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 10,
+      "return": "29",
+      "wall": 1795601181.320599,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 98,
+      "return": "16",
+      "wall": 1795601181.321214,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "12",
+      "wall": 1795601181.321439,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601181.321667,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601181.321882,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "16",
+      "wall": 1795601181.322104,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "3",
+      "wall": 1795601181.32233,
+      "tid": 156
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "12",
+      "wall": 1795601181.322353,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "32",
+      "wall": 1795601181.322787,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 16,
+      "return": "20",
+      "wall": 1795601181.323438,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 1,
+      "return": "40",
+      "wall": 1795601181.323636,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 137,
+      "return": "20",
+      "wall": 1795601181.323826,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 16,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601181.324005,
+      "tid": 160
+    },
+    {
+      "call": "sendmsg",
+      "fd": 20,
+      "first_byte_opcode_or_handshake": 23,
+      "return": "8",
+      "wall": 1795601181.324207,
+      "tid": 160
+    },
+    {
+      "call": "accept",
+      "transport": "AF_INET",
+      "return": "14",
+      "wall": 1795601181.324371,
+      "tid": 156
+    },
+    {
+      "call": "sendto",
+      "fd": 13,
+      "protocol_opcode": 3,
+      "return": "7",
+      "wall": 1795601181.326744,
+      "tid": 156
+    },
+    {
+      "call": "recvmsg",
+      "fd": 16,
+      "return": "0",
+      "wall": 1795601181.329694,
+      "tid": 160
+    },
+    {
+      "call": "kill",
+      "target": 156,
+      "signal": "SIGTERM",
+      "return": "0",
+      "wall": 1795601181.340878,
+      "tid": 154
+    },
+    {
+      "call": "signal_received",
+      "signal": "SIGTERM",
+      "si_pid": 115,
+      "wall": 1795601181.340897,
+      "tid": 156
+    },
+    {
+      "call": "exit",
+      "description": "exit_group0 or exited0",
+      "wall": 1795601181.38063,
+      "tid": 156
+    },
+    {
+      "call": "exit",
+      "description": "exit_group0 or exited0",
+      "wall": 1795601181.385165,
+      "tid": 156
+    }
+  ]
+}

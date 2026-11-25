@@ -16,6 +16,32 @@ use x11rb::{
 fn error(e: impl std::fmt::Display) -> io::Error {
     io::Error::other(e.to_string())
 }
+// Keep transport failures typed through x11rb's request/setup wrappers. Only
+// disconnected transports may be retried; authorization and protocol errors stay fatal.
+pub(super) fn x11_error(e: impl std::error::Error + Send + Sync + 'static) -> io::Error {
+    use std::any::Any;
+    use x11rb::errors::{ConnectError, ConnectionError, ReplyError, ReplyOrIdError};
+    let any = &e as &dyn Any;
+    let connection = any
+        .downcast_ref::<ConnectionError>()
+        .or_else(|| match any.downcast_ref::<ReplyError>() {
+            Some(ReplyError::ConnectionError(e)) => Some(e),
+            _ => None,
+        })
+        .or_else(|| match any.downcast_ref::<ReplyOrIdError>() {
+            Some(ReplyOrIdError::ConnectionError(e)) => Some(e),
+            _ => None,
+        });
+    let kind = match connection {
+        Some(ConnectionError::IoError(e)) => e.kind(),
+        _ => match any.downcast_ref::<ConnectError>() {
+            Some(ConnectError::IoError(e)) => e.kind(),
+            Some(ConnectError::Incomplete { .. }) => io::ErrorKind::UnexpectedEof,
+            _ => io::ErrorKind::Other,
+        },
+    };
+    io::Error::new(kind, e)
+}
 pub(super) struct Timed {
     stream: DefaultStream,
     deadline: Mutex<Instant>,
@@ -172,7 +198,7 @@ pub(super) fn connect(
         auth.0,
         auth.1,
     )
-    .map_err(error)
+    .map_err(x11_error)
 }
 /// Initialization may narrow/set the phase deadline, never allocate another budget.
 pub(super) fn initialize_until(conn: &Conn, deadline: Instant) -> io::Result<()> {

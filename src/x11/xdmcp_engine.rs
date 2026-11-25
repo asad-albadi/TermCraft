@@ -325,6 +325,9 @@ fn start(
     if session_ready {
         command.arg("-termcraft-session-ready");
     }
+    if config.clipboard == super::xdmcp::ClipboardPolicy::Bidirectional {
+        command.arg("-termcraft-internal-clipboard-parent");
+    }
     command
         .arg0(&binary)
         .args(args)
@@ -1196,6 +1199,14 @@ pub(super) mod tests {
             });
         assert_eq!(session.display(), ":177");
         let pid = session.process_id().unwrap();
+        let command_line = std::fs::read(format!("/proc/{pid}/cmdline")).unwrap();
+        let internal = command_line
+            .split(|b| *b == 0)
+            .any(|arg| arg == b"-termcraft-internal-clipboard-parent");
+        assert_eq!(
+            internal, clipboard,
+            "only bidirectional clipboard may identify its internal parent client"
+        );
         let auth = session.authority_path().to_path_buf();
         let start = Instant::now();
         while !marker.exists() {

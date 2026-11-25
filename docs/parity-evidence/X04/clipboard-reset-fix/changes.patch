@@ -1,0 +1,867 @@
+--- a/src/x11/xdmcp_clipboard.rs
++++ b/src/x11/xdmcp_clipboard.rs
+@@ -222,15 +222,15 @@
+     fn new(conn: Conn, peer: Option<i32>, deadline: Instant) -> io::Result<Self> {
+         transport::initialize_until(&conn, deadline)?;
+         conn.xfixes_query_version(2, 0)
+-            .map_err(error)?
++            .map_err(transport::x11_error)?
+             .reply()
+-            .map_err(error)?;
++            .map_err(transport::x11_error)?;
+         let atom = |n: &[u8]| -> io::Result<u32> {
+             Ok(conn
+                 .intern_atom(false, n)
+-                .map_err(error)?
++                .map_err(transport::x11_error)?
+                 .reply()
+-                .map_err(error)?
++                .map_err(transport::x11_error)?
+                 .atom)
+         };
+         let atoms = Atoms {
+@@ -249,14 +249,14 @@
+                 | SelectionEventMask::SELECTION_WINDOW_DESTROY
+                 | SelectionEventMask::SELECTION_CLIENT_CLOSE,
+         )
+-        .map_err(error)?
++        .map_err(transport::x11_error)?
+         .check()
+-        .map_err(error)?;
++        .map_err(transport::x11_error)?;
+         let owner = conn
+             .get_selection_owner(atoms.selection)
+-            .map_err(error)?
++            .map_err(transport::x11_error)?
+             .reply()
+-            .map_err(error)?
++            .map_err(transport::x11_error)?
+             .owner;
+         let mut result = Self {
+             conn,
+@@ -294,9 +294,9 @@
+                 self.atoms.property,
+                 time,
+             )
+-            .map_err(error)?
++            .map_err(transport::x11_error)?
+             .check()
+-            .map_err(error)?;
++            .map_err(transport::x11_error)?;
+         self.incoming = Some(Incoming {
+             window,
+             owner,
+@@ -756,7 +756,7 @@
+ }
+ // Dropping the connection destroys only this client's selection/request windows.
+ fn create_window(conn: &Conn) -> io::Result<u32> {
+-    let window = conn.generate_id().map_err(error)?;
++    let window = conn.generate_id().map_err(transport::x11_error)?;
+     let root = conn
+         .setup()
+         .roots
+@@ -776,10 +776,63 @@
+         0,
+         &CreateWindowAux::new().event_mask(EventMask::PROPERTY_CHANGE),
+     )
+-    .map_err(error)?
++    .map_err(transport::x11_error)?
+     .check()
+-    .map_err(error)?;
++    .map_err(transport::x11_error)?;
+     Ok(window)
++}
++// A manager may reset the display during any initialization request, including
++// GetSelectionOwner. Rebuild the entire endpoint within this ONE recovery budget;
++// failed partial endpoints never escape or acquire another two-second allowance.
++fn recover_endpoint(
++    socket: &std::path::Path,
++    cookie: &[u8],
++    pid: u32,
++    pidfd: &std::os::fd::OwnedFd,
++    stop: &Arc<AtomicBool>,
++    deadline: Instant,
++) -> io::Result<Endpoint> {
++    use std::os::fd::AsRawFd;
++    let live = || -> io::Result<()> {
++        let mut fd = libc::pollfd {
++            fd: pidfd.as_raw_fd(),
++            events: libc::POLLIN,
++            revents: 0,
++        };
++        if unsafe { libc::poll(&mut fd, 1, 0) } != 0 {
++            return Err(error("Owned clipboard engine exited"));
++        }
++        Ok(())
++    };
++    loop {
++        live()?;
++        let stream =
++            super::xdmcp_engine::connect_ready_socket(socket, deadline, stop).map_err(error)?;
++        if transport::peer(&stream)?.pid != pid as i32 {
++            return Err(error("Nested clipboard reset peer identity mismatch"));
++        }
++        live()?;
++        let attempt = transport::connect(
++            stream,
++            0,
++            (b"MIT-MAGIC-COOKIE-1".to_vec(), cookie.to_vec()),
++            stop.clone(),
++            deadline,
++        )
++        .and_then(|conn| Endpoint::new(conn, None, deadline));
++        match attempt {
++            Ok(endpoint) => return Ok(endpoint),
++            Err(e)
++                if matches!(
++                    e.kind(),
++                    io::ErrorKind::UnexpectedEof
++                        | io::ErrorKind::ConnectionReset
++                        | io::ErrorKind::BrokenPipe
++                        | io::ErrorKind::ConnectionAborted
++                ) => {}
++            Err(e) => return Err(e),
++        }
++    }
+ }
+ fn run(
+     mut parent: Endpoint,
+@@ -790,7 +843,6 @@
+     pid: u32,
+     pidfd: &std::os::fd::OwnedFd,
+ ) -> io::Result<()> {
+-    use std::os::fd::AsRawFd;
+     let mut resets = std::collections::VecDeque::new();
+     let mut nested_error = None;
+     while !stop.load(Ordering::Relaxed) {
+@@ -816,38 +868,9 @@
+                     return Err(error(format!("Nested clipboard reset limit reached: {e}")));
+                 }
+                 resets.push_back(now);
+-                // xdm SecureDisplay/pseudoReset kills clients with windows. A fresh
+-                // connection is permitted only while the retained child pidfd is live,
+-                // with a new SO_PEERCRED check before sending the private cookie.
+-                let live = || -> io::Result<()> {
+-                    let mut fd = libc::pollfd {
+-                        fd: pidfd.as_raw_fd(),
+-                        events: libc::POLLIN,
+-                        revents: 0,
+-                    };
+-                    if unsafe { libc::poll(&mut fd, 1, 0) } != 0 {
+-                        return Err(error("Owned clipboard engine exited"));
+-                    }
+-                    Ok(())
+-                };
+-                live()?;
+                 let recovery_deadline = now + Duration::from_secs(2);
+                 parent.clear_for_recovery(recovery_deadline)?;
+-                let stream =
+-                    super::xdmcp_engine::connect_ready_socket(socket, recovery_deadline, stop)
+-                        .map_err(error)?;
+-                if transport::peer(&stream)?.pid != pid as i32 {
+-                    return Err(error("Nested clipboard reset peer identity mismatch"));
+-                }
+-                live()?;
+-                let conn = transport::connect(
+-                    stream,
+-                    0,
+-                    (b"MIT-MAGIC-COOKIE-1".to_vec(), cookie.to_vec()),
+-                    stop.clone(),
+-                    recovery_deadline,
+-                )?;
+-                nested = Endpoint::new(conn, None, recovery_deadline)?;
++                nested = recover_endpoint(socket, cookie, pid, pidfd, stop, recovery_deadline)?;
+                 // Resample only a current external parent selection. Old nested text
+                 // is never carried across a display-manager reset/login boundary.
+                 transport::begin_recovery_request(&parent.conn, recovery_deadline)?;
+--- a/src/x11/xdmcp_clipboard/transport.rs
++++ b/src/x11/xdmcp_clipboard/transport.rs
+@@ -15,6 +15,32 @@
+ };
+ fn error(e: impl std::fmt::Display) -> io::Error {
+     io::Error::other(e.to_string())
++}
++// Keep transport failures typed through x11rb's request/setup wrappers. Only
++// disconnected transports may be retried; authorization and protocol errors stay fatal.
++pub(super) fn x11_error(e: impl std::error::Error + Send + Sync + 'static) -> io::Error {
++    use std::any::Any;
++    use x11rb::errors::{ConnectError, ConnectionError, ReplyError, ReplyOrIdError};
++    let any = &e as &dyn Any;
++    let connection = any
++        .downcast_ref::<ConnectionError>()
++        .or_else(|| match any.downcast_ref::<ReplyError>() {
++            Some(ReplyError::ConnectionError(e)) => Some(e),
++            _ => None,
++        })
++        .or_else(|| match any.downcast_ref::<ReplyOrIdError>() {
++            Some(ReplyOrIdError::ConnectionError(e)) => Some(e),
++            _ => None,
++        });
++    let kind = match connection {
++        Some(ConnectionError::IoError(e)) => e.kind(),
++        _ => match any.downcast_ref::<ConnectError>() {
++            Some(ConnectError::IoError(e)) => e.kind(),
++            Some(ConnectError::Incomplete { .. }) => io::ErrorKind::UnexpectedEof,
++            _ => io::ErrorKind::Other,
++        },
++    };
++    io::Error::new(kind, e)
+ }
+ pub(super) struct Timed {
+     stream: DefaultStream,
+@@ -172,7 +198,7 @@
+         auth.0,
+         auth.1,
+     )
+-    .map_err(error)
++    .map_err(x11_error)
+ }
+ /// Initialization may narrow/set the phase deadline, never allocate another budget.
+ pub(super) fn initialize_until(conn: &Conn, deadline: Instant) -> io::Result<()> {
+--- a/src/x11/xdmcp_clipboard/deadline_tests.rs
++++ b/src/x11/xdmcp_clipboard/deadline_tests.rs
+@@ -298,3 +298,459 @@
+     );
+     assert!(Instant::now() < deadline);
+ }
++
++// Serve the real Endpoint protocol, including checked void requests. The recovery
++// failure is injected only at its final GetSelectionOwner request, after auth,
++// extension discovery, atoms, window creation and XFixes subscription succeeded.
++fn endpoint_server(stream: UnixStream, close_owner: bool, ready: Option<mpsc::Sender<()>>) {
++    endpoint_server_observe(stream, close_owner, ready, |_, _, _| {});
++}
++fn endpoint_server_observe(
++    mut stream: UnixStream,
++    close_owner: bool,
++    ready: Option<mpsc::Sender<()>>,
++    mut observe: impl FnMut(u8, &[u8], &mut [u8; 32]),
++) {
++    setup_reply(&mut stream);
++    let mut sequence = 0u16;
++    loop {
++        let mut header = [0; 4];
++        if stream.read_exact(&mut header).is_err() {
++            return;
++        }
++        sequence = sequence.wrapping_add(1);
++        let length = u16::from_ne_bytes([header[2], header[3]]) as usize * 4;
++        let mut payload = vec![0; length - 4];
++        stream.read_exact(&mut payload).unwrap();
++        let mut reply = [0u8; 32];
++        reply[0] = 1;
++        reply[2..4].copy_from_slice(&sequence.to_ne_bytes());
++        observe(header[0], &payload, &mut reply);
++        match header[0] {
++            98 => {
++                reply[8] = 1;
++                reply[9] = 200;
++                reply[10] = 100;
++            }
++            200 if header[1] == 0 => {
++                reply[8..12].copy_from_slice(&2u32.to_ne_bytes());
++            }
++            16 => {
++                reply[8..12].copy_from_slice(&(u32::from(sequence) + 10).to_ne_bytes());
++            }
++            43 => {}
++            23 => {
++                if close_owner {
++                    return;
++                }
++                if let Some(ref ready) = ready {
++                    let _ = ready.send(());
++                }
++            }
++            _ => continue,
++        }
++        if stream.write_all(&reply).is_err() {
++            return;
++        }
++    }
++}
++
++#[test]
++fn recovery_retries_initializer_eof_within_one_reset_epoch() {
++    use std::os::fd::FromRawFd;
++    let dir = tempfile::tempdir().unwrap();
++    let socket = dir.path().join("nested");
++    let listener = UnixListener::bind(&socket).unwrap();
++    let (p_client, p_server) = UnixStream::pair().unwrap();
++    let p = std::thread::spawn(move || endpoint_server(p_server, false, None));
++    let (n_client, n_server) = UnixStream::pair().unwrap();
++    let n_control = n_server.try_clone().unwrap();
++    let n = std::thread::spawn(move || endpoint_server(n_server, false, None));
++    let stop = Arc::new(AtomicBool::new(false));
++    let deadline = Instant::now() + Duration::from_secs(2);
++    let parent = Endpoint::new(
++        transport::connect(p_client, 0, (vec![], vec![]), stop.clone(), deadline).unwrap(),
++        None,
++        deadline,
++    )
++    .unwrap();
++    let nested = Endpoint::new(
++        transport::connect(n_client, 0, (vec![], vec![]), stop.clone(), deadline).unwrap(),
++        None,
++        deadline,
++    )
++    .unwrap();
++    let (send, received) = mpsc::channel();
++    let flag = stop.clone();
++    let recovery = std::thread::spawn(move || {
++        let (first, _) = listener.accept().unwrap();
++        endpoint_server(first, true, None);
++        listener.set_nonblocking(true).unwrap();
++        let until = Instant::now() + Duration::from_secs(1);
++        loop {
++            match listener.accept() {
++                Ok((second, _)) => {
++                    endpoint_server(second, false, Some(send));
++                    return;
++                }
++                Err(e) if e.kind() == io::ErrorKind::WouldBlock && Instant::now() < until => {
++                    std::thread::sleep(Duration::from_millis(1))
++                }
++                Err(_) => {
++                    flag.store(true, Ordering::Relaxed);
++                    return;
++                }
++            }
++        }
++    });
++    let cancel = stop.clone();
++    let waiter = std::thread::spawn(move || {
++        let recovered = received.recv_timeout(Duration::from_millis(1500)).is_ok();
++        cancel.store(true, Ordering::Relaxed);
++        recovered
++    });
++    n_control.shutdown(std::net::Shutdown::Both).unwrap();
++    let raw = unsafe { libc::syscall(libc::SYS_pidfd_open, std::process::id(), 0) as i32 };
++    assert!(raw >= 0);
++    let pidfd = unsafe { std::os::fd::OwnedFd::from_raw_fd(raw) };
++    let result = run(
++        parent,
++        nested,
++        &stop,
++        &socket,
++        &[0x51; 16],
++        std::process::id(),
++        &pidfd,
++    );
++    let recovered = waiter.join().unwrap();
++    recovery.join().unwrap();
++    p.join().unwrap();
++    n.join().unwrap();
++    assert!(
++        recovered,
++        "a replacement endpoint must initialize after GetSelectionOwner EOF: {result:?}"
++    );
++    // Stop may cancel the subsequent parent resample. The observation above is
++    // emitted only by a replacement endpoint after complete initialization.
++    assert!(
++        result.is_ok() || result.as_ref().unwrap_err().to_string() == "operation interrupted",
++        "unexpected recovery failure: {result:?}"
++    );
++}
++
++fn self_pidfd() -> std::os::fd::OwnedFd {
++    use std::os::fd::FromRawFd;
++    let raw = unsafe { libc::syscall(libc::SYS_pidfd_open, std::process::id(), 0) as i32 };
++    assert!(raw >= 0);
++    unsafe { std::os::fd::OwnedFd::from_raw_fd(raw) }
++}
++
++#[test]
++fn recovery_wrong_peer_never_receives_private_cookie() {
++    let dir = tempfile::tempdir().unwrap();
++    let socket = dir.path().join("wrong-peer");
++    let listener = UnixListener::bind(&socket).unwrap();
++    let server = std::thread::spawn(move || {
++        let (mut stream, _) = listener.accept().unwrap();
++        stream
++            .set_read_timeout(Some(Duration::from_millis(500)))
++            .unwrap();
++        let mut bytes = [0; 64];
++        assert_eq!(stream.read(&mut bytes).unwrap(), 0);
++    });
++    let result = recover_endpoint(
++        &socket,
++        &[0x51; 16],
++        std::process::id() + 1,
++        &self_pidfd(),
++        &Arc::new(AtomicBool::new(false)),
++        Instant::now() + Duration::from_secs(2),
++    );
++    assert!(
++        result
++            .err()
++            .unwrap()
++            .to_string()
++            .contains("peer identity mismatch")
++    );
++    server.join().unwrap();
++}
++
++#[test]
++fn recovery_cancelled_or_expired_epoch_opens_no_connection() {
++    for cancelled in [false, true] {
++        let dir = tempfile::tempdir().unwrap();
++        let socket = dir.path().join("inactive");
++        let listener = UnixListener::bind(&socket).unwrap();
++        listener.set_nonblocking(true).unwrap();
++        let deadline = Instant::now()
++            + if cancelled {
++                Duration::from_secs(2)
++            } else {
++                Duration::ZERO
++            };
++        let start = Instant::now();
++        assert!(
++            recover_endpoint(
++                &socket,
++                &[0x51; 16],
++                std::process::id(),
++                &self_pidfd(),
++                &Arc::new(AtomicBool::new(cancelled)),
++                deadline
++            )
++            .is_err()
++        );
++        assert!(start.elapsed() < Duration::from_millis(100));
++        assert_eq!(
++            listener.accept().unwrap_err().kind(),
++            io::ErrorKind::WouldBlock
++        );
++    }
++}
++
++#[test]
++fn recovery_does_not_retry_authentication_rejection() {
++    let dir = tempfile::tempdir().unwrap();
++    let socket = dir.path().join("rejected");
++    let listener = UnixListener::bind(&socket).unwrap();
++    let server = std::thread::spawn(move || {
++        let (mut stream, _) = listener.accept().unwrap();
++        let mut header = [0; 12];
++        stream.read_exact(&mut header).unwrap();
++        let padded = |n: u16| (n as usize + 3) & !3;
++        let mut auth = vec![
++            0;
++            padded(u16::from_ne_bytes([header[6], header[7]]))
++                + padded(u16::from_ne_bytes([header[8], header[9]]))
++        ];
++        stream.read_exact(&mut auth).unwrap();
++        let mut rejected = [0; 12];
++        rejected[1] = 4;
++        rejected[2..4].copy_from_slice(&11u16.to_ne_bytes());
++        rejected[6..8].copy_from_slice(&1u16.to_ne_bytes());
++        rejected[8..].copy_from_slice(b"Nope");
++        stream.write_all(&rejected).unwrap();
++        listener.set_nonblocking(true).unwrap();
++        listener
++    });
++    let result = recover_endpoint(
++        &socket,
++        &[0x51; 16],
++        std::process::id(),
++        &self_pidfd(),
++        &Arc::new(AtomicBool::new(false)),
++        Instant::now() + Duration::from_secs(2),
++    );
++    assert_eq!(result.err().unwrap().kind(), io::ErrorKind::Other);
++    let listener = server.join().unwrap();
++    assert_eq!(
++        listener.accept().unwrap_err().kind(),
++        io::ErrorKind::WouldBlock
++    );
++}
++
++#[test]
++fn recovery_initializer_retries_share_original_deadline() {
++    let dir = tempfile::tempdir().unwrap();
++    let socket = dir.path().join("budget");
++    let listener = UnixListener::bind(&socket).unwrap();
++    let flag = Arc::new(AtomicBool::new(false));
++    let server_flag = flag.clone();
++    listener.set_nonblocking(true).unwrap();
++    let server = std::thread::spawn(move || {
++        let mut attempts = 0;
++        while !server_flag.load(Ordering::Relaxed) {
++            match listener.accept() {
++                Ok((stream, _)) => {
++                    attempts += 1;
++                    endpoint_server(stream, true, None);
++                }
++                Err(e) if e.kind() == io::ErrorKind::WouldBlock => std::thread::yield_now(),
++                Err(e) => panic!("{e}"),
++            }
++        }
++        attempts
++    });
++    let start = Instant::now();
++    let deadline = start + Duration::from_millis(150);
++    let result = recover_endpoint(
++        &socket,
++        &[0x51; 16],
++        std::process::id(),
++        &self_pidfd(),
++        &Arc::new(AtomicBool::new(false)),
++        deadline,
++    );
++    let elapsed = start.elapsed();
++    flag.store(true, Ordering::Relaxed);
++    let attempts = server.join().unwrap();
++    assert!(result.is_err());
++    assert!(attempts > 1);
++    assert!(elapsed >= Duration::from_millis(140));
++    assert!(elapsed < Duration::from_millis(300));
++    println!(
++        "{attempts} complete initializer EOFs shared original 150ms deadline: {}ms",
++        elapsed.as_millis()
++    );
++}
++
++#[test]
++fn three_recovered_manager_reset_episodes_still_enforce_thirty_second_limit() {
++    let dir = tempfile::tempdir().unwrap();
++    let socket = dir.path().join("episodes");
++    let listener = UnixListener::bind(&socket).unwrap();
++    let (p_client, p_server) = UnixStream::pair().unwrap();
++    let (sampled, samples) = mpsc::channel();
++    let parent_server = std::thread::spawn(move || {
++        let mut owners = 0;
++        endpoint_server_observe(p_server, false, None, move |opcode, _, _| {
++            if opcode == 23 {
++                owners += 1;
++                if owners >= 3 && owners % 2 == 1 {
++                    sampled.send(()).unwrap();
++                }
++            }
++        });
++    });
++    let (n_client, n_server) = UnixStream::pair().unwrap();
++    let n_control = n_server.try_clone().unwrap();
++    let initial_server = std::thread::spawn(move || endpoint_server(n_server, false, None));
++    let stop = Arc::new(AtomicBool::new(false));
++    let deadline = Instant::now() + Duration::from_secs(2);
++    let parent = Endpoint::new(
++        transport::connect(p_client, 0, (vec![], vec![]), stop.clone(), deadline).unwrap(),
++        None,
++        deadline,
++    )
++    .unwrap();
++    let nested = Endpoint::new(
++        transport::connect(n_client, 0, (vec![], vec![]), stop.clone(), deadline).unwrap(),
++        None,
++        deadline,
++    )
++    .unwrap();
++    let replacements = std::thread::spawn(move || {
++        for _ in 0..3 {
++            let (stream, _) = listener.accept().unwrap();
++            let control = stream.try_clone().unwrap();
++            let server = std::thread::spawn(move || endpoint_server(stream, false, None));
++            samples.recv_timeout(Duration::from_secs(2)).unwrap();
++            control.shutdown(std::net::Shutdown::Both).unwrap();
++            server.join().unwrap();
++        }
++        listener.set_nonblocking(true).unwrap();
++        listener
++    });
++    n_control.shutdown(std::net::Shutdown::Both).unwrap();
++    let result = run(
++        parent,
++        nested,
++        &stop,
++        &socket,
++        &[0x51; 16],
++        std::process::id(),
++        &self_pidfd(),
++    );
++    let listener = replacements.join().unwrap();
++    parent_server.join().unwrap();
++    initial_server.join().unwrap();
++    assert!(
++        result
++            .err()
++            .unwrap()
++            .to_string()
++            .contains("Nested clipboard reset limit reached")
++    );
++    assert_eq!(
++        listener.accept().unwrap_err().kind(),
++        io::ErrorKind::WouldBlock
++    );
++}
++
++#[test]
++fn recovery_dead_owned_pidfd_opens_no_connection() {
++    use std::os::fd::FromRawFd;
++    let mut child = std::process::Command::new("/usr/bin/true").spawn().unwrap();
++    let raw = unsafe { libc::syscall(libc::SYS_pidfd_open, child.id(), 0) as i32 };
++    assert!(raw >= 0);
++    let pidfd = unsafe { std::os::fd::OwnedFd::from_raw_fd(raw) };
++    child.wait().unwrap();
++    let dir = tempfile::tempdir().unwrap();
++    let socket = dir.path().join("dead");
++    let listener = UnixListener::bind(&socket).unwrap();
++    listener.set_nonblocking(true).unwrap();
++    let result = recover_endpoint(
++        &socket,
++        &[0x51; 16],
++        std::process::id(),
++        &pidfd,
++        &Arc::new(AtomicBool::new(false)),
++        Instant::now() + Duration::from_secs(2),
++    );
++    assert_eq!(
++        result.err().unwrap().to_string(),
++        "Owned clipboard engine exited"
++    );
++    assert_eq!(
++        listener.accept().unwrap_err().kind(),
++        io::ErrorKind::WouldBlock
++    );
++}
++
++#[test]
++#[ignore = "requires the isolated test compositor and private parent display"]
++fn recovery_preserves_foreign_parent_selection() {
++    assert_eq!(
++        std::env::var("TERMCRAFT_TEST_XSERVER_ISOLATED").as_deref(),
++        Ok("1")
++    );
++    let deadline = Instant::now() + Duration::from_secs(2);
++    let stop = Arc::new(AtomicBool::new(false));
++    let (conn, _) = transport::parent_until(":0", None, stop.clone(), deadline).unwrap();
++    let mut parent = Endpoint::new(conn, None, deadline).unwrap();
++    let (foreign, _) = transport::parent_until(":0", None, stop, deadline).unwrap();
++    let owner = create_window(&foreign).unwrap();
++    foreign
++        .set_selection_owner(owner, parent.atoms.selection, 0u32)
++        .unwrap()
++        .check()
++        .unwrap();
++    parent.clear_for_recovery(deadline).unwrap();
++    assert_eq!(
++        foreign
++            .get_selection_owner(parent.atoms.selection)
++            .unwrap()
++            .reply()
++            .unwrap()
++            .owner,
++        owner
++    );
++    assert!(!parent.clearing);
++}
++
++#[test]
++fn endpoint_initial_owner_conversion_eof_keeps_transport_kind() {
++    let (client, server) = UnixStream::pair().unwrap();
++    let control = server.try_clone().unwrap();
++    let worker = std::thread::spawn(move || {
++        endpoint_server_observe(server, false, None, move |opcode, _, reply| {
++            if opcode == 23 {
++                reply[8..12].copy_from_slice(&42u32.to_ne_bytes());
++            }
++            if opcode == 24 {
++                control.shutdown(std::net::Shutdown::Both).unwrap();
++            }
++        })
++    });
++    let deadline = Instant::now() + Duration::from_secs(2);
++    let stop = Arc::new(AtomicBool::new(false));
++    let conn = transport::connect(client, 0, (vec![], vec![]), stop, deadline).unwrap();
++    let e = Endpoint::new(conn, None, deadline).err().unwrap();
++    worker.join().unwrap();
++    assert_eq!(
++        e.kind(),
++        io::ErrorKind::UnexpectedEof,
++        "an initializer's owner conversion must remain eligible for the same bounded recovery: {e}"
++    );
++}
+--- a/src/x11/xdmcp_engine.rs
++++ b/src/x11/xdmcp_engine.rs
+@@ -324,6 +324,9 @@
+     let mut command = Command::new(format!("/proc/self/fd/{}", executable.as_raw_fd()));
+     if session_ready {
+         command.arg("-termcraft-session-ready");
++    }
++    if config.clipboard == super::xdmcp::ClipboardPolicy::Bidirectional {
++        command.arg("-termcraft-internal-clipboard-parent");
+     }
+     command
+         .arg0(&binary)
+@@ -1196,6 +1199,14 @@
+             });
+         assert_eq!(session.display(), ":177");
+         let pid = session.process_id().unwrap();
++        let command_line = std::fs::read(format!("/proc/{pid}/cmdline")).unwrap();
++        let internal = command_line
++            .split(|b| *b == 0)
++            .any(|arg| arg == b"-termcraft-internal-clipboard-parent");
++        assert_eq!(
++            internal, clipboard,
++            "only bidirectional clipboard may identify its internal parent client"
++        );
+         let auth = session.authority_path().to_path_buf();
+         let start = Instant::now();
+         while !marker.exists() {
+--- a/packaging/x11/xdmcp/manifest.json
++++ b/packaging/x11/xdmcp/manifest.json
+@@ -54,11 +54,11 @@
+     }
+   },
+   "clipboard_engine": {
+-    "artifact_id": "xephyr-21.1.26-session-ready-xkb-v2-linux-x86_64",
++    "artifact_id": "xephyr-21.1.26-session-ready-xkb-clipboard-lifecycle-v3-linux-x86_64",
+     "entry_point": "x11/linux-x86_64/Xephyr-session-ready",
+-    "executable_sha256": "8cf61e9f10f5c797c249eae12a36f8cc0f43ca51ceda89c62bc663593f30f460",
+-    "compressed_sha256": "90256d9c41e451c402b8deff69cc589d976b20340ef5d4e0452d508214b9b875",
+-    "patch_sha256": "2d03a69b2f3a0aee25141890b98b9524082de39af350a6df56e586c15fd9a344",
++    "executable_sha256": "81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e",
++    "compressed_sha256": "95201c0d7d93ae1f27d94f0cf2806f8db0d52f8d38330257d1062f48345037c3",
++    "patch_sha256": "6de42a3d543e69a8220fc52cd26f69d339c86e4c4befaa847c14025a6e2b31c8",
+     "xtrans_headers_sha256": "f00c6c854e9f08bd40de10b0278d942d6d7e48bad08e93415487e199a286d6e6",
+     "license": "x11/linux-x86_64/XEPHYR_COPYING",
+     "source_sha256": "c8609f9cdafde14de7ec7cb406dac9507add1d536df8d3c3e3d3d9c1cd864066",
+@@ -66,6 +66,7 @@
+     "xtrans_license": "x11/linux-x86_64/XTRANS_COPYING",
+     "xtrans_license_sha256": "af61583b470afb73de1bc704a34e593183c1e8ae76882991ea54a64b6d846c0d",
+     "build_inputs": "packaging/x11/xdmcp/readiness",
+-    "keyboard": "Single registered evdev layout ID, applied to the nested master and KDrive keyboard each generation. Uses the installed xorg-xkbcomp and xkeyboard-config. Host inheritance when omitted."
++    "keyboard": "Single registered evdev layout ID, applied to the nested master and KDrive keyboard each generation. Uses the installed xorg-xkbcomp and xkeyboard-config. Host inheritance when omitted.",
++    "lifecycle": "Explicit bidirectional-clipboard option excludes only authenticated local clients with exact live launching-parent PID and UID from XDMCP first-client session ownership; pidfd plus current parent identity retained. All native authorization and ordinary client accounting remain enabled."
+   }
+ }
+--- a/packaging/x11/xdmcp/readiness/xephyr.patch
++++ b/packaging/x11/xdmcp/readiness/xephyr.patch
+@@ -1,25 +1,33 @@
+ --- a/os/xdmcp.c
+ +++ b/os/xdmcp.c
+-@@ -35,6 +35,7 @@
++@@ -35,6 +35,11 @@
+  #endif
+  
+  #include <stdio.h>
+ +#include <fcntl.h>
+++#ifdef __linux__
+++#include <poll.h>
+++#include <sys/syscall.h>
+++#endif
+  #include <stdlib.h>
+  #include <X11/X.h>
+  #include <X11/Xmd.h>
+-@@ -213,6 +214,7 @@
++@@ -213,6 +218,10 @@
+  
+  static unsigned short xdm_udp_port = XDM_UDP_PORT;
+  static Bool OneSession = FALSE;
+ +static int sessionReadyFd = -1;
+++static pid_t internalClientPid;
+++static uid_t internalClientUid;
+++static int internalClientPidFd = -1;
+  static const char *xdm_from = NULL;
+  
+  void
+-@@ -286,6 +288,14 @@
++@@ -285,6 +294,28 @@
++     if (strcmp(argv[i], "-from") == 0) {
+          get_fromaddr_by_name(argc, argv, ++i);
+          return i + 1;
+-     }
+++    }
+ +    if (strcmp(argv[i], "-termcraft-session-ready") == 0) {
+ +        if (sessionReadyFd != -1)
+ +            FatalError("Duplicate XDMCP session readiness option");
+@@ -28,10 +36,59 @@
+ +            FatalError("Cannot retain XDMCP session readiness channel");
+ +        return ++i;
+ +    }
+++    if (strcmp(argv[i], "-termcraft-internal-clipboard-parent") == 0) {
+++#ifdef __linux__
+++        if (sessionReadyFd < 0 || internalClientPidFd >= 0)
+++            FatalError("Expected one internal clipboard option after session readiness");
+++        internalClientPid = getppid();
+++        internalClientUid = geteuid();
+++        internalClientPidFd = syscall(SYS_pidfd_open, internalClientPid, 0);
+++        if (internalClientPidFd < 0 || getppid() != internalClientPid)
+++            FatalError("Cannot retain internal clipboard parent identity");
+++#else
+++        FatalError("Internal clipboard parent identity requires Linux pidfd support");
+++#endif
+++        return ++i;
++     }
+      if (strcmp(argv[i], "-once") == 0) {
+          OneSession = TRUE;
+-         return i + 1;
+-@@ -633,6 +643,13 @@
++@@ -625,6 +656,35 @@
++  * when it is closed
++  */
++ 
+++/* Called only after normal X11 authorization has succeeded.  The launching
+++ * application owns a clipboard client, not the display-manager session.
+++ * Keep that exact live process out of first-client lifecycle selection;
+++ * all other local and remote clients retain the native XDMCP behavior.
+++ */
+++Bool
+++XdmcpIsInternalClient(ClientPtr client)
+++{
+++#ifdef __linux__
+++    LocalClientCredRec *cred = NULL;
+++    struct pollfd parent = { .fd = internalClientPidFd, .events = POLLIN };
+++    Bool internal = FALSE;
+++
+++    if (internalClientPidFd < 0 || getppid() != internalClientPid ||
+++        poll(&parent, 1, 0) != 0)
+++        return FALSE;
+++    if (GetLocalClientCreds(client, &cred) == 0) {
+++        internal = (cred->fieldsSet & (LCC_PID_SET | LCC_UID_SET)) ==
+++                       (LCC_PID_SET | LCC_UID_SET) &&
+++                   cred->pid == internalClientPid &&
+++                   cred->euid == internalClientUid;
+++        FreeLocalClientCreds(cred);
+++    }
+++    return internal;
+++#else
+++    return FALSE;
+++#endif
+++}
+++
++ void
++ XdmcpOpenDisplay(int sock)
++ {
++@@ -633,6 +693,13 @@
+      state = XDM_RUN_SESSION;
+      TimerSet(xdmcp_timer, 0, XDM_DEF_DORMANCY * 1000, XdmcpTimerNotify, NULL);
+      sessionSocket = sock;
+@@ -45,6 +102,28 @@
+  }
+  
+  void
++--- a/os/connection.c
+++++ b/os/connection.c
++@@ -579,7 +579,8 @@
++ 
++ #ifdef XDMCP
++     /* indicate to Xdmcp protocol that we've opened new client */
++-    XdmcpOpenDisplay(priv->fd);
+++    if (!XdmcpIsInternalClient(client))
+++        XdmcpOpenDisplay(priv->fd);
++ #endif                          /* XDMCP */
++ 
++     XaceHook(XACE_AUTH_AVAIL, client, auth_id);
++--- a/os/osdep.h
+++++ b/os/osdep.h
++@@ -190,6 +190,7 @@
++ extern void XdmcpRegisterAuthorization(const char *name, int namelen);
++ extern void XdmcpInit(void);
++ extern void XdmcpReset(void);
+++extern Bool XdmcpIsInternalClient(ClientPtr client);
++ extern void XdmcpOpenDisplay(int sock);
++ extern void XdmcpCloseDisplay(int sock);
++ extern void XdmcpRegisterAuthentication(const char *name,
+ --- a/include/xkbsrv.h
+ +++ b/include/xkbsrv.h
+ @@ -772,6 +772,7 @@

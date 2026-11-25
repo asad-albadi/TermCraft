@@ -1,25 +1,33 @@
 --- a/os/xdmcp.c
 +++ b/os/xdmcp.c
-@@ -35,6 +35,7 @@
+@@ -35,6 +35,11 @@
  #endif
  
  #include <stdio.h>
 +#include <fcntl.h>
++#ifdef __linux__
++#include <poll.h>
++#include <sys/syscall.h>
++#endif
  #include <stdlib.h>
  #include <X11/X.h>
  #include <X11/Xmd.h>
-@@ -213,6 +214,7 @@
+@@ -213,6 +218,10 @@
  
  static unsigned short xdm_udp_port = XDM_UDP_PORT;
  static Bool OneSession = FALSE;
 +static int sessionReadyFd = -1;
++static pid_t internalClientPid;
++static uid_t internalClientUid;
++static int internalClientPidFd = -1;
  static const char *xdm_from = NULL;
  
  void
-@@ -286,6 +288,14 @@
+@@ -285,6 +294,28 @@
+     if (strcmp(argv[i], "-from") == 0) {
          get_fromaddr_by_name(argc, argv, ++i);
          return i + 1;
-     }
++    }
 +    if (strcmp(argv[i], "-termcraft-session-ready") == 0) {
 +        if (sessionReadyFd != -1)
 +            FatalError("Duplicate XDMCP session readiness option");
@@ -28,10 +36,59 @@
 +            FatalError("Cannot retain XDMCP session readiness channel");
 +        return ++i;
 +    }
++    if (strcmp(argv[i], "-termcraft-internal-clipboard-parent") == 0) {
++#ifdef __linux__
++        if (sessionReadyFd < 0 || internalClientPidFd >= 0)
++            FatalError("Expected one internal clipboard option after session readiness");
++        internalClientPid = getppid();
++        internalClientUid = geteuid();
++        internalClientPidFd = syscall(SYS_pidfd_open, internalClientPid, 0);
++        if (internalClientPidFd < 0 || getppid() != internalClientPid)
++            FatalError("Cannot retain internal clipboard parent identity");
++#else
++        FatalError("Internal clipboard parent identity requires Linux pidfd support");
++#endif
++        return ++i;
+     }
      if (strcmp(argv[i], "-once") == 0) {
          OneSession = TRUE;
-         return i + 1;
-@@ -633,6 +643,13 @@
+@@ -625,6 +656,35 @@
+  * when it is closed
+  */
+ 
++/* Called only after normal X11 authorization has succeeded.  The launching
++ * application owns a clipboard client, not the display-manager session.
++ * Keep that exact live process out of first-client lifecycle selection;
++ * all other local and remote clients retain the native XDMCP behavior.
++ */
++Bool
++XdmcpIsInternalClient(ClientPtr client)
++{
++#ifdef __linux__
++    LocalClientCredRec *cred = NULL;
++    struct pollfd parent = { .fd = internalClientPidFd, .events = POLLIN };
++    Bool internal = FALSE;
++
++    if (internalClientPidFd < 0 || getppid() != internalClientPid ||
++        poll(&parent, 1, 0) != 0)
++        return FALSE;
++    if (GetLocalClientCreds(client, &cred) == 0) {
++        internal = (cred->fieldsSet & (LCC_PID_SET | LCC_UID_SET)) ==
++                       (LCC_PID_SET | LCC_UID_SET) &&
++                   cred->pid == internalClientPid &&
++                   cred->euid == internalClientUid;
++        FreeLocalClientCreds(cred);
++    }
++    return internal;
++#else
++    return FALSE;
++#endif
++}
++
+ void
+ XdmcpOpenDisplay(int sock)
+ {
+@@ -633,6 +693,13 @@
      state = XDM_RUN_SESSION;
      TimerSet(xdmcp_timer, 0, XDM_DEF_DORMANCY * 1000, XdmcpTimerNotify, NULL);
      sessionSocket = sock;
@@ -45,6 +102,28 @@
  }
  
  void
+--- a/os/connection.c
++++ b/os/connection.c
+@@ -579,7 +579,8 @@
+ 
+ #ifdef XDMCP
+     /* indicate to Xdmcp protocol that we've opened new client */
+-    XdmcpOpenDisplay(priv->fd);
++    if (!XdmcpIsInternalClient(client))
++        XdmcpOpenDisplay(priv->fd);
+ #endif                          /* XDMCP */
+ 
+     XaceHook(XACE_AUTH_AVAIL, client, auth_id);
+--- a/os/osdep.h
++++ b/os/osdep.h
+@@ -190,6 +190,7 @@
+ extern void XdmcpRegisterAuthorization(const char *name, int namelen);
+ extern void XdmcpInit(void);
+ extern void XdmcpReset(void);
++extern Bool XdmcpIsInternalClient(ClientPtr client);
+ extern void XdmcpOpenDisplay(int sock);
+ extern void XdmcpCloseDisplay(int sock);
+ extern void XdmcpRegisterAuthentication(const char *name,
 --- a/include/xkbsrv.h
 +++ b/include/xkbsrv.h
 @@ -772,6 +772,7 @@

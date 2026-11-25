@@ -1,0 +1,90 @@
+[
+  {
+    "case": "untraced-00",
+    "exit_code": 0,
+    "pending_hold": 0,
+    "selected_hold": 0,
+    "traced": false,
+    "elapsed": 5.232972145080566,
+    "evidence": [
+      "evidence.clzK4u7r"
+    ]
+  },
+  {
+    "case": "traced-110",
+    "exit_code": 1,
+    "pending_hold": 11,
+    "selected_hold": 0,
+    "traced": true,
+    "elapsed": 14.110581874847412,
+    "evidence": [
+      "evidence.OTJz9PYJ"
+    ]
+  },
+  {
+    "case": "untraced-011",
+    "exit_code": 0,
+    "pending_hold": 0,
+    "selected_hold": 11,
+    "traced": false,
+    "elapsed": 16.22383451461792,
+    "evidence": [
+      "evidence.CXJhbIix"
+    ]
+  },
+  {
+    "case": "traced-1111",
+    "exit_code": 1,
+    "pending_hold": 11,
+    "selected_hold": 11,
+    "traced": true,
+    "elapsed": 25.137189865112305,
+    "evidence": [
+      "evidence.8bFVMQM5"
+    ]
+  },
+  {
+    "case": "traced-00",
+    "exit_code": 1,
+    "pending_hold": 0,
+    "selected_hold": 0,
+    "traced": true,
+    "elapsed": 78.69095706939697,
+    "evidence": [
+      "evidence.BWIRaaYM"
+    ]
+  },
+  {
+    "case": "untraced-110",
+    "exit_code": 0,
+    "pending_hold": 11,
+    "selected_hold": 0,
+    "traced": false,
+    "elapsed": 16.369014263153076,
+    "evidence": [
+      "evidence.c79fH4im"
+    ]
+  },
+  {
+    "case": "traced-011",
+    "exit_code": 1,
+    "pending_hold": 0,
+    "selected_hold": 11,
+    "traced": true,
+    "elapsed": 89.6177875995636,
+    "evidence": [
+      "evidence.HeBm4oYc"
+    ]
+  },
+  {
+    "case": "untraced-1111",
+    "exit_code": 0,
+    "pending_hold": 11,
+    "selected_hold": 11,
+    "traced": false,
+    "elapsed": 27.505574941635132,
+    "evidence": [
+      "evidence.G7b1YFPA"
+    ]
+  }
+]

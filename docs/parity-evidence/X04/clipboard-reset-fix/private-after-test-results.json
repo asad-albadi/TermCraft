@@ -1,0 +1,70 @@
+[
+  {
+    "label": "diagnostic982",
+    "case": "diagnostic982-traced-00",
+    "evidence": "evidence.lMAOxgSp",
+    "exit_code": 0,
+    "all_three_actual_private_debug_gui_exit_zero": true,
+    "parent_map_identical": true,
+    "unicode_39_47_exact": true,
+    "german_29_52_122_121": true,
+    "wrong_cookie_rejected": true,
+    "selected_observation_seconds": 0.1231614799999079,
+    "actual_selected_app_and_native": [
+      "115",
+      "156",
+      "ec3733c72d2789924cf2bde8a4f018fe8fa8d3463c1bc3fd293973d7c13ab7ca"
+    ]
+  },
+  {
+    "label": "diagnostic982",
+    "case": "diagnostic982-untraced-1111",
+    "evidence": "evidence.fuspoWet",
+    "exit_code": 0,
+    "all_three_actual_private_debug_gui_exit_zero": true,
+    "parent_map_identical": true,
+    "unicode_39_47_exact": true,
+    "german_29_52_122_121": true,
+    "wrong_cookie_rejected": true,
+    "selected_observation_seconds": 0.09513673299989023,
+    "actual_selected_app_and_native": [
+      "113",
+      "154",
+      "ec3733c72d2789924cf2bde8a4f018fe8fa8d3463c1bc3fd293973d7c13ab7ca"
+    ]
+  },
+  {
+    "label": "production981",
+    "case": "production981-traced-00",
+    "evidence": "evidence.7Eb8I9Pn",
+    "exit_code": 0,
+    "all_three_actual_private_debug_gui_exit_zero": true,
+    "parent_map_identical": true,
+    "unicode_39_47_exact": true,
+    "german_29_52_122_121": true,
+    "wrong_cookie_rejected": true,
+    "selected_observation_seconds": 0.15306928900099592,
+    "actual_selected_app_and_native": [
+      "115",
+      "156",
+      "81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e"
+    ]
+  },
+  {
+    "label": "production981",
+    "case": "production981-untraced-1111",
+    "evidence": "evidence.awth8kAI",
+    "exit_code": 0,
+    "all_three_actual_private_debug_gui_exit_zero": true,
+    "parent_map_identical": true,
+    "unicode_39_47_exact": true,
+    "german_29_52_122_121": true,
+    "wrong_cookie_rejected": true,
+    "selected_observation_seconds": 0.09490670299965132,
+    "actual_selected_app_and_native": [
+      "113",
+      "154",
+      "81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e"
+    ]
+  }
+]
