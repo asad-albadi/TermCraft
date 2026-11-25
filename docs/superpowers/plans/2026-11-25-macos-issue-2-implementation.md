@@ -134,15 +134,15 @@
 - [x] **Step 1:** Add failing evidence-schema checks for required identity fields and explicit unavailable-fixture states.
 - [x] **Step 2:** Run schema checks and confirm incomplete records fail.
 - [x] **Step 3:** Implement the evidence checker and capture all available host-side results.
-- [ ] **Step 4:** Update issue #2 and repository parity records only for demonstrated implementation/evidence changes.
+- [x] **Step 4:** Update issue #2 and repository parity records only for demonstrated implementation/evidence changes.
 - [ ] **Step 5:** Commit `docs: record macOS native qualification evidence`.
 
 ### Task 7: Final Verification and Issue Closure Readiness
 
 **Files:** All touched files plus issue #2 comment/checklist
 
-- [ ] **Step 1:** Run formatting, focused tests, full locked workspace tests, RDP helper tests, package checks, and available native smoke checks.
-- [ ] **Step 2:** Run the final evidence/hash/integrity review and inspect the complete diff.
-- [ ] **Step 3:** Update issue #2 with completed items, remaining evidence gaps, exact commands, and artifact identifiers.
+- [x] **Step 1:** Run formatting, focused tests, full locked workspace tests, RDP helper tests, package checks, and available native smoke checks.
+- [x] **Step 2:** Run the current evidence/hash/integrity review and inspect the complete diff; retain known failures and unavailable native checks as open.
+- [x] **Step 3:** Update issue #2 with completed items, remaining evidence gaps, exact commands, and artifact identifiers.
 - [ ] **Step 4:** Commit final documentation/evidence synchronization.
 - [ ] **Step 5:** Perform final whole-branch review before claiming completion.
