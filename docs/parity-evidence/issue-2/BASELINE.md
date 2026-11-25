@@ -28,6 +28,7 @@ Recorded on 2026-11-25 from branch `issue-2-macos` at the current worktree.
 - VeNCrypt now uses a proper test CA and localhost leaf certificate chain, which passes the macOS platform verifier.
 - Portable-folder and NFS raw-byte filename assertions are retained on platforms that support non-UTF-8 directory entries; macOS exercises the ordinary-name, symlink, and size-limit paths instead of attempting an invalid filename.
 - The macOS workspace IPC boundary no longer requests unsupported socket `fchmod`; private directory, random namespace, and authenticated token protections remain in force. The same boundary is applied to the owned agent listener.
+- FTPS fixtures now use a standards-compliant one-day CA/localhost leaf chain, satisfying macOS certificate validity rules; the focused suite passed 11/11 TLS and transfer tests, with the loopback-alias active-peer case remaining environment-sensitive.
 
 The broader target failures remain environment evidence, not native macOS qualification. They must not be relabeled as passing issue #2 acceptance criteria.
 
