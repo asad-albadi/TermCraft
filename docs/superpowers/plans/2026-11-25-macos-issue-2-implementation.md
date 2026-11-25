@@ -146,3 +146,11 @@
 - [x] **Step 3:** Update issue #2 with completed items, remaining evidence gaps, exact commands, and artifact identifiers.
 - [x] **Step 4:** Commit final documentation/evidence synchronization.
 - [x] **Step 5:** Perform final whole-branch review before claiming completion; native artifact and interactive qualification gates remain explicitly open.
+
+### Follow-up: Native arm64 qualification
+
+- [x] Build the locked core arm64 package and verify relocated launcher startup and live RDP helper identity.
+- [x] Reproduce and repair actionable all-target failures, then run the workspace, RDP, native device, PCSC fixture and installed Chrome suites.
+- [x] Exercise native registration, same-version replacement, file and URL events, and preservation of settings, an encrypted vault and recovery files.
+- [x] Build and probe a source-backed XQuartz candidate with authenticated private transport through the actual Rust owner.
+- [ ] Finish native payload approval and remaining Finder Services, versioned upgrade, graphics, XDMCP, Intel and physical permission evidence. The runtime approval gate requires evidence beyond individual arm64 probes.

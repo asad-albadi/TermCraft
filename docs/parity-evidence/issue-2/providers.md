@@ -6,15 +6,20 @@ late-callback ownership, keyboard/pointer release, RDP clipboard direction,
 printer ownership, serial completion, smart-card capability negotiation, and
 native file preallocation.
 
-The following issue #2 acceptance evidence is still open and must not be
-substituted with synthetic tests:
+The native arm64 run also exercised live loopback RDP TLS/NLA, framebuffer
+resize, clipboard direction and helper cleanup. The separate device component
+passed 13 tests, including native file preallocation. The PCSC transport
+component passed 11 owned software fixture tests, including Darwin orphan
+reaping through launchd. The installed Chrome suite passed native pipe,
+input, viewport resize, proxy authentication and TLS failure checks.
+
+The following issue #2 acceptance evidence is still open:
 
 - ScreenCaptureKit permission grant, denial, and revocation on macOS 14+;
-- real VNC/RDP sessions with display capture and input control;
-- Chromium/WebKit helper startup and sandboxed clipboard behavior;
+- real capture and input control using the permission-controlled desktop;
+- bundled Chromium and its resource/signature and sandbox qualification;
 - CUPS printer, PCSC smart-card, and physical serial-device workflows;
-- Intel and Apple Silicon release artifacts with complete native dependency
-  closure.
+- Intel and optional macOS native dependency delivery.
 
 The focused source tests establish bounded ownership and error contracts only;
 they do not qualify those external providers.

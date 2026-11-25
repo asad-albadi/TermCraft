@@ -31,7 +31,8 @@ Recorded on 2026-11-25 from branch `issue-2-macos` at the current worktree.
 - The macOS workspace IPC boundary no longer requests unsupported socket `fchmod`; private directory, random namespace, and authenticated token protections remain in force. The same boundary is applied to the owned agent listener.
 - FTPS fixtures now use a standards-compliant one-day CA/localhost leaf chain, satisfying macOS certificate validity rules; the focused suite passed 11/11 TLS and transfer tests, with the loopback-alias active-peer case remaining environment-sensitive.
 
-The broader target failures remain environment evidence, not native macOS qualification. They must not be relabeled as passing issue #2 acceptance criteria.
+This section retains the initial failure observations. See `arm64.md` for
+the later complete rerun, root causes and scoped native observations.
 
 ## Native helper verification
 

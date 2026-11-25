@@ -12,4 +12,45 @@ The private builder:
 - relocates non-system Mach-O dependencies and ad-hoc signs staged images;
 - records source/archive, SDK, architecture, and file hashes in `NATIVE-BUILD.json`.
 
-Native qualification remains open. The pinned xorg-server archive was fetched and matched `36db027489d6370ec5b1b6d07c8155c547193c2a6914fd617eb4311fb029257f`; a native Meson configure reached Apple clang 17.0.0/arm64, then stopped because `pkg-config` and the pinned `xorgproto` subproject closure are not installed on this host. The compiled `macos_pin()` gate remains closed until the complete dependency/resource closure and the authenticated inherited-listener, process-group, cancellation, graphics, and XDMCP workflows are actually qualified.
+## Native arm64 candidate
+
+The pinned xorg-server archive matched
+`36db027489d6370ec5b1b6d07c8155c547193c2a6914fd617eb4311fb029257f`.
+The build used Apple clang 17.0.0 with SDK 26.2, Python 3.11, Meson, Ninja,
+pkg-config and the exact XQuartz distribution gitlinks. The private prefix
+supplied xorgproto, Mesa DRI headers, xkbcomp, XKB data, fonts and the
+recursive Mach-O dylibs. FreeType was built without optional Brotli, BZip2,
+PNG and HarfBuzz dependencies. The font install set `FONTROOTDIR` explicitly.
+LibX11 used `LC_ALL=C` for its locale table generator.
+
+The staged candidate includes 818 hashed files, 12 private dylibs, the
+generated bundle resources, core X fonts and 21 corresponding dependency
+source archives. All candidate Mach-O load commands declare a minimum of
+macOS 14.0. They were executed on macOS 26.6.2. The first probe build used
+Homebrew dylibs with a macOS 26 floor and is superseded by this source build.
+
+| Item | SHA-256 |
+| --- | --- |
+| Local candidate ZIP | `8809e99e1df82b7ebba8b72587c932bb2822d6089edc98dbbc839ec74078c83c` |
+| Signed X11.bin | `30cff793431ef36178d9814eeb13024331c2acc28c7daf608ce575fd3a9893cd` |
+| NATIVE-BUILD.json | `d628e6be7212a2708cbf2dcb94d4e5718e821dbe9216a3df9bd68e960280c1d9` |
+| DEPENDENCIES.json | `356c03f349491bf660b70908eaa297636cc55f7e21fd7b45086a5c6c8d00c0cb` |
+
+The native probe rejected anonymous and incorrect-cookie setup, accepted the
+owned cookie, returned an authenticated extension list, and cleaned up the
+owned process and directory. XKEYBOARD, RENDER, RANDR and GLX were advertised.
+Composite was absent. The separately enabled Rust owner test verified the
+same manifest digest, executed its immutable snapshot, checked pre-cancel,
+verified the dedicated process group, and observed the child, authority,
+socket and snapshot gone after dropping the lease.
+
+Replay with `python3 packaging/x11/native/probe-macos.py CANDIDATE EVIDENCE`.
+For the Rust test, stage the candidate at
+`$TERMCRAFT_TEST_XQUARTZ_ROOT/x11/macos-universal-private1`, set
+`TERMCRAFT_TEST_XQUARTZ_MANIFEST_SHA256` to the digest above, then run
+`cargo +1.96.1 test --locked --lib local_candidate_uses_verified_snapshot_and_cleans_up -- --ignored`.
+
+The combined `macos_pin()` gate remains closed. Intel, runtime confirmation
+on the minimum OS, redistribution notice review, native SSH/X and XDMCP,
+clipboard and actual graphics are open. Advertised extensions do not establish
+rendering or monitor behavior.

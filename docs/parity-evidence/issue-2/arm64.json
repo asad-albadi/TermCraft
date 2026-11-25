@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "partial",
+  "source_revision": "ebe40a693d8740329b33f33309c0a422cec6cb9d",
+  "host": {"os": "macOS 26.6.2 (25G83)", "architecture": "arm64"},
+  "target": {
+    "architecture": "arm64",
+    "deployment_target": "14.0",
+    "sdk_version": "26.2",
+    "toolchain": "Rust 1.96.1; Apple clang 17.0.0 (clang-1700.6.3.2)"
+  },
+  "lockfiles": ["Cargo.lock", "engines/rdp/Cargo.lock", "docs/parity-evidence/rdp-prototype/Cargo.lock"],
+  "artifacts": [
+    {"path": "TermCraft-0.1.0-macos-aarch64.zip", "sha256": "0d760eb3df93c7ddc255a16d2885925e4a02f704f9d0b196762a3b595322ba2b"},
+    {"path": "TermCraft-XQuartz-private-arm64.zip", "sha256": "8809e99e1df82b7ebba8b72587c932bb2822d6089edc98dbbc839ec74078c83c"}
+  ],
+  "workflows": [
+    {"name": "Native workspace all-target suite", "result": "passed", "passed": 911, "failed": 0, "ignored": 10},
+    {"name": "Native locked RDP helper", "result": "passed", "passed": 27, "failed": 0, "ignored": 0},
+    {"name": "Installed Chrome native integration", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
+    {"name": "PCSC transport software fixtures and native file/device component", "result": "passed", "passed": 24, "failed": 0, "ignored": 0},
+    {"name": "Relocated core application startup and packaged RDP helper identity", "result": "passed"},
+    {"name": "Native registration, same-version replacement, relocation, file and URL events", "result": "passed"},
+    {"name": "Private XQuartz cookie and Rust owner lifecycle", "result": "passed"}
+  ],
+  "unavailable": [
+    {"requirement": "Intel and macOS 14 runtime", "reason": "The measured host was arm64 on macOS 26.6.2."},
+    {"requirement": "Bundled Chromium and combined approved XQuartz payload", "reason": "Installed Chrome was exercised. The arm64 XQuartz candidate has an unapproved local inventory; Intel, complete native workflows and redistribution review remain open."},
+    {"requirement": "Native SSH/X, Direct/Indirect XDMCP, Finder Services and version-changing upgrade", "reason": "Local probes covered the engine owner, explicit file and URL events, and replacement of builds with the same version. These workflows need separate evidence."},
+    {"requirement": "GPU, external displays, devices, adapter transitions and TCC permissions", "reason": "These require physical fixtures or a human-operated permission session."}
+  ]
+}

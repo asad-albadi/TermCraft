@@ -410,7 +410,7 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS builders and interactive engine hosts to compile, approve hashes and qualify the reviewed owned-engine candidates.",
-      "remaining": "Reviewed Windows owned-job/loopback/PID/authentication and macOS private-socket/process-group source candidates are merged, with pinned upstream patches and offline source preparation. The macOS private builder now has recursive Mach-O relocation, runtime-aligned opt/X11 staging, and machine-checked evidence contracts; native built engines, compiled checksum approvals and redistribution/runtime qualification remain unavailable. Production gates reject stock engines. Linux owned Xwayland remains implemented.",
+      "remaining": "A private arm64 XQuartz candidate passed relocated socket authentication and cleanup through the Rust owner. Native Windows, Intel, minimum-OS validation, redistribution and combined compiled approval remain open. Linux owned Xwayland remains implemented.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -736,7 +736,7 @@
       ],
       "dependency": "",
       "remaining": "",
-      "validation_remaining": "Native macOS compilation, URL/file events, Finder Services/registration and Linux desktop variants/original comparisons remain unverified. Bundle ownership/removal checks are covered by the issue #2 lifecycle contract; moved-app and native event forwarding still require a built `.app` smoke run.",
+      "validation_remaining": "Native arm64 bookmark URL/file events, registration, relocation and removal passed. Finder Services, Intel, Linux desktop variants and original comparisons remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/B05/implementation.md",
@@ -943,11 +943,12 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS build runners with interactive desktop access; source/type checks do not establish native runtime behavior.",
-      "remaining": "Run native Windows and macOS builds and interactive workflows. The macOS release matrix records SDK/toolchain metadata and runs the locked RDP helper suite, but native package and interactive evidence remain open. Windows cross-target `cargo check` proves compilation only.",
+      "remaining": "Native arm64 tests, relocated core package startup and selected desktop workflows passed. See issue #2 arm64 evidence. Intel, native Windows and remaining interactive workflows are open.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/issue-2/BASELINE.md",
+        "docs/parity-evidence/issue-2/arm64.md",
         "docs/parity-evidence/issue-2/evidence-schema.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
