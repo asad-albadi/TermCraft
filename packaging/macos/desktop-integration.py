@@ -45,7 +45,9 @@ class DesktopIntegration:
             path=Path(name)
             if path.exists():
                 info=plistlib.loads((path/'Contents/Info.plist').read_bytes())
-                if info.get('CFBundleIdentifier')!=OWNER: raise ValueError('An owned registration path now contains a different application.')
+                if (info.get('CFBundleIdentifier')!=OWNER or
+                    info.get('CFBundleExecutable')!='termcraft-desktop-launcher'):
+                    raise ValueError('An owned registration path now contains a different application.')
         for name in owned: self._run('-u',name)
         if owned:self.receipt.unlink()
 def main():
