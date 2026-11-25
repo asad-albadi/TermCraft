@@ -1,0 +1,13 @@
+{
+  "harness": "a272e2e08ea26b4b2ecdef696437f956281b5fbe06b49bd0d9e8e9da28b01da5",
+  "harness.rs": "33fad67a777ba41b8696a758e46f044822f311bee6ea62328ec44688ec1d8eea",
+  "vnc-server-wire.bin": "b1587d97e038924891c0aa08d9bddbb18207e6028887f8a061463cc459ec6525",
+  "tigervnc-provide.zlib": "fc6272cb32666e716e41b4d4314efe211e94a37f5604344c5b69c77724ffe6e9",
+  "SMsgWriter.cxx": "17d63621c8c4fef75ec9525faa9d19bef5f07a033aed8c55629144df7f5de56f",
+  "ZlibOutStream.cxx": "7e3b63e832de695a3391b551f94f85a8e77fe92c356ba536b750e1d725b4c3d9",
+  "fix/vnc_clipboard.rs": "b8113b013cae0e42ce335325f7c02ae13118abb6fcb107248b0ad21ae3860092",
+  "fix/regression.rs": "bba194f918c12a23fcbf559ecf20c34f2acbdfd26de1f11c1017b57a2054f20c",
+  "fix/candidate.patch": "65593abc9b6f3204e4d2f2d4c764a5d17d1bdc0697ffc5380ffbb840fdcf727a",
+  "fix/red-test": "7d66f5f34c98165dd77c4ff97b4808dc02c21876dd5a18982ad44a1997e96847",
+  "fix/green-test": "0a055957396e3fa69cfe4a375a38c1454c913d4435a649a05d39eacf74edbb74"
+}

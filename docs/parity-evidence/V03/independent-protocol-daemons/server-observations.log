@@ -1,0 +1,22 @@
+VNC_INPUT_OK
+SERVER_CLIPBOARD_OWNED EncodeManager:                 1.00586 KiB (1:18.5515 ratio)
+ EncodeManager:     Indexed RLE: 4 rects, 260.16 kpixels
+ EncodeManager:                  8.55664 KiB (1:118.773 ratio)
+ EncodeManager:   Total: 23 rects, 792.078 kpixels
+ EncodeManager:          12.0762 KiB (1:256.234 ratio)
+ Connections: closed: 127.0.0.1::45466
+ ComparingUpdateTracker: 0 pixels in / 0 pixels out
+ ComparingUpdateTracker: (1:-nan ratio)
+00149a1444510d40a519e09afa9c28ca2ef71614b400f99b317714661e18aba2  /usr/sbin/proftpd
+de358a278f1e1723937dada23d6a2a91d880a3fb44d3357e90a770db166bc35e  /usr/lib/proftpd/mod_tls.so
+80a7655e462b181008815d40631b53315cdde76503ef06656e98c75cfa3fcb0d  /usr/bin/Xtigervnc
+c2c77d48d50b1fe30845cf9a3540e716a8a6816cb88f66f0a891b2fa64a42505  /usr/sbin/telnetd
+97b79dbba0ba52a9969431e2c0a8e139ea32a0088ec86e7159449c0b8e5d02ff  /usr/sbin/in.rlogind
+0965fef8e5390f99bef05536a637d2f289eab14f7e22896df3d7ede354bf4dbc  /usr/sbin/in.rshd
+283fb9faa222f26f126d03414892225e6946a452687b887caf33be9b43bd2998  /usr/sbin/inetd
+inetutils-telnetd	2:2.4-2+deb12u3
+openbsd-inetd	0.20221205-2~deb12u1
+proftpd-core	1.3.8+dfsg-4+deb12u5
+proftpd-mod-crypto	1.3.8+dfsg-4+deb12u5
+rsh-server	0.17-24
+tigervnc-standalone-server	1.12.0+dfsg-8

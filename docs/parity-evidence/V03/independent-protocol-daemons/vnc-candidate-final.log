@@ -1,0 +1,8 @@
+VNC connected 640x480
+VNC known red pixels=257424 frame_bytes=1228800
+VNC server clipboard observed
+VNC server-driven resize observed 800x600; client resize correctly unsupported
+PASS VNC password/knownpixels/input/framechange/bidirectional_clipboard/server_resize/close
+status=0
+PASS independent X display observed exact keyboard command file and client clipboard bytes
+observation_status=0

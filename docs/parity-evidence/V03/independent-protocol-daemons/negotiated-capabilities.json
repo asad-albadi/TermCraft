@@ -1,0 +1,20 @@
+{
+  "client_security": "RFB3.8 VncAuth(type2), successful Authentication event and frame",
+  "client_encodings": [
+    1,
+    5,
+    0,
+    -223,
+    -239,
+    -1063131698
+  ],
+  "extended_clipboard_encoding_advertised": true,
+  "server_clipboard_caps": [
+    {
+      "flags": "0x1f000001",
+      "length": -8,
+      "payload_hex": "00000000"
+    }
+  ],
+  "client_clipboard_caps": "0x1f000001"
+}

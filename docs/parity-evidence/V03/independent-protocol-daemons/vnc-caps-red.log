@@ -1,0 +1,7 @@
+VNC connected 640x480
+VNC known red pixels=257424 frame_bytes=1228800
+
+thread 'main' (1) panicked at target/agent-work/independent-protocol-daemons/harness.rs:22:855:
+early disconnect Invalid or oversized VNC clipboard compression
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+status=101

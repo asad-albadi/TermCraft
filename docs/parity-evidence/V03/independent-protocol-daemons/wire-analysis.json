@@ -1,0 +1,12 @@
+[
+  {
+    "offset": 4923,
+    "signed_length": -39,
+    "flags": "0x10000001",
+    "compressed_hex": "789c626060100f760d0a730d8a77f6f10c70f2770c7289f70ff773756100000000ffff",
+    "decompressed_hex": "000000175345525645525f434c4950424f4152445f4f574e454400",
+    "eof": false,
+    "unused": 0,
+    "tail": 0
+  }
+]

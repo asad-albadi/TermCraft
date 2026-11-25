@@ -1,0 +1,7 @@
+PASS FTP port=2121 tls=Plain data=Passive login/list/binary_bytes=29/size/rename/remove/mkdir fingerprint=plain
+PASS FTP port=2121 tls=Plain data=Active login/list/binary_bytes=29/size/rename/remove/mkdir fingerprint=plain
+PASS FTP port=2122 tls=Explicit data=Passive login/list/binary_bytes=29/size/rename/remove/mkdir fingerprint=ca23d37ca6aea4ebe16549c1162cce3d82f2a86b8f833293a9fd66dafc3804ff
+PASS FTP port=2122 tls=Explicit data=Active login/list/binary_bytes=29/size/rename/remove/mkdir fingerprint=ca23d37ca6aea4ebe16549c1162cce3d82f2a86b8f833293a9fd66dafc3804ff
+PASS FTP port=2990 tls=Implicit data=Passive login/list/binary_bytes=29/size/rename/remove/mkdir fingerprint=ca23d37ca6aea4ebe16549c1162cce3d82f2a86b8f833293a9fd66dafc3804ff
+PASS FTP port=2990 tls=Implicit data=Active login/list/binary_bytes=29/size/rename/remove/mkdir fingerprint=ca23d37ca6aea4ebe16549c1162cce3d82f2a86b8f833293a9fd66dafc3804ff
+status=0

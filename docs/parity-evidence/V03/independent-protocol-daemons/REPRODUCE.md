@@ -1,0 +1,19 @@
+# Bounded independent daemon replay
+
+Use a private copy of this evidence directory as EVIDENCE and run from repository app directory. No host service installation or display is involved. Commands assume the recorded Debian image digest or equivalent owned restored image; install versions are recorded separately, and arbitrary future package versions are unqualified.
+
+1. Generate a fresh eight-ASCII-byte owned secret with Python `secrets.token_hex(4)` into EVIDENCE/secret mode0600. Do not print it. Original secret and private CA/server keys are excluded from durable artifacts.
+2. `docker run -d --name termcraft-independent-daemons -v "$EVIDENCE:/evidence" debian:bookworm sleep infinity`. No published ports.
+3. Inside this container, run `apt-get update` then `DEBIAN_FRONTEND=noninteractive apt-get install -y proftpd-core proftpd-mod-crypto tigervnc-standalone-server x11-utils x11-xserver-utils xterm xdotool xclip python3 inetutils-telnetd rsh-server openbsd-inetd openssl`. Run `sh /evidence/provision-reproduce.sh`. All login accounts/PAM/rhosts/keys/display/files are container-local. Disconnect its bridge after installation if desired: `docker network disconnect bridge termcraft-independent-daemons`.
+4. Build client harness with exact frozen production inputs described in artifact-metadata.json/qualified-input-output-sha256.json. The known V03 library was selected from docs/parity-evidence/V03/build-reviewed.jsonl, its Tokio from Cargo fingerprint (c0bdde4f60a2cf7a), never an arbitrary first rlib. The fixed library build's complete argv is build-fixed-argv.json; fixed-source-sha256.json binds its source snapshot. Do not use shared cache as an output directory.
+5. The exact unchanged client command for FTP is below (replace absolute bind source with EVIDENCE):
+
+```
+docker run --rm --name termcraft-independent-client --network container:termcraft-independent-daemons -v /usr/lib:/hostlib:ro -v "$EVIDENCE:/evidence" -e TC_SECRET=/evidence/secret -e TC_CA=/evidence/ca.pem -e USER=asad archlinux:base /hostlib/ld-linux-x86-64.so.2 --library-path /hostlib /evidence/harness-qualified-unchanged ftp 127.0.0.1
+```
+
+Change mode to `legacy` for Telnet/Rlogin/Rsh. Exact host loader/libc hashes are recorded; this is an API harness qualification, not standalone Debian package compatibility. Host /usr/lib is mounted read-only only for runtime ABI; no host /home/display/clipboard/credentials are mounted. Source bind is only this owned evidence directory.
+
+6. For VNC, first `DISPLAY=:7 xrandr --output VNC-0 --mode 640x480; DISPLAY=:7 xsetroot -solid '#dd2222'; DISPLAY=:7 xdotool search --name OwnedQualification windowfocus` inside daemon. Start this owned server observation in its background: `sleep 2; printf SERVER_CLIPBOARD_OWNED | DISPLAY=:7 xclip -selection clipboard; sleep 2; DISPLAY=:7 xrandr --output VNC-0 --mode 800x600; sleep 1; DISPLAY=:7 timeout 3 xclip -selection clipboard -out >/evidence/vnc-client-clipboard.txt`. Run same client command using harness-fixed, mode vnc, omitting TC_CA. It must return zero and expected known pixels/clipboard/800x600 resize. Independently assert vnc-input.txt equals `VNC_INPUT_OK\n`, and vnc-client-clipboard.txt equals `CLIENT_CLIPBOARD_OWNED`. To reproduce the RED, use harness-qualified-unchanged and the clipboard notification; expected nonzero clipboard-compression disconnect. Packet capture optional capture-caps.py proxy port5908 with TC_VNC_PORT=5908; excludes client auth response from saved client capture.
+
+7. All client invocations are externally bounded to45 seconds by the caller. Preserve exit statuses. For cleanup: `docker rm -f termcraft-independent-client termcraft-independent-legacy termcraft-independent-vnc termcraft-independent-daemons` (ignore absent names), delete secret/ca.key/server.key/vnc.pass only inside owned evidence directory. Verify no matching container remains. Keep no host service/display modifications.

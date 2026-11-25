@@ -1,0 +1,9 @@
+# Representative independent deployed daemons
+
+See REPORT.md for results/limits, exact API/library/source lineage and root-reviewed TigerVNC clipboard correction. FTP6 and legacy3 unchanged-production cells pass; private current-source candidate TigerVNC auth/pixels/input/bothclipboarddirections/serverresize/close passes. Root owns the integrated genuine release and any normal GUI extension. No count change:46/60 implemented, strict original/native parity0/60.
+
+This durable subset excludes real passwords, VNC password file, private keys, raw authentication capture and large executables. The safely sealed complete archive and exact executed client/server artifacts remain at target/agent-work/independent-protocol-daemons/independent-daemon-evidence.tar.gz. archive-sha256.txt binds it; archive-verification.json verifies excluded secret filenames and required artifacts. Packet tigervnc-provide.zlib contains only generated SERVER_CLIPBOARD_OWNED text; wire-analysis.json and frozen fix tests preserve exact35-byte framing. Original negative server stream and post-auth-only client capture remain private scratch.
+
+copy-index.json binds every durable selected file (except the index/seal themselves) to exact bytes. durable-seal.sha256 binds the copy index. Frozen fix packet is unchanged; base-vnc_clipboard.rs is original production source, replayed-vnc_clipboard.rs is exact private full-library build source, fix/vnc_clipboard.rs is independently reviewed final candidate including Cargo-discoverable tests. Their correspondence is explicitly normalized semantics, not literal source equality. No MAIN production source was changed by this worker.
+
+Temporary fixture ownership was handed to real_wayland_portal for root-requested genuine normal-GUI proof. Its cleanup commands are in REPRODUCE.md and direct handoff; this initial record does not falsely claim that pending lifecycle already completed.

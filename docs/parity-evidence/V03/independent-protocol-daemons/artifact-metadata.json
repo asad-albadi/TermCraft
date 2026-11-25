@@ -1,0 +1,10 @@
+{
+  "main_revision": "d77297707867e0c373c4209024d505d92778ddb6",
+  "private_library_crate": "termcraft_independent_fixed",
+  "v03_library": "target/debug/deps/libharbor_workspace-dad498be578095a5.rlib",
+  "tokio": "target/debug/deps/libtokio-c0bdde4f60a2cf7a.rlib",
+  "private_build_profile": "rustc --crate-type=rlib -C debuginfo=0 -C codegen-units=2; CARGO_BUILD_JOBS=2",
+  "image_debian": "sha256:1d04200c2ece1d4d75a2a6f8e11ebce7d86a2ae28b34bb2c9cbb3ee9f4953e75",
+  "image_arch": "sha256:375a401bb3c6376b37f40b6dfa25067db37ec78d0b7af67ae6315f43a0184a9d",
+  "isolation": "Owned Docker server container, unpublished ports, client container shares only its owned network namespace; /usr/lib mounted read-only to supply exact host-runtime loader/libs. Reserved-port bind capability confined to namespace. No host services/install/display/input/clipboard/credentials."
+}

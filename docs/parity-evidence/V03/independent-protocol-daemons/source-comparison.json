@@ -1,0 +1,194 @@
+{
+  "src/model.rs": {
+    "main": "6c4b07d266c7965a4a662d566e5f4cc0140fbfd8133fd3502400973b1e0ceaf0",
+    "v03": "6c4b07d266c7965a4a662d566e5f4cc0140fbfd8133fd3502400973b1e0ceaf0"
+  },
+  "src/remote_files/mod.rs": {
+    "main": "d6f97bfc75828c66459b4ef193045ffe540bd3847057e2980f3188a8ed3821b4",
+    "v03": "d6f97bfc75828c66459b4ef193045ffe540bd3847057e2980f3188a8ed3821b4"
+  },
+  "src/remote_files/path.rs": {
+    "main": "4486c4f3f589dded1fcd65f50c548e0d30f2c70e21d80676f893f61d3cb5e652",
+    "v03": "4486c4f3f589dded1fcd65f50c548e0d30f2c70e21d80676f893f61d3cb5e652"
+  },
+  "src/remote_files/state.rs": {
+    "main": "59e1aee8ce6dcf974812da600b64974cdd9e7136cfe5b23c3294cea89fc28e26",
+    "v03": "59e1aee8ce6dcf974812da600b64974cdd9e7136cfe5b23c3294cea89fc28e26"
+  },
+  "src/remote_files/transfer.rs": {
+    "main": "49db725dcbe310e3a525dfbdb6ad3918873497b228da4008495eacd1af95be6a",
+    "v03": "49db725dcbe310e3a525dfbdb6ad3918873497b228da4008495eacd1af95be6a"
+  },
+  "src/remote_files/editor.rs": {
+    "main": "adfb1820fcaf93e5bdd768995430b32d6585ae7ff9f1e0b321b1e8dbfa8269a7",
+    "v03": "adfb1820fcaf93e5bdd768995430b32d6585ae7ff9f1e0b321b1e8dbfa8269a7"
+  },
+  "src/remote_files/capabilities.rs": {
+    "main": "1be74ebc2bdaad3ad493cecbff993f02a18e75d09b00db0a775a1b53a57bce6e",
+    "v03": "1be74ebc2bdaad3ad493cecbff993f02a18e75d09b00db0a775a1b53a57bce6e"
+  },
+  "src/remote_files/scp.rs": {
+    "main": "6aa0314496a0a7e384fd220e26d84563e32e3520b412892220d57bcbc8f1accc",
+    "v03": "6aa0314496a0a7e384fd220e26d84563e32e3520b412892220d57bcbc8f1accc"
+  },
+  "src/desktop/wire.rs": {
+    "main": "25fc322a05aabbfa41bb569d168fb0294685e488899e61a1838d6976024c9718",
+    "v03": "25fc322a05aabbfa41bb569d168fb0294685e488899e61a1838d6976024c9718"
+  },
+  "src/desktop/framebuffer.rs": {
+    "main": "2a08cd0520f5c9d632573bf86a3c79a95ed970f597bdaf806670fcfe547e6fc4",
+    "v03": "2a08cd0520f5c9d632573bf86a3c79a95ed970f597bdaf806670fcfe547e6fc4"
+  },
+  "src/desktop/options.rs": {
+    "main": "44ef5d2dc9a68b44e5853326e0e4e62b2cabf3338aade123adf7b9affbcca75e",
+    "v03": "6ee2ed2025a617b4565a0fabeaf44d3a8c34aed4e743cafc95e5422661542d4d"
+  },
+  "src/desktop/rdp_options.rs": {
+    "main": "eb55b84577322ebe2dc23440fe9b167e6a5fdf41843ab95e517888e0826b8eb3",
+    "v03": "b7bd62e7c45e2e1e85158d2e28d0e31b23470eb348f79cdcb9848a6671ec3bce"
+  },
+  "src/desktop/vnc.rs": {
+    "main": "a77117e50a9d7df1134d658f1ee56752a3cccf883edb16ae2f6e5b61ba712e3f",
+    "v03": "a77117e50a9d7df1134d658f1ee56752a3cccf883edb16ae2f6e5b61ba712e3f"
+  },
+  "src/desktop/vnc_tests.rs": {
+    "main": "7a161daf2c235d5b3108bd96ed1bad17f6981dc524b1c4d6e6914a0d0d45e294",
+    "v03": "7a161daf2c235d5b3108bd96ed1bad17f6981dc524b1c4d6e6914a0d0d45e294"
+  },
+  "src/desktop/vnc_tls.rs": {
+    "main": "377f9c2d239f3140bfb486a61740ff9a66121ad46e316982fff6ad795f887598",
+    "v03": "377f9c2d239f3140bfb486a61740ff9a66121ad46e316982fff6ad795f887598"
+  },
+  "src/desktop/vnc_encoding.rs": {
+    "main": "d89dcf9b38f9964714b9dd32f2e2b6a797eaf1ce1247b95202a8283e5d2d959c",
+    "v03": "d89dcf9b38f9964714b9dd32f2e2b6a797eaf1ce1247b95202a8283e5d2d959c"
+  },
+  "src/desktop/vnc_clipboard.rs": {
+    "main": "e463057ad1cd6057040384a832cefbd1c1627ccdff951dcca9b0a15e95654109",
+    "v03": "e463057ad1cd6057040384a832cefbd1c1627ccdff951dcca9b0a15e95654109"
+  },
+  "src/desktop/carrier.rs": {
+    "main": "9d992867fca0c2ecec4c385cabfa8c3e17eb2fa08540b5ead6f26143b0c1f439",
+    "v03": "9d992867fca0c2ecec4c385cabfa8c3e17eb2fa08540b5ead6f26143b0c1f439"
+  },
+  "src/desktop/loader_env.rs": {
+    "main": "42a0a403efe44625b4d53d59db45236ad0871e1eff81aaf451b3faedf890e707",
+    "v03": "42a0a403efe44625b4d53d59db45236ad0871e1eff81aaf451b3faedf890e707"
+  },
+  "src/desktop/mod.rs": {
+    "main": "3a3c7343b20525783f54afe06cb2c52a4fe80e71a63dc0fcb4ce4af13a3d6f59",
+    "v03": "3a3c7343b20525783f54afe06cb2c52a4fe80e71a63dc0fcb4ce4af13a3d6f59"
+  },
+  "src/protocols/telnet.rs": {
+    "main": "fda06319906894b54e92198acd40c69f7692e6b9f681456b6ff10f5faa499c77",
+    "v03": "fda06319906894b54e92198acd40c69f7692e6b9f681456b6ff10f5faa499c77"
+  },
+  "src/protocols/rlogin.rs": {
+    "main": "ebb9359e130f0048c2c83cddc5262522de099b40d4aae82f0a04ccb0bbada6a4",
+    "v03": "ebb9359e130f0048c2c83cddc5262522de099b40d4aae82f0a04ccb0bbada6a4"
+  },
+  "src/protocols/rsh.rs": {
+    "main": "c7d6cea57655d7280032d425e9126540753ad623d6b4578597aab20f34263004",
+    "v03": "c7d6cea57655d7280032d425e9126540753ad623d6b4578597aab20f34263004"
+  },
+  "src/protocols/ftp.rs": {
+    "main": "faab6d843c715ad9bee490c6b516ddaf6f8ce3487d8064c536e667745c7bfc12",
+    "v03": "faab6d843c715ad9bee490c6b516ddaf6f8ce3487d8064c536e667745c7bfc12"
+  },
+  "src/protocols/mod.rs": {
+    "main": "e5103849a6114beb286e854e9cc0cfe492de542f662ffc404b9a28ce0505f0d5",
+    "v03": "e5103849a6114beb286e854e9cc0cfe492de542f662ffc404b9a28ce0505f0d5"
+  },
+  "src/protocols/ftp_actor.rs": {
+    "main": "b7195adef1f193a9acfa4589aab269f2cf1d37a24822223ed717bde307d83e41",
+    "v03": "b7195adef1f193a9acfa4589aab269f2cf1d37a24822223ed717bde307d83e41"
+  },
+  "src/protocols/ftp/control.rs": {
+    "main": "7969454492d42a82b0374dc9b09b4f05cdc0936d91f1b6898c9b3ba9688355ce",
+    "v03": "7969454492d42a82b0374dc9b09b4f05cdc0936d91f1b6898c9b3ba9688355ce"
+  },
+  "src/protocols/ftp/data.rs": {
+    "main": "7f6b4e17cd9f8e1d0a8b997e3124fbc5716805e10a76561a33b2aa65107aab1f",
+    "v03": "7f6b4e17cd9f8e1d0a8b997e3124fbc5716805e10a76561a33b2aa65107aab1f"
+  },
+  "src/protocols/ftp/security.rs": {
+    "main": "cdd26fdab52689231351f7cc66578812d0921bcc44aeb6cd472b22525c509457",
+    "v03": "cdd26fdab52689231351f7cc66578812d0921bcc44aeb6cd472b22525c509457"
+  },
+  "src/protocols/ftp_actor/operations.rs": {
+    "main": "016fab902b1c134ce7e622786a05d08fd290fa2c37aab4dcf57a7c64a7dac2d1",
+    "v03": "016fab902b1c134ce7e622786a05d08fd290fa2c37aab4dcf57a7c64a7dac2d1"
+  },
+  "src/protocols/ftp_actor/operations/tree.rs": {
+    "main": "09d13e8224365065f04a8f3786a2280a291df7f850270e9a4834444ac3275ec7",
+    "v03": "09d13e8224365065f04a8f3786a2280a291df7f850270e9a4834444ac3275ec7"
+  },
+  "src/protocols/ftp_actor/operations/tree/local.rs": {
+    "main": "44cc3a7b2823f4da090ece4aa1d728b88d6f2b6db1f3dd5557f151df3de5ee13",
+    "v03": "44cc3a7b2823f4da090ece4aa1d728b88d6f2b6db1f3dd5557f151df3de5ee13"
+  },
+  "src/remote_files/transfer/operations.rs": {
+    "main": "cf7edb4fd3ca3f3d5f3183cef6036283a51d0453b7a276832d38e011ae3d7421",
+    "v03": "cf7edb4fd3ca3f3d5f3183cef6036283a51d0453b7a276832d38e011ae3d7421"
+  },
+  "src/remote_files/transfer/scp.rs": {
+    "main": "0413bba572221f3731705bbefab4720d32bb81a9a86fe3efb862b18ba69a4281",
+    "v03": "0413bba572221f3731705bbefab4720d32bb81a9a86fe3efb862b18ba69a4281"
+  },
+  "src/remote_files/transfer/local_stage.rs": {
+    "main": "418d448a0fa96682657ce7b14010942dad48256a796c9c0d7f24d5d426b340d3",
+    "v03": "418d448a0fa96682657ce7b14010942dad48256a796c9c0d7f24d5d426b340d3"
+  },
+  "src/remote_files/transfer/folder_archive.rs": {
+    "main": "5d3997ef3fbe98863bbb90729d97614d53211acb4254667bded8b3b7a1e30fd1",
+    "v03": "5d3997ef3fbe98863bbb90729d97614d53211acb4254667bded8b3b7a1e30fd1"
+  },
+  "src/remote_files/scp/editor.rs": {
+    "main": "71a9337c8c3bd066ce429e2fb4796b327dd05f223bbe3192a1b4bdea7e70150c",
+    "v03": "71a9337c8c3bd066ce429e2fb4796b327dd05f223bbe3192a1b4bdea7e70150c"
+  },
+  "src/remote_files/scp/source.rs": {
+    "main": "6dfa95e808984d4fdb3c8b5c8e34872c15eb98b0ff7e741d30685fec15b56a31",
+    "v03": "6dfa95e808984d4fdb3c8b5c8e34872c15eb98b0ff7e741d30685fec15b56a31"
+  },
+  "src/remote_files/transfer/operations/tree.rs": {
+    "main": "ba0aaef45831f92ce3987d3be1af97bb7f4a3ec4653e2f9c9a37f745abec239c",
+    "v03": "ba0aaef45831f92ce3987d3be1af97bb7f4a3ec4653e2f9c9a37f745abec239c"
+  },
+  "src/remote_files/transfer/operations/source.rs": {
+    "main": "28374dd311ec2e1b125693f20f6e45fa6b3a58e6bd537ce6acfa148435cd482c",
+    "v03": "28374dd311ec2e1b125693f20f6e45fa6b3a58e6bd537ce6acfa148435cd482c"
+  },
+  "src/remote_files/transfer/operations/commit.rs": {
+    "main": "6de2847eb09db997a1348574413a46901c05d15ebb99a6270f0005f700e88754",
+    "v03": "6de2847eb09db997a1348574413a46901c05d15ebb99a6270f0005f700e88754"
+  },
+  "src/remote_files/transfer/operations/merge.rs": {
+    "main": "1374c1b9ac5d1622f4373591254009b86e690333835c1cbd2f93d9a5ee4aa16b",
+    "v03": "1374c1b9ac5d1622f4373591254009b86e690333835c1cbd2f93d9a5ee4aa16b"
+  },
+  "src/remote_files/transfer/operations/delete.rs": {
+    "main": "7e25d2973f9366bb5f3b25918c04257eefbc5e797ebeffd11802a1585ee40ae6",
+    "v03": "7e25d2973f9366bb5f3b25918c04257eefbc5e797ebeffd11802a1585ee40ae6"
+  },
+  "src/remote_files/transfer/operations/editor.rs": {
+    "main": "0ad5209bf1fb90547ccbf1602b5e177006edf4e85b1d76fdf397b622af34a681",
+    "v03": "0ad5209bf1fb90547ccbf1602b5e177006edf4e85b1d76fdf397b622af34a681"
+  },
+  "src/remote_files/transfer/local_stage/windows.rs": {
+    "main": "f02ccf5b57e6a82ff291d9c213f85a08664fcfe528a3f07ec238fa90b3519b61",
+    "v03": "f02ccf5b57e6a82ff291d9c213f85a08664fcfe528a3f07ec238fa90b3519b61"
+  },
+  "src/remote_files/transfer/folder_archive/portable.rs": {
+    "main": "d1ec785b831000996bb01dfd9b31c8a26d90d490d36e6b159734cfcdb34105c4",
+    "v03": "d1ec785b831000996bb01dfd9b31c8a26d90d490d36e6b159734cfcdb34105c4"
+  },
+  "src/remote_files/transfer/folder_archive/unix.rs": {
+    "main": "83c87a09c9da6dba3b900463389a44acda1e91da949987bd901bfcf2e774854c",
+    "v03": "83c87a09c9da6dba3b900463389a44acda1e91da949987bd901bfcf2e774854c"
+  },
+  "src/remote_files/transfer/operations/source/cap_backend.rs": {
+    "main": "67dd8d1015f39804d0f97944cdee02311e16d435f647e7c9280c3ef901080c19",
+    "v03": "67dd8d1015f39804d0f97944cdee02311e16d435f647e7c9280c3ef901080c19"
+  }
+}

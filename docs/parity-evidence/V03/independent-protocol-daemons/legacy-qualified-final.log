@@ -1,0 +1,7 @@
+PASS Telnet authenticated command stdout=DAEMON_TERMINAL_OK observed_bytes=700
+PASS Telnet close finished
+PASS Rlogin authenticated command stdout=DAEMON_TERMINAL_OK observed_bytes=695
+PASS Rlogin close finished
+PASS Rsh authenticated command stdout=DAEMON_RSH_OK observed_bytes=14
+PASS Rsh close finished
+status=0
