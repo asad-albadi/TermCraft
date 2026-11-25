@@ -11,6 +11,10 @@ binary hashes and build input hashes, alongside both lockfiles. Crate metadata
 identifies upstream sources where published archives do not include notice text.
 The manifest records the project license as unspecified.
 
+macOS release manifests also record the native architecture, Xcode SDK version,
+deployment-target policy, and compiler identity. A package without those fields
+is not sufficient native build evidence.
+
 ```sh
 python3 scripts/package-release.py --output dist
 ```

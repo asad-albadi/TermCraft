@@ -354,6 +354,17 @@ def build_macos_launcher(packaging, launcher, arch):
     launcher.chmod(0o755)
 
 
+def macos_build_metadata(arch):
+    sdk = capture("xcrun", "--sdk", "macosx", "--show-sdk-version").strip()
+    compiler = capture("clang", "--version").splitlines()[0].strip()
+    return {
+        "sdk_version": sdk,
+        "deployment_target": os.environ.get("MACOSX_DEPLOYMENT_TARGET", "toolchain default"),
+        "compiler": compiler,
+        "architecture": arch,
+    }
+
+
 def macos_bundle(root, version, packaging):
     contents = root / "Contents"
     contents.mkdir()
@@ -673,6 +684,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
                          "crates": notices},
             "files": {p.relative_to(root).as_posix(): sha256(p) for p in sorted(root.rglob("*")) if p.is_file()},
         }
+        if target == "macos":
+            manifest["build"]["macos"] = macos_build_metadata(arch)
         if wayland is not None:
             manifest["wayland_helper_version"] = wayland["version"]
         (resources / "PACKAGE-MANIFEST.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")

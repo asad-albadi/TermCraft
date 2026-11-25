@@ -284,6 +284,20 @@ class PublicationBoundary(unittest.TestCase):
 
 
 class NativePackageLayout(unittest.TestCase):
+    def test_macos_build_metadata_records_sdk_and_deployment_target(self):
+        package = module_at("package_release", SCRIPT)
+        with patch.object(package, "capture", side_effect=["15.5\n", "Apple clang version 17.0.0\n"]), \
+             patch.dict(os.environ, {"MACOSX_DEPLOYMENT_TARGET": "14.0"}, clear=False):
+            self.assertEqual(
+                package.macos_build_metadata("aarch64"),
+                {
+                    "sdk_version": "15.5",
+                    "deployment_target": "14.0",
+                    "compiler": "Apple clang version 17.0.0",
+                    "architecture": "aarch64",
+                },
+            )
+
     def test_windows_zip_and_macos_bundle_keep_helper_beside_app(self):
         try:
             __import__("PIL")
