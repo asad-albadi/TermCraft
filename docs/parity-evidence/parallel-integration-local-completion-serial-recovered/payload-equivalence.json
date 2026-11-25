@@ -1,0 +1,8 @@
+{
+  "first_archive_sha256": "f02457ae354d6948e08bb4362d3547688a5e2362b726beaae7276b2dc20c5525",
+  "closed_producer_archive_sha256": "31aa3af8642135e2ba962b9c96c8caebaeb578118143876fb22f25d66b4aea9e",
+  "members_compared": 4341,
+  "payload_or_permission_changes": [],
+  "mtime_changes": 4341,
+  "scope": "All file bytes, paths, type, mode, links, ownership and non-time PAX metadata compared. Container timestamps can differ; runtime evidence remains explicitly bound to first SHA and is transferable only by this complete payload equality."
+}

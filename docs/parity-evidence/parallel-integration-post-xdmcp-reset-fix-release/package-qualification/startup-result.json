@@ -1,0 +1,13 @@
+{
+  "scope": "Owned isolated Xvfb and native Linux declared-runtime image; no hardware/original claims",
+  "status": "passed",
+  "display_backend": "X11",
+  "files_verified": 3372,
+  "help": true,
+  "helper_ready": true,
+  "rdp_initial_negotiation_and_actual_sealed_child": true,
+  "workspace_preserved": true,
+  "private_xauthority": true,
+  "tcp_display_disabled": true,
+  "xvfb_reaped": true
+}

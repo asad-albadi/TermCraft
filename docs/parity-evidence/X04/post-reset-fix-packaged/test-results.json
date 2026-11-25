@@ -1,0 +1,32 @@
+[
+  {
+    "case": "final-release-traced-00",
+    "exit_code": 0,
+    "evidence": "evidence.PrMfQ25S",
+    "selected_app_engine_sha": [
+      "115",
+      "156",
+      "81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e"
+    ],
+    "selected_observation_seconds": 0.12609931599945412,
+    "clipboard_exact39_47": true,
+    "german_29_52": true,
+    "parent_map_identical": true,
+    "three_gui_exit_zero": true
+  },
+  {
+    "case": "final-release-untraced-1111",
+    "exit_code": 0,
+    "evidence": "evidence.agqoL0kd",
+    "selected_app_engine_sha": [
+      "113",
+      "154",
+      "81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e"
+    ],
+    "selected_observation_seconds": 0.12765988499995728,
+    "clipboard_exact39_47": true,
+    "german_29_52": true,
+    "parent_map_identical": true,
+    "three_gui_exit_zero": true
+  }
+]

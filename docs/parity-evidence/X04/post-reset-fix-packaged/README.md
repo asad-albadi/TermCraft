@@ -1,0 +1,9 @@
+# Selected durable XDMCP evidence
+
+This is a selected durable copy of the source22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04 / genuine archive398d19fc6dbdf7d7dd5ee2a3a71ae8eda907bbbb31ad0117031c3a73fb106fe5 Linux XDMCP results. The scoped traced0/0 and untraced11/11 flows passed. This is not a current whole-bundle all-clear: an optional Wayland idle failure was found later. At copy time Root reports the helper-only fix on source d1a54 and a new full-bundle rebuild in progress. These original observations must not be relabeled as a run of that newer source/archive.
+
+Original source: target/agent-work/post-reset-fix-packaged-xdmcp. Original174-file artifacts.json is retained byte-identically and describes the entire private packet, including intentionally omitted files. It is not an assertion that every original entry is present here. COPY-INDEX.json records selected files and source/destination hashes; DURABLE-SHA256SUMS.json seals this selected durable directory.
+
+Included: original report, exact archive/source/app/engine identities, case results, sanitized protocol headers/timing/argv, observed process/listener snapshots, complete parent maps, non-secret negotiated green-window/keyboard markers and inspected screenshots. Engine identity records contain authority file paths only, never authorization-cookie bytes.
+
+Omitted: all raw selected.trace.* files, all .authority files, raw manager logs (may contain cookies), shader caches, executable/library/tool binaries, source fixture/helpers, mutable workspace/lock files, and redundant empty app/server logs. Omitted originals remain private under target; the original packet and its seal were verified unchanged. No new runtime case, build, source/package/extraction edit or checkpoint change was performed for this copy.

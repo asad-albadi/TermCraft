@@ -1,0 +1,25 @@
+{
+  "manifest_verified_files": 3372,
+  "source_sha256": "22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04",
+  "app_sha256": "c8d09ba5fd2c36d567c6885f117d6068e2a87185648db883853cde84d678f7e6",
+  "browser_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+  "sandboxed_renderers": 5,
+  "browser_viewport_sizes": [
+    [
+      "1021",
+      "440"
+    ],
+    [
+      "1021",
+      "454"
+    ],
+    [
+      "781",
+      "334"
+    ]
+  ],
+  "browser_result": "PASS",
+  "browser_http_fixture_receipts": "404 paths recorded by minimal server; exact query proves input/resize; initial document200",
+  "payload_equivalent_files": 2202,
+  "payload_changes": []
+}

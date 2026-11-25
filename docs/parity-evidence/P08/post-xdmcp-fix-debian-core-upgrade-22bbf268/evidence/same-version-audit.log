@@ -1,0 +1,23 @@
+Package: termcraft
+Status: install ok installed
+Priority: optional
+Section: utils
+Installed-Size: 81732
+Maintainer: TermCraft local package build
+Architecture: amd64
+Version: 0.1.0-2
+Depends: libc6 (>= 2.35), libgcc-s1, libegl1, libgl1, libwayland-client0, libwayland-cursor0, libwayland-egl1, libxkbcommon0, libxkbcommon-x11-0, libx11-6, libx11-xcb1, libxcb1, libxcursor1, libxi6, libxrandr2, ca-certificates
+Description: TermCraft remote workspace and terminal
+ Local terminal, remote sessions and bundled headless RDP worker.
+	linux-vdso.so.1 (0x00007f35d440d000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f35d1be2000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f35d1b02000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f35d1920000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f35d440f000)
+	linux-vdso.so.1 (0x00007fe1ddeee000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fe1dd5c8000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fe1dd4e8000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe1dd306000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fe1ddef0000)
+07680193ba453e22c4fbea8bc99ac2813c7b19d3e586b72b7d891bd26445b914  /opt/termcraft/harbor-workspace
+458c4ec081e14e17b4c11da27bd8e43c412cec11ae7ca3d7e8ef3771cd6c92aa  /opt/termcraft/PACKAGE-MANIFEST.json

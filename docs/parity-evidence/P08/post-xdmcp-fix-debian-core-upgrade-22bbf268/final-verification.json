@@ -1,0 +1,33 @@
+{
+  "result": "pass",
+  "source_sha256": "22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04",
+  "runtime_commands_exit_zero": 42,
+  "before_after_byte_comparisons": 16,
+  "lifecycle_hash_list_equality": [
+    "userdata-initial",
+    "clean-remove-preserved",
+    "userdata-old-baseline",
+    "removed-preserved",
+    "userdata-final"
+  ],
+  "owned_container_inventory_empty": true,
+  "inventory_command": [
+    "docker",
+    "ps",
+    "-a",
+    "--filter",
+    "label=org.termcraft.validation=post-xdmcp-fix-debian-upgrade",
+    "--format",
+    "{{.ID}} {{.Names}}"
+  ],
+  "old_d6_seal_sha256": "f1d9426d027fcb110962ebbb0875a051dbcec6453d5ca1329bd78ddc2f5dd35f",
+  "old_d6_sealed_files_preserved": 198,
+  "old_d6_artifacts_preserved": {
+    "TermCraft-0.1.0-linux-x86_64.tar.gz": "73ebdf5d695ad2d3a84c3522aacbc1b13046619378ea25ed601055523ac45ae9",
+    "termcraft_0.1.0-1_amd64.deb": "b4bab88bc6cc4290a62786d0a562c9f3104950a0b1d50fa6b961dbc0a0daf3da"
+  },
+  "app_glibc_requirement": "2.35",
+  "helper_glibc_requirement": "2.34",
+  "managed_x_runtime_payload_entries": [],
+  "saved_workspace_screenshot_identical_to_d6": true
+}

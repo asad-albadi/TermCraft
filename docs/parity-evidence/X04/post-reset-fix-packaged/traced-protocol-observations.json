@@ -1,0 +1,111 @@
+{
+  "evidence": "evidence.PrMfQ25S",
+  "app_pid": 115,
+  "engine_pid": 156,
+  "engine_sha256": "81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e",
+  "native_protocol_headers_only": [
+    {
+      "wall": 1795604309.441917,
+      "call": "sendto",
+      "fd": 14,
+      "xdmcp_opcode": 3,
+      "return": "7"
+    },
+    {
+      "wall": 1795604309.509662,
+      "call": "recvfrom",
+      "fd": 14,
+      "xdmcp_opcode": 5,
+      "return": "40"
+    },
+    {
+      "wall": 1795604309.509733,
+      "call": "sendto",
+      "fd": 14,
+      "xdmcp_opcode": 7,
+      "return": "66"
+    },
+    {
+      "wall": 1795604309.510586,
+      "call": "recvfrom",
+      "fd": 14,
+      "xdmcp_opcode": 8,
+      "return": "52"
+    },
+    {
+      "wall": 1795604309.510657,
+      "call": "sendto",
+      "fd": 14,
+      "xdmcp_opcode": 10,
+      "return": "29"
+    },
+    {
+      "wall": 1795604309.568005,
+      "call": "sendto",
+      "fd": 14,
+      "xdmcp_opcode": 3,
+      "return": "7"
+    },
+    {
+      "wall": 1795604309.615342,
+      "call": "recvfrom",
+      "fd": 14,
+      "xdmcp_opcode": 5,
+      "return": "40"
+    },
+    {
+      "wall": 1795604309.615443,
+      "call": "sendto",
+      "fd": 14,
+      "xdmcp_opcode": 7,
+      "return": "66"
+    },
+    {
+      "wall": 1795604309.616085,
+      "call": "recvfrom",
+      "fd": 14,
+      "xdmcp_opcode": 8,
+      "return": "52"
+    },
+    {
+      "wall": 1795604309.616157,
+      "call": "sendto",
+      "fd": 14,
+      "xdmcp_opcode": 10,
+      "return": "29"
+    }
+  ],
+  "selected_willing_to_request_seconds": 0.0001010894775390625,
+  "selected_marker_observation_seconds": 0.12609931599945412,
+  "exec_nonsecret_argv": [
+    {
+      "trace_file": "selected.trace.156",
+      "wall": 1795604309.417666,
+      "decoded_nonsecret_argv": [
+        "/proc/self/fd/16",
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-local-completion-qualified/398d19fc6dbdf7d7dd5ee2",
+        "-termcraft-session-ready",
+        "-termcraft-internal-clipboard-parent",
+        ":177",
+        "-port",
+        "1177",
+        "-indirect",
+        "127.0.0.1",
+        "-from",
+        "192.0.2.1",
+        "-listen",
+        "tcp",
+        "-nopn",
+        "-screen",
+        "800x600",
+        "-termcraft-keyboard-layout",
+        "de",
+        "-auth",
+        "/tmp/termcraft-xdmcp-7HDoBS/authority",
+        "-displayfd",
+        "1"
+      ]
+    }
+  ],
+  "trace_string_limit_bytes": 128
+}

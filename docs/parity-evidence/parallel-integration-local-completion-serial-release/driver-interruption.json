@@ -1,0 +1,7 @@
+{
+  "observed_outer_exec_exit": 143,
+  "final_driver_result_missing": true,
+  "archive_publication_logged": true,
+  "child_producer_exit_not_recorded": true,
+  "recovery": "New cached ordinary producer completed0/sourceunchanged with completepayload equivalence; original result remains interrupted, not relabeledpassing."
+}

@@ -1,0 +1,176 @@
+{
+  "source_sha256": "22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04",
+  "previous_source_sha256": "d6e6c3aca99a068aedc0479cb376a7d0927a4b2847ef3b0aed8e7d6d88a2e7d9",
+  "selected_runtime_paths": [
+    {
+      "path": "packaging/browser/README.md",
+      "old_sha256": "ae59c368dc9d00ca4f52fc3f3c4dbfe77653f0e68b9000de2e4c3325a1a69b05",
+      "new_sha256": "ae59c368dc9d00ca4f52fc3f3c4dbfe77653f0e68b9000de2e4c3325a1a69b05"
+    },
+    {
+      "path": "packaging/browser/THIRD-PARTY-NOTICES.html",
+      "old_sha256": "8a48726cb3854c9cbab99badf31bb7b089bf12cbcbd05932e4a1167e735d86f7",
+      "new_sha256": "8a48726cb3854c9cbab99badf31bb7b089bf12cbcbd05932e4a1167e735d86f7"
+    },
+    {
+      "path": "packaging/browser/manifest.json",
+      "old_sha256": "f79fce3df32a791f8bdb3bdc83a192adb1f42d1598ac921789f172385c74b559",
+      "new_sha256": "f79fce3df32a791f8bdb3bdc83a192adb1f42d1598ac921789f172385c74b559"
+    },
+    {
+      "path": "packaging/browser/runtime-manifest.json",
+      "old_sha256": "8446b1cbcdc255e3ef69a78b4f7c6d3683791f04d2e4b5bab5d18fa18d201c5f",
+      "new_sha256": "8446b1cbcdc255e3ef69a78b4f7c6d3683791f04d2e4b5bab5d18fa18d201c5f"
+    },
+    {
+      "path": "packaging/browser/stage-runtime.py",
+      "old_sha256": "f2faa522483791182ab0498e9342f005c318de88b0f00c9db2baaa0145973afb",
+      "new_sha256": "f2faa522483791182ab0498e9342f005c318de88b0f00c9db2baaa0145973afb"
+    },
+    {
+      "path": "packaging/browser/test_stage.py",
+      "old_sha256": "ec7b7476e77d4abb590d7e3a29cb8ed79eca23ddd9de09e235ffecb8f1b689df",
+      "new_sha256": "ec7b7476e77d4abb590d7e3a29cb8ed79eca23ddd9de09e235ffecb8f1b689df"
+    },
+    {
+      "path": "packaging/runtime/README.md",
+      "old_sha256": "abf39485f55a6f9f3644911b240eeb272bc91aa4c9252edcdc3ad458d4999565",
+      "new_sha256": "abf39485f55a6f9f3644911b240eeb272bc91aa4c9252edcdc3ad458d4999565"
+    },
+    {
+      "path": "packaging/runtime/mosh-dependencies.json",
+      "old_sha256": "e615650cccd848dfbf457ef3b7df62fc4e691921daaf9156711139e2d3238506",
+      "new_sha256": "e615650cccd848dfbf457ef3b7df62fc4e691921daaf9156711139e2d3238506"
+    },
+    {
+      "path": "packaging/runtime/stage-mosh-dependencies.py",
+      "old_sha256": "5b0165dd40150b2be269192e49eeaee04db17eae476948820c0e56f7c0528674",
+      "new_sha256": "5b0165dd40150b2be269192e49eeaee04db17eae476948820c0e56f7c0528674"
+    },
+    {
+      "path": "packaging/runtime/stage-mosh.py",
+      "old_sha256": "2e3a88534e9a02cc40a139da68ed42108ae38d7a36df3324ec7d34f98a3a625a",
+      "new_sha256": "2e3a88534e9a02cc40a139da68ed42108ae38d7a36df3324ec7d34f98a3a625a"
+    },
+    {
+      "path": "src/browser/engine.rs",
+      "old_sha256": "33e1c534011991f3c2d6918603c67fa5c17c9243431394fbf5290edb7b1b290d",
+      "new_sha256": "33e1c534011991f3c2d6918603c67fa5c17c9243431394fbf5290edb7b1b290d"
+    },
+    {
+      "path": "src/browser/mod.rs",
+      "old_sha256": "ad9911a16e48f0fa5734e0dcb2dbf95ab54f5fbe0d12669fa61ef56c2cb83c69",
+      "new_sha256": "ad9911a16e48f0fa5734e0dcb2dbf95ab54f5fbe0d12669fa61ef56c2cb83c69"
+    },
+    {
+      "path": "src/browser/native_macos.rs",
+      "old_sha256": "003d97b1be8da8770e2cb7c94c6b7c08d5e830c189263f4ef41876e9a1216fa4",
+      "new_sha256": "003d97b1be8da8770e2cb7c94c6b7c08d5e830c189263f4ef41876e9a1216fa4"
+    },
+    {
+      "path": "src/browser/native_windows.rs",
+      "old_sha256": "93847a83a5aba62062442a108ce5f971efd2de38d9a4a985e274ef691c7fb166",
+      "new_sha256": "93847a83a5aba62062442a108ce5f971efd2de38d9a4a985e274ef691c7fb166"
+    },
+    {
+      "path": "src/browser/pipe.rs",
+      "old_sha256": "2f713c32f26b34eb6b551269300dd361eecbfe58b8e3ceb0e293f8c203fbb15b",
+      "new_sha256": "2f713c32f26b34eb6b551269300dd361eecbfe58b8e3ceb0e293f8c203fbb15b"
+    },
+    {
+      "path": "src/browser/windows_pipe.rs",
+      "old_sha256": "535a7bd7a26a9f36b1646a40b9cff5b848a1cdae6e238337316c0fc7d0401b71",
+      "new_sha256": "535a7bd7a26a9f36b1646a40b9cff5b848a1cdae6e238337316c0fc7d0401b71"
+    },
+    {
+      "path": "src/browser/windows_pipe/bootstrap.rs",
+      "old_sha256": "d28dd3fbd1cf512c0d95b68901b015ab40604c3c863e23231e162acd4e796d47",
+      "new_sha256": "d28dd3fbd1cf512c0d95b68901b015ab40604c3c863e23231e162acd4e796d47"
+    },
+    {
+      "path": "src/browser/windows_pipe/tests.rs",
+      "old_sha256": "c5031021d1bf388c737e381fb211a3f5f155d0fc642aa9d541a8ec3f65b4fd33",
+      "new_sha256": "c5031021d1bf388c737e381fb211a3f5f155d0fc642aa9d541a8ec3f65b4fd33"
+    },
+    {
+      "path": "src/cli.rs",
+      "old_sha256": "d1db6b92ac2760bf29dae79d0c7a3573f517cf0ce887216d137724da8df4e960",
+      "new_sha256": "d1db6b92ac2760bf29dae79d0c7a3573f517cf0ce887216d137724da8df4e960"
+    },
+    {
+      "path": "src/connection.rs",
+      "old_sha256": "87fa87ffca499e8617cd38fd81f77fb88f33570f205e9d0e840c1172afabde69",
+      "new_sha256": "87fa87ffca499e8617cd38fd81f77fb88f33570f205e9d0e840c1172afabde69"
+    },
+    {
+      "path": "src/process.rs",
+      "old_sha256": "e7ceefd88206a3ec5365637e768bd1e9263bc8919ec969ec55c11874905a41b9",
+      "new_sha256": "e7ceefd88206a3ec5365637e768bd1e9263bc8919ec969ec55c11874905a41b9"
+    },
+    {
+      "path": "src/process_input.rs",
+      "old_sha256": "8848ef9cdc54813109d1d22cb4f8420d7f6f818ef2f9558af63080044de8dc33",
+      "new_sha256": "8848ef9cdc54813109d1d22cb4f8420d7f6f818ef2f9558af63080044de8dc33"
+    },
+    {
+      "path": "src/process_unix.rs",
+      "old_sha256": "91ef9e41b0eb641c9a745be6a0baec7cbe0465cf417e83f9e6074a7fce603d53",
+      "new_sha256": "91ef9e41b0eb641c9a745be6a0baec7cbe0465cf417e83f9e6074a7fce603d53"
+    },
+    {
+      "path": "src/runtime/browser_bundle.rs",
+      "old_sha256": "c131ec623a8b81d84edb1ceb39cc8bc151f028ac8bdfff339d3ed90d4c935cf8",
+      "new_sha256": "c131ec623a8b81d84edb1ceb39cc8bc151f028ac8bdfff339d3ed90d4c935cf8"
+    },
+    {
+      "path": "src/runtime/discovery.rs",
+      "old_sha256": "addca018ba63cfaf50a180f4d9e109b3f201b80a714eb47ee2c14c21e4e26755",
+      "new_sha256": "addca018ba63cfaf50a180f4d9e109b3f201b80a714eb47ee2c14c21e4e26755"
+    },
+    {
+      "path": "src/runtime/manifest.rs",
+      "old_sha256": "7b0ec300a40a19593728a66ecf1861e129b0e190b8f5ee49e4b2af4d2d27aa51",
+      "new_sha256": "7b0ec300a40a19593728a66ecf1861e129b0e190b8f5ee49e4b2af4d2d27aa51"
+    },
+    {
+      "path": "src/runtime/mod.rs",
+      "old_sha256": "c0eba56a5841f0047f4830a18e8a3bf35c1f2fb78c903ec1965d9d6cc55cbb8c",
+      "new_sha256": "c0eba56a5841f0047f4830a18e8a3bf35c1f2fb78c903ec1965d9d6cc55cbb8c"
+    },
+    {
+      "path": "src/runtime/mosh.rs",
+      "old_sha256": "ea74d2550577d4e30d3896e52f1eb33006e0ac117a895a9ffe4627eb69b64923",
+      "new_sha256": "ea74d2550577d4e30d3896e52f1eb33006e0ac117a895a9ffe4627eb69b64923"
+    },
+    {
+      "path": "src/runtime/mosh_dependencies.rs",
+      "old_sha256": "d7838519f806abc7c90f391fd04e7262ae1a1ada235c6b27f4a6e5f634bc8e68",
+      "new_sha256": "d7838519f806abc7c90f391fd04e7262ae1a1ada235c6b27f4a6e5f634bc8e68"
+    },
+    {
+      "path": "src/ui/mosh_startup.rs",
+      "old_sha256": "8ee556c8ae919cc13df85d1d8b6a219b1687e6b82e8ebc912a0d6c4fd6e906c2",
+      "new_sha256": "8ee556c8ae919cc13df85d1d8b6a219b1687e6b82e8ebc912a0d6c4fd6e906c2"
+    },
+    {
+      "path": "src/ui/web_browser.rs",
+      "old_sha256": "fb9e41cf89a42ca90c4e5772e70069667745d2d7a2c015135789ae86255790c0",
+      "new_sha256": "fb9e41cf89a42ca90c4e5772e70069667745d2d7a2c015135789ae86255790c0"
+    },
+    {
+      "path": "src/ui/web_browser_tests.rs",
+      "old_sha256": "74cc15bec7ca8f46eb93292d54bf5fd48a3fc5bdd6f51bb683772464e103733e",
+      "new_sha256": "74cc15bec7ca8f46eb93292d54bf5fd48a3fc5bdd6f51bb683772464e103733e"
+    }
+  ],
+  "all_production_changed_paths": [
+    "packaging/x11/xdmcp/manifest.json",
+    "packaging/x11/xdmcp/readiness/Xephyr-session-ready.xz",
+    "packaging/x11/xdmcp/readiness/executable.sha256.bin",
+    "packaging/x11/xdmcp/readiness/xephyr.patch",
+    "src/x11/xdmcp_clipboard.rs",
+    "src/x11/xdmcp_clipboard/deadline_tests.rs",
+    "src/x11/xdmcp_clipboard/transport.rs",
+    "src/x11/xdmcp_engine.rs"
+  ]
+}

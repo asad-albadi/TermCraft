@@ -1,0 +1,13 @@
+{
+  "archive": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-post-xdmcp-reset-fix-reviewed/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing.tar.gz",
+  "archive_sha256": "398d19fc6dbdf7d7dd5ee2a3a71ae8eda907bbbb31ad0117031c3a73fb106fe5",
+  "extracted_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-local-completion-qualified/398d19fc6dbdf7d7dd5ee2a3a71ae8eda907bbbb31ad0117031c3a73fb106fe5/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing",
+  "source_snapshot_sha256": "22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04",
+  "profile": "release",
+  "provenance": "local locked release build",
+  "package_manifest_sha256": "0db0f0e9864a98c676c67c25147150391f68b233872e2bbf3a92c4d47e7db787",
+  "manifest_files": 3372,
+  "app_sha256": "c8d09ba5fd2c36d567c6885f117d6068e2a87185648db883853cde84d678f7e6",
+  "feature_sha256": "81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e",
+  "stock_sha256": "d7f1f49ee428fd06b26707a79ba6d65b4e9ada4e6b53aca4146baaa92c79e593"
+}

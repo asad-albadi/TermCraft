@@ -1,0 +1,22 @@
+[
+  "docker",
+  "run",
+  "--rm",
+  "--name",
+  "termcraft-post-reset-mosh-398d",
+  "--label",
+  "termcraft.runtime-closure=398d",
+  "--user",
+  "0",
+  "--network",
+  "none",
+  "--mount",
+  "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-local-completion-qualified/398d19fc6dbdf7d7dd5ee2a3a71ae8eda907bbbb31ad0117031c3a73fb106fe5/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing,dst=/opt/termcraft,readonly",
+  "--mount",
+  "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/post-reset-fix-bundle-runtime-closure,dst=/evidence",
+  "--mount",
+  "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p01-mosh-closure/clean-root/fixture,dst=/fixture,readonly",
+  "sha256:1ab61a2bb16febd0a86829a43c26849b06ca82aca31be8385880cc7a3570c79d",
+  "/usr/bin/bash",
+  "/evidence/mosh-docker.sh"
+]

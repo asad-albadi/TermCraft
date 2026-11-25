@@ -1,0 +1,398 @@
+{
+  "source_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/post-reset-fix-packaged-xdmcp",
+  "source_seal": {
+    "index": "artifacts.json",
+    "sha256": "a2d494dbe280f6f7ea23eb809cd91ca56e3679dbc9dc385fab08f724b2e700bd",
+    "records": 174
+  },
+  "included": [
+    {
+      "source": "artifacts.json",
+      "destination": "artifacts.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "a2d494dbe280f6f7ea23eb809cd91ca56e3679dbc9dc385fab08f724b2e700bd",
+      "destination_sha256": "a2d494dbe280f6f7ea23eb809cd91ca56e3679dbc9dc385fab08f724b2e700bd"
+    },
+    {
+      "source": "report.md",
+      "destination": "report.md",
+      "disposition": "byte-identical copy",
+      "source_sha256": "2d49acd2612b16dafc9bee49e7dbfcc663c7f5b36952492d9c870569f329c3dc",
+      "destination_sha256": "2d49acd2612b16dafc9bee49e7dbfcc663c7f5b36952492d9c870569f329c3dc"
+    },
+    {
+      "source": "archive-identity.json",
+      "destination": "archive-identity.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "ad38084d7e2ecd6221ae5c981fb72eb60324198f5d0146f0e8c7425da6c3966d",
+      "destination_sha256": "ad38084d7e2ecd6221ae5c981fb72eb60324198f5d0146f0e8c7425da6c3966d"
+    },
+    {
+      "source": "test-results.json",
+      "destination": "test-results.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "20f087b4171d0f1b3a05e2a77bf412724f9494514ab200428e06638b0086d5f5",
+      "destination_sha256": "20f087b4171d0f1b3a05e2a77bf412724f9494514ab200428e06638b0086d5f5"
+    },
+    {
+      "source": "traced-protocol-observations.json",
+      "destination": "traced-protocol-observations.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "b968842f5b078ef1187748501955989bbe3a89ec671897ba26a6460ffb43f480",
+      "destination_sha256": "b968842f5b078ef1187748501955989bbe3a89ec671897ba26a6460ffb43f480"
+    },
+    {
+      "source": "traced-00.log",
+      "destination": "traced-00.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "b56e1b8af41d67068b17df714d4343657d3967f5fc3346589b88495c13e19f82",
+      "destination_sha256": "b56e1b8af41d67068b17df714d4343657d3967f5fc3346589b88495c13e19f82"
+    },
+    {
+      "source": "untraced-1111.log",
+      "destination": "untraced-1111.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "c60b7df27b5584559608121422f347469349e4b9fabf8816e7cc4d6fbab6969c",
+      "destination_sha256": "c60b7df27b5584559608121422f347469349e4b9fabf8816e7cc4d6fbab6969c"
+    },
+    {
+      "source": "engine-pins.json",
+      "destination": "engine-pins.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "ca8d8ad63b0962bfd660c635f646ee17f9bf5d0f7e9e8efd1a43180d71f47f99",
+      "destination_sha256": "ca8d8ad63b0962bfd660c635f646ee17f9bf5d0f7e9e8efd1a43180d71f47f99"
+    },
+    {
+      "source": "evidence.PrMfQ25S/case-result.json",
+      "destination": "evidence.PrMfQ25S/case-result.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "ec48683633d38afd3d230a93568030a46b1fd57619e1105b43b6e3c5d66f852b",
+      "destination_sha256": "ec48683633d38afd3d230a93568030a46b1fd57619e1105b43b6e3c5d66f852b"
+    },
+    {
+      "source": "evidence.PrMfQ25S/observations.log",
+      "destination": "evidence.PrMfQ25S/observations.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "77443f49f8feb544ec0e38cb91a12708cc065f4ffd195ba2737374fb171f69b8",
+      "destination_sha256": "77443f49f8feb544ec0e38cb91a12708cc065f4ffd195ba2737374fb171f69b8"
+    },
+    {
+      "source": "evidence.PrMfQ25S/package.log",
+      "destination": "evidence.PrMfQ25S/package.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "14851abbca6a19e19ff8c65e216ef537873f66092e0891c93dc5bac04418988c",
+      "destination_sha256": "14851abbca6a19e19ff8c65e216ef537873f66092e0891c93dc5bac04418988c"
+    },
+    {
+      "source": "evidence.PrMfQ25S/parent-before.xkb",
+      "destination": "evidence.PrMfQ25S/parent-before.xkb",
+      "disposition": "byte-identical copy",
+      "source_sha256": "90ed73980f6aa3b9a567843bb873dcbe0c8c5edd5b9ebb8245af44511416546c",
+      "destination_sha256": "90ed73980f6aa3b9a567843bb873dcbe0c8c5edd5b9ebb8245af44511416546c"
+    },
+    {
+      "source": "evidence.PrMfQ25S/parent-after.xkb",
+      "destination": "evidence.PrMfQ25S/parent-after.xkb",
+      "disposition": "byte-identical copy",
+      "source_sha256": "90ed73980f6aa3b9a567843bb873dcbe0c8c5edd5b9ebb8245af44511416546c",
+      "destination_sha256": "90ed73980f6aa3b9a567843bb873dcbe0c8c5edd5b9ebb8245af44511416546c"
+    },
+    {
+      "source": "evidence.PrMfQ25S/live-state.jsonl",
+      "destination": "evidence.PrMfQ25S/live-state.jsonl",
+      "disposition": "byte-identical copy",
+      "source_sha256": "eee4cda4fc7aec003abc972e7cd021c4bdee750bbf3735a516191342fe8c61bf",
+      "destination_sha256": "eee4cda4fc7aec003abc972e7cd021c4bdee750bbf3735a516191342fe8c61bf"
+    },
+    {
+      "source": "evidence.PrMfQ25S/pending.png",
+      "destination": "evidence.PrMfQ25S/pending.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "8d2e3299703b3f5f118dbda2879fd568f7f639fdfd3c98a7477f032b8329418f",
+      "destination_sha256": "8d2e3299703b3f5f118dbda2879fd568f7f639fdfd3c98a7477f032b8329418f"
+    },
+    {
+      "source": "evidence.PrMfQ25S/selected.png",
+      "destination": "evidence.PrMfQ25S/selected.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "e4d410d423e69144f645fa5a96f58f7e4512a0c033a8a5fa3f32a9cc15baa042",
+      "destination_sha256": "e4d410d423e69144f645fa5a96f58f7e4512a0c033a8a5fa3f32a9cc15baa042"
+    },
+    {
+      "source": "evidence.PrMfQ25S/direct.png",
+      "destination": "evidence.PrMfQ25S/direct.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "0fa39f84f9d8d12bcf30ec16a936d9da74eda45cc5460887ef14d5ab448c969f",
+      "destination_sha256": "0fa39f84f9d8d12bcf30ec16a936d9da74eda45cc5460887ef14d5ab448c969f"
+    },
+    {
+      "source": "evidence.PrMfQ25S/managers/selected/managed-177",
+      "destination": "evidence.PrMfQ25S/managers/selected/managed-177",
+      "disposition": "byte-identical copy",
+      "source_sha256": "d650f6372240ce21fa0a207003fb0638c9de71a2d3939b095369ac7f60111842",
+      "destination_sha256": "d650f6372240ce21fa0a207003fb0638c9de71a2d3939b095369ac7f60111842"
+    },
+    {
+      "source": "evidence.PrMfQ25S/managers/selected/managed-177.keyboard",
+      "destination": "evidence.PrMfQ25S/managers/selected/managed-177.keyboard",
+      "disposition": "byte-identical copy",
+      "source_sha256": "24219067d122e8324d9e447a583c22f8042565d8b2836c0ab215e77af0673766",
+      "destination_sha256": "24219067d122e8324d9e447a583c22f8042565d8b2836c0ab215e77af0673766"
+    },
+    {
+      "source": "evidence.PrMfQ25S/managers/selected/managed-178",
+      "destination": "evidence.PrMfQ25S/managers/selected/managed-178",
+      "disposition": "byte-identical copy",
+      "source_sha256": "62bd53cbcfc372fbb39691a81293a3ad4d142b42db21582d738c0d1290403011",
+      "destination_sha256": "62bd53cbcfc372fbb39691a81293a3ad4d142b42db21582d738c0d1290403011"
+    },
+    {
+      "source": "evidence.PrMfQ25S/managers/selected/managed-178.keyboard",
+      "destination": "evidence.PrMfQ25S/managers/selected/managed-178.keyboard",
+      "disposition": "byte-identical copy",
+      "source_sha256": "9ba3ae249b08bd87b53ad7d75870e19f525bd0ee4d0655d674c39f81b82307c2",
+      "destination_sha256": "9ba3ae249b08bd87b53ad7d75870e19f525bd0ee4d0655d674c39f81b82307c2"
+    },
+    {
+      "source": "evidence.agqoL0kd/case-result.json",
+      "destination": "evidence.agqoL0kd/case-result.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "8ba58553141e1ba2125849e8cd9c84a49ffcf74fa06d4066063ac75bcdba2314",
+      "destination_sha256": "8ba58553141e1ba2125849e8cd9c84a49ffcf74fa06d4066063ac75bcdba2314"
+    },
+    {
+      "source": "evidence.agqoL0kd/observations.log",
+      "destination": "evidence.agqoL0kd/observations.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "3bd8e57b17999ef3d49304d5222489374af795fc782cd9ecf88b73540f10e7e5",
+      "destination_sha256": "3bd8e57b17999ef3d49304d5222489374af795fc782cd9ecf88b73540f10e7e5"
+    },
+    {
+      "source": "evidence.agqoL0kd/package.log",
+      "destination": "evidence.agqoL0kd/package.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "14851abbca6a19e19ff8c65e216ef537873f66092e0891c93dc5bac04418988c",
+      "destination_sha256": "14851abbca6a19e19ff8c65e216ef537873f66092e0891c93dc5bac04418988c"
+    },
+    {
+      "source": "evidence.agqoL0kd/parent-before.xkb",
+      "destination": "evidence.agqoL0kd/parent-before.xkb",
+      "disposition": "byte-identical copy",
+      "source_sha256": "90ed73980f6aa3b9a567843bb873dcbe0c8c5edd5b9ebb8245af44511416546c",
+      "destination_sha256": "90ed73980f6aa3b9a567843bb873dcbe0c8c5edd5b9ebb8245af44511416546c"
+    },
+    {
+      "source": "evidence.agqoL0kd/parent-after.xkb",
+      "destination": "evidence.agqoL0kd/parent-after.xkb",
+      "disposition": "byte-identical copy",
+      "source_sha256": "90ed73980f6aa3b9a567843bb873dcbe0c8c5edd5b9ebb8245af44511416546c",
+      "destination_sha256": "90ed73980f6aa3b9a567843bb873dcbe0c8c5edd5b9ebb8245af44511416546c"
+    },
+    {
+      "source": "evidence.agqoL0kd/live-state.jsonl",
+      "destination": "evidence.agqoL0kd/live-state.jsonl",
+      "disposition": "byte-identical copy",
+      "source_sha256": "6cbfea82f1d42ee3a5cd6e40f85bae603cea1122359ad34337ca053ed27c9b79",
+      "destination_sha256": "6cbfea82f1d42ee3a5cd6e40f85bae603cea1122359ad34337ca053ed27c9b79"
+    },
+    {
+      "source": "evidence.agqoL0kd/engine-identities.jsonl",
+      "destination": "evidence.agqoL0kd/engine-identities.jsonl",
+      "disposition": "byte-identical copy",
+      "source_sha256": "a1ef7dbeeff3dd1cfc384e4fe40ea134c4c0a24ff841522462ef60a4ac950659",
+      "destination_sha256": "a1ef7dbeeff3dd1cfc384e4fe40ea134c4c0a24ff841522462ef60a4ac950659"
+    },
+    {
+      "source": "evidence.agqoL0kd/pending.png",
+      "destination": "evidence.agqoL0kd/pending.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "fd0d461f501632f1f80c31823c7816ba283a02657abe111ed31669f89365269b",
+      "destination_sha256": "fd0d461f501632f1f80c31823c7816ba283a02657abe111ed31669f89365269b"
+    },
+    {
+      "source": "evidence.agqoL0kd/selected.png",
+      "destination": "evidence.agqoL0kd/selected.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "71f87e79a232f161f616d6f3df3593bf92f29246d5a64c32ad58c3b1fe82f39f",
+      "destination_sha256": "71f87e79a232f161f616d6f3df3593bf92f29246d5a64c32ad58c3b1fe82f39f"
+    },
+    {
+      "source": "evidence.agqoL0kd/direct.png",
+      "destination": "evidence.agqoL0kd/direct.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "319afa995c576e25299b0b916519e9a03ae0241079f2831798fd53957141acd4",
+      "destination_sha256": "319afa995c576e25299b0b916519e9a03ae0241079f2831798fd53957141acd4"
+    },
+    {
+      "source": "evidence.agqoL0kd/managers/selected/managed-177",
+      "destination": "evidence.agqoL0kd/managers/selected/managed-177",
+      "disposition": "byte-identical copy",
+      "source_sha256": "d650f6372240ce21fa0a207003fb0638c9de71a2d3939b095369ac7f60111842",
+      "destination_sha256": "d650f6372240ce21fa0a207003fb0638c9de71a2d3939b095369ac7f60111842"
+    },
+    {
+      "source": "evidence.agqoL0kd/managers/selected/managed-177.keyboard",
+      "destination": "evidence.agqoL0kd/managers/selected/managed-177.keyboard",
+      "disposition": "byte-identical copy",
+      "source_sha256": "24219067d122e8324d9e447a583c22f8042565d8b2836c0ab215e77af0673766",
+      "destination_sha256": "24219067d122e8324d9e447a583c22f8042565d8b2836c0ab215e77af0673766"
+    },
+    {
+      "source": "evidence.agqoL0kd/managers/selected/managed-178",
+      "destination": "evidence.agqoL0kd/managers/selected/managed-178",
+      "disposition": "byte-identical copy",
+      "source_sha256": "62bd53cbcfc372fbb39691a81293a3ad4d142b42db21582d738c0d1290403011",
+      "destination_sha256": "62bd53cbcfc372fbb39691a81293a3ad4d142b42db21582d738c0d1290403011"
+    },
+    {
+      "source": "evidence.agqoL0kd/managers/selected/managed-178.keyboard",
+      "destination": "evidence.agqoL0kd/managers/selected/managed-178.keyboard",
+      "disposition": "byte-identical copy",
+      "source_sha256": "9ba3ae249b08bd87b53ad7d75870e19f525bd0ee4d0655d674c39f81b82307c2",
+      "destination_sha256": "9ba3ae249b08bd87b53ad7d75870e19f525bd0ee4d0655d674c39f81b82307c2"
+    }
+  ],
+  "omitted": [
+    "run.sh",
+    "xvfb.sh",
+    "xdmcp_private_net.sh",
+    "managers_lib.py",
+    "xdmcp_chooser_select.py",
+    "verify.py",
+    "probe.py",
+    "probe-traced00.py",
+    "fixture/xdm",
+    "fixture/chooser",
+    "fixture/libXdmGreet.so",
+    "fixture/xdmcp_window.py",
+    "tools/strace",
+    "evidence.PrMfQ25S/xvfb.log",
+    "evidence.PrMfQ25S/app-178.log",
+    "evidence.PrMfQ25S/app-176.log",
+    "evidence.PrMfQ25S/app-177.log",
+    "evidence.PrMfQ25S/selected.trace.115",
+    "evidence.PrMfQ25S/selected.trace.116",
+    "evidence.PrMfQ25S/selected.trace.117",
+    "evidence.PrMfQ25S/selected.trace.118",
+    "evidence.PrMfQ25S/selected.trace.119",
+    "evidence.PrMfQ25S/selected.trace.120",
+    "evidence.PrMfQ25S/selected.trace.121",
+    "evidence.PrMfQ25S/selected.trace.122",
+    "evidence.PrMfQ25S/selected.trace.123",
+    "evidence.PrMfQ25S/selected.trace.124",
+    "evidence.PrMfQ25S/selected.trace.125",
+    "evidence.PrMfQ25S/selected.trace.126",
+    "evidence.PrMfQ25S/selected.trace.127",
+    "evidence.PrMfQ25S/selected.trace.128",
+    "evidence.PrMfQ25S/selected.trace.129",
+    "evidence.PrMfQ25S/selected.trace.130",
+    "evidence.PrMfQ25S/selected.trace.131",
+    "evidence.PrMfQ25S/selected.trace.132",
+    "evidence.PrMfQ25S/selected.trace.133",
+    "evidence.PrMfQ25S/selected.trace.134",
+    "evidence.PrMfQ25S/selected.trace.135",
+    "evidence.PrMfQ25S/selected.trace.136",
+    "evidence.PrMfQ25S/selected.trace.137",
+    "evidence.PrMfQ25S/selected.trace.138",
+    "evidence.PrMfQ25S/selected.trace.139",
+    "evidence.PrMfQ25S/selected.trace.140",
+    "evidence.PrMfQ25S/selected.trace.141",
+    "evidence.PrMfQ25S/selected.trace.142",
+    "evidence.PrMfQ25S/selected.trace.143",
+    "evidence.PrMfQ25S/selected.trace.144",
+    "evidence.PrMfQ25S/selected.trace.145",
+    "evidence.PrMfQ25S/selected.trace.146",
+    "evidence.PrMfQ25S/selected.trace.147",
+    "evidence.PrMfQ25S/selected.trace.148",
+    "evidence.PrMfQ25S/selected.trace.149",
+    "evidence.PrMfQ25S/selected.trace.150",
+    "evidence.PrMfQ25S/selected.trace.151",
+    "evidence.PrMfQ25S/selected.trace.152",
+    "evidence.PrMfQ25S/selected.trace.153",
+    "evidence.PrMfQ25S/selected.trace.154",
+    "evidence.PrMfQ25S/selected.trace.155",
+    "evidence.PrMfQ25S/selected.trace.156",
+    "evidence.PrMfQ25S/selected.trace.157",
+    "evidence.PrMfQ25S/selected.trace.161",
+    "evidence.PrMfQ25S/selected.trace.162",
+    "evidence.agqoL0kd/xvfb.log",
+    "evidence.agqoL0kd/app-178.log",
+    "evidence.agqoL0kd/app-176.log",
+    "evidence.agqoL0kd/app-177.log",
+    "evidence.agqoL0kd/workspace-178/instance.lock",
+    "evidence.agqoL0kd/workspace-178/workspace.json",
+    "evidence.agqoL0kd/workspace-176/instance.lock",
+    "evidence.agqoL0kd/workspace-176/workspace.json",
+    "evidence.agqoL0kd/workspace-177/instance.lock",
+    "evidence.agqoL0kd/workspace-177/workspace.json",
+    "evidence.agqoL0kd/managers/initial/servers",
+    "evidence.agqoL0kd/managers/initial/access",
+    "evidence.agqoL0kd/managers/initial/setup",
+    "evidence.agqoL0kd/managers/initial/config",
+    "evidence.agqoL0kd/managers/initial/log",
+    "evidence.agqoL0kd/managers/selected/servers",
+    "evidence.agqoL0kd/managers/selected/access",
+    "evidence.agqoL0kd/managers/selected/setup",
+    "evidence.agqoL0kd/managers/selected/config",
+    "evidence.agqoL0kd/managers/selected/log",
+    "evidence.agqoL0kd/managers/selected/managed-178.authority",
+    "evidence.agqoL0kd/managers/selected/managed-177.authority",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/marker",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/index",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/ec/23420a6faca6a8844e2206e49df59f4ef51b6596a2746dac607469e360a10a",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/ab/6ca30323cecb44abc6fe460a6e385840721dc2ffacf8dabfcc2e3051e50915",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/6d/421c048be2fe95d2f6d0b12531ce40bda7fa2193a42065a23e4df52782a8a3",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/c8/275daf038909fc029574472ee4eddec9843eaf80cb81004cb3cca37b1456a4",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/a6/c27a17f3584cacf9e2327ac40abc837497aca0d33720ca2360b0d122188962",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/0b/efd49ffabbf0d427f1c19430d42004dbc839dc212576f3df4b0dba607c523c",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/fe/2d8b5eebcb728e10cc0f3258f7ce5915fcd9fdb1654ac1e4bdf97fa1fb7630",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/77/34bfb8103cf6199c4914265c297b566d462529fed284002386034b487ea4ee",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/e0/0a1b0146f18ef20f2ce09b2b4ce67b87c06b2f99ca7ccac229e8c294cf5e6c",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/1f/c3aac9e9e836eac77555af86258df4529c15cd37c955b4755f826afb4aefd0",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/7e/e682e37e5666e2d350649d6fb8fadfc4e15810c1b092d872fc4a8feb4b9d81",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/12/fa4bb3dfc9bf2e8c3e694fae8b55dd53b70656579b3fdcfbfe8493ca81b2f7",
+    "evidence.agqoL0kd/cache/mesa_shader_cache/cd/a6cb18706816d9384a294a1510fe33f5d403775cf99cb8d8dc76efd38b5807",
+    "evidence.PrMfQ25S/workspace-178/instance.lock",
+    "evidence.PrMfQ25S/workspace-178/workspace.json",
+    "evidence.PrMfQ25S/workspace-176/instance.lock",
+    "evidence.PrMfQ25S/workspace-176/workspace.json",
+    "evidence.PrMfQ25S/workspace-177/instance.lock",
+    "evidence.PrMfQ25S/workspace-177/workspace.json",
+    "evidence.PrMfQ25S/managers/initial/servers",
+    "evidence.PrMfQ25S/managers/initial/access",
+    "evidence.PrMfQ25S/managers/initial/setup",
+    "evidence.PrMfQ25S/managers/initial/config",
+    "evidence.PrMfQ25S/managers/initial/log",
+    "evidence.PrMfQ25S/managers/selected/servers",
+    "evidence.PrMfQ25S/managers/selected/access",
+    "evidence.PrMfQ25S/managers/selected/setup",
+    "evidence.PrMfQ25S/managers/selected/config",
+    "evidence.PrMfQ25S/managers/selected/log",
+    "evidence.PrMfQ25S/managers/selected/managed-178.authority",
+    "evidence.PrMfQ25S/managers/selected/managed-177.authority",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/marker",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/index",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/ec/23420a6faca6a8844e2206e49df59f4ef51b6596a2746dac607469e360a10a",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/ab/6ca30323cecb44abc6fe460a6e385840721dc2ffacf8dabfcc2e3051e50915",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/6d/421c048be2fe95d2f6d0b12531ce40bda7fa2193a42065a23e4df52782a8a3",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/c8/275daf038909fc029574472ee4eddec9843eaf80cb81004cb3cca37b1456a4",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/a6/c27a17f3584cacf9e2327ac40abc837497aca0d33720ca2360b0d122188962",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/0b/efd49ffabbf0d427f1c19430d42004dbc839dc212576f3df4b0dba607c523c",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/fe/2d8b5eebcb728e10cc0f3258f7ce5915fcd9fdb1654ac1e4bdf97fa1fb7630",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/77/34bfb8103cf6199c4914265c297b566d462529fed284002386034b487ea4ee",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/e0/0a1b0146f18ef20f2ce09b2b4ce67b87c06b2f99ca7ccac229e8c294cf5e6c",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/1f/c3aac9e9e836eac77555af86258df4529c15cd37c955b4755f826afb4aefd0",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/7e/e682e37e5666e2d350649d6fb8fadfc4e15810c1b092d872fc4a8feb4b9d81",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/12/fa4bb3dfc9bf2e8c3e694fae8b55dd53b70656579b3fdcfbfe8493ca81b2f7",
+    "evidence.PrMfQ25S/cache/mesa_shader_cache/cd/a6cb18706816d9384a294a1510fe33f5d403775cf99cb8d8dc76efd38b5807",
+    "fixture/app-defaults/Chooser",
+    "fixture/lib/libXpm.so.4",
+    "fixture/lib/libXaw.so.7",
+    "fixture/lib/libXmu.so.6",
+    "fixture/notices/xdm-COPYING",
+    "fixture/notices/libxpm-COPYING",
+    "fixture/notices/libxaw-COPYING",
+    "fixture/notices/libxmu-COPYING"
+  ],
+  "scope": "selected source22bb/archive398d XDMCP result; newer optional Wayland issue/rebuild separately tracked"
+}

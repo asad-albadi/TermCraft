@@ -1,0 +1,48 @@
+{
+  "command": [
+    "python3",
+    "scripts/package-release.py",
+    "--platform",
+    "linux",
+    "--output",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-local-completion-serial-reviewed",
+    "--xwayland-archive",
+    "/var/cache/pacman/pkg/xorg-xwayland-24.1.15-1-x86_64.pkg.tar.zst",
+    "--xephyr-archive",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04/source-packages/xephyr.pkg.tar.zst",
+    "--mosh-archive",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/mosh-1.4.0-35-x86_64.pkg.tar.zst",
+    "--mosh-source",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/mosh-1.4.0.tar.gz",
+    "--mosh-recipe",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/PKGBUILD",
+    "--mosh-dependencies",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/mosh-input-recovery/newcache",
+    "--iperf-runtime",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b03",
+    "--unix-cache",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/p05-cache",
+    "--browser-inputs",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p01-browser/browser-inputs",
+    "--wayland-helper-binary",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-vnc-composed/wayland-helper-release",
+    "--build-root",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-local-completion-cpu0-1961"
+  ],
+  "environment": {
+    "TERMCRAFT_OFFLINE": "1",
+    "CARGO_BUILD_JOBS": "2",
+    "RUST_MIN_STACK": "134217728",
+    "RUSTUP_HOME": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961",
+    "RUSTUP_TOOLCHAIN": "1.96.1",
+    "PATH_PREFIX": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/root-validation/serial-release-cargo:/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin"
+  },
+  "state": "executed",
+  "cargo_wrapper": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/root-validation/serial-release-cargo/cargo",
+  "cargo_wrapper_sha256": "30d3b7b2e84e5c3fc43cd5e91d8ee04954c57443a1e22b7ce0b108cd5ad7b47d",
+  "cargo_invocations": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/root-validation/serial-release-cargo/invocations.jsonl",
+  "cpu_affinity": [
+    0
+  ],
+  "source_sha256": "d6e6c3aca99a068aedc0479cb376a7d0927a4b2847ef3b0aed8e7d6d88a2e7d9"
+}

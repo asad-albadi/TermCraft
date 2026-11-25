@@ -1,0 +1,50 @@
+c8d09ba5fd2c36d567c6885f117d6068e2a87185648db883853cde84d678f7e6 harbor-workspace
+cbedd90fbc960d4cc799792cedf89b0afa1f1f74a93ba9fb05bfd4da2f27b2b8 x11/linux-x86_64/Xwayland
+d7f1f49ee428fd06b26707a79ba6d65b4e9ada4e6b53aca4146baaa92c79e593 x11/linux-x86_64/Xephyr
+81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e x11/linux-x86_64/Xephyr-session-ready
+release snapshot 22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04 all manifest file hashes verified
+12542.000733 wall=1795604307.756938 CASE final-release-traced-00 traced_selected 1 pending_hold 0 selected_hold 0 persistent_setup_seconds 120
+12542.297766 wall=1795604308.053957 TCP listener 6178 owned by sealed engine 62
+12542.297857 wall=1795604308.054042 Actual release app 22 session 178 engine 62 sha256 d7f1f49ee428fd06b26707a79ba6d65b4e9ada4e6b53aca4146baaa92c79e593 seals 15 mode direct
+12542.567069 wall=1795604308.323259 TCP listener 6176 owned by sealed engine 107
+12542.567151 wall=1795604308.323336 Actual release app 66 session 176 engine 107 sha256 81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e seals 15 mode indirect
+12542.593783 wall=1795604308.349975 Real chooser 176 observe Authenticated to mapped real xdm chooser
+12542.593979 wall=1795604308.350165 HOLD_BEGIN pending 0
+12542.594079 wall=1795604308.350265 HOLD_END pending
+12543.175495 wall=1795604308.931690 Screenshot pending.png
+12543.175814 wall=1795604308.931999 AWAIT_CLICK /tmp/evidence/pending.click
+12543.411670 wall=1795604309.167862 Visible cancel reaped own PID, authority and X socket pending
+12543.413899 wall=1795604309.170087 TCP listener 6178 owned by sealed engine 62
+12543.419644 wall=1795604309.175836 Direct companion and original private parent alive; full parent XKB unchanged
+12543.725825 wall=1795604309.482016 TCP listener 6177 owned by sealed engine 156
+12543.725936 wall=1795604309.482121 Actual release app 115 session 177 engine 156 sha256 81315f3d245b241a7fd8fd6ecf30a192edde0028bc43d5d0ba3d17b36889c92e seals 15 mode indirect
+12543.783542 wall=1795604309.539734 Real chooser 177 observe Authenticated to mapped real xdm chooser
+12543.783692 wall=1795604309.539877 HOLD_BEGIN selected 0
+12543.783734 wall=1795604309.539919 HOLD_END selected
+12543.783867 wall=1795604309.540052 EVENTS before-selection initial {"Choice checking timeout:": 0, "Read from chooser successfully": 0, "Send willing": 2, "Timeout choice": 0, "header: 1 10 ": 2, "header: 1 3 ": 2, "header: 1 4 ": 0, "header: 1 7 ": 2}
+12543.783979 wall=1795604309.540165 EVENTS before-selection selected {"Choice checking timeout:": 0, "Read from chooser successfully": 0, "Send willing": 3, "Timeout choice": 0, "header: 1 10 ": 1, "header: 1 3 ": 0, "header: 1 4 ": 0, "header: 1 7 ": 1}
+12543.786378 wall=1795604309.542566 STATE before-selection engine 156 exists True app None udp [['12537:', '010200C0:D8FA', '00000000:0000', '07', '00000000:00000000', '00:00000000', '00000000', '0', '0', '1280116', '2', '0000000000000000', '0']] wchan 0
+12543.812971 wall=1795604309.569163 Real chooser 177 accept Authenticated to mapped real xdm chooser
+12543.813358 wall=1795604309.569545 EVENTS after-selection initial {"Choice checking timeout:": 1, "Read from chooser successfully": 1, "Send willing": 2, "Timeout choice": 0, "header: 1 10 ": 2, "header: 1 3 ": 3, "header: 1 4 ": 0, "header: 1 7 ": 2}
+12543.813575 wall=1795604309.569761 EVENTS after-selection selected {"Choice checking timeout:": 0, "Read from chooser successfully": 0, "Send willing": 4, "Timeout choice": 0, "header: 1 10 ": 1, "header: 1 3 ": 0, "header: 1 4 ": 1, "header: 1 7 ": 1}
+12543.818467 wall=1795604309.574657 STATE after-selection engine 156 exists True app None udp [['12537:', '010200C0:D8FA', '00000000:0000', '07', '00000000:000003C0', '00:00000000', '00000000', '0', '0', '1280116', '2', '0000000000000000', '0']] wchan 0
+12543.818863 wall=1795604309.575050 EVENTS await-selected-0 initial {"Choice checking timeout:": 1, "Read from chooser successfully": 1, "Send willing": 2, "Timeout choice": 0, "header: 1 10 ": 2, "header: 1 3 ": 3, "header: 1 4 ": 0, "header: 1 7 ": 2}
+12543.819146 wall=1795604309.575333 EVENTS await-selected-0 selected {"Choice checking timeout:": 0, "Read from chooser successfully": 0, "Send willing": 4, "Timeout choice": 0, "header: 1 10 ": 1, "header: 1 3 ": 0, "header: 1 4 ": 1, "header: 1 7 ": 1}
+12543.823935 wall=1795604309.580125 STATE await-selected-0 engine 156 exists True app None udp [['12537:', '010200C0:D8FA', '00000000:0000', '07', '00000000:000003C0', '00:00000000', '00000000', '0', '0', '1280116', '2', '0000000000000000', '0']] wchan 0
+12543.944713 wall=1795604309.700904 SELECTED_OBSERVATION_SECONDS 0.12609931599945412
+12543.948553 wall=1795604309.704746 TCP listener 6177 owned by sealed engine 156
+12543.952738 wall=1795604309.708928 Selected real manager forwarded UDP177; same feature PID after reset; German keys 29/52=122/121; 192.0.2.1:177; mapped window 8388609; dimensions 800x600; green pixel verified
+12543.954063 wall=1795604309.710257 Incorrect cookie rejected
+12544.223380 wall=1795604309.979575 parent-to-nested exact UTF-8 39 bytes 04b583f0c1d9aa6638d6d60a49a50dabd8a17d5a9a4e9753f88c72b34297a370
+12544.489963 wall=1795604310.246156 nested-to-parent exact UTF-8 47 bytes 41595b5af613a4be312844506364f086c906cd1446231ec7b1fad783a7098116
+12544.493431 wall=1795604310.249620 TCP listener 6178 owned by sealed engine 62
+12544.502923 wall=1795604310.259119 Direct companion and original private parent alive; full parent XKB unchanged
+12545.055672 wall=1795604310.811865 Screenshot selected.png
+12545.055859 wall=1795604310.812045 AWAIT_CLICK /tmp/evidence/selected.click
+12545.290796 wall=1795604311.046986 Visible cancel reaped own PID, authority and X socket selected
+12545.292537 wall=1795604311.048726 TCP listener 6178 owned by sealed engine 62
+12545.301719 wall=1795604311.057917 Direct companion and original private parent alive; full parent XKB unchanged
+12545.833323 wall=1795604311.589514 Screenshot direct.png
+12545.833448 wall=1795604311.589633 AWAIT_CLICK /tmp/evidence/direct.click
+12546.069571 wall=1795604311.825764 Visible cancel reaped own PID, authority and X socket direct
+12546.181168 wall=1795604311.937360 PASS all three ordinary release GUIs exited zero, private parent remains responsive

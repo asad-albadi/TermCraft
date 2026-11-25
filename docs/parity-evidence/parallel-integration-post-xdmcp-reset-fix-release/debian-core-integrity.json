@@ -1,0 +1,9 @@
+{
+  "archive": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/post-xdmcp-fix-debian-upgrade/build/out/TermCraft-0.1.0-linux-x86_64.tar.gz",
+  "sha256": "04096dfc6e7cd78f619387fc440e12dcf965caca217d27d4c438ace332bac20b",
+  "package_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-current-debian-core-qualified/04096dfc6e7cd78f619387fc440e12dcf965caca217d27d4c438ace332bac20b/TermCraft-0.1.0-linux-x86_64",
+  "files_verified": 1074,
+  "source_sha256": "22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04",
+  "app_sha256": "07680193ba453e22c4fbea8bc99ac2813c7b19d3e586b72b7d891bd26445b914",
+  "scope": "root strict extraction/all payload hashes; native apt/GUI/vault matrix separately recorded"
+}

@@ -1,0 +1,10 @@
+{
+  "harbor-workspace": {
+    "sha256": "26b82706c068c8de1263f60b0448869adb0dcc501cb6b078ccdcbd30cba58de5",
+    "d6_manifest_match": true
+  },
+  "termcraft-rdp-engine": {
+    "sha256": "3c98e3ec640424ac7b847aafa03792c39d1c7400ada1a8ba5fbe2225819b06eb",
+    "d6_manifest_match": true
+  }
+}

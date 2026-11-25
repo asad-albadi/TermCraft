@@ -1,0 +1,393 @@
+{
+  "source_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/post-reset-fix-bundle-runtime-closure",
+  "source_seal": {
+    "index": "SHA256SUMS.json",
+    "sha256": "45d7d46cc08acabae2d8770a41e68f183bd702d285fe0802f9a1baf85db886c7",
+    "records": 53
+  },
+  "included": [
+    {
+      "source": "REPORT.md",
+      "destination": "REPORT.md",
+      "disposition": "byte-identical copy",
+      "source_sha256": "76f62d522583ba6459d689583c5a620b42caa2693636ab6816e6eec45e06a196",
+      "destination_sha256": "76f62d522583ba6459d689583c5a620b42caa2693636ab6816e6eec45e06a196"
+    },
+    {
+      "source": "SHA256SUMS.json",
+      "destination": "SHA256SUMS.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "45d7d46cc08acabae2d8770a41e68f183bd702d285fe0802f9a1baf85db886c7",
+      "destination_sha256": "45d7d46cc08acabae2d8770a41e68f183bd702d285fe0802f9a1baf85db886c7"
+    },
+    {
+      "source": "actual-running-app.json",
+      "destination": "actual-running-app.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "9105ab4bc8caaab1e038f1bfd2573ccff22a5539d6b2850332d91f0294dced75",
+      "destination_sha256": "9105ab4bc8caaab1e038f1bfd2573ccff22a5539d6b2850332d91f0294dced75"
+    },
+    {
+      "source": "browser-current-app.log",
+      "destination": "browser-current-app.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "destination_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "browser-current-browser-before.png",
+      "destination": "browser-current-browser-before.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "8a448fc43b5afc6823e328334025ecbf35550bb1142addc7c1d512392a755232",
+      "destination_sha256": "8a448fc43b5afc6823e328334025ecbf35550bb1142addc7c1d512392a755232"
+    },
+    {
+      "source": "browser-current-browser-input.png",
+      "destination": "browser-current-browser-input.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "3adddd1ec79e0ccf42bc178d7adb8176ddb3f2ec445b0d5dae37493d70c56c86",
+      "destination_sha256": "3adddd1ec79e0ccf42bc178d7adb8176ddb3f2ec445b0d5dae37493d70c56c86"
+    },
+    {
+      "source": "browser-current-browser-processes.json",
+      "destination": "browser-current-browser-processes.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "3cd17321e6c9df202122a149efaf1e1b6a7d2baa41bac77bd3a78531b41783b8",
+      "destination_sha256": "3cd17321e6c9df202122a149efaf1e1b6a7d2baa41bac77bd3a78531b41783b8"
+    },
+    {
+      "source": "browser-current-cleanup.json",
+      "destination": "browser-current-cleanup.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "5797a34e21fda5c468b92de26284a0a832bdbf27efbc0b86cb3c8124b95e20a3",
+      "destination_sha256": "5797a34e21fda5c468b92de26284a0a832bdbf27efbc0b86cb3c8124b95e20a3"
+    },
+    {
+      "source": "browser-current-command.json",
+      "destination": "browser-current-command.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "eb2b27d09d5cc46fb31498b6beb8f3f020375f04e4dce7a70da2988bc0a0fb64",
+      "destination_sha256": "eb2b27d09d5cc46fb31498b6beb8f3f020375f04e4dce7a70da2988bc0a0fb64"
+    },
+    {
+      "source": "browser-current-http.log",
+      "destination": "browser-current-http.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "ac64ceb869a1023ba3cff062d351234b336728576c185512c9f88f4ff9b6130f",
+      "destination_sha256": "ac64ceb869a1023ba3cff062d351234b336728576c185512c9f88f4ff9b6130f"
+    },
+    {
+      "source": "browser-current-pty-marker.txt",
+      "destination": "browser-current-pty-marker.txt",
+      "disposition": "byte-identical copy",
+      "source_sha256": "a22044dd1f3ba961b0715346056ee37ab7af5ed86ecbbbc5aa362e566c56e66e",
+      "destination_sha256": "a22044dd1f3ba961b0715346056ee37ab7af5ed86ecbbbc5aa362e566c56e66e"
+    },
+    {
+      "source": "browser-current-pty.png",
+      "destination": "browser-current-pty.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "c27d17ca9de5ce1a1bf370aacacc61fe7003b35991c2972a4ebe2e7e52fb248d",
+      "destination_sha256": "c27d17ca9de5ce1a1bf370aacacc61fe7003b35991c2972a4ebe2e7e52fb248d"
+    },
+    {
+      "source": "browser-current-resized.png",
+      "destination": "browser-current-resized.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "a09a20a5dd7d598671abbba5de6d4d812a6911e64d32c14053c7c8af8c55a703",
+      "destination_sha256": "a09a20a5dd7d598671abbba5de6d4d812a6911e64d32c14053c7c8af8c55a703"
+    },
+    {
+      "source": "browser-current-result.json",
+      "destination": "browser-current-result.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17",
+      "destination_sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17"
+    },
+    {
+      "source": "browser-current-session.log",
+      "destination": "browser-current-session.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "d8327ba6cc62573cd99a97fde112f49098332c9bd9e3f4cb81ad9afc7fbb37a7",
+      "destination_sha256": "d8327ba6cc62573cd99a97fde112f49098332c9bd9e3f4cb81ad9afc7fbb37a7"
+    },
+    {
+      "source": "browser-current-workspace-after.json",
+      "destination": "browser-current-workspace-after.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "846f89819da27336df951925936abb09e5665c219d1557e8731fcf780d121563",
+      "destination_sha256": "846f89819da27336df951925936abb09e5665c219d1557e8731fcf780d121563"
+    },
+    {
+      "source": "browser-current-xvfb.log",
+      "destination": "browser-current-xvfb.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "e2861dbf17c9cb74d57668ceaa0ec8111c014cd26d10d2d0dffdf37188dac690",
+      "destination_sha256": "e2861dbf17c9cb74d57668ceaa0ec8111c014cd26d10d2d0dffdf37188dac690"
+    },
+    {
+      "source": "browser-current.log",
+      "destination": "browser-current.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "5316f6f309f9023b8c34c14b3c3469bdafcf1bfe8701d1524996e07697aa426c",
+      "destination_sha256": "5316f6f309f9023b8c34c14b3c3469bdafcf1bfe8701d1524996e07697aa426c"
+    },
+    {
+      "source": "browser-current.sh",
+      "destination": "browser-current.sh",
+      "disposition": "byte-identical copy",
+      "source_sha256": "b85cfcac320898d95c9dcde981bee8e7c954f55b3362e80ea7594d9abd2951b6",
+      "destination_sha256": "b85cfcac320898d95c9dcde981bee8e7c954f55b3362e80ea7594d9abd2951b6"
+    },
+    {
+      "source": "check-browser-cleanup.py",
+      "destination": "check-browser-cleanup.py",
+      "disposition": "byte-identical copy",
+      "source_sha256": "776afc36222286f58ceb29f0d1b5791abd135c2199244c9641471c63bfd0c623",
+      "destination_sha256": "776afc36222286f58ceb29f0d1b5791abd135c2199244c9641471c63bfd0c623"
+    },
+    {
+      "source": "container-cleanup.json",
+      "destination": "container-cleanup.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "bd043208b4d2781f4519fcb9b42f1fc5b3256bb1c9a4be7d86cc4c22c3b03034",
+      "destination_sha256": "bd043208b4d2781f4519fcb9b42f1fc5b3256bb1c9a4be7d86cc4c22c3b03034"
+    },
+    {
+      "source": "inspect-browser-current.py",
+      "destination": "inspect-browser-current.py",
+      "disposition": "byte-identical copy",
+      "source_sha256": "6564dca42638080880cecb9d39d434c176a2e50ea69ca3344bb990001fc40ac6",
+      "destination_sha256": "6564dca42638080880cecb9d39d434c176a2e50ea69ca3344bb990001fc40ac6"
+    },
+    {
+      "source": "mosh-app.log",
+      "destination": "mosh-app.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "destination_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "mosh-before.png",
+      "destination": "mosh-before.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "72efa782b4df4908a76173c9d57cd038cfcf4260bdb396a53e4fbe092b5274f1",
+      "destination_sha256": "72efa782b4df4908a76173c9d57cd038cfcf4260bdb396a53e4fbe092b5274f1"
+    },
+    {
+      "source": "mosh-bootstrap-monitor.py",
+      "destination": "mosh-bootstrap-monitor.py",
+      "disposition": "byte-identical copy",
+      "source_sha256": "2af3d831dfa76ee4df2ebff417a54ef6de3bbf4ffc2b4e26bc9241037f88dd84",
+      "destination_sha256": "2af3d831dfa76ee4df2ebff417a54ef6de3bbf4ffc2b4e26bc9241037f88dd84"
+    },
+    {
+      "source": "mosh-bootstrap-processes.json",
+      "destination": "mosh-bootstrap-processes.sanitized.json",
+      "disposition": "derived JSON: real ephemeral MOSH_KEY redacted; all other process/environment values retained",
+      "source_sha256": "d820bf5049ec4024810cdf867bb47a4612d9f11d7f9b44d1ca7dc311c8e0f665",
+      "destination_sha256": "f25103991ca90c9dc0d953fb3dc132488f038ddabc4f604b23459db44c7f0b05"
+    },
+    {
+      "source": "mosh-cleanup.json",
+      "destination": "mosh-cleanup.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "a94c396c1100499c8fb6fde5abfe33047c0d036cf63db97cd1d5e5be3df93110",
+      "destination_sha256": "a94c396c1100499c8fb6fde5abfe33047c0d036cf63db97cd1d5e5be3df93110"
+    },
+    {
+      "source": "mosh-cleanup.py",
+      "destination": "mosh-cleanup.py",
+      "disposition": "byte-identical copy",
+      "source_sha256": "d8249d1d05fe62ab6339b63837281c6ed8dc668f42fe5add6aee9e0de1733e23",
+      "destination_sha256": "d8249d1d05fe62ab6339b63837281c6ed8dc668f42fe5add6aee9e0de1733e23"
+    },
+    {
+      "source": "mosh-client-absence.txt",
+      "destination": "mosh-client-absence.txt",
+      "disposition": "byte-identical copy",
+      "source_sha256": "b827b8885549f08c7028eab21fbd57106a306ec275605a869d4b09371a477068",
+      "destination_sha256": "b827b8885549f08c7028eab21fbd57106a306ec275605a869d4b09371a477068"
+    },
+    {
+      "source": "mosh-command.json",
+      "destination": "mosh-command.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "402f00d63f3eb29724c99a89a8b69018a9af734ab7ee76dfe22dff8ebdec31e8",
+      "destination_sha256": "402f00d63f3eb29724c99a89a8b69018a9af734ab7ee76dfe22dff8ebdec31e8"
+    },
+    {
+      "source": "mosh-docker.sh",
+      "destination": "mosh-docker.sh",
+      "disposition": "byte-identical copy",
+      "source_sha256": "c4603b7dd3b92d749deddc4bbd1152968779c469955d8846850f2cb04c1b1348",
+      "destination_sha256": "c4603b7dd3b92d749deddc4bbd1152968779c469955d8846850f2cb04c1b1348"
+    },
+    {
+      "source": "mosh-inspect.py",
+      "destination": "mosh-inspect.py",
+      "disposition": "byte-identical copy",
+      "source_sha256": "0c361a756bd250124ebd21ad5532441ffb54ef479b83f5cb613a59ca649ac7bd",
+      "destination_sha256": "0c361a756bd250124ebd21ad5532441ffb54ef479b83f5cb613a59ca649ac7bd"
+    },
+    {
+      "source": "mosh-ipc.log",
+      "destination": "mosh-ipc.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "3a5f7f10b987ca4e572b75f0887092f42e6af61147fff798fca5cb2f427b299c",
+      "destination_sha256": "3a5f7f10b987ca4e572b75f0887092f42e6af61147fff798fca5cb2f427b299c"
+    },
+    {
+      "source": "mosh-processes.json",
+      "destination": "mosh-processes.sanitized.json",
+      "disposition": "derived JSON: real ephemeral MOSH_KEY redacted; all other process/environment values retained",
+      "source_sha256": "711e12f0681007bb5b365e6c2787b2a12a0f85678c953ec0a1242b892dbbb6be",
+      "destination_sha256": "a8b3fcccea67c524064dd055ac4787a1ba20f32a88de6606a495c1cf51471224"
+    },
+    {
+      "source": "mosh-remote-initial-size.txt",
+      "destination": "mosh-remote-initial-size.txt",
+      "disposition": "byte-identical copy",
+      "source_sha256": "da34726819fa51db2b4fe480ec86fe52d47e8063d0cece9774765fbb25a14a40",
+      "destination_sha256": "da34726819fa51db2b4fe480ec86fe52d47e8063d0cece9774765fbb25a14a40"
+    },
+    {
+      "source": "mosh-remote-marker.txt",
+      "destination": "mosh-remote-marker.txt",
+      "disposition": "byte-identical copy",
+      "source_sha256": "5a5411a58ff36cb70c67891b346b8cdd7a6ca91b20e1caf0d8b4b5f745289a2e",
+      "destination_sha256": "5a5411a58ff36cb70c67891b346b8cdd7a6ca91b20e1caf0d8b4b5f745289a2e"
+    },
+    {
+      "source": "mosh-remote-resized-size.txt",
+      "destination": "mosh-remote-resized-size.txt",
+      "disposition": "byte-identical copy",
+      "source_sha256": "c06052b6823e59b7f2556f6f163563b4184d09c84a101a15ad92e7d5df1b6d21",
+      "destination_sha256": "c06052b6823e59b7f2556f6f163563b4184d09c84a101a15ad92e7d5df1b6d21"
+    },
+    {
+      "source": "mosh-resized.png",
+      "destination": "mosh-resized.png",
+      "disposition": "byte-identical copy",
+      "source_sha256": "a88ba5139dc27d8aee167822e8d6437fdfa6389d5d950c5238adabb786be668f",
+      "destination_sha256": "a88ba5139dc27d8aee167822e8d6437fdfa6389d5d950c5238adabb786be668f"
+    },
+    {
+      "source": "mosh-result.json",
+      "destination": "mosh-result.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17",
+      "destination_sha256": "e89df0eae5ec7db81135aed16463968955c578bcc4f2ec43172eff351f080c17"
+    },
+    {
+      "source": "mosh-run.log",
+      "destination": "mosh-run.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "d43f0fd422dfb72e25a254fbfc0ea6c42883df0dbe2719f9bb60e73c18e4f672",
+      "destination_sha256": "d43f0fd422dfb72e25a254fbfc0ea6c42883df0dbe2719f9bb60e73c18e4f672"
+    },
+    {
+      "source": "mosh-sshd.log",
+      "destination": "mosh-sshd.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "671b78e7f90d7ba0397c54172fe81bd6cc30de0a33eb76bdf7965a655b1fef67",
+      "destination_sha256": "671b78e7f90d7ba0397c54172fe81bd6cc30de0a33eb76bdf7965a655b1fef67"
+    },
+    {
+      "source": "mosh-typed-marker.txt",
+      "destination": "mosh-typed-marker.txt",
+      "disposition": "byte-identical copy",
+      "source_sha256": "f1ddb4de48e1e6ebd6c67ce48fa6bf910f79aab1df7875cc70d6a8c308f2c8ac",
+      "destination_sha256": "f1ddb4de48e1e6ebd6c67ce48fa6bf910f79aab1df7875cc70d6a8c308f2c8ac"
+    },
+    {
+      "source": "mosh-workspace.py",
+      "destination": "mosh-workspace.py",
+      "disposition": "byte-identical copy",
+      "source_sha256": "2a73443593f0705a4ada9b282256a42fd337da5eebad56c04ec63992b5d7f5e8",
+      "destination_sha256": "2a73443593f0705a4ada9b282256a42fd337da5eebad56c04ec63992b5d7f5e8"
+    },
+    {
+      "source": "mosh-xvfb.log",
+      "destination": "mosh-xvfb.log",
+      "disposition": "byte-identical copy",
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "destination_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "source": "payload-equivalence.json",
+      "destination": "payload-equivalence.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "f867ea09d56d6cff5c25ebdb861811e8f84d1dd1186b84ae12603c51604988da",
+      "destination_sha256": "f867ea09d56d6cff5c25ebdb861811e8f84d1dd1186b84ae12603c51604988da"
+    },
+    {
+      "source": "prior-browser-fixture.json",
+      "destination": "prior-browser-fixture.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "846f89819da27336df951925936abb09e5665c219d1557e8731fcf780d121563",
+      "destination_sha256": "846f89819da27336df951925936abb09e5665c219d1557e8731fcf780d121563"
+    },
+    {
+      "source": "prior-packet-preservation.json",
+      "destination": "prior-packet-preservation.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "fb0b2051e29bb79b82be09ea8f6be01315876f89e9e8b6cbf053a02538a35893",
+      "destination_sha256": "fb0b2051e29bb79b82be09ea8f6be01315876f89e9e8b6cbf053a02538a35893"
+    },
+    {
+      "source": "run-browser.py",
+      "destination": "run-browser.py",
+      "disposition": "byte-identical copy",
+      "source_sha256": "4c125edf364414f5eecf4bd5426eda48a85c8d56361848708a9245cb7f2387a8",
+      "destination_sha256": "4c125edf364414f5eecf4bd5426eda48a85c8d56361848708a9245cb7f2387a8"
+    },
+    {
+      "source": "run-mosh.py",
+      "destination": "run-mosh.py",
+      "disposition": "byte-identical copy",
+      "source_sha256": "f40ab921d9c8b131d43ce99c8ec10633aa16a2c927fc420ece4d235f38b2fcec",
+      "destination_sha256": "f40ab921d9c8b131d43ce99c8ec10633aa16a2c927fc420ece4d235f38b2fcec"
+    },
+    {
+      "source": "source-equivalence.json",
+      "destination": "source-equivalence.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "37d7e631c3fa18f88ec8c2caba2e57b778b164facd0b217403457db233c7af2f",
+      "destination_sha256": "37d7e631c3fa18f88ec8c2caba2e57b778b164facd0b217403457db233c7af2f"
+    },
+    {
+      "source": "verification-browser.json",
+      "destination": "verification-browser.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "8bbcecaf431de4bc7d473223e3a264a9c277ecfb843fadfdd41adeedb64d1c5b",
+      "destination_sha256": "8bbcecaf431de4bc7d473223e3a264a9c277ecfb843fadfdd41adeedb64d1c5b"
+    },
+    {
+      "source": "verification-mosh.json",
+      "destination": "verification-mosh.json",
+      "disposition": "byte-identical copy",
+      "source_sha256": "e9e46b66b1c09596180551aedf6e0c907eb27a9752fa54b788004c211e459822",
+      "destination_sha256": "e9e46b66b1c09596180551aedf6e0c907eb27a9752fa54b788004c211e459822"
+    },
+    {
+      "source": "verify-current.py",
+      "destination": "verify-current.py",
+      "disposition": "byte-identical copy",
+      "source_sha256": "6e243495cf69de4da86b7f0090cb5e74421738c8769e1d3ac50fe53abdaaea10",
+      "destination_sha256": "6e243495cf69de4da86b7f0090cb5e74421738c8769e1d3ac50fe53abdaaea10"
+    },
+    {
+      "source": "verify-mosh.py",
+      "destination": "verify-mosh.py",
+      "disposition": "byte-identical copy",
+      "source_sha256": "a2542b232d90cf39ebb81b557d41ee34c9df1b7c1fd04d8edc36ecd96b365f73",
+      "destination_sha256": "a2542b232d90cf39ebb81b557d41ee34c9df1b7c1fd04d8edc36ecd96b365f73"
+    }
+  ],
+  "omitted_raw_secret_files": [
+    "mosh-bootstrap-processes.json",
+    "mosh-processes.json"
+  ],
+  "scope": "source22bb/archive398d browser+Mosh result; newer optional Wayland issue/rebuild separately tracked"
+}

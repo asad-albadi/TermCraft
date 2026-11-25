@@ -1,0 +1,10 @@
+{
+  "exit_code": 0,
+  "seconds": 2.47,
+  "archive_sha256": "31aa3af8642135e2ba962b9c96c8caebaeb578118143876fb22f25d66b4aea9e",
+  "scope": "X11 clean declared-runtime namespace; own display, no host display/home/network/library mounts",
+  "screen_size": [
+    1280,
+    800
+  ]
+}

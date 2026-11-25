@@ -1,0 +1,9 @@
+{
+  "result": "pass",
+  "source_sha256": "22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04",
+  "runtime_image": "sha256:1d04200c2ece1d4d75a2a6f8e11ebce7d86a2ae28b34bb2c9cbb3ee9f4953e75",
+  "upgrade_type": "monotonic Debian packaging upgrade 0.1.0-1 -> 0.1.0-2; embedded app version unchanged",
+  "portable_sha256": "04096dfc6e7cd78f619387fc440e12dcf965caca217d27d4c438ace332bac20b",
+  "deb_sha256": "15757f3f90da3815910b7d371373f91a14e855ae3c807fdfd344ab99a7d14cef",
+  "workspace_vault_corrupt_bytes_preserved": true
+}
