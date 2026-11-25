@@ -1,0 +1,2 @@
+termcraft-owned-independent-xrdp
+termcraft-owned-independent-shadow

@@ -1,0 +1,8 @@
+{
+  "base_snapshot_sha256": "22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04",
+  "snapshot_sha256": "d1a54c2ec020d0bc2a4e731184065bc33c28362f9b56f9bd95401f8a14947b9f",
+  "changed_inputs": [
+    "engines/wayland/src/capture.rs"
+  ],
+  "other_595_inputs_unchanged": 595
+}

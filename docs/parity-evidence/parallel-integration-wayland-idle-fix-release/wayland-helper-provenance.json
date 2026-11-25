@@ -1,0 +1,31 @@
+{
+  "provenance": "genuine native locked offline release build from same frozen source as ordinary app/RDP package build",
+  "entry_point": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-local-completion-cpu0-1961/package-wayland/release/termcraft-wayland-engine",
+  "sha256": "fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59",
+  "source_snapshot_sha256": "d1a54c2ec020d0bc2a4e731184065bc33c28362f9b56f9bd95401f8a14947b9f",
+  "source_inputs": {
+    "engines/wayland/Cargo.lock": "52b70c3464a0cace73cb838709433560bb3fd9599218441526603773912a1396",
+    "engines/wayland/Cargo.toml": "dbd48287c9e549f7079b657b3017d009a4bf2c7b8cfb6cb73ecf6ab102f921f0",
+    "engines/wayland/examples/e03-wayland-synthetic-private.rs": "66380b9f601cc274126fbaf639fcd2de9b1aaa722f8589c62e8b8fe15e79622c",
+    "engines/wayland/src/capture.rs": "b39b189a8bd14025c5f0042563b046fa691ce9568151ad2d6789e33e0e3f40b6",
+    "engines/wayland/src/lib.rs": "6b85eb6cf4990748b067888b7f0400a9ff386d9ec26a1fb580ac90078423f608",
+    "engines/wayland/src/main.rs": "de0d59ff7e6882a752cef5fe03d59d032af85e876188ba929c67580f6ebcac03"
+  },
+  "rustc": "rustc 1.96.1 (31fca3adb 2026-06-26)\nbinary: rustc\ncommit-hash: 31fca3adb283cc9dfd56b49cdee9a96eb9c96ffd\ncommit-date: 2026-06-26\nhost: x86_64-unknown-linux-gnu\nrelease: 1.96.1\nLLVM version: 22.1.2\n",
+  "cargo": "cargo 1.96.1 (356927216 2026-06-26)\n",
+  "native_linkage": "\tlinux-vdso.so.1 (0x00007fc151f30000)\n\tlibpipewire-0.3.so.0 => /usr/lib/libpipewire-0.3.so.0 (0x00007fc151db1000)\n\tlibgcc_s.so.1 => /usr/lib/libgcc_s.so.1 (0x00007fc151d7b000)\n\tlibc.so.6 => /usr/lib/libc.so.6 (0x00007fc151a00000)\n\t/lib64/ld-linux-x86-64.so.2 => /usr/lib64/ld-linux-x86-64.so.2 (0x00007fc151f32000)\n",
+  "ELF_comment": "\nString dump of section '.comment':\n  [     0]  Linker: LLD 22.1.2 (/checkout/src/llvm-project/llvm 1cb4e3833c1919c2e6fb579a23ac0e2b22587b7e)\n  [    5f]  GCC: (GNU) 16.2.1 20260810\n  [    7a]  rustc version 1.96.1 (31fca3adb 2026-06-26)\n\n",
+  "build_command": [
+    "cargo",
+    "build",
+    "--release",
+    "--locked",
+    "--offline",
+    "--manifest-path",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-local-completion-cpu0-1961/package-sources/d1a54c2ec020d0bc2a4e731184065bc33c28362f9b56f9bd95401f8a14947b9f/engines/wayland/Cargo.toml",
+    "--target-dir",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-local-completion-cpu0-1961/package-wayland"
+  ],
+  "CARGO_BUILD_JOBS": "2",
+  "actual_jobs": "serial wrapper injects --jobs1"
+}

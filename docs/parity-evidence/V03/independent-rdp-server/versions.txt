@@ -1,0 +1,3 @@
+xorgxrdp	1:0.9.19-1
+xrdp	0.9.21.1-1+deb12u3
+xserver-xorg-core	2:21.1.7-3+deb12u13

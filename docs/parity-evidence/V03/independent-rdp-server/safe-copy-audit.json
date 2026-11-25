@@ -1,0 +1,650 @@
+{
+  "result": "selected text checks clear; masked-password GUI screenshots manually inspected; public server certificate fingerprint retained",
+  "raw_credentials_copied": false,
+  "raw_SAM_copied": false,
+  "authority_files_copied": false,
+  "wire_auth_copied": false,
+  "redactions_required": false,
+  "checks": [
+    {
+      "file": "evidence.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "cleanup-verification.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "container-identities.txt",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "container-cleanup.txt",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "container-remove.txt",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "container-stop.txt",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "versions.txt",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-versions.txt",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-certificate-fingerprint.txt",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "remote-xev.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "remote-focus.txt",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "remote-xev-focus.txt",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "xrdp.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "sesman.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "xrdp-stdout.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-xterm.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-xvfb.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "client-xvfb.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "Dockerfile",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "server.py",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow.py",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "probe-shadow-auth.py",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "probe.py",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "run-xvfb.sh",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "xvfb.sh",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "upstream-shadow-channels.c",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "upstream-x11-shadow.c",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "upstream-sources.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "tested-PACKAGE-MANIFEST.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth-run.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "xrdp-negative-run.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "ORIGINAL-REPORT.md",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "original-212-file-sha256.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "COPYINDEX.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-0",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-1",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-10",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-11",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-12",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-13",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-14",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-15",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-16",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-17",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-18",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-2",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-3",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-4",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-5",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-6",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-7",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-8",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/ack-9",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/app.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cleanup.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-0.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-1.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-10.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-11.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-12.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-13.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-14.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-15.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-16.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-17.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-18.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-19.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-2.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-3.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-4.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-5.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-6.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-7.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-8.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/cmd-9.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "shadow-auth/identity.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "xrdp-negative/app.log",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "xrdp-negative/cleanup.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    },
+    {
+      "file": "xrdp-negative/identity.json",
+      "checks": {
+        "private_key_block": 0,
+        "literal_sam_record": 0,
+        "credential_literal": 0
+      }
+    }
+  ]
+}

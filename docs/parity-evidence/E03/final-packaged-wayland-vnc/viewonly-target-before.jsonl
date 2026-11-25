@@ -1,0 +1,25 @@
+{"kind": "mapped", "time": 22028.419269353}
+{"kind": "motion", "time": 22102.993178451, "x": 230.0, "y": 181.0}
+{"kind": "button-down", "time": 22103.656559573, "button": 1, "x": 230.0, "y": 181.0}
+{"kind": "button-up", "time": 22104.311600207, "button": 1, "x": 230.0, "y": 181.0}
+{"kind": "key-down", "time": 22104.937772765, "keyval": 97, "keycode": 38, "state": 0}
+{"kind": "key-down", "time": 22105.437585221, "keyval": 97, "keycode": 38, "state": 0}
+{"kind": "key-down", "time": 22105.467548386, "keyval": 97, "keycode": 38, "state": 0}
+{"kind": "key-down", "time": 22105.499645011, "keyval": 97, "keycode": 38, "state": 0}
+{"kind": "key-down", "time": 22105.528910895, "keyval": 97, "keycode": 38, "state": 0}
+{"kind": "key-down", "time": 22105.558768541, "keyval": 97, "keycode": 38, "state": 0}
+{"kind": "key-up", "time": 22105.582502867, "keyval": 97, "keycode": 38, "state": 0}
+{"kind": "key-down", "time": 22106.211702195, "keyval": 65505, "keycode": 50, "state": 0}
+{"kind": "motion", "time": 22106.849585708, "x": 280.0, "y": 191.0}
+{"kind": "button-down", "time": 22106.850551293, "button": 1, "x": 280.0, "y": 191.0}
+{"kind": "key-up", "time": 22107.49055921, "keyval": 65505, "keycode": 50, "state": 257}
+{"kind": "button-up", "time": 22107.490873941, "button": 1, "x": 280.0, "y": 191.0}
+{"kind": "key-down", "time": 22122.129473918, "keyval": 65505, "keycode": 50, "state": 0}
+{"kind": "key-down", "time": 22122.779300839, "keyval": 65513, "keycode": 64, "state": 1}
+{"kind": "key-up", "time": 22181.811731061, "keyval": 65289, "keycode": 23, "state": 8}
+{"kind": "key-up", "time": 22181.812137785, "keyval": 65513, "keycode": 64, "state": 8}
+{"kind": "key-down", "time": 22182.793519902, "keyval": 98, "keycode": 56, "state": 0}
+{"kind": "key-up", "time": 22182.863352987, "keyval": 98, "keycode": 56, "state": 0}
+{"kind": "key-down", "time": 22183.518240575, "keyval": 65513, "keycode": 64, "state": 0}
+{"kind": "key-up", "time": 22299.88167065, "keyval": 65289, "keycode": 23, "state": 8}
+{"kind": "key-up", "time": 22299.882182402, "keyval": 65513, "keycode": 64, "state": 8}

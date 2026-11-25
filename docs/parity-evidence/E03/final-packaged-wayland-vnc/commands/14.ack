@@ -1,0 +1,1 @@
+{"ok": true, "time": 22056.94280139, "authenticated": true, "dimensions": [1600, 1000]}

@@ -1,0 +1,1 @@
+{"ok": true, "time": 22388.225930509, "app_alive": true, "target_alive": true, "compositor_alive": true, "product_helpers": [], "listener": false, "closed_sessions": 5, "private_persistence_scan": {"files": 5, "plaintext_password_hits": []}}

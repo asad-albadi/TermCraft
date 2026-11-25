@@ -1,0 +1,104 @@
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.freedesktop.impl.portal.PermissionStore' requested by ':1.9' (uid=1000 pid=91 comm="/usr/lib/xdg-desktop-portal -v")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.freedesktop.impl.portal.PermissionStore'
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.freedesktop.portal.Documents' requested by ':1.9' (uid=1000 pid=91 comm="/usr/lib/xdg-desktop-portal -v")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.freedesktop.portal.Documents'
+fuse: device /dev/fuse not found. Kernel module not loaded?
+error: fuse init failed: Can't mount path /tmp/real-runtime/doc
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.18' (uid=1000 pid=122 comm="python -I /home/asad/Documents/Craft Anything/moba")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.a11y.Bus'
+ERROR launcher_open_journal @ ../dbus-broker-37/src/launch/launcher.c +179: No such file or directory
+      launcher_open_log @ ../dbus-broker-37/src/launch/launcher.c +193
+      launcher_new @ ../dbus-broker-37/src/launch/launcher.c +223
+      run @ ../dbus-broker-37/src/launch/main.c +149
+      main @ ../dbus-broker-37/src/launch/main.c +178
+Exiting due to fatal error: -2
+
+** (process:129): CRITICAL **: 17:36:34.074: Unable to connect to the accessibility bus at 'unix:path=/tmp/real-runtime/at-spi/bus': Error receiving data: Connection reset by peer
+Failed to launch bus: Bus exited with code 1READY REAL GUI
+0 click {'ok': True, 'time': 22042.428727749}
+1 scroll {'ok': True, 'time': 22043.393298085}
+2 click {'ok': True, 'time': 22043.962532557}
+3 scroll {'ok': True, 'time': 22044.934082814}
+4 scroll {'ok': True, 'time': 22045.472680867}
+5 click {'ok': True, 'time': 22046.015827991}
+6 scroll {'ok': True, 'time': 22046.983864706}
+7 click {'ok': True, 'time': 22047.55150422}
+8 secret {'ok': True, 'time': 22048.518895402}
+9 click {'ok': True, 'time': 22050.389212178}
+10 click {'ok': True, 'time': 22051.344756843}
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.8' (uid=1000 pid=71 comm="/home/asad/Documents/Craft Anything/mobaxterm-pers")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.a11y.Bus'
+ERROR launcher_open_journal @ ../dbus-broker-37/src/launch/launcher.c +179: No such file or directory
+      launcher_open_log @ ../dbus-broker-37/src/launch/launcher.c +193
+      launcher_new @ ../dbus-broker-37/src/launch/launcher.c +223
+      run @ ../dbus-broker-37/src/launch/main.c +149
+      main @ ../dbus-broker-37/src/launch/main.c +178
+Exiting due to fatal error: -2
+
+** (process:256): CRITICAL **: 17:36:58.399: Unable to connect to the accessibility bus at 'unix:path=/tmp/real-runtime/at-spi/bus': Error receiving data: Connection reset by peer
+Failed to launch bus: Bus exited with code 111 click {'ok': True, 'time': 22052.290474837}
+12 click {'ok': True, 'time': 22054.335156012}
+13 click {'ok': True, 'time': 22055.337675451}
+14 rfb_connect {'ok': True, 'time': 22056.94280139, 'authenticated': True, 'dimensions': [1600, 1000]}
+15 inspect {'ok': True, 'time': 22057.593850279, 'app_alive': True, 'target_alive': True, 'compositor_alive': True, 'product_helpers': [{'pid': 333, 'ppid': 202, 'argv': 'termcraft-wayland-engine 51 none ', 'exe': '/memfd:termcraft-rdp-engine (deleted)', 'sha256': 'fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59'}], 'listener': True, 'closed_sessions': 0, 'private_persistence_scan': {'files': 5, 'plaintext_password_hits': []}}
+16 click {'ok': True, 'time': 22090.004108725}
+17 rfb_capture {'ok': True, 'time': 22092.667129152, 'width': 1600, 'height': 1000, 'server_name': 'TermCraft selected display (classic VNC)', 'pixels_sha256': '6081f460a7e70a527da5586e0b6a941fd72a2dc29558b632bfdb65614d24c97b', 'rfb_artifact': '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-packaged-wayland-vnc/final-reports/rfb-before-idle.rfb.png'}
+18 idle {'ok': True, 'time': 22093.504662739, 'idle_seconds': 8.000379558998247, 'native_observer_alive': True, 'listener_alive': True, 'product_helpers': [{'pid': 333, 'ppid': 202, 'argv': 'termcraft-wayland-engine 51 none ', 'exe': '/memfd:termcraft-rdp-engine (deleted)', 'sha256': 'fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59'}]}
+19 rfb_capture {'ok': True, 'time': 22102.173480946, 'width': 1600, 'height': 1000, 'server_name': 'TermCraft selected display (classic VNC)', 'pixels_sha256': '6081f460a7e70a527da5586e0b6a941fd72a2dc29558b632bfdb65614d24c97b', 'rfb_artifact': '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-packaged-wayland-vnc/final-reports/rfb-after-idle.rfb.png'}
+20 rfb_pointer {'ok': True, 'time': 22102.989271597}
+21 rfb_pointer {'ok': True, 'time': 22103.635428701}
+22 rfb_pointer {'ok': True, 'time': 22104.295717099}
+23 rfb_key {'ok': True, 'time': 22104.930523066}
+24 rfb_key {'ok': True, 'time': 22105.572440352}
+25 rfb_key {'ok': True, 'time': 22106.206340847}
+26 rfb_pointer {'ok': True, 'time': 22106.844394961}
+27 rfb_disconnect {'ok': True, 'time': 22107.484651104}
+28 inspect {'ok': True, 'time': 22108.740140854, 'app_alive': True, 'target_alive': True, 'compositor_alive': True, 'product_helpers': [{'pid': 333, 'ppid': 202, 'argv': 'termcraft-wayland-engine 51 none ', 'exe': '/memfd:termcraft-rdp-engine (deleted)', 'sha256': 'fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59'}], 'listener': True, 'closed_sessions': 0, 'private_persistence_scan': {'files': 5, 'plaintext_password_hits': []}}
+29 rfb_connect {'ok': True, 'time': 22121.414226109, 'authenticated': True, 'dimensions': [1600, 1000]}
+30 rfb_key {'ok': True, 'time': 22122.116755921}
+31 combo {'ok': True, 'time': 22122.778026544}
+32 click_and_wait_closed {'ok': True, 'time': 22149.092900916, 'pre_listener': True, 'pre_helpers': [{'pid': 333, 'ppid': 202, 'argv': 'termcraft-wayland-engine 51 none ', 'exe': '/memfd:termcraft-rdp-engine (deleted)', 'sha256': 'fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59'}], 'pre_closed_sessions': 0, 'cleanup_seconds': 0.4471345560014015, 'post_listener': False, 'post_helpers': [], 'post_closed_sessions': 1}
+33 rfb_probe_closed {'ok': True, 'time': 22150.725467709, 'eof': True}
+34 inspect {'ok': True, 'time': 22151.279914202, 'app_alive': True, 'target_alive': True, 'compositor_alive': True, 'product_helpers': [], 'listener': False, 'closed_sessions': 1, 'private_persistence_scan': {'files': 5, 'plaintext_password_hits': []}}
+35 combo {'ok': True, 'time': 22181.241790511}
+36 key {'ok': True, 'time': 22182.791264452}
+37 combo {'ok': True, 'time': 22183.517169712}
+38 click {'ok': True, 'time': 22185.069351886}
+39 combo {'ok': True, 'time': 22186.05840729}
+40 inspect {'ok': True, 'time': 22187.02711343, 'app_alive': True, 'target_alive': True, 'compositor_alive': True, 'product_helpers': [], 'listener': False, 'closed_sessions': 1, 'private_persistence_scan': {'files': 5, 'plaintext_password_hits': []}}
+41 secret {'ok': True, 'time': 22212.211175877}
+42 click {'ok': True, 'time': 22214.091541545}
+43 click {'ok': True, 'time': 22215.877606634}
+44 click {'ok': True, 'time': 22216.87923568}
+45 rfb_connect {'ok': True, 'time': 22218.482505711, 'authenticated': True, 'dimensions': [1600, 1000]}
+46 inspect {'ok': True, 'time': 22219.115467594, 'app_alive': True, 'target_alive': True, 'compositor_alive': True, 'product_helpers': [{'pid': 437, 'ppid': 202, 'argv': 'termcraft-wayland-engine 51 none ', 'exe': '/memfd:termcraft-rdp-engine (deleted)', 'sha256': 'fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59'}], 'listener': True, 'closed_sessions': 1, 'private_persistence_scan': {'files': 5, 'plaintext_password_hits': []}}
+47 revoke {'ok': True, 'time': 22219.748445438, 'session': '/org/freedesktop/portal/desktop/session/1_114/harbor_5', 'pre_listener': True, 'pre_helpers': [{'pid': 437, 'ppid': 202, 'argv': 'termcraft-wayland-engine 51 none ', 'exe': '/memfd:termcraft-rdp-engine (deleted)', 'sha256': 'fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59'}], 'cleanup_seconds': 0.21660729300128878, 'post_listener': False, 'post_helpers': [], 'closed_sessions': 2}
+48 rfb_probe_closed {'ok': True, 'time': 22221.165694607, 'eof': True}
+49 inspect {'ok': True, 'time': 22221.727158404, 'app_alive': True, 'target_alive': True, 'compositor_alive': True, 'product_helpers': [], 'listener': False, 'closed_sessions': 2, 'private_persistence_scan': {'files': 5, 'plaintext_password_hits': []}}
+50 click {'ok': True, 'time': 22247.012031605}
+51 click {'ok': True, 'time': 22248.029189009}
+52 secret {'ok': True, 'time': 22249.032275142}
+53 click {'ok': True, 'time': 22250.907230555}
+54 click {'ok': True, 'time': 22296.795851235}
+55 rfb_connect {'ok': True, 'time': 22298.416535565, 'authenticated': True, 'dimensions': [1600, 1000]}
+56 combo {'ok': True, 'time': 22299.048431299}
+57 rfb_capture {'ok': True, 'time': 22300.609652837, 'width': 1600, 'height': 1000, 'server_name': 'TermCraft selected display (classic VNC)', 'pixels_sha256': '9c948b48d1ce4a70e739ce35923a166c1c9bbca16905e7372a08f7e12fd0670f', 'rfb_artifact': '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-packaged-wayland-vnc/final-reports/viewonly-rfb-capture.rfb.png'}
+58 rfb_key {'ok': True, 'time': 22301.396529691}
+59 rfb_key {'ok': True, 'time': 22301.982970725}
+60 rfb_pointer {'ok': True, 'time': 22302.568876372}
+61 rfb_pointer {'ok': True, 'time': 22303.15925548}
+62 inspect {'ok': True, 'time': 22303.751264061, 'app_alive': True, 'target_alive': True, 'compositor_alive': True, 'product_helpers': [{'pid': 496, 'ppid': 202, 'argv': 'termcraft-wayland-engine 54 none ', 'exe': '/memfd:termcraft-rdp-engine (deleted)', 'sha256': 'fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59'}], 'listener': True, 'closed_sessions': 2, 'private_persistence_scan': {'files': 5, 'plaintext_password_hits': []}}
+63 combo {'ok': True, 'time': 22333.039946638}
+64 click_and_wait_closed {'ok': True, 'time': 22334.609741647, 'pre_listener': True, 'pre_helpers': [{'pid': 496, 'ppid': 202, 'argv': 'termcraft-wayland-engine 54 none ', 'exe': '/memfd:termcraft-rdp-engine (deleted)', 'sha256': 'fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59'}], 'pre_closed_sessions': 2, 'cleanup_seconds': 0.44784252799945534, 'post_listener': False, 'post_helpers': [], 'post_closed_sessions': 3}
+65 rfb_probe_closed {'ok': True, 'time': 22336.274541117, 'eof': True}
+66 click {'ok': True, 'time': 22336.832113619}
+67 secret {'ok': True, 'time': 22337.825170829}
+68 click {'ok': True, 'time': 22339.707062338}
+69 click {'ok': True, 'time': 22341.50985612}
+70 inspect {'ok': True, 'time': 22343.087826694, 'app_alive': True, 'target_alive': True, 'compositor_alive': True, 'product_helpers': [], 'listener': False, 'closed_sessions': 4, 'private_persistence_scan': {'files': 5, 'plaintext_password_hits': []}}
+71 click {'ok': True, 'time': 22381.978445009}
+72 secret {'ok': True, 'time': 22382.970721469}
+73 click {'ok': True, 'time': 22384.827328729}
+74 click_and_wait_closed {'ok': True, 'time': 22386.59723676, 'pre_listener': False, 'pre_helpers': [], 'pre_closed_sessions': 4, 'cleanup_seconds': 0.4271534840008826, 'post_listener': False, 'post_helpers': [], 'post_closed_sessions': 5}
+75 inspect {'ok': True, 'time': 22388.225930509, 'app_alive': True, 'target_alive': True, 'compositor_alive': True, 'product_helpers': [], 'listener': False, 'closed_sessions': 5, 'private_persistence_scan': {'files': 5, 'plaintext_password_hits': []}}
+fixture screenshot reader ended EOFError()

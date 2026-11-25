@@ -1,0 +1,3 @@
+freerdp2-shadow-x11	2.11.7+dfsg1-6~deb12u1
+libfreerdp2-2:amd64	2.11.7+dfsg1-6~deb12u1
+xvfb	2:21.1.7-3+deb12u13

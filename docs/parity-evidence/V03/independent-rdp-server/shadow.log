@@ -1,0 +1,172 @@
+[13:37:00:253] [12:18] [ERROR][com.freerdp.core.peer] - peer_recv_callback: CONNECTION_STATE_INITIAL - rdp_server_accept_nego() fail
+[13:37:00:253] [12:18] [ERROR][com.freerdp.core.transport] - transport_check_fds: transport->ReceiveCallback() - -1
+[13:37:00:253] [12:18] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor
+[13:37:50:065] [12:41] [ERROR][com.freerdp.core.peer] - peer_recv_callback: CONNECTION_STATE_INITIAL - rdp_server_accept_nego() fail
+[13:37:50:065] [12:41] [ERROR][com.freerdp.core.transport] - transport_check_fds: transport->ReceiveCallback() - -1
+[13:37:50:065] [12:41] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor
+[13:38:33:754] [12:43] [ERROR][com.freerdp.core.peer] - peer_recv_callback: CONNECTION_STATE_INITIAL - rdp_server_accept_nego() fail
+[13:38:33:754] [12:43] [ERROR][com.freerdp.core.transport] - transport_check_fds: transport->ReceiveCallback() - -1
+[13:38:33:754] [12:43] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor
+[13:38:47:047] [12:45] [ERROR][com.freerdp.core.transport] - BIO_read returned a system error 0: Success
+[13:38:47:047] [12:45] [ERROR][com.freerdp.core] - transport_read_layer:freerdp_set_last_error_ex ERRCONNECT_CONNECT_TRANSPORT_FAILED [0x0002000D]
+[13:38:47:047] [12:45] [ERROR][com.freerdp.core.nla] - [nla_recv] error: -1
+[13:38:47:047] [12:45] [ERROR][com.freerdp.core.transport] - client authentication failure
+[13:38:47:047] [12:45] [WARN][com.freerdp.core.nla] - DeleteSecurityContext status SEC_E_SECPKG_NOT_FOUND [0x80090305]
+[13:38:47:047] [12:45] [ERROR][com.freerdp.core.peer] - peer_recv_callback: CONNECTION_STATE_INITIAL - rdp_server_accept_nego() fail
+[13:38:47:047] [12:45] [ERROR][com.freerdp.core.transport] - transport_check_fds: transport->ReceiveCallback() - -1
+[13:38:47:047] [12:45] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor
+[13:38:58:317] [12:47] [ERROR][com.freerdp.core.peer] - peer_recv_callback: CONNECTION_STATE_INITIAL - rdp_server_accept_nego() fail
+[13:38:58:318] [12:47] [ERROR][com.freerdp.core.transport] - transport_check_fds: transport->ReceiveCallback() - -1
+[13:38:58:318] [12:47] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor
+[13:39:09:773] [12:49] [ERROR][com.freerdp.core.peer] - peer_recv_callback: CONNECTION_STATE_INITIAL - rdp_server_accept_nego() fail
+[13:39:09:773] [12:49] [ERROR][com.freerdp.core.transport] - transport_check_fds: transport->ReceiveCallback() - -1
+[13:39:09:773] [12:49] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor
+[13:39:20:756] [12:51] [WARN][com.winpr.negotiate] - AcceptSecurityContext status SEC_I_CONTINUE_NEEDED [0x00090312]
+[13:39:20:757] [12:51] [WARN][com.winpr.negotiate] - AcceptSecurityContext status SEC_I_COMPLETE_NEEDED [0x00090313]
+[13:39:20:757] [12:51] [ERROR][com.winpr.sspi.NTLM] - Message Integrity Check (MIC) verification failed!
+[13:39:20:757] [12:51] [WARN][com.winpr.sspi] - CompleteAuthToken status SEC_E_MESSAGE_ALTERED [0x8009030F]
+[13:39:20:757] [12:51] [WARN][com.freerdp.core.nla] - CompleteAuthToken status SEC_E_MESSAGE_ALTERED [0x8009030F]
+[13:39:20:757] [12:51] [ERROR][com.freerdp.core.transport] - client authentication failure
+[13:39:20:757] [12:51] [ERROR][com.freerdp.core.peer] - peer_recv_callback: CONNECTION_STATE_INITIAL - rdp_server_accept_nego() fail
+[13:39:20:757] [12:51] [ERROR][com.freerdp.core.transport] - transport_check_fds: transport->ReceiveCallback() - -1
+[13:39:20:757] [12:51] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor
+[13:39:36:459] [12:53] [ERROR][com.freerdp.core.peer] - peer_recv_callback: CONNECTION_STATE_INITIAL - rdp_server_accept_nego() fail
+[13:39:36:459] [12:53] [ERROR][com.freerdp.core.transport] - transport_check_fds: transport->ReceiveCallback() - -1
+[13:39:36:459] [12:53] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor
+[13:39:53:929] [12:55] [WARN][com.winpr.negotiate] - AcceptSecurityContext status SEC_I_CONTINUE_NEEDED [0x00090312]
+[13:39:53:930] [12:55] [WARN][com.winpr.negotiate] - AcceptSecurityContext status SEC_I_COMPLETE_NEEDED [0x00090313]
+[13:39:53:930] [12:55] [ERROR][com.winpr.sspi.NTLM] - Message Integrity Check (MIC) verification failed!
+[13:39:53:930] [12:55] [WARN][com.winpr.sspi] - CompleteAuthToken status SEC_E_MESSAGE_ALTERED [0x8009030F]
+[13:39:53:930] [12:55] [WARN][com.freerdp.core.nla] - CompleteAuthToken status SEC_E_MESSAGE_ALTERED [0x8009030F]
+[13:39:53:930] [12:55] [ERROR][com.freerdp.core.transport] - client authentication failure
+[13:39:53:930] [12:55] [ERROR][com.freerdp.core.peer] - peer_recv_callback: CONNECTION_STATE_INITIAL - rdp_server_accept_nego() fail
+[13:39:53:930] [12:55] [ERROR][com.freerdp.core.transport] - transport_check_fds: transport->ReceiveCallback() - -1
+[13:39:53:930] [12:55] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor
+[13:40:13:776] [12:66] [ERROR][com.freerdp.core.peer] - peer_recv_callback: CONNECTION_STATE_INITIAL - rdp_server_accept_nego() fail
+[13:40:13:776] [12:66] [ERROR][com.freerdp.core.transport] - transport_check_fds: transport->ReceiveCallback() - -1
+[13:40:13:776] [12:66] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor
+[13:40:24:072] [12:68] [WARN][com.winpr.negotiate] - AcceptSecurityContext status SEC_I_CONTINUE_NEEDED [0x00090312]
+[13:40:24:072] [12:68] [WARN][com.winpr.negotiate] - AcceptSecurityContext status SEC_I_COMPLETE_NEEDED [0x00090313]
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:45:966] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:40:55:812] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:41:13:101] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:42:10:067] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:42:10:067] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:42:10:067] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:42:10:067] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:42:10:067] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:42:10:067] [12:68] [WARN][com.freerdp.server.shadow.x11] - x11_shadow_input_unicode_keyboard_event not implemented
+[13:42:18:766] [12:68] [ERROR][com.freerdp.core.transport] - BIO_read returned a system error 0: Success
+[13:42:18:766] [12:68] [ERROR][com.freerdp.core] - transport_read_layer:freerdp_set_last_error_ex ERRCONNECT_CONNECT_TRANSPORT_FAILED [0x0002000D]
+[13:42:18:766] [12:68] [ERROR][com.freerdp.client.shadow] - Failed to check FreeRDP file descriptor

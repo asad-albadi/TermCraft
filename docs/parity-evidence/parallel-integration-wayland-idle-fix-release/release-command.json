@@ -1,0 +1,58 @@
+{
+  "helper_command": [
+    "cargo",
+    "build",
+    "--release",
+    "--locked",
+    "--offline",
+    "--manifest-path",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-local-completion-cpu0-1961/package-sources/d1a54c2ec020d0bc2a4e731184065bc33c28362f9b56f9bd95401f8a14947b9f/engines/wayland/Cargo.toml",
+    "--target-dir",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-local-completion-cpu0-1961/package-wayland"
+  ],
+  "package_command": [
+    "python3",
+    "scripts/package-release.py",
+    "--platform",
+    "linux",
+    "--output",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-post-wayland-idle-fix-reviewed",
+    "--xwayland-archive",
+    "/var/cache/pacman/pkg/xorg-xwayland-24.1.15-1-x86_64.pkg.tar.zst",
+    "--xephyr-archive",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04/source-packages/xephyr.pkg.tar.zst",
+    "--mosh-archive",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/mosh-1.4.0-35-x86_64.pkg.tar.zst",
+    "--mosh-source",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/mosh-1.4.0.tar.gz",
+    "--mosh-recipe",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/PKGBUILD",
+    "--mosh-dependencies",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/mosh-input-recovery/newcache",
+    "--iperf-runtime",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b03",
+    "--unix-cache",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/p05-cache",
+    "--browser-inputs",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p01-browser/browser-inputs",
+    "--wayland-helper-binary",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-local-completion-cpu0-1961/package-wayland/release/termcraft-wayland-engine",
+    "--build-root",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-local-completion-cpu0-1961"
+  ],
+  "environment": {
+    "TERMCRAFT_OFFLINE": "1",
+    "CARGO_BUILD_JOBS": "2",
+    "RUST_MIN_STACK": "134217728",
+    "RUSTUP_HOME": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961",
+    "RUSTUP_TOOLCHAIN": "1.96.1",
+    "PATH_PREFIX": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/root-validation/serial-release-cargo:/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin"
+  },
+  "effective_CARGO_BUILD_JOBS": "2",
+  "actual_cargo_wrapper": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/root-validation/serial-release-cargo/cargo",
+  "actual_wrapper_sha256": "30d3b7b2e84e5c3fc43cd5e91d8ee04954c57443a1e22b7ce0b108cd5ad7b47d",
+  "source_snapshot": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-local-completion-cpu0-1961/package-sources/d1a54c2ec020d0bc2a4e731184065bc33c28362f9b56f9bd95401f8a14947b9f",
+  "cpu_affinity": [
+    0
+  ]
+}

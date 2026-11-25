@@ -1,0 +1,1 @@
+owned remote Xterm fixture keyboard focus selected 1

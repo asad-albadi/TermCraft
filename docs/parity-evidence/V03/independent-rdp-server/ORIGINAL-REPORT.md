@@ -1,0 +1,32 @@
+# Independent Linux RDP representative qualification — 2026-11-25
+
+Bounded positive: a genuine packaged TermCraft application authenticated through verified TLS/NLA to independently packaged Debian FreeRDP shadow 2.11.7 and displayed its owned Xvfb/Xterm desktop. Actual application pointer and supported scan-code keyboard input crossed RDP and reached remote X11. No MAIN code, build output, packaging or tracked documentation changed in this task.
+
+The package is the qualified `398d19fc6dbdf7d7dd5ee2a3a71ae8eda907bbbb31ad0117031c3a73fb106fe5` extraction. Its package manifest identifies source snapshot `22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04`. Executed application SHA-256 `c8d09ba5fd2c36d567c6885f117d6068e2a87185648db883853cde84d678f7e6`; RDP helper `85f33c8c7987cf84d73748c2d33283cf9878426febcbfed72a3f26acb42beba6`. Copied manifest and exact argv are retained. Parent reports newer genuine source-d1a54 package reproduces these two binary hashes; this task did not execute that newer extraction.
+
+## Positive observations
+
+- `shadow-auth/app.png` shows the explicit certificate challenge. Its SHA-256 matches `shadow-certificate-fingerprint.txt`, independently obtained from owned server certificate before successful sign-in. The run used Trust once; synthetic password only followed verified TLS. No trust bypass, NLA downgrade, host identity or saved credentials.
+- `shadow-auth/action-2.png` contains masked synthetic password entry; `action-3.png` shows Connected RDP and live owned Xterm desktop. Blue pixel `(23,59,86)` matches fixture Xterm `-bg #173b56`.
+- Actual independent server `remote-xev.log` records one pointer ButtonPress/ButtonRelease at remote root `(128,79)`, F3 KeyPress/KeyRelease (keycode 69, keysym `0xffc0`), and Return KeyPress/KeyRelease (36, `0xff0d`). `shadow-auth/cmd-14.json`, `cmd-16.json`, `cmd-18.json` are corresponding application actions. Remote focus was explicitly set within the fixture because Xvfb has no window manager; no remote XTEST injection produced these RDP observations. Final screenshot `action-18.png` shows owned Xev desktop.
+- `shadow-auth/identity.json` records package hashes, argv and private client namespace. `shadow-versions.txt`, `container-identities.txt` record exact Debian packages/image IDs and `network=none`, no published ports. AF_UNIX transports inside owned workspace connect isolated client loopback to isolated container loopback. Private Xvfb had no TCP listener; no host display/input/clipboard was used.
+
+## Explicit limits and negatives
+
+FreeRDP shadow is an independent NLA desktop server, not a full Windows desktop service. Normal text sent as Unicode keyboard PDUs is ignored by this server: actual `shadow.log` reports `x11_shadow_input_unicode_keyboard_event not implemented`; tagged upstream 2.11.7 `upstream-x11-shadow.c` has the corresponding TODO. Special scan-code keyboard events above are independently observed. A typed `touch /tmp/rdpinput` did **not** create a file and is not a passing input case.
+
+Bidirectional clipboard and a writable owned drive were selected, but this server never made clipboard ready and no redirected-drive access was established. Tagged upstream `upstream-shadow-channels.c` initializes only ENCOMSP, REMDESK, audio and graphics, with no clipboard or drive provider. The application shows Waiting for server clipboard channel. This is server-limited; independent clipboard/drive interoperability remains unverified, not passed. The empty private drive is not evidence of redirection.
+
+`xrdp-negative/app.png` shows explicit `RDP security negotiation failed; this connection requires NLA`. Exact xrdp 0.9.21.1 log rejects the requested HYBRID/HYBRID_EX modes because it requires TLS-only security (`selected []`); no desktop or credential authentication occurred. This is an honest compatibility limit, not success. A separately selected TLS configuration returned to Home without an enduring visible diagnostic (`tls-preflight/app.png`); it is retained but not counted as a successful or diagnostic-negative case. Source capabilities explicitly mark TLS graphical sign-in unavailable.
+
+No physical/native Windows/macOS, smartcard/printer/serial hardware, external gateway, original Personal product, every-server matrix or 60/60 parity is claimed. Overall parent progress stays 46/60 = 76.7%.
+
+## Reproduction, fixture corrections and cleanup
+
+Build the owned Debian image with `docker build -f Dockerfile -t termcraft-independent-rdp:owned .`. Generate a new private synthetic password file mode 0600; never publish it. Run `shadow.py` inside `--network none` with this directory mounted `/evidence`. Launch `run-xvfb.sh PACKAGE /usr/bin/python -I probe-shadow-auth.py PACKAGE shadow-auth-new`; choose a fresh output and provide observed-coordinate command JSON. It launches the actual app `--data-dir OWNED --session owned-rdp`, no wrapper UI or fake executable. The tested client Xvfb is an existing extracted fixture, `target/validation/v08-clean-namespace/rootfs/usr/bin/Xvfb`; its hash is in `evidence.json`.
+
+The success script `probe-shadow-auth.py` is reconstructed from `probe.py` by reversing the sole subsequent edit changing initial screenshot delay from 4 to 10 seconds. It was not pre-sealed; this limitation is explicit. Package bytes and result artifact hashes are sealed. `probe.py` final delay was used for the corrected xrdp negative.
+
+Earlier failed attempts remain retained: read-only output bind, loopback initialization privilege, AF_UNIX path too long, Cage/Xwayland EI input unavailable, Xlib extension event decoding, keyboard special-character lookup and missing Xvfb keyboard focus. They are fixture errors and do not count as product failures or passes. Missing keyboard focus caused empty passwords and genuine NLA rejection; only `shadow-auth` is the successful authenticated run. No product patch was needed.
+
+All application runs were bounded. Owned app termination is recorded as SIGTERM (-15); this establishes fixture teardown, not a graceful product-close assertion. Namespace teardown destroys its helper/display processes. Both owned containers stopped (bounded stop required SIGKILL, exit 137) and were removed; records retained. Private password and socket files were deleted; ephemeral container SAM hashes/private certificate keys disappeared with removed containers. Retained images contain software only. `cleanup-verification.json` checks no matching application process, container, secret or transport socket remains.

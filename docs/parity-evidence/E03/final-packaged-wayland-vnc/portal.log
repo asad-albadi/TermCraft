@@ -1,0 +1,747 @@
+XDP: load portals from /tmp/real-data/xdg-desktop-portal/portals
+XDP: loading /tmp/real-data/xdg-desktop-portal/portals/gnome.portal
+XDP: portal implementation supports org.freedesktop.impl.portal.Access
+XDP: portal implementation supports org.freedesktop.impl.portal.Account
+XDP: portal implementation supports org.freedesktop.impl.portal.AppChooser
+XDP: portal implementation supports org.freedesktop.impl.portal.Background
+XDP: portal implementation supports org.freedesktop.impl.portal.Clipboard
+XDP: portal implementation supports org.freedesktop.impl.portal.DynamicLauncher
+XDP: portal implementation supports org.freedesktop.impl.portal.FileChooser
+XDP: portal implementation supports org.freedesktop.impl.portal.GlobalShortcuts
+XDP: portal implementation supports org.freedesktop.impl.portal.InputCapture
+XDP: portal implementation supports org.freedesktop.impl.portal.Lockdown
+XDP: portal implementation supports org.freedesktop.impl.portal.Notification
+XDP: portal implementation supports org.freedesktop.impl.portal.Print
+XDP: portal implementation supports org.freedesktop.impl.portal.RemoteDesktop
+XDP: portal implementation supports org.freedesktop.impl.portal.ScreenCast
+XDP: portal implementation supports org.freedesktop.impl.portal.Screenshot
+XDP: portal implementation supports org.freedesktop.impl.portal.Settings
+XDP: portal implementation supports org.freedesktop.impl.portal.Usb
+XDP: portal implementation supports org.freedesktop.impl.portal.Wallpaper
+XDP: Looking for portals configuration in '/tmp/real-data/xdg-desktop-portal/portals/gnome-portals.conf'
+XDP: Looking for portals configuration in '/tmp/real-data/xdg-desktop-portal/portals/portals.conf'
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.681: Document portal fuse mount point unknown: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name :1.11 was not provided by any .service files
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.681: Choosing gnome.portal for org.freedesktop.impl.portal.Lockdown via the deprecated UseIn key
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.681: The preferred method to match portal implementations to desktop environments is to use the portals.conf(5) configuration file
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Lockdown in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.682: Choosing gnome.portal for org.freedesktop.impl.portal.Access via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Access in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.MemoryMonitor
+XDP: Providing portal org.freedesktop.portal.PowerProfileMonitor
+XDP: Providing portal org.freedesktop.portal.NetworkMonitor
+XDP: Providing portal org.freedesktop.portal.ProxyResolver
+XDP: Providing portal org.freedesktop.portal.Trash
+XDP: Providing portal org.freedesktop.portal.GameMode
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.693: Failed to create RealtimeKit proxy: Could not connect: No such file or directory
+XDP: Providing portal org.freedesktop.portal.Realtime
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.693: Choosing gnome.portal for org.freedesktop.impl.portal.Settings via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Settings in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Settings
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.694: Choosing gnome.portal for org.freedesktop.impl.portal.FileChooser via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.FileChooser in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.FileChooser
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.695: Choosing gnome.portal for org.freedesktop.impl.portal.AppChooser via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.AppChooser in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.OpenURI
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.696: Choosing gnome.portal for org.freedesktop.impl.portal.Print via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Print in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Print
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.697: Choosing gnome.portal for org.freedesktop.impl.portal.Notification via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Notification in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Notification
+XDP: Providing portal org.freedesktop.portal.Location
+XDP: Providing portal org.freedesktop.portal.Camera
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.702: Choosing gnome.portal for org.freedesktop.impl.portal.Screenshot via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Screenshot in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Screenshot
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.703: Choosing gnome.portal for org.freedesktop.impl.portal.Background via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Background in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Background
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.706: Choosing gnome.portal for org.freedesktop.impl.portal.Wallpaper via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Wallpaper in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Wallpaper
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.707: Choosing gnome.portal for org.freedesktop.impl.portal.Account via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Account in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Account
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.708: Choosing gnome.portal for org.freedesktop.impl.portal.GlobalShortcuts via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.GlobalShortcuts in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.GlobalShortcuts
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.709: Choosing gnome.portal for org.freedesktop.impl.portal.DynamicLauncher via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.DynamicLauncher in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.DynamicLauncher
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.710: Choosing gnome.portal for org.freedesktop.impl.portal.ScreenCast via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.ScreenCast in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.ScreenCast
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.711: Choosing gnome.portal for org.freedesktop.impl.portal.RemoteDesktop via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.RemoteDesktop in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.RemoteDesktop
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.712: Choosing gnome.portal for org.freedesktop.impl.portal.Clipboard via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Clipboard in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.Clipboard
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.713: Choosing gnome.portal for org.freedesktop.impl.portal.InputCapture via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.InputCapture in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.InputCapture
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:36:31.714: Choosing gnome.portal for org.freedesktop.impl.portal.Usb via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Usb in gnome (fallback)
+XDP: [usb] Initializing USB portal
+XDP: Assigned unique ID dD8rFzX1LoaprGmn8Kf2Uw to USB device /sys/devices/pci0000:00/0000:00:02.2/0000:02:00.4/usb2
+XDP: Assigned unique ID NDvVieiDOwjtJJD40t669A to USB device /sys/devices/pci0000:00/0000:00:02.7/0000:06:00.0/usb6
+XDP: Assigned unique ID fAQQ_dw3ArKunrm28Ty1lw to USB device /sys/devices/pci0000:00/0000:00:02.7/0000:06:00.0/usb6/6-2
+XDP: Assigned unique ID 4jc5NAIY007ZC9FQYy6RRQ to USB device /sys/devices/pci0000:00/0000:00:02.7/0000:06:00.0/usb7
+XDP: Assigned unique ID lTyGDXwAn5VTmMYQppQiQg to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.3/usb1
+XDP: Assigned unique ID SCd922E4Z1mGhDrtLB0Agg to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.3/usb1/1-2
+XDP: Assigned unique ID NNru5WwEbQKaGTiD938GRg to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.3/usb1/1-4
+XDP: Assigned unique ID MTNi9D11aKldvN_8uRvwtw to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.3/usb3
+XDP: Assigned unique ID ZRhYHmoj4J8tHasfITWMVw to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.4/usb4
+XDP: Assigned unique ID VlMd_DKlP_ZWXlffPmAihA to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.4/usb4/4-3
+XDP: Assigned unique ID l31X0m7C7fCoSYqGnINe9Q to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.4/usb4/4-4
+XDP: Assigned unique ID 1vx1XipVEcewfBYhN3fcEg to USB device /sys/devices/pci0000:00/0000:00:08.1/0000:07:00.4/usb5
+XDP: Providing portal org.freedesktop.portal.Usb
+XDP: Providing portal org.freedesktop.host.portal.Registry
+XDP: org.freedesktop.portal.Desktop acquired
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.18
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.20
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.20
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.21
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.21
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.22
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.22
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.23
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.23
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.24
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.24
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.25
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.25
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.26
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.26
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.27
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.27
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.28
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.28
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.29
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.29
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.30
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.30
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.31
+XDP: remote desktop session owned by ':1.31' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.33
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.33
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.34
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.34
+XDP: remote desktop session owned by ':1.31' started
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.35
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.35
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.36
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.36
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.37
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.37
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.38
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.38
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.39
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.39
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.40
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.40
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.41
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.41
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.42
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.42
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.43
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.43
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.44
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.44
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.45
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.45
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.46
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.46
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.47
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.47
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.48
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.48
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.49
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.49
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.50
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.50
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.51
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.51
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.52
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.52
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.53
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.53
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.54
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.54
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.55
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.55
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.56
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.56
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.57
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.57
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.58
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.58
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.59
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.59
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.60
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.60
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.61
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.61
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.62
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.62
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.63
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.63
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.64
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.64
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.65
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.65
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.66
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.66
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.67
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.67
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.31
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.68
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.68
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.69
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.69
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.70
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.70
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.71
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.71
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.72
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.72
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.73
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.73
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.74
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.74
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.75
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.75
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.76
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.76
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.77
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.77
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.78
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.78
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.79
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.79
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.80
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.80
+XDP: remote desktop session owned by ':1.31' closed
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.31
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.81
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.81
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.82
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.82
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.83
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.83
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.84
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.84
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.85
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.85
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.86
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.86
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.87
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.87
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.88
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.88
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.89
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.89
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.90
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.90
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.91
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.91
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.92
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.92
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.93
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.93
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.94
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.94
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.95
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.95
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.96
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.96
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.97
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.97
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.98
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.98
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.99
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.99
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.100
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.100
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.101
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.101
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.102
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.102
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.103
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.103
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.104
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.104
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.105
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.105
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.106
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.106
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.107
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.107
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.108
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.108
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.109
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.109
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.110
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.110
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.111
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.111
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.112
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.112
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.113
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.113
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.114
+XDP: remote desktop session owned by ':1.114' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.114
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.114
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.114
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.115
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.115
+XDP: remote desktop session owned by ':1.114' started
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.114
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.116
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.116
+XDP: remote desktop session owned by ':1.114' closed
+
+(/usr/lib/xdg-desktop-portal:91): xdg-desktop-portal-WARNING **: 17:39:45.679: Failed to close session implementation: GDBus.Error:org.freedesktop.DBus.Error.UnknownMethod: Object does not exist at path “/org/freedesktop/portal/desktop/session/1_114/harbor_5”
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.114
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.117
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.117
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.118
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.118
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.119
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.119
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.120
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.120
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.121
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.121
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.122
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.122
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.123
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.123
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.124
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.124
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.125
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.125
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.126
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.126
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.127
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.127
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.128
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.128
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.129
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.129
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.130
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.130
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.131
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.131
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.132
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.132
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.133
+XDP: screen cast session owned by ':1.133' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.133
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.133
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.134
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.134
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.135
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.135
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.136
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.136
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.137
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.137
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.138
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.138
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.139
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.139
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.140
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.140
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.141
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.141
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.142
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.142
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.143
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.143
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.144
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.144
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.145
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.145
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.146
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.146
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.147
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.147
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.148
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.148
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.149
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.149
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.150
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.150
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.151
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.151
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.152
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.152
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.153
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.153
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.154
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.154
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.155
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.155
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.156
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.156
+XDP: screen cast session owned by ':1.133' started
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.133
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.157
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.157
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.158
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.158
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.159
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.159
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.160
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.160
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.161
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.161
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.162
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.162
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.163
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.163
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.164
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.164
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.165
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.165
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.166
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.166
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.167
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.167
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.168
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.168
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.169
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.169
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.170
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.170
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.171
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.171
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.172
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.172
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.173
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.173
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.174
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.174
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.175
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.175
+XDP: screen cast session owned by ':1.133' closed
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.133
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.176
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.176
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.177
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.177
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.178
+XDP: screen cast session owned by ':1.178' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.178
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.178
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.179
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.179
+XDP: screen cast session owned by ':1.178' closed
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.178
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.180
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.180
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.181
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.181
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.182
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.182
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.183
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.183
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.184
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.184
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.185
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.185
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.186
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.186
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.187
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.187
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.188
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.188
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.189
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.189
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.190
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.190
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.191
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.191
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.192
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.192
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.193
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.193
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.194
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.194
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.195
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.195
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.196
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.196
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.197
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.197
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.198
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.198
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.199
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.199
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.200
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.200
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.201
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.201
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.202
+XDP: screen cast session owned by ':1.202' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.202
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.202
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.203
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.203
+XDP: screen cast session owned by ':1.202' closed
+XDP: Handling Close
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.202
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.204
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.204
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.205
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.205
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.206
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.206
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.207
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.207
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.208
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.208
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.209
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.209
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.210
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.210
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.211
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.211
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.212
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.212
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.213
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.213
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.214
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.214
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.215
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.215

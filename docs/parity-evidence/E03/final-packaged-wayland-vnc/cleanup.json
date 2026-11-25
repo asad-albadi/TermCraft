@@ -1,0 +1,42 @@
+[
+  {
+    "name": "mutter",
+    "pid": 6,
+    "returncode": 0
+  },
+  {
+    "name": "pipewire",
+    "pid": 68,
+    "returncode": 0
+  },
+  {
+    "name": "wireplumber",
+    "pid": 70,
+    "returncode": 0
+  },
+  {
+    "name": "gnome-portal",
+    "pid": 71,
+    "returncode": -15
+  },
+  {
+    "name": "portal",
+    "pid": 91,
+    "returncode": -15
+  },
+  {
+    "name": "fixture-helper",
+    "pid": 119,
+    "returncode": -15
+  },
+  {
+    "name": "owned-target",
+    "pid": 122,
+    "returncode": -15
+  },
+  {
+    "name": "genuine-packaged-app",
+    "pid": 202,
+    "returncode": -15
+  }
+]

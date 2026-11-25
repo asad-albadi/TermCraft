@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-local-completion-qualified/398d19fc6dbdf7d7dd5ee2a3a71ae8eda907bbbb31ad0117031c3a73fb106fe5/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing/harbor-workspace",
+    "--data-dir",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/independent-rdp-server/shadow-auth/data",
+    "--session",
+    "owned-rdp"
+  ],
+  "application_sha256": "c8d09ba5fd2c36d567c6885f117d6068e2a87185648db883853cde84d678f7e6",
+  "engine_sha256": "85f33c8c7987cf84d73748c2d33283cf9878426febcbfed72a3f26acb42beba6",
+  "app_alive": true,
+  "netns": "net:[4026534509]",
+  "scope": "shadow-auth"
+}

@@ -1,0 +1,13 @@
+{
+  "archive_sha256": "8a9c97e5dc5791ee278fb485a2082f5fa7c75220801f798e46e1c21a0dd72bc8",
+  "source_sha256": "d1a54c2ec020d0bc2a4e731184065bc33c28362f9b56f9bd95401f8a14947b9f",
+  "profile": "release",
+  "files_verified_extracted_and_archive": 3372,
+  "changes_from_398d": [
+    "build-source/engines/wayland/src/capture.rs",
+    "termcraft-wayland-engine"
+  ],
+  "app_and_rdp_byte_identical_prior_genuine_release": true,
+  "seconds": 3.37,
+  "note": "Root independent archive/payload validation; runtime Wayland GUI qualification remains owned by worker."
+}

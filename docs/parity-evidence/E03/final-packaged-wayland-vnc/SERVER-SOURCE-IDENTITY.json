@@ -1,0 +1,15 @@
+{
+  "src/services/vnc.rs": "179e96ee2b4c771a50d7a66caa7d23836b9beb67b50ab81330ee3cbfeb107ca5",
+  "src/services/supervisor.rs": "8eadff379f18e60bce4f39dc399d74fdca1dddcc4b7e5ab3792b09995d7c77e3",
+  "src/ui/managed_vnc.rs": "29c4bdad534b1abdcb4316547e3001c42952c91cc94914f04b5e3c056f1553eb",
+  "src/ui/managed_servers.rs": "c8b8aa82d0274e2492bf3c318b63d1a701e0bc605a281022dbb2da6112354306",
+  "src/ui/servers.rs": "81f7c92361b0c3b4f1c6afc5d17bf9a0e8a0a001b0ac91113050613c839ed40e",
+  "src/services/vnc/wayland.rs": "1a3934c135b0ee5240178eebdedd0f8c05e80aa26cbc0d9ff710c03d6bc97dd9",
+  "src/services/vnc/wayland/portal.rs": "bb319755de31e707160e39d24002c27270c4641ef0861b189ca3a1e180da0a45",
+  "src/services/vnc/wayland/helper.rs": "9f5b5aef95820463644d59e36a2cf4c0d0bfaa71db8bdc30adb36bf141145045",
+  "src/services/vnc/keyboard.rs": "46be1e0351d0f030ba9efec630203c7cb33970ec5f3c4dde3aef247a29afe700",
+  "src/runtime/manifest.rs": "7b0ec300a40a19593728a66ecf1861e129b0e190b8f5ee49e4b2af4d2d27aa51",
+  "engines/wayland/src/capture.rs": "b39b189a8bd14025c5f0042563b046fa691ce9568151ad2d6789e33e0e3f40b6",
+  "engines/wayland/src/main.rs": "de0d59ff7e6882a752cef5fe03d59d032af85e876188ba929c67580f6ebcac03",
+  "engines/wayland/src/lib.rs": "6b85eb6cf4990748b067888b7f0400a9ff386d9ec26a1fb580ac90078423f608"
+}

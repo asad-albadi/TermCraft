@@ -1,0 +1,48 @@
+Outer window is 0x600001, inner window is 0x600002
+
+EnterNotify event, serial 16, synthetic NO, window 0x600001,
+    root 0x50d, subw 0x0, time 22344147, (126,77), root:(128,79),
+    mode NotifyNormal, detail NotifyNonlinear, same_screen YES,
+    focus NO, state 0
+
+KeymapNotify event, serial 16, synthetic NO, window 0x0,
+    keys:  4294967195 0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   
+           0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   
+
+ButtonPress event, serial 25, synthetic NO, window 0x600001,
+    root 0x50d, subw 0x0, time 22344349, (126,77), root:(128,79),
+    state 0x0, button 1, same_screen YES
+
+ButtonRelease event, serial 25, synthetic NO, window 0x600001,
+    root 0x50d, subw 0x0, time 22344500, (126,77), root:(128,79),
+    state 0x100, button 1, same_screen YES
+
+KeymapNotify event, serial 25, synthetic NO, window 0x0,
+    keys:  13  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   
+           0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   
+
+KeyPress event, serial 25, synthetic NO, window 0x600001,
+    root 0x50d, subw 0x0, time 22363676, (126,77), root:(128,79),
+    state 0x0, keycode 69 (keysym 0xffc0, F3), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyRelease event, serial 25, synthetic NO, window 0x600001,
+    root 0x50d, subw 0x0, time 22363676, (126,77), root:(128,79),
+    state 0x0, keycode 69 (keysym 0xffc0, F3), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyPress event, serial 28, synthetic NO, window 0x600001,
+    root 0x50d, subw 0x0, time 22365774, (126,77), root:(128,79),
+    state 0x0, keycode 36 (keysym 0xff0d, Return), same_screen YES,
+    XLookupString gives 1 bytes: (0d) ""
+    XmbLookupString gives 1 bytes: (0d) ""
+    XFilterEvent returns: False
+
+KeyRelease event, serial 28, synthetic NO, window 0x600001,
+    root 0x50d, subw 0x0, time 22365774, (126,77), root:(128,79),
+    state 0x0, keycode 36 (keysym 0xff0d, Return), same_screen YES,
+    XLookupString gives 1 bytes: (0d) ""
+    XFilterEvent returns: False

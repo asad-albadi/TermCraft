@@ -1,0 +1,1 @@
+{"private_net": "net:[4026534236]", "host_net": "net:[4026531833]", "display": null, "wayland_before": null, "home": "/tmp/real-home", "dev": ["ptmx", "pts", "shm", "core", "fd", "stderr", "stdout", "stdin", "tty", "urandom", "random", "full", "zero", "null"], "pid": 4}

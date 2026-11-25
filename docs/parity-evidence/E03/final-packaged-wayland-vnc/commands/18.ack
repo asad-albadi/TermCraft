@@ -1,0 +1,1 @@
+{"ok": true, "time": 22093.504662739, "idle_seconds": 8.000379558998247, "native_observer_alive": true, "listener_alive": true, "product_helpers": [{"pid": 333, "ppid": 202, "argv": "termcraft-wayland-engine 51 none ", "exe": "/memfd:termcraft-rdp-engine (deleted)", "sha256": "fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59"}]}

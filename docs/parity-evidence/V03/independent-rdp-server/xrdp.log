@@ -1,0 +1,12 @@
+[20261125-13:34:46] [INFO ] starting xrdp with pid 20
+[20261125-13:34:46] [INFO ] address [0.0.0.0] port [3389] mode 1
+[20261125-13:34:46] [INFO ] listening to port 3389 on 0.0.0.0
+[20261125-13:34:46] [INFO ] xrdp_listen_pp done
+[20261125-13:42:18] [INFO ] Socket 11: AF_INET6 connection received from ::ffff:127.0.0.1 port 48912
+[20261125-13:42:18] [INFO ] Using default X.509 certificate: /etc/xrdp/cert.pem
+[20261125-13:42:18] [INFO ] Using default X.509 key file: /etc/xrdp/key.pem
+[20261125-13:42:18] [ERROR] Server requires TLS for security, but the client did not request TLS.
+[20261125-13:42:18] [INFO ] Security protocol: configured [SSL], requested [HYBRID|HYBRID_EX|RDP], selected []
+[20261125-13:42:18] [ERROR] xrdp_sec_incoming: xrdp_iso_incoming failed
+[20261125-13:42:18] [ERROR] xrdp_rdp_incoming: xrdp_sec_incoming failed
+[20261125-13:42:18] [ERROR] xrdp_process_main_loop: libxrdp_process_incoming failed

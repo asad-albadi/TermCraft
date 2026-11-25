@@ -1,0 +1,8 @@
+{
+  "tag": "2.11.7",
+  "repository": "https://github.com/FreeRDP/FreeRDP",
+  "paths": [
+    "server/shadow/shadow_channels.c",
+    "server/shadow/X11/x11_shadow.c"
+  ]
+}

@@ -1,0 +1,2 @@
+/termcraft-owned-independent-xrdp running=false exit=137 finished=2026-11-25T13:43:04.788976052Z
+/termcraft-owned-independent-shadow running=false exit=137 finished=2026-11-25T13:43:04.789174715Z

@@ -1,0 +1,255 @@
+
+** (xdg-desktop-portal-gnome:71): WARNING **: 17:36:30.924: error: Could not connect: No such file or directory
+
+XDP: org.gnome.settings-daemon.plugins.xsettings schema not found
+XDP: Monitoring /etc/fonts/fonts.conf
+XDP: Monitoring /etc/fonts/conf.d
+XDP: Monitoring /etc/fonts/conf.d/10-hinting-slight.conf
+XDP: Monitoring /etc/fonts/conf.d/10-powerline-symbols.conf
+XDP: Monitoring /etc/fonts/conf.d/10-scale-bitmap-fonts.conf
+XDP: Monitoring /etc/fonts/conf.d/10-symbols.conf
+XDP: Monitoring /etc/fonts/conf.d/10-yes-antialias.conf
+XDP: Monitoring /etc/fonts/conf.d/11-lcdfilter-default.conf
+XDP: Monitoring /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans-mono.conf
+XDP: Monitoring /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-sans.conf
+XDP: Monitoring /etc/fonts/conf.d/20-unhint-small-dejavu-lgc-serif.conf
+XDP: Monitoring /etc/fonts/conf.d/20-unhint-small-dejavu-sans-mono.conf
+XDP: Monitoring /etc/fonts/conf.d/20-unhint-small-dejavu-sans.conf
+XDP: Monitoring /etc/fonts/conf.d/20-unhint-small-dejavu-serif.conf
+XDP: Monitoring /etc/fonts/conf.d/20-unhint-small-vera.conf
+XDP: Monitoring /etc/fonts/conf.d/30-metric-aliases.conf
+XDP: Monitoring /etc/fonts/conf.d/40-nonlatin.conf
+XDP: Monitoring /etc/fonts/conf.d/45-generic.conf
+XDP: Monitoring /etc/fonts/conf.d/45-latin.conf
+XDP: Monitoring /etc/fonts/conf.d/46-noto-sans.conf
+XDP: Monitoring /etc/fonts/conf.d/46-noto-serif.conf
+XDP: Monitoring /etc/fonts/conf.d/48-guessfamily.conf
+XDP: Monitoring /etc/fonts/conf.d/48-spacing.conf
+XDP: Monitoring /etc/fonts/conf.d/49-sansserif.conf
+XDP: Monitoring /etc/fonts/conf.d/50-user.conf
+XDP: Monitoring /etc/fonts/conf.d/51-local.conf
+XDP: Monitoring /etc/fonts/conf.d/57-dejavu-sans-mono.conf
+XDP: Monitoring /etc/fonts/conf.d/57-dejavu-sans.conf
+XDP: Monitoring /etc/fonts/conf.d/57-dejavu-serif.conf
+XDP: Monitoring /etc/fonts/conf.d/58-dejavu-lgc-sans-mono.conf
+XDP: Monitoring /etc/fonts/conf.d/58-dejavu-lgc-sans.conf
+XDP: Monitoring /etc/fonts/conf.d/58-dejavu-lgc-serif.conf
+XDP: Monitoring /etc/fonts/conf.d/60-generic.conf
+XDP: Monitoring /etc/fonts/conf.d/60-latin.conf
+XDP: Monitoring /etc/fonts/conf.d/65-fonts-persian.conf
+XDP: Monitoring /etc/fonts/conf.d/65-nonlatin.conf
+XDP: Monitoring /etc/fonts/conf.d/66-noto-sans.conf
+XDP: Monitoring /etc/fonts/conf.d/66-noto-serif.conf
+XDP: Monitoring /etc/fonts/conf.d/69-unifont.conf
+XDP: Monitoring /etc/fonts/conf.d/80-delicious.conf
+XDP: Monitoring /etc/fonts/conf.d/90-synthetic.conf
+XDP: Monitoring /usr/local/share/fonts
+XDP: Monitoring /tmp/real-data/fonts
+XDP: Monitoring /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-packaged-wayland-vnc/tools/usr/share/fonts
+XDP: Monitoring /usr/share/fonts
+XDP: Monitoring /tmp/real-home/.fonts
+XDP: Monitoring /usr/share/fonts/Adwaita
+XDP: Monitoring /usr/share/fonts/OTF
+XDP: Monitoring /usr/share/fonts/TTF
+XDP: Monitoring /usr/share/fonts/awesome-terminal-fonts
+XDP: Monitoring /usr/share/fonts/cantarell
+XDP: Monitoring /usr/share/fonts/encodings
+XDP: Monitoring /usr/share/fonts/liberation
+XDP: Monitoring /usr/share/fonts/noto
+XDP: Monitoring /usr/share/fonts/noto-cjk
+XDP: Monitoring /usr/share/fonts/encodings/large
+XDP: providing org.freedesktop.impl.portal.Settings
+XDP: providing org.freedesktop.impl.portal.FileChooser
+XDP: providing org.freedesktop.impl.portal.Access
+XDP: providing org.freedesktop.impl.portal.AppChooser
+XDP: providing org.freedesktop.impl.portal.Background
+XDP: providing org.freedesktop.impl.portal.Lockdown
+XDP: providing org.freedesktop.impl.portal.Print
+XDP: providing org.freedesktop.impl.portal.Screenshot
+XDP: providing org.freedesktop.impl.portal.Clipboard
+XDP: providing org.freedesktop.impl.portal.Wallpaper
+XDP: providing org.freedesktop.impl.portal.DynamicLauncher
+XDP: providing org.freedesktop.impl.portal.Notification
+XDP: providing org.freedesktop.impl.portal.Usb
+XDP: providing org.freedesktop.impl.portal.GlobalShortcuts
+XDP: org.freedesktop.impl.portal.desktop.gnome acquired
+XDP: providing org.freedesktop.impl.portal.RemoteDesktop
+XDP: providing org.freedesktop.impl.portal.ScreenCast
+XDP: providing org.freedesktop.impl.portal.InputCapture
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read 
+** (xdg-desktop-portal-gnome:71): WARNING **: 17:36:58.384: Failed to associate portal window with parent window 
+
+(xdg-desktop-portal-gnome:71): Gtk-CRITICAL **: 17:36:58.484: Unable to connect to the accessibility bus at 'unix:path=/tmp/real-runtime/at-spi/bus': Could not connect: Connection refused
+org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: R
+** (xdg-desktop-portal-gnome:71): WARNING **: 17:39:40.203: Failed to associate portal window with parent window 
+
+** (xdg-desktop-portal-gnome:71): WARNING **: 17:40:17.021: Failed to associate portal window with parent window 
+
+** (xdg-desktop-portal-gnome:71): WARNING **: 17:41:45.812: Failed to associate portal window with parent window 
+ead org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XDP: Read org.freedesktop.appearance color-scheme
+XD
+** (xdg-desktop-portal-gnome:71): WARNING **: 17:42:30.920: Failed to associate portal window with parent window 

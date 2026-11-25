@@ -1,0 +1,1 @@
+{"ok": true, "time": 22102.173480946, "width": 1600, "height": 1000, "server_name": "TermCraft selected display (classic VNC)", "pixels_sha256": "6081f460a7e70a527da5586e0b6a941fd72a2dc29558b632bfdb65614d24c97b", "rfb_artifact": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-packaged-wayland-vnc/final-reports/rfb-after-idle.rfb.png"}
