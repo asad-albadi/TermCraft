@@ -65,16 +65,16 @@ Saved sessions, folders, JSON import/export, keys, and SSH jump hosts already ex
 External launch adapters exist. Integration and options remain incomplete. [Remote desktop, gateway, and X11 feature reference](https://mobaxterm.mobatek.net/features.html)
 
 - [ ] **D01 · Partial:** Embed RDP sessions in the workspace rather than opening an external client. Reviewed Linux implementation checkpoint: owned headless IronRDP helper, real TLS/NLA/frame/input/certificate-change/resize/close tests pass. Native/original interoperability remains pending; see `docs/parity-evidence/D01/`.
-- [ ] **D02 · Partial:** Reviewed embedded options, clipboard, vault binding, fullscreen/admin/drive negotiation, Linux CUPS/PCSC, Unix serial flow/modem/timeouts, Windows serial provider, opened-handle Windows rename/delete and Windows/macOS allocation source are integrated. Current helper passes 47 unit + 8 PCSC cases. Physical devices, missing event/control families, remaining native printer/smartcard providers, POSIX identity-safe mutation and native/original qualification remain open. See `docs/parity-evidence/D02/`.
+- [ ] **D02 · Partial:** Reviewed options, clipboard/vault/fullscreen/admin/drive negotiation, native printer/smartcard source, Linux RXCHAR/BREAK/ERR and per-open driver statistics, Windows per-open statistics/bounded serial owners and opened-handle mutation/allocation are integrated. Current merged helper passes82unit+10worker tests; controlled owner27/pure22 and MSVC source checks pass. POSIX status/properties/modem/identity-safe mutation limitations and native physical/original RDP qualification remain explicit. See `docs/parity-evidence/D02/`.
 - [ ] **D03 · Partial (reviewed implementation checkpoint):** Embedded VNC with verified VeNCrypt TLS, Raw/CopyRect/Hextile, Rich Cursor, directional Unicode/Latin-1 clipboard, resize and shared canvas/fullscreen. Real TCP and actual workspace paint/input tests pass; native/third-party/original evidence remains pending. See `docs/parity-evidence/parallel-vnc/`.
 - [ ] **D04 · Partial (reviewed implementation checkpoint):** Managed SSH gateway streams for RDP, VNC and embedded Telnet preserve separate gateway trust and target identity, support RDP certificate retries and cancel/clean up owned channels. Real transport/workspace/CLI failure tests pass; native/deployed/original checks remain pending. See `docs/parity-evidence/parallel-gateway/`.
 - [ ] **X01 · Partial:** Linux pinned owned Xwayland is integrated; finish patched native Windows/macOS engine builds, bundled dependency closure and native lifecycle qualification.
 - [ ] **X02 · Partial:** Coordinate X-server startup, DISPLAY selection, authorization, and SSH forwarding automatically.
 - [ ] **X03 · Partial:** Actual Linux OpenGL, Composite and RandR behavior is demonstrated; finish native/GPU/monitor coverage and original comparison.
-- [ ] **X04 · Partial:** Reviewed Linux owned Xephyr supports real XDMCP discovery/Accept/MANAGE, fixed display/monitor selection, explicit TCP consent, cookies and independent leases; actual extracted runtime checks pass. Native Windows/macOS engines, bidirectional clipboard, keyboard layouts/chooser and original comparison remain open. See `docs/parity-evidence/X04/`.
+- [ ] **X04 · Partial:** Reviewed Linux Direct/Indirect/discovery, fresh hostname resolution, nondefault ports, display/monitor selection, authority/cancellation, bidirectional text clipboard and single installed XKB layouts are integrated. Current full-bundle qualification is in progress; native Windows/macOS engines and original comparison remain open. See `docs/parity-evidence/X04/`.
 - [ ] **X05 · Partial:** Add configured remote desktop environment launch through SSH.
 
-**Primary code:** `src/connection.rs`, `src/ui/servers.rs`, `src/model.rs`. Existing X11 `-Y` forwarding is useful, but does not supply the X server or manage its display.
+**Current implementation:** Linux owns and manages its bundled X server, authorization, display and per-session SSH forwarding. Native Windows/macOS engines and their runtime validation remain open. See [progress](PARITY_PROGRESS.md).
 
 ## P2 — Protocols, tools, and packaging
 
@@ -121,7 +121,7 @@ Existing adapters must not be classified as absent solely because endpoints were
 - [ ] **V05 · Verify:** Run native Windows and macOS builds and interactive workflows. Windows cross-target `cargo check` proves compilation only.
 - [ ] **V06 · Reviewed Linux implementation checkpoint:** Native X11/Wayland scale1x/1.5x/2x, real peer clipboard, idle System/explicit theme images and detached input coordinates pass bounded headless/software matrix. Current-parent1.5x replay retains game guards. Hardware/GPU, active-game and named shortcut/native-original gaps remain. See `docs/parity-evidence/V06/FIX1/`.
 - [ ] **V07 · Verify:** Capture the original Personal 26.6 workflows and compare them with equivalent TermCraft sessions; reconcile the mechanics evidence with measured behavior.
-- [ ] **V08 · Verify:** Exercise packaged builds on clean machines, including absent dependencies, upgrades, and persisted settings.
+- [ ] **V08 · Reviewed implementation checkpoint:** Current Debian12 core clean install, actual version upgrade, replacement, removal/reinstall and complete workspace/test-vault/corrupt-original preservation pass independent review. Full optional Arch artifact closure, other native platforms and original evidence remain open. See [qualification review](docs/parity-evidence/V08/current-core-qualification/review.md).
 
 ## Completion rule and execution guidance
 

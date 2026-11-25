@@ -461,15 +461,16 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "",
-      "remaining": "Reviewed Linux IPv4 hostname/direct/Indirect chooser, single installed XKB layout IDs, session-ready engine, bidirectional clipboard and cancellation source are merged. Latest combined source release remains unqualified after compiler crashes. Native engines and original workflow evidence remain; variants/groups/IPv6 require explicit scope reconciliation.",
+      "remaining": "Linux workflows are implemented, but two traced real-package chooser transitions reproduced early clipboard-client lifecycle/reset feedback and initializer EOF. Private native parent-identity classification plus bounded complete endpoint recovery fixes are in final review; current d6 artifact retains known defect. Native Windows/macOS/original coverage remains separate.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/X04/hostnames/root-integration.json",
         "docs/parity-evidence/X04/clipboard-lifecycle/root-integration.json",
-        "docs/parity-evidence/X04/keyboard-chooser/root-integration.json"
+        "docs/parity-evidence/X04/keyboard-chooser/root-integration.json",
+        "target/agent-work/current-packaged-xdmcp/reliability-boundary/owner-handoff.md"
       ],
-      "next_action": "Recover build, qualify the genuine new package and exercise actual packaged chooser/layout/clipboard/cancel workflows; retain native/original limitations.",
+      "next_action": "Finish independent native/Rust review and actual production candidate tests, integrate exact payloads, rerun source/packaged regression gates and publish a newly qualified local artifact; do not stop at external environments yet.",
       "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
     },
     {
