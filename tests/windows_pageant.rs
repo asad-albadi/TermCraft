@@ -4,6 +4,7 @@ use harbor_workspace::credentials::{
     agent::{AgentManager, AgentTarget},
     keys::{KeyManager, KeySettings},
 };
+use russh::keys::{HashAlg, PublicKey, ssh_key::SshSig};
 use std::{
     path::PathBuf,
     process::{Child, Command},
@@ -81,8 +82,31 @@ fn pageant_add_list_and_remove_use_only_the_fixture() {
         assert_eq!(listing.identities.len(), 1);
         assert_eq!(listing.identities[0].fingerprint, added.fingerprint);
         assert_eq!(pageant_window_pid(), Some(pid));
+        let public = PublicKey::from_openssh(&added.public_key).unwrap();
+        let data = b"TermCraft native Pageant qualification";
+        let namespace = "termcraft-pageant-fixture";
+        let message = SshSig::signed_data(namespace, HashAlg::Sha256, data).unwrap();
+        let mut agent = manager.endpoint(target).unwrap().connect().await.unwrap();
+        let signature = agent
+            .sign_request_signature(&public, None, &message)
+            .await
+            .unwrap();
+        let signed = SshSig::new(
+            public.key_data().clone(),
+            namespace,
+            HashAlg::Sha256,
+            signature,
+        )
+        .unwrap();
+        public.verify(namespace, data, &signed).unwrap();
         manager.remove(target, &added.public_key).await.unwrap();
         assert!(manager.list(target).await.unwrap().identities.is_empty());
+        assert!(
+            agent
+                .sign_request_signature(&public, None, &message)
+                .await
+                .is_err()
+        );
     });
     drop(fixture);
     assert!(pageant_window_pid().is_none());

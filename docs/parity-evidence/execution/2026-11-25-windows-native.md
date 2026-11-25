@@ -227,8 +227,10 @@ and Windows Authenticode validated the Simon Tatham signature. The command
 `cargo +1.96.1 test --locked --test windows_pageant -- --ignored` passed
 one test. It checked ownership of the fixture window by the launched PID,
 then added, listed and removed a synthetic key in an initially empty agent.
-The fixture process exited and its window was gone after cleanup. This
-did not exercise agent forwarding or deployment against a real SSH account.
+A follow-up replay verified a Pageant signature over synthetic SSH signing
+data and proved the same connection refused signing after key removal. The
+fixture process and window were removed after cleanup. Real-account agent
+forwarding remains open.
 
 ## Outstanding evidence
 
@@ -278,3 +280,8 @@ did not exercise agent forwarding or deployment against a real SSH account.
 - The local process used an unelevated Windows account and Windows Sandbox
   was absent. Current-account package observations do not establish
   first-login, fresh-user or real release-to-release installation behavior.
+- [Hosted Linux CI](https://github.com/asad-albadi/TermCraft/actions/runs/45692458444)
+  reproduced the existing redirected-drive allocation cleanup failure
+  tracked separately in [issue #3](https://github.com/asad-albadi/TermCraft/issues/3).
+  The failure was in the Linux-specific helper test. The native Windows
+  helper replay independently passed 35 tests.
