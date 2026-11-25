@@ -20,15 +20,16 @@ Recorded on 2026-11-25 from branch `issue-2-macos` at the current worktree.
 
 - `cargo +1.96.1 test --locked mode_tests::encoded_modes_are_checked_before_rustix_conversion --lib`: passed, 1/1.
 - `cargo +1.96.1 fmt --all -- --check`: passed after formatting.
-- `cargo +1.96.1 test --locked --all-targets --no-fail-fast`: compilation succeeded; 273 library tests passed, 3 ignored, 3 library tests failed, and subsequent GUI targets reported fixture-dependent failures.
+- `cargo +1.96.1 test --locked --lib --no-fail-fast`: passed, 276/276, with 3 ignored.
+- `cargo +1.96.1 test --locked --all-targets --no-fail-fast`: the library target passed 276/276; broader GUI/integration targets compiled but 26 targets reported environment-sensitive failures, including unavailable external SSH helpers and concurrent local-socket/resource limits.
 
-## Baseline failures retained as open
+## macOS fixture compatibility repairs
 
-- VeNCrypt TLS fixture rejected its certificate as `CertificateUnknown`.
-- Portable folder fixture and NFS fixture use raw names that macOS rejects with `Illegal byte sequence`.
-- Several GUI tests fail downstream of unavailable/failed endpoint fixtures.
+- VeNCrypt now uses a proper test CA and localhost leaf certificate chain, which passes the macOS platform verifier.
+- Portable-folder and NFS raw-byte filename assertions are retained on platforms that support non-UTF-8 directory entries; macOS exercises the ordinary-name, symlink, and size-limit paths instead of attempting an invalid filename.
+- The macOS workspace IPC boundary no longer requests unsupported socket `fchmod`; private directory, random namespace, and authenticated token protections remain in force. The same boundary is applied to the owned agent listener.
 
-These failures are baseline/environment evidence, not native macOS qualification. They must not be relabeled as passing issue #2 acceptance criteria.
+The broader target failures remain environment evidence, not native macOS qualification. They must not be relabeled as passing issue #2 acceptance criteria.
 
 ## Native helper verification
 

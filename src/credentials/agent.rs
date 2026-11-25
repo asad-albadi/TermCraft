@@ -242,7 +242,7 @@ impl AgentManager {
    runtime.block_on(async move{
     let name=match name.to_ns_name::<GenericNamespaced>(){Ok(n)=>n,Err(_)=>{let _=tx.send(Err("Invalid agent endpoint".into()));return}};
     let options=ListenerOptions::new().name(name);
-    #[cfg(unix)]let options={use interprocess::os::unix::local_socket::ListenerOptionsExt;options.mode(0o600)};
+    #[cfg(all(unix, not(target_os = "macos")))]let options={use interprocess::os::unix::local_socket::ListenerOptionsExt;options.mode(0o600)};
     #[cfg(windows)]let options={use interprocess::os::windows::{local_socket::ListenerOptionsExt,security_descriptor::SecurityDescriptor};let value=widestring::U16CString::from_str("D:P(A;;GA;;;OW)").unwrap();match SecurityDescriptor::deserialize(&value){Ok(sd)=>options.security_descriptor(sd),Err(_)=>{let _=tx.send(Err("Could not protect agent endpoint".into()));return}}};
     let listener=match options.create_tokio(){Ok(l)=>l,Err(_)=>{let _=tx.send(Err("Could not listen on the owned agent endpoint".into()));return}};
     let active=Arc::new(AtomicUsize::new(0));

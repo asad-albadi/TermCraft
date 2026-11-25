@@ -946,7 +946,9 @@ mod tests {
     #[cfg(unix)]
     #[tokio::test]
     async fn symlink_escape_raw_names_and_size_limits() {
-        use std::os::unix::{ffi::OsStringExt, fs::symlink};
+        #[cfg(not(target_os = "macos"))]
+        use std::os::unix::ffi::OsStringExt;
+        use std::os::unix::fs::symlink;
         let root = tempfile::tempdir().unwrap();
         let outside = tempfile::tempdir().unwrap();
         std::fs::write(outside.path().join("secret"), b"outside").unwrap();
@@ -961,16 +963,25 @@ mod tests {
                     .is_err()
             );
         }
+        #[cfg(not(target_os = "macos"))]
         let raw = vec![b'x', 0xff];
-        std::fs::write(root.path().join(OsString::from_vec(raw.clone())), b"raw").unwrap();
-        let key = v
-            .lookup(&c, v.root(), &NfsName::new(raw.clone()).unwrap())
-            .await
-            .unwrap()
-            .object;
+        #[cfg(not(target_os = "macos"))]
+        let key = {
+            std::fs::write(root.path().join(OsString::from_vec(raw.clone())), b"raw").unwrap();
+            v.lookup(&c, v.root(), &NfsName::new(raw.clone()).unwrap())
+                .await
+                .unwrap()
+                .object
+        };
+        #[cfg(not(target_os = "macos"))]
         assert_eq!(v.read(&c, key, 0, 3).await.unwrap().data, b"raw");
+        #[cfg(not(target_os = "macos"))]
         let page = v.readdir(&c, v.root(), 0, [0; 8], 128).await.unwrap();
+        #[cfg(target_os = "macos")]
+        v.readdir(&c, v.root(), 0, [0; 8], 128).await.unwrap();
+        #[cfg(not(target_os = "macos"))]
         assert!(page.entries.iter().any(|e| e.name.as_bytes() == raw));
+        #[cfg(not(target_os = "macos"))]
         assert_eq!(
             v.write(&c, key, MAX_BYTES, b"x", WriteStability::FileSync)
                 .await,
