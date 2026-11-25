@@ -34,6 +34,13 @@ class PrivateXQuartzBuildContract(unittest.TestCase):
         self.assertIn("x86_64", text)
         self.assertIn("arm64", text)
 
+    def test_private_builder_walks_the_complete_macho_dependency_closure(self):
+        text = (ROOT / "packaging/x11/build-private-macos.sh").read_text()
+        self.assertIn('queue=("$destination/bin/X11.bin")', text)
+        self.assertIn("while ((${#queue[@]})); do", text)
+        self.assertIn('queue+=("$target")', text)
+        self.assertIn("Missing Mach-O dependency", text)
+
 
 if __name__ == "__main__":
     unittest.main()

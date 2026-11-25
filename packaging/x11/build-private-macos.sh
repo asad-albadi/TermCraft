@@ -72,19 +72,38 @@ mkdir -p "$destination/bin" "$destination/resources"
 cp -- "$work/binaries/$arch/X11.bin" "$destination/bin/X11.bin"
 chmod 0555 "$destination/bin/X11.bin"
 
-# Copy only non-system dependencies that are directly referenced by the built image.
-otool -L "$destination/bin/X11.bin" | tail -n +2 | sed -E 's/^\s+([^ ]+) \(.*/\1/' | while IFS= read -r dependency; do
-  case "$dependency" in
-    /System/Library/*|/usr/lib/*) continue ;;
-    /opt/X11/*) echo 'XQuartz system-prefix dependency detected.' >&2; exit 1 ;;
-    /*)
-      name=$(basename "$dependency")
-      cp -- "$dependency" "$destination/resources/$name"
-      install_name_tool -change "$dependency" "@loader_path/../resources/$name" "$destination/bin/X11.bin"
-      install_name_tool -id "@loader_path/$name" "$destination/resources/$name"
-      ;;
-    *) echo "Unexpected non-absolute Mach-O dependency: $dependency" >&2; exit 1 ;;
-  esac
+# Copy and relocate the complete non-system Mach-O dependency closure.
+declare -A copied
+queue=("$destination/bin/X11.bin")
+while ((${#queue[@]})); do
+  image=${queue[0]}
+  queue=("${queue[@]:1}")
+  if [[ "$image" == "$destination/bin/X11.bin" ]]; then
+    loader_prefix='@loader_path/../resources'
+  else
+    loader_prefix='@loader_path'
+  fi
+  while IFS= read -r dependency; do
+    case "$dependency" in
+      /System/Library/*|/usr/lib/*) continue ;;
+      /opt/X11/*) echo 'XQuartz system-prefix dependency detected.' >&2; exit 1 ;;
+      /*)
+        name=$(basename "$dependency")
+        target="$destination/resources/$name"
+        if [[ ! -e "$target" ]]; then
+          [[ -f "$dependency" ]] || { echo "Missing Mach-O dependency: $dependency" >&2; exit 1; }
+          cp -- "$dependency" "$target"
+          install_name_tool -id "@loader_path/$name" "$target"
+        fi
+        install_name_tool -change "$dependency" "$loader_prefix/$name" "$image"
+        if [[ -z "${copied[$target]+set}" ]]; then
+          copied["$target"]=1
+          queue+=("$target")
+        fi
+        ;;
+      *) echo "Unexpected non-absolute Mach-O dependency: $dependency" >&2; exit 1 ;;
+    esac
+  done < <(otool -L "$image" | tail -n +2 | sed -E 's/^\s+([^ ]+) \(.*/\1/')
 done
 
 if otool -L "$destination/bin/X11.bin" "$destination/resources"/* 2>/dev/null | grep -F '/opt/X11/' >/dev/null; then
