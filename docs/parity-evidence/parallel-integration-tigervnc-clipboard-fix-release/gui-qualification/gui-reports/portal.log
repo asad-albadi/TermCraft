@@ -1,0 +1,129 @@
+XDP: load portals from /tmp/real-data/xdg-desktop-portal/portals
+XDP: loading /tmp/real-data/xdg-desktop-portal/portals/gnome.portal
+XDP: portal implementation supports org.freedesktop.impl.portal.Access
+XDP: portal implementation supports org.freedesktop.impl.portal.Account
+XDP: portal implementation supports org.freedesktop.impl.portal.AppChooser
+XDP: portal implementation supports org.freedesktop.impl.portal.Background
+XDP: portal implementation supports org.freedesktop.impl.portal.Clipboard
+XDP: portal implementation supports org.freedesktop.impl.portal.DynamicLauncher
+XDP: portal implementation supports org.freedesktop.impl.portal.FileChooser
+XDP: portal implementation supports org.freedesktop.impl.portal.GlobalShortcuts
+XDP: portal implementation supports org.freedesktop.impl.portal.InputCapture
+XDP: portal implementation supports org.freedesktop.impl.portal.Lockdown
+XDP: portal implementation supports org.freedesktop.impl.portal.Notification
+XDP: portal implementation supports org.freedesktop.impl.portal.Print
+XDP: portal implementation supports org.freedesktop.impl.portal.RemoteDesktop
+XDP: portal implementation supports org.freedesktop.impl.portal.ScreenCast
+XDP: portal implementation supports org.freedesktop.impl.portal.Screenshot
+XDP: portal implementation supports org.freedesktop.impl.portal.Settings
+XDP: portal implementation supports org.freedesktop.impl.portal.Usb
+XDP: portal implementation supports org.freedesktop.impl.portal.Wallpaper
+XDP: Looking for portals configuration in '/tmp/real-data/xdg-desktop-portal/portals/gnome-portals.conf'
+XDP: Looking for portals configuration in '/tmp/real-data/xdg-desktop-portal/portals/portals.conf'
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.854: Document portal fuse mount point unknown: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name :1.13 was not provided by any .service files
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.854: Choosing gnome.portal for org.freedesktop.impl.portal.Lockdown via the deprecated UseIn key
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.854: The preferred method to match portal implementations to desktop environments is to use the portals.conf(5) configuration file
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Lockdown in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.856: Choosing gnome.portal for org.freedesktop.impl.portal.Access via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Access in gnome (fallback)
+XDP: Providing portal org.freedesktop.portal.MemoryMonitor
+XDP: Providing portal org.freedesktop.portal.PowerProfileMonitor
+XDP: Providing portal org.freedesktop.portal.NetworkMonitor
+XDP: Providing portal org.freedesktop.portal.ProxyResolver
+XDP: Providing portal org.freedesktop.portal.Trash
+XDP: Providing portal org.freedesktop.portal.GameMode
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.868: Failed to create RealtimeKit proxy: Could not connect: No such file or directory
+XDP: Providing portal org.freedesktop.portal.Realtime
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.868: Choosing gnome.portal for org.freedesktop.impl.portal.Settings via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Settings in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.870: Failed to create settings proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.870: Not providing Settings portal: No working backend
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.870: Choosing gnome.portal for org.freedesktop.impl.portal.FileChooser via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.FileChooser in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.871: Failed to create file chooser proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.871: Choosing gnome.portal for org.freedesktop.impl.portal.AppChooser via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.AppChooser in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.873: Failed to create app chooser proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.873: Choosing gnome.portal for org.freedesktop.impl.portal.Print via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Print in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.876: Failed to create print proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.876: Choosing gnome.portal for org.freedesktop.impl.portal.Notification via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Notification in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.878: Failed to create notification proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.878: The location portal requires an access impl
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.878: The camera portal requires an access impl
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.878: Choosing gnome.portal for org.freedesktop.impl.portal.Screenshot via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Screenshot in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.878: The screenshot portal requires an access impl
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.878: Choosing gnome.portal for org.freedesktop.impl.portal.Background via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Background in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.878: The background portal requires an access impl
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.878: Choosing gnome.portal for org.freedesktop.impl.portal.Wallpaper via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Wallpaper in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.878: The wallpaper portal requires an access impl
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.878: Choosing gnome.portal for org.freedesktop.impl.portal.Account via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Account in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.880: Failed to create account proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.880: Choosing gnome.portal for org.freedesktop.impl.portal.GlobalShortcuts via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.GlobalShortcuts in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.882: Failed to create global_shortcuts proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.882: Choosing gnome.portal for org.freedesktop.impl.portal.DynamicLauncher via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.DynamicLauncher in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.884: Failed to create dynamic_launcher proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.884: Choosing gnome.portal for org.freedesktop.impl.portal.ScreenCast via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.ScreenCast in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.886: Failed to create screen cast proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.886: Choosing gnome.portal for org.freedesktop.impl.portal.RemoteDesktop via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.RemoteDesktop in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.888: Failed to create remote desktop proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.888: Choosing gnome.portal for org.freedesktop.impl.portal.Clipboard via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Clipboard in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.891: Failed to create clipboard: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.891: Choosing gnome.portal for org.freedesktop.impl.portal.InputCapture via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.InputCapture in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.893: Failed to create input capture proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.893: Choosing gnome.portal for org.freedesktop.impl.portal.Usb via the deprecated UseIn key
+XDP: Using gnome.portal for org.freedesktop.impl.portal.Usb in gnome (fallback)
+
+(/usr/lib/xdg-desktop-portal:57): xdg-desktop-portal-WARNING **: 14:05:33.896: Failed to create USB proxy: Error calling StartServiceByName for org.freedesktop.impl.portal.desktop.gnome: Failed to execute program org.freedesktop.impl.portal.desktop.gnome: No such file or directory
+XDP: Providing portal org.freedesktop.host.portal.Registry
+XDP: org.freedesktop.portal.Desktop acquired

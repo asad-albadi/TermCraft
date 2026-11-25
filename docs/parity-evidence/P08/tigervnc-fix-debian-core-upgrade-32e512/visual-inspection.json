@@ -1,0 +1,9 @@
+{
+  "inspected_screenshots": [
+    "evidence/reinstalled/workspace.png",
+    "evidence/reinstalled/corrupt.png"
+  ],
+  "saved_workspace_visible": true,
+  "corrupt_original_retained_notice_visible": true,
+  "prior_saved_workspace_screenshot_byte_identical": true
+}

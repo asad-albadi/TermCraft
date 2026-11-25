@@ -1,0 +1,704 @@
+[
+  {
+    "label": "runtime-image",
+    "command": [
+      "docker",
+      "image",
+      "inspect",
+      "debian:bookworm",
+      "--format",
+      "{{.Id}}"
+    ],
+    "exit_code": 0,
+    "seconds": 0.051
+  },
+  {
+    "label": "create",
+    "command": [
+      "docker",
+      "run",
+      "-d",
+      "--name",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "--label",
+      "org.termcraft.validation=tigervnc-fix-debian-upgrade",
+      "--cpuset-cpus",
+      "0",
+      "--pids-limit",
+      "256",
+      "--memory",
+      "3g",
+      "--security-opt",
+      "no-new-privileges",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/tigervnc-fix-debian-upgrade/input,dst=/input,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/tigervnc-fix-debian-upgrade/build,dst=/current,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/post-xdmcp-fix-debian-upgrade/build/out,dst=/old,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/tigervnc-fix-debian-upgrade/scripts,dst=/driver,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/tigervnc-fix-debian-upgrade/evidence,dst=/evidence",
+      "sha256:1d04200c2ece1d4d75a2a6f8e11ebce7d86a2ae28b34bb2c9cbb3ee9f4953e75",
+      "sleep",
+      "infinity"
+    ],
+    "exit_code": 0,
+    "seconds": 0.636
+  },
+  {
+    "label": "baseline",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "cat /etc/os-release; dpkg-query -W; test ! -e /opt/termcraft; test ! -e /usr/bin/termcraft"
+    ],
+    "exit_code": 0,
+    "seconds": 0.138
+  },
+  {
+    "label": "apt-update",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "apt-get",
+      "update"
+    ],
+    "exit_code": 0,
+    "seconds": 5.277
+  },
+  {
+    "label": "clean-install",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "apt-get",
+      "install",
+      "-y",
+      "--no-install-recommends",
+      "/current/out/termcraft_0.1.0-3_amd64.deb"
+    ],
+    "exit_code": 0,
+    "seconds": 15.012
+  },
+  {
+    "label": "clean-dependency-audit",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "dpkg-query -s termcraft; dpkg --audit; dpkg -V termcraft; ldd /usr/bin/termcraft; ldd /opt/termcraft/termcraft-rdp-engine; sha256sum /opt/termcraft/harbor-workspace /opt/termcraft/PACKAGE-MANIFEST.json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.408
+  },
+  {
+    "label": "package-info",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "dpkg-deb",
+      "--info",
+      "/current/out/termcraft_0.1.0-3_amd64.deb"
+    ],
+    "exit_code": 0,
+    "seconds": 0.061
+  },
+  {
+    "label": "package-contents",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "dpkg-deb",
+      "--contents",
+      "/current/out/termcraft_0.1.0-3_amd64.deb"
+    ],
+    "exit_code": 0,
+    "seconds": 0.389
+  },
+  {
+    "label": "test-tools",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "apt-get",
+      "install",
+      "-y",
+      "--no-install-recommends",
+      "python3",
+      "python3-pil",
+      "xvfb",
+      "xauth",
+      "fonts-dejavu-core",
+      "fontconfig"
+    ],
+    "exit_code": 0,
+    "seconds": 14.64
+  },
+  {
+    "label": "native-runtime-versions",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "python3 --version; ldd --version; dpkg-query -W libc6 libegl1 libgl1 libx11-6 libxkbcommon0 python3 xvfb; getconf GNU_LIBC_VERSION"
+    ],
+    "exit_code": 0,
+    "seconds": 0.06
+  },
+  {
+    "label": "disconnect",
+    "command": [
+      "docker",
+      "network",
+      "disconnect",
+      "bridge",
+      "termcraft-tigervnc-fix-debian-runtime"
+    ],
+    "exit_code": 0,
+    "seconds": 0.132
+  },
+  {
+    "label": "network-state",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "cat /proc/net/route; cat /proc/net/dev"
+    ],
+    "exit_code": 0,
+    "seconds": 0.059
+  },
+  {
+    "label": "isolation",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "mkdir -p /tmp/qualification-home /tmp/qualification-runtime; chmod 700 /tmp/qualification-runtime; chown -R 1000:1000 /tmp/qualification-home /tmp/qualification-runtime /evidence; setpriv --reuid=1000 --regid=1000 --clear-groups sh -c \"Xvfb :99 -screen 0 1280x800x24 -nolisten tcp > /evidence/xvfb.log 2>&1 &\""
+    ],
+    "exit_code": 0,
+    "seconds": 0.059
+  },
+  {
+    "label": "create-real-fixture",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "/current/persistence-fixture",
+      "create",
+      "/tmp/qualification-home/workspace"
+    ],
+    "exit_code": 0,
+    "seconds": 0.428
+  },
+  {
+    "label": "seed-workspace",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "python3",
+      "/driver/seed-workspace.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.078
+  },
+  {
+    "label": "corrupt-fixture",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "mkdir /tmp/qualification-home/corrupt; printf \"owned deliberately corrupt workspace {\" > /tmp/qualification-home/corrupt/workspace.json; printf \"TCVAULT1-owned-corrupt-vault\" > /tmp/qualification-home/corrupt/credentials.vault; chmod 600 /tmp/qualification-home/corrupt/*; chown -R 1000:1000 /tmp/qualification-home/corrupt"
+    ],
+    "exit_code": 0,
+    "seconds": 0.064
+  },
+  {
+    "label": "check-corrupt",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "/current/persistence-fixture",
+      "corrupt",
+      "/tmp/qualification-home/corrupt"
+    ],
+    "exit_code": 0,
+    "seconds": 0.057
+  },
+  {
+    "label": "clean-installed-startup",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "python3",
+      "/driver/runtime-smoke.py",
+      "clean-installed",
+      "32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad"
+    ],
+    "exit_code": 0,
+    "seconds": 5.792
+  },
+  {
+    "label": "userdata-initial",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "find /tmp/qualification-home/workspace /tmp/qualification-home/corrupt -type f ! -name \"*.vault-lock\" -exec sha256sum {} + | sort"
+    ],
+    "exit_code": 0,
+    "seconds": 0.058
+  },
+  {
+    "label": "remove-clean",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "apt-get",
+      "remove",
+      "-y",
+      "termcraft"
+    ],
+    "exit_code": 0,
+    "seconds": 1.154
+  },
+  {
+    "label": "clean-remove-preserved",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "test ! -e /usr/bin/termcraft; test ! -e /opt/termcraft; find /tmp/qualification-home/workspace /tmp/qualification-home/corrupt -type f ! -name \"*.vault-lock\" -exec sha256sum {} + | sort; dpkg --audit"
+    ],
+    "exit_code": 0,
+    "seconds": 0.063
+  },
+  {
+    "label": "install-old-baseline",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "apt-get",
+      "install",
+      "-y",
+      "--no-install-recommends",
+      "/old/termcraft_0.1.0-2_amd64.deb"
+    ],
+    "exit_code": 0,
+    "seconds": 1.851
+  },
+  {
+    "label": "old-audit",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "dpkg-query -s termcraft; dpkg --audit; dpkg -V termcraft; ldd /usr/bin/termcraft; ldd /opt/termcraft/termcraft-rdp-engine; sha256sum /opt/termcraft/harbor-workspace /opt/termcraft/PACKAGE-MANIFEST.json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.402
+  },
+  {
+    "label": "old-warmed-startup",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "python3",
+      "/driver/runtime-smoke.py",
+      "old-warmed",
+      "22bbf26840638474044431d242b92efa076123e87f39849cf0c8d967b33ecb04"
+    ],
+    "exit_code": 0,
+    "seconds": 5.784
+  },
+  {
+    "label": "userdata-old-baseline",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "find /tmp/qualification-home/workspace /tmp/qualification-home/corrupt -type f ! -name \"*.vault-lock\" -exec sha256sum {} + | sort"
+    ],
+    "exit_code": 0,
+    "seconds": 0.06
+  },
+  {
+    "label": "upgrade-current",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "apt-get",
+      "install",
+      "-y",
+      "--no-install-recommends",
+      "/current/out/termcraft_0.1.0-3_amd64.deb"
+    ],
+    "exit_code": 0,
+    "seconds": 1.934
+  },
+  {
+    "label": "upgrade-audit",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "dpkg-query -s termcraft; dpkg --audit; dpkg -V termcraft; ldd /usr/bin/termcraft; ldd /opt/termcraft/termcraft-rdp-engine; sha256sum /opt/termcraft/harbor-workspace /opt/termcraft/PACKAGE-MANIFEST.json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.404
+  },
+  {
+    "label": "monotonic-version",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "dpkg",
+      "--compare-versions",
+      "0.1.0-3",
+      "gt",
+      "0.1.0-2"
+    ],
+    "exit_code": 0,
+    "seconds": 0.056
+  },
+  {
+    "label": "upgrade-startup",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "python3",
+      "/driver/runtime-smoke.py",
+      "upgraded-installed",
+      "32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad"
+    ],
+    "exit_code": 0,
+    "seconds": 5.824
+  },
+  {
+    "label": "upgrade-vault",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "/current/persistence-fixture",
+      "verify",
+      "/tmp/qualification-home/workspace"
+    ],
+    "exit_code": 0,
+    "seconds": 0.289
+  },
+  {
+    "label": "same-version-replacement",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "apt-get",
+      "install",
+      "-y",
+      "--reinstall",
+      "--no-install-recommends",
+      "/current/out/termcraft_0.1.0-3_amd64.deb"
+    ],
+    "exit_code": 0,
+    "seconds": 2.023
+  },
+  {
+    "label": "same-version-audit",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "dpkg-query -s termcraft; dpkg --audit; dpkg -V termcraft; ldd /usr/bin/termcraft; ldd /opt/termcraft/termcraft-rdp-engine; sha256sum /opt/termcraft/harbor-workspace /opt/termcraft/PACKAGE-MANIFEST.json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.404
+  },
+  {
+    "label": "same-version-vault",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "/current/persistence-fixture",
+      "verify",
+      "/tmp/qualification-home/workspace"
+    ],
+    "exit_code": 0,
+    "seconds": 0.293
+  },
+  {
+    "label": "remove-upgraded",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "apt-get",
+      "remove",
+      "-y",
+      "termcraft"
+    ],
+    "exit_code": 0,
+    "seconds": 1.143
+  },
+  {
+    "label": "removed-preserved",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "test ! -e /usr/bin/termcraft; test ! -e /opt/termcraft; find /tmp/qualification-home/workspace /tmp/qualification-home/corrupt -type f ! -name \"*.vault-lock\" -exec sha256sum {} + | sort; dpkg --audit"
+    ],
+    "exit_code": 0,
+    "seconds": 0.07
+  },
+  {
+    "label": "reinstall-current",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "apt-get",
+      "install",
+      "-y",
+      "--no-install-recommends",
+      "/current/out/termcraft_0.1.0-3_amd64.deb"
+    ],
+    "exit_code": 0,
+    "seconds": 1.928
+  },
+  {
+    "label": "reinstalled-audit",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "dpkg-query -s termcraft; dpkg --audit; dpkg -V termcraft; ldd /usr/bin/termcraft; ldd /opt/termcraft/termcraft-rdp-engine; sha256sum /opt/termcraft/harbor-workspace /opt/termcraft/PACKAGE-MANIFEST.json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.458
+  },
+  {
+    "label": "reinstalled-startup",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "python3",
+      "/driver/runtime-smoke.py",
+      "reinstalled",
+      "32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad"
+    ],
+    "exit_code": 0,
+    "seconds": 6.011
+  },
+  {
+    "label": "reinstalled-vault",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "/current/persistence-fixture",
+      "verify",
+      "/tmp/qualification-home/workspace"
+    ],
+    "exit_code": 0,
+    "seconds": 0.294
+  },
+  {
+    "label": "reinstalled-corrupt",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "/current/persistence-fixture",
+      "corrupt",
+      "/tmp/qualification-home/corrupt"
+    ],
+    "exit_code": 0,
+    "seconds": 0.071
+  },
+  {
+    "label": "userdata-final",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-tigervnc-fix-debian-runtime",
+      "sh",
+      "-ec",
+      "find /tmp/qualification-home/workspace /tmp/qualification-home/corrupt -type f ! -name \"*.vault-lock\" -exec sha256sum {} + | sort"
+    ],
+    "exit_code": 0,
+    "seconds": 0.065
+  },
+  {
+    "label": "cleanup",
+    "command": [
+      "docker",
+      "rm",
+      "-f",
+      "termcraft-tigervnc-fix-debian-runtime"
+    ],
+    "exit_code": 0,
+    "seconds": 0.39
+  },
+  {
+    "label": "cleanup-inventory",
+    "command": [
+      "docker",
+      "ps",
+      "-a",
+      "--filter",
+      "label=org.termcraft.validation=tigervnc-fix-debian-upgrade",
+      "--format",
+      "{{.ID}} {{.Names}}"
+    ],
+    "exit_code": 0,
+    "seconds": 0.027
+  }
+]

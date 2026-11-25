@@ -1,0 +1,8 @@
+{
+  "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/P08/post-xdmcp-fix-debian-core-upgrade-22bbf268/evidence-sha256.json",
+  "sha256": "0ee50299b15850e87861f05a708d2958705453e59f29775d78bf58b8db0aaceb",
+  "artifacts": {
+    "TermCraft-0.1.0-linux-x86_64.tar.gz": "04096dfc6e7cd78f619387fc440e12dcf965caca217d27d4c438ace332bac20b",
+    "termcraft_0.1.0-2_amd64.deb": "15757f3f90da3815910b7d371373f91a14e855ae3c807fdfd344ab99a7d14cef"
+  }
+}

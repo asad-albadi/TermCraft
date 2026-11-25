@@ -1,0 +1,97 @@
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+binary: rustc
+commit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67
+commit-date: 2026-10-13
+host: x86_64-unknown-linux-gnu
+release: 1.99.1
+LLVM version: 23.1.1
+cargo 1.99.1 (5f94df478 2026-08-27)
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+Cpus_allowed_list:	0
+Building source snapshot 32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad
+   Compiling termcraft-rdp-engine v0.1.0 (/build/package-sources/32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad/engines/rdp)
+warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
+  --> src/../../../src/desktop/options.rs:96:9
+   |
+95 | pub struct NegotiatedRdpOptions {
+   |            -------------------- fields in this struct
+96 |     pub clipboard: ClipboardPolicy,
+   |         ^^^^^^^^^
+97 |     pub keyboard: KeyboardRouting,
+   |         ^^^^^^^^
+98 |     pub keyboard_layout: u32,
+   |         ^^^^^^^^^^^^^^^
+   |
+   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `is_default` is never used
+   --> src/../../../src/desktop/options.rs:101:12
+    |
+100 | impl RdpOptions {
+    | --------------- method in this implementation
+101 |     pub fn is_default(&self) -> bool {
+    |            ^^^^^^^^^^
+
+warning: `termcraft-rdp-engine` (bin "termcraft-rdp-engine") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 58.04s
+   Compiling harbor-workspace v0.1.0 (/build/package-sources/32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad)
+warning: methods `send` and `poll` are never used
+   --> src/ui.rs:168:8
+    |
+150 | impl TerminalTab {
+    | ---------------- methods in this implementation
+...
+168 |     fn send(&mut self, data: &[u8]) {
+    |        ^^^^
+...
+212 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+    --> src/ui/shared_sessions.rs:691:19
+     |
+ 640 | impl Workspace {
+     | -------------- methods in this implementation
+...
+ 691 |     pub(super) fn shared_sources_busy(&self) -> bool {
+     |                   ^^^^^^^^^^^^^^^^^^^
+...
+1006 |     pub(super) fn refresh_shared_source_with(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+    Finished `release` profile [optimized] target(s) in 10m 26s
+4628e1c5e58f50fc6bec4f31140a65567138c589b020d7be74abde769f32e8af  /build/out/TermCraft-0.1.0-linux-x86_64.tar.gz
+9a7c2b80deaa3f062c783fa4a49cd3f926681bf3de31238f608a0b238860f337  /build/out/termcraft_0.1.0-3_amd64.deb
+4628e1c5e58f50fc6bec4f31140a65567138c589b020d7be74abde769f32e8af  /build/out/TermCraft-0.1.0-linux-x86_64.tar.gz
+9a7c2b80deaa3f062c783fa4a49cd3f926681bf3de31238f608a0b238860f337  /build/out/termcraft_0.1.0-3_amd64.deb
+2b9f0ebfe3eb317e035fd28ec22df22455ada2312c9f5804014bbea84d3421e0  /build/persistence-fixture

@@ -1,0 +1,23 @@
+{
+  "from_archive": "8a9c97e5dc5791ee278fb485a2082f5fa7c75220801f798e46e1c21a0dd72bc8",
+  "to_archive": "d8cec853b37018e55c76a837340c86d8cdb406ef4bff9c6008d7ddebd92098f0",
+  "to_source_sha256": "32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad",
+  "unchanged_server_source_pins": {
+    "src/services/vnc.rs": "179e96ee2b4c771a50d7a66caa7d23836b9beb67b50ab81330ee3cbfeb107ca5",
+    "src/services/supervisor.rs": "8eadff379f18e60bce4f39dc399d74fdca1dddcc4b7e5ab3792b09995d7c77e3",
+    "src/ui/managed_vnc.rs": "29c4bdad534b1abdcb4316547e3001c42952c91cc94914f04b5e3c056f1553eb",
+    "src/ui/managed_servers.rs": "c8b8aa82d0274e2492bf3c318b63d1a701e0bc605a281022dbb2da6112354306",
+    "src/ui/servers.rs": "81f7c92361b0c3b4f1c6afc5d17bf9a0e8a0a001b0ac91113050613c839ed40e",
+    "src/services/vnc/wayland.rs": "1a3934c135b0ee5240178eebdedd0f8c05e80aa26cbc0d9ff710c03d6bc97dd9",
+    "src/services/vnc/wayland/portal.rs": "bb319755de31e707160e39d24002c27270c4641ef0861b189ca3a1e180da0a45",
+    "src/services/vnc/wayland/helper.rs": "9f5b5aef95820463644d59e36a2cf4c0d0bfaa71db8bdc30adb36bf141145045",
+    "src/services/vnc/keyboard.rs": "46be1e0351d0f030ba9efec630203c7cb33970ec5f3c4dde3aef247a29afe700",
+    "src/runtime/manifest.rs": "7b0ec300a40a19593728a66ecf1861e129b0e190b8f5ee49e4b2af4d2d27aa51",
+    "engines/wayland/src/capture.rs": "b39b189a8bd14025c5f0042563b046fa691ce9568151ad2d6789e33e0e3f40b6",
+    "engines/wayland/src/main.rs": "de0d59ff7e6882a752cef5fe03d59d032af85e876188ba929c67580f6ebcac03",
+    "engines/wayland/src/lib.rs": "6b85eb6cf4990748b067888b7f0400a9ff386d9ec26a1fb580ac90078423f608"
+  },
+  "unchanged_helper_sha256": "fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59",
+  "scope": "Prior actualGUI125 acceptance retained for unchanged server/portal/helper behavior with explicit identity transfer; no claim of125replay on this changed app. New actual normal-app client/runtime smoke pending separately.",
+  "prior_independent_review": "docs/parity-evidence/E03/final-packaged-wayland-vnc-independent-review.md"
+}

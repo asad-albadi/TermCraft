@@ -333,13 +333,13 @@
     },
     {
       "id": "D02",
-      "state": "Implementation remaining",
+      "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [
         "D01",
         "S05"
       ],
-      "dependency": "",
+      "dependency": "Native Windows/macOS RDP/redirection endpoints and physical printer, smartcard and serial fixtures. POSIX lacks the required opened-object rename/delete and general COMMSTATUS/properties/modem-event semantics; additional Linux hardware alone cannot supply missing OS APIs.",
       "remaining": "Reviewed native printer/smartcard, Linux RXCHAR/BREAK/ERR events and per-open statistics, Windows per-open statistics and bounded native serial owners are merged. Exact general POSIX COMMSTATUS/properties/modem events and opened-object rename/delete remain explicit platform/architecture limitations; native Windows/macOS/device/original qualification remains.",
       "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; actual RDP native/admin/drive/device/clipboard/security/original interoperability remains unverified.",
       "evidence": [
@@ -362,7 +362,8 @@
         "docs/parity-evidence/D02/unix-extra-events/root-integration.json",
         "docs/parity-evidence/parallel-integration-local-completion-helper/result.json"
       ],
-      "next_action": "Retain honest POSIX limitations; complete native Windows/macOS/physical-device and original RDP qualification in supported environments."
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
+      "platform_limitations": "Opened-object mutation and general POSIX COMMSTATUS/properties/modem events remain unavailable by design where no identity-safe native API exists. They are not marked implemented or assumed fixable by another Linux machine."
     },
     {
       "id": "D03",
@@ -403,10 +404,10 @@
     },
     {
       "id": "X01",
-      "state": "Implementation remaining",
+      "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "",
+      "dependency": "Native Windows/macOS builders and interactive engine hosts to compile, approve hashes and qualify the reviewed owned-engine candidates.",
       "remaining": "Reviewed Windows owned-job/loopback/PID/authentication and macOS private-socket/process-group source candidates are merged, with pinned upstream patches and offline source preparation. Native built engines, compiled checksum approvals and redistribution/runtime qualification remain unavailable; production gates reject stock engines. Linux owned Xwayland remains implemented.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
@@ -418,16 +419,16 @@
         "docs/parity-evidence/X01/native-providers-review.md",
         "docs/parity-evidence/parallel-integration-native-clipboard/result.json"
       ],
-      "next_action": "Build and qualify patched native engine payloads before enabling either candidate; retain Linux behavior and exact unavailable capabilities."
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
     {
       "id": "X02",
-      "state": "Implementation remaining",
+      "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [
         "F01"
       ],
-      "dependency": "",
+      "dependency": "Qualified native Windows/macOS owned engines from X01 and interactive SSH/X authentication, clipboard and display workflows on those systems.",
       "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. Complete Windows/macOS owned-engine integration, native clipboard/display behavior and native/original qualification.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
@@ -435,15 +436,15 @@
         "docs/parity-evidence/X02/review.md",
         "docs/parity-evidence/parallel-integration-clean/result.json"
       ],
-      "next_action": "Retain reviewed per-session Linux X authorization and forwarding; finish native owned-engine integrations alongside X01 and explicit platform clipboard/display tests.",
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
       "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
     },
     {
       "id": "X03",
-      "state": "Implementation remaining",
+      "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "",
+      "dependency": "Native Windows/macOS graphics hosts and physical GPU/monitor fixtures; configured headless Linux graphics coverage is retained.",
       "remaining": "Reviewed actual Linux GLX rendering, Composite readback and RandR change/restoration are integrated and qualified in private fixtures, including actual extracted release app/engine. Native Windows/macOS graphics, hardware/GPU/monitor coverage and original comparison remain pending.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
@@ -452,17 +453,17 @@
         "docs/parity-evidence/X03/review.md",
         "docs/parity-evidence/parallel-integration-browser-vnc-x03/release-verification.json"
       ],
-      "next_action": "Preserve verified Linux graphics and bounded disposable probe lifecycle; qualify native engines before enabling native probes.",
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
       "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
     },
     {
       "id": "X04",
-      "state": "Implementation remaining",
+      "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "",
-      "remaining": "Linux direct/indirect chooser, clipboard, keyboard and cleanup workflows are implemented. Reviewed parent-identity lifecycle and bounded endpoint recovery fixes are integrated; genuine source22bb full398d traced and untraced actual-app qualification passed. Native Windows/macOS engines and original comparison remain.",
-      "validation_remaining": "Source22bb root981passed/0failed/73ignored; genuine full398d actual-app traced and untraced strict-auth clipboard/chooser/keyboard/cancel tests passed. New source d1a54 differs only in optional Wayland helper; final full release rebuild is active, no XDMCP changes.",
+      "dependency": "Native Windows/macOS engines and original Personal26.6 workflow access. Linux genuine-package chooser/clipboard/keyboard/cancel checks already pass.",
+      "remaining": "Linux direct/indirect discovery, hostname, clipboard, keyboard and cleanup workflows are implemented and genuine-package qualified after the reviewed reset fix. Native Windows/macOS engine implementation/runtime qualification and original comparison remain.",
+      "validation_remaining": "Genuine source22bb/full398d traced and untraced strict-auth chooser/clipboard/keyboard/cancel checks passed. Current32 source retains identical XDMCP paths and native engine; native Windows/macOS and original workflows remain unverified.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/X04/hostnames/root-integration.json",
@@ -471,7 +472,7 @@
         "target/agent-work/current-packaged-xdmcp/reliability-boundary/owner-handoff.md",
         "docs/parity-evidence/parallel-integration-post-xdmcp-reset-fix/result.json"
       ],
-      "next_action": "Retain qualified Linux behavior and exact native engine gates. Native Windows/macOS engines and original workflow comparison require supported environments.",
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
       "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
     },
     {
@@ -496,18 +497,18 @@
     },
     {
       "id": "P01",
-      "state": "Implementation remaining",
+      "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [
         "F01"
       ],
-      "dependency": "",
+      "dependency": "Native Windows/macOS required-client payload builds and clean-runtime hosts. Declared Arch-compatible Linux optional closure and Debian12 core scopes are qualified separately.",
       "remaining": "Linux optional protocol/runtime bundle is integrated and qualified for declared Arch x86_64 ABI, with actual empty-client-PATH Mosh SSH/UDP and sandboxed embedded Chromium. Debian12 core deliberately omits these optional native payloads. Native Windows/macOS required-client payloads and clean-runtime qualification remain.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md"
       ],
-      "next_action": "Preserve qualified Linux runtime closure, finish current optional Wayland rebuild, and build/qualify Windows/macOS payloads on supported native hosts."
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
     {
       "id": "P02",
@@ -619,12 +620,12 @@
     },
     {
       "id": "P08",
-      "state": "Implementation remaining",
+      "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "",
-      "remaining": "Source22bb full398d optional Arch-compatible bundle and Debian12 core0409/revision2 are genuinely built and independently accepted within scope. Actual apt revision1-to2 upgrade/replacement/remove/reinstall preserved workspace/vault/corrupt bytes. New optional Wayland idle-sharing fix d1a54 is integrated; updated full bundle qualification is active. Other distributions and native Windows/macOS installers/lifecycle remain.",
-      "validation_remaining": "Source22bb 3372 full-bundle hashes and1074 core hashes pass. Debian42commands/16bytepairs/5lifecycle inventories pass; full actual XDMCP/browser/Mosh checks pass. Updated optional Wayland helper/full release and actual GUI idle/Stop acceptance remain open.",
+      "dependency": "Native Windows/macOS installer/build/upgrade hosts. Signing identities are needed only if a signed release is chosen, not for unsigned native qualification.",
+      "remaining": "Current source32e512 genuine full Linux archive d8cec and Debian12 core4628/revision3 are built and independently audited. Native Windows/macOS installers/lifecycle remain; full optional Debian runtime closure is not claimed.",
+      "validation_remaining": "Current Linux full3372hashes/actualGUI37checks and native Debian1074hashes/43commands/16bytepairs/5inventories pass. Native Windows/macOS installers and additional platform/original behavior remain unverified.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/parallel-packaging/review.md",
@@ -634,9 +635,11 @@
         "docs/parity-evidence/P08/debian-revision/review.md",
         "docs/parity-evidence/P08/current-debian-core-upgrade-d6e6c3/evidence-summary.md",
         "docs/parity-evidence/V08/current-core-qualification/review.md",
-        "docs/parity-evidence/P08/post-xdmcp-fix-debian-core-upgrade-22bbf268/evidence-summary.md"
+        "docs/parity-evidence/P08/post-xdmcp-fix-debian-core-upgrade-22bbf268/evidence-summary.md",
+        "docs/parity-evidence/P08/tigervnc-fix-debian-core-upgrade-32e512/evidence-summary.md",
+        "docs/parity-evidence/parallel-integration-tigervnc-clipboard-fix-release/gui-qualification/REPORT.md"
       ],
-      "next_action": "Finish updated genuine optional Linux bundle and real GUI idle/Stop checks. Preserve Debian12 core and Arch optional ABI scopes; then qualify native Windows/macOS releases in supported environments.",
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
       "interface_prerequisite_note": "Pinned Linux runtime/package manifests already exist and qualified immutable artifacts demonstrate the packaging interface; remaining full P01/native closure is separate from further Linux package validation."
     },
     {
@@ -755,10 +758,10 @@
     },
     {
       "id": "E01",
-      "state": "Implementation remaining",
+      "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "",
+      "dependency": "Native Windows/macOS packaged Chromium runtimes and interactive profile, input and lifecycle qualification.",
       "remaining": "Reviewed embedded Chromium and private process/pipe source backends are present for Linux, Windows and macOS. Genuine source22bb Linux bundle passes actual normal-app navigation/input/resize/PTY and five nested sandboxed renderer checks with clean cleanup. Native Windows/macOS browser packaging and interactive provider qualification remain.",
       "validation_remaining": "Native Windows/Linux/macOS and original runtime comparisons remain pending; static exact-target and official scope evidence established.",
       "evidence": [
@@ -771,7 +774,7 @@
         "docs/parity-evidence/E01/windows/README.md",
         "docs/parity-evidence/E01/resize-macos-review.md"
       ],
-      "next_action": "Retain verified Linux managed Chromium runtime and sandbox behavior. Build and exercise native Windows/macOS bundled browsers, private profile/input and lifecycle workflows."
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
     {
       "id": "E02",
@@ -793,12 +796,12 @@
     },
     {
       "id": "E03",
-      "state": "Implementation remaining",
+      "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "",
-      "remaining": "Reviewed Cron/NFS/VNC/native providers and offline noVNC viewer are integrated. Real private native Linux provider capture/control matrices passed. Genuine full398d GUI Start/consent/RFB authentication then exposed static-desktop helper timeout; reviewed fix is integrated as deebc2e/source d1a54. Genuine updated helper/full bundle and actual GUI idle/input/held-inputStop/backend-loss acceptance are in progress. Physical GPU/monitors, Windows/macOS and original service qualification remain.",
-      "validation_remaining": "Native Windows/Linux/macOS and original runtime comparisons remain pending; static exact-target and official scope evidence established.",
+      "dependency": "Native Windows/macOS service/capture/control hosts, physical desktop/GPU/monitor consent fixtures and measured original-service behavior. Configured Linux headless GUI sharing is qualified.",
+      "remaining": "Reviewed Linux services/native providers and offline viewer are integrated. Wayland idle defect is fixed; actual packaged GUI125checks pass on8a9 with explicit unchanged13server-source/helper transfer to currentd8cec. Current app VNC client GUI37checks pass including both clipboard directions. Native Windows/macOS and physical/original service behavior remain.",
+      "validation_remaining": "Configured private Linux native GUI capture/control/idle/Stop/revocation/view-only/denial/pending cancellation pass. Physical GPU/system consent UI, Windows/macOS and original services remain unverified.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/original-scope/README.md",
@@ -811,37 +814,39 @@
         "docs/parity-evidence/E03/real-wayland-portal/HANDOFF.md",
         "docs/parity-evidence/E03/real-wayland-rd/HANDOFF.md",
         "docs/parity-evidence/E03/real-wayland-rd/review.md",
-        "docs/parity-evidence/E03/wayland-idle-fix/independent-review.md"
+        "docs/parity-evidence/E03/wayland-idle-fix/independent-review.md",
+        "docs/parity-evidence/E03/final-packaged-wayland-vnc/REPORT.md",
+        "docs/parity-evidence/parallel-integration-tigervnc-clipboard-fix-release/wayland-gui-evidence-transfer.json"
       ],
-      "next_action": "Complete updated genuine helper/package and actual GUI idle/input/Stop/backend-loss checks; then retain exact headless Linux scope and qualify physical/native/original workflows in supported environments."
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
     {
       "id": "E04",
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Original Personal 26.6 limits/defaults/package/plugin format measurements.",
+      "dependency": "Original Personal26.6 running on supported Windows to measure version-specific limits, defaults and package/plugin behavior.",
       "remaining": "Confirm version-specific session/tunnel limits and protocol defaults rather than treating estimated values as recovered facts.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/original-scope/README.md"
       ],
-      "next_action": "Confirm version-specific session/tunnel limits and protocol defaults rather than treating estimated values as recovered facts."
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
     {
       "id": "E05",
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Personal About/Settings/Tools/import inventory to finish checking remaining edition ambiguities; Professional Customizer exclusion is established.",
+      "dependency": "Original Personal26.6 native About/Settings/Tools/import inventory for remaining edition ambiguities; standalone Professional Customizer exclusion is retained.",
       "remaining": "Keep Professional-only customization outside the Personal baseline unless the target scope is explicitly expanded. The Professional Customizer is not established as a missing Personal feature.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/original-scope/README.md"
       ],
-      "next_action": "Retain confirmed exclusion of standalone Professional Customizer; capture remaining Personal menus without removing ordinary preferences or plugins."
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
     {
       "id": "V01",
@@ -896,43 +901,46 @@
       ],
       "dependency": "",
       "remaining": "Reviewed reproducible controlled Linux endpoint matrix and runner integrated;30 exact endpoint cases pass across FTP/FTPS, Telnet, Rlogin/Rsh, RDP, VNC, XDMCP and owned gateways.",
-      "validation_remaining": "Controlled Linux endpoint checkpoint retained; representative independent deployed RDP, FTP/FTPS, VNC-server and legacy-terminal daemon interoperability remains local work and is now assigned. Native Windows/macOS/original and additional server/version combinations remain separate.",
+      "validation_remaining": "Controlled Linux matrix and representative independent ProFTPD6modes, Telnet/Rlogin/Rsh, NLA FreeRDP-shadow desktop/input and corrected TigerVNC authentication/pixels/input/bidirectional clipboard/resize pass. Independent RDP clipboard/drive and Unicode are not established by the limited shadow server. Native Windows/macOS/original and other server/version combinations remain unverified.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/V03/README.md",
         "docs/parity-evidence/V03/review.md",
         "docs/parity-evidence/V03/root-tcp-tls.log",
-        "docs/parity-evidence/V03/root-runner-contracts.log"
+        "docs/parity-evidence/V03/root-runner-contracts.log",
+        "docs/parity-evidence/V03/independent-protocol-daemons/REPORT.md",
+        "docs/parity-evidence/V03/independent-protocol-daemons/CORRECTIONS.md",
+        "docs/parity-evidence/V03/independent-rdp-server/README.md"
       ],
-      "next_action": "Complete bounded independent daemon interoperability using owned containers/displays; preserve genuine failures and unchanged controlled negative matrices."
+      "next_action": "Retain reviewed representative independent-server evidence and exact server limitations; qualify required remaining native/original cases on supported endpoints."
     },
     {
       "id": "V04",
-      "state": "Implementation remaining",
+      "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [
         "P04"
       ],
-      "dependency": "",
+      "dependency": "Physical serial adapters and real network-adapter transition fixtures. Controlled encrypted UDP roaming and actual packaged SSH/Mosh are already qualified within scope.",
       "remaining": "Exercise Mosh through network changes and serial sessions with actual hardware; inspect adapter shutdown and error reporting.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md"
       ],
-      "next_action": "Retain controlled encrypted-UDP Mosh roaming and PTY evidence already recorded; actual network changes and physical serial adapters remain separate unverified requirements."
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
     {
       "id": "V05",
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows and macOS runners with interactive desktop access.",
+      "dependency": "Native Windows/macOS build runners with interactive desktop access; source/type checks do not establish native runtime behavior.",
       "remaining": "Run native Windows and macOS builds and interactive workflows. Windows cross-target `cargo check` proves compilation only.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md"
       ],
-      "next_action": "Run native Windows and macOS builds and interactive workflows. Windows cross-target `cargo check` proves compilation only."
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
     {
       "id": "V06",
@@ -956,13 +964,13 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Original Personal 26.6 executable running on a supported host with paired captures.",
+      "dependency": "Original Personal26.6 on supported Windows with paired workflow captures and measurements against TermCraft.",
       "remaining": "Capture the original Personal 26.6 workflows and compare them with equivalent TermCraft sessions; reconcile the mechanics evidence with measured behavior.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md"
       ],
-      "next_action": "Capture the original Personal 26.6 workflows and compare them with equivalent TermCraft sessions; reconcile the mechanics evidence with measured behavior."
+      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
     {
       "id": "V08",
@@ -979,10 +987,31 @@
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/P08/current-debian-core-upgrade-d6e6c3/evidence-summary.md",
         "docs/parity-evidence/B06/native-overwrite-current-core/REPORT.md",
-        "docs/parity-evidence/V08/current-core-qualification/review.md"
+        "docs/parity-evidence/V08/current-core-qualification/review.md",
+        "docs/parity-evidence/P08/tigervnc-fix-debian-core-upgrade-32e512/evidence-summary.md"
       ],
       "next_action": "Continue current full optional Linux artifact qualification, retain scoped Debian12 current-core evidence, then run unavailable native/original cells on their supported machines.",
       "interface_prerequisite_note": "Qualified immutable Linux packages already supply the validation input. Outstanding native distributions in P08 do not block controlled clean Linux/upgrade/persistence tests."
     }
-  ]
+  ],
+  "current_local_qualification": {
+    "date": "2026-11-25",
+    "source_sha256": "32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad",
+    "source_commit": "7b04c58",
+    "implementation_checkpoints": 46,
+    "strict_verified_complete": 0,
+    "whole_suite": {
+      "passed": 986,
+      "failed": 0,
+      "ignored": 73,
+      "outer_targets": 71,
+      "unchanged_inputs": 750
+    },
+    "whole_suite_evidence": "docs/parity-evidence/parallel-integration-tigervnc-clipboard-fix/result.json",
+    "linux_full_archive_sha256": "d8cec853b37018e55c76a837340c86d8cdb406ef4bff9c6008d7ddebd92098f0",
+    "debian_core_archive_sha256": "4628e1c5e58f50fc6bec4f31140a65567138c589b020d7be74abde769f32e8af",
+    "debian_revision3_sha256": "9a7c2b80deaa3f062c783fa4a49cd3f926681bf3de31238f608a0b238860f337",
+    "final_independent_artifact_review": "docs/parity-evidence/parallel-integration-tigervnc-clipboard-fix-release/final-independent-review.md",
+    "scope_note": "Remaining implementation and validation requires stated native/equipment/original environments; documented POSIX architecture limitations remain explicit, not hardware-only or complete."
+  }
 }

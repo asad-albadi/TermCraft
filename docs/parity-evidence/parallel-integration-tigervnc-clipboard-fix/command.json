@@ -1,0 +1,22 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "--all-targets",
+    "--no-fail-fast",
+    "--jobs",
+    "1"
+  ],
+  "CARGO_BUILD_JOBS": "2",
+  "RUST_MIN_STACK": "134217728",
+  "RUSTUP_HOME": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961",
+  "RUSTUP_TOOLCHAIN": "1.96.1",
+  "CARGO_TARGET_DIR": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation-rust1961",
+  "RUST_TEST_THREADS": "1",
+  "cpu_affinity": [
+    0
+  ],
+  "PATH": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin:/home/asad/.codex/tmp/arg0-linux/codex-arg0t077VJ:/home/asad/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/home/asad/Android/Sdk/platform-tools:/home/asad/Android/Sdk/emulator:/home/asad/.local/share/flutter-android/flutter/bin:/home/asad/.local/share/flutter-android/java/bin:/home/asad/Android/Sdk/cmdline-tools/latest/bin:/home/asad/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/home/asad/.local/share/flatpak/exports/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/usr/lib/rustup/bin:/home/asad/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/usr/lib/chatgpt/resources"
+}

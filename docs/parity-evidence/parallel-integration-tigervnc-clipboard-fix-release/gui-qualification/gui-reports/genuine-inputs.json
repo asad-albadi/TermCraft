@@ -1,0 +1,15 @@
+{
+  "source_snapshot_sha256": "32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad",
+  "source_files": 596,
+  "helper_exit_code": 0,
+  "package_exit_code": 0,
+  "archive": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-post-tigervnc-clipboard-fix-reviewed/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing.tar.gz",
+  "archive_sha256": "d8cec853b37018e55c76a837340c86d8cdb406ef4bff9c6008d7ddebd92098f0",
+  "package_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-local-completion-qualified/d8cec853b37018e55c76a837340c86d8cdb406ef4bff9c6008d7ddebd92098f0/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing",
+  "application_sha256": "920f59d2a1486c2c20ccac4aea60df381b79ac2414fb11cf42af6d7d84631e2c",
+  "rdp_helper_sha256": "85f33c8c7987cf84d73748c2d33283cf9878426febcbfed72a3f26acb42beba6",
+  "wayland_helper_sha256": "fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59",
+  "files_verified": 3372,
+  "source_changes_during_build": [],
+  "seconds": 819.59
+}

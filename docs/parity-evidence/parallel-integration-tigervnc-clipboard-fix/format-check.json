@@ -1,0 +1,15 @@
+{
+  "command": [
+    "cargo",
+    "fmt",
+    "--all",
+    "--",
+    "--check"
+  ],
+  "environment": {
+    "CARGO_BUILD_JOBS": "2"
+  },
+  "exit_code": 0,
+  "source_sha256": "32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad",
+  "note": "Actual completed root tool execution66459; unchanged source since then."
+}

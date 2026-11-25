@@ -1,0 +1,82 @@
+[
+  {
+    "before": "evidence/clean-installed/corrupt.before.credentials.vault",
+    "after": "evidence/clean-installed/corrupt.after.credentials.vault",
+    "sha256": "5bb70295ea92bc55c879ba7c78a46f9706e6e6e7159bb74bfc01bfd15f1bd159"
+  },
+  {
+    "before": "evidence/clean-installed/corrupt.before.workspace.json",
+    "after": "evidence/clean-installed/corrupt.after.workspace.json",
+    "sha256": "e17f0459dc51875edbaf2c65f9e5de16b3301fbf3786434b31f45abf65b44065"
+  },
+  {
+    "before": "evidence/clean-installed/workspace.before.credentials.vault",
+    "after": "evidence/clean-installed/workspace.after.credentials.vault",
+    "sha256": "5951844b32859c23d28bad44a26477f5752a075a2837cee992dfd802655c7986"
+  },
+  {
+    "before": "evidence/clean-installed/workspace.before.workspace.json",
+    "after": "evidence/clean-installed/workspace.after.workspace.json",
+    "sha256": "82c2174f99adb094476d0ea731c04281c019c0b71b2d28a996e973d9de2ade6e"
+  },
+  {
+    "before": "evidence/old-warmed/corrupt.before.credentials.vault",
+    "after": "evidence/old-warmed/corrupt.after.credentials.vault",
+    "sha256": "5bb70295ea92bc55c879ba7c78a46f9706e6e6e7159bb74bfc01bfd15f1bd159"
+  },
+  {
+    "before": "evidence/old-warmed/corrupt.before.workspace.json",
+    "after": "evidence/old-warmed/corrupt.after.workspace.json",
+    "sha256": "e17f0459dc51875edbaf2c65f9e5de16b3301fbf3786434b31f45abf65b44065"
+  },
+  {
+    "before": "evidence/old-warmed/workspace.before.credentials.vault",
+    "after": "evidence/old-warmed/workspace.after.credentials.vault",
+    "sha256": "5951844b32859c23d28bad44a26477f5752a075a2837cee992dfd802655c7986"
+  },
+  {
+    "before": "evidence/old-warmed/workspace.before.workspace.json",
+    "after": "evidence/old-warmed/workspace.after.workspace.json",
+    "sha256": "82c2174f99adb094476d0ea731c04281c019c0b71b2d28a996e973d9de2ade6e"
+  },
+  {
+    "before": "evidence/reinstalled/corrupt.before.credentials.vault",
+    "after": "evidence/reinstalled/corrupt.after.credentials.vault",
+    "sha256": "5bb70295ea92bc55c879ba7c78a46f9706e6e6e7159bb74bfc01bfd15f1bd159"
+  },
+  {
+    "before": "evidence/reinstalled/corrupt.before.workspace.json",
+    "after": "evidence/reinstalled/corrupt.after.workspace.json",
+    "sha256": "e17f0459dc51875edbaf2c65f9e5de16b3301fbf3786434b31f45abf65b44065"
+  },
+  {
+    "before": "evidence/reinstalled/workspace.before.credentials.vault",
+    "after": "evidence/reinstalled/workspace.after.credentials.vault",
+    "sha256": "5951844b32859c23d28bad44a26477f5752a075a2837cee992dfd802655c7986"
+  },
+  {
+    "before": "evidence/reinstalled/workspace.before.workspace.json",
+    "after": "evidence/reinstalled/workspace.after.workspace.json",
+    "sha256": "82c2174f99adb094476d0ea731c04281c019c0b71b2d28a996e973d9de2ade6e"
+  },
+  {
+    "before": "evidence/upgraded-installed/corrupt.before.credentials.vault",
+    "after": "evidence/upgraded-installed/corrupt.after.credentials.vault",
+    "sha256": "5bb70295ea92bc55c879ba7c78a46f9706e6e6e7159bb74bfc01bfd15f1bd159"
+  },
+  {
+    "before": "evidence/upgraded-installed/corrupt.before.workspace.json",
+    "after": "evidence/upgraded-installed/corrupt.after.workspace.json",
+    "sha256": "e17f0459dc51875edbaf2c65f9e5de16b3301fbf3786434b31f45abf65b44065"
+  },
+  {
+    "before": "evidence/upgraded-installed/workspace.before.credentials.vault",
+    "after": "evidence/upgraded-installed/workspace.after.credentials.vault",
+    "sha256": "5951844b32859c23d28bad44a26477f5752a075a2837cee992dfd802655c7986"
+  },
+  {
+    "before": "evidence/upgraded-installed/workspace.before.workspace.json",
+    "after": "evidence/upgraded-installed/workspace.after.workspace.json",
+    "sha256": "82c2174f99adb094476d0ea731c04281c019c0b71b2d28a996e973d9de2ade6e"
+  }
+]

@@ -1,0 +1,246 @@
+runtime-image 0 sha256:1d04200c2ece1d4d75a2a6f8e11ebce7d86a2ae28b34bb2c9cbb3ee9f4953e75
+
+create 0 272af51ab4907d50d0a0914de6968a044415889e5705b09c5f898fc812daac48
+
+baseline 0 12u2
+libtasn1-6:amd64	4.19.0-2+deb12u1
+libtinfo6:amd64	6.4-4
+libudev1:amd64	252.39-1~deb12u2
+libunistring2:amd64	1.0-2
+libuuid1:amd64	2.38.1-5+deb12u3
+libxxhash0:amd64	0.8.1-1
+libzstd1:amd64	1.5.4+dfsg2-5
+login	1:4.13+dfsg1-1+deb12u2
+logsave	1.47.0-2+b2
+mawk	1.3.4.20200120-3.1
+mount	2.38.1-5+deb12u3
+ncurses-base	6.4-4
+ncurses-bin	6.4-4
+passwd	1:4.13+dfsg1-1+deb12u2
+perl-base	5.36.0-7+deb12u4
+sed	4.9-1+deb12u1
+sysvinit-utils	3.06-4
+tar	1.34+dfsg-1.2+deb12u1
+tzdata	2026f-0+deb12u1
+usr-is-merged	37~deb12u1
+util-linux	2.38.1-5+deb12u3
+util-linux-extra	2.38.1-5+deb12u3
+zlib1g:amd64	1:1.2.13.dfsg-1
+
+apt-update 0 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [34.8 kB]
+Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8790 kB]
+Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [381 kB]
+Fetched 9420 kB in 4s (2505 kB/s)
+Reading package lists...
+
+clean-install 0  ...
+Setting up libxrandr2:amd64 (2:1.5.2-2+b1) ...
+Setting up libegl1:amd64 (1.6.0-1) ...
+Setting up libglx-mesa0:amd64 (22.3.6-1+deb12u2) ...
+Setting up libxi6:amd64 (2:1.8-1+b1) ...
+Setting up libglx0:amd64 (1.6.0-1) ...
+Setting up libxcursor1:amd64 (1:1.2.1-1) ...
+Setting up libgl1:amd64 (1.6.0-1) ...
+Setting up termcraft (0.1.0-3) ...
+Processing triggers for libc-bin (2.36-9+deb12u14) ...
+Processing triggers for ca-certificates (20250419~deb12u2) ...
+Updating certificates in /etc/ssl/certs...
+0 added, 0 removed; done.
+Running hooks in /etc/ca-certificates/update.d...
+done.
+
+clean-dependency-audit 0 lib/x86_64-linux-gnu/libc.so.6 (0x00007fb047fbc000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fb04aaaa000)
+	linux-vdso.so.1 (0x00007fb880f5f000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fb880639000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fb880559000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fb880377000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fb880f61000)
+c7287a6649fbe752174b0e461cd61f58b4dd86ea837cb2f3ebc48edbd96696a2  /opt/termcraft/harbor-workspace
+b8722e738d474b5e3423e8cb64555d5751bb02a74fc582c397b05ad7ed2490f7  /opt/termcraft/PACKAGE-MANIFEST.json
+
+package-info 0 0 lines      control              
+  101310 bytes,  1079 lines      md5sums              
+ Package: termcraft
+ Version: 0.1.0-3
+ Architecture: amd64
+ Section: utils
+ Priority: optional
+ Maintainer: TermCraft local package build
+ Installed-Size: 81725
+ Depends: libc6 (>= 2.35), libgcc-s1, libegl1, libgl1, libwayland-client0, libwayland-cursor0, libwayland-egl1, libxkbcommon0, libxkbcommon-x11-0, libx11-6, libx11-xcb1, libxcb1, libxcursor1, libxi6, libxrandr2, ca-certificates
+ Description: TermCraft remote workspace and terminal
+  Local terminal, remote sessions and bundled headless RDP worker.
+
+package-contents 0 re/applications/
+-rw-r--r-- root/root       184 1970-01-01 00:00 ./usr/share/applications/org.termcraft.TermCraft.desktop
+drwxr-xr-x root/root         0 1970-01-01 00:00 ./usr/share/doc/
+drwxr-xr-x root/root         0 1970-01-01 00:00 ./usr/share/doc/termcraft/
+-rw-r--r-- root/root      7755 1970-01-01 00:00 ./usr/share/doc/termcraft/copyright
+-rw-r--r-- root/root       413 1970-01-01 00:00 ./usr/share/doc/termcraft/debian-package-manifest.json
+drwxr-xr-x root/root         0 1970-01-01 00:00 ./usr/share/pixmaps/
+-rw-r--r-- root/root   3089746 1970-01-01 00:00 ./usr/share/pixmaps/termcraft.png
+
+test-tools 0 .66) ...
+Setting up libpython3.11-stdlib:amd64 (3.11.2-6+deb12u9) ...
+Setting up libxaw7:amd64 (2:1.0.14-1) ...
+Setting up libpython3-stdlib:amd64 (3.11.2-1+b1) ...
+Setting up python3.11 (3.11.2-6+deb12u9) ...
+Setting up x11-xkb-utils (7.7+7) ...
+Setting up python3 (3.11.2-1+b1) ...
+running python rtupdate hooks for python3.11...
+running python post-rtupdate hooks for python3.11...
+Setting up python3-pil:amd64 (9.4.0-1.1+deb12u1) ...
+Setting up xserver-common (2:21.1.7-3+deb12u13) ...
+Setting up xvfb (2:21.1.7-3+deb12u13) ...
+Processing triggers for libc-bin (2.36-9+deb12u14) ...
+
+native-runtime-versions 0 Python 3.11.2
+ldd (Debian GLIBC 2.36-9+deb12u14) 2.36
+Copyright (C) 2022 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Written by Roland McGrath and Ulrich Drepper.
+libc6:amd64	2.36-9+deb12u14
+libegl1:amd64	1.6.0-1
+libgl1:amd64	1.6.0-1
+libx11-6:amd64	2:1.8.4-2+deb12u2
+libxkbcommon0:amd64	1.5.0-1
+python3	3.11.2-1+b1
+xvfb	2:21.1.7-3+deb12u13
+glibc 2.36
+
+disconnect 0 
+network-state 0 Iface	Destination	Gateway 	Flags	RefCnt	Use	Metric	Mask		MTU	Window	IRTT                                                       
+Inter-|   Receive                                                |  Transmit
+ face |bytes    packets errs drop fifo frame compressed multicast|bytes    packets errs drop fifo colls carrier compressed
+    lo:       0       0    0    0    0     0          0         0        0       0    0    0    0     0       0          0
+
+isolation 0 
+create-real-fixture 0 Synthetic credential decrypted; wrong master rejected; workspace reference/preferences retained; secret absent from plaintext
+
+seed-workspace 0 Seeded owned offline profile/gateway reference, nonempty tunnel/macro, custom shortcut and preferences
+
+corrupt-fixture 0 
+check-corrupt 0 Corrupt store/vault rejected without replacement
+
+clean-installed-startup 0 Installed native manifest, GUI, helper, workspace/vault and corrupt-store preservation passed
+
+userdata-initial 0 5951844b32859c23d28bad44a26477f5752a075a2837cee992dfd802655c7986  /tmp/qualification-home/workspace/credentials.vault
+5bb70295ea92bc55c879ba7c78a46f9706e6e6e7159bb74bfc01bfd15f1bd159  /tmp/qualification-home/corrupt/credentials.vault
+82c2174f99adb094476d0ea731c04281c019c0b71b2d28a996e973d9de2ade6e  /tmp/qualification-home/workspace/workspace.json
+e17f0459dc51875edbaf2c65f9e5de16b3301fbf3786434b31f45abf65b44065  /tmp/qualification-home/corrupt/workspace.json
+
+remove-clean 0 (Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 12697 files and directories currently installed.)
+Removing termcraft (0.1.0-3) ...
+Processing triggers for mailcap (3.70+nmu1) ...
+
+clean-remove-preserved 0 5951844b32859c23d28bad44a26477f5752a075a2837cee992dfd802655c7986  /tmp/qualification-home/workspace/credentials.vault
+5bb70295ea92bc55c879ba7c78a46f9706e6e6e7159bb74bfc01bfd15f1bd159  /tmp/qualification-home/corrupt/credentials.vault
+82c2174f99adb094476d0ea731c04281c019c0b71b2d28a996e973d9de2ade6e  /tmp/qualification-home/workspace/workspace.json
+e17f0459dc51875edbaf2c65f9e5de16b3301fbf3786434b31f45abf65b44065  /tmp/qualification-home/corrupt/workspace.json
+
+install-old-baseline 0 se ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 11063 files and directories currently installed.)
+Preparing to unpack .../termcraft_0.1.0-2_amd64.deb ...
+Unpacking termcraft (0.1.0-2) ...
+Setting up termcraft (0.1.0-2) ...
+Processing triggers for mailcap (3.70+nmu1) ...
+
+old-audit 0 lib/x86_64-linux-gnu/libc.so.6 (0x00007fe890e07000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fe8938f6000)
+	linux-vdso.so.1 (0x00007fbd89b38000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fbd89212000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fbd89132000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fbd88f50000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fbd89b3a000)
+07680193ba453e22c4fbea8bc99ac2813c7b19d3e586b72b7d891bd26445b914  /opt/termcraft/harbor-workspace
+458c4ec081e14e17b4c11da27bd8e43c412cec11ae7ca3d7e8ef3771cd6c92aa  /opt/termcraft/PACKAGE-MANIFEST.json
+
+old-warmed-startup 0 Installed native manifest, GUI, helper, workspace/vault and corrupt-store preservation passed
+
+userdata-old-baseline 0 5951844b32859c23d28bad44a26477f5752a075a2837cee992dfd802655c7986  /tmp/qualification-home/workspace/credentials.vault
+5bb70295ea92bc55c879ba7c78a46f9706e6e6e7159bb74bfc01bfd15f1bd159  /tmp/qualification-home/corrupt/credentials.vault
+82c2174f99adb094476d0ea731c04281c019c0b71b2d28a996e973d9de2ade6e  /tmp/qualification-home/workspace/workspace.json
+e17f0459dc51875edbaf2c65f9e5de16b3301fbf3786434b31f45abf65b44065  /tmp/qualification-home/corrupt/workspace.json
+
+upgrade-current 0 ding database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 12697 files and directories currently installed.)
+Preparing to unpack .../termcraft_0.1.0-3_amd64.deb ...
+Unpacking termcraft (0.1.0-3) over (0.1.0-2) ...
+Setting up termcraft (0.1.0-3) ...
+Processing triggers for mailcap (3.70+nmu1) ...
+
+upgrade-audit 0 lib/x86_64-linux-gnu/libc.so.6 (0x00007f3b685e1000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f3b6b0cf000)
+	linux-vdso.so.1 (0x00007f5c1d056000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f5c1c730000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f5c1c650000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f5c1c46e000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f5c1d058000)
+c7287a6649fbe752174b0e461cd61f58b4dd86ea837cb2f3ebc48edbd96696a2  /opt/termcraft/harbor-workspace
+b8722e738d474b5e3423e8cb64555d5751bb02a74fc582c397b05ad7ed2490f7  /opt/termcraft/PACKAGE-MANIFEST.json
+
+monotonic-version 0 
+upgrade-startup 0 Installed native manifest, GUI, helper, workspace/vault and corrupt-store preservation passed
+
+upgrade-vault 0 Synthetic credential decrypted; wrong master rejected; workspace reference/preferences retained; secret absent from plaintext
+
+same-version-replacement 0 ding database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 12697 files and directories currently installed.)
+Preparing to unpack .../termcraft_0.1.0-3_amd64.deb ...
+Unpacking termcraft (0.1.0-3) over (0.1.0-3) ...
+Setting up termcraft (0.1.0-3) ...
+Processing triggers for mailcap (3.70+nmu1) ...
+
+same-version-audit 0 lib/x86_64-linux-gnu/libc.so.6 (0x00007f2a8183b000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f2a84329000)
+	linux-vdso.so.1 (0x00007f2dc6e51000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f2dc652b000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f2dc644b000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f2dc6269000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f2dc6e53000)
+c7287a6649fbe752174b0e461cd61f58b4dd86ea837cb2f3ebc48edbd96696a2  /opt/termcraft/harbor-workspace
+b8722e738d474b5e3423e8cb64555d5751bb02a74fc582c397b05ad7ed2490f7  /opt/termcraft/PACKAGE-MANIFEST.json
+
+same-version-vault 0 Synthetic credential decrypted; wrong master rejected; workspace reference/preferences retained; secret absent from plaintext
+
+remove-upgraded 0 (Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 12697 files and directories currently installed.)
+Removing termcraft (0.1.0-3) ...
+Processing triggers for mailcap (3.70+nmu1) ...
+
+removed-preserved 0 5951844b32859c23d28bad44a26477f5752a075a2837cee992dfd802655c7986  /tmp/qualification-home/workspace/credentials.vault
+5bb70295ea92bc55c879ba7c78a46f9706e6e6e7159bb74bfc01bfd15f1bd159  /tmp/qualification-home/corrupt/credentials.vault
+82c2174f99adb094476d0ea731c04281c019c0b71b2d28a996e973d9de2ade6e  /tmp/qualification-home/workspace/workspace.json
+e17f0459dc51875edbaf2c65f9e5de16b3301fbf3786434b31f45abf65b44065  /tmp/qualification-home/corrupt/workspace.json
+
+reinstall-current 0 se ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 11063 files and directories currently installed.)
+Preparing to unpack .../termcraft_0.1.0-3_amd64.deb ...
+Unpacking termcraft (0.1.0-3) ...
+Setting up termcraft (0.1.0-3) ...
+Processing triggers for mailcap (3.70+nmu1) ...
+
+reinstalled-audit 0 lib/x86_64-linux-gnu/libc.so.6 (0x00007fdae1952000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fdae4440000)
+	linux-vdso.so.1 (0x00007f12af3bd000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f12aea97000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f12ae9b7000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f12ae7d5000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f12af3bf000)
+c7287a6649fbe752174b0e461cd61f58b4dd86ea837cb2f3ebc48edbd96696a2  /opt/termcraft/harbor-workspace
+b8722e738d474b5e3423e8cb64555d5751bb02a74fc582c397b05ad7ed2490f7  /opt/termcraft/PACKAGE-MANIFEST.json
+
+reinstalled-startup 0 Installed native manifest, GUI, helper, workspace/vault and corrupt-store preservation passed
+
+reinstalled-vault 0 Synthetic credential decrypted; wrong master rejected; workspace reference/preferences retained; secret absent from plaintext
+
+reinstalled-corrupt 0 Corrupt store/vault rejected without replacement
+
+userdata-final 0 5951844b32859c23d28bad44a26477f5752a075a2837cee992dfd802655c7986  /tmp/qualification-home/workspace/credentials.vault
+5bb70295ea92bc55c879ba7c78a46f9706e6e6e7159bb74bfc01bfd15f1bd159  /tmp/qualification-home/corrupt/credentials.vault
+82c2174f99adb094476d0ea731c04281c019c0b71b2d28a996e973d9de2ade6e  /tmp/qualification-home/workspace/workspace.json
+e17f0459dc51875edbaf2c65f9e5de16b3301fbf3786434b31f45abf65b44065  /tmp/qualification-home/corrupt/workspace.json
+
+cleanup 0 termcraft-tigervnc-fix-debian-runtime
+
+cleanup-inventory 0 

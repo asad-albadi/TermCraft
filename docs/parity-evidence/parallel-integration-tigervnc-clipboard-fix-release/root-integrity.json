@@ -1,0 +1,19 @@
+{
+  "archive_sha256": "d8cec853b37018e55c76a837340c86d8cdb406ef4bff9c6008d7ddebd92098f0",
+  "source_sha256": "32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad",
+  "profile": "release",
+  "files_verified_extracted_and_archive": 3372,
+  "changes_from_8a9_payload": [
+    "harbor-workspace"
+  ],
+  "changes_from_8a9_source": [
+    "src/desktop/vnc_clipboard.rs"
+  ],
+  "component_sha256": {
+    "harbor-workspace": "920f59d2a1486c2c20ccac4aea60df381b79ac2414fb11cf42af6d7d84631e2c",
+    "termcraft-rdp-engine": "85f33c8c7987cf84d73748c2d33283cf9878426febcbfed72a3f26acb42beba6",
+    "termcraft-wayland-engine": "fa7147099cda83486a4bdc3a59510cecc0e560e10200f4c1bac4bf6ff5b19f59"
+  },
+  "seconds": 3.87,
+  "note": "Root independent archive/payload validation; actual normal-app VNC GUI/runtime checks remain owned by worker."
+}

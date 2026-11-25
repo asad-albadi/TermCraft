@@ -1,0 +1,14 @@
+{
+  "archive_path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/tigervnc-fix-debian-upgrade/build/out/TermCraft-0.1.0-linux-x86_64.tar.gz",
+  "archive_sha256": "4628e1c5e58f50fc6bec4f31140a65567138c589b020d7be74abde769f32e8af",
+  "archive_bytes": 30721675,
+  "source_sha256": "32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad",
+  "manifest_files_verified": 1074,
+  "app_sha256": "c7287a6649fbe752174b0e461cd61f58b4dd86ea837cb2f3ebc48edbd96696a2",
+  "helper_sha256": "3c98e3ec640424ac7b847aafa03792c39d1c7400ada1a8ba5fbe2225819b06eb",
+  "elf_glibc_requirements": {
+    "harbor-workspace": "2.35",
+    "termcraft-rdp-engine": "2.34"
+  },
+  "managed_x_runtime_payload_entries": []
+}

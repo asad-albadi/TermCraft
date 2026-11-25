@@ -1,0 +1,32 @@
+{
+  "time_utc": "2026-11-25T14:02:03.891376+00:00",
+  "reason": "Move only current owned unit-test execution off concurrent compiler CPU0; parent Cargo/compilers unchanged. No tests skipped or source/binary changes.",
+  "pid": 314260,
+  "exe": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation-rust1961/debug/deps/harbor_workspace-77be29a0d51f2f21",
+  "exe_sha256": "0948b810a341673be6bc829527e960179ad498d6e5909f2ca913a6c6acf62197",
+  "owned_ancestor_chain": [
+    314260,
+    301273,
+    301261
+  ],
+  "thread_changes": [
+    {
+      "tid": 314260,
+      "before": [
+        0
+      ],
+      "after": [
+        2
+      ]
+    },
+    {
+      "tid": 315164,
+      "before": [
+        0
+      ],
+      "after": [
+        2
+      ]
+    }
+  ]
+}

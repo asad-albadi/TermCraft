@@ -1,3 +1,5 @@
+> Current execution status(2026-11-25):46/60implementation checkpoints(76.7%), strict native/original0/60. Reviewed local fixes and representative independent-server cells pass; current source32e512 has986passing tests/0failures/73ignored and genuine Linux full plus Debian12 core/revision3 qualification. Remaining native/equipment/original dependencies and POSIX architecture limits are explicit in [the authoritative queue](../../../PARITY_EXECUTION_QUEUE.json) and [local closure report](../../parity-evidence/execution/2026-11-25-local-completion.md). Initial planned-status tables below are historical inventory, not current execution state.
+
 # Complete TermCraft Parity Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.

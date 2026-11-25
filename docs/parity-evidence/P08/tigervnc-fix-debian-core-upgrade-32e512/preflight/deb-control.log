@@ -1,0 +1,10 @@
+Package: termcraft
+Version: 0.1.0-3
+Architecture: amd64
+Section: utils
+Priority: optional
+Maintainer: TermCraft local package build
+Installed-Size: 81725
+Depends: libc6 (>= 2.35), libgcc-s1, libegl1, libgl1, libwayland-client0, libwayland-cursor0, libwayland-egl1, libxkbcommon0, libxkbcommon-x11-0, libx11-6, libx11-xcb1, libxcb1, libxcursor1, libxi6, libxrandr2, ca-certificates
+Description: TermCraft remote workspace and terminal
+ Local terminal, remote sessions and bundled headless RDP worker.

@@ -1,0 +1,19 @@
+{
+  "origin": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/post-xdmcp-fix-debian-upgrade/build",
+  "method": "private cp -a --reflink=auto per cache; original never mounted writable",
+  "original_artifacts": {
+    "TermCraft-0.1.0-linux-x86_64.tar.gz": "04096dfc6e7cd78f619387fc440e12dcf965caca217d27d4c438ace332bac20b",
+    "termcraft_0.1.0-2_amd64.deb": "15757f3f90da3815910b7d371373f91a14e855ae3c807fdfd344ab99a7d14cef"
+  },
+  "origin_cache_binaries": {
+    "harbor-workspace": {
+      "sha256": "07680193ba453e22c4fbea8bc99ac2813c7b19d3e586b72b7d891bd26445b914",
+      "prior_packaged_sha256": "07680193ba453e22c4fbea8bc99ac2813c7b19d3e586b72b7d891bd26445b914"
+    },
+    "termcraft-rdp-engine": {
+      "sha256": "d7c40bef522d268cbe5314a729699170f7695c237a41fe7c77537a802f5bc359",
+      "prior_packaged_sha256": "3c98e3ec640424ac7b847aafa03792c39d1c7400ada1a8ba5fbe2225819b06eb"
+    }
+  },
+  "qualification_note": "Original caches are rebuildable working state; helper cache differs from prior packaged helper. Both components are ordinarily rebuilt from new frozen source; prior sealed artifacts are independent immutable baseline."
+}

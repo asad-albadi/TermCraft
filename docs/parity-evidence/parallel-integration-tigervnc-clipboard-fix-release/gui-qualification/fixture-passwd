@@ -1,0 +1,2 @@
+root:x:0:0:root:/tmp/root:/usr/bin/bash
+asad:x:1000:1000:Owned GUI fixture:/tmp/real-home:/usr/bin/bash

@@ -1,0 +1,32 @@
+{
+  "time_utc": "2026-11-25T13:59:44.025910+00:00",
+  "reason": "Move only the current owned long-running library-test execution off the CPU used by concurrent release/native compiler jobs. Parent Cargo and compiler CPU0 affinity remain unchanged. No source/test/binary changes.",
+  "pid": 311629,
+  "exe": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation-rust1961/debug/deps/harbor_workspace-2fdcb113c4549838",
+  "exe_sha256": "10bb51aa1e881e35ac6d689f445ac0c1c0586a73009fd45798fbc9e102672fd6",
+  "owned_ancestor_chain": [
+    311629,
+    301273,
+    301261
+  ],
+  "thread_changes": [
+    {
+      "tid": 311629,
+      "before": [
+        0
+      ],
+      "after": [
+        2
+      ]
+    },
+    {
+      "tid": 313780,
+      "before": [
+        0
+      ],
+      "after": [
+        2
+      ]
+    }
+  ]
+}

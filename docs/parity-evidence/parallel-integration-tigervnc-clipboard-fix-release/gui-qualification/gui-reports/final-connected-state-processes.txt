@@ -1,0 +1,18 @@
+    PID    PPID COMMAND         COMMAND
+      1       0 dbus-run-sessio dbus-run-session -- python -I /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-vnc-clipboard-release/gui-matrix.py
+      7       1 dbus-daemon     dbus-daemon --nofork --print-address 4 --session
+      8       1 python          python -I /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-vnc-clipboard-release/gui-matrix.py
+     10       8 mutter          mutter --headless --wayland --no-x11 --virtual-monitor 1600x1000 --debug-control --mutter-plugin=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-vnc-clipboard-release/tools/usr/lib/mutter-51/plugins/libdefault.so
+     42       8 pipewire        pipewire
+     44       8 wireplumber     wireplumber
+     45       8 xdg-desktop-por /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-vnc-clipboard-release/tools/usr/lib/xdg-desktop-portal-gnome -v
+     57       8 xdg-desktop-por /usr/lib/xdg-desktop-portal -v
+     63       1 xdg-permission- /usr/lib/xdg-permission-store
+    118       8 termcraft-wayla /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-local-completion-qualified/d8cec853b37018e55c76a837340c86d8cdb406ef4bff9c6008d7ddebd92098f0/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing/termcraft-wayland-engine 42 43
+    133       8 21 <defunct>    [21] <defunct>
+    137       8 harbor-workspac /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-local-completion-qualified/d8cec853b37018e55c76a837340c86d8cdb406ef4bff9c6008d7ddebd92098f0/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing/harbor-workspace --data-dir /tmp/tiger-gui-workspace --session owned-tiger-vnc-gui
+    175       8 python          python -I /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-vnc-clipboard-release/clipboard-peer.py /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/final-vnc-clipboard-release/gui-reports/peer
+    182       1 at-spi-bus-laun /usr/lib/at-spi-bus-launcher
+    188     182 dbus-daemon     /usr/bin/dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 10 --address=unix:path=/tmp/real-runtime/at-spi/bus
+    201       1 at-spi2-registr /usr/lib/at-spi2-registryd --use-gnome-session
+    251       8 ps              ps -eo pid,ppid,comm,args

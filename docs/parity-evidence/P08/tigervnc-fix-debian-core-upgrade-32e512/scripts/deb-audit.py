@@ -1,0 +1,10 @@
+from pathlib import Path
+import subprocess,tarfile,io,json,hashlib
+q=Path.cwd()/'target/agent-work/tigervnc-fix-debian-upgrade';d=q/'build/out/termcraft_0.1.0-3_amd64.deb';m=json.loads((q/'portable-manifest.json').read_text())
+base=['docker','run','--rm','--label','org.termcraft.validation=tigervnc-fix-debian-upgrade','--network','none','--read-only','--tmpfs','/tmp:rw,nosuid,mode=1777','--cpuset-cpus','0','--cap-drop','ALL','--security-opt','no-new-privileges','--user','1000:1000','--env','CARGO_BUILD_JOBS=2','--mount',f'type=bind,src={q}/build/out,dst=/input,readonly','--entrypoint','/usr/bin/dpkg-deb','sha256:1e7cd41f77c63d2093907d8a33cc65562eafd5cfbed60c829b9faedf652f24a0'];cmds=[base+['--fsys-tarfile','/input/'+d.name],base+['--field','/input/'+d.name]]
+raw=subprocess.run(cmds[0],capture_output=True,check=True).stdout
+with tarfile.open(fileobj=io.BytesIO(raw)) as t:
+ f={x.name:x for x in t.getmembers()};assert f['./usr/bin/termcraft'].issym() and f['./usr/bin/termcraft'].linkname=='/opt/termcraft/harbor-workspace';assert all(x.uid==0 and x.gid==0 for x in f.values())
+ for n,v in m['files'].items():assert hashlib.sha256(t.extractfile(f['./opt/termcraft/'+n]).read()).hexdigest()==v,n
+ assert json.load(t.extractfile(f['./opt/termcraft/PACKAGE-MANIFEST.json']))==m
+control=subprocess.run(cmds[1],capture_output=True,text=True,check=True).stdout;assert 'Version: 0.1.0-3\n' in control and 'Architecture: amd64\n' in control;(q/'preflight/deb-control.log').write_text(control);(q/'deb-payload-verification.json').write_text(json.dumps({'deb_sha256':hashlib.sha256(d.read_bytes()).hexdigest(),'version':'0.1.0-3','architecture':'amd64','root_owned_entries':len(f),'manifest_files_verified':len(m['files']),'portable_manifest_identical':True,'launcher_symlink':'/opt/termcraft/harbor-workspace','audit_commands':cmds,'audit_exit_codes':[0,0],'note':'Host has no dpkg-deb; read-only offline native Debian builder was used for this independent post-runtime audit.'},indent=2)+'\n');print('RealDEB revision3/rootownership/launcher/all1074payload hashes verified')

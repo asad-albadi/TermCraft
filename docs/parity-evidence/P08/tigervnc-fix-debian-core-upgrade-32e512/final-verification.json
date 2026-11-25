@@ -1,0 +1,24 @@
+{
+  "result": "pass",
+  "source_sha256": "32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad",
+  "runtime_commands_exit_zero": 43,
+  "before_after_byte_comparisons": 16,
+  "lifecycle_hash_list_equality": [
+    "userdata-initial",
+    "clean-remove-preserved",
+    "userdata-old-baseline",
+    "removed-preserved",
+    "userdata-final"
+  ],
+  "owned_container_inventory_empty": true,
+  "prior_22bb_seal_sha256": "0ee50299b15850e87861f05a708d2958705453e59f29775d78bf58b8db0aaceb",
+  "prior_22bb_sealed_files_preserved": 132,
+  "prior_22bb_artifacts_preserved": {
+    "TermCraft-0.1.0-linux-x86_64.tar.gz": "04096dfc6e7cd78f619387fc440e12dcf965caca217d27d4c438ace332bac20b",
+    "termcraft_0.1.0-2_amd64.deb": "15757f3f90da3815910b7d371373f91a14e855ae3c807fdfd344ab99a7d14cef"
+  },
+  "app_glibc_requirement": "2.35",
+  "helper_glibc_requirement": "2.34",
+  "managed_x_runtime_payload_entries": [],
+  "saved_workspace_screenshot_identical_to_prior": true
+}

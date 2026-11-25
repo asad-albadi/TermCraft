@@ -1,0 +1,14 @@
+{
+  "post_qualification_audit_setup_attempts": [
+    {
+      "attempt": 1,
+      "issue": "Host lacks dpkg-deb; no package installation was attempted. Switched to existing Debian image."
+    },
+    {
+      "attempt": 2,
+      "issue": "Read-only Debian audit container lacked writable /tmp for dpkg-deb --field. Payload extraction/hash assertions already passed; added private tmpfs."
+    }
+  ],
+  "final_corrected_audit": "scripts/deb-audit.py; both commands exited 0; all 1074 file hashes/root ownership/manifest/launcher/version passed",
+  "native_build_and_43_command_lifecycle_retry": false
+}

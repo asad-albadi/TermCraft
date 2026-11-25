@@ -1,5 +1,3 @@
-> **Current local gate, 2026-11-25 —46/60 implementation checkpoints(76.7%).** The root suite passed981tests with zero failures(73ignored); current source22bb release checks passed for the declared Arch optional bundle and Debian12 core revision2. Actual packaged Wayland sharing then exposed a reproducible idle-screen disconnect after about seven seconds. The regression-tested fix was independently accepted and integrated as commitdeebc2e/current sourced1a54; the genuine updated helper/full package build is running. Actual GUI idle/input/Stop/backend-loss acceptance remains pending. Earlier “builds running” entries below are historical. Local completion is not yet claimed.
-
 # TermCraft parity execution progress
 
 Updated: 2026-11-25.
@@ -7,6 +5,22 @@ Updated: 2026-11-25.
 **Implementation checkpoints: 46 of 60 (76.7%; F01–F06, T01–T06, W01–W05, S01–S07, D01/D03/D04, X05, P02/P03/P04/P05/P06/P07, B01/B02/B03/B04/B05/B06, E02, V01/V02/V03/V06/V08).** Terminal subsystem review and its required fix pass passed. **Full parity verified: 0 of 60**, because native/original and stated interoperability evidence remains pending; implementation checkpoints are not full-parity claims.
 
 ## Current checkpoint
+
+Current source **32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad**, source commit **7b04c58**, local Git branch `parity-implementation`; no remote is configured.
+
+The identified reproducible Linux defects and representative local interoperability gaps are addressed. The fresh whole-app gate passed **986 tests, zero failures, 73 ignored, 71 outer targets**, with all750 captured inputs unchanged. Formatting checks pass. The ignored/native/original cases are not counted as passing. [Whole-app result](docs/parity-evidence/parallel-integration-tigervnc-clipboard-fix/result.json).
+
+- The reviewed XDMCP reset/clipboard fix passed genuine traced and untraced normal-app qualification. Original failure evidence and old artifacts remain preserved.
+- The reviewed Wayland idle fix passed six helper tests and125actual packaged GUI checks for capture/input/idle/held-release/Stop/revocation/view-only/denial/pending cancellation. Its13server-source pins and helper are unchanged in the current release; the evidence transfer is explicit, without claiming125replayed checks.
+- The reviewed TigerVNC clipboard fix adds five discoverable regression tests. Independent deployed ProFTPD(all6modes), Telnet/Rlogin/Rsh and TigerVNC API checks pass. The current genuine app additionally passes37normal-startup/sealed-RDP-helper/actualGUI checks, including real clipboard exchange in both directions. Independent NLA RDP desktop/input passes; the shadow server does not qualify Unicode or clipboard/drive channels.
+- Current full Linux optional release: **d8cec853b37018e55c76a837340c86d8cdb406ef4bff9c6008d7ddebd92098f0**,3372 verified payload entries, ordinary genuine source32 release. This has its declared Arch-compatible ABI scope. [Current release GUI report](docs/parity-evidence/parallel-integration-tigervnc-clipboard-fix-release/gui-qualification/REPORT.md).
+- Current native Debian12 core: **4628e1c5e58f50fc6bec4f31140a65567138c589b020d7be74abde769f32e8af**; real Debian revision3 **9a7c2b80deaa3f062c783fa4a49cd3f926681bf3de31238f608a0b238860f337**. All43runtime commands,1074payload hashes,16byte pairs and5lifecycle inventories pass across actual revision2→3 upgrade/replacement/remove/reinstall. Optional Arch payloads are absent. [Debian qualification](docs/parity-evidence/P08/tigervnc-fix-debian-core-upgrade-32e512/evidence-summary.md).
+
+The14 remaining implementation checkpoints require the explicitly named native/equipment/original environments. The46 implemented checkpoints still retain their outstanding native/original validation. **POSIX opened-object mutation and general serial status/properties/modem semantics remain architecture/platform limitations; another Linux machine or added hardware does not supply the missing APIs.** No full60/60 or strict native/original completion is claimed. [Local closure and remaining dependencies](docs/parity-evidence/execution/2026-11-25-local-completion.md).
+
+## Historical checkpoint notes
+
+The following entries describe earlier source/artifact scopes; current status above supersedes their old running/latest labels.
 
 **Active local X04 fix:** traced ordinary-package failures were reproduced and corrected by exact live-parent post-auth lifecycle classification plus bounded complete endpoint recovery. Native and Rust independent reviews accepted; private library310/0/30ignored, focused49/0/15ignored, native six and four traced/untraced private normal-app scenarios passed. The eight reviewed files are integrated and committed as ec1c621, source22bbf268…33ecb04. Final whole-app and genuine package checks are running; older d6 full artifacts retain the known defect and are preserved honestly. Local work is not complete until the new artifacts are qualified.
 
@@ -33,7 +47,7 @@ Continuation decisions and costs: [2026-11-25 rulings](docs/parity-evidence/exec
 
 [PARITY_EXECUTION_QUEUE.json](PARITY_EXECUTION_QUEUE.json) is the single authoritative queue for all 60 items. Historical ledger entries below record observations; their strict-order/stop-after-increment instructions are superseded by the user's 2026-11-24 execution instruction. Implementation checkpoints and full native/original parity remain separate.
 
-Run `python3 scripts/parity_queue.py` for actionable tasks. The four states are **Implementation remaining**, **Implemented, validation remaining**, **Blocked** (exact dependency required), and **Verified complete**. Dependencies consume implemented interfaces, never the unrelated native/original verification of an entire predecessor. D03 needs D01's existing framebuffer/input interfaces, not D02's printer/serial/smartcard providers. D02 missing providers remain implementation tasks, not false hardware-only blockers.
+Run `python3 scripts/parity_queue.py` for actionable tasks. The four states are **Implementation remaining**, **Implemented, validation remaining**, **Blocked** (exact dependency required), and **Verified complete**. Dependencies consume implemented interfaces, never the unrelated native/original verification of an entire predecessor. D03 needs D01's existing framebuffer/input interfaces, not D02's printer/serial/smartcard providers. D02 provider gaps must remain implementation tasks wherever they can be implemented locally. The current native provider candidates are reviewed; their exact remaining native environments and POSIX architecture limits are recorded in the queue, without treating missing OS APIs as hardware-only blockers.
 
 After targeted checks pass, take the next actionable task immediately. Batch unfiltered full/host validation at subsystem boundaries; preserve targeted regressions and the latest passing provider host baseline. `rebuild_check` Ready and unavailable comparisons never close the queue. A partial result with actionable tasks requires another builder turn; if the runner cannot launch one, report that limitation and leave the queue open.
 

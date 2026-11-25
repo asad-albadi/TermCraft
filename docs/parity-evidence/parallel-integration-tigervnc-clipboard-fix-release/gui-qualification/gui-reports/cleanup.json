@@ -1,0 +1,42 @@
+[
+  {
+    "name": "mutter",
+    "pid": 10,
+    "returncode": 0
+  },
+  {
+    "name": "pipewire",
+    "pid": 42,
+    "returncode": 0
+  },
+  {
+    "name": "wireplumber",
+    "pid": 44,
+    "returncode": 0
+  },
+  {
+    "name": "gnome-portal",
+    "pid": 45,
+    "returncode": -15
+  },
+  {
+    "name": "portal",
+    "pid": 57,
+    "returncode": -15
+  },
+  {
+    "name": "fixture-helper",
+    "pid": 118,
+    "returncode": -15
+  },
+  {
+    "name": "genuine-vnc-gui",
+    "pid": 137,
+    "returncode": -15
+  },
+  {
+    "name": "owned-clipboard-peer",
+    "pid": 175,
+    "returncode": -15
+  }
+]

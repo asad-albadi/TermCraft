@@ -1,0 +1,1 @@
+{"status": "PASS", "normal_app_help": true, "actual_normal_app_RDP_session_TPKT": true, "actual_child_memfd_seals_hash": true, "preserved_workspace": true, "app_sha256": "920f59d2a1486c2c20ccac4aea60df381b79ac2414fb11cf42af6d7d84631e2c", "helper_sha256": "85f33c8c7987cf84d73748c2d33283cf9878426febcbfed72a3f26acb42beba6"}

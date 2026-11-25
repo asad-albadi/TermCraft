@@ -1,0 +1,40 @@
+{
+  "containers": [
+    {
+      "container": "termcraft-independent-gui",
+      "exit_code": 0,
+      "output": "",
+      "error": ""
+    },
+    {
+      "container": "termcraft-independent-daemons",
+      "exit_code": 0,
+      "output": "termcraft-independent-daemons",
+      "error": ""
+    }
+  ],
+  "generated_private_inputs": [
+    {
+      "name": "secret",
+      "existed": true,
+      "absent_after": true
+    },
+    {
+      "name": "ca.key",
+      "existed": true,
+      "absent_after": true
+    },
+    {
+      "name": "server.key",
+      "existed": true,
+      "absent_after": true
+    },
+    {
+      "name": "vnc.pass",
+      "existed": true,
+      "absent_after": true
+    }
+  ],
+  "remaining_matching_containers": "",
+  "gui_container_exit": 0
+}
