@@ -249,7 +249,7 @@ impl AgentManager {
     let incoming=futures::stream::unfold((listener,active),|(listener,active)|async move{
      loop{let stream=match listener.accept().await{Ok(s)=>s,Err(e)=>return Some((Err(e),(listener,active)))};
       #[cfg(unix)]if stream.peer_creds().ok().and_then(|p|p.euid())!=Some(unsafe{libc::geteuid()}){continue}
-      if active.try_update(Ordering::AcqRel,Ordering::Acquire,|n|if n<32{Some(n+1)}else{None}).is_err(){continue}
+      if active.fetch_update(Ordering::AcqRel,Ordering::Acquire,|n|if n<32{Some(n+1)}else{None}).is_err(){continue}
       return Some((Ok(Counted{stream,active:active.clone()}),(listener,active)));
      }
     });

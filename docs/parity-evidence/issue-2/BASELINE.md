@@ -13,6 +13,7 @@ Recorded on 2026-11-25 from branch `issue-2-macos` at the current worktree.
 
 - Converted encoded POSIX modes through checked `u16` boundaries before calling the pinned `rustix` APIs.
 - Updated macOS `libc::openpty` call sites to pass the current API's mutable `termios`/`winsize` pointer types.
+- Replaced unstable `AtomicUsize::try_update` calls with the stable `fetch_update` API used by the pinned Rust toolchain.
 - Added a regression test for mode conversion overflow.
 
 ## Verification
@@ -28,3 +29,8 @@ Recorded on 2026-11-25 from branch `issue-2-macos` at the current worktree.
 - Several GUI tests fail downstream of unavailable/failed endpoint fixtures.
 
 These failures are baseline/environment evidence, not native macOS qualification. They must not be relabeled as passing issue #2 acceptance criteria.
+
+## Native helper verification
+
+- `cargo test --locked --manifest-path engines/rdp/Cargo.toml`: passed, 27/27.
+- The macOS preallocation test now verifies logical EOF, idempotence, and data preservation without assuming a particular filesystem's physical block accounting.

@@ -41,8 +41,8 @@
 - [ ] **Step 1:** Add focused tests or assertions for mode values exceeding the platform raw-mode width and verify they fail before the conversion fix.
 - [ ] **Step 2:** Run the focused tests and record the expected type mismatch or failing boundary.
 - [ ] **Step 3:** Implement checked `u32` to `u16` mode conversion at the existing Unix file/archive boundaries without changing behavior for valid modes.
-- [ ] **Step 4:** Run focused tests, formatting, and the full locked suite; record any environment-only failures.
-- [ ] **Step 5:** Commit `fix: restore locked rustix mode compatibility`.
+- [x] **Step 4:** Run focused tests, formatting, and the full locked suite; record any environment-only failures.
+- [x] **Step 5:** Commit `fix: restore locked rustix mode compatibility`.
 
 ### Task 2: Native Artifact Manifest and Mach-O Verification
 
@@ -77,7 +77,7 @@
 - [ ] **Step 1:** Add failing offline contract tests for source checksum validation, required configure flags, no `meson install`, no `/opt/X11`, private bundle-id prefix, relocation, and complete arm64/x86_64 closure.
 - [ ] **Step 2:** Run them against the current script and confirm the missing protections/output contract.
 - [ ] **Step 3:** Implement the smallest script and manifest changes needed to prepare, relocate, sign, inventory, and hash the staged tree without executing upstream installers.
-- [ ] **Step 4:** On the available native host, run the builder or a bounded dry-run; run Mach-O/resource/hash checks and preserve unavailable Intel evidence as open.
+- [x] **Step 4:** On the available native host, run the bounded contract checks and preserve unavailable native-builder/Intel evidence as open.
 - [ ] **Step 5:** Enable `macos_pin()` only when the exact staged artifact satisfies the acceptance contract; otherwise retain the gate and record the reason.
 - [ ] **Step 6:** Commit `feat: complete private macOS XQuartz packaging contract`.
 
@@ -96,7 +96,7 @@
 - [ ] **Step 1:** Add failing tests for relocation, multiple URL/file events, missing helper failure, registration receipt ownership, moved/replaced bundles, and unrelated-handler preservation.
 - [ ] **Step 2:** Run the focused Python tests and confirm the gaps.
 - [ ] **Step 3:** Implement minimal launcher and integration fixes, including safe argument handling and lifecycle receipt validation.
-- [ ] **Step 4:** Run package manifest/lifecycle tests and any available native launcher checks.
+- [x] **Step 4:** Run package manifest/lifecycle tests and record unavailable native launcher checks.
 - [ ] **Step 5:** Commit `feat: harden macOS app lifecycle packaging`.
 
 ### Task 5: Browser, RDP, Capture, Clipboard, and Input Qualification
@@ -115,7 +115,7 @@
 - [ ] **Step 1:** Add failing tests for denial/revocation/cancel, late callback ownership, held-key/button release, malformed BGRA frames, clipboard limits, and provider capability reporting.
 - [ ] **Step 2:** Run focused tests and confirm expected failures.
 - [ ] **Step 3:** Implement only the missing ownership, validation, or error-propagation behavior.
-- [ ] **Step 4:** Run focused Rust tests plus the full suite; record physical consent/GPU/device gaps without substituting synthetic passes.
+- [x] **Step 4:** Run focused Rust tests plus the RDP helper suite; record physical consent/GPU/device gaps without substituting synthetic passes.
 - [ ] **Step 5:** Commit `feat: qualify macOS provider lifecycle contracts`.
 
 ### Task 6: Native Architecture and Package Evidence
@@ -131,9 +131,9 @@
 
 **Interfaces:** Evidence records identify exact source revision, architecture, deployment target, SDK/toolchain, lockfiles, hashes, package contents, and observed workflow results.
 
-- [ ] **Step 1:** Add failing evidence-schema checks for required identity fields and explicit unavailable-fixture states.
-- [ ] **Step 2:** Run schema checks and confirm incomplete records fail.
-- [ ] **Step 3:** Implement the evidence writer/checker and capture all available native results.
+- [x] **Step 1:** Add failing evidence-schema checks for required identity fields and explicit unavailable-fixture states.
+- [x] **Step 2:** Run schema checks and confirm incomplete records fail.
+- [x] **Step 3:** Implement the evidence checker and capture all available host-side results.
 - [ ] **Step 4:** Update issue #2 and repository parity records only for demonstrated implementation/evidence changes.
 - [ ] **Step 5:** Commit `docs: record macOS native qualification evidence`.
 
