@@ -68,6 +68,12 @@ jobs:
           archive=(dist/TermCraft-*.zip)
           test "${#archive[@]}" -eq 1
           python scripts/package-check-startup.py "${archive[0]}" --evidence startup-evidence
+      - if: runner.os == 'Windows' && inputs.native_gui
+        shell: pwsh
+        run: |
+          $archive = @(Get-ChildItem dist -Filter 'TermCraft-*.zip')
+          if ($archive.Count -ne 1) { throw 'Expected exactly one Windows package.' }
+          ./tests/windows-package-lifecycle.ps1 -Archive $archive[0].FullName
       - if: success()
         shell: bash
         run: |
