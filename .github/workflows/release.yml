@@ -47,6 +47,14 @@ jobs:
             $reader = Join-Path $env:ProgramFiles 'LLVM\bin\llvm-objdump.exe'
             if (!(Test-Path -LiteralPath $reader)) { throw 'LLVM import inspection tool unavailable.' }
             Split-Path $reader | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          echo 'MACOSX_DEPLOYMENT_TARGET=14.0' >> "$GITHUB_ENV"
+          sw_vers
+          xcodebuild -version
+          xcrun --sdk macosx --show-sdk-version
+          cargo test --locked --manifest-path engines/rdp/Cargo.toml
           }
       - run: cargo test --locked --test package_manifest
       - run: python scripts/package-release.py --output dist
