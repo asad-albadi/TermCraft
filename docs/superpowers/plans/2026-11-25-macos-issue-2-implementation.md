@@ -38,9 +38,9 @@
 
 **Interfaces:** Preserve the existing `rustix` mode conversion semantics while making the pinned toolchain compile. The evidence ledger records the exact baseline command, host architecture, toolchain, and unrelated pre-existing warnings.
 
-- [ ] **Step 1:** Add focused tests or assertions for mode values exceeding the platform raw-mode width and verify they fail before the conversion fix.
-- [ ] **Step 2:** Run the focused tests and record the expected type mismatch or failing boundary.
-- [ ] **Step 3:** Implement checked `u32` to `u16` mode conversion at the existing Unix file/archive boundaries without changing behavior for valid modes.
+- [x] **Step 1:** Add focused tests or assertions for mode values exceeding the platform raw-mode width and verify they fail before the conversion fix.
+- [x] **Step 2:** Run the focused tests and record the expected type mismatch or failing boundary.
+- [x] **Step 3:** Implement checked `u32` to `u16` mode conversion at the existing Unix file/archive boundaries without changing behavior for valid modes.
 - [x] **Step 4:** Run focused tests, formatting, and the full locked suite; record any environment-only failures.
 - [x] **Step 5:** Commit `fix: restore locked rustix mode compatibility`.
 
@@ -55,10 +55,10 @@
 
 **Interfaces:** Native runtime discovery consumes architecture-specific Mach-O verification and file manifests; native policy produces a `NativePin` only for complete approved output.
 
-- [ ] **Step 1:** Add failing tests for wrong CPU slices, duplicate/missing universal slices, forbidden `/opt/X11` references, missing resources, and incomplete manifests.
-- [ ] **Step 2:** Run the focused native-component tests and confirm the new cases fail for the missing contract.
-- [ ] **Step 3:** Implement minimal manifest validation and architecture/resource checks using existing `VerifiedSnapshot` and runtime-manifest patterns.
-- [ ] **Step 4:** Run native-component tests and host-side manifest checks; keep `macos_pin()` closed until a real artifact is available.
+- [x] **Step 1:** Add failing tests for wrong CPU slices, duplicate/missing universal slices, forbidden `/opt/X11` references, missing resources, and incomplete manifests.
+- [x] **Step 2:** Run the focused native-component tests and confirm the new cases fail for the missing contract.
+- [x] **Step 3:** Implement minimal manifest validation and architecture/resource checks using existing `VerifiedSnapshot` and runtime-manifest patterns.
+- [x] **Step 4:** Run native-component tests and host-side manifest checks; keep `macos_pin()` closed until a real artifact is available.
 - [ ] **Step 5:** Commit `feat: define macOS native artifact acceptance contract`.
 
 ### Task 3: Private XQuartz Build, Relocation, and Trust Pinning
@@ -74,9 +74,9 @@
 
 **Interfaces:** The builder outputs a fresh staged `macos-universal-private1` tree; the Rust provider consumes only its pinned executable, resources, dependencies, and authority-safe inherited socket behavior.
 
-- [ ] **Step 1:** Add failing offline contract tests for source checksum validation, required configure flags, no `meson install`, no `/opt/X11`, private bundle-id prefix, relocation, and complete arm64/x86_64 closure.
-- [ ] **Step 2:** Run them against the current script and confirm the missing protections/output contract.
-- [ ] **Step 3:** Implement the smallest script and manifest changes needed to prepare, relocate, sign, inventory, and hash the staged tree without executing upstream installers.
+- [x] **Step 1:** Add failing offline contract tests for source checksum validation, required configure flags, no `meson install`, no `/opt/X11`, private bundle-id prefix, relocation, and complete arm64/x86_64 closure.
+- [x] **Step 2:** Run them against the current script and confirm the missing protections/output contract.
+- [x] **Step 3:** Implement the smallest script and manifest changes needed to prepare, relocate, sign, inventory, and hash the staged tree without executing upstream installers.
 - [x] **Step 4:** On the available native host, run the bounded contract checks and preserve unavailable native-builder/Intel evidence as open.
 - [ ] **Step 5:** Enable `macos_pin()` only when the exact staged artifact satisfies the acceptance contract; otherwise retain the gate and record the reason.
 - [ ] **Step 6:** Commit `feat: complete private macOS XQuartz packaging contract`.
@@ -93,9 +93,9 @@
 
 **Interfaces:** The packaged launcher forwards literal CLI/Finder/URL/Services arguments to the adjacent Rust executable; registration owns only recorded bundles and never changes unrelated defaults.
 
-- [ ] **Step 1:** Add failing tests for relocation, multiple URL/file events, missing helper failure, registration receipt ownership, moved/replaced bundles, and unrelated-handler preservation.
-- [ ] **Step 2:** Run the focused Python tests and confirm the gaps.
-- [ ] **Step 3:** Implement minimal launcher and integration fixes, including safe argument handling and lifecycle receipt validation.
+- [x] **Step 1:** Add failing tests for relocation, multiple URL/file events, missing helper failure, registration receipt ownership, moved/replaced bundles, and unrelated-handler preservation.
+- [x] **Step 2:** Run the focused Python tests and confirm the gaps.
+- [x] **Step 3:** Implement minimal launcher and integration fixes, including safe argument handling and lifecycle receipt validation.
 - [x] **Step 4:** Run package manifest/lifecycle tests and record unavailable native launcher checks.
 - [ ] **Step 5:** Commit `feat: harden macOS app lifecycle packaging`.
 
@@ -112,9 +112,9 @@
 
 **Interfaces:** Existing provider APIs remain unchanged; tests pin bounded frame conversion, permission errors, held-input release, cancellation, clipboard direction, architecture selection, and native RDP provider availability.
 
-- [ ] **Step 1:** Add failing tests for denial/revocation/cancel, late callback ownership, held-key/button release, malformed BGRA frames, clipboard limits, and provider capability reporting.
-- [ ] **Step 2:** Run focused tests and confirm expected failures.
-- [ ] **Step 3:** Implement only the missing ownership, validation, or error-propagation behavior.
+- [x] **Step 1:** Add failing tests for denial/revocation/cancel, late callback ownership, held-key/button release, malformed BGRA frames, clipboard limits, and provider capability reporting.
+- [x] **Step 2:** Run focused tests and confirm expected failures.
+- [x] **Step 3:** Implement only the missing ownership, validation, or error-propagation behavior.
 - [x] **Step 4:** Run focused Rust tests plus the RDP helper suite; record physical consent/GPU/device gaps without substituting synthetic passes.
 - [ ] **Step 5:** Commit `feat: qualify macOS provider lifecycle contracts`.
 
@@ -135,7 +135,7 @@
 - [x] **Step 2:** Run schema checks and confirm incomplete records fail.
 - [x] **Step 3:** Implement the evidence checker and capture all available host-side results.
 - [x] **Step 4:** Update issue #2 and repository parity records only for demonstrated implementation/evidence changes.
-- [ ] **Step 5:** Commit `docs: record macOS native qualification evidence`.
+- [x] **Step 5:** Commit `docs: record macOS native qualification evidence`.
 
 ### Task 7: Final Verification and Issue Closure Readiness
 
@@ -144,5 +144,5 @@
 - [x] **Step 1:** Run formatting, focused tests, full locked workspace tests, RDP helper tests, package checks, and available native smoke checks.
 - [x] **Step 2:** Run the current evidence/hash/integrity review and inspect the complete diff; retain known failures and unavailable native checks as open.
 - [x] **Step 3:** Update issue #2 with completed items, remaining evidence gaps, exact commands, and artifact identifiers.
-- [ ] **Step 4:** Commit final documentation/evidence synchronization.
+- [x] **Step 4:** Commit final documentation/evidence synchronization.
 - [ ] **Step 5:** Perform final whole-branch review before claiming completion.
