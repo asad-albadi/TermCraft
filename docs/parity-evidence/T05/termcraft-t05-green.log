@@ -1,0 +1,14 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.19s
+     Running tests/terminal_safety.rs (target/debug/deps/terminal_safety-83be327e0477c871)
+
+running 6 tests
+test cancel_close_retains_running_session ... ok
+test cancelled_multiline_paste_sends_zero_bytes ... ok
+test refused_transport_chunk_is_retried_without_skipping_or_orphan_delimiters ... ok
+test existing_transport_backpressure_messages_retry_but_closed_connections_stop ... ok
+test delayed_bracketed_paste_uses_one_delimiter_pair ... ok
+test paste_chunks_and_interrupts_are_bounded_and_injection_is_rejected ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

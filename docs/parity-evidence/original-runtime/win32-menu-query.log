@@ -1,0 +1,20 @@
+WINDOW hwnd=0x40180 visible=0 enabled=1 class=ComboLBox title=
+WINDOW hwnd=0x70174 visible=0 enabled=1 class=ComboLBox title=
+WINDOW hwnd=0x120164 visible=0 enabled=1 class=ComboLBox title=
+WINDOW hwnd=0x110134 visible=0 enabled=1 class=TFormSessionEdit title=Session settings
+WINDOW hwnd=0x80130 visible=0 enabled=1 class=ComboLBox title=
+WINDOW hwnd=0x38010e visible=0 enabled=1 class=TFormParams title=MobaXterm Configuration
+WINDOW hwnd=0x210108 visible=0 enabled=1 class=TForm1 title=
+WINDOW hwnd=0x100da visible=0 enabled=1 class=TPUtilWindow title=
+WINDOW hwnd=0x2b0098 visible=0 enabled=1 class=TMobaXtermForm title=MobaXterm
+WINDOW hwnd=0x20090 visible=0 enabled=1 class=TPUtilWindow title=
+WINDOW hwnd=0x30084 visible=0 enabled=1 class=TPUtilWindow title=
+WINDOW hwnd=0x1008a visible=0 enabled=1 class=TPUtilWindow title=
+WINDOW hwnd=0x1007a visible=0 enabled=1 class=TApplication title=MobaXterm
+WINDOW hwnd=0x10082 visible=0 enabled=0 class=IME title=Default IME
+WINDOW hwnd=0x1004a visible=0 enabled=1 class=WineDdeServerName title=
+WINDOW hwnd=0x10048 visible=0 enabled=1 class=WineDdeServerName title=
+WINDOW hwnd=0x10046 visible=0 enabled=1 class=WineDdeServerName title=
+WINDOW hwnd=0x10044 visible=0 enabled=1 class=WineDdeEventClass title=
+WINDOW hwnd=0x1003c visible=0 enabled=1 class=Shell_TrayWnd title=
+WINDOW hwnd=0x10042 visible=0 enabled=0 class=IME title=Default IME

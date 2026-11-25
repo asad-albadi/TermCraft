@@ -1,0 +1,2370 @@
+{
+  "sha256": "4750dc32ba3372fa7f4b8ca38583f98d9d0477d9b0686966fee40aa181bff915",
+  "container": "ZIP",
+  "entries": [
+    {
+      "path": "lib/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/locale/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/locale/locale.alias",
+      "size": 498,
+      "compressed_size": 498,
+      "crc32": "929fbc9d"
+    },
+    {
+      "path": "usr/share/man.tar",
+      "size": 364268,
+      "compressed_size": 364268,
+      "crc32": "a1a3e579"
+    },
+    {
+      "path": "usr/share/terminfo/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/terminfo/78/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/terminfo/78/xterm",
+      "size": 1221,
+      "compressed_size": 1221,
+      "crc32": "0a72c5ac"
+    },
+    {
+      "path": "usr/share/vim.tar",
+      "size": 228899,
+      "compressed_size": 228899,
+      "crc32": "db975e52"
+    },
+    {
+      "path": "usr/share/zsh.tar",
+      "size": 204248,
+      "compressed_size": 204248,
+      "crc32": "fa087860"
+    },
+    {
+      "path": "bin/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "bin/awk.exe",
+      "size": 52435,
+      "compressed_size": 52435,
+      "crc32": "1258a5a5"
+    },
+    {
+      "path": "bin/conin.exe",
+      "size": 41913,
+      "compressed_size": 41913,
+      "crc32": "0b694837"
+    },
+    {
+      "path": "bin/cyggcc_s-seh-1.dll",
+      "size": 28293,
+      "compressed_size": 28293,
+      "crc32": "3be23736"
+    },
+    {
+      "path": "bin/cygncursesw-10.dll",
+      "size": 123791,
+      "compressed_size": 123791,
+      "crc32": "d0af0f9f"
+    },
+    {
+      "path": "bin/cygssp-0.dll",
+      "size": 3340,
+      "compressed_size": 3340,
+      "crc32": "3f87abb4"
+    },
+    {
+      "path": "bin/cygtermd.exe",
+      "size": 11367,
+      "compressed_size": 11367,
+      "crc32": "6c1e65e4"
+    },
+    {
+      "path": "bin/cygwin1.dll",
+      "size": 909747,
+      "compressed_size": 909747,
+      "crc32": "7b98f279"
+    },
+    {
+      "path": "bin/cygz.dll",
+      "size": 42103,
+      "compressed_size": 42103,
+      "crc32": "602709eb"
+    },
+    {
+      "path": "bin/grep.exe",
+      "size": 15612,
+      "compressed_size": 15612,
+      "crc32": "77175dcc"
+    },
+    {
+      "path": "bin/less.exe",
+      "size": 53874,
+      "compressed_size": 53874,
+      "crc32": "0b4e6363"
+    },
+    {
+      "path": "bin/lscolors",
+      "size": 506,
+      "compressed_size": 506,
+      "crc32": "0905e040"
+    },
+    {
+      "path": "bin/MobaControlPanel",
+      "size": 759,
+      "compressed_size": 759,
+      "crc32": "aa21bf31"
+    },
+    {
+      "path": "bin/MobaHwInfo",
+      "size": 290,
+      "compressed_size": 290,
+      "crc32": "8e11b6dd"
+    },
+    {
+      "path": "bin/MobApt",
+      "size": 758,
+      "compressed_size": 758,
+      "crc32": "ff8a38e5"
+    },
+    {
+      "path": "bin/MobaSwInfo",
+      "size": 218,
+      "compressed_size": 218,
+      "crc32": "20de32fc"
+    },
+    {
+      "path": "bin/MobaVerifySSHAlgos",
+      "size": 364,
+      "compressed_size": 364,
+      "crc32": "dca5f8fd"
+    },
+    {
+      "path": "bin/showkey.exe",
+      "size": 2935,
+      "compressed_size": 2935,
+      "crc32": "515e9fbb"
+    },
+    {
+      "path": "bin/ssh-copy-id",
+      "size": 5039,
+      "compressed_size": 5039,
+      "crc32": "2021024c"
+    },
+    {
+      "path": "bin/ssh.exe",
+      "size": 1142,
+      "compressed_size": 1142,
+      "crc32": "eb40e717"
+    },
+    {
+      "path": "bin/top",
+      "size": 260,
+      "compressed_size": 260,
+      "crc32": "ca7ee42d"
+    },
+    {
+      "path": "bin/vim",
+      "size": 117,
+      "compressed_size": 117,
+      "crc32": "7e0f6ce0"
+    },
+    {
+      "path": "bin/winpty-agent.exe",
+      "size": 120013,
+      "compressed_size": 120013,
+      "crc32": "d55f2b99"
+    },
+    {
+      "path": "bin/winpty.dll",
+      "size": 95146,
+      "compressed_size": 95146,
+      "crc32": "080cced3"
+    },
+    {
+      "path": "bin/zsh.exe",
+      "size": 490265,
+      "compressed_size": 490265,
+      "crc32": "eeb35d0c"
+    },
+    {
+      "path": "bin/_vim.exe",
+      "size": 650721,
+      "compressed_size": 650721,
+      "crc32": "8dc6cb89"
+    },
+    {
+      "path": "etc/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "etc/machine-id",
+      "size": 29,
+      "compressed_size": 29,
+      "crc32": "e3260389"
+    },
+    {
+      "path": "etc/setup/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "etc/vimrc.less",
+      "size": 367,
+      "compressed_size": 367,
+      "crc32": "6a577bb0"
+    },
+    {
+      "path": "bin/ascii",
+      "size": 3343,
+      "compressed_size": 3343,
+      "crc32": "3ffba230"
+    },
+    {
+      "path": "bin/cyggssapi_krb5-2.dll",
+      "size": 91130,
+      "compressed_size": 91130,
+      "crc32": "bf26dbfd"
+    },
+    {
+      "path": "bin/cygk5crypto-3.dll",
+      "size": 67070,
+      "compressed_size": 67070,
+      "crc32": "374edbe3"
+    },
+    {
+      "path": "bin/cygkrb5-3.dll",
+      "size": 213238,
+      "compressed_size": 213238,
+      "crc32": "3a32d5aa"
+    },
+    {
+      "path": "bin/cygkrb5support-0.dll",
+      "size": 13003,
+      "compressed_size": 13003,
+      "crc32": "4288fb24"
+    },
+    {
+      "path": "etc/system.jwmrc",
+      "size": 883,
+      "compressed_size": 883,
+      "crc32": "4d30d885"
+    },
+    {
+      "path": "CygUtilsLicenses.html",
+      "size": 44259,
+      "compressed_size": 14161,
+      "crc32": "411dfac6"
+    },
+    {
+      "path": "bin/cygcom_err-3.dll",
+      "size": 3559,
+      "compressed_size": 3559,
+      "crc32": "8c01b7a9"
+    },
+    {
+      "path": "bin/cygkdb5-8.dll",
+      "size": 21915,
+      "compressed_size": 21915,
+      "crc32": "8e8b4fb1"
+    },
+    {
+      "path": "bin/cygkadm5srv_mit-11.dll",
+      "size": 33054,
+      "compressed_size": 33054,
+      "crc32": "e903e63c"
+    },
+    {
+      "path": "bin/cyggssrpc-4.dll",
+      "size": 37439,
+      "compressed_size": 37439,
+      "crc32": "89cb3746"
+    },
+    {
+      "path": "bin/moshsession",
+      "size": 1230,
+      "compressed_size": 1230,
+      "crc32": "0e8aa6b5"
+    },
+    {
+      "path": "bin/klist.exe",
+      "size": 7256,
+      "compressed_size": 7256,
+      "crc32": "1660878f"
+    },
+    {
+      "path": "bin/kinit.exe",
+      "size": 7271,
+      "compressed_size": 7271,
+      "crc32": "ad24ffe0"
+    },
+    {
+      "path": "etc/system.jwmrc.backgroundless",
+      "size": 729,
+      "compressed_size": 729,
+      "crc32": "6e2e90fc"
+    },
+    {
+      "path": "etc/persistprofile.sh",
+      "size": 188,
+      "compressed_size": 188,
+      "crc32": "c064c5f2"
+    },
+    {
+      "path": "etc/zprofile",
+      "size": 65,
+      "compressed_size": 65,
+      "crc32": "6b46f160"
+    },
+    {
+      "path": "bin/Rainbowizer",
+      "size": 166,
+      "compressed_size": 166,
+      "crc32": "f0be66f3"
+    },
+    {
+      "path": "bin/fortune",
+      "size": 257,
+      "compressed_size": 257,
+      "crc32": "0290321a"
+    },
+    {
+      "path": "bin/scrdaemons",
+      "size": 389,
+      "compressed_size": 389,
+      "crc32": "499e8813"
+    },
+    {
+      "path": "bin/waitforX",
+      "size": 155,
+      "compressed_size": 155,
+      "crc32": "f44904bb"
+    },
+    {
+      "path": "bin/MobaBox.exe",
+      "size": 227413,
+      "compressed_size": 227413,
+      "crc32": "1d7b4689"
+    },
+    {
+      "path": "bin/mobawget",
+      "size": 260,
+      "compressed_size": 260,
+      "crc32": "dda9ea11"
+    },
+    {
+      "path": "bin/ServersListToMxtSessions.sh",
+      "size": 694,
+      "compressed_size": 694,
+      "crc32": "4bd320a8"
+    },
+    {
+      "path": "bin/png2ico",
+      "size": 278,
+      "compressed_size": 278,
+      "crc32": "1567c68a"
+    },
+    {
+      "path": "bin/MobaTools",
+      "size": 837,
+      "compressed_size": 837,
+      "crc32": "c99c4952"
+    },
+    {
+      "path": "bin/help",
+      "size": 2829,
+      "compressed_size": 2829,
+      "crc32": "6b42690a"
+    },
+    {
+      "path": "bin/getAvailableDisplay",
+      "size": 96,
+      "compressed_size": 96,
+      "crc32": "0e42f687"
+    },
+    {
+      "path": "bin/vicron",
+      "size": 76,
+      "compressed_size": 76,
+      "crc32": "6eeaf38f"
+    },
+    {
+      "path": "bin/setx11dpi",
+      "size": 189,
+      "compressed_size": 189,
+      "crc32": "381c1f44"
+    },
+    {
+      "path": "bin/autossh.exe",
+      "size": 9102,
+      "compressed_size": 9102,
+      "crc32": "b829e882"
+    },
+    {
+      "path": "bin/rcp.exe",
+      "size": 7188,
+      "compressed_size": 7188,
+      "crc32": "9bb15ce2"
+    },
+    {
+      "path": "bin/rlogin.exe",
+      "size": 5393,
+      "compressed_size": 5393,
+      "crc32": "28bcfa58"
+    },
+    {
+      "path": "bin/rsh.exe",
+      "size": 3743,
+      "compressed_size": 3743,
+      "crc32": "b0bbab4a"
+    },
+    {
+      "path": "bin/png2bmp",
+      "size": 282,
+      "compressed_size": 282,
+      "crc32": "1f6f9568"
+    },
+    {
+      "path": "bin/cygwin-console-helper.exe",
+      "size": 18111,
+      "compressed_size": 18111,
+      "crc32": "0c1f642a"
+    },
+    {
+      "path": "bin/cygcurl-4.dll",
+      "size": 259900,
+      "compressed_size": 259900,
+      "crc32": "ecbb67da"
+    },
+    {
+      "path": "bin/curl.exe",
+      "size": 69769,
+      "compressed_size": 69769,
+      "crc32": "68f3b6e9"
+    },
+    {
+      "path": "bin/cygssh2-1.dll",
+      "size": 89404,
+      "compressed_size": 89404,
+      "crc32": "b19f98ca"
+    },
+    {
+      "path": "bin/termwalk.exe",
+      "size": 6949,
+      "compressed_size": 6949,
+      "crc32": "88ac75aa"
+    },
+    {
+      "path": "bin/soliterm.exe",
+      "size": 11990,
+      "compressed_size": 11990,
+      "crc32": "79f365d0"
+    },
+    {
+      "path": "usr/share/terminfo/74/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/terminfo/74/tmux",
+      "size": 1228,
+      "compressed_size": 1228,
+      "crc32": "320caa76"
+    },
+    {
+      "path": "usr/share/terminfo/78/xterm-256color",
+      "size": 936,
+      "compressed_size": 936,
+      "crc32": "5428b17a"
+    },
+    {
+      "path": "usr/share/terminfo/78/xterm-color",
+      "size": 559,
+      "compressed_size": 559,
+      "crc32": "048da123"
+    },
+    {
+      "path": "usr/share/terminfo/73/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/terminfo/73/screen",
+      "size": 657,
+      "compressed_size": 657,
+      "crc32": "e4cf81fa"
+    },
+    {
+      "path": "bin/lsfont",
+      "size": 2657,
+      "compressed_size": 2657,
+      "crc32": "83f8923d"
+    },
+    {
+      "path": "bin/zstd-decompress.exe",
+      "size": 87145,
+      "compressed_size": 87145,
+      "crc32": "ece1ab13"
+    },
+    {
+      "path": "etc/setup/cmdlist",
+      "size": 47553,
+      "compressed_size": 47553,
+      "crc32": "6e468cbb"
+    },
+    {
+      "path": "etc/zshrc",
+      "size": 102,
+      "compressed_size": 102,
+      "crc32": "4598c3f7"
+    },
+    {
+      "path": "etc/bash.bashrc",
+      "size": 104,
+      "compressed_size": 104,
+      "crc32": "fe1b65f7"
+    },
+    {
+      "path": "etc/inputrc",
+      "size": 311,
+      "compressed_size": 311,
+      "crc32": "e7a38772"
+    },
+    {
+      "path": "etc/bash_completion",
+      "size": 3873,
+      "compressed_size": 3873,
+      "crc32": "e6de8312"
+    },
+    {
+      "path": "bin/vim.exe",
+      "size": 117,
+      "compressed_size": 117,
+      "crc32": "7e0f6ce0"
+    },
+    {
+      "path": "bin/man",
+      "size": 735,
+      "compressed_size": 735,
+      "crc32": "d708fce4"
+    },
+    {
+      "path": "bin/bash.exe",
+      "size": 417919,
+      "compressed_size": 417919,
+      "crc32": "5bcd2fd7"
+    },
+    {
+      "path": "bin/_ssh1.exe",
+      "size": 239184,
+      "compressed_size": 239184,
+      "crc32": "352265b8"
+    },
+    {
+      "path": "bin/iperf.exe",
+      "size": 23046,
+      "compressed_size": 23046,
+      "crc32": "b0ccf80a"
+    },
+    {
+      "path": "bin/lrz.exe",
+      "size": 23395,
+      "compressed_size": 23395,
+      "crc32": "e9d811a8"
+    },
+    {
+      "path": "bin/lsz.exe",
+      "size": 25389,
+      "compressed_size": 25389,
+      "crc32": "7edc7a31"
+    },
+    {
+      "path": "bin/mosh-client.exe",
+      "size": 175741,
+      "compressed_size": 175741,
+      "crc32": "58c2c9c6"
+    },
+    {
+      "path": "bin/cygstdc++-6.dll",
+      "size": 439967,
+      "compressed_size": 439967,
+      "crc32": "8bb93df6"
+    },
+    {
+      "path": "etc/ssl/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "etc/ssl/certs",
+      "size": 59,
+      "compressed_size": 59,
+      "crc32": "889de3aa"
+    },
+    {
+      "path": "etc/pki/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "etc/pki/ca-trust/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "etc/pki/ca-trust/ca-legacy.conf",
+      "size": 33,
+      "compressed_size": 33,
+      "crc32": "70cd1dab"
+    },
+    {
+      "path": "etc/pki/ca-trust/extracted/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "etc/pki/ca-trust/extracted/openssl/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt",
+      "size": 80,
+      "compressed_size": 80,
+      "crc32": "eb0ecd07"
+    },
+    {
+      "path": "etc/pki/ca-trust/extracted/pem/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+      "size": 74,
+      "compressed_size": 74,
+      "crc32": "fe440d54"
+    },
+    {
+      "path": "etc/pki/tls/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "etc/pki/tls/cert.pem",
+      "size": 74,
+      "compressed_size": 74,
+      "crc32": "fe440d54"
+    },
+    {
+      "path": "etc/pki/tls/certs/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "etc/pki/tls/certs/ca-bundle.crt,ca-bundle.trust.crt.mobapack",
+      "size": 159793,
+      "compressed_size": 159793,
+      "crc32": "0af48b31"
+    },
+    {
+      "path": "usr/git/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/git/git-core/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/git/git-core/git-add--interactive",
+      "size": 11970,
+      "compressed_size": 11970,
+      "crc32": "afb848b1"
+    },
+    {
+      "path": "usr/git/git-core/git-add.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-am.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-annotate.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-apply.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-archimport",
+      "size": 11006,
+      "compressed_size": 11006,
+      "crc32": "48de2020"
+    },
+    {
+      "path": "usr/git/git-core/git-archive.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-bisect",
+      "size": 907,
+      "compressed_size": 907,
+      "crc32": "46b05e39"
+    },
+    {
+      "path": "usr/git/git-core/git-bisect--helper.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-blame.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-branch.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-bugreport.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-bundle.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-cat-file.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-check-attr.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-check-ignore.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-check-mailmap.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-check-ref-format.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-checkout--worker.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-checkout-index.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-checkout.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-cherry-pick.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-cherry.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-clean.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-clone.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-column.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-commit-graph.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-commit-tree.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-commit.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-config.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-count-objects.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-credential-cache--daemon.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-credential-cache.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-credential-store.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-credential.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-cvsexportcommit",
+      "size": 4892,
+      "compressed_size": 4892,
+      "crc32": "e61772a9"
+    },
+    {
+      "path": "usr/git/git-core/git-cvsimport",
+      "size": 11148,
+      "compressed_size": 11148,
+      "crc32": "7ed7a024"
+    },
+    {
+      "path": "usr/git/git-core/git-describe.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-diff-files.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-diff-index.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-diff-tree.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-diff.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-difftool--helper",
+      "size": 1141,
+      "compressed_size": 1141,
+      "crc32": "fc3d9f9e"
+    },
+    {
+      "path": "usr/git/git-core/git-difftool.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-env--helper.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-fast-export.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-fast-import.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-fetch-pack.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-fetch.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-filter-branch",
+      "size": 5399,
+      "compressed_size": 5399,
+      "crc32": "6bffa4ab"
+    },
+    {
+      "path": "usr/git/git-core/git-fmt-merge-msg.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-for-each-ref.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-for-each-repo.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-format-patch.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-fsck-objects.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-fsck.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-fsmonitor--daemon.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-gc.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-get-tar-commit-id.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-grep.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-hash-object.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-help.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-hook.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-http-fetch.exe,git-http-push.exe,git-remote-http.exe.mobapack",
+      "size": 1079462,
+      "compressed_size": 1079462,
+      "crc32": "32a3cd67"
+    },
+    {
+      "path": "usr/git/git-core/git-index-pack.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-init-db.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-init.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-instaweb",
+      "size": 6801,
+      "compressed_size": 6801,
+      "crc32": "e18bb7ad"
+    },
+    {
+      "path": "usr/git/git-core/git-interpret-trailers.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-log.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-ls-files.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-ls-remote.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-ls-tree.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-mailinfo.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-mailsplit.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-maintenance.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-merge-base.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-merge-file.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-merge-index.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-merge-octopus",
+      "size": 1197,
+      "compressed_size": 1197,
+      "crc32": "4c9d8848"
+    },
+    {
+      "path": "usr/git/git-core/git-merge-one-file",
+      "size": 1524,
+      "compressed_size": 1524,
+      "crc32": "1ad65acb"
+    },
+    {
+      "path": "usr/git/git-core/git-merge-ours.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-merge-recursive.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-merge-resolve",
+      "size": 545,
+      "compressed_size": 545,
+      "crc32": "0d2b23ce"
+    },
+    {
+      "path": "usr/git/git-core/git-merge-subtree.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-merge-tree.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-merge.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-mergetool",
+      "size": 3413,
+      "compressed_size": 3413,
+      "crc32": "002d4bc2"
+    },
+    {
+      "path": "usr/git/git-core/git-mergetool--lib",
+      "size": 3321,
+      "compressed_size": 3321,
+      "crc32": "f91aad5a"
+    },
+    {
+      "path": "usr/git/git-core/git-mktag.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-mktree.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-multi-pack-index.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-mv.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-name-rev.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-notes.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-p4",
+      "size": 38421,
+      "compressed_size": 38421,
+      "crc32": "d576ef1a"
+    },
+    {
+      "path": "usr/git/git-core/git-pack-objects.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-pack-redundant.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-pack-refs.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-patch-id.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-prune-packed.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-prune.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-pull.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-push.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-quiltimport",
+      "size": 1419,
+      "compressed_size": 1419,
+      "crc32": "c033665d"
+    },
+    {
+      "path": "usr/git/git-core/git-range-diff.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-read-tree.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-rebase.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-receive-pack.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-reflog.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-remote-ext.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-remote-fd.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-remote-ftp.exe",
+      "size": 62,
+      "compressed_size": 62,
+      "crc32": "fc6556d0"
+    },
+    {
+      "path": "usr/git/git-core/git-remote-ftps.exe",
+      "size": 62,
+      "compressed_size": 62,
+      "crc32": "fc6556d0"
+    },
+    {
+      "path": "usr/git/git-core/git-remote-https.exe",
+      "size": 62,
+      "compressed_size": 62,
+      "crc32": "fc6556d0"
+    },
+    {
+      "path": "usr/git/git-core/git-remote.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-repack.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-replace.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-request-pull",
+      "size": 1785,
+      "compressed_size": 1785,
+      "crc32": "46ea2284"
+    },
+    {
+      "path": "usr/git/git-core/git-rerere.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-reset.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-restore.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-rev-list.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-rev-parse.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-revert.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-rm.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-send-email",
+      "size": 18550,
+      "compressed_size": 18550,
+      "crc32": "ba1a5515"
+    },
+    {
+      "path": "usr/git/git-core/git-send-pack.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-sh-i18n",
+      "size": 759,
+      "compressed_size": 759,
+      "crc32": "cc8f7e74"
+    },
+    {
+      "path": "usr/git/git-core/git-sh-setup",
+      "size": 3519,
+      "compressed_size": 3519,
+      "crc32": "5d5c5174"
+    },
+    {
+      "path": "usr/git/git-core/git-shortlog.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-show-branch.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-show-index.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-show-ref.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-show.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-sparse-checkout.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-stage.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-stash.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-status.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-stripspace.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-submodule",
+      "size": 2963,
+      "compressed_size": 2963,
+      "crc32": "18f54b91"
+    },
+    {
+      "path": "usr/git/git-core/git-submodule--helper.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-svn",
+      "size": 19050,
+      "compressed_size": 19050,
+      "crc32": "89dcefdc"
+    },
+    {
+      "path": "usr/git/git-core/git-switch.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-symbolic-ref.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-tag.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-unpack-file.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-unpack-objects.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-update-index.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-update-ref.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-update-server-info.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-upload-archive.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-upload-pack.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-var.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-verify-commit.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-verify-pack.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-verify-tag.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-web--browse",
+      "size": 1733,
+      "compressed_size": 1733,
+      "crc32": "ec43d5f1"
+    },
+    {
+      "path": "usr/git/git-core/git-whatchanged.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-worktree.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git-write-tree.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/git.exe",
+      "size": 51,
+      "compressed_size": 51,
+      "crc32": "7caa8011"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/araxis",
+      "size": 244,
+      "compressed_size": 244,
+      "crc32": "90f6292b"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/bc",
+      "size": 267,
+      "compressed_size": 267,
+      "crc32": "1a1dfb04"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/codecompare",
+      "size": 237,
+      "compressed_size": 237,
+      "crc32": "2b24e5db"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/deltawalker",
+      "size": 415,
+      "compressed_size": 415,
+      "crc32": "4d9c6092"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/diffmerge",
+      "size": 238,
+      "compressed_size": 238,
+      "crc32": "fabbf8a4"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/diffuse",
+      "size": 191,
+      "compressed_size": 191,
+      "crc32": "4dbb01a4"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/ecmerge",
+      "size": 217,
+      "compressed_size": 217,
+      "crc32": "947942f0"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/emerge",
+      "size": 248,
+      "compressed_size": 248,
+      "crc32": "a84320bc"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/examdiff",
+      "size": 233,
+      "compressed_size": 233,
+      "crc32": "ea03c17d"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/guiffy",
+      "size": 218,
+      "compressed_size": 218,
+      "crc32": "98484789"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/gvimdiff",
+      "size": 47,
+      "compressed_size": 47,
+      "crc32": "2072917d"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/kdiff3",
+      "size": 343,
+      "compressed_size": 343,
+      "crc32": "df0d61d4"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/kompare",
+      "size": 160,
+      "compressed_size": 160,
+      "crc32": "1af5f862"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/meld",
+      "size": 795,
+      "compressed_size": 795,
+      "crc32": "a3b3d35f"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/nvimdiff",
+      "size": 47,
+      "compressed_size": 47,
+      "crc32": "2072917d"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/opendiff",
+      "size": 200,
+      "compressed_size": 200,
+      "crc32": "198809f0"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/p4merge",
+      "size": 361,
+      "compressed_size": 361,
+      "crc32": "3b722586"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/smerge",
+      "size": 191,
+      "compressed_size": 191,
+      "crc32": "a3131de6"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/tkdiff",
+      "size": 205,
+      "compressed_size": 205,
+      "crc32": "bac27a66"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/tortoisemerge",
+      "size": 353,
+      "compressed_size": 353,
+      "crc32": "1a63e860"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/vimdiff",
+      "size": 4251,
+      "compressed_size": 4251,
+      "crc32": "adf3ed99"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/winmerge",
+      "size": 290,
+      "compressed_size": 290,
+      "crc32": "ff22c696"
+    },
+    {
+      "path": "usr/git/git-core/mergetools/xxdiff",
+      "size": 389,
+      "compressed_size": 389,
+      "crc32": "4db133df"
+    },
+    {
+      "path": "usr/share/git-core/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/git-core/templates/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/git-core/templates/branches/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/git-core/templates/description",
+      "size": 75,
+      "compressed_size": 75,
+      "crc32": "34a4de9f"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/applypatch-msg.sample",
+      "size": 305,
+      "compressed_size": 305,
+      "crc32": "342d42f7"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/commit-msg.sample",
+      "size": 527,
+      "compressed_size": 527,
+      "crc32": "3ae4499a"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/fsmonitor-watchman.sample",
+      "size": 1825,
+      "compressed_size": 1825,
+      "crc32": "440c5c05"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/post-update.sample",
+      "size": 159,
+      "compressed_size": 159,
+      "crc32": "60ac849b"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-applypatch.sample",
+      "size": 289,
+      "compressed_size": 289,
+      "crc32": "441acc8e"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-commit.sample",
+      "size": 942,
+      "compressed_size": 942,
+      "crc32": "8073eed0"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-merge-commit.sample",
+      "size": 281,
+      "compressed_size": 281,
+      "crc32": "704ca331"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-push.sample",
+      "size": 731,
+      "compressed_size": 731,
+      "crc32": "dec84cdb"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-rebase.sample",
+      "size": 2009,
+      "compressed_size": 2009,
+      "crc32": "f58d7824"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-receive.sample",
+      "size": 353,
+      "compressed_size": 353,
+      "crc32": "8a0f7214"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/prepare-commit-msg.sample",
+      "size": 796,
+      "compressed_size": 796,
+      "crc32": "ba626679"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/push-to-checkout.sample",
+      "size": 1283,
+      "compressed_size": 1283,
+      "crc32": "e31305c6"
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/update.sample",
+      "size": 1189,
+      "compressed_size": 1189,
+      "crc32": "f4f0b74b"
+    },
+    {
+      "path": "usr/share/git-core/templates/info/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/git-core/templates/info/exclude",
+      "size": 196,
+      "compressed_size": 196,
+      "crc32": "68197650"
+    },
+    {
+      "path": "bin/git-receive-pack.exe",
+      "size": 44,
+      "compressed_size": 44,
+      "crc32": "e383c4a6"
+    },
+    {
+      "path": "bin/git-upload-archive.exe",
+      "size": 44,
+      "compressed_size": 44,
+      "crc32": "e383c4a6"
+    },
+    {
+      "path": "bin/git-upload-pack.exe",
+      "size": 44,
+      "compressed_size": 44,
+      "crc32": "e383c4a6"
+    },
+    {
+      "path": "bin/git.exe",
+      "size": 1098065,
+      "compressed_size": 1098065,
+      "crc32": "ab216446"
+    },
+    {
+      "path": "usr/share/perl5/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/perl5/FromCPAN/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/perl5/FromCPAN/Error.pm",
+      "size": 7985,
+      "compressed_size": 7985,
+      "crc32": "a5544177"
+    },
+    {
+      "path": "usr/share/perl5/FromCPAN/Mail/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/perl5/FromCPAN/Mail/Address.pm",
+      "size": 2558,
+      "compressed_size": 2558,
+      "crc32": "9f3253b2"
+    },
+    {
+      "path": "usr/share/perl5/Git/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/perl5/Git/I18N.pm",
+      "size": 1423,
+      "compressed_size": 1423,
+      "crc32": "8a8c15f1"
+    },
+    {
+      "path": "usr/share/perl5/Git/IndexInfo.pm",
+      "size": 453,
+      "compressed_size": 453,
+      "crc32": "90ed867c"
+    },
+    {
+      "path": "usr/share/perl5/Git/LoadCPAN/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/perl5/Git/LoadCPAN/Error.pm",
+      "size": 155,
+      "compressed_size": 155,
+      "crc32": "ab46a641"
+    },
+    {
+      "path": "usr/share/perl5/Git/LoadCPAN/Mail/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/perl5/Git/LoadCPAN/Mail/Address.pm",
+      "size": 162,
+      "compressed_size": 162,
+      "crc32": "af8741d4"
+    },
+    {
+      "path": "usr/share/perl5/Git/LoadCPAN.pm",
+      "size": 1610,
+      "compressed_size": 1610,
+      "crc32": "39c44ad0"
+    },
+    {
+      "path": "usr/share/perl5/Git/Packet.pm",
+      "size": 1509,
+      "compressed_size": 1509,
+      "crc32": "195f7054"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Editor.pm",
+      "size": 5181,
+      "compressed_size": 5181,
+      "crc32": "45077768"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Fetcher.pm",
+      "size": 5822,
+      "compressed_size": 5822,
+      "crc32": "4c76ad44"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/GlobSpec.pm",
+      "size": 849,
+      "compressed_size": 849,
+      "crc32": "d192ce48"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Log.pm",
+      "size": 3548,
+      "compressed_size": 3548,
+      "crc32": "1310b499"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Memoize/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Memoize/YAML.pm",
+      "size": 876,
+      "compressed_size": 876,
+      "crc32": "1a2a17b8"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Migration.pm",
+      "size": 2949,
+      "compressed_size": 2949,
+      "crc32": "d760275d"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Prompt.pm",
+      "size": 1629,
+      "compressed_size": 1629,
+      "crc32": "08706932"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Ra.pm",
+      "size": 6487,
+      "compressed_size": 6487,
+      "crc32": "2ba55770"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Utils.pm",
+      "size": 1858,
+      "compressed_size": 1858,
+      "crc32": "b61ea6b2"
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN.pm",
+      "size": 20269,
+      "compressed_size": 20269,
+      "crc32": "2e2183ce"
+    },
+    {
+      "path": "usr/share/perl5/Git.pm",
+      "size": 15020,
+      "compressed_size": 15020,
+      "crc32": "fe261560"
+    },
+    {
+      "path": "bin/cygfido2-1.dll",
+      "size": 63284,
+      "compressed_size": 63284,
+      "crc32": "45f9d022"
+    },
+    {
+      "path": "bin/mount.exe",
+      "size": 6506,
+      "compressed_size": 6506,
+      "crc32": "d8b7c263"
+    },
+    {
+      "path": "bin/cygiconv-2.dll",
+      "size": 522452,
+      "compressed_size": 522452,
+      "crc32": "fd53cf88"
+    },
+    {
+      "path": "bin/cygcrypto-3.dll",
+      "size": 1475006,
+      "compressed_size": 1475006,
+      "crc32": "702f1144"
+    },
+    {
+      "path": "bin/cygopenssh.dll",
+      "size": 239804,
+      "compressed_size": 239804,
+      "crc32": "52e3dfac"
+    },
+    {
+      "path": "bin/cygssl-3.dll",
+      "size": 326071,
+      "compressed_size": 326071,
+      "crc32": "8e95429b"
+    },
+    {
+      "path": "bin/openssl.exe",
+      "size": 292266,
+      "compressed_size": 292266,
+      "crc32": "ba55bc18"
+    },
+    {
+      "path": "bin/scp.exe",
+      "size": 73605,
+      "compressed_size": 73605,
+      "crc32": "e27b905e"
+    },
+    {
+      "path": "bin/sftp-server.exe",
+      "size": 17721,
+      "compressed_size": 17721,
+      "crc32": "895267e9"
+    },
+    {
+      "path": "bin/sftp.exe",
+      "size": 42957,
+      "compressed_size": 42957,
+      "crc32": "3a9add06"
+    },
+    {
+      "path": "bin/ssh-add.exe",
+      "size": 16406,
+      "compressed_size": 16406,
+      "crc32": "6676157f"
+    },
+    {
+      "path": "bin/ssh-agent.exe",
+      "size": 26434,
+      "compressed_size": 26434,
+      "crc32": "fed30a39"
+    },
+    {
+      "path": "bin/ssh-keygen.exe",
+      "size": 48596,
+      "compressed_size": 48596,
+      "crc32": "61e53ca9"
+    },
+    {
+      "path": "bin/ssh-keyscan.exe",
+      "size": 14754,
+      "compressed_size": 14754,
+      "crc32": "38cdd05f"
+    },
+    {
+      "path": "bin/ssh-pkcs11-helper.exe",
+      "size": 17702,
+      "compressed_size": 17702,
+      "crc32": "d6a58750"
+    },
+    {
+      "path": "bin/ssh-sk-helper.exe",
+      "size": 16507,
+      "compressed_size": 16507,
+      "crc32": "b9510847"
+    },
+    {
+      "path": "bin/sshd.exe",
+      "size": 63959,
+      "compressed_size": 63959,
+      "crc32": "3dc5c84d"
+    },
+    {
+      "path": "bin/toybox.exe",
+      "size": 202281,
+      "compressed_size": 202281,
+      "crc32": "03154abe"
+    },
+    {
+      "path": "bin/_ssh.exe",
+      "size": 111830,
+      "compressed_size": 111830,
+      "crc32": "288e5727"
+    },
+    {
+      "path": "bin/MobaVNC.exe",
+      "size": 219533,
+      "compressed_size": 219533,
+      "crc32": "cd47adb3"
+    },
+    {
+      "path": "bin/sudoku.exe",
+      "size": 12118,
+      "compressed_size": 12118,
+      "crc32": "9b11039a"
+    },
+    {
+      "path": "bin/vnp.exe",
+      "size": 4237,
+      "compressed_size": 4237,
+      "crc32": "fdfac26e"
+    },
+    {
+      "path": "bin/VNCHooks.dll",
+      "size": 28818,
+      "compressed_size": 28818,
+      "crc32": "545e1924"
+    },
+    {
+      "path": "bin/ctris.exe",
+      "size": 12021,
+      "compressed_size": 12021,
+      "crc32": "c1fee726"
+    },
+    {
+      "path": "bin/greed.exe",
+      "size": 20579,
+      "compressed_size": 20579,
+      "crc32": "15aebbd0"
+    },
+    {
+      "path": "usr/share/sudoku/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/sudoku/template",
+      "size": 3642,
+      "compressed_size": 3642,
+      "crc32": "ac07a13d"
+    },
+    {
+      "path": "bin/sshd-session.exe",
+      "size": 127616,
+      "compressed_size": 127616,
+      "crc32": "09535c63"
+    },
+    {
+      "path": "bin/rsync.exe",
+      "size": 230071,
+      "compressed_size": 230071,
+      "crc32": "236a1efd"
+    },
+    {
+      "path": "bin/sshd-auth.exe",
+      "size": 115876,
+      "compressed_size": 115876,
+      "crc32": "7678e128"
+    },
+    {
+      "path": "lib/engines-3/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "lib/engines-3/capi.dll",
+      "size": 1532,
+      "compressed_size": 1532,
+      "crc32": "3af69e30"
+    },
+    {
+      "path": "lib/engines-3/loader_attic.dll",
+      "size": 14500,
+      "compressed_size": 14500,
+      "crc32": "377432ba"
+    },
+    {
+      "path": "lib/engines-3/padlock.dll",
+      "size": 6960,
+      "compressed_size": 6960,
+      "crc32": "230ae9e5"
+    },
+    {
+      "path": "lib/ossl-modules/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "lib/ossl-modules/legacy.dll",
+      "size": 32225,
+      "compressed_size": 32225,
+      "crc32": "16084b99"
+    },
+    {
+      "path": "etc/pki/tls/openssl.cnf",
+      "size": 3706,
+      "compressed_size": 3706,
+      "crc32": "c8382ab8"
+    }
+  ]
+}

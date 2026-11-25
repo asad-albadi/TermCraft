@@ -1,0 +1,317 @@
+warning: method `poll` is never used
+   --> src/ui.rs:158:8
+    |
+115 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+158 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: method `restart_with_new_host_key` is never used
+   --> tests/support/ssh_server.rs:131:12
+    |
+ 14 | impl SshServer {
+    | -------------- method in this implementation
+...
+131 |     pub fn restart_with_new_host_key(&mut self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (test "ssh_browser") generated 1 warning
+warning: variants `PasswordThenMfa` and `ScpStartup` are never constructed
+  --> tests/support/auth_server.rs:18:5
+   |
+16 | pub enum Mode {
+   |          ---- variants in this enum
+17 |     Password,
+18 |     PasswordThenMfa,
+   |     ^^^^^^^^^^^^^^^
+...
+22 |     ScpStartup,
+   |     ^^^^^^^^^^
+   |
+   = note: `Mode` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `attempts` and `startup` are never read
+   --> tests/support/auth_server.rs:271:5
+    |
+270 | pub struct AuthServer {
+    |            ---------- fields in this struct
+271 |     attempts: Arc<Attempts>,
+    |     ^^^^^^^^
+272 |     startup: Arc<StartupState>,
+    |     ^^^^^^^
+
+warning: methods `startup_requests`, `active_startup_helpers`, `allow_startup_helpers`, and `attempts` are never used
+   --> tests/support/auth_server.rs:345:12
+    |
+281 | impl AuthServer {
+    | --------------- methods in this implementation
+...
+345 |     pub fn startup_requests(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^
+...
+348 |     pub fn active_startup_helpers(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+351 |     pub fn allow_startup_helpers(&self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+...
+370 |     pub fn attempts(&self) -> [usize; 4] {
+    |            ^^^^^^^^
+
+warning: `harbor-workspace` (test "ssh_authentication") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 49.32s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-94bde7e000a59e92)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 37 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-29e3f133fb9121f7)
+
+running 1 test
+test ui::credential_tests::explicit_proxy_save_links_only_proxy_reference_and_encrypts_both_fields ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 93 filtered out; finished in 11.43s
+
+     Running tests/cli_dispatch.rs (target/debug/deps/cli_dispatch-58798fba9cca6e92)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/connection.rs (target/debug/deps/connection-cd4c75530d76964c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/credential_vault.rs (target/debug/deps/credential_vault-c4e523920d4d91c9)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/highlighting.rs (target/debug/deps/highlighting-c8039613347be3bc)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/model.rs (target/debug/deps/model-f098ca0a4e1c9fde)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+     Running tests/multiexec.rs (target/debug/deps/multiexec-93d76714f34bc546)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/process_input.rs (target/debug/deps/process_input-f8efc342db99d933)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/remote_editor.rs (target/debug/deps/remote_editor-d50b5b30e5e7c4ed)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/remote_paths.rs (target/debug/deps/remote_paths-eb369f07fed7cea2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/remote_transfers.rs (target/debug/deps/remote_transfers-31b1d82dd8d059a8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.00s
+
+     Running tests/scp_browser.rs (target/debug/deps/scp_browser-0810d4ac3af8bffe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 0.00s
+
+     Running tests/session_groups.rs (target/debug/deps/session_groups-defc4b3c5bf779fd)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/session_import.rs (target/debug/deps/session_import-e35dfc52f6de3677)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+     Running tests/shared_sessions.rs (target/debug/deps/shared_sessions-ce70d1743899f725)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/shared_source_ssh.rs (target/debug/deps/shared_source_ssh-c7efe339668cd08e)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+
+     Running tests/shared_sources_network.rs (target/debug/deps/shared_sources_network-a8c46e956f374a26)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/shell_directory.rs (target/debug/deps/shell_directory-177b40d35900df56)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s
+
+     Running tests/shortcuts.rs (target/debug/deps/shortcuts-aec1ee19afb76b7d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/ssh_agent.rs (target/debug/deps/ssh_agent-96c5e464b593f117)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 0.00s
+
+     Running tests/ssh_authentication.rs (target/debug/deps/ssh_authentication-0eb7aeb314677527)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/ssh_browser.rs (target/debug/deps/ssh_browser-f6572ca2fdf02454)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.00s
+
+     Running tests/ssh_lifecycle.rs (target/debug/deps/ssh_lifecycle-c43ca3397be569fd)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.00s
+
+     Running tests/ssh_options.rs (target/debug/deps/ssh_options-16d2e8be86b6d66f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+
+     Running tests/tab_activity.rs (target/debug/deps/tab_activity-ce852dddc12b3998)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/terminal_conformance.rs (target/debug/deps/terminal_conformance-471cf5e79344708a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.00s
+
+     Running tests/terminal_mouse.rs (target/debug/deps/terminal_mouse-352436a328d6c0aa)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/terminal_performance.rs (target/debug/deps/terminal_performance-63796884a8475453)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/terminal_programs.rs (target/debug/deps/terminal_programs-b019d5d27c5a72e8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+     Running tests/terminal_safety.rs (target/debug/deps/terminal_safety-09bba4fc2b8b98df)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/terminal_search.rs (target/debug/deps/terminal_search-9f4d16f01d8bda74)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+
+     Running tests/terminal_selection.rs (target/debug/deps/terminal_selection-64c01b461074c1b3)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.00s
+
+     Running tests/terminal_settings.rs (target/debug/deps/terminal_settings-904b0f0e8a3377db)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+     Running tests/workspace_layout.rs (target/debug/deps/workspace_layout-0fadfe060151c67f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+     Running tests/workspace_windows.rs (target/debug/deps/workspace_windows-5393dd4956d9e122)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+

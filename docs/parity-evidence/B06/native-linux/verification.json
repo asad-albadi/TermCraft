@@ -1,0 +1,26 @@
+{
+  "checks": {
+    "frozen_executable_identity": true,
+    "captured_source_manifest_identity": true,
+    "captured_games_and_ui_source_unchanged": true,
+    "thirteen_distinct_catalog_boards": true,
+    "native_reserve_transfer_pixels_changed": true,
+    "native_greed_board_changed": true,
+    "jigsaw_solve_undo_redo_observed_pixel_transitions": true,
+    "idle_overlay_replaced_terminal": true,
+    "wake_key_absent_and_focused_followup_exact": true,
+    "native_close_guard_cancel_transition": true,
+    "owned_app_exit_assertion": true,
+    "namespace_cleanup_ran": true,
+    "final_xvfb_root_cleared": true
+  },
+  "passed": 13,
+  "total": 13,
+  "verified_game_ui_source_paths": 37,
+  "limits": [
+    "Visual observations are in REPORT.md; pixel checks corroborate transitions, not semantic OCR.",
+    "Repeated failed-seed New is a confirmed finding, so this is not an all-green product verdict.",
+    "Earlier post-game idle nonactivation remains unisolated; fresh idle/wake proof passed.",
+    "Native Save/Load chooser/roundtrip not available in portal-free namespace."
+  ]
+}

@@ -1,0 +1,2 @@
+The client-side shutdown woke the copy thread and shut down its upstream TCP duplicate.
+The later main-thread shutdown on the same upstream connection returned errno 107 (ENOTCONN).

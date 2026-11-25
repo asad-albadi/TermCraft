@@ -1,0 +1,85 @@
+MOSH CONNECT 60379 [REDACTED]
+
+mosh-server (mosh 1.4.0) [build mosh-1.4.0-dirty]
+Copyright 2012 Keith Winstein <mosh-devel@mit.edu>
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+[mosh-server detached, pid = 376000]
+Server now attached to client at 127.0.0.2:47969
+[87371] Received state 1 [coming from 0, ack 0]
+[87371] Sent [0=>1] id 1, frag 0 ack=1, throwaway=0, len=119, frame rate=4.00, timeout=1000, srtt=1000.0
+[87478] Received state 2 [coming from 1, ack 1]
+[87478] Sent [1=>2] id 2, frag 0 ack=2, throwaway=1, len=62, frame rate=50.00, timeout=50, srtt=7.0
+[87498] Received state 3 [coming from 2, ack 2]
+[87506] Sent [2=>3] id 3, frag 0 ack=3, throwaway=2, len=47, frame rate=50.00, timeout=50, srtt=6.2
+[87557] Sent [2=>4] id 4, frag 0 ack=3, throwaway=2, len=58, frame rate=50.00, timeout=50, srtt=6.2
+[87708] Sent [2=>4] id 5, frag 0 ack=3, throwaway=2, len=62, frame rate=50.00, timeout=50, srtt=6.2
+[87728] Sent [2=>4] id 6, frag 0 ack=3, throwaway=2, len=57, frame rate=50.00, timeout=50, srtt=6.2
+[87749] Sent [2=>4] id 7, frag 0 ack=3, throwaway=2, len=64, frame rate=50.00, timeout=50, srtt=6.2
+[87769] Sent [2=>4] id 8, frag 0 ack=3, throwaway=2, len=52, frame rate=50.00, timeout=50, srtt=6.2
+[87790] Sent [2=>4] id 9, frag 0 ack=3, throwaway=2, len=61, frame rate=50.00, timeout=50, srtt=6.2
+[87810] Sent [2=>4] id 10, frag 0 ack=3, throwaway=2, len=49, frame rate=50.00, timeout=50, srtt=6.2
+[87830] Sent [2=>4] id 11, frag 0 ack=3, throwaway=2, len=59, frame rate=50.00, timeout=50, srtt=6.2
+[87851] Sent [2=>4] id 12, frag 0 ack=3, throwaway=2, len=52, frame rate=50.00, timeout=50, srtt=6.2
+[87871] Sent [2=>4] id 13, frag 0 ack=3, throwaway=2, len=54, frame rate=50.00, timeout=50, srtt=6.2
+[87892] Sent [2=>4] id 14, frag 0 ack=3, throwaway=2, len=48, frame rate=50.00, timeout=50, srtt=6.2
+[87912] Sent [2=>4] id 15, frag 0 ack=3, throwaway=2, len=64, frame rate=50.00, timeout=50, srtt=6.2
+[87933] Sent [2=>4] id 16, frag 0 ack=3, throwaway=2, len=49, frame rate=50.00, timeout=50, srtt=6.2
+[87953] Sent [2=>4] id 17, frag 0 ack=3, throwaway=2, len=59, frame rate=50.00, timeout=50, srtt=6.2
+[87974] Sent [2=>4] id 18, frag 0 ack=3, throwaway=2, len=63, frame rate=50.00, timeout=50, srtt=6.2
+[87994] Sent [2=>4] id 19, frag 0 ack=3, throwaway=2, len=60, frame rate=50.00, timeout=50, srtt=6.2
+[88015] Sent [2=>4] id 20, frag 0 ack=3, throwaway=2, len=50, frame rate=50.00, timeout=50, srtt=6.2
+[88035] Sent [2=>4] id 21, frag 0 ack=3, throwaway=2, len=63, frame rate=50.00, timeout=50, srtt=6.2
+[88056] Sent [2=>4] id 22, frag 0 ack=3, throwaway=2, len=65, frame rate=50.00, timeout=50, srtt=6.2
+[88076] Sent [2=>4] id 23, frag 0 ack=3, throwaway=2, len=48, frame rate=50.00, timeout=50, srtt=6.2
+[88097] Sent [2=>4] id 24, frag 0 ack=3, throwaway=2, len=60, frame rate=50.00, timeout=50, srtt=6.2
+[88117] Sent [2=>4] id 25, frag 0 ack=3, throwaway=2, len=59, frame rate=50.00, timeout=50, srtt=6.2
+[88138] Sent [2=>4] id 26, frag 0 ack=3, throwaway=2, len=57, frame rate=50.00, timeout=50, srtt=6.2
+[88158] Sent [2=>4] id 27, frag 0 ack=3, throwaway=2, len=48, frame rate=50.00, timeout=50, srtt=6.2
+[88178] Sent [2=>4] id 28, frag 0 ack=3, throwaway=2, len=55, frame rate=50.00, timeout=50, srtt=6.2
+[88199] Sent [2=>4] id 29, frag 0 ack=3, throwaway=2, len=49, frame rate=50.00, timeout=50, srtt=6.2
+[88219] Sent [2=>4] id 30, frag 0 ack=3, throwaway=2, len=53, frame rate=50.00, timeout=50, srtt=6.2
+[88240] Sent [2=>4] id 31, frag 0 ack=3, throwaway=2, len=63, frame rate=50.00, timeout=50, srtt=6.2
+[88260] Sent [2=>4] id 32, frag 0 ack=3, throwaway=2, len=49, frame rate=50.00, timeout=50, srtt=6.2
+[88280] Sent [2=>4] id 33, frag 0 ack=3, throwaway=2, len=53, frame rate=50.00, timeout=50, srtt=6.2
+[88301] Sent [2=>4] id 34, frag 0 ack=3, throwaway=2, len=63, frame rate=50.00, timeout=50, srtt=6.2
+[88321] Sent [2=>4] id 35, frag 0 ack=3, throwaway=2, len=63, frame rate=50.00, timeout=50, srtt=6.2
+[88342] Sent [2=>4] id 36, frag 0 ack=3, throwaway=2, len=60, frame rate=50.00, timeout=50, srtt=6.2
+[88362] Sent [2=>4] id 37, frag 0 ack=3, throwaway=2, len=59, frame rate=50.00, timeout=50, srtt=6.2
+[88382] Sent [2=>4] id 38, frag 0 ack=3, throwaway=2, len=55, frame rate=50.00, timeout=50, srtt=6.2
+[88403] Sent [2=>4] id 39, frag 0 ack=3, throwaway=2, len=58, frame rate=50.00, timeout=50, srtt=6.2
+[88423] Sent [2=>4] id 40, frag 0 ack=3, throwaway=2, len=59, frame rate=50.00, timeout=50, srtt=6.2
+[88444] Sent [2=>4] id 41, frag 0 ack=3, throwaway=2, len=60, frame rate=50.00, timeout=50, srtt=6.2
+[88464] Sent [2=>4] id 42, frag 0 ack=3, throwaway=2, len=50, frame rate=50.00, timeout=50, srtt=6.2
+[88485] Sent [2=>4] id 43, frag 0 ack=3, throwaway=2, len=53, frame rate=50.00, timeout=50, srtt=6.2
+[88505] Sent [2=>4] id 44, frag 0 ack=3, throwaway=2, len=60, frame rate=50.00, timeout=50, srtt=6.2
+[88525] Sent [2=>4] id 45, frag 0 ack=3, throwaway=2, len=56, frame rate=50.00, timeout=50, srtt=6.2
+[88546] Sent [2=>4] id 46, frag 0 ack=3, throwaway=2, len=56, frame rate=50.00, timeout=50, srtt=6.2
+[88566] Sent [2=>4] id 47, frag 0 ack=3, throwaway=2, len=49, frame rate=50.00, timeout=50, srtt=6.2
+[88587] Sent [2=>4] id 48, frag 0 ack=3, throwaway=2, len=56, frame rate=50.00, timeout=50, srtt=6.2
+[88607] Sent [2=>4] id 49, frag 0 ack=3, throwaway=2, len=52, frame rate=50.00, timeout=50, srtt=6.2
+[88628] Sent [2=>4] id 50, frag 0 ack=3, throwaway=2, len=53, frame rate=50.00, timeout=50, srtt=6.2
+[88648] Sent [2=>4] id 51, frag 0 ack=3, throwaway=2, len=61, frame rate=50.00, timeout=50, srtt=6.2
+[88669] Sent [2=>4] id 52, frag 0 ack=3, throwaway=2, len=48, frame rate=50.00, timeout=50, srtt=6.2
+[88689] Sent [2=>4] id 53, frag 0 ack=3, throwaway=2, len=52, frame rate=50.00, timeout=50, srtt=6.2
+[88709] Sent [2=>4] id 54, frag 0 ack=3, throwaway=2, len=52, frame rate=50.00, timeout=50, srtt=6.2
+[88730] Sent [2=>4] id 55, frag 0 ack=3, throwaway=2, len=54, frame rate=50.00, timeout=50, srtt=6.2
+Server now attached to client at 127.0.0.3:51102
+[88731] Received state 4 [coming from 3, ack 3]
+[88750] Sent [3=>5] id 56, frag 0 ack=4, throwaway=3, len=59, frame rate=50.00, timeout=50, srtt=6.2
+[88790] Sent [3=>6] id 57, frag 0 ack=4, throwaway=3, len=55, frame rate=50.00, timeout=50, srtt=6.2
+[88941] Sent [3=>6] id 58, frag 0 ack=4, throwaway=3, len=59, frame rate=50.00, timeout=50, srtt=6.2
+[88961] Sent [3=>6] id 59, frag 0 ack=4, throwaway=3, len=64, frame rate=50.00, timeout=50, srtt=6.2
+[88979] Received state 5 [coming from 4, ack 6]
+[88987] Sent [6=>7] id 60, frag 0 ack=5, throwaway=6, len=72, frame rate=50.00, timeout=50, srtt=5.6
+[88998] Received state 6 [coming from 5, ack 7]
+[89007] Sent [7=>8] id 61, frag 0 ack=6, throwaway=7, len=57, frame rate=50.00, timeout=50, srtt=4.9
+[89038] Sent [7=>9] id 62, frag 0 ack=6, throwaway=7, len=58, frame rate=50.00, timeout=50, srtt=4.9
+[89058] Sent [7=>10] id 63, frag 0 ack=6, throwaway=7, len=58, frame rate=50.00, timeout=50, srtt=4.9
+[89107] Received state 7 [coming from 6, ack 10]
+[89228] Received state -1 [coming from 6, ack 10]
+[89228] Sent [10=>11] id 64, frag 0 ack=-1, throwaway=10, len=30, frame rate=50.00, timeout=50, srtt=4.3
+
+[mosh-server is exiting.]

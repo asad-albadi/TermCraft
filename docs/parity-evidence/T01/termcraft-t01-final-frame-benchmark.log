@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-9a2e8410f611c3b2)
+
+running 1 test
+T01 CPU egui renderer: profile=debug input_lines=360000 visible_rows=30 cols=110 history_lines=359971 samples=100 frame_p50_us=2551 frame_p95_us=2585 (no native GPU/window timing)
+test ui::pages::appearance_tests::benchmark_visible_terminal_rows_with_long_history ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 27 filtered out; finished in 13.91s
+

@@ -1,0 +1,63 @@
+   Compiling b04-components v0.1.0-b04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b04/component)
+error[E0599]: no associated function or constant named `parse_text` found for struct `RegistryValue` in the current scope
+  --> tests/windows_integration.rs:34:28
+   |
+34 |  assert_eq!(RegistryValue::parse_text(4,"4294967295").unwrap().bytes, u32::MAX.to_le_bytes());
+   |                            ^^^^^^^^^^ associated function or constant not found in `RegistryValue`
+   |
+note: if you're trying to build a new `RegistryValue`, consider using `RegistryValue::string` which returns `RegistryValue`
+  --> src/../../source/src/platform/registry_fs.rs:10:2
+   |
+10 |  pub fn string(value: &str)->Self {Self {kind:1, bytes:value.encode_utf16().chain([0]).flat_map(u16::to_le_bytes).collect()}}
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no associated function or constant named `parse_text` found for struct `RegistryValue` in the current scope
+  --> tests/windows_integration.rs:35:25
+   |
+35 |  assert!(RegistryValue::parse_text(4,"4294967296").is_err());
+   |                         ^^^^^^^^^^ associated function or constant not found in `RegistryValue`
+   |
+note: if you're trying to build a new `RegistryValue`, consider using `RegistryValue::string` which returns `RegistryValue`
+  --> src/../../source/src/platform/registry_fs.rs:10:2
+   |
+10 |  pub fn string(value: &str)->Self {Self {kind:1, bytes:value.encode_utf16().chain([0]).flat_map(u16::to_le_bytes).collect()}}
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no associated function or constant named `parse_text` found for struct `RegistryValue` in the current scope
+  --> tests/windows_integration.rs:36:28
+   |
+36 |  assert_eq!(RegistryValue::parse_text(3,"00 ff 20").unwrap().bytes,vec![0,255,32]);
+   |                            ^^^^^^^^^^ associated function or constant not found in `RegistryValue`
+   |
+note: if you're trying to build a new `RegistryValue`, consider using `RegistryValue::string` which returns `RegistryValue`
+  --> src/../../source/src/platform/registry_fs.rs:10:2
+   |
+10 |  pub fn string(value: &str)->Self {Self {kind:1, bytes:value.encode_utf16().chain([0]).flat_map(u16::to_le_bytes).collect()}}
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no associated function or constant named `parse_text` found for struct `RegistryValue` in the current scope
+  --> tests/windows_integration.rs:37:25
+   |
+37 |  assert!(RegistryValue::parse_text(1,"bad\0value").is_err());
+   |                         ^^^^^^^^^^ associated function or constant not found in `RegistryValue`
+   |
+note: if you're trying to build a new `RegistryValue`, consider using `RegistryValue::string` which returns `RegistryValue`
+  --> src/../../source/src/platform/registry_fs.rs:10:2
+   |
+10 |  pub fn string(value: &str)->Self {Self {kind:1, bytes:value.encode_utf16().chain([0]).flat_map(u16::to_le_bytes).collect()}}
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no associated function or constant named `parse_text` found for struct `RegistryValue` in the current scope
+  --> tests/windows_integration.rs:38:25
+   |
+38 |  assert!(RegistryValue::parse_text(99,"anything").is_err());
+   |                         ^^^^^^^^^^ associated function or constant not found in `RegistryValue`
+   |
+note: if you're trying to build a new `RegistryValue`, consider using `RegistryValue::string` which returns `RegistryValue`
+  --> src/../../source/src/platform/registry_fs.rs:10:2
+   |
+10 |  pub fn string(value: &str)->Self {Self {kind:1, bytes:value.encode_utf16().chain([0]).flat_map(u16::to_le_bytes).collect()}}
+   |  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `b04-components` (test "windows_integration") due to 5 previous errors

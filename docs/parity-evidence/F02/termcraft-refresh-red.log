@@ -1,0 +1,17 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `refresh_path` found for struct `BrowserState` in the current scope
+  --> tests/remote_paths.rs:73:21
+   |
+73 |     assert!(browser.refresh_path().is_none());
+   |                     ^^^^^^^^^^^^ method not found in `BrowserState`
+
+error[E0599]: no method named `refresh_path` found for struct `BrowserState` in the current scope
+  --> tests/remote_paths.rs:75:24
+   |
+75 |     assert_eq!(browser.refresh_path(),Some(new_path));
+   |                        ^^^^^^^^^^^^ method not found in `BrowserState`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (test "remote_paths") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

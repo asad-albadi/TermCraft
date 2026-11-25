@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.6 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p06)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.58s
+     Running unittests src/lib.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-bcb84ae701577a55)
+
+running 1 test
+test plugins::registry::lifecycle_regressions::registry_executes_granted_elf_when_installed_inode_changes_after_verification ... FAILED
+
+failures:
+
+---- plugins::registry::lifecycle_regressions::registry_executes_granted_elf_when_installed_inode_changes_after_verification stdout ----
+
+thread 'plugins::registry::lifecycle_regressions::registry_executes_granted_elf_when_installed_inode_changes_after_verification' (572001) panicked at src/plugins/registry.rs:571:9:
+executed bytes outside the release grant: Err(Invalid("Plugin reported failure"))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    plugins::registry::lifecycle_regressions::registry_executes_granted_elf_when_installed_inode_changes_after_verification
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 74 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `--lib`

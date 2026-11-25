@@ -1,0 +1,19 @@
+     Locking 7 packages to highest Rust 1.99.0 compatible versions
+      Adding proc-macro2 v1.0.107
+      Adding quote v1.0.47
+      Adding serde v1.0.229
+      Adding serde_core v1.0.229
+      Adding serde_derive v1.0.229
+      Adding syn v3.0.10
+      Adding unicode-ident v1.0.27
+    Checking d02-device-native-component v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/tests/rdp-native-component)
+warning: unused variable: `metadata`
+   --> src/drives.rs:230:29
+    |
+230 |             let (file, dir, metadata) = if directory {
+    |                             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_metadata`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `d02-device-native-component` (lib test) generated 1 warning (run `cargo fix --lib -p d02-device-native-component --tests` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.32s

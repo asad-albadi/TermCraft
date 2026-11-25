@@ -1,0 +1,22 @@
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.freedesktop.impl.portal.PermissionStore' requested by ':1.2' (uid=1000 pid=13 comm="/usr/lib/xdg-desktop-portal -v")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.freedesktop.impl.portal.PermissionStore'
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.freedesktop.portal.Documents' requested by ':1.2' (uid=1000 pid=13 comm="/usr/lib/xdg-desktop-portal -v")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.freedesktop.portal.Documents'
+fuse: device /dev/fuse not found. Kernel module not loaded?
+error: fuse init failed: Can't mount path /tmp/real-runtime/doc
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.7' (uid=1000 pid=45 comm="zenity --info --title=PRIVATE PORTAL TARGET 640x48")
+dbus-daemon[3]: [session uid=1000 pid=3 pidfd=5] Successfully activated service 'org.a11y.Bus'
+ERROR launcher_open_journal @ ../dbus-broker-37/src/launch/launcher.c +179: No such file or directory
+      launcher_open_log @ ../dbus-broker-37/src/launch/launcher.c +193
+      launcher_new @ ../dbus-broker-37/src/launch/launcher.c +223
+      run @ ../dbus-broker-37/src/launch/main.c +149
+      main @ ../dbus-broker-37/src/launch/main.c +178
+Exiting due to fatal error: -2
+
+** (process:53): CRITICAL **: 12:48:03.080: Unable to connect to the accessibility bus at 'unix:path=/tmp/real-runtime/at-spi/bus': Error receiving data: Connection reset by peer
+Failed to launch bus: Bus exited with code 1control {"elapsed_ms":32,"open_error":"Portal request failed, cancelled or timed out"}
+deny {"elapsed_ms":44,"open_error":"Desktop sharing was denied or cancelled"}
+cancel {"elapsed_ms":903,"open_error":"Portal request failed, cancelled or timed out"}
+revoke {"after_error":"Selected portal video helper ended; check optional PipeWire helper/native ABI","elapsed_ms":362,"view_only_input_error":"Portal source is view-only"}
+normal-drop {"after_error":null,"elapsed_ms":393,"view_only_input_error":"Portal source is view-only"}
+capture {"after_error":"Selected portal video helper ended; check optional PipeWire helper/native ABI","elapsed_ms":337,"view_only_input_error":"Portal source is view-only"}

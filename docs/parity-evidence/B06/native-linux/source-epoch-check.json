@@ -1,0 +1,10 @@
+{
+  "captured_files": 691,
+  "changes_at_qualification_checkpoint": [
+    "engines/rdp/Cargo.toml",
+    "engines/rdp/src/serial_windows.rs",
+    "tests/rdp-native-component/Cargo.toml",
+    "tests/rdp-native-component/generate.py",
+    "tests/rdp-native-component/src/lib.rs"
+  ]
+}

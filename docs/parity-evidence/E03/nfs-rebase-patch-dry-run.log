@@ -1,0 +1,8 @@
+checking file Cargo.toml
+checking file src/services/mod.rs
+checking file src/services/supervisor.rs
+checking file src/model.rs
+checking file src/ui/managed_servers.rs
+checking file src/ui/servers.rs
+
+exit=0

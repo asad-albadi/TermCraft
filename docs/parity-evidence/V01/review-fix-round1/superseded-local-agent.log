@@ -1,0 +1,8 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_agent-2d144c00deeb961c' --exact protected_import_preserves_encryption_and_agent_lifetime_expires --nocapture --test-threads=1
+Executable SHA256: 127988c54287740d6c5ce7ffbd01879e99a87c88cbb8e6440e6b5ec919ac56ce
+
+running 1 test
+test protected_import_preserves_encryption_and_agent_lifetime_expires ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 4.10s
+

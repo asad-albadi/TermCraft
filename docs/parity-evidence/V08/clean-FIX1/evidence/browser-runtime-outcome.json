@@ -1,0 +1,19 @@
+{
+  "mode": "runtime",
+  "version": {
+    "exit_code": 0,
+    "timed_out": false,
+    "log": "browser-runtime-version.log"
+  },
+  "status": "SANDBOX_BLOCKED",
+  "qualification": "UNAVAILABLE",
+  "native": {
+    "exit_code": -6,
+    "timed_out": false,
+    "log": "browser-runtime-native.log"
+  },
+  "user_namespace": {
+    "return_code": -1,
+    "errno": 1
+  }
+}

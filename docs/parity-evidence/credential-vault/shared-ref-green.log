@@ -1,0 +1,37 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: method `poll` is never used
+   --> src/ui.rs:150:8
+    |
+107 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+150 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:519:19
+    |
+481 | impl Workspace {
+    | -------------- methods in this implementation
+...
+519 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+832 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.85s
+     Running tests/shared_sessions.rs (target/debug/deps/shared_sessions-2851a6e150420dc5)
+
+running 5 tests
+test unsupported_or_credential_bearing_source_urls_are_rejected ... ok
+test editing_source_metadata_preserves_identity_but_does_not_retarget_credentials ... ok
+test shared_definitions_cannot_reference_local_vault_credentials ... ok
+test offline_source_keeps_labeled_cached_snapshot ... ok
+test shared_refresh_never_overwrites_local_session ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

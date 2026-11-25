@@ -1,0 +1,9 @@
+{
+  "game_ui_paths": 37,
+  "changes": {
+    "src/ui/games/play.rs": {
+      "old": "8019865e83ea1864e055fa9349356bd85511acc52d30693791b383a5c2954b18",
+      "current": "c449a915bf89c0aad71d1b8d4091c1252ad1c44a0ac7d476391b01da18d2d105"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "artifact_id": "xephyr-21.1.26-arch-x86_64",
+  "status": "Linux Arch x86_64 XDMCP candidate; explicit inbound listener policy required; native Windows/macOS unqualified",
+  "entry_point": "x11/linux-x86_64/Xephyr",
+  "archive_url": "https://archive.archlinux.org/packages/x/xorg-server-xephyr/xorg-server-xephyr-21.1.26-1-x86_64.pkg.tar.zst",
+  "archive_sha256": "599d85569d0a99c83b2e4529c009f03c6921db428aa14f28aecc36cf7362f714",
+  "executable_sha256": "d7f1f49ee428fd06b26707a79ba6d65b4e9ada4e6b53aca4146baaa92c79e593",
+  "source_url": "https://www.x.org/releases/individual/xserver/xorg-server-21.1.26.tar.xz",
+  "source_sha256": "c8609f9cdafde14de7ec7cb406dac9507add1d536df8d3c3e3d3d9c1cd864066",
+  "license": "x11/linux-x86_64/XEPHYR_COPYING",
+  "inventory": [
+    "x11/linux-x86_64/XEPHYR_BUILDINFO",
+    "x11/linux-x86_64/XEPHYR_PKGINFO"
+  ],
+  "runtime_dependencies": [
+    "host X11 display",
+    "libxfont2",
+    "libgl",
+    "libepoxy",
+    "libunwind",
+    "systemd-libs",
+    "pixman",
+    "xorg-server-common",
+    "xcb-util-image",
+    "xcb-util-renderutil",
+    "xcb-util-wm",
+    "xcb-util-keysyms",
+    "nettle",
+    "libtirpc",
+    "xcb-util",
+    "libxdmcp",
+    "libx11",
+    "libxau",
+    "libxshmfence",
+    "glibc",
+    "xorg-xkbcomp",
+    "xkeyboard-config"
+  ],
+  "network_policy": "Default deny. XDMCP requires explicit per-session permission for upstream all-interface inbound TCP. -from only selects advertised/source address; it does not constrain the TCP listener. Never -ac. XDMCP and X11 remain unencrypted and discovery unauthenticated.",
+  "clipboard": "Host keyboard with disabled clipboard uses stock Xephyr. An explicit layout or bidirectional clipboard selects the separately pinned session-ready engine. Only bidirectional clipboard opens the parent clipboard endpoint.",
+  "native_gaps": "Private VcXsrv and XQuartz candidate engines require dedicated XDMCP network/authorization adapters and real native qualification. Never automatic installed-client fallback.",
+  "fixture": {
+    "archive_url": "https://archive.archlinux.org/packages/x/xorg-xdm/xorg-xdm-1.1.17-1-x86_64.pkg.tar.zst",
+    "archive_sha256": "40f414912600e2d7c7bda12d4ce8698f8a488e6ea3658bf61d42319e4d8b27e0",
+    "source_url": "https://www.x.org/releases/individual/app/xdm-1.1.17.tar.xz",
+    "source_sha256": "9494aef0911a031c53670725b5c8c9bb9d3f7c5ea7318b1f72ddd9dcbbeceb6a",
+    "scope": "Tests only, unshare user/PID/network + private TEST-NET veth + Cage; no PAM login, host display manager or network changes",
+    "private_library": {
+      "archive_url": "https://archive.archlinux.org/packages/l/libxpm/libxpm-3.5.20-1-x86_64.pkg.tar.zst",
+      "archive_sha256": "cf538c4400abd6bdba8942bfdddb0c01716528e75bd95279b4b0a842fa035052",
+      "entry": "usr/lib/libXpm.so.4.11.0",
+      "entry_sha256": "e02df8ee6e0bff934a13563d9543e1a727620399ddf43d5c211d6846830768ac"
+    }
+  },
+  "clipboard_engine": {
+    "artifact_id": "xephyr-21.1.26-session-ready-xkb-v2-linux-x86_64",
+    "entry_point": "x11/linux-x86_64/Xephyr-session-ready",
+    "executable_sha256": "8cf61e9f10f5c797c249eae12a36f8cc0f43ca51ceda89c62bc663593f30f460",
+    "compressed_sha256": "90256d9c41e451c402b8deff69cc589d976b20340ef5d4e0452d508214b9b875",
+    "patch_sha256": "2d03a69b2f3a0aee25141890b98b9524082de39af350a6df56e586c15fd9a344",
+    "xtrans_headers_sha256": "f00c6c854e9f08bd40de10b0278d942d6d7e48bad08e93415487e199a286d6e6",
+    "license": "x11/linux-x86_64/XEPHYR_COPYING",
+    "source_sha256": "c8609f9cdafde14de7ec7cb406dac9507add1d536df8d3c3e3d3d9c1cd864066",
+    "readiness": "display number, then session-ready-v1 after XDMCP session socket selection, then EOF",
+    "xtrans_license": "x11/linux-x86_64/XTRANS_COPYING",
+    "xtrans_license_sha256": "af61583b470afb73de1bc704a34e593183c1e8ae76882991ea54a64b6d846c0d",
+    "build_inputs": "packaging/x11/xdmcp/readiness",
+    "keyboard": "Single registered evdev layout ID, applied to the nested master and KDrive keyboard each generation. Uses the installed xorg-xkbcomp and xkeyboard-config. Host inheritance when omitted."
+  }
+}

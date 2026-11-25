@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "point": "V03",
+  "capture_utc": "2026-11-24T22:40:01.574901+00:00",
+  "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+  "matrix_path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03/protocol-matrix.json",
+  "fixture_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03/evidence/absent-fixtures",
+  "source_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+  "matrix_sha256": "a85bcf6ffc10b4709f56fe0cefcc575da9e8de5a0e1bd8ae1fd3e86c5c546b57",
+  "build_artifacts_sha256": "68bc5492714bef953abd5a04ed601aa03e34177a76f6ed463e3a10708abf3358",
+  "build_inputs_sha256": "7f277dd699a4d54783f82ba85c723f36711d76e984887a99e74cefde512ffd72",
+  "source_inputs_stable": true,
+  "source_input_inventory_sha256": "f180583c9b44dfd22479cbd3858abe9dc0227699c5744a426025407537f72854",
+  "complete_matrix": false,
+  "native_original_validated": 0,
+  "records": [
+    {
+      "case": {
+        "id": "rdp-frame-input",
+        "protocol": "RDP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+        "encoding_options": "TLS/NLA; BGRA frame/input",
+        "steps": "authenticate and receive fixture frame; send input",
+        "expected": "known frame color and server input observations",
+        "target": "rdp_session",
+        "test": "rdp_frame_updates_render_inside_workspace",
+        "inputs": [
+          "inputs/termcraft-rdp-engine",
+          "inputs/termcraft-rdp-engine-evaluation"
+        ]
+      },
+      "command": [],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+      "executable_sha256": null,
+      "exit_code": null,
+      "result": "unavailable",
+      "log": "rdp-frame-input.log",
+      "log_sha256": "0d6f737c0544e17676c456e6a7e40d5597a78f44afa9f7e19f8a34d4bf5af117",
+      "source_input_inventory": "source-input-sha256.json"
+    }
+  ],
+  "controlled_endpoint_checkpoint": false
+}

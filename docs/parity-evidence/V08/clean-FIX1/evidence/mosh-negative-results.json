@@ -1,0 +1,20 @@
+[
+  {
+    "provider": "system",
+    "status": "EXPECTED_ERROR_OBSERVED",
+    "required_error": "The selected installed Mosh provider is unavailable. Install the required system program.",
+    "ocr_file": "mosh-system-ocr.txt",
+    "screenshot": "mosh-system.png",
+    "installed_mosh_absent": true,
+    "perl_absent": true
+  },
+  {
+    "provider": "bundled",
+    "status": "EXPECTED_ERROR_OBSERVED",
+    "required_error": "Bundled Mosh requires system Perl at /usr/bin/perl",
+    "ocr_file": "mosh-bundled-ocr.txt",
+    "screenshot": "mosh-bundled.png",
+    "installed_mosh_absent": true,
+    "perl_absent": true
+  }
+]

@@ -1,0 +1,15 @@
+PASS independent Solo 2x2 diag=False grade=Trivial half-turn mask + set replay
+PASS independent Solo 3x2 diag=False grade=Trivial half-turn mask + set replay
+PASS independent Solo 3x3 diag=False grade=Trivial half-turn mask + set replay
+PASS independent Solo 3x3 diag=False grade=Basic half-turn mask + set replay
+PASS independent Solo 3x3 diag=True grade=Basic half-turn mask + set replay
+PASS independent Solo 4x3 diag=False grade=Basic half-turn mask + set replay
+PASS independent Solo 4x4 diag=False grade=Basic half-turn mask + set replay
+PASS independent Mines 9x9/35 complete constraint replay, start=40
+PASS independent Mines 16x16/99 complete constraint replay, start=128
+PASS independent Mines 30x16/170 complete constraint replay, start=240
+PASS independent Map 20x15/30 adjacency, connected regions, complete Easy replay
+PASS independent Map 30x25/75 adjacency, connected regions, complete Normal replay
+PASS independent Map 25x30/75 adjacency, connected regions, complete Normal replay
+NET_SOLVE|won=true|locked=1/25
+PASS dynamic Guess blank/distinct config, invalid-action redo preservation, Net Solve assisted undo/redo

@@ -1,0 +1,38 @@
+{
+  "archive_sha256": "f3185b54967e19109aafbdec2317a299db8f54dc0092c9fb97e82ca582bd32e6",
+  "files_verified": 971,
+  "package_root": "target/package-x11-qualified/f3185b54967e19109aafbdec2317a299db8f54dc0092c9fb97e82ca582bd32e6/TermCraft-0.1.0-linux-x86_64-arch-xwayland",
+  "qualification": "Arch-compatible Linux x86_64; kernel/procfs policy allowing executable sealed memfd",
+  "wayland": {
+    "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland.tar.gz",
+    "archive_sha256": "f3185b54967e19109aafbdec2317a299db8f54dc0092c9fb97e82ca582bd32e6",
+    "manifest_schema": 1,
+    "platform": "linux",
+    "display_backend": "Wayland",
+    "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+    "screen_size": [
+      938,
+      990
+    ],
+    "rdp_helper_wire_version": 1,
+    "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+    "rdp_helper_child_location_verified": true
+  },
+  "x11": {
+    "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland.tar.gz",
+    "archive_sha256": "f3185b54967e19109aafbdec2317a299db8f54dc0092c9fb97e82ca582bd32e6",
+    "manifest_schema": 1,
+    "platform": "linux",
+    "display_backend": "X11",
+    "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+    "screen_size": [
+      938,
+      990
+    ],
+    "rdp_helper_wire_version": 1,
+    "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+    "rdp_helper_child_location_verified": true
+  },
+  "isolated_live_tests_passed": 5,
+  "scope": "Qualified Linux X11 packaging snapshot; subsequent E01/runtime changes are not part of this artifact."
+}

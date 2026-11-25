@@ -1,0 +1,248 @@
+{
+  "scope": "Accepted FIX1 core compatible UI/registry addon; no MAIN product edits",
+  "main_base_files": {
+    "src/games/library.rs": {
+      "sha256": "169729dbe3df50144b23fd473d745c7bb30146dd4e099a016cb5371ca3b05e03",
+      "size": 7547
+    },
+    "src/ui/games/play.rs": {
+      "sha256": "feff31a26d6f819840c2fab0043531697fee41290d3b18fef22c4cfd255ffb00",
+      "size": 70423
+    },
+    "src/ui/games.rs": {
+      "sha256": "52f57bffea9ed82867533b100a96ee4586cfd2492b992a3446fd9cfe5c2e4c3f",
+      "size": 34114
+    },
+    "tests/games.rs": {
+      "sha256": "e9c7e944788ba2ff91c9120568c314cc238e58c2e5b12d53a69fa0e0b565a97b",
+      "size": 6293
+    }
+  },
+  "payload_files": {
+    "src/games/library.rs": {
+      "sha256": "c98ab78924f1b692cccd5eb512940fcc6e423d82fdc0549db8341d8d68c8451a",
+      "size": 11196
+    },
+    "src/ui/games/play.rs": {
+      "sha256": "746fb35c9e5b9e4cc0c8aaf45648fd03ac3f111ba95354fad957a1b25bc1768e",
+      "size": 107202
+    },
+    "tests/games.rs": {
+      "sha256": "1b0440290ad6396a8c468feb21e07e1a00d22509bd821023d48729485803360c",
+      "size": 8165
+    }
+  },
+  "required_core_archive_sha256": "f9923a046d53cbac31f08841a5a6dbbb705dc69c49b63cdca32d1f0dde386ef9",
+  "required_core_source_tree_sha256": "255241f23f1a8920bace433935bf1a322f2676c2f4ce8378c7cd784e81fe0585",
+  "required_core_files": {
+    "docs/parity-evidence/B06/puzzle-options-final-clippy.log": {
+      "sha256": "62beb9de2ba7196fbea2ba83f48d69ca84e21eca8f75b46d150212eba9c81c8f",
+      "size": 222
+    },
+    "docs/parity-evidence/B06/puzzle-options-final-fmt.log": {
+      "sha256": "3758c84f0c166988de1b4a09ad5b5fc97bbf09ec778013c723fc643b5feb1d05",
+      "size": 64
+    },
+    "docs/parity-evidence/B06/puzzle-options-final-macos.log": {
+      "sha256": "b7d6a60ad27e4f09022ccba2215c71f69e7300276c576dc9cfc16739c386649f",
+      "size": 222
+    },
+    "docs/parity-evidence/B06/puzzle-options-final-test.log": {
+      "sha256": "54f0320d8f0504af86e8b7999b4e35e47e24425ce8d57f4ce796e665c2a56233",
+      "size": 7086
+    },
+    "docs/parity-evidence/B06/puzzle-options-final-windows.log": {
+      "sha256": "a34aa5269af19577c6d4764c24a8f5a2e9e65eceee8bb67b1c2d84ea5aef3a3b",
+      "size": 222
+    },
+    "docs/parity-evidence/B06/puzzle-options-fix1-clippy.log": {
+      "sha256": "b7d6a60ad27e4f09022ccba2215c71f69e7300276c576dc9cfc16739c386649f",
+      "size": 222
+    },
+    "docs/parity-evidence/B06/puzzle-options-fix1-fmt.log": {
+      "sha256": "f3c0e635c687b9d69160dce60195fae221753f65fe37194aa005255588233c1b",
+      "size": 54
+    },
+    "docs/parity-evidence/B06/puzzle-options-fix1-green.log": {
+      "sha256": "f9ccf8d355dab05f6e024a42e2579ae715a9657b94aae85f2c7ed494be38e099",
+      "size": 1008
+    },
+    "docs/parity-evidence/B06/puzzle-options-fix1-macos.log": {
+      "sha256": "063fb14382bc9454a34d17fdb7ae0a156bffc40569cee1d152ca182fe11cba3c",
+      "size": 222
+    },
+    "docs/parity-evidence/B06/puzzle-options-fix1-net-green.log": {
+      "sha256": "8c5bb882900bd6af17bbb0eb9a7762cfb0d41efb5e405e44fcce5fd3e6258cce",
+      "size": 937
+    },
+    "docs/parity-evidence/B06/puzzle-options-fix1-red.log": {
+      "sha256": "53ed8b8e12f1b0933a82af4741bf171a2c977ce41630ed36e026840f782c994c",
+      "size": 1337
+    },
+    "docs/parity-evidence/B06/puzzle-options-fix1-redo-green.log": {
+      "sha256": "6cee788e5fb12b33dc3b44808197fc0a6e3179cf8c3a49b7a40ac89db0d85138",
+      "size": 412
+    },
+    "docs/parity-evidence/B06/puzzle-options-fix1-report.md": {
+      "sha256": "84401d69eca03b560e6f6b95a80f8c2bff3cb4e2ec15334c2a2b511542030eec",
+      "size": 5159
+    },
+    "docs/parity-evidence/B06/puzzle-options-fix1-verify-source.py": {
+      "sha256": "d6cc58886a16921feccae47d56e5a8e48a06f9043278977c4560df2303e88db1",
+      "size": 1715
+    },
+    "docs/parity-evidence/B06/puzzle-options-fix1-windows.log": {
+      "sha256": "1afa0c204d427b2ad4bc2a34ac9a6445c3a7b2fe6bc64ed910adf1be46ff02d3",
+      "size": 222
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-guess-blanks-red.log": {
+      "sha256": "b26653626af96ee0c8562d1ce639bb27cc1408e8b67c1e0e3be509ddce61c805",
+      "size": 953
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-guess-distinct-red.log": {
+      "sha256": "6fca35ba8e7ab8246f65c0de44ff5477fdd2c291b2605c11cb72b8531799d877",
+      "size": 953
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-mines-corrections-red.log": {
+      "sha256": "fdf2d17529d216f0792e73fee1df31d11a615308ee1213dd86a1c302dfc18119",
+      "size": 997
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-net-barrier-red.log": {
+      "sha256": "83076d6d2a167dbc07d3c2dfcc691ed63f1a61416003919c742b9750e3297000",
+      "size": 965
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-net-loop-red.log": {
+      "sha256": "aacc9ab75a0a307fc75373b6c1f50f0ceb23b08c23e656b58218f6076c018d80",
+      "size": 1475
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-net-wrap-red.log": {
+      "sha256": "a879f5cf4c0cc28bb7f574510283873368c1b93b70cff644d0349ff9e3e3a7a7",
+      "size": 964
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-redo-noop-red.log": {
+      "sha256": "cce0b5063e92a5e3431437660cc20ff441022d168155e5039e917e098a9e35f3",
+      "size": 930
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-results.json": {
+      "sha256": "2a696ce582c14ec973a7e676dc26d9182f57150167ca7d7a2dd65e8b699c8a5b",
+      "size": 3250
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-solo-block-grade-red.log": {
+      "sha256": "07509d0ca45794b39dfb45d5e82c11a314c405edb29fa57f3bb93ecdd0ff97ea",
+      "size": 1496
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-solo-symmetry-red.log": {
+      "sha256": "6b387e4ef9878b11812a11cae67ebe7b342e46d58319364bc44d1562252ba695",
+      "size": 972
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-solve-assisted-red.log": {
+      "sha256": "ae14c3b4c5ba422ace4bbbb397572383b02921dd3fefb647e19fc099bcb54625",
+      "size": 958
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutation-untangle-points-red.log": {
+      "sha256": "184034976ab4e84767fc52a227c9ec1a73313d426a466e4b49f2d80a1d7d7102",
+      "size": 1046
+    },
+    "docs/parity-evidence/B06/puzzle-options-mutations-final.log": {
+      "sha256": "a52346e82a8b9761944416505ab78134976dc43989f1306fbb12709f33342d07",
+      "size": 56
+    },
+    "docs/parity-evidence/B06/puzzle-options-net-barrier-rate-red.log": {
+      "sha256": "95ac31c1aecd015312fcd1c8c15e314e6706a90e45472070915f3192314b2fe7",
+      "size": 1178
+    },
+    "docs/parity-evidence/B06/puzzle-options-report.md": {
+      "sha256": "034462106b587269520ff119c8e0a745894143bbd444455489b5e39667dc41bb",
+      "size": 8994
+    },
+    "docs/parity-evidence/B06/puzzle-options-solo-default-behavioral-red.log": {
+      "sha256": "6c04bb678e74bcacfa91c4c4249331b3ebd480800a4d5b4559ea4ca2834a3c1f",
+      "size": 1864
+    },
+    "docs/parity-evidence/B06/puzzle-options-solo-preset-orientation-red.log": {
+      "sha256": "c368e767e6e59498cb0a8a050574ec4ba4b0d31a2ca3524ba25e88029e3a9207",
+      "size": 1058
+    },
+    "docs/parity-evidence/B06/puzzle-options-verify-mutations.py": {
+      "sha256": "3cfe3e528e03f0b7e5ea53e8ccb7e99759674f87cfbbb83e7fedbcaf53a97c55",
+      "size": 3016
+    },
+    "docs/parity-evidence/B06/puzzle-options-verify-source.py": {
+      "sha256": "313012233d9dcc1efe4da86b347e4384f4fd21cef22d0f69297b126e85e47417",
+      "size": 1703
+    },
+    "src/games/puzzles/PROVENANCE.md": {
+      "sha256": "e9f8312d62473bd3f0389502df6e102377a6cd27b399b8951203539a7ace094b",
+      "size": 12047
+    },
+    "src/games/puzzles/config.rs": {
+      "sha256": "ad14f58c0b575dce078eadb7f3701228a162af90ba6b3c87a0978b20e5ed174d",
+      "size": 12668
+    },
+    "src/games/puzzles/guess.rs": {
+      "sha256": "97b4e824a1cbb1a087cfd03b74ab8703e22b10cdc6883559b2c97a474984de95",
+      "size": 8415
+    },
+    "src/games/puzzles/map.rs": {
+      "sha256": "7420a10a9e53ce1e0b9def314a7398673395cda6d579979fb17f84d6a26a49a0",
+      "size": 27459
+    },
+    "src/games/puzzles/mines.rs": {
+      "sha256": "47ceafff40fd4730eb411927c254fa3592b33a614cd9aa1f64e22bfcc20e5315",
+      "size": 16564
+    },
+    "src/games/puzzles/mod.rs": {
+      "sha256": "5ecd35f85364727b5043aded81edb6fd2466d8fa0996bf90182fa8d0ee02dda1",
+      "size": 13428
+    },
+    "src/games/puzzles/net.rs": {
+      "sha256": "74aed8b3a2b70b6b8ccd1d7c52aa2fa899ffcc67bfc62dc73ce319df6ed2c1fa",
+      "size": 18859
+    },
+    "src/games/puzzles/provenance/UPSTREAM-LICENCE": {
+      "sha256": "324cba4984cf02666dec301689f11806c75cee0bdef56bc81a5bdc75667dd68b",
+      "size": 1275
+    },
+    "src/games/puzzles/provenance/options-source-excerpts.txt": {
+      "sha256": "55eac037125eba9b11d80ed3b8967a7262cca55a446f78af176fc3649e824a4d",
+      "size": 31655
+    },
+    "src/games/puzzles/provenance/options-source-manifest.json": {
+      "sha256": "aea46ce2cfed9aeb874ac1a0857e49b4448fba7eb003489fb94573b89d75cb19",
+      "size": 5558
+    },
+    "src/games/puzzles/provenance/recovered-manual-sections.but": {
+      "sha256": "ef6c371b62dc4ca074f8808f84d4dd657f50f2c8a22f96b439716915bb052abe",
+      "size": 22466
+    },
+    "src/games/puzzles/provenance/recovered-source-excerpts.txt": {
+      "sha256": "8274950155663828b00dfd319c81a765974eaf18331122f3a0af3aeda65f2e90",
+      "size": 64309
+    },
+    "src/games/puzzles/provenance/source-manifest.json": {
+      "sha256": "2def57c10f6675907ad7bdd7815f7fc44bdde3c54115bc586f2c576cf8f93dda",
+      "size": 5862
+    },
+    "src/games/puzzles/solo.rs": {
+      "sha256": "baefef2ac51e74b62a88350ae9381f9ef547b11574a0a565a7fe0862cbd948de",
+      "size": 22412
+    },
+    "src/games/puzzles/tests.rs": {
+      "sha256": "7fc1792137010f872b258e7591173dfd1aeb46a3b378ebfd41e638db953cfb9e",
+      "size": 20820
+    },
+    "src/games/puzzles/untangle.rs": {
+      "sha256": "cdf9cd40fa22ab4242fe516a84cd195f5e75400d0b9a8b889419b09e557a7bd4",
+      "size": 7585
+    }
+  },
+  "patch_sha256": "bb8c43979d809b6567dbcbd05250e69c147bf4efbbf44ddd26080ba350d11d3e",
+  "archive_sha256": "c596fc406101d5ff08c862796f5b2ea953fe178bf3efdbb03f9658460c1f97dd",
+  "private_only_build_identity": {
+    "package": "harbor-workspace 0.1.609",
+    "binary": "termcraft-games-options609",
+    "cargo_toml_sha256": "1c2363df76fac69c69b7831fdd7566c00e5c2ccf9edc02b0648941540c20a3fe",
+    "cargo_lock_sha256": "05e7f5b33e307dce3a7e367ef808bd70b56cd942c5e04c1cc9c6d30e12501dc3"
+  },
+  "excluded": "Cargo.toml, Cargo.lock, core files, dependencies and unrelated formatter differences are excluded from UI payload."
+}

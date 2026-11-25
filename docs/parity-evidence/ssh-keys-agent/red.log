@@ -1,0 +1,51 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0432]: unresolved imports `harbor_workspace::credentials::agent`, `harbor_workspace::credentials::keys`
+ --> tests/ssh_agent.rs:3:38
+  |
+3 | use harbor_workspace::{credentials::{agent::{AgentManager,AgentTarget,AgentEndpoint},keys::{KeyManager,KeySettings}},ssh::{Connection...
+  |                                      ^^^^^ could not find `agent` in `credentials`   ^^^^ could not find `keys` in `credentials`
+
+error[E0609]: no field `agent` on type `ConnectionConfig`
+  --> tests/ssh_agent.rs:13:73
+   |
+13 |  let mut first=server.config(4001,true);first.session.key.clear();first.agent=Some(endpoint.clone());assert!(authentication(first));
+   |                                                                         ^^^^^ unknown field
+   |
+   = note: available fields are: `id`, `session`, `app_known_hosts`, `user_known_hosts`
+
+error[E0609]: no field `agent` on type `ConnectionConfig`
+  --> tests/ssh_agent.rs:15:76
+   |
+15 |  let mut second=server.config(4002,true);second.session.key.clear();second.agent=Some(endpoint);assert!(!authentication(second));man...
+   |                                                                            ^^^^^ unknown field
+   |
+   = note: available fields are: `id`, `session`, `app_known_hosts`, `user_known_hosts`
+
+Some errors have detailed explanations: E0432, E0609.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `harbor-workspace` (test "ssh_agent") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+warning: method `poll` is never used
+   --> src/ui.rs:154:8
+    |
+111 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+154 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:679:19
+    |
+641 | impl Workspace {
+    | -------------- methods in this implementation
+...
+679 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+994 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 2 warnings

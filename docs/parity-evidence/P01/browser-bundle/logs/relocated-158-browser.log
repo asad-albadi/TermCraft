@@ -1,0 +1,21 @@
+
+running 3 tests
+test chromium_cancels_site_auth_without_credentials_and_rejects_untrusted_tls ... ok
+test chromium_renders_and_submits_browser_input ... 
+thread 'chromium_renders_and_submits_browser_input' (7001) panicked at tests/browser_session.rs:300:5:
+Chromium fixture timed out at Fixture (loading: false, error: None, notice: None)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test chromium_routes_through_configured_proxy_and_signs_in_only_after_consent ... 
+thread 'chromium_routes_through_configured_proxy_and_signs_in_only_after_consent' (8925) panicked at tests/browser_session.rs:22:74:
+called `Result::unwrap()` on an `Err` value: "The selected bundled Chromium runtime is unavailable or damaged: invalid locales/en-US.pak"
+FAILED
+
+failures:
+
+failures:
+    chromium_renders_and_submits_browser_input
+    chromium_routes_through_configured_proxy_and_signs_in_only_after_consent
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 71.34s
+

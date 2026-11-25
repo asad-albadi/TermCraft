@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "backend": "wayland",
+  "scale": 1.0,
+  "case": "packaged_xserver_actual_workspace_start_render_stop",
+  "engine_executed_sha256": "cbedd90fbc960d4cc799792cedf89b0afa1f1f74a93ba9fb05bfd4da2f27b2b8",
+  "state": {
+    "authority": "/tmp/termcraft-x11-IIvkWP/Xauthority",
+    "capabilities": {
+      "Ok": {
+        "composite_pixels": true,
+        "composite_version": "0.4",
+        "dimensions": [
+          640,
+          480
+        ],
+        "errors": [],
+        "glx_version": "1.4",
+        "initial_mode_restored": true,
+        "opengl": {
+          "direct": true,
+          "matched_pixels": 4096,
+          "renderer": "llvmpipe (LLVM 23.1.4, 256 bits)",
+          "sampled_pixels": 4096,
+          "scene_png_base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABFElEQVR4Ae3AA6AkWZbG8f937o3IzKdyS2Oubdu2bdu2bdu2bWmMnpZKr54yMyLu+Xa3anqmhztr1a8azH8jmf9OBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xvB/28E/78R/P9G8P8bwf9vBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xvB/28E/78R/P9G8P8bwf9vBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xtVmP9ORvw3Ivj/jeD/N4L/3wj+fyP4/43g/zeC/98I/n8j+P+N4P83gv/fCP5/I/j/jeD/N4L/3wj+fyP4/43g/zeC/98I/n8j+P+N4P83gv/fCP5/I/j/jeD/N4L/3wj+fyP4/43g/zeC/9/4R9W2BYMffFTgAAAAAElFTkSuQmCC",
+          "software": true,
+          "vendor": "Mesa",
+          "version": "4.6 (Compatibility Profile) Mesa 26.2.6-arch3.1"
+        },
+        "randr_change": [
+          720,
+          400
+        ],
+        "randr_version": "1.6"
+      }
+    },
+    "display": ":909",
+    "error": null,
+    "running": true
+  },
+  "app_sha256": "ea603394a68bebd30ff66472cb3b7aa9c1a9ce9589bc231c5ecae65bec7bcf6d",
+  "env": {
+    "DISPLAY": null,
+    "WAYLAND_DISPLAY": "wayland-1",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/tmp/dbus-yZHW5Dlov6,guid=f7b2741c34b6cbf7e005c1056b0617df"
+  }
+}

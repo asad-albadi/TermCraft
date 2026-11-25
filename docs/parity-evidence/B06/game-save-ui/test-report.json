@@ -1,0 +1,72 @@
+{
+  "scope": [
+    "src/ui/games.rs",
+    "src/ui/games/play.rs",
+    "src/ui/games/save.rs",
+    "src/ui/session_confirmations.rs"
+  ],
+  "main_edits": false,
+  "package_version": "0.1.917",
+  "normal_bin": "termcraft-game-save-ui917",
+  "backend_dependencies": {
+    "library.rs": "310bc21c795e6081876eb22e68d663ca8e5fd9080f6aeec87df95fd56967c16c",
+    "mod.rs": "4dd43fa71ef16d02df645233369b6fc50458bcc96bf6c468b684ba24ba6dd4dd",
+    "persistence.rs": "56b61c2c334a5976869da7fa7319950d4bfaec41d01fc598bb07cbca547540d8"
+  },
+  "source_provenance": {
+    "initial_snapshot": "MAIN src/assets/data/vendor/Cargo.toml/Cargo.lock; no MAIN mutations",
+    "test_compile_resources": "MAIN packaging, FEATURE_PARITY.md, complete tests copied into private work to satisfy existing include_str!/cfg(test) references",
+    "backend_overlay": "owner-frozen b06-game-save/payload/src/games/{library.rs,mod.rs,persistence.rs}; no backend source edits by UI worker",
+    "version_and_bin": "Private Cargo package/lock0.1.917 and explicit normal binary917; excluded from integration payload"
+  },
+  "verification": [
+    {
+      "command": "CARGO_TARGET_DIR=<app>/target cargo test --manifest-path <private>/work/Cargo.toml --offline --locked -j 2 --bin termcraft-game-save-ui917 ui::games -- --test-threads=2",
+      "log": "games-ui-native-final.log",
+      "result": "58 passed; 0 failed; 156 filtered out; 41.07s (includes10 save_ui tests and all existing game/screen/session isolation tests)"
+    },
+    {
+      "command": "CARGO_TARGET_DIR=<app>/target cargo test --manifest-path <private>/work/Cargo.toml --offline --locked -j 2 --bin termcraft-game-save-ui917 ui::games -- --test-threads=2",
+      "log": "games-ui-final2.log",
+      "result": "56 passed; 0 failed; 156 filtered out; 34.66s"
+    },
+    {
+      "log": "games-ui.log",
+      "result": "RED52 passed/1 failed: existing invalid-New-game test stopped at newly intentional discard guard. Updated test to assert pending and preserved scene, click Discard, then retain original invalid-config/history/selection/error assertions."
+    },
+    {
+      "log": "focused3.log",
+      "result": "Earlier focused5/5 passed before last3 tests were added; final56/56 includes all8 save_ui cases."
+    }
+  ],
+  "coverage": [
+    "All13 real Save/Load controls are painted; Save clicked for each with canceled injected worker chooser.",
+    "Actual Save captures state only at click; chooser callback verified off GUI thread; later timed Tick remains unsaved after older snapshot saved.",
+    "Actual overwrite decline preserves exact original file and active saved/history bytes; explicit acceptance atomically replaces and marks exact revision clean.",
+    "Actual dirty Load/New/Reset/Close buttons require discard; Keep playing preserves current scene/history. Discard completes Reset/New/Close.",
+    "Actual malformed Load failure preserves exact active save/history bytes and original invalid bytes.",
+    "Successful Load refreshes Solitaire initial variant/passes and resets selection/source/drag/tick/focus. Added adoption input quarantine/configuration test.",
+    "Timed input during Load queues another discard confirmation before candidate replacement; stale-generation worker cannot replace newer Termwalk session.",
+    "Bounded regular-file reads/writes; size-limit rejection; symlink target/ancestor rejection; no-clobber publication preserves racing/existing destination; exact-revision clean/stale-completion tests.",
+    "Existing terminal isolation, focused-editor ownership, explicit Solve assistance, all advanced UI and screensaver lifecycle regressions pass.",
+    "Raw ROOT ViewportEvent::Close in logic-only pass cancels close even with no owned terminals or a suspended retained dirty game. Actual Keep playing preserves exact session/history. Actual discard emits Close only when no remaining owned-session guard; with running terminal it retains separate existing confirmation. Already-pending owned-session approval also rechecks dirty game. Existing detached close test strengthened to retain actual dirty global game."
+  ],
+  "filesystem_design": "Capability-anchored directory chain opened without following links; bounded no-follow/nonblocking final-file reads; exclusive random same-directory staging, sync, atomic rename after explicit overwrite or hard-link no-clobber publication. Failed work never adopts a candidate or truncates an existing file.",
+  "job_design": "At most one chooser/codec/I/O worker. Monotonic generation and successful-action revision tracked separately. Saves only clean identical generation+revision; load after intervening revisions re-confirms. Native window suspension invalidates pending generation. Final adoption drops prior-board queued input.",
+  "limits": "Native rfd dialogs use a narrow test-only chooser/overwrite callback injection in actual egui button tests. This worker did not run a parent all-target gate or independent review; root owns integration review/gates. Future pure-core changes intentionally affect backend dynamic engine identity and require combined final gate.",
+  "native_close_design": "Three narrow hooks in session_confirmations.rs: request_window_session_close, intercept_session_close, resolve_session_close(Window). PlayState ROOT exit guard checks retained session regardless of suspended/is_open, explicitly CancelClose and raises the existing game surface. Discard removes game then uses existing remote document / owned-session close workflow. Detached close preserves the global game and keeps its existing reattach/session confirmation behavior; no loss-specific game prompt.",
+  "red_green_notes": "games-ui.log RED52/53 exposed intentional new discard guard expectation in existing invalid-New-game test; updated to explicitly confirm without weakening preservation/error assertions. native-close.log RED1/2 was test setup: logic-only pass had not yet painted first egui Modal layout before querying text; added one normal frame and kept all assertions. Final native58/58 GREEN.",
+  "main_baseline_verification": {
+    "src/ui/games/play.rs": true,
+    "src/ui/games.rs": true,
+    "src/ui/session_confirmations.rs": true
+  },
+  "normal_build": {
+    "command": "CARGO_TARGET_DIR=<app>/target cargo build --manifest-path <private>/work/Cargo.toml --offline --locked -j 2 --bin termcraft-game-save-ui917",
+    "log": "build-normal-final.log",
+    "result": "PASS; dev profile completed5.75s; 3 preexisting dead_code warnings in ui.rs/shared_sessions.rs/ssh_keys.rs",
+    "binary": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/termcraft-game-save-ui917",
+    "sha256": "1fd186cec72f2faf0b6903bdf1d270a452857d9ead4076ed5e8a9d472fa00d35",
+    "bytes": 611432360
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "progress": "66.7% (40/60)",
+  "cron_red_exit": 101,
+  "scp_contention_red_exit": 101,
+  "cron_green": {
+    "exit": 0,
+    "passed": 10,
+    "failed": 0
+  },
+  "managed_gui_green": {
+    "exit": 0,
+    "passed": 4,
+    "failed": 0
+  },
+  "constrained_gui_green": {
+    "exit": 0,
+    "passed": 10,
+    "failed": 0,
+    "test_threads": 16,
+    "affinity_cpus": 1,
+    "seconds": 27.77
+  },
+  "fmt_exit": 0,
+  "source_manifest_verified": true,
+  "modified_source_files": [
+    "src/services/cron/tests.rs",
+    "src/services/cron.rs",
+    "src/ui/managed_servers.rs",
+    "src/ui.rs"
+  ],
+  "full_gate_run": false,
+  "independent_review_claimed": false,
+  "all_own_commands_finished": true,
+  "review_followup": {
+    "finding": "P2 shared Telnet stop deadline",
+    "deadline_red_exit": 101,
+    "deadline_green": {
+      "exit": 0,
+      "passed": 1,
+      "failed": 0
+    },
+    "managed_gui_green": {
+      "exit": 0,
+      "passed": 4,
+      "failed": 0
+    },
+    "constrained_gui_green": {
+      "exit": 0,
+      "passed": 10,
+      "failed": 0,
+      "test_threads": 16,
+      "affinity_cpus": 1,
+      "seconds": 37.55
+    },
+    "fmt_exit": 0,
+    "approved_cron_scp_hashes_unchanged": true,
+    "x03_seven_accepted_hashes_preserved": true,
+    "all_own_commands_finished": true
+  }
+}

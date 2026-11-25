@@ -1,0 +1,7 @@
+{
+  "path": "tests/tunnel_interop.rs",
+  "base_sha256": "3cc7b2ac7b73b147575aa1edce93ef5323e1e0d388563f0a3a1ed3239fbf3d64",
+  "sha256": "d6102df5d9a84de87ac2c9118be69f193a7b36a5640ed51f63f6477c8e5d7450",
+  "review": "independent spec/quality ACCEPT",
+  "root_whole_gate": "pending after hostname integration"
+}

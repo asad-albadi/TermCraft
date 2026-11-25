@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "qualification": "unqualified source-engineered native providers; no approved private executable or dependency inventory pin yet",
+  "redistribution_approved": false,
+  "windows": {
+    "artifact_id": "vcxsrv-21.1.16.1-termcraft-private1-windows-x86_64",
+    "upstream_artifact": "vcxsrv.exe",
+    "upstream_archive_sha256": "dea6c7d67d3d15b4ed45c87b63a83c88f4aceaaef5425630f0e97a0bad70d620",
+    "source_archive_url": "https://codeload.github.com/marchaesen/vcxsrv/tar.gz/b1c7712a2584b263f44fa24e8c493f4f59c472ea",
+    "source_archive_sha256": "a73b30db3eb6b60efd181a1cd7fa39bc6df8f0d4c973d6c8416a856b0bf55b28",
+    "patch_sha256": "d647860419fca13a17cb2765e8d30a1c521016d66969f8fb297b6f46e3c4f8bb",
+    "private_executable_sha256": null,
+    "native_build_inputs": [
+      "Windows x86_64",
+      "Visual Studio 2022 VC143 SDK/redistributable rights and notices",
+      "Cygwin bison/flex/gawk/gperf/gzip/nasm/sed/Python",
+      "Strawberry Perl",
+      "Python lxml/mako",
+      "NSIS only for upstream installer packaging, never execute installers"
+    ],
+    "blocking_evidence": [
+      "native private build and signed/output dependency inventory absent",
+      "native owned-job/readiness/authority/port-collision tests unavailable",
+      "MSVC runtime redistribution notices not present in upstream extracted payload",
+      "X03 active graphics probe unavailable on Windows"
+    ]
+  },
+  "macos": {
+    "artifact_id": "xquartz-2.8.6-termcraft-private1-macos-universal",
+    "upstream_archive_sha256": "9ac35a505095bfbd3009c3b4772f0c6421e2f79c4210ab908459270d1c447909",
+    "distribution_source_url": "https://codeload.github.com/XQuartz/XQuartz/tar.gz/db446ed66b76f386b815e8b095beb56aa368424a",
+    "distribution_source_sha256": "d534c1dbb9736e044eff8beaa895fa90dd05a3fc987dd9d0dddb6b4400c6e12b",
+    "xserver_source_url": "https://codeload.github.com/XQuartz/xorg-server/tar.gz/0f7f5eb17c2e22528ecd2cf7feff11da85c7dcbc",
+    "xserver_source_sha256": "36db027489d6370ec5b1b6d07c8155c547193c2a6914fd617eb4311fb029257f",
+    "patch_sha256": "5e1e42e50c918ed28f9d782e743c6e6708278b84e069badbeb9b06c2630b98ff",
+    "private_executable_sha256": null,
+    "native_build_inputs": [
+      "macOS SDK/Xcode clang and Objective-C/AppKit/CoreFoundation",
+      "meson/ninja/pkg-config/bison/flex/mig",
+      "complete pinned XQuartz component dependencies and matching headers/pkg-config data",
+      "private app-relative Mach-O dylib relocation",
+      "codesign for both x86_64 and arm64"
+    ],
+    "blocking_evidence": [
+      "no relocated signed private native build",
+      "full source/license closure for all upstream binary dependencies remains unreviewed",
+      "upstream Composite explicitly disabled due known bug 1409; not overridden",
+      "native authenticated inherited-listener/no-global-lock tests unavailable",
+      "X03 native graphics probe unavailable on macOS"
+    ]
+  }
+}

@@ -1,0 +1,243 @@
+   Compiling harbor-workspace v0.1.610 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced-ui/work)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.76s
+     Running unittests src/main.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/termcraft_advanced_ui610-aef57433844c9f8f)
+
+running 204 tests
+test ui::appearance::tests::portal_values_follow_the_desktop_specification ... ok
+test ui::appearance::tests::reads_live_desktop_appearance_portal ... ignored, requires a running desktop appearance portal
+test ui::appearance::tests::system_theme_updates_do_not_override_explicit_appearance ... ok
+test ui::activity::tests::real_background_output_is_unread_until_painted_and_detached_output_is_seen ... ok
+test ui::broadcast::tests::painted_keyboard_and_paste_use_only_the_selected_real_transports ... ok
+test ui::cli_dispatch::tests::command_dispatch_uses_its_own_process_and_exact_local_cwd ... ok
+test ui::cli_dispatch::tests::exit_when_done_preserves_preexisting_user_terminals ... ok
+test ui::cli_dispatch::tests::exit_when_done_retires_telnet_job_when_gateway_cannot_connect ... ok
+test ui::cli_dispatch::tests::forwarded_new_tab_opens_once_in_the_actual_workspace ... ok
+test ui::cli_dispatch::tests::named_macro_targets_its_new_terminal_and_respects_paste_confirmation ... ok
+test ui::credential_tests::explicit_proxy_save_links_only_proxy_reference_and_encrypts_both_fields ... ok
+test ui::desktop::clipboard_tests::remote_clipboard_is_bounded_directional_and_cleared_on_disconnect ... ok
+test ui::desktop::cursor_tests::cursor_shape_is_bounded_and_hotspot_tracks_scaled_canvas ... ok
+test ui::credential_tests::optional_saved_password_stays_encrypted_and_requires_a_matching_live_challenge ... ok
+test ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input ... FAILED
+test ui::desktop::tests::real_rdp_vault_save_use_delete_and_session_fullscreen ... FAILED
+test ui::desktop_gateway::tests::telnet_tab_signs_in_to_gateway_and_closes_its_target ... ok
+test ui::ftp::tests::ftp_confirmation_carries_the_source_kind_into_transfer_jobs ... ok
+test ui::ftp::tests::ftp_recursive_delete_requires_explicit_contents_choice_and_exact_path ... ok
+test ui::ftp::tests::graphical_ftp_session_connects_opens_edits_and_guards_tab_close ... ok
+test ui::games::lifecycle_tests::canceled_touch_and_focus_loss_recover_stale_pointer_without_replaying_input ... ok
+test ui::games::lifecycle_tests::held_wakeup_guard_waits_with_bounded_repaint ... ok
+test ui::games::lifecycle_tests::immediate_detached_close_is_canceled_and_queued_while_idle_with_owned_pty ... ok
+test ui::games::lifecycle_tests::ordinary_input_at_idle_threshold_is_preserved_before_activation ... ok
+test ui::games::lifecycle_tests::preidle_blur_frame_is_preserved_and_stale_removed_or_blurred_pointer_does_not_inhibit ... ok
+test ui::games::lifecycle_tests::preidle_held_modifier_without_repeat_prevents_activation ... ok
+test ui::games::lifecycle_tests::preidle_root_and_detached_held_inputs_without_repeat_prevent_activation ... ok
+test ui::games::lifecycle_tests::unrelated_viewport_cannot_release_guard_but_missing_owner_recovers ... ok
+test ui::games::play::options_ui_tests::advanced_ui_actual_jigsaw_and_killer_cell_hits_keys_solve_buttons ... ok
+test ui::games::play::options_ui_tests::advanced_ui_actual_menu_selects_intermediate_and_creates_new_board ... ok
+test ui::games::play::options_ui_tests::advanced_ui_all_51_presets_available_and_15_samples_paint_exact_grade ... ok
+test ui::games::play::options_ui_tests::advanced_ui_custom_flags_regular_help_and_focus_quarantine ... ok
+test ui::games::play::options_ui_tests::advanced_ui_jigsaw_exact_region_edges_and_diagonals ... ok
+test ui::games::play::options_ui_tests::advanced_ui_killer_cages_sums_arithmetic_and_history ... ok
+test ui::games::play::options_ui_tests::options_actual_new_game_applies_draft_then_rejects_bad_settings ... ok
+test ui::games::play::options_ui_tests::options_actual_preset_menu_selects_super_without_replacing_board ... ok
+test ui::desktop_gateway::tests::rdp_tab_retries_after_certificate_trust_with_original_nla_identity ... FAILED
+test ui::games::play::options_ui_tests::options_actual_solve_confirmation_and_redo_buttons ... ok
+test ui::games::play::options_ui_tests::options_actual_super_guess_fifth_peg_click_and_hold ... ok
+test ui::games::play::options_ui_tests::options_actual_wrapping_net_last_cell_and_solve_undo_redo ... ok
+test ui::games::play::options_ui_tests::options_custom_guess_blanks_distinct_and_failed_submission_keeps_row ... ok
+test ui::games::play::options_ui_tests::options_dynamic_guess_last_slot_and_atomic_failure ... ok
+test ui::games::play::options_ui_tests::options_changed_sizes_render_inside_scrolling_surface ... ok
+test ui::games::play::options_ui_tests::options_focused_numeric_edit_owns_digits_shortcuts_and_enter ... ok
+test ui::games::play::options_ui_tests::options_guess_tenth_colour_keyboard_reaches_last_custom_slot ... ok
+test ui::games::play::options_ui_tests::options_focused_shortcut_preserves_assisted_game ... ok
+test ui::games::play::options_ui_tests::options_large_mines_and_map_pointer_coordinates ... ok
+test ui::games::play::options_ui_tests::options_net_barriers_and_solo_bit16_are_painted_from_scene ... ok
+test ui::games::play::options_ui_tests::options_leaving_editor_by_board_click_restores_game_keys ... ok
+test ui::games::play::options_ui_tests::options_solo_16_keyboard_pencil ... ok
+test ui::games::play::options_ui_tests::options_widget_buttons_and_combo_receive_keyboard_without_board_moves ... ok
+test ui::games::play::tests::all_thirteen_real_boards_render_and_game_keys_cannot_reach_owned_broadcast_sessions ... ok
+test ui::games::play::tests::cards_keyboard_source_and_destination_apply_a_real_transfer ... ok
+test ui::games::play::tests::canceled_pointer_keeps_other_held_close_keys_owned_until_their_release ... ok
+test ui::games::play::tests::close_consumes_escape_repeats_release_and_recovers_canceled_pointer ... ok
+test ui::games::play::tests::closing_main_game_consumes_a_held_game_key_and_release_in_another_viewport ... ok
+test ui::games::play::tests::detached_native_close_is_canceled_while_game_retains_owned_terminal ... ok
+test ui::games::play::tests::invader_render_player_marker_uses_core_player_row ... ok
+test ui::games::play::tests::library_retains_session_and_new_variants_reset_to_selected_rules ... ok
+test ui::games::play::tests::keyboard_pointer_moves_reset_and_undo_reach_actual_core ... ok
+test ui::games::play::tests::untangle_keyboard_move_uses_selected_vertex_and_bounded_integer_coordinates ... ok
+test ui::games::play::tests::native_close_suspends_game_without_destroying_it_and_shows_owned_session_confirmation ... ok
+test ui::games::play::untangle_fix1_regression::untangle_batched_press_motion_drag ... ok
+test ui::games::play::untangle_fix1_regression::untangle_separate_press_drag ... ok
+test ui::games::tests::disabled_screensaver_preserves_ordinary_input_frame ... ok
+test ui::games::tests::ime_and_raw_mouse_input_dismiss_the_idle_screen ... ok
+test ui::games::tests::screensaver_dismissal_in_detached_viewport_preserves_terminal ... ok
+test ui::games::tests::screensaver_dismisses_without_losing_terminal_input ... ok
+test ui::games::tests::wakeup_key_repeats_are_consumed_until_release ... ok
+test ui::gui_tests::appearance_tracks_system_and_honors_overrides ... ok
+test ui::gui_tests::all_workspace_pages_and_dialogs_render ... ok
+test ui::gui_tests::broadcast_paste_cancel_and_stale_target_send_no_payload ... ok
+test ui::gui_tests::cancel_active_tab_close_preserves_real_process ... ok
+test ui::gui_tests::closing_an_earlier_tab_preserves_active_session ... ok
+test ui::gui_tests::dirty_remote_editor_blocks_tab_close_and_reconnect ... ok
+test ui::gui_tests::disconnected_serial_aborts_pending_broadcast_before_other_target_writes ... ok
+test ui::gui_tests::generated_sftp_filename_keeps_native_bytes_outside_keyboard_codec ... ok
+test ui::gui_tests::integrated_tab_close_does_not_select_the_tab ... ok
+test ui::gui_tests::embedded_ssh_creates_browser_even_when_sidebar_collapsed ... ok
+test ui::gui_tests::new_remote_revision_blocks_stale_active_window_close_approval ... ok
+test ui::gui_tests::native_drop_on_local_zone_does_not_upload ... ok
+test ui::gui_tests::reconnect_keeps_tool_program_and_arguments ... ok
+test ui::gui_tests::scp_pane_never_identifies_itself_as_sftp ... ok
+test ui::gui_tests::selected_legacy_transport_decodes_once_and_encodes_keyboard_input ... ok
+test ui::gui_tests::ssh_directory_notices_follow_only_after_opt_in ... ok
+test ui::gui_tests::sidebar_keyboard_toggle_persists_and_restores ... ok
+test ui::gui_tests::system_appearance_without_native_theme_defaults_to_light ... ok
+test ui::gui_tests::unauthenticated_terminal_input_cannot_be_recorded_or_queued ... ok
+test ui::highlighting::tests::invalid_editor_draft_does_not_replace_saved_rules_or_enabled_state ... ok
+test ui::highlighting::tests::malformed_import_retains_cached_working_rules_until_valid_replacement ... ok
+test ui::highlighting::tests::rejected_saved_rules_are_not_cloned_into_render_caches ... ok
+test ui::gui_tests::terminal_widget_writes_keyboard_input_into_real_shell ... ok
+test ui::http_share::tests::http_ui_background_start_applies_private_auth_and_upload_policy ... ok
+test ui::layout::tests::dragging_real_divider_persists_the_ratio_and_small_views_fall_back ... ok
+test ui::macro_events::tests::macro_import_is_bounded_and_rejects_invalid_call_libraries ... ok
+test ui::macro_events::tests::timed_macro_never_records_unauthenticated_terminal_input ... ok
+test ui::layout::tests::four_painted_panes_route_input_once_to_the_clicked_owner ... ok
+test ui::macro_events::tests::timed_macro_starts_output_wait_after_the_ninth_input_reaches_the_transport ... ok
+test ui::macro_events::tests::timed_macro_startup_sees_the_first_authenticated_ssh_output ... ok
+test ui::macro_events::tests::timed_macro_startup_survives_duplication_and_named_cli_runs_once ... ok
+test ui::macro_events::tests::timed_macro_wait_ignores_pty_output_before_paste_confirmation ... ok
+test ui::macro_events::tests::timed_macro_waits_for_focus_in_a_detached_terminal_on_another_root_page ... ok
+test ui::macro_events::tests::timed_macro_waits_for_its_pty_output_and_calls_the_named_child ... ok
+test ui::macro_events::tests::timed_terminal_macro_cancels_with_declined_paste_or_replaced_transport ... ok
+test ui::macro_events::tests::timed_terminal_macro_records_content_and_binds_replay_across_active_switch ... ok
+test ui::managed_servers::tests::ftp_service_password_field_leaves_no_undo_history ... ok
+test ui::managed_cron::tests::pointer_save_start_due_stop_and_disabled_persistence ... ok
+test ui::managed_servers::tests::refusal_probe_rejects_late_refusal_and_retries_timeout ... ok
+test ui::managed_servers::tests::nfs_servers_page_pointer_start_stop ... ok
+test ui::managed_servers::tests::telnet_service_password_field_leaves_no_undo_history ... ok
+test ui::managed_servers::tests::servers_page_buttons_own_real_listeners_and_restart ... ok
+test ui::managed_ssh_iperf::tests::ssh_service_password_field_leaves_no_undo_history ... ok
+test ui::managed_vnc::tests::servers_vnc_pointer_start_stop_owns_only_selected_display ... ignored, requires private bwrap/Cage display; never run on a host display
+test ui::managed_vnc::tests::vnc_service_password_field_leaves_no_undo_history ... ok
+test ui::mosh_startup::tests::cancelled_mosh_preparation_cannot_spawn_a_child ... ok
+test ui::mosh_startup::tests::mosh_startup_keeps_render_and_input_live_and_cancels_owned_process ... ok
+test ui::packages::legacy::tests::legacy_package_import_result_keeps_commands_disabled_in_user_copy ... ok
+test ui::packages::legacy::tests::legacy_package_worker_failure_is_visible ... ok
+test ui::packages::legacy::tests::legacy_package_worker_reviews_and_imports_real_zip_off_the_caller_thread ... ok
+test ui::packages::tests::portable_open_button_keeps_render_and_other_input_live_and_cleans_cancelled_child ... ignored, requires pinned BusyBox fixture archives
+test ui::pages::appearance_tests::benchmark_visible_terminal_rows_with_long_history ... ignored, CPU renderer benchmark; run explicitly to record frame timings
+test ui::managed_ssh_iperf::tests::servers_ssh_pointer_start_auth_root_readonly_stop_preserves_local_pty ... ok
+test ui::pages::appearance_tests::keyword_rendering_preserves_ansi_and_search_has_priority ... ok
+test ui::pages::appearance_tests::configured_terminal_profile_changes_actual_paint_and_dimensions ... ok
+test ui::pages::appearance_tests::physical_selection_highlight_has_priority_and_covers_wide_cells ... ok
+test ui::pages::appearance_tests::oversized_fixed_alternate_grid_can_reveal_its_far_controls ... ok
+test ui::pages::appearance_tests::search_only_highlights_matching_text_and_inverse_stays_legible ... ok
+test ui::pages::appearance_tests::proportional_font_keeps_physical_terminal_columns ... ok
+test ui::pages::appearance_tests::terminal_view_copies_cell_rectangle_and_opens_shift_right_click_menu ... ok
+test ui::pages::appearance_tests::terminal_view_routes_mouse_without_broadcast_or_macro_recording ... ok
+test ui::pages::appearance_tests::wide_graphemes_reserve_exact_terminal_columns_in_the_galley ... ok
+test ui::pages::appearance_tests::the_entire_live_screen_fits_the_terminal_viewport ... ok
+test ui::rdp_settings::tests::embedded_rdp_controls_add_read_only_folder_and_enable_admin ... ok
+test ui::rdp_settings::tests::explicit_serial_mapping_is_reachable_and_defaults_read_only ... ok
+test ui::rdp_settings::tests::rdp_settings_controls_change_saved_clipboard_and_keyboard_choices ... ok
+test ui::rdp_settings::tests::switching_engines_can_clear_incompatible_saved_options ... ok
+test ui::remote_files::auth_tests::auth_field_leaves_no_secret_in_undo_history ... ok
+test ui::remote_files::transfer_tests::action_dialog_keeps_its_confirmed_target_and_rejects_traversal ... ok
+test ui::remote_files::transfer_tests::download_uses_selected_raw_path_and_requires_a_regular_file ... ok
+test ui::remote_files::transfer_tests::folder_download_and_dropped_upload_keep_explicit_roots ... ok
+test ui::plugins::pointer_workflow_tests::tools_plugin_pointer_consent_invocation_cancel_disable_keeps_live_pty_usable ... ok
+test ui::remote_files::transfer_tests::recursive_deletion_requires_the_explicit_contents_choice ... ok
+test ui::remote_files::transfer_tests::remote_drop_cannot_cross_connection_or_escape_local_directory ... ok
+test ui::remote_files::transfer_tests::scp_remote_directory_drop_is_rejected_before_submission ... ok
+test ui::serial_settings::tests::serial_controls_change_parity_and_flow_control ... ok
+test ui::remote_files::transfer_tests::old_listing_rows_cannot_be_selected_during_navigation ... ok
+test ui::session_groups::tests::mixed_group_launch_opens_real_valid_peers_and_reports_bad_program ... ok
+test ui::session_import::tests::background_import_previews_before_apply_and_persists_only_after_apply ... ok
+test ui::session_import::tests::cancelled_or_failed_import_cannot_apply_a_late_result ... ok
+test ui::shared_sessions::tests::cancelled_source_prompt_cannot_send_values_to_a_later_refresh ... ok
+test ui::shared_sessions::tests::readonly_source_cache_survives_restart_and_never_overwrites_local_names ... ok
+test ui::shared_sessions::tests::source_definition_rows_are_painted_with_readonly_and_stale_text ... ok
+test ui::shortcuts::tests::closing_shortcut_targets_focused_pane_instead_of_stale_tab_index ... ok
+test ui::shortcuts::tests::edited_global_binding_respects_real_textedit_focus_and_store_reload ... ok
+test ui::shortcuts::tests::modifier_shortcut_text_event_is_consumed_before_terminal_encoding ... ok
+test ui::shared_sessions::tests::saved_source_credential_never_fills_a_canceled_refresh_generation ... ok
+test ui::shortcuts::tests::native_paste_payload_and_shortcut_do_not_request_another_clipboard_read ... ok
+test ui::shortcuts::tests::real_history_pageup_changes_view_without_transport_bytes ... ok
+test ui::shortcuts::tests::shortcut_capture_keeps_typed_keys_out_of_the_focused_shell ... ok
+test ui::ssh_key_tests::background_key_generation_records_the_real_created_paths ... ok
+test ui::ssh_key_tests::key_manager_footer_is_visible_at_the_minimum_app_height ... ok
+test ui::terminal_mouse::tests::sidebar_history_clip_scroll_offsets_focus_and_shift_gate_mouse ... ok
+test ui::terminal_mouse::tests::wheel_work_is_bounded_per_frame_and_small_deltas_accumulate ... ok
+test ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source ... ok
+test ui::terminal_review_tests::asynchronous_clipboard_keeps_original_targets_across_focus_and_broadcast_changes ... ok
+test ui::terminal_review_tests::cancelling_recorded_paste_records_logical_text_without_framing ... ok
+test ui::terminal_review_tests::cursor_report_waits_until_the_paste_transaction_ends ... ok
+test ui::terminal_review_tests::native_copy_event_interrupts_without_selection_but_shift_copy_does_not ... ok
+test ui::terminal_review_tests::output_bursts_share_one_work_budget_and_keep_close_cancel_responsive ... ok
+test ui::terminal_review_tests::paste_then_enter_in_one_frame_keeps_wire_order ... ok
+test ui::terminal_review_tests::refused_mouse_release_is_retried_after_transport_admission_recovers ... ok
+test ui::terminal_review_tests::zero_budget_cannot_finalize_a_decoder_with_unread_transport_tail ... ok
+test ui::terminal_selection::tests::cell_drag_copies_rectangle_and_mouse_mode_requires_shift ... ok
+test ui::terminal_settings::tests::profile_editor_migrates_legacy_font_and_rejects_invalid_draft ... ok
+test ui::terminal_review_tests::telnet_paste_and_enter_same_frame_use_the_mode_at_delivery ... ok
+test ui::vnc_integration_tests::embedded_vnc_workspace_paints_real_frame_and_cursor_and_routes_scaled_input ... ok
+test ui::vnc_settings::tests::vnc_controls_require_consent_and_keep_clipboard_and_keyboard_choices ... ok
+test ui::vnc_integration_tests::timed_macro_records_vnc_gui_input_and_releases_held_buttons_on_cancel ... ok
+test ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs ... ok
+test ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted ... ok
+test ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full ... ok
+test ui::windows::tests::real_transport_survives_detach_paint_rename_and_reattach_once ... ok
+test ui::workspace_review_tests::detach_reconciles_root_toolbar_and_reconnect_preserves_window_and_peers ... ok
+test ui::workspace_review_tests::detached_dispatcher_consumes_modifier_text_before_painting_terminal ... ok
+test ui::workspace_review_tests::detached_find_query_is_edited_in_child_instead_of_sent_to_shell ... ok
+test ui::workspace_review_tests::embedded_child_cannot_close_a_different_focused_window ... ok
+test ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text ... ok
+test ui::workspace_review_tests::multiexec_failure_survives_next_success_until_acknowledged ... ok
+test ui::workspace_review_tests::multiexec_toggle_preserves_explicit_membership ... ok
+test ui::workspace_review_tests::opaque_client_password_keyboard_and_paste_stay_private ... ok
+test ui::workspace_review_tests::output_after_last_paint_stays_unread_when_switching_to_another_tab ... ok
+test ui::workspace_review_tests::tiny_output_on_four_large_screens_has_bounded_activity_overhead ... ok
+test ui::workspace_review_tests::paste_and_close_confirmations_show_custom_titles_and_terminal_identity ... ok
+test ui::xdmcp::tests::opening_broadcast_settings_never_starts_discovery ... ok
+test ui::xdmcp::tests::workspace_routes_xdmcp_to_owned_session_and_rejects_stale_endpoint ... ok
+test ui::xserver::tests::crashed_probe_discards_fresh_display_before_releasing_clients ... ignored, requires the isolated Wayland fixture and a qualified Xwayland bundle
+test ui::xserver::tests::embedded_config_controls_owned_display_startup ... ignored, requires the isolated Wayland fixture and a qualified Xwayland bundle
+test ui::xserver::tests::local_tab_starts_owned_server_and_only_its_shell_gets_client_environment ... ignored, requires the isolated Wayland fixture and a qualified Xwayland bundle
+test ui::xserver::tests::openssh_without_display_blocks_only_requested_forwarding ... FAILED
+test ui::xdmcp::tests::editor_invalidates_stale_selection_and_does_not_carry_network_choices_between_profiles ... ok
+test ui::xserver::tests::xserver_ui_cancels_in_background ... ok
+test ui::xserver::tests::xserver_ui_reports_missing_bundle ... ok
+test ui::xserver::tests::xserver_ui_starts_and_stops_packaged_engine ... ignored, requires the isolated Wayland fixture and a qualified Xwayland bundle
+test ui::xserver::tests::requested_display_failure_blocks_local_shell ... ok
+
+failures:
+
+---- ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input stdout ----
+
+thread 'ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input' (470849) panicked at src/ui/../../tests/support/rdp_server.rs:97:14:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ui::desktop::tests::real_rdp_vault_save_use_delete_and_session_fullscreen stdout ----
+
+thread 'ui::desktop::tests::real_rdp_vault_save_use_delete_and_session_fullscreen' (470887) panicked at src/ui/../../tests/support/rdp_server.rs:97:14:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- ui::desktop_gateway::tests::rdp_tab_retries_after_certificate_trust_with_original_nla_identity stdout ----
+
+thread 'ui::desktop_gateway::tests::rdp_tab_retries_after_certificate_trust_with_original_nla_identity' (471500) panicked at src/ui/../../tests/support/rdp_server.rs:97:14:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+---- ui::xserver::tests::openssh_without_display_blocks_only_requested_forwarding stdout ----
+
+thread 'ui::xserver::tests::openssh_without_display_blocks_only_requested_forwarding' (479976) panicked at src/ui/xserver.rs:637:18:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+
+failures:
+    ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input
+    ui::desktop::tests::real_rdp_vault_save_use_delete_and_session_fullscreen
+    ui::desktop_gateway::tests::rdp_tab_retries_after_certificate_trust_with_original_nla_identity
+    ui::xserver::tests::openssh_without_display_blocks_only_requested_forwarding
+
+test result: FAILED. 192 passed; 4 failed; 8 ignored; 0 measured; 0 filtered out; finished in 184.90s
+
+error: test failed, to rerun pass `--bin termcraft-advanced-ui610`

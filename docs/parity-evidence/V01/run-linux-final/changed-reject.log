@@ -1,0 +1,8 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_browser-6a8ad83dd46fcc62' --exact changed_key_prevents_authentication --nocapture --test-threads=1
+Executable SHA256: 00aa0799bfd5bfd23a0537964f5fd51f9e9d2ac669386d07f903f320e0897d46
+
+running 1 test
+test changed_key_prevents_authentication ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.12s
+

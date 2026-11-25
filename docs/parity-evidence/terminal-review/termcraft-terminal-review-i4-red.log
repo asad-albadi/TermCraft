@@ -1,0 +1,30 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0425]: cannot find function `sftp_quote_path` in module `connection`
+    --> src/ui.rs:2443:145
+     |
+2443 | ... command=b"put -p ".to_vec();command.extend(connection::sftp_quote_path(&path).unwrap());command.push(b'\n');
+     |                                                            ^^^^^^^^^^^^^^^
+     |
+    ::: src/connection.rs:251:1
+     |
+ 251 | pub fn sftp_quote(p: &str) -> Result<String, String> {
+     | ---------------------------------------------------- similarly named function `sftp_quote` defined here
+     |
+help: a function with a similar name exists
+     |
+2443 -         let path=root.path().join("café.txt");fs::write(&path,b"owned").unwrap();let mut command=b"put -p ".to_vec();command.extend(connection::sftp_quote_path(&path).unwrap());command.push(b'\n');
+2443 +         let path=root.path().join("café.txt");fs::write(&path,b"owned").unwrap();let mut command=b"put -p ".to_vec();command.extend(connection::sftp_quote(&path).unwrap());command.push(b'\n');
+     |
+
+error[E0599]: no method named `send_generated_command` found for struct `ui::TerminalTab` in the current scope
+    --> src/ui.rs:2444:19
+     |
+  54 | struct TerminalTab {
+     | ------------------ method `send_generated_command` not found for this struct
+...
+2444 |         w.tabs[0].send_generated_command(&command);
+     |                   ^^^^^^^^^^^^^^^^^^^^^^ method not found in `ui::TerminalTab`
+
+Some errors have detailed explanations: E0425, E0599.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 2 previous errors

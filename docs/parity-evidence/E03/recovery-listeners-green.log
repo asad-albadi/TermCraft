@@ -1,0 +1,12 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.25s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-80877b55ca4b4e50)
+
+running 4 tests
+test ui::managed_servers::tests::telnet_service_password_field_leaves_no_undo_history ... ok
+test ui::managed_servers::tests::ftp_service_password_field_leaves_no_undo_history ... ok
+test ui::managed_servers::tests::nfs_servers_page_pointer_start_stop ... ok
+test ui::managed_servers::tests::servers_page_buttons_own_real_listeners_and_restart ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 142 filtered out; finished in 1.65s
+

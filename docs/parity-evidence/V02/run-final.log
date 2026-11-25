@@ -1,0 +1,14 @@
+local-ipv4: passed
+local-ipv6: passed
+remote-ipv4: passed
+remote-ipv6: passed
+dynamic-ipv4: passed
+dynamic-ipv6: passed
+named-payload: passed
+nondefault-bind: passed
+port-conflict: passed
+cancel-reconnect: passed
+destination-failure: passed
+native-windows: unavailable
+native-macos: unavailable
+Evidence: /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/docs/parity-evidence/V02/run-linux-final

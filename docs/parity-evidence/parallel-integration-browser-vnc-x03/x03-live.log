@@ -1,0 +1,100 @@
+00:00:00.000 [INFO] [backend/backend.c:342] Loading user-specified backends due to WLR_BACKENDS: headless
+00:00:00.000 [INFO] [backend/headless/backend.c:60] Creating headless backend
+00:00:00.000 [INFO] [util/env.c:25] Loading WLR_RENDERER option: pixman
+00:00:00.000 [INFO] [render/pixman/renderer.c:328] Creating pixman renderer
+00:00:00.000 [INFO] [../cage/cage.c:521] Failed to create wlr_drm_lease_manager_v1
+00:00:00.006 [INFO] [backend/headless/backend.c:17] Starting headless backend
+00:00:00.049 [INFO] [xwayland/server.c:108] Starting Xwayland on :0
+Xwayland glamor: GBM Wayland interfaces not available
+Failed to initialize glamor, falling back to sw
+
+running 7 tests
+test cancellation_reaps_a_stalled_probe_process ... ok
+test cancelled_probe_keeps_owned_display_usable ... ok
+test capability_report_does_not_turn_extension_presence_into_render_success ... ok
+test invalid_cookie_cannot_probe_owned_display ... ok
+test known_gl_scene_renders_nonblank ... {
+  "glx_version": "1.4",
+  "opengl": {
+    "vendor": "Mesa",
+    "renderer": "llvmpipe (LLVM 23.1.4, 256 bits)",
+    "version": "4.6 (Compatibility Profile) Mesa 26.2.6-arch3.1",
+    "direct": true,
+    "software": true,
+    "matched_pixels": 4096,
+    "sampled_pixels": 4096,
+    "scene_png_base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABFElEQVR4Ae3AA6AkWZbG8f937o3IzKdyS2Oubdu2bdu2bdu2bWmMnpZKr54yMyLu+Xa3anqmhztr1a8azH8jmf9OBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xvB/28E/78R/P9G8P8bwf9vBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xvB/28E/78R/P9G8P8bwf9vBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xtVmP9ORvw3Ivj/jeD/N4L/3wj+fyP4/43g/zeC/98I/n8j+P+N4P83gv/fCP5/I/j/jeD/N4L/3wj+fyP4/43g/zeC/98I/n8j+P+N4P83gv/fCP5/I/j/jeD/N4L/3wj+fyP4/43g/zeC/9/4R9W2BYMffFTgAAAAAElFTkSuQmCC"
+  },
+  "composite_version": "0.4",
+  "composite_pixels": true,
+  "randr_version": "1.6",
+  "dimensions": [
+    1280,
+    720
+  ],
+  "randr_change": [
+    1152,
+    864
+  ],
+  "initial_mode_restored": true,
+  "errors": []
+}
+ok
+test randr_resolution_change_is_observed ... {
+  "glx_version": "1.4",
+  "opengl": {
+    "vendor": "Mesa",
+    "renderer": "llvmpipe (LLVM 23.1.4, 256 bits)",
+    "version": "4.6 (Compatibility Profile) Mesa 26.2.6-arch3.1",
+    "direct": true,
+    "software": true,
+    "matched_pixels": 4096,
+    "sampled_pixels": 4096,
+    "scene_png_base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABFElEQVR4Ae3AA6AkWZbG8f937o3IzKdyS2Oubdu2bdu2bdu2bWmMnpZKr54yMyLu+Xa3anqmhztr1a8azH8jmf9OBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xvB/28E/78R/P9G8P8bwf9vBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xvB/28E/78R/P9G8P8bwf9vBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xtVmP9ORvw3Ivj/jeD/N4L/3wj+fyP4/43g/zeC/98I/n8j+P+N4P83gv/fCP5/I/j/jeD/N4L/3wj+fyP4/43g/zeC/98I/n8j+P+N4P83gv/fCP5/I/j/jeD/N4L/3wj+fyP4/43g/zeC/9/4R9W2BYMffFTgAAAAAElFTkSuQmCC"
+  },
+  "composite_version": "0.4",
+  "composite_pixels": true,
+  "randr_version": "1.6",
+  "dimensions": [
+    1280,
+    720
+  ],
+  "randr_change": [
+    1152,
+    864
+  ],
+  "initial_mode_restored": true,
+  "errors": []
+}
+ok
+test xcapabilities_reflect_real_server ... {
+  "glx_version": "1.4",
+  "opengl": {
+    "vendor": "Mesa",
+    "renderer": "llvmpipe (LLVM 23.1.4, 256 bits)",
+    "version": "4.6 (Compatibility Profile) Mesa 26.2.6-arch3.1",
+    "direct": true,
+    "software": true,
+    "matched_pixels": 4096,
+    "sampled_pixels": 4096,
+    "scene_png_base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABFElEQVR4Ae3AA6AkWZbG8f937o3IzKdyS2Oubdu2bdu2bdu2bWmMnpZKr54yMyLu+Xa3anqmhztr1a8azH8jmf9OBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xvB/28E/78R/P9G8P8bwf9vBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xvB/28E/78R/P9G8P8bwf9vBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xtVmP9ORvw3Ivj/jeD/N4L/3wj+fyP4/43g/zeC/98I/n8j+P+N4P83gv/fCP5/I/j/jeD/N4L/3wj+fyP4/43g/zeC/98I/n8j+P+N4P83gv/fCP5/I/j/jeD/N4L/3wj+fyP4/43g/zeC/9/4R9W2BYMffFTgAAAAAElFTkSuQmCC"
+  },
+  "composite_version": "0.4",
+  "composite_pixels": true,
+  "randr_version": "1.6",
+  "dimensions": [
+    1280,
+    720
+  ],
+  "randr_change": [
+    1152,
+    864
+  ],
+  "initial_mode_restored": true,
+  "errors": []
+}
+ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.71s
+
+(EE) failed to read Wayland events: Broken pipe

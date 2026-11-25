@@ -1,0 +1,172 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 369B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c
+#2 DONE 2.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/2] FROM docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c
+#4 resolve docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c 0.0s done
+#4 DONE 0.1s
+
+#4 [1/2] FROM docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c
+#4 extracting sha256:69245854ad5855991d16224f6abf55855d2d73922785206adea9c5c5988434a0
+#4 extracting sha256:69245854ad5855991d16224f6abf55855d2d73922785206adea9c5c5988434a0 1.5s done
+#4 DONE 1.6s
+
+#4 [1/2] FROM docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c
+#4 extracting sha256:338554e9113fa6731ba588cb8f45e85b3e3fe7ada531ee7d7b0bc9291d616727
+#4 extracting sha256:338554e9113fa6731ba588cb8f45e85b3e3fe7ada531ee7d7b0bc9291d616727 0.4s done
+#4 DONE 2.0s
+
+#4 [1/2] FROM docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c
+#4 extracting sha256:d6c30932f8d3f5798b438cce12cdf6cebb1717b52f51e22ff010b4d86667031d
+#4 extracting sha256:d6c30932f8d3f5798b438cce12cdf6cebb1717b52f51e22ff010b4d86667031d 1.6s done
+#4 DONE 3.6s
+
+#4 [1/2] FROM docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c
+#4 extracting sha256:9bab93d346cda15207e5a5000093cee7256ec1092fb689ec3d2997faf31b9a16
+#4 extracting sha256:9bab93d346cda15207e5a5000093cee7256ec1092fb689ec3d2997faf31b9a16 6.1s done
+#4 DONE 9.7s
+
+#4 [1/2] FROM docker.io/library/rust@sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c
+#4 extracting sha256:197527a0befa9c2f78706cf912319f641d33cfc011bd35c5041d98ea2e27c87d
+#4 extracting sha256:197527a0befa9c2f78706cf912319f641d33cfc011bd35c5041d98ea2e27c87d 3.1s done
+#4 DONE 12.8s
+
+#5 [2/2] RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pil pkg-config libssl-dev libfontconfig1-dev libudev-dev libxkbcommon-dev libwayland-dev && dpkg-query -W > /opt/termcraft-builder-packages.txt
+#5 0.635 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+#5 1.192 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+#5 1.371 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [34.8 kB]
+#5 1.598 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8790 kB]
+#5 2.530 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+#5 2.726 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [380 kB]
+#5 3.228 Fetched 9419 kB in 3s (3061 kB/s)
+#5 3.228 Reading package lists...
+#5 3.708 Reading package lists...
+#5 4.155 Building dependency tree...
+#5 4.289 Reading state information...
+#5 4.503 python3 is already the newest version (3.11.2-1+b1).
+#5 4.503 python3 set to manually installed.
+#5 4.503 pkg-config is already the newest version (1.8.1-1).
+#5 4.503 pkg-config set to manually installed.
+#5 4.503 libssl-dev is already the newest version (3.0.22-1~deb12u2).
+#5 4.503 The following additional packages will be installed:
+#5 4.503   libimagequant0 libraqm0 libwayland-bin libwayland-client0 libwayland-cursor0
+#5 4.504   libwayland-egl1 libwayland-server0 libxkbcommon0 mailcap mime-support
+#5 4.504   xkb-data
+#5 4.505 Suggested packages:
+#5 4.505   libwayland-doc python-pil-doc
+#5 4.505 Recommended packages:
+#5 4.505   python3-olefile
+#5 4.605 The following NEW packages will be installed:
+#5 4.606   libfontconfig1-dev libimagequant0 libraqm0 libudev-dev libwayland-bin
+#5 4.606   libwayland-client0 libwayland-cursor0 libwayland-dev libwayland-egl1
+#5 4.606   libwayland-server0 libxkbcommon-dev libxkbcommon0 mailcap mime-support
+#5 4.606   python3-pil xkb-data
+#5 5.289 0 upgraded, 16 newly installed, 0 to remove and 3 not upgraded.
+#5 5.289 Need to get 1983 kB of archives.
+#5 5.289 After this operation, 11.1 MB of additional disk space will be used.
+#5 5.289 Get:1 http://deb.debian.org/debian bookworm/main amd64 mailcap all 3.70+nmu1 [32.0 kB]
+#5 5.454 Get:2 http://deb.debian.org/debian bookworm/main amd64 mime-support all 3.66 [10.9 kB]
+#5 5.666 Get:3 http://deb.debian.org/debian bookworm/main amd64 libfontconfig1-dev amd64 2.14.1-4 [268 kB]
+#5 7.139 Get:4 http://deb.debian.org/debian bookworm/main amd64 libimagequant0 amd64 2.17.0-1 [32.5 kB]
+#5 7.333 Get:5 http://deb.debian.org/debian bookworm/main amd64 libraqm0 amd64 0.7.0-4.1 [10.6 kB]
+#5 7.389 Get:6 http://deb.debian.org/debian bookworm/main amd64 libudev-dev amd64 252.39-1~deb12u2 [53.1 kB]
+#5 7.692 Get:7 http://deb.debian.org/debian bookworm/main amd64 libwayland-bin amd64 1.21.0-1 [23.6 kB]
+#5 7.820 Get:8 http://deb.debian.org/debian bookworm/main amd64 libwayland-client0 amd64 1.21.0-1 [28.3 kB]
+#5 7.985 Get:9 http://deb.debian.org/debian bookworm/main amd64 libwayland-cursor0 amd64 1.21.0-1 [14.4 kB]
+#5 8.068 Get:10 http://deb.debian.org/debian bookworm/main amd64 libwayland-server0 amd64 1.21.0-1 [35.9 kB]
+#5 8.271 Get:11 http://deb.debian.org/debian bookworm/main amd64 libwayland-egl1 amd64 1.21.0-1 [8640 B]
+#5 8.332 Get:12 http://deb.debian.org/debian bookworm/main amd64 libwayland-dev amd64 1.21.0-1 [72.5 kB]
+#5 8.970 Get:13 http://deb.debian.org/debian bookworm/main amd64 xkb-data all 2.35.1-1 [764 kB]
+#5 13.08 Get:14 http://deb.debian.org/debian bookworm/main amd64 libxkbcommon0 amd64 1.5.0-1 [106 kB]
+#5 13.46 Get:15 http://deb.debian.org/debian bookworm/main amd64 libxkbcommon-dev amd64 1.5.0-1 [51.0 kB]
+#5 13.79 Get:16 http://deb.debian.org/debian bookworm/main amd64 python3-pil amd64 9.4.0-1.1+deb12u1 [472 kB]
+#5 15.15 debconf: delaying package configuration, since apt-utils is not installed
+#5 15.18 Fetched 1983 kB in 10s (191 kB/s)
+#5 15.20 Selecting previously unselected package mailcap.
+#5 15.20 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 23259 files and directories currently installed.)
+#5 15.22 Preparing to unpack .../00-mailcap_3.70+nmu1_all.deb ...
+#5 15.23 Unpacking mailcap (3.70+nmu1) ...
+#5 15.26 Selecting previously unselected package mime-support.
+#5 15.26 Preparing to unpack .../01-mime-support_3.66_all.deb ...
+#5 15.26 Unpacking mime-support (3.66) ...
+#5 15.28 Selecting previously unselected package libfontconfig1-dev:amd64.
+#5 15.29 Preparing to unpack .../02-libfontconfig1-dev_2.14.1-4_amd64.deb ...
+#5 15.29 Unpacking libfontconfig1-dev:amd64 (2.14.1-4) ...
+#5 15.32 Selecting previously unselected package libimagequant0:amd64.
+#5 15.32 Preparing to unpack .../03-libimagequant0_2.17.0-1_amd64.deb ...
+#5 15.33 Unpacking libimagequant0:amd64 (2.17.0-1) ...
+#5 15.35 Selecting previously unselected package libraqm0:amd64.
+#5 15.36 Preparing to unpack .../04-libraqm0_0.7.0-4.1_amd64.deb ...
+#5 15.36 Unpacking libraqm0:amd64 (0.7.0-4.1) ...
+#5 15.38 Selecting previously unselected package libudev-dev:amd64.
+#5 15.38 Preparing to unpack .../05-libudev-dev_252.39-1~deb12u2_amd64.deb ...
+#5 15.38 Unpacking libudev-dev:amd64 (252.39-1~deb12u2) ...
+#5 15.41 Selecting previously unselected package libwayland-bin.
+#5 15.42 Preparing to unpack .../06-libwayland-bin_1.21.0-1_amd64.deb ...
+#5 15.42 Unpacking libwayland-bin (1.21.0-1) ...
+#5 15.44 Selecting previously unselected package libwayland-client0:amd64.
+#5 15.45 Preparing to unpack .../07-libwayland-client0_1.21.0-1_amd64.deb ...
+#5 15.45 Unpacking libwayland-client0:amd64 (1.21.0-1) ...
+#5 15.47 Selecting previously unselected package libwayland-cursor0:amd64.
+#5 15.48 Preparing to unpack .../08-libwayland-cursor0_1.21.0-1_amd64.deb ...
+#5 15.48 Unpacking libwayland-cursor0:amd64 (1.21.0-1) ...
+#5 15.50 Selecting previously unselected package libwayland-server0:amd64.
+#5 15.51 Preparing to unpack .../09-libwayland-server0_1.21.0-1_amd64.deb ...
+#5 15.51 Unpacking libwayland-server0:amd64 (1.21.0-1) ...
+#5 15.54 Selecting previously unselected package libwayland-egl1:amd64.
+#5 15.54 Preparing to unpack .../10-libwayland-egl1_1.21.0-1_amd64.deb ...
+#5 15.54 Unpacking libwayland-egl1:amd64 (1.21.0-1) ...
+#5 15.56 Selecting previously unselected package libwayland-dev:amd64.
+#5 15.57 Preparing to unpack .../11-libwayland-dev_1.21.0-1_amd64.deb ...
+#5 15.57 Unpacking libwayland-dev:amd64 (1.21.0-1) ...
+#5 15.59 Selecting previously unselected package xkb-data.
+#5 15.60 Preparing to unpack .../12-xkb-data_2.35.1-1_all.deb ...
+#5 15.60 Unpacking xkb-data (2.35.1-1) ...
+#5 15.68 Selecting previously unselected package libxkbcommon0:amd64.
+#5 15.69 Preparing to unpack .../13-libxkbcommon0_1.5.0-1_amd64.deb ...
+#5 15.69 Unpacking libxkbcommon0:amd64 (1.5.0-1) ...
+#5 15.71 Selecting previously unselected package libxkbcommon-dev:amd64.
+#5 15.72 Preparing to unpack .../14-libxkbcommon-dev_1.5.0-1_amd64.deb ...
+#5 15.72 Unpacking libxkbcommon-dev:amd64 (1.5.0-1) ...
+#5 15.74 Selecting previously unselected package python3-pil:amd64.
+#5 15.75 Preparing to unpack .../15-python3-pil_9.4.0-1.1+deb12u1_amd64.deb ...
+#5 15.75 Unpacking python3-pil:amd64 (9.4.0-1.1+deb12u1) ...
+#5 15.81 Setting up libwayland-server0:amd64 (1.21.0-1) ...
+#5 15.81 Setting up libfontconfig1-dev:amd64 (2.14.1-4) ...
+#5 15.82 Setting up xkb-data (2.35.1-1) ...
+#5 15.82 Setting up libwayland-bin (1.21.0-1) ...
+#5 15.83 Setting up libraqm0:amd64 (0.7.0-4.1) ...
+#5 15.83 Setting up libimagequant0:amd64 (2.17.0-1) ...
+#5 15.84 Setting up libudev-dev:amd64 (252.39-1~deb12u2) ...
+#5 15.84 Setting up libwayland-egl1:amd64 (1.21.0-1) ...
+#5 15.85 Setting up mailcap (3.70+nmu1) ...
+#5 15.87 Setting up libxkbcommon0:amd64 (1.5.0-1) ...
+#5 15.87 Setting up libwayland-client0:amd64 (1.21.0-1) ...
+#5 15.88 Setting up mime-support (3.66) ...
+#5 15.88 Setting up libxkbcommon-dev:amd64 (1.5.0-1) ...
+#5 15.88 Setting up python3-pil:amd64 (9.4.0-1.1+deb12u1) ...
+#5 16.12 Setting up libwayland-cursor0:amd64 (1.21.0-1) ...
+#5 16.13 Setting up libwayland-dev:amd64 (1.21.0-1) ...
+#5 16.13 Processing triggers for libc-bin (2.36-9+deb12u14) ...
+#5 DONE 16.3s
+
+#6 exporting to image
+#6 exporting layers
+#6 exporting layers 1.8s done
+#6 exporting manifest sha256:8f713d74c50e55273931051717c1dd11e731d3e860a84e8dd94b695cc70c814f done
+#6 exporting config sha256:00bb0eb5968de628bef74afa7f5872795dd7971a965652d2f5ebf9a3484d721b done
+#6 exporting attestation manifest sha256:9747904ebb4a447c7346321620e850103f771ad88fd7aa5a765710421104b533 done
+#6 exporting manifest list sha256:1e7cd41f77c63d2093907d8a33cc65562eafd5cfbed60c829b9faedf652f24a0 done
+#6 naming to docker.io/library/termcraft-validation-p08:debian-builder done
+#6 unpacking to docker.io/library/termcraft-validation-p08:debian-builder
+#6 unpacking to docker.io/library/termcraft-validation-p08:debian-builder 0.3s done
+#6 DONE 2.1s

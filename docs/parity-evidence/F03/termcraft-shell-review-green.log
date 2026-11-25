@@ -1,0 +1,26 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: unused import: `TransferOperation`
+ --> src/remote_files/editor.rs:2:58
+  |
+2 | use super::{RemotePath, transfer::{Job, TransferManager, TransferOperation, TransferOutcome}};
+  |                                                          ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (lib) generated 1 warning (run `cargo fix --lib -p harbor-workspace` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.08s
+     Running tests/shell_directory.rs (target/debug/deps/shell_directory-eb58b94ddc62a2d6)
+
+running 9 tests
+test disabling_follow_before_initial_listing_does_not_fabricate_an_empty_directory ... ok
+test malformed_or_other_host_metadata_cannot_navigate ... ok
+test disabling_follow_invalidates_only_its_pending_listing ... ok
+test manual_mode_ignores_shell_directory ... ok
+test split_osc7_updates_only_matching_connection ... ok
+test unsupported_shell_keeps_manual_browser ... ok
+test notices_are_bounded_and_recover_after_a_terminated_oversized_message ... ok
+test opt_in_shell_scripts_report_literal_paths_and_restore_existing_hooks ... ok
+test bash_prompt_pipeline_cleanup_and_export_regressions ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+

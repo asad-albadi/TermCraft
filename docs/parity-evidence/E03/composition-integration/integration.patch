@@ -1,0 +1,1203 @@
+--- a/CREDITS.md
++++ b/CREDITS.md
+@@ -40,3 +40,7 @@
+ The embedded classic VNC transport is independently written against [RFC 6143](https://www.rfc-editor.org/rfc/rfc6143.html). Classic VNC password challenge authentication uses RustCrypto des 0.9.0 (MIT OR Apache-2.0), with its zeroize feature; this legacy protocol does not encrypt the desktop transport and is explicitly opt-in. It does not include proprietary VNC code or assets.
+ 
+ VNC VeNCrypt X509 transport uses rustls 0.23.46, rustls-platform-verifier 0.7.1 and tokio-rustls 0.26.6 (MIT OR Apache-2.0; transitive notices in Cargo.lock). Protocol extension reference: [RFB protocol community specification](https://github.com/rfbproto/rfbproto/blob/master/rfbproto.rst#vencrypt).
++
++## Bundled browser VNC viewer
++
++noVNC 1.7.0 by the noVNC authors, primarily Mozilla Public License 2.0; its incorporated pako files use the MIT license and other notices are retained in the upstream source. Unmodified pinned JavaScript source, complete upstream LICENSE.txt/AUTHORS, component notices, release URL and archive SHA-256 are in `vendor/noVNC/`. The owned HTTP viewer serves the source modules and `/novnc/LICENSE.txt` and `/novnc/UPSTREAM.json` offline. noVNC upstream: https://github.com/novnc/noVNC/releases/tag/v1.7.0 . Local integration in `assets/vnc-browser/` and `src/services/vnc/browser.rs` is TermCraft code.
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -125,7 +125,7 @@
+  "clipboard-win",
+  "image",
+  "log",
+- "objc2 0.6.5",
++ "objc2 0.6.4",
+  "objc2-app-kit 0.3.2",
+  "objc2-core-foundation",
+  "objc2-core-graphics",
+@@ -412,7 +412,7 @@
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "cdeb9d870516001442e364c5220d3574d2da8dc765554b4a617230d33fa58ef5"
+ dependencies = [
+- "objc2 0.6.5",
++ "objc2 0.6.4",
+ ]
+ 
+ [[package]]
+@@ -979,7 +979,7 @@
+  "bitflags 2.13.2",
+  "block2 0.6.2",
+  "libc",
+- "objc2 0.6.5",
++ "objc2 0.6.4",
+ ]
+ 
+ [[package]]
+@@ -1099,7 +1099,7 @@
+  "image",
+  "js-sys",
+  "log",
+- "objc2 0.6.5",
++ "objc2 0.6.4",
+  "objc2-app-kit 0.3.2",
+  "objc2-foundation 0.3.2",
+  "parking_lot",
+@@ -1164,7 +1164,7 @@
+  "bytemuck",
+  "egui",
+  "log",
+- "objc2 0.6.5",
++ "objc2 0.6.4",
+  "objc2-foundation 0.3.2",
+  "objc2-ui-kit 0.3.2",
+  "profiling",
+@@ -1710,7 +1710,7 @@
+  "glutin_glx_sys",
+  "glutin_wgl_sys",
+  "libloading",
+- "objc2 0.6.5",
++ "objc2 0.6.4",
+  "objc2-app-kit 0.3.2",
+  "objc2-core-foundation",
+  "objc2-foundation 0.3.2",
+@@ -1802,6 +1802,7 @@
+  "argon2",
+  "async-trait",
+  "base64 0.22.1",
++ "block2 0.6.2",
+  "cap-fs-ext",
+  "cap-std",
+  "chacha20poly1305",
+@@ -1818,6 +1819,12 @@
+  "libc",
+  "libloading",
+  "nfsembed",
++ "objc2 0.6.4",
++ "objc2-app-kit 0.3.2",
++ "objc2-core-foundation",
++ "objc2-core-graphics",
++ "objc2-foundation 0.3.2",
++ "objc2-screen-capture-kit",
+  "regex",
+  "rfd",
+  "russh",
+@@ -2670,9 +2677,9 @@
+ 
+ [[package]]
+ name = "objc2"
+-version = "0.6.5"
++version = "0.6.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "08849bbd4767dfae9457696856ae1c84fe4e0281bbe4a7abff2d0e06fb7981f8"
++checksum = "3a12a8ed07aefc768292f076dc3ac8c48f3781c8f2d5851dd3d98950e8c5a89f"
+ dependencies = [
+  "objc2-encode",
+ ]
+@@ -2701,13 +2708,23 @@
+ dependencies = [
+  "bitflags 2.13.2",
+  "block2 0.6.2",
+- "objc2 0.6.5",
++ "objc2 0.6.4",
+  "objc2-core-foundation",
+  "objc2-core-graphics",
+  "objc2-foundation 0.3.2",
+ ]
+ 
+ [[package]]
++name = "objc2-av-foundation"
++version = "0.3.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "478ae33fcac9df0a18db8302387c666b8ef08a3e2d62b510ca4fc278a384b6c0"
++dependencies = [
++ "objc2 0.6.4",
++ "objc2-foundation 0.3.2",
++]
++
++[[package]]
+ name = "objc2-cloud-kit"
+ version = "0.2.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -2732,6 +2749,28 @@
+ ]
+ 
+ [[package]]
++name = "objc2-core-audio"
++version = "0.3.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e1eebcea8b0dbff5f7c8504f3107c68fc061a3eb44932051c8cf8a68d969c3b2"
++dependencies = [
++ "dispatch2",
++ "objc2 0.6.4",
++ "objc2-core-audio-types",
++ "objc2-core-foundation",
++]
++
++[[package]]
++name = "objc2-core-audio-types"
++version = "0.3.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "5a89f2ec274a0cf4a32642b2991e8b351a404d290da87bb6a9a9d8632490bd1c"
++dependencies = [
++ "bitflags 2.13.2",
++ "objc2 0.6.4",
++]
++
++[[package]]
+ name = "objc2-core-data"
+ version = "0.2.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -2750,8 +2789,10 @@
+ checksum = "2a180dd8642fa45cdb7dd721cd4c11b1cadd4929ce112ebd8b9f5803cc79d536"
+ dependencies = [
+  "bitflags 2.13.2",
++ "block2 0.6.2",
+  "dispatch2",
+- "objc2 0.6.5",
++ "libc",
++ "objc2 0.6.4",
+ ]
+ 
+ [[package]]
+@@ -2761,10 +2802,13 @@
+ checksum = "e022c9d066895efa1345f8e33e584b9f958da2fd4cd116792e15e07e4720a807"
+ dependencies = [
+  "bitflags 2.13.2",
++ "block2 0.6.2",
+  "dispatch2",
+- "objc2 0.6.5",
++ "libc",
++ "objc2 0.6.4",
+  "objc2-core-foundation",
+  "objc2-io-surface",
++ "objc2-metal 0.3.2",
+ ]
+ 
+ [[package]]
+@@ -2776,7 +2820,7 @@
+  "block2 0.5.1",
+  "objc2 0.5.3",
+  "objc2-foundation 0.2.2",
+- "objc2-metal",
++ "objc2-metal 0.2.2",
+ ]
+ 
+ [[package]]
+@@ -2792,6 +2836,34 @@
+ ]
+ 
+ [[package]]
++name = "objc2-core-media"
++version = "0.3.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "05ec576860167a15dd9fce7fbee7512beb4e31f532159d3482d1f9c6caedf31d"
++dependencies = [
++ "bitflags 2.13.2",
++ "dispatch2",
++ "objc2 0.6.4",
++ "objc2-core-audio",
++ "objc2-core-audio-types",
++ "objc2-core-foundation",
++ "objc2-core-video",
++]
++
++[[package]]
++name = "objc2-core-video"
++version = "0.3.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "d425caf1df73233f29fd8a5c3e5edbc30d2d4307870f802d18f00d83dc5141a6"
++dependencies = [
++ "bitflags 2.13.2",
++ "objc2 0.6.4",
++ "objc2-core-foundation",
++ "objc2-core-graphics",
++ "objc2-io-surface",
++]
++
++[[package]]
+ name = "objc2-encode"
+ version = "4.1.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -2818,7 +2890,8 @@
+ dependencies = [
+  "bitflags 2.13.2",
+  "block2 0.6.2",
+- "objc2 0.6.5",
++ "libc",
++ "objc2 0.6.4",
+  "objc2-core-foundation",
+ ]
+ 
+@@ -2829,7 +2902,7 @@
+ checksum = "180788110936d59bab6bd83b6060ffdfffb3b922ba1396b312ae795e1de9d81d"
+ dependencies = [
+  "bitflags 2.13.2",
+- "objc2 0.6.5",
++ "objc2 0.6.4",
+  "objc2-core-foundation",
+ ]
+ 
+@@ -2858,6 +2931,17 @@
+ ]
+ 
+ [[package]]
++name = "objc2-metal"
++version = "0.3.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a0125f776a10d00af4152d74616409f0d4a2053a6f57fa5b7d6aa2854ac04794"
++dependencies = [
++ "bitflags 2.13.2",
++ "objc2 0.6.4",
++ "objc2-foundation 0.3.2",
++]
++
++[[package]]
+ name = "objc2-quartz-core"
+ version = "0.2.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -2867,7 +2951,24 @@
+  "block2 0.5.1",
+  "objc2 0.5.3",
+  "objc2-foundation 0.2.2",
+- "objc2-metal",
++ "objc2-metal 0.2.2",
++]
++
++[[package]]
++name = "objc2-screen-capture-kit"
++version = "0.3.2"
++dependencies = [
++ "bitflags 2.13.2",
++ "block2 0.6.2",
++ "dispatch2",
++ "libc",
++ "objc2 0.6.4",
++ "objc2-av-foundation",
++ "objc2-core-foundation",
++ "objc2-core-graphics",
++ "objc2-core-media",
++ "objc2-foundation 0.3.2",
++ "objc2-uniform-type-identifiers 0.3.2",
+ ]
+ 
+ [[package]]
+@@ -2897,7 +2998,7 @@
+  "objc2-link-presentation",
+  "objc2-quartz-core",
+  "objc2-symbols",
+- "objc2-uniform-type-identifiers",
++ "objc2-uniform-type-identifiers 0.2.2",
+  "objc2-user-notifications",
+ ]
+ 
+@@ -2908,7 +3009,7 @@
+ checksum = "d87d638e33c06f577498cbcc50491496a3ed4246998a7fbba7ccb98b1e7eab22"
+ dependencies = [
+  "bitflags 2.13.2",
+- "objc2 0.6.5",
++ "objc2 0.6.4",
+  "objc2-core-foundation",
+  "objc2-foundation 0.3.2",
+ ]
+@@ -2925,6 +3026,16 @@
+ ]
+ 
+ [[package]]
++name = "objc2-uniform-type-identifiers"
++version = "0.3.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "7902ac02859fc1f7045f8b598c63f1ae0cc7efeaa06a9bc9f3d9a3c955974fa4"
++dependencies = [
++ "objc2 0.6.4",
++ "objc2-foundation 0.3.2",
++]
++
++[[package]]
+ name = "objc2-user-notifications"
+ version = "0.2.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+@@ -3548,7 +3659,7 @@
+  "js-sys",
+  "libc",
+  "log",
+- "objc2 0.6.5",
++ "objc2 0.6.4",
+  "objc2-app-kit 0.3.2",
+  "objc2-core-foundation",
+  "objc2-foundation 0.3.2",
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -48,6 +48,14 @@
+ xkeysym = "=0.2.1"
+ 
+ [target.'cfg(target_os = "macos")'.dependencies]
++objc2 = "=0.6.4"
++objc2-foundation = "=0.3.2"
++objc2-screen-capture-kit = { version = "=0.3.2", path = "vendor/objc2-screen-capture-kit" }
++objc2-core-graphics = "=0.3.2"
++objc2-core-foundation = "=0.3.2"
++objc2-app-kit = { version = "=0.3.2", default-features = false, features = ["std", "NSPasteboard"] }
++block2 = "=0.6.2"
++
+ winit = { version = "0.30", default-features = false, features = ["rwh_06", "x11", "wayland"] }
+ 
+ [patch.crates-io]
+@@ -60,7 +68,7 @@
+ windows-sys = { version = "0.61", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Console", "Win32_System_Registry", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_Services", "Win32_System_IO", "Win32_Security", "Win32_Security_Authorization", "Win32_Devices_Communication", "Win32_NetworkManagement_IpHelper", "Win32_Networking_WinSock", "Win32_Storage_FileSystem", "Win32_Graphics_Gdi", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_WindowsAndMessaging", "Win32_System_StationsAndDesktops", "Win32_System_DataExchange", "Win32_System_Memory"] }
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+-zbus = "5.19"
++zbus = "=5.19.0"
+ x11rb = { version = "=0.13.2", features = ["xtest", "xkb"] }
+ 
+ [target.'cfg(unix)'.dependencies]
+--- a/scripts/package-release.py
++++ b/scripts/package-release.py
+@@ -61,14 +61,45 @@
+         shutil.copyfile(asset, destination / asset.name)
+ 
+ 
++def stage_vnc_browser(source, resources):
++    """Ship unmodified embedded viewer source/notices; never download at runtime."""
++    root = source / "vendor/noVNC"
++    inventory = json.loads(regular_source(source, Path("vendor/noVNC/SHA256SUMS.json")).read_text())
++    expected = set(inventory) | {"SHA256SUMS.json"}
++    actual = {p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()}
++    if actual != expected:
++        raise ValueError("noVNC source inventory mismatch")
++    verified = []
++    for relative in sorted(expected):
++        path = Path(relative)
++        if path.is_absolute() or ".." in path.parts or path.as_posix() != relative:
++            raise ValueError("Unsafe noVNC source path")
++        original = regular_source(source, Path("vendor/noVNC") / path)
++        if relative in inventory and sha256(original) != inventory[relative]:
++            raise ValueError(f"noVNC source checksum mismatch: {relative}")
++        verified.append((relative, original))
++    destination = resources / "build-source/noVNC"
++    if destination.exists():
++        raise FileExistsError(destination)
++    for relative, original in verified:
++        target = destination / relative
++        target.parent.mkdir(parents=True, exist_ok=True)
++        shutil.copyfile(original, target)
++    metadata = json.loads((root / "UPSTREAM.json").read_text())
++    return {"release": metadata["release"], "source_url": metadata["source"],
++            "source_archive_sha256": metadata["sha256"], "embedded_runtime": True,
++            "source_and_notices": destination.relative_to(resources).as_posix()}
++
++
+ def source_inputs(root):
+     paths = [
+         *PACKAGES, *(p.with_name("Cargo.lock") for p in PACKAGES),
++        Path("engines/wayland/Cargo.toml"), Path("engines/wayland/Cargo.lock"),
+         Path("CREDITS.md"), Path("FEATURE_PARITY.md"),
+         Path("scripts/package-release.py"), Path("scripts/package-debian.py"),
+         Path("scripts/build-release.sh"), *ASSETS,
+     ]
+-    for relative in ("src", "engines/rdp/src", "packaging", "vendor"):
++    for relative in ("src", "engines/rdp/src", "engines/wayland/src", "engines/wayland/examples", "packaging", "vendor", "assets/vnc-browser"):
+         paths.extend(
+             p.relative_to(root) for p in (root / relative).rglob("*")
+             if p.is_file() and not {".git", "target", "__pycache__"}.intersection(p.relative_to(root).parts)
+@@ -179,17 +210,17 @@
+     )
+ 
+ 
+-def cargo_notices(resources, arch, target, source, cargo_settings):
++def cargo_notices(resources, arch, target, source, cargo_settings, extra_packages=()):
+     if cargo_settings is None:
+         with tempfile.TemporaryDirectory(prefix="TermCraft metadata ") as temporary:
+             settings = cargo_invocation(Path(temporary))
+-            return cargo_notices(resources, arch, target, source, settings)
++            return cargo_notices(resources, arch, target, source, settings, extra_packages)
+     triple = f"{arch}-" + {
+         "linux": "unknown-linux-gnu", "macos": "apple-darwin", "windows": "pc-windows-msvc"
+     }[target]
+     output = resources / "licenses/crates"
+     crates = {}
+-    for manifest in PACKAGES:
++    for manifest in (*PACKAGES, *extra_packages):
+         offline = ["--offline"] if os.environ.get("TERMCRAFT_OFFLINE") == "1" else []
+         metadata = json.loads(capture(
+             "cargo", "metadata", "--locked", *offline, "--format-version", "1",
+@@ -456,7 +487,7 @@
+ 
+ 
+ def package_release(target, output, app_binary, helper_binary, build_inputs=None, source=ROOT,
+-                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None, xephyr_archive=None):
++                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None, xephyr_archive=None, wayland_helper_binary=None):
+     packaging = source / "packaging"
+     binaries = [app_binary.resolve(strict=True), helper_binary.resolve(strict=True)]
+     if binaries[0].samefile(binaries[1]):
+@@ -482,6 +513,11 @@
+         raise ValueError("Unix payload supports Linux and Windows x86_64 only.")
+     if browser_inputs is not None and (target, arch) != ("linux", "x86_64"):
+         raise ValueError("No qualified bundled Chromium payload for this platform.")
++    if wayland_helper_binary is not None:
++        if target != "linux" or binary_arch(wayland_helper_binary, target) != arch:
++            raise ValueError("The optional Wayland helper requires the same native Linux architecture as the app.")
++        if any(wayland_helper_binary.samefile(binary) for binary in binaries):
++            raise ValueError("The Wayland helper must be distinct from the app and RDP helper.")
+     basename = f"TermCraft-{version}-{target}-{arch}"
+     if xwayland_archive is not None:
+         basename += "-arch-xwayland"
+@@ -493,6 +529,8 @@
+         basename += "-unix"
+     if browser_inputs is not None:
+         basename += "-chromium"
++    if wayland_helper_binary is not None:
++        basename += "-wayland-sharing"
+     name = f"{basename}.tar.gz" if target == "linux" else f"{basename}.zip"
+     output.mkdir(parents=True, exist_ok=True)
+     archive = output / name
+@@ -512,6 +550,29 @@
+             shutil.copyfile(binary, executable)
+             executable.chmod(0o755)
+             linked[executable.name] = native_libraries(executable, target)
++        wayland = None
++        if wayland_helper_binary is not None:
++            helper_package = Path("engines/wayland/Cargo.toml")
++            helper_meta = tomllib.loads(regular_source(source, helper_package).read_text())["package"]
++            entry = bindir / "termcraft-wayland-engine"
++            shutil.copyfile(wayland_helper_binary, entry)
++            entry.chmod(0o755)
++            linked[entry.name] = native_libraries(entry, target)
++            if "libpipewire-0.3.so.0" not in linked[entry.name]["libraries"]:
++                raise ValueError("Optional Wayland helper has no native libpipewire-0.3 ABI dependency.")
++            wayland = {"entry_point": entry.name, "version": helper_meta["version"],
++                       "provenance": "explicit prebuilt helper input", "sha256": sha256(entry),
++                       "native_abi": "libpipewire-0.3.so.0 >= 0.3.65; matching SPA plugins; build-qualified with 1.6.11",
++                       "consent": "XDG ScreenCast or RemoteDesktop portal; fresh explicit user selection",
++                       "source": "build-source/engines/wayland", "license": "licenses/wayland/README.md"}
++            for helper_source in ("Cargo.toml", "Cargo.lock", "src/lib.rs", "src/main.rs", "src/capture.rs", "examples/e03-wayland-synthetic-private.rs"):
++                relative = Path("engines/wayland") / helper_source
++                destination = resources / "build-source" / relative
++                destination.parent.mkdir(parents=True, exist_ok=True)
++                shutil.copyfile(regular_source(source, relative), destination)
++            notice = resources / "licenses/wayland/README.md"
++            notice.parent.mkdir(parents=True, exist_ok=True)
++            shutil.copyfile(regular_source(source, Path("packaging/wayland/README.md")), notice)
+         xwayland = None
+         if xwayland_archive is not None:
+             xwayland, dependencies = stage_xwayland(source, resources, xwayland_archive)
+@@ -538,6 +599,7 @@
+             browser, browser_libraries = stage_browser(source, resources, browser_inputs, target, arch)
+             linked.update(browser_libraries)
+         unix = stage_unix(source, resources, unix_cache, target, arch) if unix_cache is not None else None
++        vnc_browser = stage_vnc_browser(source, resources)
+         copy_release_assets(source, resources / "assets")
+         shutil.copyfile(source / "CREDITS.md", resources / "CREDITS.md")
+         for cargo in PACKAGES:
+@@ -565,6 +627,9 @@
+         runtime["optional_native_providers"] = runtime["optional_native_providers"][target]
+         runtime["linked_libraries"] = linked
+         runtime["artifact_declarations"] = "RUNTIME-MANIFEST.json"
++        if wayland is not None:
++            runtime["managed_wayland_sharing"] = wayland
++        runtime["managed_vnc_browser"] = vnc_browser
+         if iperf_runtime is not None:
+             runtime["managed_iperf"] = "runtime/linux-x86_64/IPERF-MANIFEST.json"
+         if browser is not None:
+@@ -579,7 +644,8 @@
+             runtime["managed_xdmcp"] = xephyr
+         if target != "linux":
+             del runtime["linux_display_libraries"]
+-        notices = cargo_notices(resources, arch, target, source, cargo_settings)
++        notices = cargo_notices(resources, arch, target, source, cargo_settings,
++                                (Path("engines/wayland/Cargo.toml"),) if wayland is not None else ())
+         inputs = source_inputs(source)
+         if build_inputs is not None and inputs != build_inputs:
+             raise ValueError("Frozen source snapshot changed during the release build.")
+@@ -601,6 +667,8 @@
+                          "crates": notices},
+             "files": {p.relative_to(root).as_posix(): sha256(p) for p in sorted(root.rglob("*")) if p.is_file()},
+         }
++        if wayland is not None:
++            manifest["wayland_helper_version"] = wayland["version"]
+         (resources / "PACKAGE-MANIFEST.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+         temporary_archive = temp / name
+         if target == "linux":
+@@ -629,6 +697,7 @@
+     parser.add_argument("--helper-binary", type=Path)
+     parser.add_argument("--xwayland-archive", type=Path,
+                         help="Bundle the pinned Arch x86_64 Xwayland package (Linux only).")
++    parser.add_argument("--wayland-helper-binary", type=Path, help="Optionally bundle an explicitly built native Linux PipeWire helper; ordinary app startup does not require PipeWire.")
+     parser.add_argument("--xephyr-archive", type=Path, help="Bundle the pinned owned Linux x86_64 Xephyr XDMCP engine (explicit session network policy still required).")
+     parser.add_argument("--iperf-runtime", type=Path, help="Root of the pinned Linux x86_64 Iperf runtime payload.")
+     parser.add_argument("--mosh-archive", type=Path, help="Pinned Arch Linux x86_64 Mosh binary package.")
+@@ -652,6 +721,8 @@
+         parser.error("--xephyr-archive is available for Linux x86_64 only.")
+     if args.unix_cache is not None and args.platform not in ("linux", "windows"):
+         parser.error("--unix-cache supports Linux and Windows x86_64 only.")
++    if args.wayland_helper_binary is not None and args.platform != "linux":
++        parser.error("--wayland-helper-binary is available for native Linux only.")
+     mosh_inputs = (args.mosh_archive, args.mosh_source, args.mosh_recipe)
+     if any(mosh_inputs):
+         if not all(mosh_inputs):
+@@ -663,7 +734,7 @@
+     try:
+         if args.app_binary:
+             archive = package_release(args.platform, args.output.resolve(), args.app_binary, args.helper_binary,
+-                                      xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive)
++                                      xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary)
+         else:
+             build_root = args.build_root.resolve() if args.build_root else ROOT / "target"
+             source, inputs = freeze_sources(ROOT, build_root / "package-sources")
+@@ -672,7 +743,7 @@
+                 print(f"Building source snapshot {source.name}", flush=True)
+                 app, helper = release_build(source, build_root, settings)
+                 archive = package_release(args.platform, args.output.resolve(), app, helper, inputs, source, settings,
+-                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive)
++                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary)
+     except (OSError, ValueError, subprocess.CalledProcessError) as error:
+         parser.exit(1, f"Packaging failed: {error}\n")
+     print(f"{sha256(archive)}  {archive}")
+--- a/src/runtime/manifest.rs
++++ b/src/runtime/manifest.rs
+@@ -71,6 +71,8 @@
+     platform: String,
+     architecture: String,
+     rdp_helper_version: String,
++    #[serde(default)]
++    wayland_helper_version: Option<String>,
+     files: BTreeMap<PathBuf, String>,
+ }
+ 
+@@ -106,6 +108,27 @@
+     }
+ }
+ 
++#[cfg(target_os = "linux")]
++pub(crate) fn wayland_command(
++    root: &Path,
++) -> Result<(std::process::Command, std::fs::File), String> {
++    let manifest = PackageManifest::read(root).map_err(|_| {
++        "Wayland sharing requires the optional packaged PipeWire helper and package manifest."
++            .to_string()
++    })?;
++    let version = manifest
++        .wayland_helper_version
++        .as_deref()
++        .ok_or("This package does not include the optional Wayland PipeWire helper.")?;
++    let path = Path::new("termcraft-wayland-engine");
++    let expected = manifest
++        .files
++        .get(path)
++        .ok_or("Package manifest has no Wayland helper checksum.")?;
++    let verified = verify(root, path, version, expected, None)?;
++    verified.sealed_command()
++}
++
+ pub(crate) struct VerifiedArtifact {
+     pub(crate) path: PathBuf,
+     pub(crate) version: String,
+--- a/src/runtime/mod.rs
++++ b/src/runtime/mod.rs
+@@ -5,6 +5,8 @@
+ pub(crate) use browser_bundle::VERIFIED_CHUNKS;
+ mod manifest;
+ #[cfg(target_os = "linux")]
++pub(crate) use manifest::wayland_command;
++#[cfg(target_os = "linux")]
+ mod mosh;
+ #[cfg(target_os = "linux")]
+ pub(crate) use mosh::{MoshLaunch, prepare_mosh_launch};
+--- a/src/services/supervisor.rs
++++ b/src/services/supervisor.rs
+@@ -35,6 +35,7 @@
+     pub protocol: ServiceProtocol,
+     pub state: ServiceState,
+     pub address: Option<SocketAddr>,
++    pub browser_address: Option<SocketAddr>,
+     pub error: Option<String>,
+     pub cron: Option<super::cron::CronStatus>,
+     pub log: VecDeque<&'static str>,
+@@ -114,6 +115,7 @@
+                 protocol: config.protocol,
+                 state: ServiceState::Starting,
+                 address: None,
++                browser_address: None,
+                 error: None,
+                 cron: None,
+                 log: VecDeque::new(),
+@@ -296,7 +298,7 @@
+ }
+ 
+ impl Listener {
+-    fn bind(config: ServiceConfig) -> Result<Self, String> {
++    fn bind(config: ServiceConfig, context: &Arc<Context>) -> Result<Self, String> {
+         if !config.bind.ip().is_loopback() && !config.allow_non_loopback {
+             return Err("Enable network access before using a non-loopback address.".into());
+         }
+@@ -322,7 +324,8 @@
+                 if vnc.bind == config.bind
+                     && vnc.allow_non_loopback == config.allow_non_loopback =>
+             {
+-                super::vnc::Listener::bind(vnc).map(Self::Vnc)
++                let owned = context.clone();
++                super::vnc::Listener::bind_cancel(vnc, Arc::new(move || owned.cancelled())).map(Self::Vnc)
+             }
+             (ServiceProtocol::Ssh, ServiceRuntime::Ssh(ssh))
+                 if ssh.bind == config.bind
+@@ -410,9 +413,13 @@
+         return;
+     }
+     let lifetime = config.lifetime;
+-    let setup = Listener::bind(config).and_then(|listener| {
++    let setup = Listener::bind(config, context).and_then(|listener| {
+         let address = listener.address().map_err(bind_error)?;
+-        Ok((listener, address))
++        let browser_address = match &listener {
++            Listener::Vnc(vnc) => vnc.browser_address().map_err(bind_error)?,
++            _ => None,
++        };
++        Ok((listener, address, browser_address))
+     });
+     {
+         let mut status = context.status.lock().unwrap();
+@@ -429,18 +436,19 @@
+                 let _ = ready.try_send(Err(error));
+                 return;
+             }
+-            Ok((ref _listener, address)) => {
++            Ok((ref _listener, address, browser_address)) => {
+                 if let Some(deadline) =
+                     lifetime.and_then(|duration| Instant::now().checked_add(duration))
+                 {
+                     let _ = context.deadline.set(deadline);
+                 }
+                 status.address = Some(address);
++                status.browser_address = browser_address;
+                 status.state = ServiceState::Running;
+             }
+         }
+     }
+-    let Ok((listener, _)) = setup else { return };
++    let Ok((listener, _, _)) = setup else { return };
+     context.log("Listener started.");
+     let _ = ready.try_send(Ok(()));
+     let result = listener.serve(context);
+--- a/src/services/vnc.rs
++++ b/src/services/vnc.rs
+@@ -13,23 +13,41 @@
+ };
+ use subtle::ConstantTimeEq;
+ use zeroize::Zeroizing;
++mod browser;
++#[cfg(test)]
++mod lifecycle_tests;
+ mod clipboard;
+-#[cfg(any(windows, target_os = "linux", test))]
++#[cfg(target_os="macos")]
++mod macos;
++#[cfg(any(windows, target_os = "linux", target_os = "macos", test))]
+ mod keyboard;
+ #[cfg(windows)]
+ mod windows;
+ #[cfg(target_os = "linux")]
+ mod x11;
++#[cfg(target_os = "linux")]
++mod wayland;
+ 
+ #[derive(Clone, Debug)]
+ pub enum VncSource {
++    #[cfg(test)]
++    SyntheticFixture {
++        events: std::path::PathBuf,
++    },
++    #[cfg(test)]
++    LifecycleFixture {
++        entered: Arc<AtomicBool>,
++        release: Arc<AtomicBool>,
++        released: Arc<AtomicBool>,
++        clipboard: bool,
++    },
+     /// Explicit X11 display, such as :2. The host DISPLAY is never inferred.
+     X11 {
+         display: String,
+     },
+     /// Explicitly selected primary display on the current Windows desktop.
+     WindowsPrimaryDesktop,
+-    /// Requires a user-mediated ScreenCast/RemoteDesktop portal; not yet implemented.
++    /// Opens a fresh user-mediated ScreenCast/RemoteDesktop portal selection.
+     WaylandPortal,
+     MacOsDisplay {
+         display_id: u32,
+@@ -37,6 +55,8 @@
+ }
+ pub struct VncServiceConfig {
+     pub bind: SocketAddr,
++    /// Optional same-instance HTTP viewer. None disables the listener.
++    pub browser_bind: Option<SocketAddr>,
+     pub allow_non_loopback: bool,
+     pub allow_unencrypted: bool,
+     pub source: VncSource,
+@@ -50,6 +70,7 @@
+     pub fn local(source: VncSource, password: Secret) -> Self {
+         Self {
+             bind: ([127, 0, 0, 1], 0).into(),
++            browser_bind: None,
+             allow_non_loopback: false,
+             allow_unencrypted: false,
+             source,
+@@ -67,23 +88,35 @@
+         if !self.bind.ip().is_loopback() && !self.allow_non_loopback {
+             return Err("Enable network access before using a non-loopback address.".into());
+         }
++        if self
++            .browser_bind
++            .is_some_and(|bind| !bind.ip().is_loopback())
++            && !self.allow_non_loopback
++        {
++            return Err(
++                "Enable network access before using a non-loopback browser address.".into(),
++            );
++        }
+         let p = self.password.expose();
+         if p.is_empty() || p.len() > 8 || !p.bytes().all(|b| b.is_ascii() && !b.is_ascii_control())
+         {
+             return Err("Classic VNC requires 1–8 printable ASCII password bytes; passwords are never silently truncated.".into());
+         }
+         if let VncSource::X11 { display } = &self.source {
+-            let number = display
+-                .strip_prefix(':')
+-                .and_then(|s| s.split('.').next())
+-                .and_then(|s| s.parse::<u16>().ok());
+-            if number.is_none()
++            let number = display.strip_prefix(':').and_then(|s| {
++                // Match x11rb's display/screen u16 parsing without opening a display.
++                let (number, screen) = s.split_once('.').unwrap_or((s, "0"));
++                screen.parse::<u16>().ok()?;
++                number.parse::<u16>().ok()
++            });
++            // x11rb also constructs a TCP fallback at 6000 + display, even for :N.
++            if number.is_none_or(|number| number.checked_add(6000).is_none())
+                 || display.len() > 32
+                 || display
+                     .bytes()
+                     .any(|b| !b.is_ascii_digit() && b != b':' && b != b'.')
+             {
+-                return Err("Choose an explicit local X11 display such as :2. Remote X11 displays are not accepted.".into());
++                return Err("Choose an explicit local X11 display such as :2 or :2.0 (display 0–59535, screen 0–65535). Remote X11 displays are not accepted.".into());
+             }
+         }
+         Ok(())
+@@ -135,14 +168,23 @@
+     source: &VncSource,
+     control: bool,
+     authority: Option<&std::path::Path>,
++    cancel: Arc<dyn Fn() -> bool + Send + Sync>,
+ ) -> Result<Box<dyn Source>, String> {
++    #[cfg(not(target_os="linux"))]
++    let _ = cancel;
+     match source {
++        #[cfg(test)]
++        VncSource::SyntheticFixture { events } => Ok(Box::new(browser::tests::Synthetic { events: events.clone() })),
++        #[cfg(test)]
++        VncSource::LifecycleFixture { entered, release, released, clipboard } => Ok(Box::new(lifecycle_tests::Controlled::new(entered.clone(), release.clone(), released.clone(), *clipboard))),
+         #[cfg(target_os="linux")]
+         VncSource::X11{display}=>x11::X11::open(display,control,authority).map(|s|Box::new(s) as Box<dyn Source>),
+         #[cfg(windows)]
+         VncSource::WindowsPrimaryDesktop=>windows::Desktop::open(control).map(|s|Box::new(s) as Box<dyn Source>),
+-        VncSource::WaylandPortal=>Err("Wayland desktop sharing requires a user-approved portal source; that backend is not implemented.".into()),
+-        VncSource::MacOsDisplay{..}=>Err("Native macOS display sharing is not implemented.".into()),
++        #[cfg(target_os="linux")]
++        VncSource::WaylandPortal=>wayland::Wayland::open(control,cancel).map(|s|Box::new(s) as Box<dyn Source>),
++        #[cfg(target_os="macos")]
++        VncSource::MacOsDisplay{display_id}=>macos::Desktop::open(*display_id,control,cancel.clone()).map(|s|Box::new(s) as Box<dyn Source>),
+         _=>Err("The selected VNC display backend is unavailable on this platform.".into())
+     }
+ }
+@@ -154,19 +196,31 @@
+     control_active: AtomicBool,
+     release: AtomicBool,
+ }
++// Stop wins a Source-operation status race only when cancellation is actually
++// observed. ErrorKind::Interrupted without that signal is still a real failure.
++fn source_failed(state: &Shared, context: &Context, message: &'static str) {
++    if context.cancelled() { return; }
++    *state.failure.lock().unwrap() = Some(message.into());
++    context.request_stop();
++}
+ pub(super) struct Listener {
++    browser: Option<browser::Gateway>,
+     listener: TcpListener,
+     config: VncServiceConfig,
+     source: Box<dyn Source>,
+     frame: Frame,
+ }
+ impl Listener {
+-    pub(super) fn bind(config: VncServiceConfig) -> Result<Self, String> {
++    pub(super) fn bind_cancel(config: VncServiceConfig, cancel: Arc<dyn Fn() -> bool + Send + Sync>) -> Result<Self, String> {
+         config.validate()?;
++        if matches!(config.source, VncSource::WaylandPortal) && config.allow_clipboard {
++            return Err("Wayland portal clipboard sharing is unavailable. Disable clipboard sharing for this source.".into());
++        }
+         let mut source = open_source(
+             &config.source,
+             config.allow_control,
+             config.x11_authority.as_deref(),
++            cancel.clone(),
+         )?;
+         if config.allow_clipboard {
+             source
+@@ -175,12 +229,21 @@
+         }
+         let frame = source
+             .capture()
+-            .map_err(|_| "Could not capture the explicitly selected display.")?;
++            .map_err(|error| if matches!(config.source, VncSource::WaylandPortal) {
++                format!("Wayland sharing failed: {error}")
++            } else { "Could not capture the explicitly selected display.".into() })?;
+         frame.validate().map_err(|e| e.to_string())?;
++        if cancel() { return Err("Service startup cancelled.".into()); }
+         let listener = TcpListener::bind(config.bind)
+             .map_err(|e| format!("Could not bind VNC listener: {e}"))?;
+         listener.set_nonblocking(true).map_err(|e| e.to_string())?;
++        let browser = config
++            .browser_bind
++            .map(|bind| browser::Gateway::bind(bind, listener.local_addr()?))
++            .transpose()
++            .map_err(|e| format!("Could not bind browser viewer: {e}"))?;
+         Ok(Self {
++            browser,
+             listener,
+             config,
+             source,
+@@ -190,6 +253,12 @@
+     pub(super) fn address(&self) -> io::Result<SocketAddr> {
+         self.listener.local_addr()
+     }
++    pub(super) fn browser_address(&self) -> io::Result<Option<SocketAddr>> {
++        self.browser
++            .as_ref()
++            .map(browser::Gateway::address)
++            .transpose()
++    }
+     pub(super) fn serve(mut self, context: &Arc<Context>) -> io::Result<()> {
+         let (tx, rx) = std::sync::mpsc::sync_channel(64);
+         let shared = Arc::new(Shared {
+@@ -210,7 +279,7 @@
+                     (f.width, f.height)
+                 };
+                 let mut next = Instant::now();
+-                while !cancelled.cancelled() {
++                'source: while !cancelled.cancelled() {
+                     for _ in 0..64 {
+                         if cancelled.cancelled() {
+                             break;
+@@ -223,18 +292,14 @@
+                                     v.1 = None;
+                                 }
+                                 if self.source.set_clipboard(text).is_err() {
+-                                    *state.failure.lock().unwrap() =
+-                                        Some("Selected display clipboard failed.".into());
+-                                    cancelled.request_stop();
+-                                    return;
++                                    source_failed(&state, &cancelled, "Selected display clipboard failed.");
++                                    break 'source;
+                                 }
+                             }
+                             Ok(event) => {
+                                 if self.source.input(event).is_err() {
+-                                    *state.failure.lock().unwrap() =
+-                                        Some("Selected display input failed.".into());
+-                                    cancelled.request_stop();
+-                                    return;
++                                    source_failed(&state, &cancelled, "Selected display input failed.");
++                                    break 'source;
+                                 }
+                             }
+                             Err(_) => break,
+@@ -245,10 +310,8 @@
+                     }
+                     if state.release.swap(false, Ordering::AcqRel) {
+                         if self.source.input(Input::Release).is_err() {
+-                            *state.failure.lock().unwrap() =
+-                                Some("Selected display input release failed.".into());
+-                            cancelled.request_stop();
+-                            return;
++                            source_failed(&state, &cancelled, "Selected display input release failed.");
++                            break 'source;
+                         }
+                         state.control_active.store(false, Ordering::Release);
+                     }
+@@ -261,10 +324,8 @@
+                             }
+                             Ok(None) => {}
+                             Err(_) => {
+-                                *state.failure.lock().unwrap() =
+-                                    Some("Selected display clipboard stopped.".into());
+-                                cancelled.request_stop();
+-                                return;
++                                source_failed(&state, &cancelled, "Selected display clipboard stopped.");
++                                break 'source;
+                             }
+                         }
+                     }
+@@ -280,11 +341,8 @@
+                         }) {
+                             Ok(f) => *state.frame.lock().unwrap() = Arc::new(f),
+                             Err(_) => {
+-                                *state.failure.lock().unwrap() = Some(
+-                                    "Selected display capture stopped; restart sharing.".into(),
+-                                );
+-                                cancelled.request_stop();
+-                                return;
++                                source_failed(&state, &cancelled, "Selected display capture stopped; restart sharing.");
++                                break 'source;
+                             }
+                         }
+                         next = Instant::now() + Duration::from_millis(100);
+@@ -293,6 +351,31 @@
+                 }
+                 let _ = self.source.input(Input::Release);
+             })?;
++        let browser_worker = if let Some(browser) = self.browser.take() {
++            let ctx = context.clone();
++            let failure = shared.clone();
++            let worker = thread::Builder::new()
++                .name("vnc-browser-gateway".into())
++                .spawn(move || {
++                    let result = browser.serve(&ctx);
++                    if result.is_err() {
++                        *failure.failure.lock().unwrap() =
++                            Some("Browser viewer listener stopped.".into());
++                        ctx.log("Browser viewer stopped with an error.");
++                        ctx.request_stop();
++                    }
++                });
++            match worker {
++                Ok(worker) => Some(worker),
++                Err(error) => {
++                    context.request_stop();
++                    let _ = capture.join();
++                    return Err(error);
++                }
++            }
++        } else {
++            None
++        };
+         let password = self.config.password;
+         let control = self.config.allow_control;
+         let clipboard = self.config.allow_clipboard;
+@@ -303,6 +386,9 @@
+         // Capture failures request cancellation; join both network and display ownership on stop.
+         context.request_stop();
+         let _ = capture.join();
++        if let Some(worker) = browser_worker {
++            let _ = worker.join();
++        }
+         if let Some(error) = shared.failure.lock().unwrap().take() {
+             Err(io::Error::other(error))
+         } else {
+@@ -691,6 +777,83 @@
+ mod tests {
+     use super::*;
+     #[test]
++    fn local_x11_display_validation_matches_u16_parser_and_tcp_boundaries() {
++        for display in [":0", ":1.0", ":59535", ":59535.65535"] {
++            let mut config = VncServiceConfig::local(
++                VncSource::X11 {
++                    display: display.into(),
++                },
++                Secret::new("fixture"),
++            );
++            config.allow_unencrypted = true;
++            assert!(config.validate().is_ok(), "valid local display {display}");
++        }
++        for display in [
++            ":59536", ":59536.0", ":65535", ":0.65536", ":0.", ":0.1.2", ":0:1", "remote:0",
++        ] {
++            let mut config = VncServiceConfig::local(
++                VncSource::X11 {
++                    display: display.into(),
++                },
++                Secret::new("fixture"),
++            );
++            config.allow_unencrypted = true;
++            assert!(
++                config.validate().is_err(),
++                "invalid local display {display}"
++            );
++        }
++    }
++    #[test]
++    fn overflowing_x11_display_start_records_failed_before_source_open() {
++        use crate::services::{ServiceState, ServiceSupervisor};
++        for display in [":59536", ":65535"] {
++            let supervisor = ServiceSupervisor::default();
++            let mut config = VncServiceConfig::local(
++                VncSource::X11 {
++                    display: display.into(),
++                },
++                Secret::new("fixture"),
++            );
++            config.allow_unencrypted = true;
++            let error = supervisor.start_vnc(config).unwrap_err();
++            assert!(error.contains("local X11 display"), "{error}");
++            let statuses = supervisor.statuses();
++            assert_eq!(statuses.len(), 1);
++            assert_eq!(statuses[0].state, ServiceState::Failed);
++            assert!(statuses[0].address.is_none());
++            assert_eq!(statuses[0].error.as_deref(), Some(error.as_str()));
++        }
++    }
++    #[test]
++    fn overflowing_x11_display_async_start_reaches_failed() {
++        use crate::services::{ServiceState, ServiceSupervisor};
++        let supervisor = ServiceSupervisor::default();
++        let mut config = VncServiceConfig::local(
++            VncSource::X11 {
++                display: ":65535".into(),
++            },
++            Secret::new("fixture"),
++        );
++        config.allow_unencrypted = true;
++        let id = supervisor.begin_vnc(config).unwrap();
++        let deadline = Instant::now() + Duration::from_secs(2);
++        loop {
++            let status = supervisor.status(id).unwrap();
++            if status.state == ServiceState::Failed {
++                assert!(status.error.unwrap().contains("local X11 display"));
++                assert!(status.address.is_none());
++                break;
++            }
++            assert_eq!(status.state, ServiceState::Starting);
++            assert!(
++                Instant::now() < deadline,
++                "asynchronous startup must not remain Starting"
++            );
++            thread::sleep(Duration::from_millis(5));
++        }
++    }
++    #[test]
+     fn vnc_clipboard_optin_validates_without_opening_display() {
+         let mut c = VncServiceConfig::local(
+             VncSource::X11 {
+--- a/src/services/vnc_service_tests.rs
++++ b/src/services/vnc_service_tests.rs
+@@ -40,13 +40,20 @@
+ fn vnc_unsupported_sources_and_clipboard_fail_closed() {
+     let s = ServiceSupervisor::default();
+     for source in [
+-        VncSource::WaylandPortal,
++        #[cfg(not(target_os = "macos"))]
+         VncSource::MacOsDisplay { display_id: 0 },
++        #[cfg(not(windows))]
++        VncSource::WindowsPrimaryDesktop,
+     ] {
+         let mut c = VncServiceConfig::local(source, Secret::new("fixture"));
+         c.allow_unencrypted = true;
+         assert!(s.start_vnc(c).is_err());
+     }
++    // Configuration rejection happens before touching the host portal or clipboard.
++    let mut wayland = VncServiceConfig::local(VncSource::WaylandPortal, Secret::new("fixture"));
++    wayland.allow_unencrypted = true;
++    wayland.allow_clipboard = true;
++    assert!(s.start_vnc(wayland).unwrap_err().contains("clipboard"));
+     let mut c = VncServiceConfig::local(
+         VncSource::X11 {
+             display: ":65535".into(),
+--- a/src/ui/managed_vnc.rs
++++ b/src/ui/managed_vnc.rs
+@@ -8,8 +8,12 @@
+     supervisor: ServiceSupervisor,
+     id: Option<ServiceId>,
+     display: String,
++    wayland: bool,
+     authority: String,
++    #[cfg(target_os="macos")] macos_display_id:u32,
+     bind: String,
++    browser: bool,
++    browser_bind: String,
+     password: Zeroizing<String>,
+     control: bool,
+     clipboard: bool,
+@@ -24,8 +28,12 @@
+             supervisor: Default::default(),
+             id: None,
+             display: String::new(),
++            wayland: false,
+             authority: String::new(),
++            #[cfg(target_os="macos")] macos_display_id:0,
+             bind: "127.0.0.1:5900".into(),
++            browser: false,
++            browser_bind: "127.0.0.1:5800".into(),
+             password: Zeroizing::new(String::new()),
+             control: false,
+             clipboard: false,
+@@ -46,33 +54,41 @@
+             let busy=status.as_ref().is_some_and(|s|matches!(s.state,ServiceState::Starting|ServiceState::Running|ServiceState::Stopping));
+             ui.add_enabled_ui(!busy,|ui|{
+                 Grid::new("managed-vnc-form").num_columns(2).show(ui,|ui|{
+-                    #[cfg(target_os="linux")]{ui.label("X11 display");ui.add(TextEdit::singleline(&mut self.display).hint_text("Explicit display, e.g. :2"));ui.end_row();ui.label("Xauthority file (optional)");ui.text_edit_singleline(&mut self.authority);ui.end_row();}
++                    #[cfg(target_os="linux")]{ui.label("Display source");ui.horizontal(|ui|{ui.selectable_value(&mut self.wayland,false,"Explicit X11 display");ui.selectable_value(&mut self.wayland,true,"Wayland portal selection");});ui.end_row();if self.wayland {ui.label("Permission");ui.label("Start opens your desktop permission dialog. Select one screen or window. Stop cancels sharing.");ui.end_row();}else{ui.label("X11 display");ui.add(TextEdit::singleline(&mut self.display).hint_text("Explicit display, e.g. :2"));ui.end_row();ui.label("Xauthority file (optional)");ui.text_edit_singleline(&mut self.authority);ui.end_row();}}
+                     #[cfg(windows)]{ui.label("Display source");ui.label("Primary display on the current Windows desktop");ui.end_row();}
+-                    #[cfg(target_os="macos")]{ui.label("Display source");ui.label("Native macOS sharing is not implemented");ui.end_row();}
++                    #[cfg(target_os="macos")]{ui.label("Display source");ui.add(DragValue::new(&mut self.macos_display_id).prefix("Display ID ").range(0..=u32::MAX));ui.end_row();}
+                     ui.label("Listen address");ui.text_edit_singleline(&mut self.bind);ui.end_row();
++                    ui.label("Browser viewer");ui.checkbox(&mut self.browser,"Enable HTTP browser viewer (unencrypted)");ui.end_row();
++                    if self.browser {ui.label("Browser listen address");ui.text_edit_singleline(&mut self.browser_bind);ui.end_row();}
+                     ui.label("VNC password");super::managed_servers::service_password_field(ui,&mut self.password,210.);ui.end_row();
+                     ui.label("Access");ui.checkbox(&mut self.control,"Allow remote keyboard and pointer (view-only by default)");ui.end_row();
+-                    ui.label("Clipboard");ui.checkbox(&mut self.clipboard,"Share selected display clipboard (read-only viewers can receive only)");ui.end_row();
++                    ui.label("Clipboard");
++                    #[cfg(target_os="macos")]ui.checkbox(&mut self.clipboard,"Share my global macOS clipboard (viewers receive only)");
++                    #[cfg(not(target_os="macos"))]if self.wayland {ui.label("Unavailable for Wayland portal sharing");}else{ui.checkbox(&mut self.clipboard,"Share selected display clipboard (read-only viewers can receive only)");}ui.end_row();
+                     ui.label("Network access");ui.checkbox(&mut self.network,"Allow non-loopback listening");ui.end_row();
+                     ui.label("Transport");ui.checkbox(&mut self.consent,"I accept unencrypted classic VNC for this listener");ui.end_row();
+                     ui.label("Stop after");ui.add(DragValue::new(&mut self.lifetime).range(0..=86400).suffix(" seconds (0 = until stopped)"));ui.end_row();
+                 });
+-                ui.small("Password: 1–8 printable ASCII bytes. Clipboard is limited to 8 KiB text and disabled by default. Browser HTTP viewer is not implemented. Wayland requires a user-approved portal backend, which is not implemented. One controlling client at a time; view-only servers allow multiple viewers.");
++                #[cfg(target_os="macos")]ui.small("macOS 14 or later. Display ID 0 selects the primary display when Start is clicked; another ID selects only that display. Capture is limited to 5 frames/second. Start may request Screen Recording permission; remote control also requires Accessibility permission. Approve permissions yourself in macOS. The optional clipboard belongs to your entire macOS session.");
++                ui.small("Password: 1–8 printable ASCII bytes. Clipboard is limited to 8 KiB text and disabled by default. Browser viewer uses bundled noVNC, shares this server’s password/access, and stops with it. HTTPS is not available on this listener. Wayland sharing requires a desktop portal and PipeWire; permission is requested only when you start this source. One controlling client at a time; view-only servers allow multiple viewers.");
+             });
+             if let Some(s)=status {
+                 ui.label(format!("{:?}",s.state));
+                 if s.state==ServiceState::Running {if let Some(address)=s.address{ui.monospace(address.to_string());}}
++                if s.state==ServiceState::Running { if let Some(mut address)=s.browser_address { if address.ip().is_unspecified() { address.set_ip(if address.is_ipv4() { std::net::Ipv4Addr::LOCALHOST.into() } else { std::net::Ipv6Addr::LOCALHOST.into() }); } let url=format!("http://{address}/");ui.hyperlink_to(&url,&url);ui.small("Use this listener’s literal interface IP for access from another computer. Custom hostnames and reverse proxy origins are not accepted."); } }
+                 if let Some(error)=s.error{ui.colored_label(ui.visuals().error_fg_color,error);}
+                 if busy {ui.ctx().request_repaint_after(Duration::from_millis(50));if ui.button("Stop VNC server").clicked(){let _=self.supervisor.stop(s.id);}}
+             }
+             if !busy&&ui.button("Start VNC server").clicked(){
+                 let result=(||{
+-                    #[cfg(target_os="linux")]let source=VncSource::X11{display:self.display.clone()};
++                    #[cfg(target_os="linux")]let source=if self.wayland {VncSource::WaylandPortal}else{VncSource::X11{display:self.display.clone()}};
+                     #[cfg(windows)]let source=VncSource::WindowsPrimaryDesktop;
+-                    #[cfg(not(any(target_os="linux",windows)))]let source=VncSource::MacOsDisplay{display_id:0};
++                    #[cfg(target_os="macos")]let source=VncSource::MacOsDisplay{display_id:self.macos_display_id};
++                    #[cfg(not(any(target_os="linux",target_os="macos",windows)))]let source=VncSource::MacOsDisplay{display_id:0};
+                     let mut config=VncServiceConfig::local(source,Secret::new(self.password.as_str()));
+                     config.bind=self.bind.parse().map_err(|_|"Enter a listen IP address and port.".to_string())?;
+-                    config.x11_authority=(!self.authority.is_empty()).then(||self.authority.clone().into());config.allow_non_loopback=self.network;config.allow_unencrypted=self.consent;config.allow_control=self.control;config.allow_clipboard=self.clipboard;config.lifetime=(self.lifetime!=0).then(||Duration::from_secs(u64::from(self.lifetime)));
++                    config.browser_bind=if self.browser {Some(self.browser_bind.parse().map_err(|_|"Enter a browser listen IP address and port.".to_string())?)} else {None};
++                    config.x11_authority=(!self.authority.is_empty()).then(||self.authority.clone().into());config.allow_non_loopback=self.network;config.allow_unencrypted=self.consent;config.allow_control=self.control;config.allow_clipboard=self.clipboard&&!self.wayland;config.lifetime=(self.lifetime!=0).then(||Duration::from_secs(u64::from(self.lifetime)));
+                     self.supervisor.begin_vnc(config)
+                 })();self.password.zeroize();match result{Ok(id)=>{self.id=Some(id);self.error=None},Err(e)=>self.error=Some(e)}
+             }
+@@ -88,6 +104,8 @@
+         let mut form = ManagedVnc::default();
+         assert!(!form.clipboard);
+         assert!(!form.control);
++        assert!(!form.wayland);
++        assert!(!form.browser);
+         super::super::managed_servers::tests::password_history(
+             &mut form,
+             |form, ui| form.card(ui),
+--- a/src/ui/servers.rs
++++ b/src/ui/servers.rs
+@@ -21,7 +21,7 @@
+    self.managed_vnc.card(ui);
+    ui.add_space(17.);self.managed_cron.card(ui,service_data);
+    ui.add_space(17.);self.xserver_card(ui);
+-   ui.add_space(17.);CollapsingHeader::new("Additional original server types").show(ui,|ui|{ui.label("VNC clipboard, macOS and Wayland sharing, and the browser viewer remain unimplemented. FTPS server support in Personal is still unverified.");});
++   ui.add_space(17.);CollapsingHeader::new("Additional original server types").show(ui,|ui|{ui.label("VNC offers optional browser viewing and platform-specific sharing. Wayland requires portal permission and the optional PipeWire helper; macOS requires version 14 or later and native permissions. FTPS server support in Personal is still unverified.");});
+   });
+     }
+ }

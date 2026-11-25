@@ -1,0 +1,54 @@
+{
+  "archive_sha256": "b0d1f602e02a06050afa4196b3f4e6f6c5e3b1b370ddb741b01295a1d09c1a98",
+  "source_snapshot_sha256": "13216f29383b2a50b2c7ecf5417c994f6447cb8400b2cc2dcaba32c62fd7a11c",
+  "files_verified": 1269,
+  "package_root": "target/package-interop-xdmcp-devices-qualified/b0d1f602e02a06050afa4196b3f4e6f6c5e3b1b370ddb741b01295a1d09c1a98/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium",
+  "startup": {
+    "wayland": {
+      "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium.tar.gz",
+      "archive_sha256": "b0d1f602e02a06050afa4196b3f4e6f6c5e3b1b370ddb741b01295a1d09c1a98",
+      "manifest_schema": 1,
+      "platform": "linux",
+      "display_backend": "Wayland",
+      "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+      "screen_size": [
+        938,
+        486
+      ],
+      "rdp_helper_wire_version": 1,
+      "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+      "rdp_helper_child_location_verified": true
+    },
+    "x11": {
+      "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium.tar.gz",
+      "archive_sha256": "b0d1f602e02a06050afa4196b3f4e6f6c5e3b1b370ddb741b01295a1d09c1a98",
+      "manifest_schema": 1,
+      "platform": "linux",
+      "display_backend": "X11",
+      "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+      "screen_size": [
+        938,
+        990
+      ],
+      "rdp_helper_wire_version": 1,
+      "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+      "rdp_helper_child_location_verified": true
+    }
+  },
+  "qualification": "1269-file verified unsigned Arch-compatible Linux archive; nativeWayland/X11emptyPATHstartup+sealedRDPhelper;extractedXephyrXDMCP1+extractedapp/Xwaylandgraphics7pass;717app+55helper sourceboundary",
+  "scope": "Predates pending Wayland/macOS/HTTP VNC provider candidates",
+  "extracted_runtime": {
+    "package-xdmcp": {
+      "log": "package-xdmcp.log",
+      "passed": 1,
+      "sha256": "146abc74616ad48a89c8de603822f36a87130776ee107a899eb9a2c5f8f6fb96",
+      "scope": "actual extracted Xephyr/xdm or extracted app/Xwayland in private namespaces"
+    },
+    "package-x03": {
+      "log": "package-x03.log",
+      "passed": 7,
+      "sha256": "ce06287b97d30fb2d42c598b0ab641d2e667b1425545b13fecaea80244187be7",
+      "scope": "actual extracted Xephyr/xdm or extracted app/Xwayland in private namespaces"
+    }
+  }
+}

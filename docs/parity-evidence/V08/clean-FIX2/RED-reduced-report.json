@@ -1,0 +1,27 @@
+{
+  "client": {
+    "intervals": [
+      {}
+    ],
+    "end": {
+      "sum_sent": {
+        "bytes": 262144
+      },
+      "sum_received": {
+        "bytes": 262144
+      }
+    }
+  },
+  "server": {
+    "end": {
+      "sum_received": {
+        "bytes": 262144
+      }
+    }
+  },
+  "FIX1_accepted_actual_result": [
+    262144,
+    262144
+  ],
+  "incorrect_acceptance_reproduced": true
+}

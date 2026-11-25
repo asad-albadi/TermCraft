@@ -1,0 +1,13 @@
+# X04 hostname FIX1 (946) scoped re-review
+
+SPEC: ACCEPT
+QUALITY: ACCEPT
+
+All four 942 review findings are resolved in scope. No fix-diff blocker found.
+
+1. **Editor lifetime.** `src/ui/xdmcp.rs:25–33,104–126` drops previous state and advances generation across editor lifetimes. All production editor entry/replacement assignments go through `src/ui.rs:932–935` (including imported/shared profiles). `src/ui/pages.rs:113–116,173,193–196,239–253,279–287` ends state on protocol exit, cancellation, window close or accepted Save/Connect. The normal retained frame and retained generic validation error are the only paths that apply a ready hostname result. Applying the result is now outside the settings paint. The owned-UDP test at `src/ui/xdmcp.rs:575–637` has both no-packet-when-closing and retained-editor exact QUERY controls. State dropping remains nonjoining.
+2. **Stale rows.** `src/ui/xdmcp.rs:44–55,199–241` clears both lists before attempting explicit Resolve or Discover, including immediate start errors. Selection is held separately from rows and can survive a successful new answer only as a fresh member. Host/port/mode/generation changes invalidate stale binding. The independent worker Connect membership check and missing-preference error remain unchanged. The real Resolve button regression at `src/ui/xdmcp.rs:489–516` covers both old lists on immediate failure.
+3. **Exact inputs and evidence.** Independently verified the evidence seal and exact equality of tested and sealed canonical maps, checked all 716 source/extra entries and seven payload entries, round-tripped the patch to the seven mapped hashes, and validated normal and live executables against both published hashes. Independently checked that the sole matching Cargo library-test executable came from the FIX1 manifest/source and matches the live test binary hash record. The prior added AAAA-only/mixed test is included in the sealed source now. The recorded baseline has two real regression failures. The sealed final evidence shows 27 focused library passes (2 ignored), 9 UI passes, 1 workspace smoke pass, successful normal build and format check, and 1 owned isolated localhost UDP1177 hostname pass with Clipboard Disabled. I did not rerun those covering suites or start any fixtures.
+4. **Address cap wording.** FIX1 report accurately distinguishes bounded application admission and its 33-item sentinel from the standard library's eager/native address materialization. Resolver production limits and consent conditions are unchanged.
+
+Independent checks are in `fix1-artifact-probe.log`. This is an acceptance of the private FIX1 patch, not an assertion of integration verification or clipboard qualification. No MAIN or candidate files changed.

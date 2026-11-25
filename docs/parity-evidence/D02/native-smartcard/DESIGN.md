@@ -1,0 +1,13 @@
+# D02 native smartcard implementation design
+
+Private source only; no native reader/card/service calls during development.
+
+Session and NDR remain the sole remote policy boundary: opaque handles, selected reader only, 16 contexts/cards, 8 watches, bounded/zeroized APDUs, cancellation and context retirement. Linux pcsc-lite and seqpacket worker remain unchanged. macOS and Windows use a separate native ABI adapter exposing the existing Api interface. Only the owned worker loads/invokes PC/SC.
+
+macOS ABI: Apple's published SmartCardServices src/PCSC/pcsclite.h and winscard.h specify int32 handles/results, uint32 parameters, packed(1) reader state and PCI, ATR33. Load only /System/Library/Frameworks/PCSC.framework/PCSC with RTLD_LOCAL|RTLD_NOW. Windows: ULONG_PTR context/card, DWORD32/LONG32, system calling convention, Unicode W entry points, SCARD_READERSTATEW ATR36/natural layout, PCI8; load WinSCard.dll with LOAD_LIBRARY_SEARCH_SYSTEM32. No Linux c_long/c_ulong reuse.
+
+Native worker transport preserves MAX_PACKET with a 4-byte little endian bounded frame length; rejects zero/oversize before payload allocation. Partial reads/writes retain framing; bounded outgoing queue and completion IDs retain backpressure. macOS uses anonymous inherited stdin/stdout pipe pairs, current_exe, and loader environment sanitization. A Child owns an isolated process group; kill signals precede reaping, so its unreaped PID anchors the group against reuse. The child validates its group and runs an independent parent-death watchdog able to kill the live owned group while a vendor call hangs. Windows uses inherited anonymous pipe endpoints with STARTUPINFOEX handle list, suspended CreateProcess with an atomic JOB_LIST attribute assigning its kill-on-close Job before any instruction can run; only private worker endpoints inherit. Parent pipe IO is on bounded broker threads (16 requests, 17 responses); owned group/Job termination closes endpoints before joins. Windows requires Windows 10+ job-list launch support and fails closed if absent. Native drivers never run on UI/RDP thread. Watches use zero-timeout native polls, with heartbeat progress bounded by the existing four-second timeout.
+
+Qualification remains pending on real native SDK/runtime/hardware. Linux fake providers and pure component compilation/tests are source evidence only.
+
+Root ruling approved the anonymous inherited pipe design: literal UnixStream is unnecessary, because framed pipes preserve the full packet contract without Darwin datagram limits or a listener. The cost is two bounded local IO broker threads per enabled provider. The new component lock initialization used one specifically approved offline generate-lockfile operation; checks and tests are offline, locked, jobs2.

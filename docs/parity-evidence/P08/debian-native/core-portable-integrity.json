@@ -1,0 +1,30 @@
+{
+  "archive": "target/validation/p08-debian-native/build/out/TermCraft-0.1.0-linux-x86_64.tar.gz",
+  "sha256": "76590bedfbbd024b094a92d64743b9f6c884ea42f953c2385e4463e91268d3c8",
+  "files": 1074,
+  "linked": {
+    "harbor-workspace": {
+      "highest_required_glibc_symbol_version": "2.35",
+      "interpreter": "/lib64/ld-linux-x86-64.so.2",
+      "libraries": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "linux-vdso.so.1"
+      ]
+    },
+    "termcraft-rdp-engine": {
+      "highest_required_glibc_symbol_version": "2.34",
+      "interpreter": "/lib64/ld-linux-x86-64.so.2",
+      "libraries": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6",
+        "libgcc_s.so.1",
+        "libm.so.6",
+        "linux-vdso.so.1"
+      ]
+    }
+  },
+  "qualification": "Native Debian Bookworm core build; Debian wrapper/startup validation pending; managed Arch payloads omitted"
+}

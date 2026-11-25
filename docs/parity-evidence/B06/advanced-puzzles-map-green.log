@@ -1,0 +1,10 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/work)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.65s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/work/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 2 tests
+test map::advanced_tests::forcing_chain_deduction_is_real ... ok
+test map::advanced_tests::advanced_map_stock_grades_are_exact_or_explicitly_exhausted ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 50 filtered out; finished in 0.62s
+

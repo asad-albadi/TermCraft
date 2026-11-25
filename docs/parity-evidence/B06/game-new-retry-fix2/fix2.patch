@@ -1,0 +1,323 @@
+--- a/src/ui/games/play.rs
++++ b/src/ui/games/play.rs
+@@ -7,6 +7,7 @@
+ pub(in crate::ui) struct PlayState {
+     files: Files,
+     exit_ready: bool,
++    next_seed: u64,
+     launcher: bool,
+     suspended: bool,
+     pub(in crate::ui) session: Option<GameSession>,
+@@ -35,6 +36,7 @@
+         Self {
+             files: Files::default(),
+             exit_ready: false,
++            next_seed: 1,
+             launcher: false,
+             suspended: false,
+             session: None,
+@@ -107,6 +109,7 @@
+             ),
+             _ => GameRegistry::start(id, seed),
+         });
++        self.next_seed = seed.wrapping_add(1);
+         self.files.replaced();
+         self.draft = self.session.as_ref().and_then(GameSession::configuration);
+         self.solve_confirm = false;
+@@ -124,6 +127,7 @@
+     fn start_config(&mut self, seed: u64, config: p::PuzzleConfig) -> bool {
+         match GameSession::new_puzzle(seed, config) {
+             Ok(session) => {
++                self.next_seed = seed.wrapping_add(1);
+                 self.files.replaced();
+                 self.session = Some(session);
+                 self.draft = Some(config);
+@@ -175,7 +179,11 @@
+             FileAction::Start(id, seed) => self.start(id, seed),
+             FileAction::New => {
+                 if let Some(s) = self.session.as_ref() {
+-                    let (id, seed) = (s.id(), s.seed().wrapping_add(1));
++                    let (id, seed) = (s.id(), self.next_seed);
++                    // Consume an attempt only after the New action is confirmed.
++                    // A bounded generation failure keeps the active game intact,
++                    // while the next explicit attempt can try a fresh seed.
++                    self.next_seed = seed.wrapping_add(1);
+                     if let Some(c) = self.draft {
+                         self.start_config(seed, c);
+                     } else {
+@@ -186,6 +194,7 @@
+             FileAction::Reset => {
+                 if let Some(s) = self.session.as_mut() {
+                     s.reset();
++                    self.next_seed = s.seed().wrapping_add(1);
+                     self.files.replaced();
+                     self.tick = None;
+                     self.dragging = None;
+@@ -198,6 +207,7 @@
+             FileAction::Close => {
+                 self.files.replaced();
+                 self.session = None;
++                self.next_seed = 1;
+                 self.launcher = false;
+                 self.tick = None;
+                 self.dragging = None;
+@@ -240,6 +250,7 @@
+         if let Some(p::PuzzleConfig::Map(c)) = self.draft {
+             self.portrait = c.preset == p::MapPreset::Portrait;
+         }
++        self.next_seed = session.seed().wrapping_add(1);
+         self.files.replaced();
+         self.session = Some(session);
+         self.launcher = false;
+@@ -3718,15 +3729,16 @@
+         assert_eq!(play.session.as_ref().unwrap().scene(), solved);
+         assert_eq!(play.selected, selected);
+         assert!(play.session.as_ref().unwrap().assisted());
+-        let hard = p::PuzzleConfig::Map(p::MapConfig {
++        let difficult = p::PuzzleConfig::Map(p::MapConfig {
+             preset: p::MapPreset::Default,
+             regions: 30,
+-            difficulty: p::MapDifficulty::Hard,
++            difficulty: p::MapDifficulty::Unreasonable,
+         });
+-        assert!(
+-            !play.start_config(0, hard),
+-            "known bounded-exhaustion fixture must fail honestly"
+-        );
++        assert!(difficult.validate().is_ok());
++        let failure_seed = (0..=16)
++            .find(|&seed| GameSession::new_puzzle(seed, difficult).is_err())
++            .expect("bounded independent valid-configuration failure sample");
++        assert!(!play.start_config(failure_seed, difficult));
+         assert_eq!(play.session.as_ref().unwrap().scene(), solved);
+         assert_eq!(play.selected, selected);
+         assert_eq!(
+@@ -3820,15 +3832,17 @@
+             if !names.contains(&preset.name.as_str()) && !advanced_map {
+                 continue;
+             }
+-            let seed = match config {
+-                p::PuzzleConfig::Map(c) => match (c.preset, c.regions, c.difficulty) {
+-                    (p::MapPreset::Default, 30, _) => 10,
+-                    (p::MapPreset::Default, 75, _) => 1,
+-                    (p::MapPreset::Portrait, 75, _) => 2,
+-                    (p::MapPreset::Portrait, 30, p::MapDifficulty::Hard) => 1,
+-                    _ => 0,
+-                },
+-                _ => 0,
++            let seed = if matches!(config, p::PuzzleConfig::Map(_)) {
++                (0..=32)
++                    .find(|&seed| GameSession::new_puzzle(seed, config).is_ok())
++                    .unwrap_or_else(|| {
++                        panic!(
++                            "no independently generated sample for {} within 33 seeds",
++                            preset.name
++                        )
++                    })
++            } else {
++                0
+             };
+             let mut play = PlayState::default();
+             assert!(
+@@ -3843,6 +3857,12 @@
+             let texts = painted_texts(&out);
+             match play.session.as_ref().unwrap().scene() {
+                 GameScene::Puzzle(p::PuzzleScene::Solo(s)) => {
++                    let requested = match config {
++                        p::PuzzleConfig::Solo(c) => c.difficulty,
++                        p::PuzzleConfig::SoloVariant(c) => c.base.difficulty,
++                        _ => panic!(),
++                    };
++                    assert_eq!(s.certificate.achieved, requested, "{}", preset.name);
+                     assert!(
+                         texts.iter().any(|(_, t)| t
+                             .contains(&format!("Difficulty: {:?}", s.certificate.achieved))),
+@@ -3851,6 +3871,14 @@
+                     )
+                 }
+                 GameScene::Puzzle(p::PuzzleScene::Map(s)) => {
++                    let p::PuzzleConfig::Map(requested) = config else {
++                        panic!()
++                    };
++                    assert_eq!(
++                        s.certificate.achieved, requested.difficulty,
++                        "{}",
++                        preset.name
++                    );
+                     assert!(
+                         texts.iter().any(|(_, t)| t
+                             .contains(&format!("Difficulty: {:?}", s.certificate.achieved))),
+@@ -4458,4 +4486,173 @@
+         assert!(w.games.play.files.dirty());
+         assert!(w.games.play.message.contains("target changed"));
+     }
++
++    #[test]
++    fn fix2_actual_new_failure_advances_attempt_and_cancel_preserves_game() {
++        for (id, desired) in [
++            (GameId::Solo, advanced_preset("3x3 Advanced")),
++            (
++                GameId::Map,
++                p::PuzzleConfig::Map(p::MapConfig {
++                    preset: p::MapPreset::Default,
++                    regions: 30,
++                    difficulty: p::MapDifficulty::Unreasonable,
++                }),
++            ),
++        ] {
++            let first_valid = (2..=16)
++                .find(|&seed| GameSession::new_puzzle(seed, desired).is_ok())
++                .expect("bounded independent graded sample");
++            assert!(
++                first_valid > 2,
++                "native failed seed2 fixture must exercise failure: {desired:?}"
++            );
++            eprintln!("{desired:?}: independent first valid seed after1 is {first_valid}");
++            let (ctx, _dir, mut w) = crate::ui::terminal_review_tests::owned_workspace();
++            w.games.play.start(id, 1);
++            w.games.play.session.as_mut().unwrap().solve().unwrap();
++            w.games.play.files.changed();
++            w.games.play.selected = 7;
++            w.games.play.draft = Some(desired);
++            let before = w.games.play.session.as_ref().unwrap().save_bytes().unwrap();
++            let file_state = (
++                w.games.play.files.generation,
++                w.games.play.files.revision,
++                w.games.play.files.clean,
++            );
++            save_ui_click(&ctx, &mut w, "New game");
++            save_ui_click(&ctx, &mut w, "Keep playing");
++            assert_eq!(
++                w.games.play.next_seed, 2,
++                "cancel must not consume an attempt"
++            );
++            assert_eq!(
++                w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),
++                before
++            );
++            for seed in 2..=first_valid {
++                save_ui_click(&ctx, &mut w, "New game");
++                save_ui_click(&ctx, &mut w, "Discard changes and continue");
++                assert_eq!(w.games.play.next_seed, seed.wrapping_add(1));
++                if seed < first_valid {
++                    assert_eq!(
++                        w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),
++                        before
++                    );
++                    assert_eq!(
++                        (
++                            w.games.play.files.generation,
++                            w.games.play.files.revision,
++                            w.games.play.files.clean
++                        ),
++                        file_state
++                    );
++                    assert_eq!(w.games.play.selected, 7);
++                    assert_eq!(w.games.play.draft, Some(desired));
++                    assert!(w.games.play.message.contains("Your current game is kept"));
++                    assert!(w.games.play.files.dirty());
++                } else {
++                    let expected = GameSession::new_puzzle(seed, desired).unwrap();
++                    assert_eq!(
++                        w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),
++                        expected.save_bytes().unwrap()
++                    );
++                    assert!(!w.games.play.files.dirty());
++                    assert!(!w.games.play.session.as_ref().unwrap().assisted());
++                }
++            }
++        }
++    }
++    #[test]
++    fn fix2_attempt_cursor_wraps_and_reinitializes_for_all_start_reset_load_paths() {
++        let ctx = Context::default();
++        let mut play = PlayState::default();
++        play.perform_file_action(FileAction::New, &ctx);
++        assert_eq!(play.next_seed, 1);
++        for spec in GameRegistry::catalog() {
++            play.start(spec.id, u64::MAX);
++            assert_eq!(play.next_seed, 0, "{:?}", spec.id);
++            play.perform_file_action(FileAction::New, &ctx);
++            assert_eq!(play.next_seed, 1, "{:?}", spec.id);
++            play.next_seed = 99;
++            play.perform_file_action(FileAction::Reset, &ctx);
++            assert_eq!(
++                play.next_seed,
++                play.session.as_ref().unwrap().seed().wrapping_add(1)
++            );
++            let loaded = play.session.as_ref().unwrap().clone();
++            let expected = loaded.seed().wrapping_add(1);
++            play.next_seed = 123;
++            play.adopt_file(loaded, &ctx);
++            assert_eq!(play.next_seed, expected);
++        }
++        play.start(GameId::Solo, u64::MAX - 1);
++        play.draft = Some(p::PuzzleConfig::SoloVariant(p::SoloVariantConfig {
++            base: p::SoloConfig::default(),
++            jigsaw: true,
++            killer: true,
++        }));
++        let before = play.session.as_ref().unwrap().save_bytes().unwrap();
++        for next in [0, 1] {
++            play.perform_file_action(FileAction::New, &ctx);
++            assert_eq!(play.next_seed, next);
++            assert_eq!(play.session.as_ref().unwrap().save_bytes().unwrap(), before);
++        }
++        play.perform_file_action(FileAction::Reset, &ctx);
++        assert_eq!(play.next_seed, u64::MAX);
++        assert!(play.start_config(12, p::PuzzleConfig::Guess(p::GuessConfig::default())));
++        assert_eq!(play.next_seed, 13);
++    }
++    #[test]
++    fn fix2_failed_confirmed_new_keeps_queued_input_and_active_settings() {
++        let ctx = Context::default();
++        let mut play = PlayState::default();
++        play.start(GameId::Solo, 1);
++        play.session.as_mut().unwrap().solve().unwrap();
++        play.files.changed();
++        let invalid = p::PuzzleConfig::SoloVariant(p::SoloVariantConfig {
++            base: p::SoloConfig::default(),
++            jigsaw: true,
++            killer: true,
++        });
++        play.draft = Some(invalid);
++        play.selected = 7;
++        play.colour = 4;
++        play.pencil = true;
++        let before = play.session.as_ref().unwrap().save_bytes().unwrap();
++        let files = (play.files.generation, play.files.revision, play.files.clean);
++        let mut out = ctx.run_ui(
++            RawInput {
++                events: vec![
++                    key_event(Key::ArrowRight, Modifiers::CTRL),
++                    Event::Paste("queued input".into()),
++                ],
++                ..Default::default()
++            },
++            |ui| {
++                let queued = ui
++                    .ctx()
++                    .input(|i| (i.events.clone(), i.keys_down.clone(), i.modifiers));
++                play.perform_file_action(FileAction::New, ui.ctx());
++                assert_eq!(
++                    ui.ctx()
++                        .input(|i| (i.events.clone(), i.keys_down.clone(), i.modifiers)),
++                    queued
++                );
++            },
++        );
++        out.textures_delta.clear();
++        assert_eq!(play.session.as_ref().unwrap().save_bytes().unwrap(), before);
++        assert_eq!(
++            (play.files.generation, play.files.revision, play.files.clean),
++            files
++        );
++        assert_eq!(
++            (play.draft, play.selected, play.colour, play.pencil),
++            (Some(invalid), 7, 4, true)
++        );
++        assert_eq!(play.next_seed, 3);
++        let expected_error = GameSession::new_puzzle(2, invalid).err().unwrap();
++        assert_eq!(play.message, player_error(expected_error));
++    }
+ }

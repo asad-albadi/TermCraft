@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.610 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced-ui/work)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.72s
+     Running unittests src/main.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/termcraft_advanced_ui610-aef57433844c9f8f)
+
+running 1 test
+test ui::games::play::options_ui_tests::advanced_ui_killer_cages_sums_arithmetic_and_history ... FAILED
+
+failures:
+
+---- ui::games::play::options_ui_tests::advanced_ui_killer_cages_sums_arithmetic_and_history stdout ----
+
+thread 'ui::games::play::options_ui_tests::advanced_ui_killer_cages_sums_arithmetic_and_history' (469924) panicked at src/ui/games/play.rs:3351:9:
+cages retain readable sums and notes through horizontal scrolling
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::games::play::options_ui_tests::advanced_ui_killer_cages_sums_arithmetic_and_history
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.29s
+
+error: test failed, to rerun pass `--bin termcraft-advanced-ui610`

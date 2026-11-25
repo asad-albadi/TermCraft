@@ -1,0 +1,64 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling cfg-if v1.0.5
+   Compiling libc v0.2.190
+   Compiling syn v2.0.119
+   Compiling syn v3.0.10
+   Compiling zeroize_derive v1.5.0
+   Compiling zeroize v1.9.2
+   Compiling subtle v2.6.1
+   Compiling cmov v0.5.4
+   Compiling typenum v1.20.1
+   Compiling ctutils v0.4.8
+
+thread 'rustc' (194258) panicked at /rustc-dev/31fca3adb283cc9dfd56b49cdee9a96eb9c96ffd/compiler/rustc_metadata/src/creader.rs:247:31:
+index out of bounds: the len is 2 but the index is 2097152
+stack backtrace:
+   0:     0x7fcd45225fab - <<std[2b826acdc1f5e0a6]::sys::backtrace::BacktraceLock>::print::DisplayBacktrace as core[2a04ef4615689bd8]::fmt::Display>::fmt
+   1:     0x7fcd4581e648 - core[2a04ef4615689bd8]::fmt::write
+   2:     0x7fcd46cb7e36 - <std[2b826acdc1f5e0a6]::sys::stdio::unix::Stderr as std[2b826acdc1f5e0a6]::io::Write>::write_fmt
+   3:     0x7fcd451fc2b8 - std[2b826acdc1f5e0a6]::panicking::default_hook::{closure#0}
+   4:     0x7fcd45219613 - std[2b826acdc1f5e0a6]::panicking::default_hook
+   5:     0x7fcd441f107c - std[2b826acdc1f5e0a6]::panicking::update_hook::<alloc[6396a74c74b4abac]::boxed::Box<rustc_driver_impl[ca870b9720f08484]::install_ice_hook::{closure#1}>>::{closure#0}
+   6:     0x7fcd452198f2 - std[2b826acdc1f5e0a6]::panicking::panic_with_hook
+   7:     0x7fcd451fc378 - std[2b826acdc1f5e0a6]::panicking::panic_handler::{closure#0}
+   8:     0x7fcd451f08d9 - std[2b826acdc1f5e0a6]::sys::backtrace::__rust_end_short_backtrace::<std[2b826acdc1f5e0a6]::panicking::panic_handler::{closure#0}, !>
+   9:     0x7fcd451fdddd - __rustc[38dafaa32e25e62e]::rust_begin_unwind
+  10:     0x7fcd41d7062c - core[2a04ef4615689bd8]::panicking::panic_fmt
+  11:     0x7fcd41f6e6c3 - core[2a04ef4615689bd8]::panicking::panic_bounds_check
+  12:     0x7fcd458521ac - <rustc_resolve[53e6a8652b33591e]::Resolver>::resolve_ident_in_scope_set_inner
+  13:     0x7fcd45d59890 - <rustc_resolve[53e6a8652b33591e]::Resolver>::finalize_import::{closure#2}
+  14:     0x7fcd45d50984 - <rustc_resolve[53e6a8652b33591e]::Resolver>::resolve_crate::{closure#0}
+  15:     0x7fcd45d4c4bf - <rustc_resolve[53e6a8652b33591e]::Resolver>::resolve_crate
+  16:     0x7fcd45f9dc6d - rustc_interface[c468f08876874b33]::passes::configure_and_expand
+  17:     0x7fcd46a01bd2 - rustc_interface[c468f08876874b33]::passes::resolver_for_lowering_raw
+  18:     0x7fcd46a0194d - rustc_query_impl[2bb66b0b4b541c6]::query_impl::resolver_for_lowering_raw::invoke_provider_fn::__rust_begin_short_backtrace
+  19:     0x7fcd469c8866 - rustc_query_impl[2bb66b0b4b541c6]::execution::try_execute_query::<rustc_middle[cbe0dc6bf6ab09ab]::query::caches::SingleCache<rustc_middle[cbe0dc6bf6ab09ab]::query::erase::ErasedData<[u8; 16usize]>>, false>
+  20:     0x7fcd469a8184 - rustc_query_impl[2bb66b0b4b541c6]::query_impl::resolver_for_lowering_raw::execute_query_non_incr::__rust_end_short_backtrace
+  21:     0x7fcd469a5fac - rustc_interface[c468f08876874b33]::interface::run_compiler::<(), rustc_driver_impl[ca870b9720f08484]::run_compiler::{closure#0}>::{closure#1}
+  22:     0x7fcd4698af7e - std[2b826acdc1f5e0a6]::sys::backtrace::__rust_begin_short_backtrace::<rustc_interface[c468f08876874b33]::util::run_in_thread_with_globals<rustc_interface[c468f08876874b33]::util::run_in_thread_pool_with_globals<rustc_interface[c468f08876874b33]::interface::run_compiler<(), rustc_driver_impl[ca870b9720f08484]::run_compiler::{closure#0}>::{closure#1}, ()>::{closure#0}, ()>::{closure#0}::{closure#0}, ()>
+  23:     0x7fcd4698b820 - <std[2b826acdc1f5e0a6]::thread::lifecycle::spawn_unchecked<rustc_interface[c468f08876874b33]::util::run_in_thread_with_globals<rustc_interface[c468f08876874b33]::util::run_in_thread_pool_with_globals<rustc_interface[c468f08876874b33]::interface::run_compiler<(), rustc_driver_impl[ca870b9720f08484]::run_compiler::{closure#0}>::{closure#1}, ()>::{closure#0}, ()>::{closure#0}::{closure#0}, ()>::{closure#1} as core[2a04ef4615689bd8]::ops::function::FnOnce<()>>::call_once::{shim:vtable#0}
+  24:     0x7fcd4698c6ac - <std[2b826acdc1f5e0a6]::sys::thread::unix::Thread>::new::thread_start
+  25:     0x7fcd402ac93f - <unknown>
+  26:     0x7fcd4034eeec - <unknown>
+  27:                0x0 - <unknown>
+
+error: the compiler unexpectedly panicked. This is a bug
+
+note: we would appreciate a bug report: https://github.com/rust-lang/rust/issues/new?labels=C-bug%2C+I-ICE%2C+T-compiler&template=ice.md
+
+note: rustc 1.96.1 (31fca3adb 2026-06-26) running on x86_64-unknown-linux-gnu
+
+note: compiler flags: --crate-type lib -C embed-bitcode=no -C debuginfo=2
+
+note: some of the compiler flags provided by cargo are hidden
+
+query stack during panic:
+#0 [resolver_for_lowering_raw] getting the resolver for lowering
+end of query stack
+error: could not compile `typenum` (lib)
+
+Caused by:
+  process didn't exit successfully: `rustc --crate-name typenum --edition=2018 /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/typenum-1.20.1/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no -C debuginfo=2 --cfg 'feature="const-generics"' --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values("const-generics", "i128", "scale-info", "scale_info", "strict"))' -C metadata=137b227b55c3758f -C extra-filename=-7dacdb8d260cb56d --out-dir '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation-rust1961/debug/deps' -L 'dependency=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation-rust1961/debug/deps' --cap-lints allow` (exit status: 101)
+warning: build failed, waiting for other jobs to finish...

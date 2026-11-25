@@ -1,0 +1,16 @@
+{
+  "frozen_binaries": {
+    "harbor_workspace-a8c1431dc62fd8f8": "34d368ac3eb1521d0b45d3b485766e5985cbe3e1dfd1cb95222b9be198944eeb",
+    "termcraft-xdmcp-combined962": "8cac58329ef1e677fd9d7706e91acfc41174610775eb5060d2270b3830543bc9",
+    "termcraft_xdmcp_combined962-bcc2d8d9b4453630": "a7f139b9b624332f88ef0289a1c0dbb7ff913298c63ed5f1002b477eb2dda642"
+  },
+  "isolated_cases": [
+    "cancel after successful startup",
+    "owned cleanup receives ECHILD"
+  ],
+  "prior_seal": "766a1ea8cc7f6ad67fe203d2f0d04344a1d052d1eda4202c1b1d5ef53baaea3f",
+  "review": "95dd54c6f23475be332f36ac796bdb12b85f23ae7904cda34b16dcd5f1b4f64b",
+  "sha256": "6be28a366f71499b309db6259f4c7596f7a7abda6124bcf8d8ca79d30b630554",
+  "test_binary": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04-combined-fix1/build/debug/deps/harbor_workspace-a8c1431dc62fd8f8",
+  "tests_passed": 1
+}

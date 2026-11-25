@@ -1,0 +1,10 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.23s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-c95ec83546c98485)
+
+running 2 tests
+test x11::platform::linux::tests::verified_executable_survives_in_place_mutation ... ok
+test x11::platform::linux::tests::full_listener_queue_cancels_and_cleans_owned_startup ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 56 filtered out; finished in 0.05s
+

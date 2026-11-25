@@ -1,0 +1,18 @@
+{
+  "files": [
+    {
+      "path": "packaging/runtime/stage-mosh-dependencies.py",
+      "base_sha256": "40d58cefa2f619b07dc3f363051b73143f5c3f3695b2fb11c642eb83d880ea14",
+      "sha256": "5b0165dd40150b2be269192e49eeaee04db17eae476948820c0e56f7c0528674"
+    },
+    {
+      "path": "tests/mosh_dependency_staging.py",
+      "base_sha256": "780c820b73347ed217ac0df5052b577668d34498a6da6b38667f1cd6dfbe0694",
+      "sha256": "5b0876b727c9ba7cea37c9f97af9be7c73e25ceadd56cee96bef49bf64f31430"
+    }
+  ],
+  "review": "SPEC/QUALITY ACCEPT",
+  "pins_and_extractor": "unchanged",
+  "failed_archive_preserved": "70fd16ae1a394ce52975afbc0001a889048ff633154d2aef4051199f4fc9961b",
+  "root_new_release": "pending"
+}

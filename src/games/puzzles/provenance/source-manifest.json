@@ -1,0 +1,241 @@
+{
+  "evidence_class": "RECOVERED historical upstream source correspondence; never original runtime measurement",
+  "upstream": "https://git.tartarus.org/simon/puzzles.git",
+  "commit": "f306b9db55453f7d7fc824bbbf89ca6ac7d2d273",
+  "version_lead": "20150612.f306b9d",
+  "retrieval": "git clone --bare; git rev-parse f306b9d; git archive f306b9d net.c mines.c solo.c guess.c map.c untangle.c puzzles.but LICENCE",
+  "commit_date": "2015-06-10T21:58:59+01:00",
+  "source_files": [
+    {
+      "file": "net.c",
+      "sha256": "e6f5a66c5b054e1a69941a1e0c71eeac017ec1cfdb3e583a7e712470bc13643f",
+      "bytes": 103376,
+      "retained_functions": [
+        {
+          "function": "default_params",
+          "lines": [
+            160,
+            171
+          ]
+        },
+        {
+          "function": "interpret_move",
+          "lines": [
+            2192,
+            2464
+          ]
+        },
+        {
+          "function": "execute_move",
+          "lines": [
+            2466,
+            2550
+          ]
+        }
+      ],
+      "retained_macros": [
+        {
+          "macro": "OFFSETWH / OFFSET",
+          "lines": [
+            113,
+            118
+          ]
+        }
+      ]
+    },
+    {
+      "file": "mines.c",
+      "sha256": "9abe5e5628344624bf46d97ced69aac0af2e7a4bd82c3a8e6b0e63c303c72e00",
+      "bytes": 85029,
+      "retained_functions": [
+        {
+          "function": "default_params",
+          "lines": [
+            94,
+            103
+          ]
+        },
+        {
+          "function": "interpret_move",
+          "lines": [
+            2419,
+            2593
+          ]
+        },
+        {
+          "function": "execute_move",
+          "lines": [
+            2595,
+            2690
+          ]
+        }
+      ]
+    },
+    {
+      "file": "solo.c",
+      "sha256": "9e4954485f1222966b57b121c7648a932980cb3aa5f7da87a818c0b24024ff8a",
+      "bytes": 159861,
+      "retained_functions": [
+        {
+          "function": "default_params",
+          "lines": [
+            273,
+            285
+          ]
+        },
+        {
+          "function": "interpret_move",
+          "lines": [
+            4520,
+            4618
+          ]
+        },
+        {
+          "function": "execute_move",
+          "lines": [
+            4620,
+            4670
+          ]
+        },
+        {
+          "function": "check_valid",
+          "lines": [
+            2966,
+            3064
+          ]
+        }
+      ]
+    },
+    {
+      "file": "guess.c",
+      "sha256": "a2c569b89395ba733e97c90cac1e5f18de997db30df68deb826977db61c3a227",
+      "bytes": 40836,
+      "retained_functions": [
+        {
+          "function": "default_params",
+          "lines": [
+            49,
+            62
+          ]
+        },
+        {
+          "function": "interpret_move",
+          "lines": [
+            636,
+            785
+          ]
+        },
+        {
+          "function": "execute_move",
+          "lines": [
+            787,
+            832
+          ]
+        },
+        {
+          "function": "mark_pegs",
+          "lines": [
+            574,
+            612
+          ]
+        }
+      ]
+    },
+    {
+      "file": "map.c",
+      "sha256": "7e1b9ff5aeeeb925af389f4d686210afe08621c16ac6500f9052f5c16eaa7749",
+      "bytes": 90862,
+      "retained_functions": [
+        {
+          "function": "default_params",
+          "lines": [
+            99,
+            114
+          ]
+        },
+        {
+          "function": "interpret_move",
+          "lines": [
+            2366,
+            2501
+          ]
+        },
+        {
+          "function": "execute_move",
+          "lines": [
+            2503,
+            2578
+          ]
+        },
+        {
+          "function": "map_solver",
+          "lines": [
+            945,
+            1390
+          ]
+        }
+      ]
+    },
+    {
+      "file": "untangle.c",
+      "sha256": "0677a651273677e72be34955c4fc642f8a6da2e92cfb15a3b26ba1c6a7d01c9d",
+      "bytes": 36815,
+      "retained_functions": [
+        {
+          "function": "default_params",
+          "lines": [
+            119,
+            126
+          ]
+        },
+        {
+          "function": "interpret_move",
+          "lines": [
+            1083,
+            1155
+          ]
+        },
+        {
+          "function": "execute_move",
+          "lines": [
+            1157,
+            1190
+          ]
+        },
+        {
+          "function": "mark_crossings",
+          "lines": [
+            763,
+            804
+          ]
+        },
+        {
+          "function": "cross",
+          "lines": [
+            304,
+            385
+          ]
+        }
+      ]
+    },
+    {
+      "file": "puzzles.but",
+      "sha256": "eb04e99528067795a2b400984d0410ca29a54e695e44c6f4aad7fa16a259d242",
+      "bytes": 127798
+    },
+    {
+      "file": "LICENCE",
+      "sha256": "324cba4984cf02666dec301689f11806c75cee0bdef56bc81a5bdc75667dd68b",
+      "bytes": 1275
+    }
+  ],
+  "qualifications": [
+    "Original stgames.exe has CRC anomaly; was not executed, linked, or redistributed.",
+    "Version string correspondence does not establish binary/source equivalence.",
+    "Independent Rust generators and seed mapping do not reproduce upstream random.c or game IDs.",
+    "Solo uses 9x9 standard boxes; does not reproduce upstream rotational symmetry or difficulty classification.",
+    "No source C is compiled or linked; excerpts retained solely for audit with upstream licence.",
+    "Map default dimensions 20x15/30 and PORTRAIT_SCREEN alternative16x18/30 implemented independently; historical Easy/Normal deduction completion and Easy failure are certified for accepted boards, without upstream layout/ID equivalence.",
+    "Net wrapping/barriers/custom sizes; Map Hard/Unreasonable/custom settings; Solo rotational symmetry/DIFF_BLOCK; common redo/Solve/save/ID menus remain implementation gaps."
+  ]
+}

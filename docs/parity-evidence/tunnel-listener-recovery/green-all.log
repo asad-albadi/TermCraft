@@ -1,0 +1,75 @@
+
+running 14 tests
+fixture candidate 127.0.0.1:36077 rejected while claimed, available after drop
+test fixture_port_claim_survives_socket_handoff_and_releases_on_drop ... ok
+observed owned listener local=0100007F:83DB
+echo peer=127.0.0.1:54312, local=127.0.0.1:32897, exact=TUNNEL_OK
+test dynamic_ipv4 ... ok
+echo peer=127.0.0.1:40566, local=127.0.0.1:33631, exact=TUNNEL_OK
+observed owned listener local=0200007F:9DFD
+echo peer=127.0.0.1:32996, local=127.0.0.2:33587, exact=TUNNEL_OK
+deterministic wrong endpoint 127.0.0.1:46589: "SSH-2.0-O"
+observed owned listener local=00000000000000000000000001000000:805D
+echo peer=[::1]:33494, local=[::1]:45897, exact=TUNNEL_OK
+test dynamic_ipv6 ... ok
+observed owned listener local=0100007F:A33F
+echo peer=127.0.0.1:52552, local=127.0.0.1:44559, exact=TUNNEL_OK
+test local_ipv4 ... ok
+observed owned listener local=00000000000000000000000001000000:96F1
+echo peer=[::1]:42894, local=[::1]:38553, exact=TUNNEL_OK
+test local_ipv6 ... ok
+observed owned listener local=0100007F:8D31
+echo peer=127.0.0.1:60490, local=127.0.0.1:46857, exact=TUNNEL_OK
+echo peer=127.0.0.1:40578, local=127.0.0.1:33631, exact=TUNNEL_OK
+real SSH process subsequently rejected occupied requested port: Error: remote port forwarding failed for listen port 46589
+
+test released_forward_port_can_connect_to_wrong_ssh_endpoint ... ok
+observed owned listener local=0100007F:996B
+echo peer=127.0.0.1:54196, local=127.0.0.1:38823, exact=TUNNEL_OK
+test remote_ipv4 ... ok
+test destination_failure_is_observable ... ok
+Local: bind [127.0.0.1]:41919: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 41919
+Could not request local forwarding.
+
+echo peer=127.0.0.1:40582, local=127.0.0.1:33631, exact=TUNNEL_OK
+observed owned listener local=00000000000000000000000001000000:9D11
+echo peer=[::1]:57524, local=[::1]:42533, exact=TUNNEL_OK
+test remote_ipv6 ... ok
+Remote: Error: remote port forwarding failed for listen port 36841
+
+echo peer=127.0.0.1:40586, local=127.0.0.1:33631, exact=TUNNEL_OK
+echo peer=127.0.0.1:60106, local=127.0.0.1:41259, exact=TUNNEL_OK
+echo peer=[::1]:48548, local=[::1]:45135, exact=TUNNEL_OK
+echo peer=[::1]:34052, local=[::1]:37513, exact=TUNNEL_OK
+echo peer=[::1]:33920, local=[::1]:39763, exact=TUNNEL_OK
+echo peer=127.0.0.1:45748, local=127.0.0.1:38439, exact=TUNNEL_OK
+echo peer=127.0.0.1:39240, local=127.0.0.1:36459, exact=TUNNEL_OK
+barrier roundtrip Dynamic [::1]:44585: exact=TUNNEL_OK; count=1; cancelled; rebound
+barrier roundtrip Dynamic 127.0.0.1:44233: exact=TUNNEL_OK; count=1; cancelled; rebound
+barrier roundtrip Remote [::1]:44683: exact=TUNNEL_OK; count=1; cancelled; rebound
+barrier roundtrip Local 127.0.0.1:33425: exact=TUNNEL_OK; count=1; cancelled; rebound
+barrier roundtrip Remote 127.0.0.1:41613: exact=TUNNEL_OK; count=1; cancelled; rebound
+barrier roundtrip Local [::1]:32847: exact=TUNNEL_OK; count=1; cancelled; rebound
+test parallel_forward_handoffs_keep_distinct_claims_and_real_roundtrips ... ok
+observed owned listener local=0200007F:A9F9
+echo peer=127.0.0.1:37784, local=127.0.0.2:41957, exact=TUNNEL_OK
+observed owned listener local=0100007F:81D3
+echo peer=127.0.0.1:38230, local=127.0.0.1:37471, exact=TUNNEL_OK
+Dynamic: bind [127.0.0.1]:36907: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 36907
+Could not request local forwarding.
+
+echo peer=127.0.0.1:40600, local=127.0.0.1:33631, exact=TUNNEL_OK
+test tunnel_port_conflict_is_visible ... ok
+observed owned listener local=0200007F:99ED
+echo peer=127.0.0.1:40132, local=127.0.0.2:42057, exact=TUNNEL_OK
+test explicit_nondefault_loopback_bind ... ok
+observed owned listener local=0100007F:9A75
+echo peer=127.0.0.1:55550, local=127.0.0.1:39755, exact=TUNNEL_OK
+test local_remote_dynamic_tunnels_carry_exact_payload ... ok
+echo peer=127.0.0.1:40610, local=127.0.0.1:33631, exact=TUNNEL_OK
+test closing_tunnel_releases_listener ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.95s
+

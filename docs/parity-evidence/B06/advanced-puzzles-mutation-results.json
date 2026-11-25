@@ -1,0 +1,56 @@
+[
+  {
+    "mutation": "solo-intersection",
+    "test": "intersections_remove_only_candidates_outside_overlap",
+    "exit": 101,
+    "caught_by_behavioral_assertion": true
+  },
+  {
+    "mutation": "solo-set",
+    "test": "full_set_rule_eliminates_naked_triple",
+    "exit": 101,
+    "caught_by_behavioral_assertion": true
+  },
+  {
+    "mutation": "solo-fish",
+    "test": "extreme_fish_eliminates_common_columns",
+    "exit": 101,
+    "caught_by_behavioral_assertion": true
+  },
+  {
+    "mutation": "solo-forcing",
+    "test": "extreme_forcing_traverses_bivalue_peer_chain",
+    "exit": 101,
+    "caught_by_behavioral_assertion": true
+  },
+  {
+    "mutation": "map-forcing",
+    "test": "forcing_chain_deduction_is_real",
+    "exit": 101,
+    "caught_by_behavioral_assertion": true
+  },
+  {
+    "mutation": "killer-sum-table",
+    "test": "killer_distinct_sum_table_matches_independent_enumeration",
+    "exit": 101,
+    "caught_by_behavioral_assertion": true
+  },
+  {
+    "mutation": "jigsaw-regions",
+    "test": "jigsaw_peer_conflicts_follow_irregular_regions_instead_of_boxes",
+    "exit": 101,
+    "caught_by_behavioral_assertion": true
+  },
+  {
+    "mutation": "killer-45-residual",
+    "test": "killer_stock_requires_source_intersection_grade",
+    "exit": 101,
+    "caught_by_behavioral_assertion": true
+  },
+  {
+    "mutation": "killer-completion-sum",
+    "test": "killer_wrong_sum_blocks_win_even_when_all_sudoku_units_are_valid",
+    "exit": 101,
+    "caught_by_behavioral_assertion": true
+  }
+]

@@ -1,0 +1,72 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: methods `send` and `poll` are never used
+   --> src/ui.rs:161:8
+    |
+135 | impl TerminalTab {
+    | ---------------- methods in this implementation
+...
+161 |     fn send(&mut self, data: &[u8]) {
+    |        ^^^^
+...
+205 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.27s
+     Running tests/connection.rs (target/debug/deps/connection-bd94d47ead2bb31f)
+
+running 2 tests
+test sftp_escapes_quotes_and_rejects_newlines ... ok
+test missing_client_is_actionable ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/runtime_manifest.rs (target/debug/deps/runtime_manifest-551f8b3425ae304a)
+
+running 5 tests
+test existing_mosh_profiles_keep_the_installed_provider ... ok
+test manifest_rejects_wrong_architecture_or_hash ... ok
+test staged_runtime_runs_with_empty_path ... ignored, requires staged Linux x86_64 archive and genuine Mosh server fixture
+test manifest_rejects_wrong_elf_and_symlinked_helper ... ok
+
+running 1 test
+test packaged_runtime_works_with_empty_path ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
+
+test packaged_runtime_works_with_empty_path ... ok
+
+test result: ok. 4 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

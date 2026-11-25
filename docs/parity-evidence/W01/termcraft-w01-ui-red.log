@@ -1,0 +1,93 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `set_layout_preset` found for struct `ui::Workspace` in the current scope
+   --> src/ui/layout.rs:9:151
+    |
+  9 | ...ned-D"]{raw_terminal(&mut w,name);}w.set_layout_preset(LayoutPreset::Four);
+    |                                         ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:364:1
+    |
+364 | pub struct Workspace {
+    | -------------------- method `set_layout_preset` not found for this struct
+
+error[E0609]: no field `pane_bounds` on type `ui::Workspace`
+  --> src/ui/layout.rs:11:57
+   |
+11 |         let out=render(&ctx,&mut w,vec![]);assert_eq!(w.pane_bounds.len(),4);
+   |                                                         ^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 56 others
+
+error[E0609]: no field `pane_bounds` on type `ui::Workspace`
+  --> src/ui/layout.rs:14:24
+   |
+14 | ...   let(id,rect)=w.pane_bounds[2];let pos=rect.center();let events=vec![Event::PointerMoved(pos),Event::PointerButton{pos,button:P...
+   |                      ^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 56 others
+
+error[E0609]: no field `layout_state` on type `ui::Workspace`
+  --> src/ui/layout.rs:17:188
+   |
+17 | ...ssert_eq!(w.tabs[w.active].id,active);assert_eq!(w.layout_state.root.as_ref().unwrap().ids().len(),3);assert!(!w.layout_state.roo...
+   |                                                       ^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 56 others
+
+error[E0609]: no field `layout_state` on type `ui::Workspace`
+  --> src/ui/layout.rs:17:250
+   |
+17 | ...e.root.as_ref().unwrap().ids().len(),3);assert!(!w.layout_state.root.as_ref().unwrap().ids().contains(&removed));
+   |                                                       ^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 56 others
+
+error[E0599]: no method named `set_layout_preset` found for struct `ui::Workspace` in the current scope
+   --> src/ui/layout.rs:22:133
+    |
+ 22 | ...le".into(),..Default::default()});}w.set_layout_preset(LayoutPreset::Columns);
+    |                                         ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:364:1
+    |
+364 | pub struct Workspace {
+    | -------------------- method `set_layout_preset` not found for this struct
+
+error[E0609]: no field `pane_bounds` on type `ui::Workspace`
+  --> src/ui/layout.rs:24:65
+   |
+24 | ...   render(&ctx,&mut w,vec2(1500.,1000.),vec![]);let left=w.pane_bounds[0].1;let right=w.pane_bounds[1].1;let start=pos2((left.max...
+   |                                                               ^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 56 others
+
+error[E0609]: no field `pane_bounds` on type `ui::Workspace`
+  --> src/ui/layout.rs:24:94
+   |
+24 | ...   render(&ctx,&mut w,vec2(1500.,1000.),vec![]);let left=w.pane_bounds[0].1;let right=w.pane_bounds[1].1;let start=pos2((left.max...
+   |                                                                                            ^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 56 others
+
+error[E0599]: no method named `set_layout_preset` found for struct `ui::Workspace` in the current scope
+   --> src/ui/layout.rs:27:11
+    |
+ 27 | ...   w.set_layout_preset(LayoutPreset::Four);render(&ctx,&mut w,vec2(400.,650.),vec![]);assert_eq!(w.pane_bounds.len(),1,"an under...
+    |         ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:364:1
+    |
+364 | pub struct Workspace {
+    | -------------------- method `set_layout_preset` not found for this struct
+
+error[E0609]: no field `pane_bounds` on type `ui::Workspace`
+  --> src/ui/layout.rs:27:105
+   |
+27 | ...   w.set_layout_preset(LayoutPreset::Four);render(&ctx,&mut w,vec2(400.,650.),vec![]);assert_eq!(w.pane_bounds.len(),1,"an unders...
+   |                                                                                                       ^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 56 others
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 10 previous errors

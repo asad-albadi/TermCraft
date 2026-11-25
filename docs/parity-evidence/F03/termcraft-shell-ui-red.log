@@ -1,0 +1,29 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0609]: no field `directory_tracker` on type `ui::TerminalTab`
+    --> src/ui.rs:1895:119
+     |
+1895 | ...ace.tabs[0].poll();let latest=workspace.tabs[0].directory_tracker.as_ref().unwrap().last_directory();if latest.is_some_and(|p|p...
+     |                                                    ^^^^^^^^^^^^^^^^^ unknown field
+     |
+     = note: available fields are: `id`, `session`, `screen`, `launch`, `process` ... and 15 others
+
+error[E0609]: no field `directory_tracker` on type `ui::TerminalTab`
+    --> src/ui.rs:1897:128
+     |
+1897 | ...owMode::FollowShell);let path=workspace.tabs[0].directory_tracker.as_ref().unwrap().last_directory().unwrap().clone();workspace...
+     |                                                    ^^^^^^^^^^^^^^^^^ unknown field
+     |
+     = note: available fields are: `id`, `session`, `screen`, `launch`, `process` ... and 15 others
+
+error[E0599]: no method named `follow_shell_directory` found for struct `ui::TerminalTab` in the current scope
+    --> src/ui.rs:1897:216
+     |
+  48 | struct TerminalTab {
+     | ------------------ method `follow_shell_directory` not found for this struct
+...
+1897 |         workspace.tabs[0].browser.as_mut().unwrap().set_follow_mode(BrowserFollowMode::FollowShell);let path=workspace.tabs[0].directory_tracker.as_ref().unwrap().last_directory().unwrap().clone();workspace.tabs[0].follow_shell_directory(pa...
+     |                                                                                                                                                                                                                        ^^^^^^^^^^^^^^^^^^^^^^ method not found in `ui::TerminalTab`
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 3 previous errors

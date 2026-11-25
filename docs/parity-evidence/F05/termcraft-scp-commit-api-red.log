@@ -1,0 +1,39 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `begin_commit` found for struct `transfer::Job` in the current scope
+   --> src/remote_files/transfer.rs:304:21
+    |
+100 | pub(crate) struct Job {
+    | --------------------- method `begin_commit` not found for this struct
+...
+304 |         assert!(job.begin_commit());
+    |                     ^^^^^^^^^^^^ method not found in `transfer::Job`
+
+error[E0609]: no field `committing` on type `TransferEvent`
+   --> src/remote_files/transfer.rs:307:35
+    |
+307 |         assert!(manager.poll()[0].committing);
+    |                                   ^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `summary`, `id`, `bytes`, `completed_entries`, `outcome`, `recovery`
+
+error[E0599]: no variant, associated function, or constant named `Indeterminate` found for enum `transfer::TransferOutcome` in the current scope
+   --> src/remote_files/transfer.rs:309:75
+    |
+ 73 | pub enum TransferOutcome {
+    | ------------------------ variant, associated function, or constant `Indeterminate` not found for this enum
+...
+309 |         assert!(matches!(manager.poll()[0].outcome, Some(TransferOutcome::Indeterminate(_))));
+    |                                                                           ^^^^^^^^^^^^^ variant, associated function, or constant not found in `transfer::TransferOutcome`
+
+error[E0599]: no method named `begin_commit` found for struct `transfer::Job` in the current scope
+   --> src/remote_files/transfer.rs:313:22
+    |
+100 | pub(crate) struct Job {
+    | --------------------- method `begin_commit` not found for this struct
+...
+313 |         assert!(!job.begin_commit(), "Cancellation before commit still prevents publication");
+    |                      ^^^^^^^^^^^^ method not found in `transfer::Job`
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (lib test) due to 4 previous errors

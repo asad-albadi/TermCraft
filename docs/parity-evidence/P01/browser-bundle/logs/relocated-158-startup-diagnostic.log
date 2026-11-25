@@ -1,0 +1,25 @@
+
+running 1 test
+test chromium_renders_and_submits_browser_input ... WAIT tests/browser_session.rs:103:5
+DIAG screenshot [640, 480] expected [640, 480]
+FRAME gen=9 size=[640, 480] pixel=Some([254, 0, 0, 255]) rev=0
+WAIT tests/browser_session.rs:127:5
+DIAG screenshot [640, 480] expected [640, 480]
+WAIT tests/browser_session.rs:130:5
+DIAG screenshot [640, 480] expected [640, 480]
+DIAG screenshot [640, 480] expected [640, 480]
+WAIT tests/browser_session.rs:134:5
+DIAG screenshot [640, 480] expected [640, 480]
+DIAG screenshot [640, 480] expected [640, 480]
+DIAG screenshot [640, 480] expected [640, 480]
+WAIT tests/browser_session.rs:144:9
+DIAG screenshot [300, 200] expected [300, 200]
+WAIT tests/browser_session.rs:165:9
+WAIT tests/browser_session.rs:144:9
+DIAG screenshot [460, 320] expected [460, 320]
+WAIT tests/browser_session.rs:165:9
+WAIT tests/browser_session.rs:170:5
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 33.03s
+

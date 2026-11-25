@@ -1,0 +1,38 @@
+[
+  {
+    "version": "1.95.0",
+    "exit_code": 0,
+    "seconds": 1.67,
+    "command": [
+      "cargo",
+      "run",
+      "--offline",
+      "--locked",
+      "-j",
+      "1",
+      "--manifest-path",
+      "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/build-host-diagnostics/libc-probe/Cargo.toml"
+    ],
+    "CARGO_BUILD_JOBS": "2",
+    "explicit_diagnostic_jobs": 1,
+    "target": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/build-host-diagnostics/libc-probe/target-1.95.0"
+  },
+  {
+    "version": "1.99.1",
+    "exit_code": 101,
+    "seconds": 1.63,
+    "command": [
+      "cargo",
+      "run",
+      "--offline",
+      "--locked",
+      "-j",
+      "1",
+      "--manifest-path",
+      "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/build-host-diagnostics/libc-probe/Cargo.toml"
+    ],
+    "CARGO_BUILD_JOBS": "2",
+    "explicit_diagnostic_jobs": 1,
+    "target": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/build-host-diagnostics/libc-probe/target-1.99.1"
+  }
+]

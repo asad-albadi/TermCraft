@@ -1,0 +1,9 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_interop-402819b4a2c8008c' --exact independent_dropbear_key_shell_and_sftp_roundtrip --nocapture --test-threads=1 --ignored
+Executable SHA256: b0a1bd3777a60c56a3e7b4dcbb678df706a8bfece6b0dfb5161ef69fc1aa594b
+
+running 1 test
+test independent_dropbear_key_shell_and_sftp_roundtrip ... Dropbear 2026.94: pinned Ed25519 key, shell marker, SFTP 90000 exact bytes/literal filename, one authentication
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.24s
+

@@ -1,0 +1,158 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0609]: no field `session_import` on type `&mut ui::Workspace`
+ --> src/ui/session_import.rs:8:17
+  |
+8 | ...   while w.session_import.as_ref().is_some_and(|s|s.job.is_some()) {w.poll_session_import(ctx);assert!(Instant::now()<deadline);st...
+  |               ^^^^^^^^^^^^^^ unknown field
+  |
+help: a field with a similar name exists
+  |
+8 -         while w.session_import.as_ref().is_some_and(|s|s.job.is_some()) {w.poll_session_import(ctx);assert!(Instant::now()<deadline);std::thread::sleep(Duration::from_millis(5));}
+8 +         while w.session_form.as_ref().is_some_and(|s|s.job.is_some()) {w.poll_session_import(ctx);assert!(Instant::now()<deadline);std::thread::sleep(Duration::from_millis(5));}
+  |
+
+error[E0599]: no method named `poll_session_import` found for mutable reference `&mut ui::Workspace` in the current scope
+ --> src/ui/session_import.rs:8:76
+  |
+8 | ...is_some_and(|s|s.job.is_some()) {w.poll_session_import(ctx);assert!(Instant::now()<deadline);std::thread::sleep(Duration::from_mil...
+  |                                       ^^^^^^^^^^^^^^^^^^^ method not found in `&mut ui::Workspace`
+
+error[E0599]: no method named `begin_session_import` found for struct `ui::Workspace` in the current scope
+   --> src/ui/session_import.rs:13:11
+    |
+ 13 |         w.begin_session_import(Format::Moba,path,&ctx);ready(&ctx,&mut w);
+    |           ^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:372:1
+    |
+372 | pub struct Workspace {
+    | -------------------- method `begin_session_import` not found for this struct
+
+error[E0433]: cannot find type `Format` in this scope
+  --> src/ui/session_import.rs:13:32
+   |
+13 |         w.begin_session_import(Format::Moba,path,&ctx);ready(&ctx,&mut w);
+   |                                ^^^^^^ use of undeclared type `Format`
+
+error[E0609]: no field `session_import` on type `ui::Workspace`
+  --> src/ui/session_import.rs:14:59
+   |
+14 | ...   assert!(w.store.sessions.is_empty());assert_eq!(w.session_import.as_ref().unwrap().preview.as_ref().unwrap().candidates.len(),1);
+   |                                                         ^^^^^^^^^^^^^^ unknown field
+   |
+help: a field with a similar name exists
+   |
+14 -         assert!(w.store.sessions.is_empty());assert_eq!(w.session_import.as_ref().unwrap().preview.as_ref().unwrap().candidates.len(),1);
+14 +         assert!(w.store.sessions.is_empty());assert_eq!(w.session_form.as_ref().unwrap().preview.as_ref().unwrap().candidates.len(),1);
+   |
+
+error[E0599]: no method named `session_import_window` found for struct `ui::Workspace` in the current scope
+   --> src/ui/session_import.rs:15:139
+    |
+ 15 | ...50.))),..Default::default()},|ui|w.session_import_window(ui.ctx()));output.textures_delta.clear();
+    |                                       ^^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:372:1
+    |
+372 | pub struct Workspace {
+    | -------------------- method `session_import_window` not found for this struct
+
+error[E0599]: no method named `apply_session_import` found for struct `ui::Workspace` in the current scope
+   --> src/ui/session_import.rs:17:11
+    |
+ 17 |         w.apply_session_import(&ctx);ready(&ctx,&mut w);
+    |           ^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:372:1
+    |
+372 | pub struct Workspace {
+    | -------------------- method `apply_session_import` not found for this struct
+
+error[E0599]: no method named `begin_session_import` found for struct `ui::Workspace` in the current scope
+   --> src/ui/session_import.rs:24:11
+    |
+ 24 |         w.begin_session_import(Format::Moba,source.clone(),&ctx);assert!(w.cancel_session_import());
+    |           ^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:372:1
+    |
+372 | pub struct Workspace {
+    | -------------------- method `begin_session_import` not found for this struct
+
+error[E0433]: cannot find type `Format` in this scope
+  --> src/ui/session_import.rs:24:32
+   |
+24 |         w.begin_session_import(Format::Moba,source.clone(),&ctx);assert!(w.cancel_session_import());
+   |                                ^^^^^^ use of undeclared type `Format`
+
+error[E0599]: no method named `cancel_session_import` found for struct `ui::Workspace` in the current scope
+   --> src/ui/session_import.rs:24:76
+    |
+ 24 |         w.begin_session_import(Format::Moba,source.clone(),&ctx);assert!(w.cancel_session_import());
+    |                                                                            ^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/ui.rs:372:1
+    |
+372 | pub struct Workspace {
+    | -------------------- method `cancel_session_import` not found for this struct
+    |
+help: there is a method `new_session` with a similar name, but with different arguments
+   --> src/ui.rs:684:5
+    |
+684 |     fn new_session(&mut self, protocol: &str) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `poll_session_import` found for struct `ui::Workspace` in the current scope
+   --> src/ui/session_import.rs:25:57
+    |
+ 25 |         std::thread::sleep(Duration::from_millis(40));w.poll_session_import(&ctx);assert!(w.store.sessions.is_empty());
+    |                                                         ^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:372:1
+    |
+372 | pub struct Workspace {
+    | -------------------- method `poll_session_import` not found for this struct
+
+error[E0599]: no method named `begin_session_import` found for struct `ui::Workspace` in the current scope
+   --> src/ui/session_import.rs:26:11
+    |
+ 26 |         w.begin_session_import(Format::Moba,source,&ctx);ready(&ctx,&mut w);
+    |           ^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:372:1
+    |
+372 | pub struct Workspace {
+    | -------------------- method `begin_session_import` not found for this struct
+
+error[E0433]: cannot find type `Format` in this scope
+  --> src/ui/session_import.rs:26:32
+   |
+26 |         w.begin_session_import(Format::Moba,source,&ctx);ready(&ctx,&mut w);
+   |                                ^^^^^^ use of undeclared type `Format`
+
+error[E0599]: no method named `apply_session_import` found for struct `ui::Workspace` in the current scope
+   --> src/ui/session_import.rs:28:11
+    |
+ 28 |         w.apply_session_import(&ctx);ready(&ctx,&mut w);
+    |           ^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:372:1
+    |
+372 | pub struct Workspace {
+    | -------------------- method `apply_session_import` not found for this struct
+
+error[E0609]: no field `session_import` on type `ui::Workspace`
+  --> src/ui/session_import.rs:29:57
+   |
+29 | ...   assert!(w.store.sessions.is_empty());assert!(!w.session_import.as_ref().unwrap().error.is_empty());assert!(w.store_path.is_dir...
+   |                                                       ^^^^^^^^^^^^^^ unknown field
+   |
+help: a field with a similar name exists
+   |
+29 -         assert!(w.store.sessions.is_empty());assert!(!w.session_import.as_ref().unwrap().error.is_empty());assert!(w.store_path.is_dir());
+29 +         assert!(w.store.sessions.is_empty());assert!(!w.session_form.as_ref().unwrap().error.is_empty());assert!(w.store_path.is_dir());
+   |
+
+Some errors have detailed explanations: E0433, E0599, E0609.
+For more information about an error, try `rustc --explain E0433`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 15 previous errors

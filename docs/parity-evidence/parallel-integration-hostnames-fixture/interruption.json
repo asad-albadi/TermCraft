@@ -1,0 +1,7 @@
+{
+  "state": "interrupted; no final result file, no corresponding live cargo/rustc/runner processes and execution session handles unavailable",
+  "cause": "not established",
+  "source_inputs_checked": 727,
+  "changes": [],
+  "restart": "new evidence directory; retain all unfinished logs"
+}

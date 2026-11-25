@@ -1,0 +1,7 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282' --exact closing_rdp_releases_transport --nocapture --test-threads=1
+
+running 1 test
+test closing_rdp_releases_transport ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.29s
+

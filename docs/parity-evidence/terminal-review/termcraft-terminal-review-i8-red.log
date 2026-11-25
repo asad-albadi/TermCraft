@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.26s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-c814a3629b30588a)
+
+running 1 test
+test ui::terminal_review_tests::output_bursts_share_one_work_budget_and_keep_close_cancel_responsive ... FAILED
+
+failures:
+
+---- ui::terminal_review_tests::output_bursts_share_one_work_budget_and_keep_close_cancel_responsive stdout ----
+
+thread 'ui::terminal_review_tests::output_bursts_share_one_work_budget_and_keep_close_cancel_responsive' (433252) panicked at src/ui/terminal_review_tests.rs:48:108:
+all tabs and logic/render passes must share one 8 KiB parse budget; parsed 2500000 bytes
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::terminal_review_tests::output_bursts_share_one_work_budget_and_keep_close_cancel_responsive
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 51 filtered out; finished in 4.93s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

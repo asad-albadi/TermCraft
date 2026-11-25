@@ -1,0 +1,157 @@
+--- a/src/ui.rs
++++ b/src/ui.rs
+@@ -14,6 +14,7 @@
+ };
+ mod activity;
+ mod appearance;
++mod v06_probe;
+ mod broadcast;
+ mod cli_dispatch;
+ mod clipboard;
+@@ -1415,7 +1416,7 @@
+                         }
+                     });
+                     ui.menu_button("Games", |ui| {
+-                        self.games_menu(ui);
++                        ui.label("Games are not available in this build.");
+                         ui.separator();
+                         self.screensaver_settings(ui);
+                     });
+@@ -1477,9 +1478,10 @@
+                     if tool_button(ui, "tools", "Tools").clicked() {
+                         self.page = Page::Tools;
+                     }
+-                    if tool_button(ui, "games", "Games").clicked() {
+-                        self.games.play.open();
+-                    }
++                    ui.add_enabled_ui(false, |ui| {
++                        tool_button(ui, "games", "Games")
++                            .on_hover_text("Games are not available in this build");
++                    });
+                     if tool_button(ui, "folder", "Sessions").clicked() {
+                         self.store.preferences.sidebar_visible =
+                             !self.store.preferences.sidebar_visible;
+@@ -2051,7 +2053,9 @@
+         if self.import_applying() {
+             root.disable();
+         }
++        self.v06_control(&ctx);
+         self.apply_appearance(&ctx);
++        self.v06_observe(&ctx);
+         self.set_shortcut_context(&ctx);
+         self.frames += 1;
+         self.update_activity_visibility(&ctx);
+@@ -2098,11 +2102,6 @@
+             self.detached_windows(&ctx);
+             return;
+         }
+-        if self.games_frame(root) {
+-            self.session_confirmations(&ctx);
+-            self.detached_windows(&ctx);
+-            return;
+-        }
+         Window::new("Feature parity and known differences")
+             .open(&mut self.parity_open)
+             .default_size([850., 580.])
+@@ -2127,11 +2126,6 @@
+                 });
+             });
+         self.top(root);
+-        if self.games_frame(root) {
+-            self.session_confirmations(&ctx);
+-            self.detached_windows(&ctx);
+-            return;
+-        }
+         self.sidebar(root);
+         CentralPanel::default()
+             .frame(Frame::new().fill(content(root)).inner_margin(0))
+--- a/src/ui/desktop.rs
++++ b/src/ui/desktop.rs
+@@ -824,6 +824,7 @@
+         vec2(frame.width as f32 * scale, frame.height as f32 * scale),
+     );
+     state.canvas_rect = Some(remote);
++    super::v06_probe::desktop(ui,tab.id,remote,frame.width,frame.height);
+     let texture = state.texture.as_ref().unwrap();
+     ui.painter().image(
+         texture.id(),
+--- a/src/ui/pages.rs
++++ b/src/ui/pages.rs
+@@ -1584,6 +1584,7 @@
+     t.history_offset = frame.inner;
+     let id = Id::new(("terminal-input", t.id));
+     let response = ui.interact(frame.response.rect, id, Sense::click());
++    super::v06_probe::terminal(ui, t, &viewport);
+     let pointer_events = ui.input(|i| i.events.clone());
+     let pointer_press=pointer_events.iter().any(|event| matches!(event,Event::PointerButton{pos,pressed:true,..} if selection_viewport.cell(ui.ctx(),*pos).is_some()));
+     if response.clicked() || clicked || pointer_press {
+--- a/src/ui/session_confirmations.rs
++++ b/src/ui/session_confirmations.rs
+@@ -532,7 +532,7 @@
+                 ui.label(format!("Send this text to {} original terminal target(s)? Newlines can execute commands.",pending.jobs.len()));
+                 for (id,_) in &pending.jobs {if let Some(tab)=self.tabs.iter().find(|t|t.id==*id){ui.label(self.confirmation_target(tab.id));}}
+                 if let Some((_,paste))=pending.jobs.first(){ScrollArea::vertical().max_height(180.).show(ui,|ui|{ui.label(RichText::new(paste.preview()).monospace());});}
+-                ui.horizontal(|ui|{approve=primary(ui,"Paste to these targets").clicked();cancel=ui.button("Cancel paste").clicked();});
++                ui.horizontal(|ui|{let response=primary(ui,"Paste to these targets");super::v06_probe::confirm(ui,&response);approve=response.clicked();cancel=ui.button("Cancel paste").clicked();});
+             });
+             if approve || cancel {
+                 self.resolve_paste(approve);
+--- a/src/ui/xserver.rs
++++ b/src/ui/xserver.rs
+@@ -912,3 +912,10 @@
+         assert!(!authority.exists());
+     }
+ }
++
++// Private V06 instrumentation; excluded from product source.
++impl State {
++ pub(super) fn v06_start(&mut self,ctx:&Context){self.bundle_root=Some(std::env::var_os("V06_ENGINE_PACKAGE").unwrap().into());self.probe_executable=Some(std::env::var_os("V06_PROBE_EXE").map(PathBuf::from).unwrap_or_else(||std::env::current_exe().unwrap()));self.start(ctx);}
++ pub(super) fn v06_state(&self)->serde_json::Value {serde_json::json!({"display":self.display.as_ref().map(|d|d.display()),"authority":self.display.as_ref().map(|d|d.authority_path()),"capabilities":self.capabilities,"error":self.error,"running":self.worker.is_some()})}
++ pub(super) fn v06_stop(&mut self){self.shutdown();self.display=None;}
++}
+--- /dev/null
++++ b/src/ui/v06_probe.rs
+@@ -0,0 +1,43 @@
++//! Private validation-only adapter. Not a product change.
++use super::*;
++use std::sync::{OnceLock,Mutex};
++fn dir()->PathBuf { PathBuf::from(std::env::var_os("V06_REPORT").expect("V06_REPORT required")) }
++fn emit(name:&str,value:serde_json::Value) { let _=fs::write(dir().join(name),serde_json::to_vec_pretty(&value).unwrap()); }
++impl Workspace {
++ pub(super) fn v06_control(&mut self,ctx:&Context) {
++  static START:OnceLock<()>=OnceLock::new();
++  START.get_or_init(|| { let ctx=ctx.clone();std::thread::spawn(move|| {let mut old=String::new(); loop {let cmd=fs::read_to_string(dir().join("command")).unwrap_or_default();if cmd!=old {old=cmd;ctx.request_repaint();}std::thread::sleep(Duration::from_millis(100));}}); });
++  static LAST:Mutex<String>=Mutex::new(String::new());
++  let cmd=fs::read_to_string(dir().join("command")).unwrap_or_default();let mut last=LAST.lock().unwrap();
++  if *last==cmd {return} *last=cmd.clone();drop(last);
++  let parts:Vec<_>=cmd.trim().splitn(2,' ').collect();
++  match parts.first().copied().unwrap_or("") {
++   "terminal"=> {self.start_with_launch(Session{name:"V06 Native Terminal".into(),protocol:"Local".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"/usr/bin/python".into(),args:vec!["-c".into(),format!("import os,tty\ntty.setraw(0)\nos.write(1,b'\\x1b[?2004h\\x1b[?1000h\\x1b[?1006hREADY')\nf=open({:?},'ab',buffering=0)\nwhile True:\n d=os.read(0,32768)\n if not d:break\n f.write(d)\n",dir().join("pty.bin").display().to_string())],directory:None}));}
++   "xserver"=> {self.page=Page::Servers;self.xserver.v06_start(ctx);},
++   "stop-xserver"=> self.xserver.v06_stop(),
++   "vnc"=> {let mut session=Session{name:"V06 Native Desktop".into(),protocol:"VNC".into(),host:"127.0.0.1".into(),port:std::env::var("V06_VNC_PORT").unwrap().parse().unwrap(),..Default::default()};session.vnc_options=harbor_workspace::desktop::vnc::VncOptions{embedded:true,allow_unencrypted:true,security:harbor_workspace::desktop::vnc::Security::None,..Default::default()};self.start(session);}
++   "detach"=> {if let Some(t)=self.tabs.last(){let id=t.id;self.detach_terminal(id);}}
++   "appearance"=> self.store.preferences.appearance=match parts.get(1).copied(){Some("Light")=>Appearance::Light,Some("Dark")=>Appearance::Dark,_=>Appearance::System},
++   "copy"=>ctx.copy_text(fs::read_to_string(dir().join("payload")).unwrap()),
++   "paste"=>{if let Some(t)=self.tabs.last(){let id=t.id;self.request_clipboard(id,ctx);}},
++   "capture"=>ctx.send_viewport_cmd(ViewportCommand::Screenshot(Default::default())),
++   "close"=>ctx.send_viewport_cmd(ViewportCommand::Close),
++   _=>{}
++  }
++ }
++ pub(super) fn v06_observe(&self,ctx:&Context) {
++  emit("xserver.json",self.xserver.v06_state());
++  emit("workspace.json",serde_json::json!({"theme":format!("{:?}",ctx.theme()),"appearance":format!("{:?}",self.store.preferences.appearance),"pixels_per_point":ctx.pixels_per_point(),"frame":self.frames,"tabs":self.tabs.len(),"detached":self.windows.detached()}));
++  for event in ctx.input(|i|i.events.clone()) {if let Event::Screenshot{image,..}=event {image::save_buffer(dir().join("capture.png"),&image.as_raw(),image.size[0] as u32,image.size[1] as u32,image::ColorType::Rgba8).unwrap();}}
++ }
++}
++pub(super) fn terminal(ui:&Ui,t:&TerminalTab,view:&super::terminal_mouse::Viewport) {
++ let events=ui.input(|i|i.events.clone());
++ let rows:Vec<_>=view.rows.iter().take(12).map(|(row,r)|serde_json::json!({"row":row,"min":[r.min.x,r.min.y],"max":[r.max.x,r.max.y]})).collect();
++ emit("terminal.json",serde_json::json!({"id":t.id,"plain":t.screen.plain(),"mouse_mode":format!("{:?}",t.screen.mouse_mode()),"ready":t.ready_for_input(),"focused":ui.input(|i|i.focused),"widget_focus":ui.memory(|m|m.has_focus(Id::new(("terminal-input",t.id)))),"clip":format!("{:?}",view.clip),"viewport":format!("{:?}",ui.ctx().viewport_id()),"pixels_per_point":ui.ctx().pixels_per_point(),"cell_width":view.cell_width,"rows":rows,"pointer":format!("{:?}",ui.input(|i|i.pointer.hover_pos()))}));
++ if events.iter().any(|e|matches!(e,Event::PointerButton{..})) {emit("pointer.json",serde_json::json!({"mode":format!("{:?}",t.screen.mouse_mode()),"cells":format!("{:?}",events.iter().filter_map(|e|if let Event::PointerButton{pos,..}=e{Some(view.cell(ui.ctx(),*pos))}else{None}).collect::<Vec<_>>()),"focused":ui.input(|i|i.focused),"widget_focus":ui.memory(|m|m.has_focus(Id::new(("terminal-input",t.id)))),"events":format!("{events:?}"),"ppp":ui.ctx().pixels_per_point()}));}
++}
++
++pub(super) fn confirm(ui:&Ui,response:&Response){emit("confirmation.json",serde_json::json!({"center":[response.rect.center().x,response.rect.center().y],"ppp":ui.ctx().pixels_per_point()}));}
++
++pub(super) fn desktop(ui:&Ui,id:u64,rect:Rect,width:u16,height:u16){emit("desktop.json",serde_json::json!({"id":id,"rect":[rect.min.x,rect.min.y,rect.max.x,rect.max.y],"width":width,"height":height,"ppp":ui.ctx().pixels_per_point(),"viewport":format!("{:?}",ui.ctx().viewport_id())}));}

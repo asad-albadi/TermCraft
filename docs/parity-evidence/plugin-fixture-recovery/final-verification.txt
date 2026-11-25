@@ -1,0 +1,8 @@
+MAIN unchanged: 3026341c6f1cbee61b0135953d425b54523a40f43730c16b568dd40ee5374faf
+Private candidate restored: 308099082909608838fd9d2a7fe4ac8bdd1eb9a7cdacc337b57e7dd373876a95
+Focused: passed
+Repeated focused: 40/40 passed
+Counterexample: expected failure at original-true assertion
+Restored focused: passed
+Plugin-filter tests: 4/4 passed
+All owned jobs reaped

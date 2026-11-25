@@ -1,0 +1,34 @@
+   Compiling harbor-workspace v0.1.809 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-options-review809)
+warning: unused variable: `i`
+    --> src/ui/games/play.rs:1275:24
+     |
+1275 |                 .map(|(i, &d)| if d != 0 { d.to_string() } else { String::new() })
+     |                        ^ help: if this is intentional, prefix it with an underscore: `_i`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (bin "termcraft-options-review809" test) generated 1 warning (run `cargo fix --bin "termcraft-options-review809" -p harbor-workspace --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.83s
+     Running unittests src/main.rs (target/debug/deps/termcraft_options_review809-659a4c11fc934a68)
+
+running 1 test
+test ui::games::play::options_ui_tests::review_options_keyboard_focus_does_not_edit_current_guess ... FAILED
+
+failures:
+
+---- ui::games::play::options_ui_tests::review_options_keyboard_focus_does_not_edit_current_guess stdout ----
+Focused numeric options edit: draft=Some(Guess(GuessConfig { colours: 3, pegs: 4, max_guesses: 10, allow_blank: false, allow_multiple: true }))
+
+thread 'ui::games::play::options_ui_tests::review_options_keyboard_focus_does_not_edit_current_guess' (423529) panicked at src/ui/games/play.rs:2764:9:
+assertion `left == right` failed: editing a focused option must not write into current Guess row
+  left: Puzzle(Guess(GuessScene { colours: 6, max_guesses: 10, current: [3, 0, 0, 0], held: [false, false, false, false], rows: [], solution: None }))
+ right: Puzzle(Guess(GuessScene { colours: 6, max_guesses: 10, current: [0, 0, 0, 0], held: [false, false, false, false], rows: [], solution: None }))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::games::play::options_ui_tests::review_options_keyboard_focus_does_not_edit_current_guess
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 194 filtered out; finished in 1.16s
+
+error: test failed, to rerun pass `--bin termcraft-options-review809`

@@ -1,0 +1,18 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.54s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-14aa6650a5347986)
+
+running 10 tests
+test ui::macro_events::tests::macro_import_is_bounded_and_rejects_invalid_call_libraries ... ok
+test ui::macro_events::tests::timed_macro_never_records_unauthenticated_terminal_input ... ok
+test ui::macro_events::tests::timed_macro_starts_output_wait_after_the_ninth_input_reaches_the_transport ... ok
+test ui::macro_events::tests::timed_macro_waits_for_focus_in_a_detached_terminal_on_another_root_page ... ok
+test ui::macro_events::tests::timed_macro_wait_ignores_pty_output_before_paste_confirmation ... ok
+test ui::macro_events::tests::timed_macro_startup_survives_duplication_and_named_cli_runs_once ... ok
+test ui::macro_events::tests::timed_macro_startup_sees_the_first_authenticated_ssh_output ... ok
+test ui::macro_events::tests::timed_terminal_macro_records_content_and_binds_replay_across_active_switch ... ok
+test ui::macro_events::tests::timed_macro_waits_for_its_pty_output_and_calls_the_named_child ... ok
+test ui::macro_events::tests::timed_terminal_macro_cancels_with_declined_paste_or_replaced_transport ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 140 filtered out; finished in 2.99s
+

@@ -1,0 +1,63 @@
+error[E0425]: cannot find function `verify` in module `super`
+  --> src/browser/native_macos.rs:30:24
+   |
+30 |         assert!(super::verify(&mut Cursor::new(&data),0x01000007).is_ok());
+   |                        ^^^^^^ not found in `super`
+
+error[E0425]: cannot find function `verify` in module `super`
+  --> src/browser/native_macos.rs:31:24
+   |
+31 |         assert!(super::verify(&mut Cursor::new(&data),0x0100000c).is_err());
+   |                        ^^^^^^ not found in `super`
+
+error[E0425]: cannot find function `verify` in module `super`
+  --> src/browser/native_macos.rs:33:24
+   |
+33 |         assert!(super::verify(&mut Cursor::new(&data),0x01000007).is_err());
+   |                        ^^^^^^ not found in `super`
+
+error[E0425]: cannot find function `verify` in module `super`
+  --> src/browser/native_macos.rs:34:24
+   |
+34 |         assert!(super::verify(&mut Cursor::new(thin(0x0100000c)),0x0100000c).is_ok());
+   |                        ^^^^^^ not found in `super`
+
+error[E0425]: cannot find function `verify` in module `super`
+  --> src/browser/native_macos.rs:39:24
+   |
+39 |         assert!(super::verify(&mut Cursor::new(&data),0x01000007).is_ok());
+   |                        ^^^^^^ not found in `super`
+
+error[E0425]: cannot find function `verify` in module `super`
+  --> src/browser/native_macos.rs:40:24
+   |
+40 |         assert!(super::verify(&mut Cursor::new(&data),0x0100000c).is_ok());
+   |                        ^^^^^^ not found in `super`
+
+error[E0425]: cannot find function `verify` in module `super`
+  --> src/browser/native_macos.rs:42:24
+   |
+42 |         assert!(super::verify(&mut Cursor::new(&data),0x0100000c).is_err());
+   |                        ^^^^^^ not found in `super`
+
+error[E0425]: cannot find function `verify` in module `super`
+  --> src/browser/native_macos.rs:46:46
+   |
+46 |         for length in 0..32 { assert!(super::verify(&mut Cursor::new(vec![0;length]),0x0100000c).is_err()); }
+   |                                              ^^^^^^ not found in `super`
+
+error[E0425]: cannot find function `verify` in module `super`
+  --> src/browser/native_macos.rs:49:24
+   |
+49 |         assert!(super::verify(&mut Cursor::new(&data),0x01000007).is_err());
+   |                        ^^^^^^ not found in `super`
+
+error[E0425]: cannot find function `verify` in module `super`
+  --> src/browser/native_macos.rs:52:24
+   |
+52 |         assert!(super::verify(&mut Cursor::new(&data),0x01000007).is_err());
+   |                        ^^^^^^ not found in `super`
+
+error: aborting due to 10 previous errors
+
+For more information about this error, try `rustc --explain E0425`.

@@ -1,0 +1,26 @@
+{
+  "validation_status": "VALID_PARTIAL_EVIDENCE",
+  "qualification_complete": false,
+  "iperf_actual_bytes": {
+    "2": {
+      "sender": 262144,
+      "receiver": 262144
+    },
+    "3": {
+      "sender": 262144,
+      "receiver": 262144
+    }
+  },
+  "browser_native": "UNAVAILABLE: SANDBOX_BLOCKED",
+  "remaining_gaps": [
+    "successful native browser sandbox",
+    "credential vault upgrade contents",
+    "native Windows/macOS",
+    "physical supported Linux distro/install/upgrade matrix",
+    "complete managed API/runtime and original parity",
+    "signing/notarization"
+  ],
+  "iperf3_semantic_scope": "Required pinned iperf3 3.19.1 single forward TCP client/server report structure and byte receipts; not exhaustive Iperf JSON schema",
+  "historical_index_sha256": "3bd2371c13d7593cd1f81f85ee07d23ff707f7c32d85897af46dc2a0c3b1c0f4",
+  "fixed_index_sha256": "c9e8a1071e28ac37ca7d8c8fb39652997aad1eb880ece07ee8b87c02b4029b0d"
+}

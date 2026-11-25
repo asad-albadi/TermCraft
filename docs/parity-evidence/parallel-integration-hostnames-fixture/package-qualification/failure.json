@@ -1,0 +1,8 @@
+{
+  "stage": "strict archive extraction, before app or display launch",
+  "archive_sha256": "70fd16ae1a394ce52975afbc0001a889048ff633154d2aef4051199f4fc9961b",
+  "member": "runtime/linux-x86_64/mosh-deps/sources/zlib-1:1.4-1-x86_64.pkg.tar.zst.sig",
+  "error": "ValueError: Invalid archive member; colon violates existing portable extraction policy",
+  "status": "unqualified; no extractor bypass",
+  "repair_task": "mosh_portable_source_names, private output naming change; input pins unchanged"
+}

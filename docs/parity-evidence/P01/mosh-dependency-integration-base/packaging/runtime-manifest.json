@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "artifacts": [
+    {
+      "tool": "mosh",
+      "platform": "linux",
+      "architecture": "x86_64",
+      "version": "1.4.0-35",
+      "archive_url": "https://archive.archlinux.org/packages/m/mosh/mosh-1.4.0-35-x86_64.pkg.tar.zst",
+      "archive_sha256": "5dfbab541564596e912a1fbbe9424e269230a6cee598abad962c0cfbf04408bc",
+      "source_url": "https://codeload.github.com/mobile-shell/mosh/tar.gz/refs/tags/mosh-1.4.0",
+      "source_sha256": "ae581fbddf038730af9eee4d319a483288395a0722d0c94c7efb7fdbdbb0dbac",
+      "license": "GPL-3.0-or-later with OpenSSL exception (see corresponding source and COPYING)",
+      "arch_recipe_url": "https://gitlab.archlinux.org/archlinux/packaging/packages/mosh/-/raw/1.4.0-35/PKGBUILD",
+      "arch_recipe_sha256": "a3dd7235722b11d96da04faa70f429480f459def3310047f5d9f9ea22517d4c7",
+      "path": "runtime/linux-x86_64/mosh",
+      "sha256": "030a303e9eaf5dbd262ae24e7995ad135eae9da7f39f9ce224b68281130ca733",
+      "interpreter": "/usr/bin/perl",
+      "original_sha256": "00e1be54fa80c1a7ea9542ecf9e10f6c53d9928d79de56d4fec7dbb94e1bd5dd"
+    },
+    {
+      "tool": "mosh-client",
+      "platform": "linux",
+      "architecture": "x86_64",
+      "version": "1.4.0-35",
+      "archive_url": "https://archive.archlinux.org/packages/m/mosh/mosh-1.4.0-35-x86_64.pkg.tar.zst",
+      "archive_sha256": "5dfbab541564596e912a1fbbe9424e269230a6cee598abad962c0cfbf04408bc",
+      "source_url": "https://codeload.github.com/mobile-shell/mosh/tar.gz/refs/tags/mosh-1.4.0",
+      "source_sha256": "ae581fbddf038730af9eee4d319a483288395a0722d0c94c7efb7fdbdbb0dbac",
+      "license": "GPL-3.0-or-later with OpenSSL exception (see corresponding source and COPYING)",
+      "arch_recipe_url": "https://gitlab.archlinux.org/archlinux/packaging/packages/mosh/-/raw/1.4.0-35/PKGBUILD",
+      "arch_recipe_sha256": "a3dd7235722b11d96da04faa70f429480f459def3310047f5d9f9ea22517d4c7",
+      "path": "runtime/linux-x86_64/mosh-client",
+      "sha256": "8340406879686ea76784d3969c0f0418cd044719636c29aa6dd59ffad2442358"
+    }
+  ],
+  "local_build": {
+    "rdp": {
+      "manifest": "PACKAGE-MANIFEST.json",
+      "source": "engines/rdp",
+      "dependency_lock": "build-source/engines/rdp/Cargo.lock",
+      "license": "TermCraft source has no declared project license. Dependency notices are shipped by the release packager.",
+      "version_field": "rdp_helper_version",
+      "digest_field": "files"
+    },
+    "xwayland": {
+      "manifest": "packaging/x11/manifest.json"
+    }
+  },
+  "mosh_inputs": {
+    "runtime_system": [
+      "/usr/bin/perl and standard Getopt::Long, IO::Socket, Text::ParseWords, Socket, Errno and POSIX modules",
+      "/usr/bin/ssh and user OpenSSH settings, known hosts and SSH authentication",
+      "glibc and runtime loader, ncurses (xterm-256color terminfo), protobuf 36.1, abseil-cpp 20260817.0, OpenSSL 3, zlib, GCC C++ runtime",
+      "Transitive native dependencies recorded by packager after verifying the client"
+    ],
+    "remote": "OpenSSH server, Mosh server, and direct UDP reachability to the selected port",
+    "archive_inventory": {
+      ".BUILDINFO": "a677bb0e8e2d60ada319e2798e691e4cff5ed8e65e1f15332bef0d30bc0cdbe7",
+      ".PKGINFO": "953ef4e0ab460f0bc0984c502df644f9726c05a874a80e026608ee0b75d691e8"
+    },
+    "source_license_sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "signer_fingerprint": "F00B96D15228013FFC9C9D0393B11DAA4C197E3D"
+  }
+}

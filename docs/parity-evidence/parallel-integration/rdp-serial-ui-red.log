@@ -1,0 +1,23 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 27.74s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-2041547e3c11b1fb)
+
+running 1 test
+test ui::rdp_settings::tests::explicit_serial_mapping_is_reachable_and_defaults_read_only ... FAILED
+
+failures:
+
+---- ui::rdp_settings::tests::explicit_serial_mapping_is_reachable_and_defaults_read_only stdout ----
+
+thread 'ui::rdp_settings::tests::explicit_serial_mapping_is_reachable_and_defaults_read_only' (204595) panicked at src/ui/rdp_settings.rs:318:25:
+No explicit serial mapping control
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::rdp_settings::tests::explicit_serial_mapping_is_reachable_and_defaults_read_only
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 104 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

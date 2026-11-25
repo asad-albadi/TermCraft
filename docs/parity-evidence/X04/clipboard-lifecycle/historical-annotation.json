@@ -1,0 +1,6 @@
+{
+  "path": "docs/parity-evidence/X04/clipboard.md",
+  "reviewed_payload_sha256": "32d9df2848f0692c151e7abc382cec739e22420085ca0ce5edc29f54800ee168",
+  "annotated_sha256": "8b784847a9942068ed3eaf0a54caf4485e22a352a961dbb33b678a8c1e7f90c9",
+  "change": "Evidence-only historical/current provenance pointer requested by reviewer"
+}

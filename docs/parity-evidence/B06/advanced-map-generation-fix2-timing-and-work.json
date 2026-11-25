@@ -1,0 +1,1826 @@
+{
+  "baseline-timing-red.log": {
+    "summary": {
+      "MapConfig { preset: Default, regions: 30, difficulty: Hard }": {
+        "successes": 0,
+        "count": 8,
+        "mean_us": 4375,
+        "p95_us": 6709,
+        "max_us": 6709
+      },
+      "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }": {
+        "successes": 0,
+        "count": 8,
+        "mean_us": 3696,
+        "p95_us": 3979,
+        "max_us": 3979
+      },
+      "MapConfig { preset: Default, regions: 75, difficulty: Hard }": {
+        "successes": 5,
+        "count": 8,
+        "mean_us": 45836,
+        "p95_us": 57055,
+        "max_us": 57055
+      },
+      "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }": {
+        "successes": 1,
+        "count": 8,
+        "mean_us": 2938,
+        "p95_us": 3862,
+        "max_us": 3862
+      },
+      "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }": {
+        "successes": 2,
+        "count": 8,
+        "mean_us": 3294,
+        "p95_us": 4067,
+        "max_us": 4067
+      },
+      "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }": {
+        "successes": 5,
+        "count": 8,
+        "mean_us": 31552,
+        "p95_us": 62906,
+        "max_us": 62906
+      }
+    },
+    "rows": [
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 0,
+        "status": "exhausted",
+        "microseconds": 6709,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 1,
+        "status": "exhausted",
+        "microseconds": 5812,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 2,
+        "status": "exhausted",
+        "microseconds": 3427,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 3,
+        "status": "exhausted",
+        "microseconds": 3448,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 4,
+        "status": "exhausted",
+        "microseconds": 3981,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 5,
+        "status": "exhausted",
+        "microseconds": 3767,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 6,
+        "status": "exhausted",
+        "microseconds": 3341,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 7,
+        "status": "exhausted",
+        "microseconds": 4514,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 0,
+        "status": "exhausted",
+        "microseconds": 3724,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 1,
+        "status": "exhausted",
+        "microseconds": 3550,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 2,
+        "status": "exhausted",
+        "microseconds": 3616,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 3,
+        "status": "exhausted",
+        "microseconds": 3602,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 4,
+        "status": "exhausted",
+        "microseconds": 3979,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 5,
+        "status": "exhausted",
+        "microseconds": 3864,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 6,
+        "status": "exhausted",
+        "microseconds": 3372,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 7,
+        "status": "exhausted",
+        "microseconds": 3860,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 0,
+        "status": "exhausted",
+        "microseconds": 52381,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 1,
+        "status": "success",
+        "microseconds": 38668,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 2,
+        "status": "exhausted",
+        "microseconds": 54305,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 3,
+        "status": "success",
+        "microseconds": 42443,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 57055,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 5,
+        "status": "success",
+        "microseconds": 48980,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 19916,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 7,
+        "status": "exhausted",
+        "microseconds": 52938,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 0,
+        "status": "exhausted",
+        "microseconds": 3281,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 1,
+        "status": "success",
+        "microseconds": 348,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 2,
+        "status": "exhausted",
+        "microseconds": 3316,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 3,
+        "status": "exhausted",
+        "microseconds": 3862,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 4,
+        "status": "exhausted",
+        "microseconds": 3150,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 5,
+        "status": "exhausted",
+        "microseconds": 3157,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 6,
+        "status": "exhausted",
+        "microseconds": 3023,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 7,
+        "status": "exhausted",
+        "microseconds": 3371,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 1718,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 1,
+        "status": "exhausted",
+        "microseconds": 3672,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 2,
+        "status": "exhausted",
+        "microseconds": 3471,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 3,
+        "status": "exhausted",
+        "microseconds": 4067,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 4,
+        "status": "exhausted",
+        "microseconds": 3300,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 5,
+        "status": "success",
+        "microseconds": 3399,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 6,
+        "status": "exhausted",
+        "microseconds": 3159,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 7,
+        "status": "exhausted",
+        "microseconds": 3570,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 0,
+        "status": "exhausted",
+        "microseconds": 50600,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 1,
+        "status": "exhausted",
+        "microseconds": 62906,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 14806,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 3,
+        "status": "success",
+        "microseconds": 13727,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 7322,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 5,
+        "status": "exhausted",
+        "microseconds": 56136,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 33545,
+        "work": null
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 13371,
+        "work": null
+      }
+    ]
+  },
+  "map-regression-green.log": {
+    "summary": {
+      "MapConfig { preset: Default, regions: 30, difficulty: Hard }": {
+        "successes": 7,
+        "count": 16,
+        "mean_us": 5428,
+        "p95_us": 12700,
+        "max_us": 12700
+      },
+      "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }": {
+        "successes": 11,
+        "count": 16,
+        "mean_us": 4000,
+        "p95_us": 5287,
+        "max_us": 5287
+      },
+      "MapConfig { preset: Default, regions: 75, difficulty: Hard }": {
+        "successes": 16,
+        "count": 16,
+        "mean_us": 17347,
+        "p95_us": 58221,
+        "max_us": 58221
+      },
+      "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }": {
+        "successes": 9,
+        "count": 16,
+        "mean_us": 3324,
+        "p95_us": 5355,
+        "max_us": 5355
+      },
+      "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }": {
+        "successes": 12,
+        "count": 16,
+        "mean_us": 3193,
+        "p95_us": 5796,
+        "max_us": 5796
+      },
+      "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }": {
+        "successes": 15,
+        "count": 16,
+        "mean_us": 17738,
+        "p95_us": 66731,
+        "max_us": 66731
+      }
+    },
+    "rows": [
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 5920,
+        "work": "GenerationWork { candidates: 8, colour_nodes: 248, removal_replays: 237, certifications: 8 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 1,
+        "status": "success",
+        "microseconds": 8320,
+        "work": "GenerationWork { candidates: 11, colour_nodes: 373, removal_replays: 329, certifications: 11 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 854,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 62, removal_replays: 60, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 3,
+        "status": "exhausted",
+        "microseconds": 4212,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 579,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 5,
+        "status": "exhausted",
+        "microseconds": 3991,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 502, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 2024,
+        "work": "GenerationWork { candidates: 8, colour_nodes: 248, removal_replays: 236, certifications: 8 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 7,
+        "status": "exhausted",
+        "microseconds": 4745,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 524, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 490,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 1,
+        "status": "success",
+        "microseconds": 3492,
+        "work": "GenerationWork { candidates: 11, colour_nodes: 373, removal_replays: 329, certifications: 11 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 2,
+        "status": "exhausted",
+        "microseconds": 4761,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 3,
+        "status": "success",
+        "microseconds": 4448,
+        "work": "GenerationWork { candidates: 14, colour_nodes: 434, removal_replays: 417, certifications: 14 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 4757,
+        "work": "GenerationWork { candidates: 14, colour_nodes: 434, removal_replays: 417, certifications: 14 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 5,
+        "status": "exhausted",
+        "microseconds": 4512,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 502, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 2714,
+        "work": "GenerationWork { candidates: 9, colour_nodes: 279, removal_replays: 266, certifications: 9 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 5272,
+        "work": "GenerationWork { candidates: 15, colour_nodes: 493, removal_replays: 448, certifications: 15 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 2917,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 76, removal_replays: 75, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 1,
+        "status": "success",
+        "microseconds": 18113,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 6983,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 80, removal_replays: 75, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 3,
+        "status": "success",
+        "microseconds": 58221,
+        "work": "GenerationWork { candidates: 13, colour_nodes: 991, removal_replays: 975, certifications: 13 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 13682,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 160, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 5,
+        "status": "success",
+        "microseconds": 8346,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 160, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 10943,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 20505,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 380, removal_replays: 375, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 428,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 1,
+        "status": "exhausted",
+        "microseconds": 5084,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 1296,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 124, removal_replays: 119, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 3,
+        "status": "exhausted",
+        "microseconds": 5355,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 474, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 4,
+        "status": "exhausted",
+        "microseconds": 4647,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 479, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 5,
+        "status": "success",
+        "microseconds": 3509,
+        "work": "GenerationWork { candidates: 11, colour_nodes: 341, removal_replays: 327, certifications: 11 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 1547,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 155, removal_replays: 149, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 3324,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 313, removal_replays: 298, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 891,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 1,
+        "status": "success",
+        "microseconds": 4626,
+        "work": "GenerationWork { candidates: 13, colour_nodes: 405, removal_replays: 387, certifications: 13 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 1925,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 155, removal_replays: 149, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 3,
+        "status": "success",
+        "microseconds": 2285,
+        "work": "GenerationWork { candidates: 6, colour_nodes: 186, removal_replays: 180, certifications: 6 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 1596,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 124, removal_replays: 120, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 5,
+        "status": "success",
+        "microseconds": 528,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 1260,
+        "work": "GenerationWork { candidates: 3, colour_nodes: 93, removal_replays: 90, certifications: 3 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 3748,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 313, removal_replays: 298, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 12702,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 1,
+        "status": "exhausted",
+        "microseconds": 66731,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 1236, removal_replays: 1200, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 17191,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 3,
+        "status": "success",
+        "microseconds": 11449,
+        "work": "GenerationWork { candidates: 3, colour_nodes: 250, removal_replays: 225, certifications: 3 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 17273,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 5,
+        "status": "success",
+        "microseconds": 31684,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 762, removal_replays: 750, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 8995,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 13142,
+        "work": "GenerationWork { candidates: 3, colour_nodes: 231, removal_replays: 225, certifications: 3 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 8,
+        "status": "exhausted",
+        "microseconds": 11651,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 504, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 9,
+        "status": "success",
+        "microseconds": 11165,
+        "work": "GenerationWork { candidates: 13, colour_nodes: 403, removal_replays: 388, certifications: 13 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 10,
+        "status": "exhausted",
+        "microseconds": 12700,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 11,
+        "status": "success",
+        "microseconds": 3358,
+        "work": "GenerationWork { candidates: 9, colour_nodes: 282, removal_replays: 268, certifications: 9 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 12,
+        "status": "exhausted",
+        "microseconds": 4604,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 13,
+        "status": "exhausted",
+        "microseconds": 4389,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 501, removal_replays: 474, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 14,
+        "status": "exhausted",
+        "microseconds": 4083,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 15,
+        "status": "exhausted",
+        "microseconds": 4259,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 520, removal_replays: 478, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 8,
+        "status": "success",
+        "microseconds": 1586,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 130, removal_replays: 120, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 9,
+        "status": "success",
+        "microseconds": 3272,
+        "work": "GenerationWork { candidates: 9, colour_nodes: 279, removal_replays: 269, certifications: 9 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 10,
+        "status": "exhausted",
+        "microseconds": 5287,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 11,
+        "status": "success",
+        "microseconds": 4900,
+        "work": "GenerationWork { candidates: 14, colour_nodes: 437, removal_replays: 418, certifications: 14 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 12,
+        "status": "exhausted",
+        "microseconds": 5253,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 13,
+        "status": "success",
+        "microseconds": 5140,
+        "work": "GenerationWork { candidates: 15, colour_nodes: 470, removal_replays: 444, certifications: 15 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 14,
+        "status": "success",
+        "microseconds": 3358,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 310, removal_replays: 297, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 15,
+        "status": "exhausted",
+        "microseconds": 4762,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 520, removal_replays: 478, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 8,
+        "status": "success",
+        "microseconds": 17101,
+        "work": "GenerationWork { candidates: 3, colour_nodes: 230, removal_replays: 225, certifications: 3 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 9,
+        "status": "success",
+        "microseconds": 14916,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 10,
+        "status": "success",
+        "microseconds": 9560,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 11,
+        "status": "success",
+        "microseconds": 14337,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 384, removal_replays: 375, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 12,
+        "status": "success",
+        "microseconds": 31368,
+        "work": "GenerationWork { candidates: 8, colour_nodes: 608, removal_replays: 600, certifications: 8 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 13,
+        "status": "success",
+        "microseconds": 14541,
+        "work": "GenerationWork { candidates: 3, colour_nodes: 233, removal_replays: 225, certifications: 3 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 14,
+        "status": "success",
+        "microseconds": 7191,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 76, removal_replays: 75, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 15,
+        "status": "success",
+        "microseconds": 28829,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 380, removal_replays: 375, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 8,
+        "status": "success",
+        "microseconds": 2910,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 312, removal_replays: 299, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 9,
+        "status": "exhausted",
+        "microseconds": 4846,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 508, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 10,
+        "status": "exhausted",
+        "microseconds": 4817,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 474, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 11,
+        "status": "success",
+        "microseconds": 852,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 62, removal_replays: 59, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 12,
+        "status": "success",
+        "microseconds": 2454,
+        "work": "GenerationWork { candidates: 6, colour_nodes: 188, removal_replays: 178, certifications: 6 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 13,
+        "status": "exhausted",
+        "microseconds": 4677,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 471, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 14,
+        "status": "exhausted",
+        "microseconds": 4409,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 15,
+        "status": "success",
+        "microseconds": 3036,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 310, removal_replays: 295, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 8,
+        "status": "success",
+        "microseconds": 5176,
+        "work": "GenerationWork { candidates: 15, colour_nodes: 473, removal_replays: 449, certifications: 15 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 9,
+        "status": "exhausted",
+        "microseconds": 5082,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 508, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 10,
+        "status": "exhausted",
+        "microseconds": 5013,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 474, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 11,
+        "status": "exhausted",
+        "microseconds": 5796,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 12,
+        "status": "success",
+        "microseconds": 2114,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 126, removal_replays: 118, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 13,
+        "status": "success",
+        "microseconds": 2721,
+        "work": "GenerationWork { candidates: 8, colour_nodes: 248, removal_replays: 236, certifications: 8 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 14,
+        "status": "exhausted",
+        "microseconds": 4767,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 15,
+        "status": "success",
+        "microseconds": 3566,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 310, removal_replays: 295, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 8,
+        "status": "success",
+        "microseconds": 6497,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 76, removal_replays: 75, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 9,
+        "status": "success",
+        "microseconds": 17466,
+        "work": "GenerationWork { candidates: 6, colour_nodes: 464, removal_replays: 450, certifications: 6 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 10,
+        "status": "success",
+        "microseconds": 15752,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 604, removal_replays: 375, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 11,
+        "status": "success",
+        "microseconds": 30593,
+        "work": "GenerationWork { candidates: 7, colour_nodes: 538, removal_replays: 525, certifications: 7 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 12,
+        "status": "success",
+        "microseconds": 8445,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 154, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 13,
+        "status": "success",
+        "microseconds": 5023,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 81, removal_replays: 75, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 14,
+        "status": "success",
+        "microseconds": 10228,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 15,
+        "status": "success",
+        "microseconds": 10641,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      }
+    ]
+  },
+  "debug-focused-green.log": {
+    "summary": {
+      "MapConfig { preset: Default, regions: 30, difficulty: Hard }": {
+        "successes": 7,
+        "count": 16,
+        "mean_us": 28896,
+        "p95_us": 41858,
+        "max_us": 41858
+      },
+      "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }": {
+        "successes": 11,
+        "count": 16,
+        "mean_us": 31088,
+        "p95_us": 42428,
+        "max_us": 42428
+      },
+      "MapConfig { preset: Default, regions: 75, difficulty: Hard }": {
+        "successes": 16,
+        "count": 16,
+        "mean_us": 175475,
+        "p95_us": 467435,
+        "max_us": 467435
+      },
+      "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }": {
+        "successes": 9,
+        "count": 16,
+        "mean_us": 25243,
+        "p95_us": 41329,
+        "max_us": 41329
+      },
+      "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }": {
+        "successes": 12,
+        "count": 16,
+        "mean_us": 24829,
+        "p95_us": 51002,
+        "max_us": 51002
+      },
+      "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }": {
+        "successes": 15,
+        "count": 16,
+        "mean_us": 192620,
+        "p95_us": 695072,
+        "max_us": 695072
+      }
+    },
+    "rows": [
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 18946,
+        "work": "GenerationWork { candidates: 8, colour_nodes: 248, removal_replays: 237, certifications: 8 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 1,
+        "status": "success",
+        "microseconds": 24496,
+        "work": "GenerationWork { candidates: 11, colour_nodes: 373, removal_replays: 329, certifications: 11 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 4639,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 62, removal_replays: 60, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 3,
+        "status": "exhausted",
+        "microseconds": 33551,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 4851,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 5,
+        "status": "exhausted",
+        "microseconds": 30974,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 502, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 16887,
+        "work": "GenerationWork { candidates: 8, colour_nodes: 248, removal_replays: 236, certifications: 8 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 7,
+        "status": "exhausted",
+        "microseconds": 39080,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 524, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 3534,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 1,
+        "status": "success",
+        "microseconds": 26980,
+        "work": "GenerationWork { candidates: 11, colour_nodes: 373, removal_replays: 329, certifications: 11 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 2,
+        "status": "exhausted",
+        "microseconds": 37070,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 3,
+        "status": "success",
+        "microseconds": 34005,
+        "work": "GenerationWork { candidates: 14, colour_nodes: 434, removal_replays: 417, certifications: 14 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 36954,
+        "work": "GenerationWork { candidates: 14, colour_nodes: 434, removal_replays: 417, certifications: 14 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 5,
+        "status": "exhausted",
+        "microseconds": 33843,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 502, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 20525,
+        "work": "GenerationWork { candidates: 9, colour_nodes: 279, removal_replays: 266, certifications: 9 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 39286,
+        "work": "GenerationWork { candidates: 15, colour_nodes: 493, removal_replays: 448, certifications: 15 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 25825,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 76, removal_replays: 75, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 1,
+        "status": "success",
+        "microseconds": 181862,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 63052,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 80, removal_replays: 75, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 3,
+        "status": "success",
+        "microseconds": 467435,
+        "work": "GenerationWork { candidates: 13, colour_nodes: 991, removal_replays: 975, certifications: 13 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 128255,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 160, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 5,
+        "status": "success",
+        "microseconds": 70813,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 160, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 97087,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 199246,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 380, removal_replays: 375, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 2450,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 1,
+        "status": "exhausted",
+        "microseconds": 37573,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 8814,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 124, removal_replays: 119, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 3,
+        "status": "exhausted",
+        "microseconds": 41329,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 474, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 4,
+        "status": "exhausted",
+        "microseconds": 33695,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 479, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 5,
+        "status": "success",
+        "microseconds": 26879,
+        "work": "GenerationWork { candidates: 11, colour_nodes: 341, removal_replays: 327, certifications: 11 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 11464,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 155, removal_replays: 149, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 25655,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 313, removal_replays: 298, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 4864,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 1,
+        "status": "success",
+        "microseconds": 33746,
+        "work": "GenerationWork { candidates: 13, colour_nodes: 405, removal_replays: 387, certifications: 13 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 13450,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 155, removal_replays: 149, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 3,
+        "status": "success",
+        "microseconds": 16476,
+        "work": "GenerationWork { candidates: 6, colour_nodes: 186, removal_replays: 180, certifications: 6 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 10751,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 124, removal_replays: 120, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 5,
+        "status": "success",
+        "microseconds": 3546,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 8530,
+        "work": "GenerationWork { candidates: 3, colour_nodes: 93, removal_replays: 90, certifications: 3 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 28045,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 313, removal_replays: 298, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 0,
+        "status": "success",
+        "microseconds": 140906,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 1,
+        "status": "exhausted",
+        "microseconds": 695072,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 1236, removal_replays: 1200, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 2,
+        "status": "success",
+        "microseconds": 191604,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 3,
+        "status": "success",
+        "microseconds": 125528,
+        "work": "GenerationWork { candidates: 3, colour_nodes: 250, removal_replays: 225, certifications: 3 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 4,
+        "status": "success",
+        "microseconds": 196084,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 5,
+        "status": "success",
+        "microseconds": 341292,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 762, removal_replays: 750, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 6,
+        "status": "success",
+        "microseconds": 102676,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 7,
+        "status": "success",
+        "microseconds": 148833,
+        "work": "GenerationWork { candidates: 3, colour_nodes: 231, removal_replays: 225, certifications: 3 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 8,
+        "status": "exhausted",
+        "microseconds": 41858,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 504, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 9,
+        "status": "success",
+        "microseconds": 38761,
+        "work": "GenerationWork { candidates: 13, colour_nodes: 403, removal_replays: 388, certifications: 13 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 10,
+        "status": "exhausted",
+        "microseconds": 41481,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 11,
+        "status": "success",
+        "microseconds": 22832,
+        "work": "GenerationWork { candidates: 9, colour_nodes: 282, removal_replays: 268, certifications: 9 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 12,
+        "status": "exhausted",
+        "microseconds": 39538,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 13,
+        "status": "exhausted",
+        "microseconds": 37229,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 501, removal_replays: 474, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 14,
+        "status": "exhausted",
+        "microseconds": 32812,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+        "seed": 15,
+        "status": "exhausted",
+        "microseconds": 34395,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 520, removal_replays: 478, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 8,
+        "status": "success",
+        "microseconds": 12961,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 130, removal_replays: 120, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 9,
+        "status": "success",
+        "microseconds": 26816,
+        "work": "GenerationWork { candidates: 9, colour_nodes: 279, removal_replays: 269, certifications: 9 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 10,
+        "status": "exhausted",
+        "microseconds": 42428,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 11,
+        "status": "success",
+        "microseconds": 38231,
+        "work": "GenerationWork { candidates: 14, colour_nodes: 437, removal_replays: 418, certifications: 14 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 12,
+        "status": "exhausted",
+        "microseconds": 42228,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 13,
+        "status": "success",
+        "microseconds": 40376,
+        "work": "GenerationWork { candidates: 15, colour_nodes: 470, removal_replays: 444, certifications: 15 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 14,
+        "status": "success",
+        "microseconds": 25254,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 310, removal_replays: 297, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+        "seed": 15,
+        "status": "exhausted",
+        "microseconds": 36920,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 520, removal_replays: 478, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 8,
+        "status": "success",
+        "microseconds": 201058,
+        "work": "GenerationWork { candidates: 3, colour_nodes: 230, removal_replays: 225, certifications: 3 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 9,
+        "status": "success",
+        "microseconds": 173495,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 10,
+        "status": "success",
+        "microseconds": 108944,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 11,
+        "status": "success",
+        "microseconds": 152806,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 384, removal_replays: 375, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 12,
+        "status": "success",
+        "microseconds": 350867,
+        "work": "GenerationWork { candidates: 8, colour_nodes: 608, removal_replays: 600, certifications: 8 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 13,
+        "status": "success",
+        "microseconds": 162376,
+        "work": "GenerationWork { candidates: 3, colour_nodes: 233, removal_replays: 225, certifications: 3 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 14,
+        "status": "success",
+        "microseconds": 86804,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 76, removal_replays: 75, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+        "seed": 15,
+        "status": "success",
+        "microseconds": 337682,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 380, removal_replays: 375, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 8,
+        "status": "success",
+        "microseconds": 23266,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 312, removal_replays: 299, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 9,
+        "status": "exhausted",
+        "microseconds": 37095,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 508, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 10,
+        "status": "exhausted",
+        "microseconds": 37010,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 474, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 11,
+        "status": "success",
+        "microseconds": 7271,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 62, removal_replays: 59, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 12,
+        "status": "success",
+        "microseconds": 17331,
+        "work": "GenerationWork { candidates: 6, colour_nodes: 188, removal_replays: 178, certifications: 6 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 13,
+        "status": "exhausted",
+        "microseconds": 36242,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 471, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 14,
+        "status": "exhausted",
+        "microseconds": 34243,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+        "seed": 15,
+        "status": "success",
+        "microseconds": 23568,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 310, removal_replays: 295, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 8,
+        "status": "success",
+        "microseconds": 40607,
+        "work": "GenerationWork { candidates: 15, colour_nodes: 473, removal_replays: 449, certifications: 15 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 9,
+        "status": "exhausted",
+        "microseconds": 42814,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 508, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 10,
+        "status": "exhausted",
+        "microseconds": 42705,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 474, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 11,
+        "status": "exhausted",
+        "microseconds": 51002,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 12,
+        "status": "success",
+        "microseconds": 16738,
+        "work": "GenerationWork { candidates: 4, colour_nodes: 126, removal_replays: 118, certifications: 4 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 13,
+        "status": "success",
+        "microseconds": 20301,
+        "work": "GenerationWork { candidates: 8, colour_nodes: 248, removal_replays: 236, certifications: 8 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 14,
+        "status": "exhausted",
+        "microseconds": 37134,
+        "work": "GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 477, certifications: 16 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+        "seed": 15,
+        "status": "success",
+        "microseconds": 26552,
+        "work": "GenerationWork { candidates: 10, colour_nodes: 310, removal_replays: 295, certifications: 10 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 8,
+        "status": "success",
+        "microseconds": 73905,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 76, removal_replays: 75, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 9,
+        "status": "success",
+        "microseconds": 178636,
+        "work": "GenerationWork { candidates: 6, colour_nodes: 464, removal_replays: 450, certifications: 6 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 10,
+        "status": "success",
+        "microseconds": 163065,
+        "work": "GenerationWork { candidates: 5, colour_nodes: 604, removal_replays: 375, certifications: 5 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 11,
+        "status": "success",
+        "microseconds": 348314,
+        "work": "GenerationWork { candidates: 7, colour_nodes: 538, removal_replays: 525, certifications: 7 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 12,
+        "status": "success",
+        "microseconds": 88928,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 154, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 13,
+        "status": "success",
+        "microseconds": 55399,
+        "work": "GenerationWork { candidates: 1, colour_nodes: 81, removal_replays: 75, certifications: 1 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 14,
+        "status": "success",
+        "microseconds": 115636,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      },
+      {
+        "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+        "seed": 15,
+        "status": "success",
+        "microseconds": 116047,
+        "work": "GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }"
+      }
+    ]
+  }
+}

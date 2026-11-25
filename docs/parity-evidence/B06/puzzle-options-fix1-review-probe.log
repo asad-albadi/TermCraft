@@ -1,0 +1,2 @@
+PASS Net 25 tiles: source solved locks, repeat-Solve no-op, atomic undo/redo, assistance, reset/config
+PASS Net 35 tiles: source solved locks, repeat-Solve no-op, atomic undo/redo, assistance, reset/config

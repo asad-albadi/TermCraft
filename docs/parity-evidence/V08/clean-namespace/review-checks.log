@@ -1,0 +1,59 @@
+{
+  "seals_before": {
+    "SHA256SUMS.json": {
+      "entries": 60,
+      "mismatches": [],
+      "sha256": "9844375ff02cd6340a4401d7b4b9150e7f5b790c07b928a5f07d24fdf91d4e86"
+    },
+    "SHA256SUMS-final.json": {
+      "entries": 64,
+      "mismatches": [],
+      "sha256": "76d9ca18c4412aaee3d81f2807dc64dfd8513925351cb6550a849518bd9f2b14"
+    }
+  },
+  "rootfs": {
+    "regular_files": 27304,
+    "contained_links": 3961,
+    "export_sha256": "6353fa53c015793f83ee64ae1a335fe2e6cf5ff1649af3696d6269165ed61798",
+    "extra_empty_dirs": [
+      "evidence",
+      "opt/termcraft"
+    ]
+  },
+  "image_id": "sha256:1ab61a2bb16febd0a86829a43c26849b06ca82aca31be8385880cc7a3570c79d",
+  "export_container_absent": true,
+  "package": {
+    "files": 1415,
+    "source_sha256": "4726eebadb56a15c2e9ed9f4018a63ffe9a55e9834ad927fea5472f2f2c29b53",
+    "archive_sha256": "68f356f63c92a9a6aced6abe3d845ab9d064e5da0d37b52ff0c4c99f0fc4b117"
+  },
+  "sealed_native_browser": {
+    "executables_hash_matched": 12,
+    "protected_nested_renderers": 5,
+    "browser_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126"
+  },
+  "sealed_markers_and_runtime_inventory": true,
+  "replay": {
+    "command_file": "review-replay/exact-command.json",
+    "exit_code": 0,
+    "seconds": 24.91,
+    "browser": {
+      "executables_hash_matched": 12,
+      "protected_nested_renderers": 5,
+      "browser_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126"
+    }
+  },
+  "seals_after": {
+    "SHA256SUMS.json": {
+      "entries": 60,
+      "mismatches": [],
+      "sha256": "9844375ff02cd6340a4401d7b4b9150e7f5b790c07b928a5f07d24fdf91d4e86"
+    },
+    "SHA256SUMS-final.json": {
+      "entries": 64,
+      "mismatches": [],
+      "sha256": "76d9ca18c4412aaee3d81f2807dc64dfd8513925351cb6550a849518bd9f2b14"
+    }
+  },
+  "owned_bwrap_remaining": []
+}

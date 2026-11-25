@@ -1,0 +1,427 @@
+    PID    PPID COMMAND
+      1       0 /usr/lib/systemd/systemd --switched-root --system --deserialize=60 splash
+      2       0 [kthreadd]
+      3       2 [pool_workqueue_release]
+      4       2 [kworker/R-rcu_gp]
+      5       2 [kworker/R-sync_wq]
+      6       2 [kworker/R-kvfree_rcu_reclaim]
+      7       2 [kworker/R-slub_flushwq]
+      8       2 [kworker/R-netns]
+     11       2 [kworker/0:0H-kblockd]
+     14       2 [kworker/R-mm_percpu_wq]
+     15       2 [ksoftirqd/0]
+     16       2 [rcu_preempt]
+     17       2 [rcub/0]
+     18       2 [rcu_exp_par_gp_kthread_worker/0]
+     19       2 [rcu_exp_gp_kthread_worker]
+     20       2 [migration/0]
+     21       2 [kprobe-optimizer]
+     22       2 [idle_inject/0]
+     23       2 [cpuhp/0]
+     24       2 [cpuhp/2]
+     25       2 [idle_inject/2]
+     26       2 [migration/2]
+     27       2 [ksoftirqd/2]
+     29       2 [kworker/2:0H-kblockd]
+     30       2 [cpuhp/4]
+     31       2 [idle_inject/4]
+     32       2 [migration/4]
+     33       2 [ksoftirqd/4]
+     35       2 [kworker/4:0H-kblockd]
+     36       2 [cpuhp/6]
+     37       2 [idle_inject/6]
+     38       2 [migration/6]
+     39       2 [ksoftirqd/6]
+     41       2 [kworker/6:0H-kblockd]
+     42       2 [cpuhp/8]
+     43       2 [idle_inject/8]
+     44       2 [migration/8]
+     45       2 [ksoftirqd/8]
+     47       2 [kworker/8:0H-kblockd]
+     48       2 [cpuhp/10]
+     49       2 [idle_inject/10]
+     50       2 [migration/10]
+     51       2 [ksoftirqd/10]
+     53       2 [kworker/10:0H-kblockd]
+     54       2 [cpuhp/12]
+     55       2 [idle_inject/12]
+     56       2 [migration/12]
+     57       2 [ksoftirqd/12]
+     59       2 [kworker/12:0H-kblockd]
+     60       2 [cpuhp/14]
+     61       2 [idle_inject/14]
+     62       2 [migration/14]
+     63       2 [ksoftirqd/14]
+     65       2 [kworker/14:0H-kblockd]
+     66       2 [cpuhp/1]
+     67       2 [idle_inject/1]
+     68       2 [migration/1]
+     69       2 [ksoftirqd/1]
+     71       2 [kworker/1:0H-kblockd]
+     72       2 [cpuhp/3]
+     73       2 [idle_inject/3]
+     74       2 [migration/3]
+     75       2 [ksoftirqd/3]
+     77       2 [kworker/3:0H-kblockd]
+     78       2 [cpuhp/5]
+     79       2 [idle_inject/5]
+     80       2 [migration/5]
+     81       2 [ksoftirqd/5]
+     83       2 [kworker/5:0H-kblockd]
+     84       2 [cpuhp/7]
+     85       2 [idle_inject/7]
+     86       2 [migration/7]
+     87       2 [ksoftirqd/7]
+     89       2 [kworker/7:0H-kblockd]
+     90       2 [cpuhp/9]
+     91       2 [idle_inject/9]
+     92       2 [migration/9]
+     93       2 [ksoftirqd/9]
+     95       2 [kworker/9:0H-kblockd]
+     96       2 [cpuhp/11]
+     97       2 [idle_inject/11]
+     98       2 [migration/11]
+     99       2 [ksoftirqd/11]
+    101       2 [kworker/11:0H-kblockd]
+    102       2 [cpuhp/13]
+    103       2 [idle_inject/13]
+    104       2 [migration/13]
+    105       2 [ksoftirqd/13]
+    107       2 [kworker/13:0H-kblockd]
+    108       2 [cpuhp/15]
+    109       2 [idle_inject/15]
+    110       2 [migration/15]
+    111       2 [ksoftirqd/15]
+    113       2 [kworker/15:0H-kblockd]
+    116       2 [kdevtmpfs]
+    117       2 [kworker/R-inet_frag_wq]
+    118       2 [rcu_tasks_kthread]
+    119       2 [rcu_tasks_rude_kthread]
+    120       2 [kauditd]
+    121       2 [khungtaskd]
+    122       2 [oom_reaper]
+    125       2 [kworker/R-writeback]
+    126       2 [kcompactd0]
+    127       2 [ksmd]
+    128       2 [khugepaged]
+    129       2 [kworker/R-bio_complete]
+    130       2 [kworker/R-kblockd]
+    131       2 [kworker/R-blkcg_punt_bio]
+    132       2 [kworker/R-kintegrityd]
+    133       2 [irq/9-acpi]
+    134       2 [kworker/1:1-mm_percpu_wq]
+    135       2 [kworker/R-tpm_dev_wq]
+    136       2 [kworker/R-ata_sff]
+    137       2 [kworker/R-edac-poller]
+    138       2 [kworker/R-devfreq_wq]
+    139       2 [watchdogd]
+    140       2 [kworker/R-quota_events_unbound]
+    141       2 [irq/25-AMD-Vi0-Evt]
+    142       2 [irq/26-AMD-Vi0-PPR]
+    143       2 [irq/27-AMD-Vi0-GA]
+    146       2 [kswapd0]
+    147       2 [kworker/R-kthrotld]
+    148       2 [kworker/u67:0-hci0]
+    149       2 [irq/40-pciehp]
+    150       2 [kworker/R-acpi_thermal_pm]
+    154       2 [hwrng]
+    156       2 [kworker/R-mld]
+    157       2 [kworker/R-ipv6_addrconf]
+    159       2 [kworker/R-kstrp]
+    169       2 [kworker/R-zswap-shrink]
+    172       2 [irq/28-ACPI:Event]
+    173       2 [irq/29-ACPI:Event]
+    174       2 [irq/30-ACPI:Event]
+    175       2 [irq/31-ACPI:Event]
+    176       2 [irq/32-ACPI:Event]
+    177       2 [irq/33-ACPI:Event]
+    178       2 [irq/34-ACPI:Event]
+    179       2 [irq/35-ACPI:Event]
+    180       2 [irq/36-ACPI:Event]
+    181       2 [irq/37-ACPI:Event]
+    203       2 [kworker/6:1-mm_percpu_wq]
+    264       2 [kworker/5:2-mm_percpu_wq]
+    267       2 [kworker/R-nvme-wq]
+    268       2 [kworker/R-nvme-reset-wq]
+    269       2 [kworker/R-nvme-delete-wq]
+    270       2 [kworker/R-nvme-auth-wq]
+    283       2 [kworker/6:1H-kblockd]
+    285       2 [kworker/0:1H-kblockd]
+    288       2 [kworker/5:1H-kblockd]
+    289       2 [kworker/4:1H-kblockd]
+    291       2 [kworker/R-ktpacpid]
+    297       2 [kworker/R-btrfs-worker]
+    298       2 [kworker/R-btrfs-delalloc]
+    299       2 [kworker/R-btrfs-flush_delalloc]
+    300       2 [kworker/R-btrfs-cache]
+    301       2 [kworker/R-btrfs-fixup]
+    302       2 [kworker/R-btrfs-endio]
+    303       2 [kworker/R-btrfs-endio-meta]
+    304       2 [kworker/R-btrfs-rmw]
+    305       2 [kworker/R-btrfs-endio-write]
+    306       2 [kworker/R-btrfs-freespace-write]
+    307       2 [kworker/R-btrfs-delayed-meta]
+    308       2 [kworker/R-btrfs-qgroup-rescan]
+    309       2 [btrfs-cleaner]
+    310       2 [btrfs-transaction]
+    313       2 [kworker/2:1H-kblockd]
+    328       2 [kworker/3:1H-kblockd]
+    329       2 [kworker/R-amdgpu-reset-dev]
+    330       2 [kworker/R-ttm]
+    331       2 [kworker/R-amdgpu_dm_hpd_rx_offload_wq]
+    332       2 [kworker/R-amdgpu_dm_hpd_rx_offload_wq]
+    333       2 [kworker/R-amdgpu_dm_hpd_rx_offload_wq]
+    334       2 [kworker/R-amdgpu_dm_hpd_rx_offload_wq]
+    335       2 [kworker/R-dm_vblank_control_workqueue]
+    336       2 [kworker/R-hdmi_frl_status_polling_wq]
+    337       2 [card1-crtc0]
+    338       2 [card1-crtc1]
+    339       2 [card1-crtc2]
+    340       2 [card1-crtc3]
+    341       2 [kworker/R-gfx]
+    342       2 [kworker/R-comp_1.0.0]
+    343       2 [kworker/R-comp_1.1.0]
+    344       2 [kworker/R-comp_1.2.0]
+    345       2 [kworker/R-comp_1.3.0]
+    346       2 [kworker/R-comp_1.0.1]
+    347       2 [kworker/R-comp_1.1.1]
+    348       2 [kworker/R-comp_1.2.1]
+    349       2 [kworker/R-comp_1.3.1]
+    350       2 [kworker/R-sdma0]
+    351       2 [kworker/R-vcn_dec]
+    352       2 [kworker/R-vcn_enc0]
+    353       2 [kworker/R-vcn_enc1]
+    354       2 [kworker/R-jpeg_dec]
+    355       2 [kworker/9:2-mm_percpu_wq]
+    361       2 [kworker/14:1H-kblockd]
+    370       2 [kworker/12:1H-kblockd]
+    374       2 [kworker/15:1H-kblockd]
+    378       2 [kworker/11:1H-kblockd]
+    379       2 [kworker/13:1H-kblockd]
+    408       2 [kworker/8:1H-kblockd]
+    410       2 [kworker/9:1H-kblockd]
+    411       2 [kworker/10:1H-kblockd]
+    414       2 [kworker/7:1H-kblockd]
+    415       2 [kworker/1:1H-kblockd]
+    417       2 [psimon]
+    428       1 /usr/lib/systemd/systemd-journald
+    474       1 /usr/lib/systemd/systemd-userdbd
+    503       2 [psimon]
+    517       1 /usr/lib/systemd/systemd-resolved
+    523       1 /usr/lib/systemd/systemd-udevd
+    528       1 /usr/lib/systemd/systemd-timesyncd
+    552       2 [psimon]
+    640       2 [kworker/R-ipmi-msghandler-remove-wq]
+    647       2 [kworker/R-cfg80211]
+    662       2 [irq/98-iwlwifi:default_queue]
+    663       2 [irq/100-iwlwifi:queue_1]
+    664       2 [irq/101-iwlwifi:queue_2]
+    665       2 [irq/102-iwlwifi:queue_3]
+    666       2 [irq/103-iwlwifi:queue_4]
+    667       2 [irq/104-iwlwifi:queue_5]
+    668       2 [irq/105-iwlwifi:queue_6]
+    669       2 [irq/106-iwlwifi:queue_7]
+    670       2 [irq/107-iwlwifi:queue_8]
+    671       2 [irq/108-iwlwifi:queue_9]
+    672       2 [irq/109-iwlwifi:queue_10]
+    674       2 [irq/111-iwlwifi:queue_11]
+    676       2 [irq/112-iwlwifi:queue_12]
+    677       2 [irq/113-iwlwifi:queue_13]
+    678       2 [irq/114-iwlwifi:queue_14]
+    679       2 [irq/115-iwlwifi:exception]
+    699       1 /usr/lib/systemd/systemd-oomd
+    713       2 [kworker/u67:1-hci0]
+    748       2 [kworker/11:2-mm_percpu_wq]
+    775       1 /usr/bin/dbus-broker-launch --scope system --audit
+    777     775 dbus-broker --log 10 --controller 9 --machine-id 1f7c0e0e5456432a86a8b974738e3f8a --max-bytes 536870912 --max-fds 4096 --max-matches 131072 --audit
+    778       1 /usr/bin/ananicy-cpp start
+    779       1 /usr/bin/NetworkManager --no-daemon
+    781       1 avahi-daemon: running [t14-cachyos.local]
+    782       1 /usr/lib/bluetooth/bluetoothd
+    787       1 /usr/lib/systemd/systemd-logind
+    808     781 avahi-daemon: chroot helper
+    868       1 /usr/bin/wpa_supplicant -u -s -O /run/wpa_supplicant
+    880       1 /usr/lib/systemd/systemd --user
+    881       1 /usr/bin/containerd
+    884     880 (sd-pam)
+    899       1 greetd
+   1000     880 /usr/bin/dbus-broker-launch --scope user
+   1006    1000 dbus-broker --log 11 --controller 10 --machine-id 1f7c0e0e5456432a86a8b974738e3f8a --max-bytes 100000000000000 --max-fds 25000000000000 --max-matches 5000000000
+   1007     880 /usr/bin/gnome-keyring-daemon --start --foreground --components=secrets
+   1009     880 /usr/bin/gnome-keyring-daemon --foreground --components=pkcs11,secrets --control-directory=/run/user/1000/keyring
+   1113       1 /usr/lib/accounts-daemon
+   1120       1 /usr/lib/polkit-1/polkitd --no-debug --log-level=notice
+   1123       2 [krfcommd]
+   1175       1 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+   1176       1 /usr/bin/zerotier-one
+   1493       1 /usr/lib/power-profiles-daemon
+   1495     899 /usr/bin/greetd --session-worker 12
+   1571    1495 /usr/bin/sh /usr/lib/uwsm/signal-handler.sh wayland-session-envelope@hyprland.desktop.target
+   1597     880 waitpid -e 1571
+   1598    1571 systemctl --user start --wait wayland-session-envelope@hyprland.desktop.target
+   1647     880 /usr/bin/start-hyprland
+   1652    1647 Hyprland --watchdog-fd 4
+   1704     880 /usr/lib/dconf-service
+   1716    1652 Xwayland :0 -rootless -core -listenfd 53 -listenfd 54 -displayfd 111 -wm 108
+   1733     880 bash /usr/bin/limine-snapper-notify
+   1734     880 /usr/bin/wl-paste --watch cliphist store
+   1735     880 /usr/bin/hypridle
+   1736     880 /usr/lib/hyprpolkitagent/hyprpolkitagent
+   1737     880 /usr/bin/bt-agent --capability=NoInputNoOutput
+   1739     880 /usr/bin/qs -c neobrix
+   1747    1733 journalctl --output=short-iso -b -p 3 -n0 -f
+   1774     880 /usr/lib/xdg-desktop-portal
+   1782     880 /usr/lib/xdg-permission-store
+   1787     880 /usr/lib/xdg-document-portal
+   1798    1787 fusermount3 -o rw,nosuid,nodev,fsname=portal,auto_unmount,subtype=portal -- /run/user/1000/doc
+   1802     880 /usr/lib/xdg-desktop-portal-gtk
+   1809     880 /usr/lib/at-spi-bus-launcher
+   1815    1809 /usr/bin/dbus-broker-launch --config-file=/usr/share/defaults/at-spi2/accessibility.conf --scope user
+   1816    1815 dbus-broker --log 10 --controller 9 --machine-id 1f7c0e0e5456432a86a8b974738e3f8a --max-bytes 100000000000000 --max-fds 6400000 --max-matches 5000000000
+   1818     880 /usr/lib/at-spi2-registryd --use-gnome-session
+   1821     880 /usr/bin/pipewire
+   1824     880 /usr/bin/wireplumber
+   1828     880 /usr/lib/xdg-desktop-portal-hyprland
+   1847       1 /usr/lib/upowerd
+   2663     880 /usr/lib/chatgpt/ChatGPT
+   2667     880 /usr/lib/chatgpt/browser_crashpad_handler --monitor-self --monitor-self-annotation=ptype=crashpad-handler --user-stream-region=4,65568 --database=/home/asad/.config/Codex/Crash Reports --annotation=lsb-release=CachyOS --annotation=plat=Linux --annotation=prod=Chrome_Linux --annotation=ver=157.0.8103.78 --initial-client-fd=7 --shared-client-connection
+   2669     880 /usr/lib/chatgpt/browser_crashpad_handler --no-periodic-tasks --monitor-self-annotation=ptype=crashpad-handler --database=/home/asad/.config/Codex/Crash Reports --annotation=lsb-release=CachyOS --annotation=plat=Linux --annotation=prod=Chrome_Linux --annotation=ver=157.0.8103.78 --initial-client-fd=4 --shared-client-connection
+   2673    2663 /usr/lib/chatgpt/ChatGPT --type=zygote --no-zygote-sandbox --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --owl-electron-scheme-replay --change-stack-guard-on-fork=enable
+   2674    2663 /usr/lib/chatgpt/ChatGPT --type=zygote --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --owl-electron-scheme-replay --change-stack-guard-on-fork=enable
+   2680    2674 /usr/lib/chatgpt/ChatGPT --type=zygote --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --owl-electron-scheme-replay --change-stack-guard-on-fork=enable
+   2704    2673 /usr/lib/chatgpt/ChatGPT --type=gpu-process --gpu-recent-crash-count=0 --ozone-platform=x11 --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --change-stack-guard-on-fork=enable --gpu-preferences=YAAAAAAAAACgAAACAAAAAAAAAAAAAGAASAAAAAAAAAABAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAAAEAAAAAAAAACAAAAAAAAAAMAAAAAQAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --metrics-shmem-handle=4,i,16877088363712233190,14812121932904358753,262144 --field-trial-handle=3,i,5420175697559341330,7268162757724949838,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,OwlNativeCaret,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16831291507684985645,6002812690244514050,4 --trace-process-track-uuid=3190708988185955192
+   2706    2663 /usr/lib/chatgpt/ChatGPT --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=none --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --code-cache-schemes=app --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,18225126207773526667,12515573691177044710,524288 --field-trial-handle=3,i,5420175697559341330,7268162757724949838,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,OwlNativeCaret,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16831291507684985645,6002812690244514050,4 --trace-process-track-uuid=3190708989122997041
+   2720    2680 /usr/lib/chatgpt/ChatGPT --type=utility --utility-sub-type=storage.mojom.StorageService --lang=en-US --service-sandbox-type=utility --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --code-cache-schemes=app --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,17760320796652795233,2747661514286300075,524288 --field-trial-handle=3,i,5420175697559341330,7268162757724949838,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,OwlNativeCaret,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16831291507684985645,6002812690244514050,4 --trace-process-track-uuid=3190708990060038890
+   3057    2680 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --code-cache-schemes=app --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP,FocusgroupV2 --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=6 --launch-time-ticks=59884507 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,17401758114377862070,18158996140970053276,1572864 --field-trial-handle=3,i,5420175697559341330,7268162757724949838,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,OwlNativeCaret,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16831291507684985645,6002812690244514050,4 --trace-process-track-uuid=3190708991934122588
+   3082    2663 /usr/lib/chatgpt/resources/codex -c features.code_mode_host=true app-server --analytics-default-enabled -c plugins.codex-app-tools@openai-bundled.mcp_servers.codex_app.enabled=true
+   3164    2663 /usr/lib/chatgpt/ChatGPT --type=utility --utility-sub-type=node.mojom.NodeService --lang=en-US --service-sandbox-type=none --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --code-cache-schemes=app --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,16540404981846960658,7611321654387304683,524288 --field-trial-handle=3,i,5420175697559341330,7268162757724949838,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,OwlNativeCaret,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16831291507684985645,6002812690244514050,4 --trace-process-track-uuid=3190708992871164437
+   3218    2680 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --code-cache-schemes=app --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP,FocusgroupV2 --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=9 --launch-time-ticks=62520129 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,12530896165458122578,8843075791968650900,1572864 --field-trial-handle=3,i,5420175697559341330,7268162757724949838,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,OwlNativeCaret,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16831291507684985645,6002812690244514050,4 --trace-process-track-uuid=3190708994745248135 --force-fieldtrials=WebRTC-Sctp-Snap/Enabled/WebRTC-IceHandshakeDtls/Enabled/WebRTC-ForceDtls13/Enabled/
+   3593    2663 /usr/lib/chatgpt/resources/codex -c forced_login_method="chatgpt" exec-server --concurrent-requests 32 --remote https://codex-cloud-environments.chatgpt.com/api --environment-id ccarenv_b64_Y2NhcmVudl82YWMzNzYyM2Y5ZDA4MTkxYjhhZmUxMTdmOGQ4YmY4Mg
+   3645    3082 /usr/lib/chatgpt/resources/cua_node/bin/node ./server.mjs
+   3646    3082 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+   3649    3082 /usr/lib/chatgpt/resources/cua_node/bin/node_repl
+   3802    2663 /home/asad/.config/Codex/artifact-sessions/runtime-generations/generation-jqAeCc/runtime/bin/node /home/asad/.config/Codex/artifact-sessions/runtime-generations/generation-jqAeCc/runtime/node_modules/@oai/artifact-tool/dist/artifact-session/host-daemon.mjs
+   3817    2680 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --code-cache-schemes=app --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP,FocusgroupV2 --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=11 --launch-time-ticks=73724479 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,11912113929403642153,9274772084350197618,1572864 --field-trial-handle=3,i,5420175697559341330,7268162757724949838,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,OwlNativeCaret,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16831291507684985645,6002812690244514050,4 --trace-process-track-uuid=3190708996619331833 --force-fieldtrials=WebRTC-Sctp-Snap/Enabled/WebRTC-IceHandshakeDtls/Enabled/WebRTC-ForceDtls13/Enabled/
+   4001    2680 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --code-cache-schemes=app --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP,FocusgroupV2 --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=15 --launch-time-ticks=77446195 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,10868544766448029330,8333966617165415747,1572864 --field-trial-handle=3,i,5420175697559341330,7268162757724949838,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,OwlNativeCaret,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16831291507684985645,6002812690244514050,4 --trace-process-track-uuid=3190709000367499229
+   4176    2680 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --code-cache-schemes=app --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP,FocusgroupV2 --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=19 --launch-time-ticks=77886473 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,10291122856466894173,6534613428527058872,1572864 --field-trial-handle=3,i,5420175697559341330,7268162757724949838,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,OwlNativeCaret,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16831291507684985645,6002812690244514050,4 --trace-process-track-uuid=3190709004115666625
+   4488    3082 /usr/lib/chatgpt/resources/codex-code-mode-host --listen grpc+stdio://
+   5262    1652 /opt/zen-browser-bin/zen-bin
+   5412    5262 /opt/zen-browser-bin/zen-bin -contentproc -ipcHandle 0 -signalPipe 1 -initialChannelId {755c7578-a934-45a9-b016-8a1574d70811} -parentPid 5262 -greomni /opt/zen-browser-bin/omni.ja -appomni /opt/zen-browser-bin/browser/omni.ja -appDir /opt/zen-browser-bin/browser 1 forkserver
+   5429    5412 /opt/zen-browser-bin/zen-bin -contentproc -parentBuildID 20261111122308 -prefsHandle 0:43441 -prefMapHandle 1:313287 -sandboxReporter 2 -chrootClient 3 -ipcHandle 4 -initialChannelId {c459993b-eed1-435f-92b4-4193704464c7} -parentPid 5262 -appDir /opt/zen-browser-bin/browser 2 socket
+   5453    5412 /opt/zen-browser-bin/zen-bin -contentproc -isForBrowser -prefsHandle 0:43555 -prefMapHandle 1:313287 -jsInitHandle 2:161360 -parentBuildID 20261111122308 -sandboxReporter 3 -chrootClient 4 -ipcHandle 5 -initialChannelId {f03482ef-51b9-4420-a2f2-79f820dccc0e} -parentPid 5262 -greomni /opt/zen-browser-bin/omni.ja -appomni /opt/zen-browser-bin/browser/omni.ja -appDir /opt/zen-browser-bin/browser 3 tab
+   5463    5412 /opt/zen-browser-bin/zen-bin -contentproc -parentBuildID 20261111122308 -prefsHandle 0:43555 -prefMapHandle 1:313287 -sandboxReporter 2 -chrootClient 3 -ipcHandle 4 -initialChannelId {cc8b8896-44e2-41b5-aad2-36bc7ce43a9d} -parentPid 5262 -appDir /opt/zen-browser-bin/browser 4 rdd
+   5701    5412 /opt/zen-browser-bin/zen-bin -contentproc -isForBrowser -prefsHandle 0:43594 -prefMapHandle 1:313287 -jsInitHandle 2:161360 -parentBuildID 20261111122308 -sandboxReporter 3 -chrootClient 4 -ipcHandle 5 -initialChannelId {4a14072f-d33c-4685-8036-e955cf9f72d3} -parentPid 5262 -greomni /opt/zen-browser-bin/omni.ja -appomni /opt/zen-browser-bin/browser/omni.ja -appDir /opt/zen-browser-bin/browser 7 tab
+   5758    5412 /opt/zen-browser-bin/zen-bin -contentproc -parentBuildID 20261111122308 -sandboxingKind 0 -prefsHandle 0:60962 -prefMapHandle 1:313287 -sandboxReporter 2 -chrootClient 3 -ipcHandle 4 -initialChannelId {936f3189-3c20-4168-9486-82b2ed705d51} -parentPid 5262 -appDir /opt/zen-browser-bin/browser 8 utility
+   5825    5412 /opt/zen-browser-bin/zen-bin -contentproc -isForBrowser -prefsHandle 0:53780 -prefMapHandle 1:313287 -jsInitHandle 2:161360 -parentBuildID 20261111122308 -sandboxReporter 3 -chrootClient 4 -ipcHandle 5 -initialChannelId {6493151e-a7d9-4b32-8733-72c434cad391} -parentPid 5262 -greomni /opt/zen-browser-bin/omni.ja -appomni /opt/zen-browser-bin/browser/omni.ja -appDir /opt/zen-browser-bin/browser 9 tab
+   5828    5412 /opt/zen-browser-bin/zen-bin -contentproc -isForBrowser -prefsHandle 0:53780 -prefMapHandle 1:313287 -jsInitHandle 2:161360 -parentBuildID 20261111122308 -sandboxReporter 3 -chrootClient 4 -ipcHandle 5 -initialChannelId {99132072-791d-4aa5-859a-cc87ab34f264} -parentPid 5262 -greomni /opt/zen-browser-bin/omni.ja -appomni /opt/zen-browser-bin/browser/omni.ja -appDir /opt/zen-browser-bin/browser 10 tab
+  17565     880 /usr/bin/pipewire-pulse
+ 130443     880 /usr/bin/artcraft-launcher
+ 131411     880 /usr/bin/shelly-notifications
+ 132034    5412 /opt/zen-browser-bin/zen-bin -contentproc -isForBrowser -prefsHandle 0:53913 -prefMapHandle 1:313287 -jsInitHandle 2:161360 -parentBuildID 20261111122308 -sandboxReporter 3 -chrootClient 4 -ipcHandle 5 -initialChannelId {17841ac4-73fc-4803-b1b1-6c6d2e24796d} -parentPid 5262 -greomni /opt/zen-browser-bin/omni.ja -appomni /opt/zen-browser-bin/browser/omni.ja -appDir /opt/zen-browser-bin/browser 16 tab
+ 134590       2 [kworker/0:0-mm_percpu_wq]
+ 136524     880 /usr/lib/flatpak-session-helper
+ 136529     880 server --sh -n /run/user/1000/.flatpak-helper/pkcs11-flatpak-136524 --provider p11-kit-trust.so pkcs11:model=p11-kit-trust?write-protected=yes
+ 147657    2680 /usr/lib/chatgpt/ChatGPT --type=renderer --crashpad-handler-pid=2667 --enable-crash-reporter=, --user-data-dir=/home/asad/.config/Codex --owl-electron-scheme-replay --standard-schemes=app,codex-sandbox --service-worker-schemes=codex-sandbox --secure-schemes=app,codex-sandbox --fetch-schemes=app,codex-sandbox --cors-schemes=codex-sandbox --streaming-schemes=app,codex-sandbox --code-cache-schemes=app --owl-scoped-user-agent-additional-hosts=openai.com,chatgpt.com,chatgpt.site,chatgpt-team.site --owl-scoped-user-agent-prefix=CodexBrowser --change-stack-guard-on-fork=enable --ozone-platform=x11 --enable-blink-features=WebMCP,FocusgroupV2 --disable-blink-features=ReplacedNormalFlowStackingInlinePaint --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=34 --launch-time-ticks=4230024918 --shared-files=v8_context_snapshot_data:100 --metrics-shmem-handle=4,i,15962593823643742869,16269000559544993652,1572864 --field-trial-handle=3,i,5420175697559341330,7268162757724949838,262144 --enable-features=DevToolsWebMCPSupport,DocumentPolicyIncludeJSCallStacksInCrashReports,ReportStuckThrottle --disable-features=DropInputEventsWhilePaintHolding,OwlNativeCaret,WebUIOmniboxAimPopup,WebUIOmniboxPopup --variations-seed-version --pseudonymization-salt-handle=7,i,16831291507684985645,6002812690244514050,4 --trace-process-track-uuid=3190709018171294360
+ 161747    5412 /opt/zen-browser-bin/zen-bin -contentproc -isForBrowser -prefsHandle 0:53944 -prefMapHandle 1:313287 -jsInitHandle 2:161360 -parentBuildID 20261111122308 -sandboxReporter 3 -chrootClient 4 -ipcHandle 5 -initialChannelId {fb40c3bb-bd38-4874-874c-868907835ce2} -parentPid 5262 -greomni /opt/zen-browser-bin/omni.ja -appomni /opt/zen-browser-bin/browser/omni.ja -appDir /opt/zen-browser-bin/browser 17 tab
+ 219594     880 hyprlock
+ 373927       2 [kworker/13:0-events]
+ 375429       2 [kworker/15:0-events]
+ 381379       2 [kworker/u66:4-btrfs-endio-write]
+ 390841       2 [kworker/u66:8-btrfs-endio-write]
+ 403912       2 [kworker/14:0-mm_percpu_wq]
+ 405830       2 [kworker/10:0-events]
+ 415079       2 [kworker/0:2-cgroup_free]
+ 415204       2 [kworker/3:1-events]
+ 415622       2 [kworker/11:1-events]
+ 421402       2 [kworker/u66:9-btrfs-endio]
+ 425169       2 [kworker/13:2-mm_percpu_wq]
+ 426173       2 [kworker/12:1-mm_percpu_wq]
+ 427472       2 [kworker/2:0-events]
+ 439689       2 [kworker/8:0-mm_percpu_wq]
+ 441649       2 [kworker/u65:20-btrfs-endio]
+ 484850       2 [kworker/u65:1-blkcg_punt_bio]
+ 486157       2 [kworker/u66:0-btrfs-endio]
+ 486489       2 [kworker/7:1-mm_percpu_wq]
+ 486509       2 [kworker/4:1-mm_percpu_wq]
+ 487417       2 [kworker/14:2]
+ 488714       2 [kworker/u66:7-btrfs-endio-write]
+ 490698       2 [kworker/3:2]
+ 491667       2 [kworker/6:0-events]
+ 497720       2 [kworker/u66:12-btrfs-endio]
+ 497822       2 [kworker/u65:8-blkcg_punt_bio]
+ 497823       2 [kworker/u65:11-btrfs-endio]
+ 498739       2 [kworker/5:0]
+ 509207       2 [kworker/u66:1-btrfs-endio-write]
+ 509503       2 [kworker/u65:14-btrfs-endio-write]
+ 521363       2 [kworker/10:1-mm_percpu_wq]
+ 521370       2 [kworker/7:0]
+ 527899       2 [kworker/u69:5-ttm]
+ 528182       2 [kworker/u65:21-btrfs-endio-write]
+ 530129       2 [kworker/u65:22-btrfs-endio-write]
+ 545254       2 [kworker/12:0-cgroup_offline]
+ 553491       2 [kworker/u66:24-btrfs-endio-write]
+ 570451       2 [kworker/u64:1-gfx]
+ 573280       2 [kworker/15:2-events]
+ 575085       2 [kworker/u65:2-btrfs-endio]
+ 575128       2 [kworker/u65:6-btrfs-endio]
+ 576492       2 [kworker/u68:3-ttm]
+ 577254       2 [kworker/u68:8-ttm]
+ 578557       2 [kworker/u69:0-ttm]
+ 578834       2 [kworker/u64:2-comp_1.0.1]
+ 579260       2 [kworker/u65:0-blkcg_punt_bio]
+ 579261       2 [kworker/u65:3-btrfs-endio]
+ 579263       2 [kworker/u66:2-flush-btrfs-1]
+ 579264       2 [kworker/u66:3-events_power_efficient]
+ 579265       2 [kworker/u66:5-btrfs-endio]
+ 579472       2 [kworker/u65:4-blkcg_punt_bio]
+ 579473       2 [kworker/u65:5-btrfs-endio]
+ 579475       2 [kworker/u65:9-btrfs-endio]
+ 579476       2 [kworker/u65:12-btrfs-endio]
+ 579477       2 [kworker/u65:13-btrfs-endio]
+ 579478       2 [kworker/u65:15-btrfs-endio-write]
+ 579553       2 [kworker/u66:6-btrfs-endio-write]
+ 579554       2 [kworker/u66:10-btrfs-endio]
+ 579991       2 [kworker/u66:11-btrfs-endio-write]
+ 579992       2 [kworker/u66:13-btrfs-endio-write]
+ 579993       2 [kworker/u66:15-blkcg_punt_bio]
+ 579994       2 [kworker/u66:16-btrfs-endio-write]
+ 579997       2 [kworker/u66:17-btrfs-endio]
+ 579998       2 [kworker/u65:17-btrfs-endio-write]
+ 580000       2 [kworker/u65:19-events_unbound]
+ 581115       2 [kworker/u69:3-ttm]
+ 585234       2 [kworker/u66:19-btrfs-endio]
+ 585408       2 [kworker/u66:21-btrfs-endio]
+ 585417       2 [kworker/u66:22-btrfs-endio]
+ 587013       2 [kworker/u65:23-events_power_efficient]
+ 590227       2 [kworker/2:1]
+ 595773       2 [kworker/u66:23-btrfs-endio]
+ 605092       2 [kworker/8:2]
+ 607426       2 [kworker/u68:0-rb_allocator]
+ 607427       2 [kworker/u68:1-ttm]
+ 607428       2 [kworker/u68:2-ttm]
+ 607429       2 [kworker/u68:4-ttm]
+ 607430       2 [kworker/u68:5-ttm]
+ 608940       2 [kworker/4:0-cgroup_free]
+ 616008       2 [kworker/u65:18-btrfs-endio-write]
+ 616010       2 [kworker/u65:25-btrfs-endio-write]
+ 616462       2 [kworker/u68:6-ttm]
+ 620275    5412 /opt/zen-browser-bin/zen-bin -contentproc -isForBrowser -prefsHandle 0:53944 -prefMapHandle 1:313287 -jsInitHandle 2:161360 -parentBuildID 20261111122308 -sandboxReporter 3 -chrootClient 4 -ipcHandle 5 -initialChannelId {d72f89f9-5e22-46de-b6d5-705f3b29891f} -parentPid 5262 -greomni /opt/zen-browser-bin/omni.ja -appomni /opt/zen-browser-bin/browser/omni.ja -appDir /opt/zen-browser-bin/browser 18 tab
+ 620816       2 [kworker/9:0-events]
+ 620841       2 [kworker/1:2]
+ 621166       2 [kworker/u68:7]
+ 621176       2 [kworker/u64:0-comp_1.0.1]
+ 621526       2 [kworker/u66:14-btrfs-endio]
+ 621663       2 [kworker/7:2-events]
+ 625413       2 [kworker/u69:1-ttm]
+ 626519       2 [kworker/10:2-events]
+ 627626     474 systemd-userwork: waiting...
+ 627627     474 systemd-userwork: waiting...
+ 627811       2 [kworker/0:1-cgroup_release]
+ 627831     474 systemd-userwork: waiting...
+ 628025       2 [kworker/u69:2-ttm]
+ 628026       2 [kworker/u69:4-ttm]
+ 628027       2 [kworker/u69:6]
+ 628028       2 [kworker/u69:7]
+ 628040    3082 /usr/bin/bash -lc python3 - <<'PY' from pathlib import Path import json,hashlib,subprocess p=Path('docs/parity-evidence/B06/native-linux'); rows=json.loads((p/'matrix.json').read_text()) obs=['Column 1 bottom 3 hearts moved to Reserve 1; Undo 004 returned it; fast Redo attempt 005 is not used as proof.','First tile rotated; unsaved state and Undo enabled.','Left/Up/Space advanced Next 0 to 1 and locked dropped piece.','Invalid 1 was rejected with visible conflict error in 013; valid 8 at row 1 column 3 accepted in 087.','First tile left click revealed 1; unsaved state and Undo enabled.','Space Start/Fire and Right removed Press Start; unsaved state and Undo enabled.','Right moved player; 0 to 7 squares erased.','First tile rotation; dirty state and Undo enabled.','Flag first tile; 0 to 1 flags before first reveal.','First editable tile 1 visible with conflict marking; Jigsaw/Advanced/Killer followups included.','First peg 0 to 1; dirty state and Undo enabled.','75 regions Unreasonable seed 2; first blank region painted orange with colour 2.','Actual drag of selected yellow vertex from (68,516) to (110,540); dirty state and Undo enabled.'] for r,o in zip(rows,obs):r['observation']=o rows[3]['successful_action']='087-sudoku-valid-move.png';(p/'matrix.json').write_text(json.dumps(rows,indent=2)+'\n') proc=json.loads((p/'session2-processes.json').read_text()); alive=[x['host_pid'] for x in proc if Path('/proc',str(x['host_pid'])).exists()] inv=subprocess.run(['ps','-eo','pid,ppid,args'],capture_output=True,text=True).stdout (p/'cleanup-host-check.json').write_text(json.dumps({'recorded_session2_host_pids':[x['host_pid'] for x in proc],'recorded_pids_still_alive':alive,'namespace_exit_code':0,'cleanup_marker':(p/'cleanup-native2.txt').read_text().strip()},indent=2)+'\n');assert not alive (p/'cleanup-host-processes.txt').write_text(inv) PY python3 docs/parity-evidence/B06/native-linux/verify.py python3 - <<'PY' from pathlib import Path import json,hashlib p=Path('docs/parity-evidence/B06/native-linux');s={str(x.relative_to(p)):hashlib.sha256(x.read_bytes()).hexdigest() for x in sorted(p.rglob('*')) if x.is_file() and x.name!='SHA256SUMS.json'};(p/'SHA256SUMS.json').write_text(json.dumps(s,indent=2)+'\n'); print('sealed',len(s),'artifacts') PY
+ 628050  628040 python3 -
+ 628051  628050 ps -eo pid,ppid,args

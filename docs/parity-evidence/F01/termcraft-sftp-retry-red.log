@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.74s
+     Running tests/ssh_browser.rs (app/target/debug/deps/ssh_browser-4725addc40dbd022)
+
+running 1 test
+test closed_sftp_channel_can_reopen_without_reauthenticating ... FAILED
+
+failures:
+
+---- closed_sftp_channel_can_reopen_without_reauthenticating stdout ----
+
+thread 'closed_sftp_channel_can_reopen_without_reauthenticating' (177966) panicked at tests/ssh_browser.rs:22:5:
+Timed out waiting for SSH event
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    closed_sftp_channel_can_reopen_without_reauthenticating
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 11 filtered out; finished in 8.34s
+
+error: test failed, to rerun pass `--test ssh_browser`

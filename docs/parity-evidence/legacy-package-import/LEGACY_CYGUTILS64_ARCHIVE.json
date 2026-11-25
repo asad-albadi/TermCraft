@@ -1,0 +1,3215 @@
+{
+  "schema": "termcraft.local-legacy-import.v1",
+  "provenance": "Local inspection of a user-selected archive; publisher and dependencies are not authenticated",
+  "source_name": "CygUtils64.plugin",
+  "source_sha256": "4750dc32ba3372fa7f4b8ca38583f98d9d0477d9b0686966fee40aa181bff915",
+  "container": "ZIP",
+  "execution_enabled": false,
+  "runtime_status": "Commands are disabled. A supported Windows/Cygwin runtime and verified dependencies are required; this import does not provide them.",
+  "files": [
+    {
+      "path": "usr/share/locale/locale.alias",
+      "encoded_bytes": 498,
+      "decoded_bytes": 1311,
+      "sha256": "dc4436b6bea7b682eef1934f4dad32cbe80babaa04ab002bde9993a5cf833e29",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/man.tar",
+      "encoded_bytes": 364268,
+      "decoded_bytes": 1686528,
+      "sha256": "65f54d79e6e7439f4b47cce5ed349c19fd2fd2a7a7c4f4fffca3655d323636aa",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/terminfo/78/xterm",
+      "encoded_bytes": 1221,
+      "decoded_bytes": 3258,
+      "sha256": "3b32c7c5088ec79942deeff2b365b27de437a826c257242c3d6d544c65530999",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/vim.tar",
+      "encoded_bytes": 228899,
+      "decoded_bytes": 1189888,
+      "sha256": "474e8c6e526414ac3723c92b2ff636aa2c975c0199fcf318e44e0e54655e41df",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/zsh.tar",
+      "encoded_bytes": 204248,
+      "decoded_bytes": 1055744,
+      "sha256": "3cf4dda93cda574ef17bd93319ab51d06595ad08caec979fe3987c9ceb68eabc",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "bin/awk.exe",
+      "encoded_bytes": 52435,
+      "decoded_bytes": 151040,
+      "sha256": "dcc77ba89d85f4e1add44ca8b45d4e5f9daaa0c57832520c9e2931b351e792ab",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/conin.exe",
+      "encoded_bytes": 41913,
+      "decoded_bytes": 209408,
+      "sha256": "47cdbf0cb73577314f176b30be9fbe4e7c083360b432a4e7445ad55fe4ae6c7f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cyggcc_s-seh-1.dll",
+      "encoded_bytes": 28293,
+      "decoded_bytes": 75283,
+      "sha256": "d2a29591de5e3024bc4cdf2907d6d7222fa5baede48b4583498ad0724bf69dcf",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygncursesw-10.dll",
+      "encoded_bytes": 123791,
+      "decoded_bytes": 345107,
+      "sha256": "6d53a07408fde0f51886b23e357a8c003e08368e832ab654ca9a11ebb1eda9c0",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygssp-0.dll",
+      "encoded_bytes": 3340,
+      "decoded_bytes": 12307,
+      "sha256": "443424355e619b0777294e0aa83c26fc9b60d8f0e79400c189ae468e7130f595",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygtermd.exe",
+      "encoded_bytes": 11367,
+      "decoded_bytes": 31336,
+      "sha256": "a3744867fdb96066cc4725ce45a22ab4a0cdc9f0b6bb9f9941848720263c3015",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygwin1.dll",
+      "encoded_bytes": 909747,
+      "decoded_bytes": 3079206,
+      "sha256": "2f1dfa6448671ef51bc34996beb19143e70b70f3241c920ff2dd866098bc51d9",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygz.dll",
+      "encoded_bytes": 42103,
+      "decoded_bytes": 89619,
+      "sha256": "fc75f210fdcabdedc83a71ef9a128ce6f6d175a3cb8c61c63d8ca9b2b8096f05",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/grep.exe",
+      "encoded_bytes": 15612,
+      "decoded_bytes": 57344,
+      "sha256": "aa2cfdcb4476f265e1ee2242ce315e59110d705da495e70c37fe7d4d92f5444f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/less.exe",
+      "encoded_bytes": 53874,
+      "decoded_bytes": 140288,
+      "sha256": "276f3006d4537ead9858e0b18008a93ce854d5e8320008c1321055e9a89a5ccc",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/lscolors",
+      "encoded_bytes": 506,
+      "decoded_bytes": 1282,
+      "sha256": "071da820ebadcb70262fa6de4b1d7e70b59aa5b3928f03afc038412cf819cd9c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/MobaControlPanel",
+      "encoded_bytes": 759,
+      "decoded_bytes": 3647,
+      "sha256": "4a17c07452e6eeff321c9e7875337a7b8cecccee30ba2193ecaf43e08e3f5503",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/MobaHwInfo",
+      "encoded_bytes": 290,
+      "decoded_bytes": 595,
+      "sha256": "fd2807534aa4cb836ff0a688177e5941abdbd186f97a927297008e8ed72ede9b",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/MobApt",
+      "encoded_bytes": 758,
+      "decoded_bytes": 2466,
+      "sha256": "5abef116348b17f288a43b9fd687c3b39752dd5134d4a8fa02814e2f0d644dd3",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/MobaSwInfo",
+      "encoded_bytes": 218,
+      "decoded_bytes": 517,
+      "sha256": "fa7353b148d3adf2f40bffb728d20267581ee5b8c874fd678247d00305d08a94",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/MobaVerifySSHAlgos",
+      "encoded_bytes": 364,
+      "decoded_bytes": 1011,
+      "sha256": "58d917e4ccc5b94815994354c8384513b241f2d2f4564e345c41644557af4fcb",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/showkey.exe",
+      "encoded_bytes": 2935,
+      "decoded_bytes": 9728,
+      "sha256": "4a79951453a3b55a20bf687ac5991323be7fdd83e188e51b8c034639204081af",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/ssh-copy-id",
+      "encoded_bytes": 5039,
+      "decoded_bytes": 12713,
+      "sha256": "bbc052a6f2e08cdb20a3ebee526a4d481d6f34c402c43aaea2c5ae77b93582c5",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/ssh.exe",
+      "encoded_bytes": 1142,
+      "decoded_bytes": 3831,
+      "sha256": "4b5fb3d2186c51daac38442227e0006826b32ebc71cdb86a781be7ce4a867c22",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/top",
+      "encoded_bytes": 260,
+      "decoded_bytes": 693,
+      "sha256": "f29aff54d787a6c3f05c30adc07213a49dc8660c0b6a756eec66603ce27e45f3",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/vim",
+      "encoded_bytes": 117,
+      "decoded_bytes": 177,
+      "sha256": "9cbe0dde20314d43388f772fc0389c5b65294ade09860275e9a4f501b9785cdf",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/winpty-agent.exe",
+      "encoded_bytes": 120013,
+      "decoded_bytes": 343040,
+      "sha256": "9e12ecdb8c4d8a2ffd60655148129fb2693c22ce21e7d3a417a58308b30116b8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/winpty.dll",
+      "encoded_bytes": 95146,
+      "decoded_bytes": 284160,
+      "sha256": "219f95f66b40fcd4a58da51206cb7f4fa13e355003d04b9c10ffd44b411aae6c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/zsh.exe",
+      "encoded_bytes": 490265,
+      "decoded_bytes": 1186816,
+      "sha256": "beb171617d1aa12e5cab4661c9fb02c9e51851f16acc2404a20f6cb7aa885144",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/_vim.exe",
+      "encoded_bytes": 650721,
+      "decoded_bytes": 1570816,
+      "sha256": "b4ecb92edd243819643064b1bb86778184440f4972275560061a566976f6dd1a",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "etc/machine-id",
+      "encoded_bytes": 29,
+      "decoded_bytes": 33,
+      "sha256": "fe04decc640fc7b4be2210ce7dde910ce110df45104844d568b1ee4d2b013491",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "etc/vimrc.less",
+      "encoded_bytes": 367,
+      "decoded_bytes": 547,
+      "sha256": "d5c65c9d0710009580e4a199125b150c2ae194fef676b46390e1bc1b46c8a0ae",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/ascii",
+      "encoded_bytes": 3343,
+      "decoded_bytes": 28018,
+      "sha256": "59ba835bb0d262fa5acaa1827850df09c7df44c67206a49d727b6fd9cf0f63d1",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "bin/cyggssapi_krb5-2.dll",
+      "encoded_bytes": 91130,
+      "decoded_bytes": 262144,
+      "sha256": "f0d5a1357548a1f3adb39e38cfabb424737b9e6154a38bf241509075d2732b2c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygk5crypto-3.dll",
+      "encoded_bytes": 67070,
+      "decoded_bytes": 183808,
+      "sha256": "c420d4fe04a120982fe1acbaf801b8e41dd21b54823183a6dacce6892a52d877",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygkrb5-3.dll",
+      "encoded_bytes": 213238,
+      "decoded_bytes": 742400,
+      "sha256": "996e68fca7e6f06701c3e8df179eb2ab9b83a18186a0f6db1652b6fd75dd3a58",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygkrb5support-0.dll",
+      "encoded_bytes": 13003,
+      "decoded_bytes": 35840,
+      "sha256": "b1dbaca6c0eef44dfc26231bf079489377d32526bae6b824332b0a730d1062c0",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "etc/system.jwmrc",
+      "encoded_bytes": 883,
+      "decoded_bytes": 3073,
+      "sha256": "ac7848b66c2600a96f32fe973b8d75cdede282f0ac86b27e32c794c6175e9ef5",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "CygUtilsLicenses.html",
+      "encoded_bytes": 44259,
+      "decoded_bytes": 44259,
+      "sha256": "20d711f047afb6c715cc26b0b1265565c0776dda80dfefb181f179ec69d6836a",
+      "encoding": "ZIP member",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/cygcom_err-3.dll",
+      "encoded_bytes": 3559,
+      "decoded_bytes": 11264,
+      "sha256": "59f846faafa991b848833147b4d6ae261490bc2724d08544a35861d1d9e1b889",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygkdb5-8.dll",
+      "encoded_bytes": 21915,
+      "decoded_bytes": 56320,
+      "sha256": "5a3de082f85990a24b86d667dd409ef16a875b60e09ee462dac1c6395cb18a1a",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygkadm5srv_mit-11.dll",
+      "encoded_bytes": 33054,
+      "decoded_bytes": 91136,
+      "sha256": "4c3c9498a4091d308525281bb26e44c7b39513f8921f40569617b22d54a5ef67",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cyggssrpc-4.dll",
+      "encoded_bytes": 37439,
+      "decoded_bytes": 102931,
+      "sha256": "e371a659489b32a8d3859656f9cea782af6d6a1e7c40d3884819d766ca8fb7d7",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/moshsession",
+      "encoded_bytes": 1230,
+      "decoded_bytes": 3999,
+      "sha256": "c61649cda2c5ec7b49660ba54c4fe2ee0a4488c7e2318cd199209a751cadc49f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/klist.exe",
+      "encoded_bytes": 7256,
+      "decoded_bytes": 20992,
+      "sha256": "65c06487707b0538651a94977937fcfc0d8f3075d26ef4227f0b8a2c5f893770",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/kinit.exe",
+      "encoded_bytes": 7271,
+      "decoded_bytes": 24576,
+      "sha256": "cf3f8f6c2b939550d687f17763c1afd4a00f3f6d88f1843f9446b2b745cf5c57",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "etc/system.jwmrc.backgroundless",
+      "encoded_bytes": 729,
+      "decoded_bytes": 2694,
+      "sha256": "9bdad3ef5ffa4f2e2798721d98e606535f60449ee04d948baa82f609d889e087",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "etc/persistprofile.sh",
+      "encoded_bytes": 188,
+      "decoded_bytes": 634,
+      "sha256": "9abeab0dc5e784210b75405cb766de331177bf674be58155bfaccd2ad3901805",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "etc/zprofile",
+      "encoded_bytes": 65,
+      "decoded_bytes": 58,
+      "sha256": "197df772735d1df8f279c476bf808de89187bfdf0572f442069a370450f53e1c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/Rainbowizer",
+      "encoded_bytes": 166,
+      "decoded_bytes": 228,
+      "sha256": "941f34f4eea770b77249fd588045b471ae5a233def596d8cb4f966fd515b2de3",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/fortune",
+      "encoded_bytes": 257,
+      "decoded_bytes": 382,
+      "sha256": "fe3ac6b06c5c2c10ba921506ca798f507e0c544490394e076f6b32836bed9219",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/scrdaemons",
+      "encoded_bytes": 389,
+      "decoded_bytes": 1147,
+      "sha256": "5b95c869203c8f1448f048b42666e90d4ae53010242ec9fb5bae0d2486f3f62b",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/waitforX",
+      "encoded_bytes": 155,
+      "decoded_bytes": 205,
+      "sha256": "ca7beb539f616c557d80ffa78cf359d7eb47a5f3eacfa97ecc72236b9f785135",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/MobaBox.exe",
+      "encoded_bytes": 227413,
+      "decoded_bytes": 652080,
+      "sha256": "44483bf60fe11539505db5113f2dfcf7531559d7c46f141b5665248ffe586121",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86"
+    },
+    {
+      "path": "bin/mobawget",
+      "encoded_bytes": 260,
+      "decoded_bytes": 470,
+      "sha256": "ba16f2829807aed1cac109dccb18a7dbc2ec24c8876034c591d06bd373cf601f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/ServersListToMxtSessions.sh",
+      "encoded_bytes": 694,
+      "decoded_bytes": 1861,
+      "sha256": "2007bac355fed7f230d6ad0d2aec08a3b83c53ebd8e54656e0afa9ae5a7cbf82",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/png2ico",
+      "encoded_bytes": 278,
+      "decoded_bytes": 539,
+      "sha256": "de6d9706b37b4c46d122b05ee5139c07151f8a7cc439de7acdceb8c09700f33c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/MobaTools",
+      "encoded_bytes": 837,
+      "decoded_bytes": 1993,
+      "sha256": "8f097353e7f2967efdcd4962659b03dd28ebbcf987ffacfe5e4b23b07e66e178",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/help",
+      "encoded_bytes": 2829,
+      "decoded_bytes": 7435,
+      "sha256": "64158019d5fe98e93a6e25a3605c17fd023ea908ecf0ece8fe9873e9c9294e3c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/getAvailableDisplay",
+      "encoded_bytes": 96,
+      "decoded_bytes": 90,
+      "sha256": "4f631d09c0459064fae0f193f1eb82cd1a4d0bf5bfd5ba85890fb2c50d5e9cd6",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/vicron",
+      "encoded_bytes": 76,
+      "decoded_bytes": 72,
+      "sha256": "31888e85faf50452e707689403a4f7f3f0aa0475b6d7cb3aa6aa20eb7ecf6f66",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/setx11dpi",
+      "encoded_bytes": 189,
+      "decoded_bytes": 373,
+      "sha256": "1b96319dbf72d16fd96734058f5c1632c78b7c90d7910311f60dae2a6fe9dbad",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/autossh.exe",
+      "encoded_bytes": 9102,
+      "decoded_bytes": 27648,
+      "sha256": "76eaac998af4a9bf9e186f29903a8678279d82e636de4f265f8fae5fd918cf2a",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/rcp.exe",
+      "encoded_bytes": 7188,
+      "decoded_bytes": 18451,
+      "sha256": "9e71c3ebf087fb70c37c947eed8ca337ed8f6b6f2f3be15ac66c54c549c716b8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/rlogin.exe",
+      "encoded_bytes": 5393,
+      "decoded_bytes": 14867,
+      "sha256": "3a2957532bc41ccf64e081c086aa19de7aeaec705e442de07a22c88dc43aa08d",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/rsh.exe",
+      "encoded_bytes": 3743,
+      "decoded_bytes": 11795,
+      "sha256": "bcb89e196bebf5b0520776dc35370a721af815094ddb25dcf9bf8205d0e8137f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/png2bmp",
+      "encoded_bytes": 282,
+      "decoded_bytes": 545,
+      "sha256": "20cba720415c40f7dc7ba27fdb2647545fa7a3f40984ae3721b960ab5d8682b4",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/cygwin-console-helper.exe",
+      "encoded_bytes": 18111,
+      "decoded_bytes": 41491,
+      "sha256": "c7c50ce2bf573c7f03de080e0f64d44f78b6d04590eed5bc18565dd5e68feb88",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygcurl-4.dll",
+      "encoded_bytes": 259900,
+      "decoded_bytes": 687616,
+      "sha256": "96dff8cc984419c7f8a5d0d034824d70016e2d818c1c35611c49845c1e85fe06",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/curl.exe",
+      "encoded_bytes": 69769,
+      "decoded_bytes": 194048,
+      "sha256": "e57d4972ba54066b88e6c70e50b832438a169b84b655f70f7a3f355ca9e1d86c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygssh2-1.dll",
+      "encoded_bytes": 89404,
+      "decoded_bytes": 252928,
+      "sha256": "d15da9080762498bb77254d0cd810a86a5c779c58bf9877221b2ace9aa17c580",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/termwalk.exe",
+      "encoded_bytes": 6949,
+      "decoded_bytes": 24576,
+      "sha256": "3735eec9b74ee349ae40c10d1e8d0953f73b78e7ef52403ddbde1485ed2ac10d",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/soliterm.exe",
+      "encoded_bytes": 11990,
+      "decoded_bytes": 41472,
+      "sha256": "b66550de1aea2b0dc15ebca3d76a8787c6c0bc8f338c3641718a50fbb144826a",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "usr/share/terminfo/74/tmux",
+      "encoded_bytes": 1228,
+      "decoded_bytes": 3083,
+      "sha256": "fa54959e88ddb0cd1ada3bf08077865dc451caa9a6381736d394b58ad3106ad4",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/terminfo/78/xterm-256color",
+      "encoded_bytes": 936,
+      "decoded_bytes": 2273,
+      "sha256": "65e9507d4d15fe6187f89f941aba0c4937393075360f95d7743a37763a8d95a3",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/terminfo/78/xterm-color",
+      "encoded_bytes": 559,
+      "decoded_bytes": 1551,
+      "sha256": "fcb5173ee0c48a229b82180eebf160b8f2b4b2593767d6373d9c28d2aea705fc",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/terminfo/73/screen",
+      "encoded_bytes": 657,
+      "decoded_bytes": 1581,
+      "sha256": "1c8d8b5a252543ca2e48c51366e6286173945091ad2c3e0def72c50d97b22e90",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "bin/lsfont",
+      "encoded_bytes": 2657,
+      "decoded_bytes": 6914,
+      "sha256": "11fb9bd2805707774e94bfa2922c63c793d829b72116d6c0f309099d841b5c72",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/zstd-decompress.exe",
+      "encoded_bytes": 87145,
+      "decoded_bytes": 239616,
+      "sha256": "d9dc7d69ed908f253564c120aed08a596df92613da61d128853b22bfd41e9c19",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "etc/setup/cmdlist",
+      "encoded_bytes": 47553,
+      "decoded_bytes": 211113,
+      "sha256": "5f0577b56479d2c50ecd73489b9f061a322a572f6ac1fc725d97de21592b4e0f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "etc/zshrc",
+      "encoded_bytes": 102,
+      "decoded_bytes": 114,
+      "sha256": "b8e850513ee7daee552abba622108ceadffba1c6c013a68605f894e7d60b9aae",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "etc/bash.bashrc",
+      "encoded_bytes": 104,
+      "decoded_bytes": 116,
+      "sha256": "61439e888938c30c0cc3d5601dc9a59c2aa90352bf82866469f59603b02093a8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "etc/inputrc",
+      "encoded_bytes": 311,
+      "decoded_bytes": 704,
+      "sha256": "93ad87bda8ed0f935e79f7b3a9984fe1c610fd34bc03d1c49daa505cd8cdeac7",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "etc/bash_completion",
+      "encoded_bytes": 3873,
+      "decoded_bytes": 13753,
+      "sha256": "beb907b77608c8887f126a6315c9ed4df9b05ada9b2ab435e58af35a38ca3265",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/vim.exe",
+      "encoded_bytes": 117,
+      "decoded_bytes": 177,
+      "sha256": "9cbe0dde20314d43388f772fc0389c5b65294ade09860275e9a4f501b9785cdf",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/man",
+      "encoded_bytes": 735,
+      "decoded_bytes": 2275,
+      "sha256": "8126efc1dda9667e5e00b3f18101e8c8aec0b7eda002d48b0b72005cc48b5358",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/bash.exe",
+      "encoded_bytes": 417919,
+      "decoded_bytes": 1052672,
+      "sha256": "ffe3504986c8ebe35e9e2543b38c60ba20073f2b9295efa1a3920d388974d9cc",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/_ssh1.exe",
+      "encoded_bytes": 239184,
+      "decoded_bytes": 688128,
+      "sha256": "3a948ed85211f631dbccf07399ae0d22fe2deb570feb1849570bb8832b7e4ef0",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/iperf.exe",
+      "encoded_bytes": 23046,
+      "decoded_bytes": 64019,
+      "sha256": "cc4d8fa62710be2d806468b7cf57327185a874ebaacd649b834c1bf0995049e9",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/lrz.exe",
+      "encoded_bytes": 23395,
+      "decoded_bytes": 57344,
+      "sha256": "be1f2931392714a4c40c4cc243327c8fa7832f602f87e44cad60373557a079ce",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/lsz.exe",
+      "encoded_bytes": 25389,
+      "decoded_bytes": 61440,
+      "sha256": "8ad71d4f0ea7e76fcd0b2f988655ca2f35a4270ca1df8c8d7d15280cf2997051",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/mosh-client.exe",
+      "encoded_bytes": 175741,
+      "decoded_bytes": 569856,
+      "sha256": "5c2019e9954c6ac4faa320118f346bc21a3fa0cc8b87e94c5f1c719890d6a8b3",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygstdc++-6.dll",
+      "encoded_bytes": 439967,
+      "decoded_bytes": 1949203,
+      "sha256": "16cd8796b7fc8b7db24eed54aed5f7a0dcd7b35f4b49c480661bfe728425358a",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "etc/ssl/certs",
+      "encoded_bytes": 59,
+      "decoded_bytes": 50,
+      "sha256": "b14d83882ff9226832636135c82fc18a3daddd8a68e5c5381d7e98d745272d00",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "etc/pki/ca-trust/ca-legacy.conf",
+      "encoded_bytes": 33,
+      "decoded_bytes": 15,
+      "sha256": "082e5e9a536ca1c0712e7a8c983b502f1e30e6bc5f6ab686cd9d1ee0647f2ccb",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt",
+      "encoded_bytes": 80,
+      "decoded_bytes": 90,
+      "sha256": "bf2a761f893a86b6077459fa5629f20ebbf2544c7a239fc9724b80dc16ea60e7",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+      "encoded_bytes": 74,
+      "decoded_bytes": 78,
+      "sha256": "de359762160f975609c3061734e933f7366ce24150d3271273d304d156658a2f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "etc/pki/tls/cert.pem",
+      "encoded_bytes": 74,
+      "decoded_bytes": 78,
+      "sha256": "de359762160f975609c3061734e933f7366ce24150d3271273d304d156658a2f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "etc/pki/tls/certs/ca-bundle.crt,ca-bundle.trust.crt.mobapack",
+      "encoded_bytes": 159793,
+      "decoded_bytes": 463405,
+      "sha256": "1fc75353da55f4651694d9ad84bf7b6487fcc0468ab6b3f6f2f35c277d76abea",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-add--interactive",
+      "encoded_bytes": 11970,
+      "decoded_bytes": 47789,
+      "sha256": "92795e746587da675acf9c8e987f3252506bf9ffd3cb5a47bedd6c15526bdaee",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-add.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-am.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-annotate.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-apply.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-archimport",
+      "encoded_bytes": 11006,
+      "decoded_bytes": 37001,
+      "sha256": "f29a374e48f358693391a54ac7ceb25626e0dfbf644d756891f964f682f1f528",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-archive.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-bisect",
+      "encoded_bytes": 907,
+      "decoded_bytes": 2137,
+      "sha256": "e5bfe329eaf1a5cbd0c14d1322665f724bbb91af2483a786625dff2f147d9507",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-bisect--helper.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-blame.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-branch.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-bugreport.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-bundle.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-cat-file.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-check-attr.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-check-ignore.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-check-mailmap.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-check-ref-format.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-checkout--worker.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-checkout-index.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-checkout.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-cherry-pick.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-cherry.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-clean.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-clone.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-column.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-commit-graph.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-commit-tree.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-commit.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-config.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-count-objects.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-credential-cache--daemon.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-credential-cache.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-credential-store.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-credential.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-cvsexportcommit",
+      "encoded_bytes": 4892,
+      "decoded_bytes": 13148,
+      "sha256": "9e50b384629fb232087fc18ba66f7e74075609aafcd19edf026c438fd0f75a3a",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-cvsimport",
+      "encoded_bytes": 11148,
+      "decoded_bytes": 32136,
+      "sha256": "d04f98739c6b1541222a70a3e04ebe7b64bf8c98db5e383f2b5b84917992b6f9",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-describe.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-diff-files.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-diff-index.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-diff-tree.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-diff.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-difftool--helper",
+      "encoded_bytes": 1141,
+      "decoded_bytes": 2503,
+      "sha256": "85be77328b93558f55f400c11b8e32789db0e81ecbc1cc0fbffbd0bba1ad821a",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-difftool.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-env--helper.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-fast-export.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-fast-import.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-fetch-pack.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-fetch.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-filter-branch",
+      "encoded_bytes": 5399,
+      "decoded_bytes": 15857,
+      "sha256": "064210cbf11b45d097dbcc24c465c03232251da430bf182a58dc78378d574543",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-fmt-merge-msg.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-for-each-ref.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-for-each-repo.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-format-patch.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-fsck-objects.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-fsck.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-fsmonitor--daemon.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-gc.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-get-tar-commit-id.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-grep.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-hash-object.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-help.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-hook.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-http-fetch.exe,git-http-push.exe,git-remote-http.exe.mobapack",
+      "encoded_bytes": 1079462,
+      "decoded_bytes": 7783782,
+      "sha256": "dd4f362a294b604b130b8dc9c37378bbe47da47e5c97c5ca9b957d81db17d587",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-index-pack.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-init-db.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-init.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-instaweb",
+      "encoded_bytes": 6801,
+      "decoded_bytes": 22160,
+      "sha256": "3364ce38916e99ad2222a4030e0cf3366bcf624cc643b64a616e58ad6ea86c32",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-interpret-trailers.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-log.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-ls-files.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-ls-remote.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-ls-tree.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-mailinfo.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-mailsplit.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-maintenance.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge-base.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge-file.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge-index.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge-octopus",
+      "encoded_bytes": 1197,
+      "decoded_bytes": 2477,
+      "sha256": "c5d08a8c4e5afc8b48d965c309d3b98930592da304cf04ac265c8b24ea3d6891",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge-one-file",
+      "encoded_bytes": 1524,
+      "decoded_bytes": 3695,
+      "sha256": "496bd3daaca988726b23252e8032f8e3cc38913dbe2a0d9f1bafd7b7276ae717",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge-ours.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge-recursive.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge-resolve",
+      "encoded_bytes": 545,
+      "decoded_bytes": 944,
+      "sha256": "c10ebe981e23461cc8ee48cc60632093638fc1dfce448b0519ff952d9c9d1655",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge-subtree.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge-tree.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-merge.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-mergetool",
+      "encoded_bytes": 3413,
+      "decoded_bytes": 11564,
+      "sha256": "cdb1cff2af7759bd38791b20173069d9860fab30d667d32d3be93fbaa435ffc5",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-mergetool--lib",
+      "encoded_bytes": 3321,
+      "decoded_bytes": 9922,
+      "sha256": "7eb2f68244187cdc8959d329ed6cdef575cccdafc4f65691a35c2fc73eb3114c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-mktag.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-mktree.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-multi-pack-index.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-mv.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-name-rev.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-notes.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-p4",
+      "encoded_bytes": 38421,
+      "decoded_bytes": 171846,
+      "sha256": "e587bfb08a7f2e8aa3897d00e2b214f5f592b5a3944c00943b4c68e198380b8e",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-pack-objects.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-pack-redundant.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-pack-refs.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-patch-id.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-prune-packed.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-prune.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-pull.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-push.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-quiltimport",
+      "encoded_bytes": 1419,
+      "decoded_bytes": 3693,
+      "sha256": "0af8839f6d89cb9b7c2973b6f95cfb3839e05d82fa4ecbf1f0af495a0e715a64",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-range-diff.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-read-tree.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-rebase.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-receive-pack.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-reflog.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-remote-ext.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-remote-fd.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-remote-ftp.exe",
+      "encoded_bytes": 62,
+      "decoded_bytes": 52,
+      "sha256": "d4001c2bc7f4331951e811070fe359655e8b65a220c829e4779a38299a143936",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-remote-ftps.exe",
+      "encoded_bytes": 62,
+      "decoded_bytes": 52,
+      "sha256": "d4001c2bc7f4331951e811070fe359655e8b65a220c829e4779a38299a143936",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-remote-https.exe",
+      "encoded_bytes": 62,
+      "decoded_bytes": 52,
+      "sha256": "d4001c2bc7f4331951e811070fe359655e8b65a220c829e4779a38299a143936",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-remote.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-repack.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-replace.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-request-pull",
+      "encoded_bytes": 1785,
+      "decoded_bytes": 4130,
+      "sha256": "07f3f5c9adea01a3126f0ee3878402b4fb0fd2fbcda9beca13a090b0282078cd",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-rerere.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-reset.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-restore.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-rev-list.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-rev-parse.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-revert.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-rm.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-send-email",
+      "encoded_bytes": 18550,
+      "decoded_bytes": 62855,
+      "sha256": "112e0eabd4918540039939bf5606a5ca2727598880ca5fff007b16f93a5a2d5e",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-send-pack.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-sh-i18n",
+      "encoded_bytes": 759,
+      "decoded_bytes": 1683,
+      "sha256": "c2e9d7fc23f9f631e8434bb427c06aa61bf075ad6daa7e4e827d0ce22eef0fcf",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-sh-setup",
+      "encoded_bytes": 3519,
+      "decoded_bytes": 8715,
+      "sha256": "bb49c6e5b9c4194f6edbd06ed06034971e517fe45efbfae63a1b6af174af7baa",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-shortlog.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-show-branch.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-show-index.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-show-ref.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-show.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-sparse-checkout.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-stage.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-stash.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-status.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-stripspace.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-submodule",
+      "encoded_bytes": 2963,
+      "decoded_bytes": 11284,
+      "sha256": "0a85ec86b1a835e965895121a5fbff7aa44aa8ed2626e6f159bf6eb7e636b5dd",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-submodule--helper.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-svn",
+      "encoded_bytes": 19050,
+      "decoded_bytes": 64714,
+      "sha256": "21665f3ee8c096ab3626347584aedb0d4df169a3325e357a5837b6755e2f17aa",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-switch.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-symbolic-ref.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-tag.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-unpack-file.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-unpack-objects.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-update-index.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-update-ref.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-update-server-info.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-upload-archive.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-upload-pack.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-var.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-verify-commit.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-verify-pack.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-verify-tag.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-web--browse",
+      "encoded_bytes": 1733,
+      "decoded_bytes": 4401,
+      "sha256": "5c0d1d91dadfba3fe353add1f07be76016a7c6a3b2260ff9dfec5491fcd9e5e6",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-whatchanged.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-worktree.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git-write-tree.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/git.exe",
+      "encoded_bytes": 51,
+      "decoded_bytes": 38,
+      "sha256": "3e6ecda77250329d1530349fafe7d98e8e8cfbb3f68020fb8be1b730778d03c8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/araxis",
+      "encoded_bytes": 244,
+      "decoded_bytes": 515,
+      "sha256": "49aa2286e6ec2d7c0fb4077a2f9c5a757537476c07f517694fcc79dca021aa31",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/bc",
+      "encoded_bytes": 267,
+      "decoded_bytes": 584,
+      "sha256": "e54e6e1b38bbcd7ededcad7d6e05638453dd4c10631e392ecebfae8d396b01b6",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/codecompare",
+      "encoded_bytes": 237,
+      "decoded_bytes": 510,
+      "sha256": "7ee88c614edf10653d6c66f94a6f19a469551cd21aab224ad97101661cda0dc2",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/deltawalker",
+      "encoded_bytes": 415,
+      "decoded_bytes": 818,
+      "sha256": "4c64c36c09ba536fc5bd822be2750f6f6dd74b5c2feffc5564b5d51d55f120c1",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/diffmerge",
+      "encoded_bytes": 238,
+      "decoded_bytes": 460,
+      "sha256": "d1b72ad340d905e6ea652069b870fcac2cbfa5296e13b35701d99d3cabc7bfbf",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/diffuse",
+      "encoded_bytes": 191,
+      "decoded_bytes": 395,
+      "sha256": "ba5c97c501cae4219a7f4db36ea3934dbde0768a06818b1d49acc63070acbdaf",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/ecmerge",
+      "encoded_bytes": 217,
+      "decoded_bytes": 453,
+      "sha256": "2d23869a9a5c52a45d1d76fff9b446a77fd2205a1db63090fa072ea3e12d5fa6",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/emerge",
+      "encoded_bytes": 248,
+      "decoded_bytes": 535,
+      "sha256": "014c19e4a9c4227cc08b53703ada35283882ecabada96198ca98c7238cfc9135",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/examdiff",
+      "encoded_bytes": 233,
+      "decoded_bytes": 493,
+      "sha256": "162a10db12c2574d424172fdf00c1b097e0c1be900458da27d4619a9005d281d",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/guiffy",
+      "encoded_bytes": 218,
+      "decoded_bytes": 432,
+      "sha256": "294fd58816e5105234628d99af3c64bcc105826171da32ea8134649d9592613b",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/gvimdiff",
+      "encoded_bytes": 47,
+      "decoded_bytes": 29,
+      "sha256": "bc1d96063154a0e5a7f55f5f3579d275c124e84ba33eb50db2f5802e259b479f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/kdiff3",
+      "encoded_bytes": 343,
+      "decoded_bytes": 818,
+      "sha256": "b5c69d346db89853a21287b3b2b9f0f923123b691e9f0ebeb0422125fdd8a5ac",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/kompare",
+      "encoded_bytes": 160,
+      "decoded_bytes": 264,
+      "sha256": "1e57841ff2f88c6d66cb979b43f382a3e476a747825c1abd32a95f0c26e64b6f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/meld",
+      "encoded_bytes": 795,
+      "decoded_bytes": 2213,
+      "sha256": "8913bd55b2ab6afd4b9776b18cc7b409e134beeb3dd63aa05d21b53fe027312b",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/nvimdiff",
+      "encoded_bytes": 47,
+      "decoded_bytes": 29,
+      "sha256": "bc1d96063154a0e5a7f55f5f3579d275c124e84ba33eb50db2f5802e259b479f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/opendiff",
+      "encoded_bytes": 200,
+      "decoded_bytes": 418,
+      "sha256": "b43bb602aff994bc92f007d72398cb1439bfaa8d5eb5df3cc99f9e6aaec73901",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/p4merge",
+      "encoded_bytes": 361,
+      "decoded_bytes": 784,
+      "sha256": "4d1f6e3cdd1a06d600c672ee4ca88d83b50b8cf42c4f7be0fac323b5c4b32993",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/smerge",
+      "encoded_bytes": 191,
+      "decoded_bytes": 423,
+      "sha256": "a40d6cae6fa097464595c94ffcca127672b7838d21c5b47efad880fd6afe04f5",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/tkdiff",
+      "encoded_bytes": 205,
+      "decoded_bytes": 403,
+      "sha256": "f1c788423c7a7792319168ce5c5c871918b7f6f428c7304e511692702bf260d9",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/tortoisemerge",
+      "encoded_bytes": 353,
+      "decoded_bytes": 761,
+      "sha256": "6d0a7e1f66eb108327816949b6cbaef0c727d05fc77c60870a2555b401a93c5b",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/vimdiff",
+      "encoded_bytes": 4251,
+      "decoded_bytes": 16127,
+      "sha256": "81a5c3eae86015708e55e10513429d056b5463d96c7f5add9809970b685b95ab",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/winmerge",
+      "encoded_bytes": 290,
+      "decoded_bytes": 510,
+      "sha256": "18e584efa573fef5a04d5701fa237f83dfa5fb058b790c6aaff27eba33835f07",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/git/git-core/mergetools/xxdiff",
+      "encoded_bytes": 389,
+      "decoded_bytes": 913,
+      "sha256": "9184e4eab6bb40f09834f27dca31244e8f9028047a97d07467d9c340abb82a87",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/description",
+      "encoded_bytes": 75,
+      "decoded_bytes": 73,
+      "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/applypatch-msg.sample",
+      "encoded_bytes": 305,
+      "decoded_bytes": 478,
+      "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/commit-msg.sample",
+      "encoded_bytes": 527,
+      "decoded_bytes": 896,
+      "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/fsmonitor-watchman.sample",
+      "encoded_bytes": 1825,
+      "decoded_bytes": 4726,
+      "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/post-update.sample",
+      "encoded_bytes": 159,
+      "decoded_bytes": 189,
+      "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-applypatch.sample",
+      "encoded_bytes": 289,
+      "decoded_bytes": 424,
+      "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-commit.sample",
+      "encoded_bytes": 942,
+      "decoded_bytes": 1643,
+      "sha256": "f9af7d95eb1231ecf2eba9770fedfa8d4797a12b02d7240e98d568201251244a",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-merge-commit.sample",
+      "encoded_bytes": 281,
+      "decoded_bytes": 416,
+      "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-push.sample",
+      "encoded_bytes": 731,
+      "decoded_bytes": 1374,
+      "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-rebase.sample",
+      "encoded_bytes": 2009,
+      "decoded_bytes": 4898,
+      "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/pre-receive.sample",
+      "encoded_bytes": 353,
+      "decoded_bytes": 544,
+      "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/prepare-commit-msg.sample",
+      "encoded_bytes": 796,
+      "decoded_bytes": 1492,
+      "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/push-to-checkout.sample",
+      "encoded_bytes": 1283,
+      "decoded_bytes": 2783,
+      "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/hooks/update.sample",
+      "encoded_bytes": 1189,
+      "decoded_bytes": 3650,
+      "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/git-core/templates/info/exclude",
+      "encoded_bytes": 196,
+      "decoded_bytes": 240,
+      "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/git-receive-pack.exe",
+      "encoded_bytes": 44,
+      "decoded_bytes": 28,
+      "sha256": "f8b0cc4efb6663615eb5fc4a359752df3f01643dec68fd6598d39df5bd7370c2",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "bin/git-upload-archive.exe",
+      "encoded_bytes": 44,
+      "decoded_bytes": 28,
+      "sha256": "f8b0cc4efb6663615eb5fc4a359752df3f01643dec68fd6598d39df5bd7370c2",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "bin/git-upload-pack.exe",
+      "encoded_bytes": 44,
+      "decoded_bytes": 28,
+      "sha256": "f8b0cc4efb6663615eb5fc4a359752df3f01643dec68fd6598d39df5bd7370c2",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "data",
+      "architecture": null
+    },
+    {
+      "path": "bin/git.exe",
+      "encoded_bytes": 1098065,
+      "decoded_bytes": 4410880,
+      "sha256": "8bc19fc48efa8bc55ad910b8de58e9ff2899a2f8cd8c288689404d8c526217d0",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "usr/share/perl5/FromCPAN/Error.pm",
+      "encoded_bytes": 7985,
+      "decoded_bytes": 24922,
+      "sha256": "a180ed071c1e296a23269b386f4d0a7ac6f6d3d2bdf280487b0403a708b162b5",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/FromCPAN/Mail/Address.pm",
+      "encoded_bytes": 2558,
+      "decoded_bytes": 6990,
+      "sha256": "f65a3f10f2ae55ca2cb7908678c6f1eb9077b41ecbe65dbb67eec3f743ecdc1a",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/I18N.pm",
+      "encoded_bytes": 1423,
+      "decoded_bytes": 2814,
+      "sha256": "bf1328cb5f6efa171bad5f0eb53da3531297bd99137788292b433c25683c92ff",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/IndexInfo.pm",
+      "encoded_bytes": 453,
+      "decoded_bytes": 848,
+      "sha256": "f5beaa7a049976c4ec96ba6688adcc335bd55ad41bf3d33c46c01987117e3064",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/LoadCPAN/Error.pm",
+      "encoded_bytes": 155,
+      "decoded_bytes": 179,
+      "sha256": "f8a36aed2f651f3a35a62207758668463463ac693eb6b18f3695c9dd9a48cbf2",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/LoadCPAN/Mail/Address.pm",
+      "encoded_bytes": 162,
+      "decoded_bytes": 195,
+      "sha256": "3920ffc0400d2bd81b91ad83418af935c47e45544d7c8c734589fbb4caf90fe6",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/LoadCPAN.pm",
+      "encoded_bytes": 1610,
+      "decoded_bytes": 3433,
+      "sha256": "c8094ef9753ed7663326b56396ea4280a69a44f073dd6139a1b918e11e70e2e0",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/Packet.pm",
+      "encoded_bytes": 1509,
+      "decoded_bytes": 4180,
+      "sha256": "9ba5523784dc8daef2d421fb3c352bb023d7c177b9ef6851f6fbd51b07b5b9b2",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Editor.pm",
+      "encoded_bytes": 5181,
+      "decoded_bytes": 17013,
+      "sha256": "c46dbfba0a62a4d0632bc3927b1747037e2cf6853930ac016786c7e39fe766a5",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Fetcher.pm",
+      "encoded_bytes": 5822,
+      "decoded_bytes": 18617,
+      "sha256": "d848d026662c027d9605185619394e8c3a9b9bd8b021256769281d6e9f48c793",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/GlobSpec.pm",
+      "encoded_bytes": 849,
+      "decoded_bytes": 1849,
+      "sha256": "d8599d5813eff549dbfb31b171e988f855e5da83d912bf3ed437b4b267114da8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Log.pm",
+      "encoded_bytes": 3548,
+      "decoded_bytes": 9613,
+      "sha256": "b7c7d47b964fe5ff3c3157c38598e12fdcb06ef1ced3a16687ed29a351153803",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Memoize/YAML.pm",
+      "encoded_bytes": 876,
+      "decoded_bytes": 1799,
+      "sha256": "2575632bc1649518fbd19a9cbaa188940362de51a4400932607c6518185e791f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Migration.pm",
+      "encoded_bytes": 2949,
+      "decoded_bytes": 8196,
+      "sha256": "430ddece25a88f962332541e95b3e86af11e772b6a064fd767ee3d3f517c4af2",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Prompt.pm",
+      "encoded_bytes": 1629,
+      "decoded_bytes": 5370,
+      "sha256": "cdb76d3cb74ab51a37a4c2f4cb222a530f6f97321c069c792706b9e7da5352ec",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Ra.pm",
+      "encoded_bytes": 6487,
+      "decoded_bytes": 19431,
+      "sha256": "7b3c8e1dd516cbb6240e594985d6149fbe1fec87788c3299916edbf9a0d2e667",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN/Utils.pm",
+      "encoded_bytes": 1858,
+      "decoded_bytes": 4637,
+      "sha256": "33d9334d8059682c4084015f0659f730c55d05fd54ff41767bb89a3decfa55de",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git/SVN.pm",
+      "encoded_bytes": 20269,
+      "decoded_bytes": 72812,
+      "sha256": "01535bd5390febbe378ab9619ed9dbbe835261c267e9af797fd40a7892145bf8",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/perl5/Git.pm",
+      "encoded_bytes": 15020,
+      "decoded_bytes": 48063,
+      "sha256": "8e9b630ca6dfd4884f2521c3b54ff1db86ee279028b5cee36726d4f0ecba6f85",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/cygfido2-1.dll",
+      "encoded_bytes": 63284,
+      "decoded_bytes": 266752,
+      "sha256": "6da714114cb8c5fc5b2f28f4661c81c05087d1267444c612eaae9d5cda92f298",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/mount.exe",
+      "encoded_bytes": 6506,
+      "decoded_bytes": 18451,
+      "sha256": "80effe08493d2ba01b9d35209534a143baede1b01662daab770a01f53021b9e1",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygiconv-2.dll",
+      "encoded_bytes": 522452,
+      "decoded_bytes": 1088019,
+      "sha256": "542a816afac795e5be81c1b7f18baff211eb55c64de5a09e6d36fc5fb9740ae0",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygcrypto-3.dll",
+      "encoded_bytes": 1475006,
+      "decoded_bytes": 5382163,
+      "sha256": "4c1b545609bee93ff74f70326a7ceccdb26fbd3aecacac153249ddbe0cc47e73",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygopenssh.dll",
+      "encoded_bytes": 239804,
+      "decoded_bytes": 706048,
+      "sha256": "c3326db7a304b7a833207bc57f6a1139e5d4b253c319a519f98d33f326244f58",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/cygssl-3.dll",
+      "encoded_bytes": 326071,
+      "decoded_bytes": 987155,
+      "sha256": "0c9881f46d3f675408ae6d9515feab23ad692430ec94a9e71222090e093ef944",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/openssl.exe",
+      "encoded_bytes": 292266,
+      "decoded_bytes": 935955,
+      "sha256": "e5104df9ee06f3bc4f28894a052d1423c522cc5485e2a25f9526d96b79f7912c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/scp.exe",
+      "encoded_bytes": 73605,
+      "decoded_bytes": 201728,
+      "sha256": "bb12d3e52d4c83eef74dddaa0eeada3d303ec1a076da07d22515a35f157ebfca",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/sftp-server.exe",
+      "encoded_bytes": 17721,
+      "decoded_bytes": 55296,
+      "sha256": "40d3a6a39e7ecd079e8663cf41be20729ad994c7c9887036c67fb314786725d3",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/sftp.exe",
+      "encoded_bytes": 42957,
+      "decoded_bytes": 121856,
+      "sha256": "f7a23fb9c02579f2e72f865a2d72c5f2706f362c66355fa00780655f312a8e85",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/ssh-add.exe",
+      "encoded_bytes": 16406,
+      "decoded_bytes": 47616,
+      "sha256": "378eac56f287a82a8fe6882585f5c9194f05e14adec0e25382d4c2c95259d0c1",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/ssh-agent.exe",
+      "encoded_bytes": 26434,
+      "decoded_bytes": 76288,
+      "sha256": "8b897756c41ebcd195fd8609dc6a6e02ae148aadabade9b1a4e2543999113d6b",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/ssh-keygen.exe",
+      "encoded_bytes": 48596,
+      "decoded_bytes": 147456,
+      "sha256": "bd614c2aa6d2cc86ea4915822de0e4677a32a104501a547b9b4ec00c78d60332",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/ssh-keyscan.exe",
+      "encoded_bytes": 14754,
+      "decoded_bytes": 43008,
+      "sha256": "ff59c6027cee1b1003ab6eaed3727b3771b2326d450fa5fbbf6881c2f8c23a21",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/ssh-pkcs11-helper.exe",
+      "encoded_bytes": 17702,
+      "decoded_bytes": 54784,
+      "sha256": "8d561e6df1a395fd5452e5f6d7cc1a123d183b3af3a2a909df6bc089d8ec35c0",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/ssh-sk-helper.exe",
+      "encoded_bytes": 16507,
+      "decoded_bytes": 51712,
+      "sha256": "9184d4f19b68b598c92c5621411a89668bb2dcc56e6b55c5376379f08401b46c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/sshd.exe",
+      "encoded_bytes": 63959,
+      "decoded_bytes": 202240,
+      "sha256": "d2077ed83b4f9c8a2b93c4ebe0421dfd81513cc34291a5d479b3db86b732b825",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/toybox.exe",
+      "encoded_bytes": 202281,
+      "decoded_bytes": 464384,
+      "sha256": "e6b72054638df2963d1ed6ae9e6f01660ced68d4f3ecaa247302b39016338a89",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/_ssh.exe",
+      "encoded_bytes": 111830,
+      "decoded_bytes": 328192,
+      "sha256": "5f3ff2096da539d19d2aaf80be884ea6b6df3f0d2c988b0e66e09b1b15a4266e",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/MobaVNC.exe",
+      "encoded_bytes": 219533,
+      "decoded_bytes": 547328,
+      "sha256": "2cd7aadab4196c3eff16f3872e7e56b92ea1bfe84aa9978fd9119c870fe488c4",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86"
+    },
+    {
+      "path": "bin/sudoku.exe",
+      "encoded_bytes": 12118,
+      "decoded_bytes": 37888,
+      "sha256": "f233686ef80543da3271042b9fbcd89e53bc086f811d43ebf283217dfc5d279b",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/vnp.exe",
+      "encoded_bytes": 4237,
+      "decoded_bytes": 16384,
+      "sha256": "b0668336026072385c7075cd56fa134ab471a020c97b5d5cd44b6c3fb5f0b953",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/VNCHooks.dll",
+      "encoded_bytes": 28818,
+      "decoded_bytes": 67584,
+      "sha256": "3c404a5315264ee99b023f2b94d2861b049892778068e5372a0d5b6fade41482",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86"
+    },
+    {
+      "path": "bin/ctris.exe",
+      "encoded_bytes": 12021,
+      "decoded_bytes": 50176,
+      "sha256": "b2179b4b6b89eccdb5c893a667dd854891cc3a2df22bcbb7d6830e3bb26ac059",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/greed.exe",
+      "encoded_bytes": 20579,
+      "decoded_bytes": 84398,
+      "sha256": "471c176d92e162ef4df67a441a352d23b3dcc8c7084263526f3ead3b1204ce8f",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "usr/share/sudoku/template",
+      "encoded_bytes": 3642,
+      "decoded_bytes": 24012,
+      "sha256": "92f4cb075b725becd7bf27e1a16584b2ca7d53581a9c28f7e1db5a4c1ddf0f4e",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "bin/sshd-session.exe",
+      "encoded_bytes": 127616,
+      "decoded_bytes": 403968,
+      "sha256": "293f1292c2120c278ae09c96dce988cf0bec06829c58b5cdfb9018d075da8c0c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/rsync.exe",
+      "encoded_bytes": 230071,
+      "decoded_bytes": 538112,
+      "sha256": "bce105974907e1aa34f7fdba97c771cba07af901dd0a38705a1f1fef6e7b079b",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "bin/sshd-auth.exe",
+      "encoded_bytes": 115876,
+      "decoded_bytes": 367104,
+      "sha256": "02ee2c9fdcee0b7ef521284c4cfb63803e22d169b98926826433ac0c268a1292",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "lib/engines-3/capi.dll",
+      "encoded_bytes": 1532,
+      "decoded_bytes": 8211,
+      "sha256": "38b2ef3235ee937930c112a25aaac060d643584e8d76f9215731671312a3c977",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "lib/engines-3/loader_attic.dll",
+      "encoded_bytes": 14500,
+      "decoded_bytes": 42003,
+      "sha256": "264a8497f5c16bf504c4730ca2adf8337e6eacaf6b78a28b00f70b3cc45bf108",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "lib/engines-3/padlock.dll",
+      "encoded_bytes": 6960,
+      "decoded_bytes": 22547,
+      "sha256": "bee422ab976b69132bd684b48674a928ce7df8f1a7bed8aca42baa8a1c4b6758",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "lib/ossl-modules/legacy.dll",
+      "encoded_bytes": 32225,
+      "decoded_bytes": 126483,
+      "sha256": "e2a85c46c0e3dd36160d61b5ef3cd97d60d2c6c5dbe362dca9e3796d5de43b1b",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "Windows PE",
+      "architecture": "x86_64"
+    },
+    {
+      "path": "etc/pki/tls/openssl.cnf",
+      "encoded_bytes": 3706,
+      "decoded_bytes": 11229,
+      "sha256": "24b1b1d2c08d740c1c60097a6cfff0b0af26f05fd66275ab75c12d6adbf8b36c",
+      "encoding": "ZIP member containing LZMA-alone",
+      "format": "text",
+      "architecture": null
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+   Compiling harbor-workspace v0.1.0-x04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04)
+error[E0425]: cannot find value `MAX_PAYLOAD_BYTES` in this scope
+  --> src/x11/xdmcp_payload.rs:12:89
+   |
+12 |         let huge=root.path().join("huge");std::fs::File::create(&huge).unwrap().set_len(MAX_PAYLOAD_BYTES+1).unwrap();
+   |                                                                                         ^^^^^^^^^^^^^^^^^ not found in this scope
+
+warning: unused import: `super::*`
+ --> src/x11/xdmcp_payload.rs:4:9
+  |
+4 |     use super::*;
+  |         ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0425]: cannot find function `load_pinned` in this scope
+  --> src/x11/xdmcp_payload.rs:15:53
+   |
+15 | ...   std::thread::spawn(move||{let _=tx.send(load_pinned(&path,&AtomicBool::new(false),Instant::now()+Duration::from_secs(1)).map(|...
+   |                                               ^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `load_pinned` in this scope
+  --> src/x11/xdmcp_payload.rs:23:17
+   |
+23 |         assert!(load_pinned(path,&AtomicBool::new(true),Instant::now()+Duration::from_secs(1)).unwrap_err().contains("cancel"));
+   |                 ^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `load_pinned` in this scope
+  --> src/x11/xdmcp_payload.rs:24:17
+   |
+24 |         assert!(load_pinned(path,&AtomicBool::new(false),Instant::now()).unwrap_err().contains("deadline"));
+   |                 ^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `copy_verified` in this scope
+  --> src/x11/xdmcp_payload.rs:32:91
+   |
+32 | ...   std::thread::spawn(move||{let mut output=tempfile::tempfile().unwrap();let result=copy_verified(CancelAfterRead{file,cancelled...
+   |                                                                                         ^^^^^^^^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+warning: `harbor-workspace` (lib test) generated 1 warning
+error: could not compile `harbor-workspace` (lib test) due to 5 previous errors; 1 warning emitted

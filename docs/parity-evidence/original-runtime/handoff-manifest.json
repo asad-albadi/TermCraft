@@ -1,0 +1,261 @@
+{
+  "qualification": "EMULATED ORIGINAL ONLY; no native Windows qualification",
+  "private_stage": "app/target/agent-work/original-runtime",
+  "product_code_changed": false,
+  "native_qualification_count_increment": 0,
+  "cleanup": "All owned command sessions completed; namespace-scoped children torn down, private gpgconf --kill all completed; final process audit found no owned runtime/helper/server processes.",
+  "retained_files": [
+    {
+      "path": "app/docs/parity-evidence/original-runtime/B06.json",
+      "sha256": "a95d8835c71f47bc2721ac1bbbe6777863c07e0f7dd2ca78df9d19400816465a",
+      "bytes": 1561
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/CygUtils.plugin.catalog.json",
+      "sha256": "1d7694aa33060dd006145bc8f4502b556333c2c6aa3d97d0e583cddf1ce30a65",
+      "bytes": 138475
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/CygUtils64.plugin.catalog.json",
+      "sha256": "c4b5d282ad25a2d44ae50b68719b1ab982efcf6c2306ad3a74826b64e12dd4d6",
+      "bytes": 52818
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/E04.json",
+      "sha256": "87dd524ae7d628e97d5f2439090771c2a40e22b2f40873a859da9f67151b7ac0",
+      "bytes": 1561
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/E05.json",
+      "sha256": "234f3361cb535ceedf45d64d24c8e473acb6b32c6c0a661a80ab5ac5c5affcd6",
+      "bytes": 1561
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/README.md",
+      "sha256": "fd052cd055560adcf85d13880b7ad9bb8ffab03d65d932ba0baa4cfb69fb7ab5",
+      "bytes": 7173
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/Sqlite3-Cygwin.README",
+      "sha256": "19eb70ec8a39f2709a60dbe53cba3b2384c1ac6ddaa5a615fab03b94333f2e85",
+      "bytes": 8299
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/Sqlite3.mxt3.catalog.json",
+      "sha256": "13a4595f55b28704d788f9e6b8fb4c8a83959f67037dacf1779f0260c9b0aaf9",
+      "bytes": 1603
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/V07.json",
+      "sha256": "b809b3bb47cd49fb9abfc8e25f6f12ada7e14515006e96312d5c221249cb7c88",
+      "bytes": 1561
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/Wine-BUILDINFO",
+      "sha256": "b0b53a039c451b10d14bfb7058673586f81fd91921890a9c40226f903e7b4be2",
+      "bytes": 13480
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/Wine-COPYING.LIB",
+      "sha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c",
+      "bytes": 26434
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/Wine-PKGINFO",
+      "sha256": "a76a3c3b20f4d5354cf05219ac2af9495cab2f3aa974a0115bb3a88f4dc22646",
+      "bytes": 1907
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/Xvfb-COPYING",
+      "sha256": "c9f90a6669109aad6c9a7c3b46cc2c574221a73b792afa419336816b49da5c11",
+      "bytes": 95075
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/Xvfb-PKGINFO",
+      "sha256": "1ced41b35755e187150e37767b8141e29969e767d4a2533f6312c2b1a2a40bb1",
+      "bytes": 1323
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/action-xtest-unresolved.py",
+      "sha256": "6248127f61ec36b879c114aa57c8107131a2849ca2e79f26f98c12e6ad3ee6f7",
+      "bytes": 1871
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/action.py",
+      "sha256": "6098bd5b1de7cfb3ecf9bd30c61ba73729849455ee08736487d168ea28a404c6",
+      "bytes": 143
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/fast_capture.py",
+      "sha256": "2515fcbb5530c6f0d9da3097406dd781b624240019f2cab1ab81b4b00baecc5d",
+      "bytes": 1540
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/fixture.log",
+      "sha256": "6bb4867887de324de5bbe05579ece0ee7d6e2106386fdac9ddae9cb890d237cf",
+      "bytes": 1555
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/helper-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/initial.json",
+      "sha256": "73702e0aa25a34eaa261f67bb1d7b7b1f170126ffd01c6ae71069345a702e29d",
+      "bytes": 1330
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/inspect.c",
+      "sha256": "553e46b7f154a30d291f88c3bbefd38e81c0dd14d17527383f25c3cb79a2efcb",
+      "bytes": 812
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/isolation.json",
+      "sha256": "f44d59c2f76495aba240a27f13d33ed245224f636bb136a7c3316643e5fbb8a0",
+      "bytes": 128
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/keyring.sha256",
+      "sha256": "27be9568801a47a6271b30327d6ca924b4782556d54dee2cad8c7c7ff74e5165",
+      "bytes": 107
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/original-inputs.sha256",
+      "sha256": "8e04daa898fa029114c0eff0c13bef01c96ee2d7978951b932dbbeb7814bf928",
+      "bytes": 404
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/original-startup.ini",
+      "sha256": "259e1847c9ded4819f754a65eb3a7e05590e49f3b3328d823d09ce8150545067",
+      "bytes": 110
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/package.json",
+      "sha256": "3464dab70a17f814e0a3e17bc3acf0e87839741a3eb93eb6074c41bafab413ea",
+      "bytes": 1607
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/probe.py",
+      "sha256": "921d661d6deefd785f96faf1eaf132a8624b1f336d929b9c46b7cd15645b7adb",
+      "bytes": 3988
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/run-cage.sh",
+      "sha256": "eabbbbcb065162fa5fdc233b0cf094daa21d8ab07a9f83445a91c90584d660ca",
+      "bytes": 1117
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/run.sh",
+      "sha256": "3a8a809b50392b8da40ed2a10c728c85becddda6f82d3fb3178486d10fa66aeb",
+      "bytes": 1103
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/runtime-host-dependencies.txt",
+      "sha256": "1a0f76ae38d7e014d6f6bf0500cd2b7131042f31cf8d8672209de09cae742345",
+      "bytes": 655
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/signature.log",
+      "sha256": "506ccaff056eebb50fa2bf361e87206db8642445e6249a29f0b75bf62be265a8",
+      "bytes": 804
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/stable-fallback.log",
+      "sha256": "fac5a81c76bcb5147f9bd0c300cd75333c105a730b238e52c009135339c7ffa1",
+      "bytes": 307
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/startup.png",
+      "sha256": "0cbc620f3c3cb0b69deaaedafe21b008c2c37472ed7333680c56626989263bd8",
+      "bytes": 42086
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/twm-COPYING",
+      "sha256": "4809ffc9656bc9a704e19ab467d1cedc97c48c9d1f9a4018e6d99d2e61f75945",
+      "bytes": 3649
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/twm-package.json",
+      "sha256": "676d458149014315cffabd8011d4d0a395b19b1918cda2f80cf00afa7ed3cf24",
+      "bytes": 736
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/twm-signature.log",
+      "sha256": "020b3f7d3c53355852f4e175af1d1171f4eb1c29be5b01950cb0b3607a29cf29",
+      "bytes": 959
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/win32-menu-query.log",
+      "sha256": "933413500135b9740e9cd6c7f07247b4a38b2e8e82f4110864c91062d264a022",
+      "bytes": 1394
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/wine.log",
+      "sha256": "463523ac1d112adc45b339d66b334cb2601bb682f7a200293f027b66e9a3a13c",
+      "bytes": 6872
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/xvfb-package.json",
+      "sha256": "f4f396da949ada041036f54c740c64ec6e08c9fe2272254b9d909e668d948b85",
+      "bytes": 1233
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/xvfb-run.py",
+      "sha256": "e52007a54570b9f72d1308ce161a6ac4e96f6840fe8841544f83484705bcc6c6",
+      "bytes": 638
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/xvfb-signature.log",
+      "sha256": "1eafb872b83e5ace41ace1f4bac45e7e0b04a6bc313ef27f93e8951fda384035",
+      "bytes": 959
+    },
+    {
+      "path": "app/docs/parity-evidence/original-runtime/xvfb.log",
+      "sha256": "e872725f89e5a89c826cf7ff97fd88f7dd8b3f4ad647362492020725551b7041",
+      "bytes": 526
+    }
+  ],
+  "private_downloads": [
+    {
+      "path": "app/target/agent-work/original-runtime/downloads/Sqlite3.mxt3",
+      "sha256": "3bd4979a8b7241b8a27b7020bb2eb08ab950ad15b2dde854c840da465f311c77",
+      "bytes": 494649
+    },
+    {
+      "path": "app/target/agent-work/original-runtime/downloads/apt-cyg.tar.bz2",
+      "sha256": "54c453098e8450d1c117ed7d98591570e5465d02d989eef96840363e394fc4f2",
+      "bytes": 10999
+    },
+    {
+      "path": "app/target/agent-work/original-runtime/downloads/twm.pkg.tar.zst",
+      "sha256": "3fdf26ad652031e3129aed3d2da5ded08d26d8c7cbb79cf937edf748c954136e",
+      "bytes": 100976
+    },
+    {
+      "path": "app/target/agent-work/original-runtime/downloads/twm.pkg.tar.zst.sig",
+      "sha256": "3bd30017225fe9d0eec87ff40f312e9506b1471d0100bc66b38802c574e09112",
+      "bytes": 310
+    },
+    {
+      "path": "app/target/agent-work/original-runtime/downloads/wine.pkg.tar.zst",
+      "sha256": "27327c65c6ee2e1e63b5c67e8b7d481982969dad7ad6715bbe284202d35fcfa7",
+      "bytes": 80969757
+    },
+    {
+      "path": "app/target/agent-work/original-runtime/downloads/wine.pkg.tar.zst.sig",
+      "sha256": "f30b710c986c31c88194d377ac19a1987fcfa40a74d62a4e49dbab195979d36e",
+      "bytes": 119
+    },
+    {
+      "path": "app/target/agent-work/original-runtime/downloads/xvfb.pkg.tar.zst",
+      "sha256": "67fb3d52b7658bf610449cb83b97a224ea683d7486b612995b4d10ec26a1a9af",
+      "bytes": 873799
+    },
+    {
+      "path": "app/target/agent-work/original-runtime/downloads/xvfb.pkg.tar.zst.sig",
+      "sha256": "c8bdcd897b40dfb22ddbfd149f2be3cba06aab2799ff327d315ea8567e9fed3d",
+      "bytes": 310
+    }
+  ]
+}

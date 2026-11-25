@@ -1,0 +1,243 @@
+--- a/engines/rdp/src/serial.rs
++++ b/engines/rdp/src/serial.rs
+@@ -34,9 +34,11 @@
+ const WAIT_ON_MASK: u32 = 0x001b0048;
+ const GET_STATS: u32 = 0x001b008c;
+ const RXCHAR: u32 = 1;
+-// Only Linux exposes the nonblocking TIOCGICOUNT counter snapshot used here.
++// Linux exposes receive error/break counters through nonblocking TIOCGICOUNT.
++// Reading modem counters does not arm modem-status interrupts. Never accept
++// CTS/DSR/RLSD/RING without a separately established bounded capture provider.
+ // TXEMPTY requires physical transmitter status; a software queue count is insufficient.
+-const COUNTER_EVENTS: u32 = if cfg!(target_os = "linux") { 0x01f8 } else { 0 };
++const COUNTER_EVENTS: u32 = if cfg!(target_os = "linux") { 0x00c0 } else { 0 };
+ 
+ // Admission recognizes only a well-shaped, supported Unix mask set. The worker
+ // still validates the handle and access and remains the sole owner of TTY state.
+@@ -54,7 +56,7 @@
+     queued: usize,
+     received: bool,
+     counter_bits: u32,
+-    counters: Option<[u32; 8]>,
++    counters: Option<[u32; 4]>,
+     wait: Option<Vec<u8>>,
+ }
+ 
+@@ -75,17 +77,16 @@
+         }
+         if let Some(previous) = self.counters {
+             let current = event_counters(file)?;
+-            // Each counter counts actual interrupts, not the present modem level.
+-            // A wrapping u32 increment is still a change. Polling coalesces edges.
++            // The driver's receive path records these errors/breaks. Merely
++            // reading a modem snapshot does not establish modem edge capture.
++            // A wrapping u32 increment is still a change. Polling coalesces events.
+             let changed = |index: usize| current[index].wrapping_sub(previous[index]) != 0;
+-            for (index, event) in [(0, 8), (1, 16), (2, 256), (3, 32), (7, 64)] {
+-                if changed(index) {
+-                    self.counter_bits |= event & self.mask;
+-                }
++            if changed(3) {
++                self.counter_bits |= 64 & self.mask;
+             }
+             // EV_ERR is framing, hardware overrun or parity, not RX/TX counts,
+             // BREAK, software buffer overrun or any reserved UAPI field.
+-            if (4..=6).any(changed) {
++            if (0..=2).any(changed) {
+                 self.counter_bits |= 128 & self.mask;
+             }
+             self.counters = Some(current);
+@@ -136,13 +137,13 @@
+ }
+ 
+ #[cfg(target_os = "linux")]
+-fn event_counters(file: &File) -> Result<[u32; 8], u32> {
+-    // CTS, DSR, RI, DCD, framing, hardware overrun, parity, input break.
+-    native_counters(file).map(|counts| [0, 1, 2, 3, 6, 7, 8, 9].map(|index| counts[index] as u32))
++fn event_counters(file: &File) -> Result<[u32; 4], u32> {
++    // Only framing, hardware overrun, parity and input break. No modem counters.
++    native_counters(file).map(|counts| [6, 7, 8, 9].map(|index| counts[index] as u32))
+ }
+ 
+ #[cfg(not(target_os = "linux"))]
+-fn event_counters(_: &File) -> Result<[u32; 8], u32> {
++fn event_counters(_: &File) -> Result<[u32; 4], u32> {
+     Err(UNSUPPORTED)
+ }
+ 
+@@ -1814,13 +1815,13 @@
+         let mut counts = [17; 20];
+         FIXTURE_COUNTERS.set(Some(counts));
+         let reply =
+-            event_control(&mut unsupported, u, 2, 0x1b0044, &8u32.to_le_bytes(), 0).unwrap();
++            event_control(&mut unsupported, u, 2, 0x1b0044, &64u32.to_le_bytes(), 0).unwrap();
+         assert_eq!(u32_at(&reply, 12), Ok(UNSUPPORTED));
+         let (_m, _s, mut serial, h) = purge_fixture();
+-        counts[0] = counts[0].wrapping_add(10); // historic CTS changes before SET
++        counts[9] = counts[9].wrapping_add(10); // historic input breaks before SET
+         counts[8] = counts[8].wrapping_add(10); // historic parity errors before SET
+         FIXTURE_COUNTERS.set(Some(counts));
+-        let mask = 0x1f8u32; // CTS, DSR, RLSD, BREAK, ERR, RING; no TXEMPTY
++        let mask = 0xc0u32; // input BREAK and line-status ERR only
+         let reply = event_control(&mut serial, h, 3, 0x1b0044, &mask.to_le_bytes(), 0).unwrap();
+         assert_eq!(u32_at(&reply, 12), Ok(0));
+         assert!(event_control(&mut serial, h, 4, 0x1b0048, &[], 4).is_none());
+@@ -1828,7 +1829,7 @@
+             serial.ready().is_empty(),
+             "historic counts are not new edges"
+         );
+-        for index in [0, 1, 2, 3, 9, 8] {
++        for index in [9, 8] {
+             counts[index] = counts[index].wrapping_add(1);
+         }
+         FIXTURE_COUNTERS.set(Some(counts));
+@@ -1853,10 +1854,10 @@
+     #[test]
+     fn unix_counter_events_filter_fields_wrap_and_preserve_wait_on_failed_set() {
+         let mut counts = [0i32; 20];
+-        counts[0] = -1;
++        counts[9] = -1;
+         FIXTURE_COUNTERS.set(Some(counts));
+         let (_m, _s, mut serial, h) = purge_fixture();
+-        let mask = 8u32 | 128;
++        let mask = 64u32 | 128;
+         assert_eq!(
+             u32_at(
+                 &event_control(&mut serial, h, 2, 0x1b0044, &mask.to_le_bytes(), 0).unwrap(),
+@@ -1867,10 +1868,10 @@
+         assert!(event_control(&mut serial, h, 3, 0x1b0048, &[], 4).is_none());
+         counts[4] += 1;
+         counts[5] += 1;
+-        counts[9] += 1; // RX/TX/BREAK aren't ERR
++        counts[0] += 1; // RX/TX/modem snapshots are not receive errors
+         FIXTURE_COUNTERS.set(Some(counts));
+         assert!(serial.ready().is_empty());
+-        for rejected in [4u32, 0x200, 0x2000] {
++        for rejected in [4u32, 8, 16, 32, 256, 64 | 8, 0x200, 0x2000] {
+             let expected = if rejected == 0x2000 {
+                 INVALID
+             } else {
+@@ -1895,7 +1896,7 @@
+         );
+         FIXTURE_COUNTERS.set(Some(counts));
+         assert!(serial.ready().is_empty());
+-        counts[0] = 0;
++        counts[9] = 0;
+         counts[6] += 1; // real modulo-u32 transition + framing error
+         FIXTURE_COUNTERS.set(Some(counts));
+         let replies = serial.ready();
+@@ -1911,7 +1912,7 @@
+         let mut body = vec![0; 32];
+         body[4..8].copy_from_slice(&4u32.to_le_bytes());
+         body[8..12].copy_from_slice(&0x1b0044u32.to_le_bytes());
+-        body.extend(0x1f9u32.to_le_bytes());
++        body.extend(0xc1u32.to_le_bytes());
+         assert!(
+             is_wait_mask_set(&body),
+             "reset escape must admit newly supported masks"
+@@ -1928,7 +1929,7 @@
+         let mut counts = [0i32; 20];
+         FIXTURE_COUNTERS.set(Some(counts));
+         let (_m, _s, mut serial, h) = purge_fixture();
+-        let mask = 0x1f8u32;
++        let mask = 0xc0u32;
+         assert_eq!(
+             u32_at(
+                 &event_control(&mut serial, h, 2, 0x1b0044, &mask.to_le_bytes(), 0).unwrap(),
+@@ -1936,18 +1937,9 @@
+             ),
+             Ok(0)
+         );
+-        for (tag, (index, expected)) in [
+-            (0, 8u32),
+-            (1, 16),
+-            (3, 32),
+-            (9, 64),
+-            (6, 128),
+-            (7, 128),
+-            (8, 128),
+-            (2, 256),
+-        ]
+-        .into_iter()
+-        .enumerate()
++        for (tag, (index, expected)) in [(9, 64u32), (6, 128), (7, 128), (8, 128)]
++            .into_iter()
++            .enumerate()
+         {
+             // Counter changes between waits must satisfy the NEXT wait.
+             counts[index] += 1;
+@@ -1962,7 +1954,7 @@
+             );
+         }
+         assert!(event_control(&mut serial, h, 40, 0x1b0048, &[], 4).is_none());
+-        for index in [4, 5, 10, 11, 19] {
++        for index in [0, 1, 2, 3, 4, 5, 10, 11, 19] {
+             counts[index] += 1;
+         }
+         FIXTURE_COUNTERS.set(Some(counts));
+@@ -1983,7 +1975,7 @@
+         let mut counts = [0i32; 20];
+         FIXTURE_COUNTERS.set(Some(counts));
+         let (mut master, _slave, mut serial, h) = purge_fixture();
+-        let mask = 8u32;
++        let mask = 64u32;
+         assert_eq!(
+             u32_at(
+                 &event_control(&mut serial, h, 2, 0x1b0044, &mask.to_le_bytes(), 0).unwrap(),
+@@ -2010,12 +2002,12 @@
+             serial.ready().is_empty(),
+             "a real protocol read cannot fabricate RXCHAR outside the mask"
+         );
+-        counts[0] += 1;
++        counts[9] += 1;
+         FIXTURE_COUNTERS.set(Some(counts));
+         let replies = serial.ready();
+         assert_eq!(replies.len(), 1);
+         assert_eq!(u32_at(&replies[0], 8), Ok(3));
+-        assert_eq!(u32_at(&replies[0], 20), Ok(8));
++        assert_eq!(u32_at(&replies[0], 20), Ok(64));
+         assert!(event_control(&mut serial, h, 5, 0x1b0048, &[], 4).is_none());
+         assert_eq!(
+             u32_at(
+@@ -2031,4 +2023,40 @@
+         assert!(!serial.has_pending());
+         FIXTURE_COUNTERS.set(None);
+     }
+-}
++    #[cfg(target_os = "linux")]
++    #[test]
++    fn unix_modem_snapshot_does_not_establish_active_interrupt_capture() {
++        FIXTURE_COUNTERS.set(Some([0; 20]));
++        let (_m, _s, mut serial, h) = purge_fixture();
++        // A real driver can return a valid snapshot with modem interrupts off.
++        // Snapshot success never authorizes modem masks, before or after local
++        // flow/carrier configuration changes. Only this test-owned PTY changes.
++        for mode in [0, libc::CLOCAL, libc::CRTSCTS, libc::CLOCAL | libc::CRTSCTS] {
++            let handle = serial.ports.get_mut(&1).unwrap().handle.as_mut().unwrap();
++            let mut attrs = get_attributes(&handle.file).unwrap();
++            attrs.c_cflag = (attrs.c_cflag & !(libc::CLOCAL | libc::CRTSCTS)) | mode;
++            set_attributes(&handle.file, &attrs).unwrap();
++            let before = get_attributes(&handle.file).unwrap().c_cflag;
++            for bit in [8u32, 16, 32, 256] {
++                let reply =
++                    event_control(&mut serial, h, 2, 0x1b0044, &bit.to_le_bytes(), 0).unwrap();
++                assert_eq!(u32_at(&reply, 12), Ok(UNSUPPORTED), "modem event {bit:#x}");
++                let mut body = vec![0; 32];
++                body[4..8].copy_from_slice(&4u32.to_le_bytes());
++                body[8..12].copy_from_slice(&0x1b0044u32.to_le_bytes());
++                body.extend(bit.to_le_bytes());
++                assert!(
++                    !is_wait_mask_set(&body),
++                    "no queue escape for unsupported modem event {bit:#x}"
++                );
++            }
++            let handle = serial.ports.get(&1).unwrap().handle.as_ref().unwrap();
++            assert_eq!(
++                get_attributes(&handle.file).unwrap().c_cflag,
++                before,
++                "failed modem masks must not force arming through flow/carrier flags"
++            );
++        }
++        FIXTURE_COUNTERS.set(None);
++    }
++}

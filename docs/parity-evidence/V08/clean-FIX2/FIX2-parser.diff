@@ -1,0 +1,80 @@
+--- FIX1/source/validate.py::iperf3_bytes
++++ FIX2/source/pinned_iperf3.py
+@@ -1,8 +1,70 @@
++"""Required pinned iperf3 3.19.1 single forward TCP report structure and byte receipts.
++Not an exhaustive Iperf JSON schema or a validator for other modes/versions.
++"""
++import json,math
++BYTES=262144
++PORT=25323
++def need(condition,label):
++ if not condition:raise ValueError(label)
++def obj(value,label):need(type(value) is dict,label+' object');return value
++def integer(value,label,minimum=0):need(type(value) is int and value>=minimum,label+' integer');return value
++def number(value,label,minimum=0):need(type(value) in (int,float) and math.isfinite(value) and value>=minimum,label+' finite number');return value
++def one(value,label):need(type(value) is list and len(value)==1,label+' exactly one');return obj(value[0],label)
++def close(a,b,label):need(math.isclose(a,b,rel_tol=.001,abs_tol=.001),label+' consistency')
++def transfer(value,label,role):
++ r=obj(value,label)
++ start=number(r['start'],label+' start');end=number(r['end'],label+' end');seconds=number(r['seconds'],label+' seconds')
++ need(end>start and seconds>0,label+' positive duration');close(end-start,seconds,label+' duration')
++ count=integer(r['bytes'],label+' bytes');rate=number(r['bits_per_second'],label+' rate');close(rate*seconds,count*8,label+' rate/bytes')
++ need(r['sender'] is role,label+' sender role')
++ return r
++
++def report(value,role):
++ r=obj(value,'report');need('error' not in r,'report has error')
++ start=obj(r['start'],'start');need(start['version']=='iperf 3.19.1','pinned Iperf version')
++ need(type(start['cookie']) is str and bool(start['cookie'].strip()) and not any(c.isspace() for c in start['cookie']),'session cookie')
++ timestamp=obj(start['timestamp'],'timestamp');need(type(timestamp['time']) is str and bool(timestamp['time'].strip()),'timestamp time');integer(timestamp['timesecs'],'timestamp epoch',1)
++ connection=one(start['connected'],'connected');socket=integer(connection['socket'],'connection socket')
++ for prefix in ['local','remote']:
++  need(connection[prefix+'_host']=='127.0.0.1','loopback '+prefix+' host');port=integer(connection[prefix+'_port'],prefix+' port',1);need(port<=65535,prefix+' port range')
++ need(connection['remote_port' if role else 'local_port']==PORT,'fixture TCP port')
++ setup=obj(start['test_start'],'test start')
++ expected={'protocol':'TCP','num_streams':1,'blksize':131072,'omit':0,'duration':0,'bytes':BYTES,'blocks':0,'reverse':0,'bidir':0,'interval':1}
++ for key,v in expected.items():need(type(setup[key]) is type(v) and setup[key]==v,'pinned setup '+key)
++ if role:
++  peer=obj(start['connecting_to'],'connecting_to');need(peer['host']=='127.0.0.1','client peer');need(type(peer['port']) is int and peer['port']==PORT,'client peer port')
++ else:
++  peer=obj(start['accepted_connection'],'accepted_connection');need(peer['host']=='127.0.0.1','server peer');integer(peer['port'],'server control peer port',1);need(peer['port']<=65535,'server control peer port range')
++ intervals=r['intervals'];need(type(intervals) is list and bool(intervals),'nonempty intervals')
++ total=0;previous=0
++ for index,value in enumerate(intervals):
++  interval=obj(value,'interval');stream=transfer(one(interval['streams'],'interval streams'),'interval stream',role);summary=transfer(interval['sum'],'interval sum',role)
++  integer(stream['socket'],'interval socket');need(stream['socket']==socket,'interval socket identity')
++  need(stream['omitted'] is False and summary['omitted'] is False,'non-omitted interval')
++  need(stream['bytes']==summary['bytes'],'interval sum bytes')
++  for key in ['start','end','seconds','bits_per_second']:close(stream[key],summary[key],'interval '+key)
++  close(stream['start'],previous,'contiguous interval start');previous=stream['end'];total+=stream['bytes']
++ need(total==BYTES,'complete interval byte total')
++ end=obj(r['end'],'end');streams=one(end['streams'],'end streams')
++ for key in ['sender','receiver']:
++  stream=transfer(streams[key],'end '+key,role);need(integer(stream['socket'],'end socket')==socket,'end socket identity')
++  summary=transfer(end['sum_sent' if key=='sender' else 'sum_received'],'end sum '+key,role)
++  need(stream['bytes']==summary['bytes'],'stream/summary byte consistency')
++  for field in ['start','end','seconds','bits_per_second']:close(stream[field],summary[field],'stream/summary '+field)
++  need(stream['start']==0,'complete summary start')
++  expected_bytes=BYTES if key=='receiver' or role else 0
++  need(stream['bytes']==expected_bytes,'pinned '+key+' byte receipt')
++ need(total==end['sum_sent' if role else 'sum_received']['bytes'],'interval/end byte consistency')
++ # The final interval must cover the completed summary; rounding differs slightly.
++ close(previous,end['sum_sent' if role else 'sum_received']['end'],'interval/end duration')
++ return start,connection,end
++
+ def iperf3_bytes(client,server):
+- c=json.loads(client);s=json.loads(server)
+- need('error' not in c and 'error' not in s,'iperf3 error')
+- need(type(c.get('intervals')) is list and len(c['intervals'])>0,'iperf3 intervals')
+- sent=c['end']['sum_sent']['bytes'];received=s['end']['sum_received']['bytes']
+- integer(c['end']['sum_received']['bytes'],received,'iperf3 client/server receipt')
+- integer(sent,262144,'iperf3 sender');integer(received,262144,'iperf3 receiver')
+- return sent,received
++ cs,cc,ce=report(json.loads(client),True);ss,sc,se=report(json.loads(server),False)
++ need(cs['cookie']==ss['cookie'],'client/server session cookie')
++ need(cc['local_host']==sc['remote_host'] and cc['remote_host']==sc['local_host'],'reciprocal hosts')
++ need(cc['local_port']==sc['remote_port'] and cc['remote_port']==sc['local_port'],'reciprocal data ports')
++ need(cs['test_start']==ss['test_start'],'client/server setup identity')
++ need(ce['sum_received']['bytes']==se['sum_received']['bytes']==BYTES,'client/server byte receipt')
++ close(ce['sum_received']['end'],se['sum_received']['end'],'client/server completed receiver time')
++ return ce['sum_sent']['bytes'],se['sum_received']['bytes']

@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "private_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+  "inputs": [
+    {
+      "path": "inputs/compositor/x11/linux-x86_64/Xwayland",
+      "sha256": "cbedd90fbc960d4cc799792cedf89b0afa1f1f74a93ba9fb05bfd4da2f27b2b8",
+      "origin": "/usr/bin/Xwayland"
+    },
+    {
+      "path": "inputs/termcraft-rdp-engine",
+      "sha256": "df05ad1671da073239d4b007db4cd317a8e5725f9b28cb8267cd81437519e481",
+      "origin": "engines/rdp/target/debug/termcraft-rdp-engine"
+    },
+    {
+      "path": "inputs/termcraft-rdp-engine-evaluation",
+      "sha256": "86ae5c412393c69da5d4ee73d61be2ded219e8c5b1b8e6d8a7b8bcece4bf3368",
+      "origin": "docs/parity-evidence/rdp-prototype/target/debug/termcraft-rdp-engine-evaluation"
+    },
+    {
+      "path": "inputs/xdmcp-engine/x11/linux-x86_64/XEPHYR_BUILDINFO",
+      "sha256": "e27c71e041c672fe757e6abd3dd626fbf6ee2adc96f26b75fe827130299e239a",
+      "origin": "target/agent-work/x04/evidence/staged-engine/x11/linux-x86_64/XEPHYR_BUILDINFO"
+    },
+    {
+      "path": "inputs/xdmcp-engine/x11/linux-x86_64/XEPHYR_COPYING",
+      "sha256": "c9f90a6669109aad6c9a7c3b46cc2c574221a73b792afa419336816b49da5c11",
+      "origin": "target/agent-work/x04/evidence/staged-engine/x11/linux-x86_64/XEPHYR_COPYING"
+    },
+    {
+      "path": "inputs/xdmcp-engine/x11/linux-x86_64/XEPHYR_PKGINFO",
+      "sha256": "a87fef8984962035ab8bbd47a7cdaff44c9ad10cc6d43309f4e8fced0eab31a2",
+      "origin": "target/agent-work/x04/evidence/staged-engine/x11/linux-x86_64/XEPHYR_PKGINFO"
+    },
+    {
+      "path": "inputs/xdmcp-engine/x11/linux-x86_64/Xephyr",
+      "sha256": "d7f1f49ee428fd06b26707a79ba6d65b4e9ada4e6b53aca4146baaa92c79e593",
+      "origin": "target/agent-work/x04/evidence/staged-engine/x11/linux-x86_64/Xephyr"
+    },
+    {
+      "path": "inputs/xdmcp-fixture/lib/libXpm.so.4",
+      "sha256": "e02df8ee6e0bff934a13563d9543e1a727620399ddf43d5c211d6846830768ac",
+      "origin": "target/agent-work/x04/evidence/staged-fixture/lib/libXpm.so.4"
+    },
+    {
+      "path": "inputs/xdmcp-fixture/libXdmGreet.so",
+      "sha256": "ab10ec35cf6045a27261ac4e6003127e23b5e9be0f054005cae69cf08f0a03ae",
+      "origin": "target/agent-work/x04/evidence/staged-fixture/libXdmGreet.so"
+    },
+    {
+      "path": "inputs/xdmcp-fixture/xdm",
+      "sha256": "d0f9df84fa1313b9e9155d2a5e5f790af7a760a8918239bd60b7b3dc3a27d946",
+      "origin": "target/agent-work/x04/evidence/staged-fixture/xdm"
+    },
+    {
+      "path": "inputs/xdmcp-fixture/xdmcp_output.py",
+      "sha256": "5376c6c050de55abb91eb5fb8fb798edf006c7f3c47d48e111d0876ac073ea2f",
+      "origin": "target/agent-work/x04/evidence/staged-fixture/xdmcp_output.py"
+    },
+    {
+      "path": "inputs/xdmcp-fixture/xdmcp_window.py",
+      "sha256": "78c78a4464775ab615e0a8ef3404e5e0d6cf4571dac7abf338080d0b1588b780",
+      "origin": "target/agent-work/x04/evidence/staged-fixture/xdmcp_window.py"
+    }
+  ],
+  "rdp_binary_bounds": "Prebuilt owned Linux helper and prototype server copied before the run; hashes identify exact executed bytes. This V03 increment does not rebuild them or claim current helper source correspondence. Application test/source snapshot is independently pinned.",
+  "xdmcp_bounds": "Xdm 1.1.17 owned staged fixture and pinned Xephyr 21.1.26-1; compositor is installed Xwayland copied as private fixture, not product bundle qualification."
+}

@@ -1,0 +1,2882 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -45,6 +45,7 @@
+ flate2 = "=1.1.11"
+ tar = { version = "=0.4.46", default-features = false }
+ libloading = "=0.8.9"
++xkeysym = "=0.2.1"
+ 
+ [target.'cfg(target_os = "macos")'.dependencies]
+ winit = { version = "0.30", default-features = false, features = ["rwh_06", "x11", "wayland"] }
+@@ -56,10 +57,11 @@
+ widestring = "=1.2.1"
+ cap-std = "=4.0.3"
+ cap-fs-ext = "=4.0.3"
+-windows-sys = { version = "0.61", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Console", "Win32_System_Registry", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_Services", "Win32_System_IO", "Win32_Security", "Win32_Security_Authorization", "Win32_Devices_Communication", "Win32_Storage_FileSystem"] }
++windows-sys = { version = "0.61", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Console", "Win32_System_Registry", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_Services", "Win32_System_IO", "Win32_Security", "Win32_Security_Authorization", "Win32_Devices_Communication", "Win32_Storage_FileSystem", "Win32_Graphics_Gdi", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_WindowsAndMessaging", "Win32_System_StationsAndDesktops"] }
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+ zbus = "5.19"
++x11rb = { version = "=0.13.2", features = ["xtest", "xkb"] }
+ 
+ [target.'cfg(unix)'.dependencies]
+ rustix = { version = "1.1.6", features = ["fs"] }
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1843,6 +1843,7 @@
+  "windows-sys 0.61.2",
+  "winit",
+  "x11rb",
++ "xkeysym",
+  "zbus",
+  "zeroize",
+ ]
+--- a/src/services/mod.rs
++++ b/src/services/mod.rs
+@@ -8,6 +8,8 @@
+ pub use sshd::{SshAuthorizedUser, SshServiceConfig};
+ mod ftp;
+ mod supervisor;
++mod vnc;
++pub use vnc::{VncServiceConfig, VncSource};
+ mod telnet;
+ mod tftp;
+ 
+@@ -27,6 +29,7 @@
+     Telnet,
+     Ssh,
+     Iperf,
++    Vnc,
+     Cron,
+ }
+ 
+@@ -41,6 +44,7 @@
+     Cron(cron::CronServiceConfig),
+     Ssh(SshServiceConfig),
+     Iperf(IperfServiceConfig),
++    Vnc(VncServiceConfig),
+     Shell { executable: PathBuf },
+ }
+ 
+@@ -197,3 +201,6 @@
+         assert!(TcpStream::connect(address).is_err());
+     }
+ }
++
++#[cfg(test)]
++mod vnc_service_tests;
+--- a/src/services/supervisor.rs
++++ b/src/services/supervisor.rs
+@@ -47,6 +47,12 @@
+ }
+ 
+ impl ServiceSupervisor {
++    pub fn start_vnc(&self, config: super::VncServiceConfig) -> Result<ServiceId, String> {
++        self.start(vnc_config(config))
++    }
++    pub fn begin_vnc(&self, config: super::VncServiceConfig) -> Result<ServiceId, String> {
++        self.begin(vnc_config(config))
++    }
+     pub fn start_cron(&self, config: super::cron::CronServiceConfig) -> Result<ServiceId, String> {
+         self.start(cron_config(config))
+     }
+@@ -267,7 +273,20 @@
+         runtime: ServiceRuntime::Iperf(config),
+     }
+ }
++fn vnc_config(config: super::VncServiceConfig) -> ServiceConfig {
++    ServiceConfig {
++        protocol: ServiceProtocol::Vnc,
++        bind: config.bind,
++        allow_non_loopback: config.allow_non_loopback,
++        root: None,
++        auth: super::ServiceAuth::Unauthenticated,
++        allow_write: false,
++        lifetime: config.lifetime,
++        runtime: ServiceRuntime::Vnc(config),
++    }
++}
+ enum Listener {
++    Vnc(super::vnc::Listener),
+     Nfs(super::nfs::Listener),
+     Ssh(super::sshd::Listener),
+     Iperf(super::iperf::Listener),
+@@ -299,6 +318,12 @@
+             Ok::<_, String>(listener)
+         };
+         match (config.protocol, config.runtime) {
++            (ServiceProtocol::Vnc, ServiceRuntime::Vnc(vnc))
++                if vnc.bind == config.bind
++                    && vnc.allow_non_loopback == config.allow_non_loopback =>
++            {
++                super::vnc::Listener::bind(vnc).map(Self::Vnc)
++            }
+             (ServiceProtocol::Ssh, ServiceRuntime::Ssh(ssh))
+                 if ssh.bind == config.bind
+                     && ssh.allow_non_loopback == config.allow_non_loopback =>
+@@ -343,6 +368,7 @@
+             Self::Ftp(listener, ..) | Self::Telnet(listener, ..) => listener.local_addr(),
+             Self::Tftp(socket, ..) => socket.local_addr(),
+             Self::Nfs(listener) => listener.address(),
++            Self::Vnc(listener) => listener.address(),
+             Self::Ssh(listener) => listener.address(),
+             Self::Iperf(listener) => listener.address(),
+         }
+@@ -350,6 +376,7 @@
+ 
+     fn serve(self, context: &Arc<Context>) -> io::Result<()> {
+         match self {
++            Self::Vnc(listener) => listener.serve(context),
+             Self::Ssh(listener) => listener.serve(context),
+             Self::Nfs(listener) => listener.serve(|| context.cancelled()),
+             Self::Iperf(listener) => listener.serve(context),
+--- a/src/model.rs
++++ b/src/model.rs
+@@ -664,6 +664,7 @@
+         Telnet => (2323, 3600),
+         Ssh => (2222, 3600),
+         Iperf => (5201, 3600),
++        Vnc => (5900, 3600),
+         Cron => (0, 0), // Scheduler has no listener; active until explicitly stopped.
+     };
+     (([127, 0, 0, 1], port).into(), lifetime)
+--- a/src/ui.rs
++++ b/src/ui.rs
+@@ -31,6 +31,7 @@
+ mod managed_cron;
+ mod managed_servers;
+ mod managed_ssh_iperf;
++mod managed_vnc;
+ mod mosh_startup;
+ mod packages;
+ mod pages;
+@@ -619,6 +620,7 @@
+     managed_servers: managed_servers::ManagedServers,
+     managed_cron: managed_cron::ManagedCron,
+     managed_ssh_iperf: managed_ssh_iperf::ManagedSshIperf,
++    managed_vnc: managed_vnc::ManagedVnc,
+     status: String,
+     status_time: Instant,
+     quick_host: String,
+@@ -854,6 +856,7 @@
+             managed_servers: Default::default(),
+             managed_cron: Default::default(),
+             managed_ssh_iperf: Default::default(),
++            managed_vnc: Default::default(),
+             status,
+             status_time: Instant::now(),
+             quick_host: String::new(),
+--- a/src/ui/managed_servers.rs
++++ b/src/ui/managed_servers.rs
+@@ -265,7 +265,7 @@
+             .map_err(|_| "Enter an IP address and port, for example 127.0.0.1:2121.")?;
+         let make_password = || Secret::new(self.password.as_str());
+         let mut config = match self.protocol {
+-            ServiceProtocol::Ssh | ServiceProtocol::Iperf | ServiceProtocol::Cron => {
++            ServiceProtocol::Vnc | ServiceProtocol::Ssh | ServiceProtocol::Iperf | ServiceProtocol::Cron => {
+                 return Err("Use the SSH or Iperf service card.".into());
+             }
+             ServiceProtocol::Ftp => ServiceConfig::ftp(
+--- a/src/ui/servers.rs
++++ b/src/ui/servers.rs
+@@ -18,9 +18,10 @@
+    self.managed_servers.cards(ui);
+    let service_data=self.store_path.parent().unwrap_or(std::path::Path::new("."));
+    self.managed_ssh_iperf.cards(ui,service_data);
++   self.managed_vnc.card(ui);
+    ui.add_space(17.);self.managed_cron.card(ui,service_data);
+    ui.add_space(17.);self.xserver_card(ui);
+-   ui.add_space(17.);CollapsingHeader::new("Additional original server types").show(ui,|ui|{ui.label("VNC server remains a feature gap. FTPS server support in Personal is still unverified.");});
++   ui.add_space(17.);CollapsingHeader::new("Additional original server types").show(ui,|ui|{ui.label("VNC clipboard, macOS and Wayland sharing, and the browser viewer remain unimplemented. FTPS server support in Personal is still unverified.");});
+   });
+     }
+ }
+--- /dev/null
++++ b/src/services/vnc.rs
+@@ -0,0 +1,599 @@
++//! Owned, bounded RFB 3.8 server. Classic VNC authentication is not encryption.
++use super::supervisor::{self, Context};
++use crate::credentials::Secret;
++use std::{
++    io,
++    net::{SocketAddr, TcpListener, TcpStream},
++    sync::{
++        Arc, Mutex,
++        atomic::{AtomicBool, Ordering},
++    },
++    thread,
++    time::{Duration, Instant},
++};
++use subtle::ConstantTimeEq;
++use zeroize::Zeroizing;
++#[cfg(any(windows, target_os = "linux", test))]
++mod keyboard;
++#[cfg(windows)]
++mod windows;
++#[cfg(target_os = "linux")]
++mod x11;
++
++#[derive(Clone, Debug)]
++pub enum VncSource {
++    /// Explicit X11 display, such as :2. The host DISPLAY is never inferred.
++    X11 {
++        display: String,
++    },
++    /// Explicitly selected primary display on the current Windows desktop.
++    WindowsPrimaryDesktop,
++    /// Requires a user-mediated ScreenCast/RemoteDesktop portal; not yet implemented.
++    WaylandPortal,
++    MacOsDisplay {
++        display_id: u32,
++    },
++}
++pub struct VncServiceConfig {
++    pub bind: SocketAddr,
++    pub allow_non_loopback: bool,
++    pub allow_unencrypted: bool,
++    pub source: VncSource,
++    pub x11_authority: Option<std::path::PathBuf>,
++    pub password: Secret,
++    pub allow_control: bool,
++    pub allow_clipboard: bool,
++    pub lifetime: Option<Duration>,
++}
++impl VncServiceConfig {
++    pub fn local(source: VncSource, password: Secret) -> Self {
++        Self {
++            bind: ([127, 0, 0, 1], 0).into(),
++            allow_non_loopback: false,
++            allow_unencrypted: false,
++            source,
++            x11_authority: None,
++            password,
++            allow_control: false,
++            allow_clipboard: false,
++            lifetime: Some(Duration::from_secs(3600)),
++        }
++    }
++    fn validate(&self) -> Result<(), String> {
++        if !self.allow_unencrypted {
++            return Err("This server uses unencrypted classic VNC. Explicit transport consent is required; use an SSH tunnel on untrusted networks.".into());
++        }
++        if !self.bind.ip().is_loopback() && !self.allow_non_loopback {
++            return Err("Enable network access before using a non-loopback address.".into());
++        }
++        let p = self.password.expose();
++        if p.is_empty() || p.len() > 8 || !p.bytes().all(|b| b.is_ascii() && !b.is_ascii_control())
++        {
++            return Err("Classic VNC requires 1–8 printable ASCII password bytes; passwords are never silently truncated.".into());
++        }
++        if self.allow_clipboard {
++            return Err("VNC server clipboard transfer is not implemented for this source; leave it disabled.".into());
++        }
++        if let VncSource::X11 { display } = &self.source {
++            let number = display
++                .strip_prefix(':')
++                .and_then(|s| s.split('.').next())
++                .and_then(|s| s.parse::<u16>().ok());
++            if number.is_none()
++                || display.len() > 32
++                || display
++                    .bytes()
++                    .any(|b| !b.is_ascii_digit() && b != b':' && b != b'.')
++            {
++                return Err("Choose an explicit local X11 display such as :2. Remote X11 displays are not accepted.".into());
++            }
++        }
++        Ok(())
++    }
++}
++const MAX_PIXELS: usize = 8_388_608;
++const IO_LIMIT: Duration = Duration::from_secs(5);
++const IDLE_LIMIT: Duration = Duration::from_secs(300);
++#[derive(Clone)]
++struct Frame {
++    width: u16,
++    height: u16,
++    rgba: Vec<u8>,
++}
++impl Frame {
++    fn validate(&self) -> io::Result<()> {
++        let pixels = usize::from(self.width) * usize::from(self.height);
++        if pixels == 0 || pixels > MAX_PIXELS || self.rgba.len() != pixels * 4 {
++            return Err(io::Error::other(
++                "Display exceeds the bounded VNC framebuffer",
++            ));
++        }
++        Ok(())
++    }
++}
++#[derive(Clone, Debug)]
++enum Input {
++    Key { down: bool, keysym: u32 },
++    Pointer { buttons: u8, x: u16, y: u16 },
++    Release,
++}
++trait Source: Send {
++    fn capture(&mut self) -> io::Result<Frame>;
++    fn input(&mut self, event: Input) -> io::Result<()>;
++}
++fn open_source(
++    source: &VncSource,
++    control: bool,
++    authority: Option<&std::path::Path>,
++) -> Result<Box<dyn Source>, String> {
++    match source {
++        #[cfg(target_os="linux")]
++        VncSource::X11{display}=>x11::X11::open(display,control,authority).map(|s|Box::new(s) as Box<dyn Source>),
++        #[cfg(windows)]
++        VncSource::WindowsPrimaryDesktop=>windows::Desktop::open(control).map(|s|Box::new(s) as Box<dyn Source>),
++        VncSource::WaylandPortal=>Err("Wayland desktop sharing requires a user-approved portal source; that backend is not implemented.".into()),
++        VncSource::MacOsDisplay{..}=>Err("Native macOS display sharing is not implemented.".into()),
++        _=>Err("The selected VNC display backend is unavailable on this platform.".into())
++    }
++}
++struct Shared {
++    frame: Mutex<Arc<Frame>>,
++    input: std::sync::mpsc::SyncSender<Input>,
++    failure: Mutex<Option<String>>,
++    control_active: AtomicBool,
++    release: AtomicBool,
++}
++pub(super) struct Listener {
++    listener: TcpListener,
++    config: VncServiceConfig,
++    source: Box<dyn Source>,
++    frame: Frame,
++}
++impl Listener {
++    pub(super) fn bind(config: VncServiceConfig) -> Result<Self, String> {
++        config.validate()?;
++        let mut source = open_source(
++            &config.source,
++            config.allow_control,
++            config.x11_authority.as_deref(),
++        )?;
++        let frame = source
++            .capture()
++            .map_err(|_| "Could not capture the explicitly selected display.")?;
++        frame.validate().map_err(|e| e.to_string())?;
++        let listener = TcpListener::bind(config.bind)
++            .map_err(|e| format!("Could not bind VNC listener: {e}"))?;
++        listener.set_nonblocking(true).map_err(|e| e.to_string())?;
++        Ok(Self {
++            listener,
++            config,
++            source,
++            frame,
++        })
++    }
++    pub(super) fn address(&self) -> io::Result<SocketAddr> {
++        self.listener.local_addr()
++    }
++    pub(super) fn serve(mut self, context: &Arc<Context>) -> io::Result<()> {
++        let (tx, rx) = std::sync::mpsc::sync_channel(64);
++        let shared = Arc::new(Shared {
++            frame: Mutex::new(Arc::new(self.frame)),
++            input: tx,
++            failure: Mutex::new(None),
++            control_active: AtomicBool::new(false),
++            release: AtomicBool::new(false),
++        });
++        let state = shared.clone();
++        let cancelled = context.clone();
++        let capture = thread::Builder::new()
++            .name("vnc-selected-display".into())
++            .spawn(move || {
++                let size = {
++                    let f = state.frame.lock().unwrap();
++                    (f.width, f.height)
++                };
++                let mut next = Instant::now();
++                while !cancelled.cancelled() {
++                    for _ in 0..64 {
++                        if cancelled.cancelled() {
++                            break;
++                        }
++                        match rx.try_recv() {
++                            Ok(event) => {
++                                if self.source.input(event).is_err() {
++                                    *state.failure.lock().unwrap() =
++                                        Some("Selected display input failed.".into());
++                                    cancelled.request_stop();
++                                    return;
++                                }
++                            }
++                            Err(_) => break,
++                        }
++                    }
++                    if cancelled.cancelled() {
++                        break;
++                    }
++                    if state.release.swap(false, Ordering::AcqRel) {
++                        if self.source.input(Input::Release).is_err() {
++                            *state.failure.lock().unwrap() =
++                                Some("Selected display input release failed.".into());
++                            cancelled.request_stop();
++                            return;
++                        }
++                        state.control_active.store(false, Ordering::Release);
++                    }
++                    if Instant::now() >= next {
++                        match self.source.capture().and_then(|f| {
++                            f.validate()?;
++                            if (f.width, f.height) != size {
++                                return Err(io::Error::other(
++                                    "Selected display changed size; restart sharing.",
++                                ));
++                            }
++                            Ok(f)
++                        }) {
++                            Ok(f) => *state.frame.lock().unwrap() = Arc::new(f),
++                            Err(_) => {
++                                *state.failure.lock().unwrap() = Some(
++                                    "Selected display capture stopped; restart sharing.".into(),
++                                );
++                                cancelled.request_stop();
++                                return;
++                            }
++                        }
++                        next = Instant::now() + Duration::from_millis(100);
++                    }
++                    thread::sleep(Duration::from_millis(10));
++                }
++                let _ = self.source.input(Input::Release);
++            })?;
++        let password = self.config.password;
++        let control = self.config.allow_control;
++        let state = shared.clone();
++        let result = supervisor::serve_tcp(self.listener, context, move |mut stream, ctx| {
++            serve_client(&mut stream, ctx, &state, &password, control)
++        });
++        // Capture failures request cancellation; join both network and display ownership on stop.
++        context.request_stop();
++        let _ = capture.join();
++        if let Some(error) = shared.failure.lock().unwrap().take() {
++            Err(io::Error::other(error))
++        } else {
++            result
++        }
++    }
++}
++fn exact(
++    stream: &mut TcpStream,
++    mut b: &mut [u8],
++    ctx: &Context,
++    deadline: Instant,
++) -> io::Result<()> {
++    while !b.is_empty() {
++        let n = supervisor::read(stream, b, ctx, deadline)?;
++        if n == 0 {
++            return Err(io::ErrorKind::UnexpectedEof.into());
++        }
++        b = &mut b[n..];
++    }
++    Ok(())
++}
++fn send(stream: &mut TcpStream, b: &[u8], ctx: &Context) -> io::Result<()> {
++    supervisor::write(stream, b, ctx, Instant::now() + IO_LIMIT)
++}
++pub(super) fn auth_response(password: &Secret, challenge: &[u8; 16]) -> Zeroizing<[u8; 16]> {
++    use des::cipher::{BlockCipherEncrypt, KeyInit};
++    let mut key = Zeroizing::new([0u8; 8]);
++    for (d, b) in key.iter_mut().zip(password.expose().bytes()) {
++        *d = b.reverse_bits()
++    }
++    let cipher = des::Des::new_from_slice(&*key).unwrap();
++    let mut response = Zeroizing::new(*challenge);
++    for block in response.chunks_exact_mut(8) {
++        cipher.encrypt_block(block.try_into().unwrap())
++    }
++    response
++}
++#[derive(Clone, Copy)]
++struct Pixel {
++    bpp: u8,
++    big: bool,
++    max: [u16; 3],
++    shift: [u8; 3],
++}
++impl Pixel {
++    const DEFAULT: Self = Self {
++        bpp: 32,
++        big: false,
++        max: [255; 3],
++        shift: [16, 8, 0],
++    };
++    fn wire(self) -> [u8; 16] {
++        let mut b = [0; 16];
++        b[0] = self.bpp;
++        b[1] = 24;
++        b[2] = u8::from(self.big);
++        b[3] = 1;
++        for i in 0..3 {
++            b[4 + i * 2..6 + i * 2].copy_from_slice(&self.max[i].to_be_bytes());
++            b[10 + i] = self.shift[i]
++        }
++        b
++    }
++    fn parse(b: &[u8]) -> io::Result<Self> {
++        let p = Self {
++            bpp: b[0],
++            big: b[2] != 0,
++            max: [
++                u16::from_be_bytes([b[4], b[5]]),
++                u16::from_be_bytes([b[6], b[7]]),
++                u16::from_be_bytes([b[8], b[9]]),
++            ],
++            shift: [b[10], b[11], b[12]],
++        };
++        let mut used = 0u32;
++        if !matches!(p.bpp, 8 | 16 | 32) || b[1] > p.bpp || b[2] > 1 || b[3] != 1 {
++            return Err(io::Error::other("Unsupported VNC pixel format"));
++        }
++        for i in 0..3 {
++            let m = u32::from(p.max[i]);
++            let bits = 32 - m.leading_zeros();
++            if m == 0
++                || !m.wrapping_add(1).is_power_of_two()
++                || u32::from(p.shift[i]) + bits > u32::from(p.bpp)
++            {
++                return Err(io::Error::other("Invalid VNC pixel channels"));
++            }
++            let mask = m << p.shift[i];
++            if mask & used != 0 {
++                return Err(io::Error::other("Overlapping VNC channels"));
++            }
++            used |= mask;
++        }
++        Ok(p)
++    }
++    fn encode(self, rgba: &[u8], out: &mut Vec<u8>) {
++        let mut v = 0u32;
++        for i in 0..3 {
++            v |= (u32::from(rgba[i]) * u32::from(self.max[i]) / 255) << self.shift[i]
++        }
++        let bytes = if self.big {
++            v.to_be_bytes()
++        } else {
++            v.to_le_bytes()
++        };
++        let n = usize::from(self.bpp / 8);
++        out.extend_from_slice(if self.big {
++            &bytes[4 - n..]
++        } else {
++            &bytes[..n]
++        });
++    }
++}
++fn serve_client(
++    s: &mut TcpStream,
++    c: &Context,
++    state: &Shared,
++    password: &Secret,
++    control: bool,
++) -> io::Result<()> {
++    let mut control_lease = false;
++    let result = (|| {
++        send(s, b"RFB 003.008\n", c)?;
++        let mut banner = [0; 12];
++        exact(s, &mut banner, c, Instant::now() + IO_LIMIT)?;
++        let minor = match &banner {
++            b"RFB 003.003\n" => 3,
++            b"RFB 003.007\n" => 7,
++            b"RFB 003.008\n" => 8,
++            _ => return Err(io::Error::other("Unsupported RFB version")),
++        };
++        if minor == 3 {
++            send(s, &2u32.to_be_bytes(), c)?
++        } else {
++            send(s, &[1, 2], c)?;
++            let mut choice = [0];
++            exact(s, &mut choice, c, Instant::now() + IO_LIMIT)?;
++            if choice != [2] {
++                return Err(io::ErrorKind::PermissionDenied.into());
++            }
++        }
++        let mut challenge = [0; 16];
++        getrandom::fill(&mut challenge)
++            .map_err(|_| io::Error::other("VNC challenge generation failed"))?;
++        send(s, &challenge, c)?;
++        let mut response = Zeroizing::new([0; 16]);
++        exact(s, &mut *response, c, Instant::now() + IO_LIMIT)?;
++        if !bool::from(response.ct_eq(&*auth_response(password, &challenge))) {
++            send(s, &1u32.to_be_bytes(), c)?;
++            if minor == 8 {
++                let reason = b"Authentication failed";
++                send(s, &(reason.len() as u32).to_be_bytes(), c)?;
++                send(s, reason, c)?
++            }
++            return Err(io::ErrorKind::PermissionDenied.into());
++        }
++        if control {
++            if state.control_active.swap(true, Ordering::AcqRel) {
++                return Err(io::Error::other("Another controlling VNC client is active"));
++            }
++            control_lease = true;
++        }
++        send(s, &0u32.to_be_bytes(), c)?;
++        let mut init = [0];
++        exact(s, &mut init, c, Instant::now() + IO_LIMIT)?;
++        // Always shared: never disconnect another client on a remote exclusive request.
++        let frame = state.frame.lock().unwrap().clone();
++        let mut init = Vec::new();
++        init.extend_from_slice(&frame.width.to_be_bytes());
++        init.extend_from_slice(&frame.height.to_be_bytes());
++        init.extend_from_slice(&Pixel::DEFAULT.wire());
++        let name = b"TermCraft selected display (classic VNC)";
++        init.extend_from_slice(&(name.len() as u32).to_be_bytes());
++        init.extend_from_slice(name);
++        send(s, &init, c)?;
++        drop(frame);
++        let mut pixel = Pixel::DEFAULT;
++        let mut next = Instant::now();
++        loop {
++            if state.failure.lock().unwrap().is_some() {
++                return Err(io::Error::other("Selected display unavailable"));
++            }
++            let mut ty = [0];
++            exact(s, &mut ty, c, Instant::now() + IDLE_LIMIT)?;
++            match ty[0] {
++                0 => {
++                    let mut b = [0; 19];
++                    exact(s, &mut b, c, Instant::now() + IO_LIMIT)?;
++                    pixel = Pixel::parse(&b[3..])?;
++                }
++                2 => {
++                    let mut h = [0; 3];
++                    exact(s, &mut h, c, Instant::now() + IO_LIMIT)?;
++                    let n = u16::from_be_bytes([h[1], h[2]]) as usize;
++                    if n > 256 {
++                        return Err(io::Error::other("Too many VNC encodings"));
++                    }
++                    let mut b = vec![0; n * 4];
++                    exact(s, &mut b, c, Instant::now() + IO_LIMIT)?; /* Raw is mandatory even when absent from list, RFC6143 7.5.2. */
++                }
++                3 => {
++                    let mut b = [0; 9];
++                    exact(s, &mut b, c, Instant::now() + IO_LIMIT)?;
++                    while Instant::now() < next {
++                        c.check(Instant::now() + IO_LIMIT)?;
++                        thread::sleep(Duration::from_millis(10));
++                    }
++                    next = Instant::now() + Duration::from_millis(100);
++                    let f = state.frame.lock().unwrap().clone();
++                    let x = u16::from_be_bytes([b[1], b[2]]);
++                    let y = u16::from_be_bytes([b[3], b[4]]);
++                    let w = u16::from_be_bytes([b[5], b[6]]).min(f.width.saturating_sub(x));
++                    let h = u16::from_be_bytes([b[7], b[8]]).min(f.height.saturating_sub(y));
++                    if x >= f.width || y >= f.height || w == 0 || h == 0 {
++                        send(s, &[0, 0, 0, 0], c)?;
++                        continue;
++                    }
++                    let mut header = vec![0, 0, 0, 1];
++                    for v in [x, y, w, h] {
++                        header.extend_from_slice(&v.to_be_bytes())
++                    }
++                    header.extend_from_slice(&0i32.to_be_bytes());
++                    send(s, &header, c)?;
++                    let deadline = Instant::now() + IO_LIMIT;
++                    let mut row = Vec::with_capacity(usize::from(w) * 4);
++                    for yy in y..y + h {
++                        row.clear();
++                        for xx in x..x + w {
++                            let offset =
++                                (usize::from(yy) * usize::from(f.width) + usize::from(xx)) * 4;
++                            pixel.encode(&f.rgba[offset..offset + 4], &mut row)
++                        }
++                        supervisor::write(s, &row, c, deadline)?;
++                    }
++                }
++                4 => {
++                    let mut b = [0; 7];
++                    exact(s, &mut b, c, Instant::now() + IO_LIMIT)?;
++                    if control {
++                        state
++                            .input
++                            .try_send(Input::Key {
++                                down: b[0] != 0,
++                                keysym: u32::from_be_bytes(b[3..7].try_into().unwrap()),
++                            })
++                            .map_err(|_| io::Error::other("VNC input queue is full"))?;
++                    }
++                }
++                5 => {
++                    let mut b = [0; 5];
++                    exact(s, &mut b, c, Instant::now() + IO_LIMIT)?;
++                    if control {
++                        let f = state.frame.lock().unwrap();
++                        let x = u16::from_be_bytes([b[1], b[2]]).min(f.width - 1);
++                        let y = u16::from_be_bytes([b[3], b[4]]).min(f.height - 1);
++                        drop(f);
++                        state
++                            .input
++                            .try_send(Input::Pointer {
++                                buttons: b[0] & 0x1f,
++                                x,
++                                y,
++                            })
++                            .map_err(|_| io::Error::other("VNC input queue is full"))?;
++                    }
++                }
++                6 => {
++                    let mut h = [0; 7];
++                    exact(s, &mut h, c, Instant::now() + IO_LIMIT)?;
++                    let n = u32::from_be_bytes(h[3..7].try_into().unwrap()) as usize;
++                    if n > 65536 {
++                        return Err(io::Error::other("VNC clipboard message exceeds limit"));
++                    }
++                    let mut discard = Zeroizing::new(vec![0; n]);
++                    exact(s, &mut discard, c, Instant::now() + IO_LIMIT)?;
++                }
++                _ => return Err(io::Error::other("Unsupported VNC client message")),
++            }
++        }
++    })();
++    if control_lease {
++        state.release.store(true, Ordering::Release);
++    }
++    result
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn vnc_server_truecolor_formats_encode_channels_and_reject_overlap() {
++        let mut out = Vec::new();
++        Pixel::DEFAULT.encode(&[255, 0, 0, 255], &mut out);
++        assert_eq!(out, [0, 0, 255, 0]);
++        let mut format = Pixel::DEFAULT.wire();
++        format[0] = 16;
++        format[1] = 16;
++        format[2] = 1;
++        format[4..10].copy_from_slice(&[0, 31, 0, 63, 0, 31]);
++        format[10..13].copy_from_slice(&[11, 5, 0]);
++        let pixel = Pixel::parse(&format).unwrap();
++        out.clear();
++        pixel.encode(&[255, 0, 0, 255], &mut out);
++        assert_eq!(out, [0xf8, 0]);
++        format[11] = 11;
++        assert!(Pixel::parse(&format).is_err());
++        format[10] = 255;
++        assert!(Pixel::parse(&format).is_err());
++    }
++    #[test]
++    fn vnc_server_framebuffer_bounds_are_enforced() {
++        assert!(
++            Frame {
++                width: 0,
++                height: 2,
++                rgba: vec![]
++            }
++            .validate()
++            .is_err()
++        );
++        assert!(
++            Frame {
++                width: 4,
++                height: 4,
++                rgba: vec![0; 63]
++            }
++            .validate()
++            .is_err()
++        );
++        assert!(
++            Frame {
++                width: u16::MAX,
++                height: u16::MAX,
++                rgba: vec![]
++            }
++            .validate()
++            .is_err()
++        );
++    }
++}
+--- /dev/null
++++ b/src/services/vnc/x11.rs
+@@ -0,0 +1,457 @@
++//! Explicit local X11 source. No implicit DISPLAY, Xauthority mutation, shell or host daemon.
++use super::{Frame, Input, MAX_PIXELS, Source};
++use std::{
++    io,
++    io::IoSlice,
++    os::fd::AsRawFd,
++    sync::Mutex,
++    time::{Duration, Instant},
++};
++use x11rb::{
++    connection::Connection,
++    protocol::{xproto::*, xtest::ConnectionExt as _},
++    rust_connection::{DefaultStream, PollMode, RustConnection, Stream},
++    utils::RawFdContainer,
++};
++#[path = "x11/keyboard.rs"]
++mod keyboard;
++struct Timed {
++    stream: DefaultStream,
++    deadline: Mutex<Instant>,
++}
++impl Stream for Timed {
++    fn poll(&self, mode: PollMode) -> io::Result<()> {
++        loop {
++            let remain = self
++                .deadline
++                .lock()
++                .unwrap()
++                .saturating_duration_since(Instant::now());
++            if remain.is_zero() {
++                return Err(io::ErrorKind::TimedOut.into());
++            }
++            let mut fd = libc::pollfd {
++                fd: self.stream.as_raw_fd(),
++                events: (if mode.readable() { libc::POLLIN } else { 0 })
++                    | (if mode.writable() { libc::POLLOUT } else { 0 }),
++                revents: 0,
++            };
++            let result = unsafe { libc::poll(&mut fd, 1, remain.as_millis().min(50) as i32) };
++            if result > 0 {
++                return Ok(());
++            }
++            if result < 0 {
++                let e = io::Error::last_os_error();
++                if e.kind() != io::ErrorKind::Interrupted {
++                    return Err(e);
++                }
++            }
++        }
++    }
++    fn read(&self, b: &mut [u8], fds: &mut Vec<RawFdContainer>) -> io::Result<usize> {
++        self.stream.read(b, fds)
++    }
++    fn write(&self, b: &[u8], fds: &mut Vec<RawFdContainer>) -> io::Result<usize> {
++        self.stream.write(b, fds)
++    }
++    fn write_vectored(
++        &self,
++        b: &[IoSlice<'_>],
++        fds: &mut Vec<RawFdContainer>,
++    ) -> io::Result<usize> {
++        self.stream.write_vectored(b, fds)
++    }
++}
++pub(super) struct X11 {
++    conn: RustConnection<Timed>,
++    root: u32,
++    width: u16,
++    height: u16,
++    bpp: u8,
++    pad: u8,
++    big: bool,
++    masks: [u32; 3],
++    keyboard: Option<keyboard::Keyboard>,
++    held: Vec<keyboard::Held>,
++    temporary: Vec<u8>,
++    buttons: u8,
++    control: bool,
++}
++fn error(e: impl std::fmt::Display) -> io::Error {
++    io::Error::other(e.to_string())
++}
++impl X11 {
++    pub(super) fn open(
++        display: &str,
++        control: bool,
++        authority: Option<&std::path::Path>,
++    ) -> Result<Self, String> {
++        Self::connect(display,control,authority).map_err(|_|"Could not open selected local X11 display; check display name and Xauthority permission.".into())
++    }
++    fn connect(
++        display: &str,
++        control: bool,
++        authority: Option<&std::path::Path>,
++    ) -> io::Result<Self> {
++        let parsed = x11rb::reexports::x11rb_protocol::parse_display::parse_display(Some(display))
++            .map_err(error)?;
++        let addr = parsed
++            .connect_instruction()
++            .find(|a| {
++                matches!(
++                    a,
++                    x11rb::reexports::x11rb_protocol::parse_display::ConnectAddress::Socket(_)
++                )
++            })
++            .ok_or_else(|| error("Local X11 display required"))?;
++        let path = match &addr {
++            x11rb::reexports::x11rb_protocol::parse_display::ConnectAddress::Socket(path) => path,
++            _ => return Err(error("Local X11 display required")),
++        };
++        let (stream, (_family, address)) =
++            DefaultStream::from_unix_stream(local_socket(std::path::Path::new(path))?)?;
++        let selected_authority = authority
++            .map(std::path::Path::to_path_buf)
++            .or_else(|| std::env::var_os("XAUTHORITY").map(std::path::PathBuf::from))
++            .or_else(|| {
++                std::env::var_os("HOME").map(|p| std::path::PathBuf::from(p).join(".Xauthority"))
++            });
++        let (auth_name, auth_data) = match selected_authority {
++            Some(path) if authority.is_some() || path.exists() => {
++                authority_cookie(&path, parsed.display, &address)?
++            }
++            _ => Default::default(),
++        };
++        let conn = RustConnection::connect_to_stream_with_auth_info(
++            Timed {
++                stream,
++                deadline: Mutex::new(Instant::now() + Duration::from_secs(2)),
++            },
++            usize::from(parsed.screen),
++            auth_name,
++            auth_data,
++        )
++        .map_err(error)?;
++        let setup = conn.setup();
++        let screen = setup
++            .roots
++            .get(usize::from(parsed.screen))
++            .ok_or_else(|| error("Invalid X11 screen"))?;
++        let root = screen.root;
++        let width = screen.width_in_pixels;
++        let height = screen.height_in_pixels;
++        if width > i16::MAX as u16
++            || height > i16::MAX as u16
++            || usize::from(width) * usize::from(height) > MAX_PIXELS
++        {
++            return Err(error("Display exceeds VNC framebuffer limit"));
++        }
++        let format = setup
++            .pixmap_formats
++            .iter()
++            .find(|f| f.depth == screen.root_depth)
++            .ok_or_else(|| error("Unsupported X11 pixel format"))?;
++        if !matches!(format.bits_per_pixel, 16 | 24 | 32)
++            || !matches!(format.scanline_pad, 8 | 16 | 32)
++        {
++            return Err(error("Unsupported X11 pixel depth"));
++        }
++        let visual = screen
++            .allowed_depths
++            .iter()
++            .flat_map(|d| &d.visuals)
++            .find(|v| v.visual_id == screen.root_visual)
++            .ok_or_else(|| error("Missing X11 visual"))?;
++        if visual.class != VisualClass::TRUE_COLOR {
++            return Err(error("VNC source needs a TrueColor X11 display"));
++        }
++        let (bpp, pad, big, masks) = (
++            format.bits_per_pixel,
++            format.scanline_pad,
++            setup.image_byte_order == ImageOrder::MSB_FIRST,
++            [visual.red_mask, visual.green_mask, visual.blue_mask],
++        );
++        let mut used = 0u32;
++        for mask in masks {
++            if mask == 0 || used & mask != 0 || (bpp < 32 && mask >> bpp != 0) {
++                return Err(error("Invalid X11 visual masks"));
++            }
++            let maximum = mask >> mask.trailing_zeros();
++            if !maximum.wrapping_add(1).is_power_of_two() {
++                return Err(error("Non-contiguous X11 visual mask"));
++            }
++            used |= mask;
++        }
++        let keyboard = if control {
++            Some(keyboard::Keyboard::load(&conn)?)
++        } else {
++            None
++        };
++        Ok(Self {
++            conn,
++            root,
++            width,
++            height,
++            bpp,
++            pad,
++            big,
++            masks,
++            keyboard,
++            held: Vec::new(),
++            temporary: Vec::new(),
++            buttons: 0,
++            control,
++        })
++    }
++    fn deadline(&self) {
++        *self.conn.stream().deadline.lock().unwrap() = Instant::now() + Duration::from_secs(2)
++    }
++    fn fake(&self, ty: u8, detail: u8, x: i16, y: i16) -> io::Result<()> {
++        self.conn
++            .xtest_fake_input(ty, detail, 0, self.root, x, y, 0)
++            .map_err(error)?
++            .check()
++            .map_err(error)
++    }
++    fn release(&mut self) -> io::Result<()> {
++        for key in std::mem::take(&mut self.temporary) {
++            self.fake(KEY_RELEASE_EVENT, key, 0, 0)?;
++        }
++        let mut released = Vec::new();
++        for key in std::mem::take(&mut self.held) {
++            if key.owned && !released.contains(&key.code) {
++                self.fake(KEY_RELEASE_EVENT, key.code, 0, 0)?;
++                released.push(key.code);
++            }
++        }
++        for b in 0..5 {
++            if self.buttons & (1 << b) != 0 {
++                self.fake(BUTTON_RELEASE_EVENT, b + 1, 0, 0)?;
++            }
++        }
++        self.buttons = 0;
++        self.conn.flush().map_err(error)
++    }
++}
++impl Source for X11 {
++    fn capture(&mut self) -> io::Result<Frame> {
++        self.deadline();
++        let geometry = self
++            .conn
++            .get_geometry(self.root)
++            .map_err(error)?
++            .reply()
++            .map_err(error)?;
++        if geometry.width != self.width || geometry.height != self.height {
++            return Err(error("Selected display resized"));
++        }
++        let image = self
++            .conn
++            .get_image(
++                ImageFormat::Z_PIXMAP,
++                self.root,
++                0,
++                0,
++                self.width,
++                self.height,
++                u32::MAX,
++            )
++            .map_err(error)?
++            .reply()
++            .map_err(error)?;
++        let bytes = usize::from(self.bpp / 8);
++        let bits = usize::from(self.width) * usize::from(self.bpp);
++        let pad = usize::from(self.pad);
++        let stride = bits.div_ceil(pad) * pad / 8;
++        if image.data.len() != stride * usize::from(self.height) {
++            return Err(error("Malformed X11 framebuffer"));
++        }
++        let mut rgba = vec![255; usize::from(self.width) * usize::from(self.height) * 4];
++        for y in 0..usize::from(self.height) {
++            for x in 0..usize::from(self.width) {
++                let src = &image.data[y * stride + x * bytes..][..bytes];
++                let mut value = 0u32;
++                if self.big {
++                    for b in src {
++                        value = (value << 8) | u32::from(*b)
++                    }
++                } else {
++                    for (i, b) in src.iter().enumerate() {
++                        value |= u32::from(*b) << (i * 8)
++                    }
++                }
++                let dest = (y * usize::from(self.width) + x) * 4;
++                for (i, mask) in self.masks.iter().enumerate() {
++                    let shift = mask.trailing_zeros();
++                    let max = mask >> shift;
++                    rgba[dest + i] =
++                        (u64::from((value & mask) >> shift) * 255 / u64::from(max)) as u8;
++                }
++            }
++        }
++        Ok(Frame {
++            width: self.width,
++            height: self.height,
++            rgba,
++        })
++    }
++    fn input(&mut self, event: Input) -> io::Result<()> {
++        if !self.control {
++            return Ok(());
++        }
++        self.deadline();
++        match event {
++            Input::Key { down, keysym } => self.keyboard_event(keysym, down)?,
++            Input::Pointer { buttons, x, y } => {
++                self.fake(
++                    MOTION_NOTIFY_EVENT,
++                    0,
++                    x.min(self.width - 1) as i16,
++                    y.min(self.height - 1) as i16,
++                )?;
++                for b in 0..5 {
++                    if (buttons ^ self.buttons) & (1 << b) != 0 {
++                        self.fake(
++                            if buttons & (1 << b) != 0 {
++                                BUTTON_PRESS_EVENT
++                            } else {
++                                BUTTON_RELEASE_EVENT
++                            },
++                            b + 1,
++                            0,
++                            0,
++                        )?;
++                    }
++                }
++                self.buttons = buttons;
++            }
++            Input::Release => self.release()?,
++        }
++        self.conn.flush().map_err(error)
++    }
++}
++impl Drop for X11 {
++    fn drop(&mut self) {
++        if self.control {
++            self.deadline();
++            let _ = self.release();
++        }
++    }
++}
++
++fn authority_cookie(
++    path: &std::path::Path,
++    display: u16,
++    address: &[u8],
++) -> io::Result<(Vec<u8>, Vec<u8>)> {
++    use std::io::Read;
++    use std::os::unix::fs::OpenOptionsExt;
++    let file = std::fs::OpenOptions::new()
++        .read(true)
++        .custom_flags(libc::O_NONBLOCK)
++        .open(path)?;
++    if !file.metadata()?.is_file() || file.metadata()?.len() > 65536 {
++        return Err(error("Invalid Xauthority file"));
++    }
++    let mut bytes = zeroize::Zeroizing::new(Vec::new());
++    file.take(65537).read_to_end(&mut bytes)?;
++    let mut rest = bytes.as_slice();
++    fn field<'a>(rest: &mut &'a [u8]) -> io::Result<&'a [u8]> {
++        if rest.len() < 2 {
++            return Err(error("Truncated Xauthority"));
++        }
++        let n = u16::from_be_bytes([rest[0], rest[1]]) as usize;
++        *rest = &rest[2..];
++        if rest.len() < n {
++            return Err(error("Truncated Xauthority"));
++        }
++        let (b, r) = rest.split_at(n);
++        *rest = r;
++        Ok(b)
++    }
++    while !rest.is_empty() {
++        if rest.len() < 2 {
++            return Err(error("Truncated Xauthority"));
++        }
++        let family = u16::from_be_bytes([rest[0], rest[1]]);
++        rest = &rest[2..];
++        let addr = field(&mut rest)?;
++        let number = field(&mut rest)?;
++        let name = field(&mut rest)?;
++        let data = field(&mut rest)?;
++        if (family == 65535 || family == 256 && addr == address)
++            && (number.is_empty() || number == display.to_string().as_bytes())
++            && name == b"MIT-MAGIC-COOKIE-1"
++            && data.len() == 16
++        {
++            return Ok((name.to_vec(), data.to_vec()));
++        }
++    }
++    Err(error("No matching Xauthority cookie"))
++}
++
++fn local_socket(path: &std::path::Path) -> io::Result<std::os::unix::net::UnixStream> {
++    use std::os::{
++        fd::{AsRawFd, FromRawFd, OwnedFd},
++        unix::ffi::OsStrExt,
++    };
++    let bytes = path.as_os_str().as_bytes();
++    let mut addr: libc::sockaddr_un = unsafe { std::mem::zeroed() };
++    if bytes.len() >= addr.sun_path.len() {
++        return Err(error("X11 socket path too long"));
++    }
++    addr.sun_family = libc::AF_UNIX as _;
++    for (d, b) in addr.sun_path.iter_mut().zip(bytes) {
++        *d = *b as _;
++    }
++    let raw = unsafe {
++        libc::socket(
++            libc::AF_UNIX,
++            libc::SOCK_STREAM | libc::SOCK_NONBLOCK | libc::SOCK_CLOEXEC,
++            0,
++        )
++    };
++    if raw < 0 {
++        return Err(io::Error::last_os_error());
++    }
++    let owned = unsafe { OwnedFd::from_raw_fd(raw) };
++    let result = unsafe {
++        libc::connect(
++            owned.as_raw_fd(),
++            (&addr as *const libc::sockaddr_un).cast(),
++            (std::mem::size_of::<libc::sa_family_t>() + bytes.len() + 1) as _,
++        )
++    };
++    if result != 0 {
++        let e = io::Error::last_os_error();
++        if e.raw_os_error() != Some(libc::EINPROGRESS) {
++            return Err(e);
++        }
++        let mut fd = libc::pollfd {
++            fd: owned.as_raw_fd(),
++            events: libc::POLLOUT,
++            revents: 0,
++        };
++        if unsafe { libc::poll(&mut fd, 1, 2000) } <= 0 {
++            return Err(io::ErrorKind::TimedOut.into());
++        }
++        let mut socket_error = 0i32;
++        let mut length = std::mem::size_of::<i32>() as libc::socklen_t;
++        if unsafe {
++            libc::getsockopt(
++                owned.as_raw_fd(),
++                libc::SOL_SOCKET,
++                libc::SO_ERROR,
++                (&mut socket_error as *mut i32).cast(),
++                &mut length,
++            )
++        } != 0
++        {
++            return Err(io::Error::last_os_error());
++        }
++        if socket_error != 0 {
++            return Err(io::Error::from_raw_os_error(socket_error));
++        }
++    }
++    Ok(owned.into())
++}
+--- /dev/null
++++ b/src/services/vnc/windows.rs
+@@ -0,0 +1,415 @@
++//! Windows primary display provider. Native runtime qualification is required.
++//! GDI objects are created/released on the calling thread; no handles cross workers.
++use super::{Frame, Input, MAX_PIXELS, Source};
++use std::{
++    io,
++    mem::{size_of, zeroed},
++    ptr,
++};
++use windows_sys::Win32::{
++    Graphics::Gdi::*,
++    System::StationsAndDesktops::*,
++    UI::{Input::KeyboardAndMouse::*, WindowsAndMessaging::*},
++};
++pub(super) struct Desktop {
++    width: u16,
++    height: u16,
++    control: bool,
++    buttons: u8,
++    held: Vec<Held>,
++    temporary: Vec<u16>,
++}
++struct Held {
++    sym: u32,
++    code: u16,
++    flags: u32,
++    owned: bool,
++    required: u8,
++}
++fn fail() -> io::Error {
++    io::Error::last_os_error()
++}
++fn metrics() -> io::Result<(u16, u16)> {
++    unsafe {
++        let w = GetSystemMetrics(SM_CXSCREEN);
++        let h = GetSystemMetrics(SM_CYSCREEN);
++        if w <= 0
++            || h <= 0
++            || w > u16::MAX as i32
++            || h > u16::MAX as i32
++            || w as usize * h as usize > MAX_PIXELS
++        {
++            return Err(io::Error::other(
++                "Primary display exceeds VNC framebuffer limit",
++            ));
++        }
++        Ok((w as u16, h as u16))
++    }
++}
++// Refuse input/capture while a secure or otherwise different desktop is active.
++fn active_desktop() -> io::Result<()> {
++    unsafe {
++        let input = OpenInputDesktop(0, 0, DESKTOP_READOBJECTS);
++        if input.is_null() {
++            return Err(fail());
++        }
++        let thread = GetThreadDesktop(windows_sys::Win32::System::Threading::GetCurrentThreadId());
++        let name = |handle| -> io::Result<Vec<u16>> {
++            let mut needed = 0;
++            let mut b = vec![0u16; 256];
++            if GetUserObjectInformationW(
++                handle,
++                UOI_NAME,
++                b.as_mut_ptr().cast(),
++                (b.len() * 2) as u32,
++                &mut needed,
++            ) == 0
++            {
++                return Err(fail());
++            }
++            b.truncate((needed as usize / 2).saturating_sub(1));
++            Ok(b)
++        };
++        let a = name(input);
++        let b = name(thread);
++        CloseDesktop(input);
++        if a? != b? {
++            return Err(io::Error::other(
++                "Selected Windows desktop is no longer active",
++            ));
++        }
++        Ok(())
++    }
++}
++impl Desktop {
++    pub(super) fn open(control: bool) -> Result<Self, String> {
++        active_desktop()
++            .map_err(|_| "The selected Windows desktop is not accessible.".to_string())?;
++        let (width, height) = metrics().map_err(|e| e.to_string())?;
++        Ok(Self {
++            width,
++            height,
++            control,
++            buttons: 0,
++            held: Vec::new(),
++            temporary: Vec::new(),
++        })
++    }
++    fn key(code: u16, flags: u32) -> io::Result<()> {
++        unsafe {
++            let event = INPUT {
++                r#type: INPUT_KEYBOARD,
++                Anonymous: INPUT_0 {
++                    ki: KEYBDINPUT {
++                        wVk: if flags & KEYEVENTF_UNICODE != 0 {
++                            0
++                        } else {
++                            code
++                        },
++                        wScan: if flags & KEYEVENTF_UNICODE != 0 {
++                            code
++                        } else {
++                            0
++                        },
++                        dwFlags: flags,
++                        time: 0,
++                        dwExtraInfo: 0,
++                    },
++                },
++            };
++            if SendInput(1, &event, size_of::<INPUT>() as i32) != 1 {
++                return Err(fail());
++            }
++            Ok(())
++        }
++    }
++    fn mouse(x: i32, y: i32, flags: u32, data: u32) -> io::Result<()> {
++        unsafe {
++            let event = INPUT {
++                r#type: INPUT_MOUSE,
++                Anonymous: INPUT_0 {
++                    mi: MOUSEINPUT {
++                        dx: x,
++                        dy: y,
++                        mouseData: data,
++                        dwFlags: flags,
++                        time: 0,
++                        dwExtraInfo: 0,
++                    },
++                },
++            };
++            if SendInput(1, &event, size_of::<INPUT>() as i32) != 1 {
++                return Err(fail());
++            }
++            Ok(())
++        }
++    }
++    fn release(&mut self) -> io::Result<()> {
++        for code in std::mem::take(&mut self.temporary) {
++            Self::key(code, KEYEVENTF_KEYUP)?;
++        }
++        let mut released = Vec::new();
++        for held in std::mem::take(&mut self.held) {
++            if held.owned && !released.contains(&(held.code, held.flags)) {
++                Self::key(held.code, held.flags | KEYEVENTF_KEYUP)?;
++                released.push((held.code, held.flags));
++            }
++        }
++        for (i, flag) in [
++            MOUSEEVENTF_LEFTUP,
++            MOUSEEVENTF_MIDDLEUP,
++            MOUSEEVENTF_RIGHTUP,
++        ]
++        .into_iter()
++        .enumerate()
++        {
++            if self.buttons & (1 << i) != 0 {
++                Self::mouse(0, 0, flag, 0)?;
++            }
++        }
++        self.buttons = 0;
++        Ok(())
++    }
++}
++fn keycode(sym: u32) -> Option<(u16, u32)> {
++    Some(match sym {
++        0xff08 => (VK_BACK, 0),
++        0xff09 => (VK_TAB, 0),
++        0xff0d => (VK_RETURN, 0),
++        0xff1b => (VK_ESCAPE, 0),
++        0xffff => (VK_DELETE, 0),
++        0xff50 => (VK_HOME, 0),
++        0xff51 => (VK_LEFT, 0),
++        0xff52 => (VK_UP, 0),
++        0xff53 => (VK_RIGHT, 0),
++        0xff54 => (VK_DOWN, 0),
++        0xff55 => (VK_PRIOR, 0),
++        0xff56 => (VK_NEXT, 0),
++        0xff57 => (VK_END, 0),
++        0xffe1 => (VK_LSHIFT, 0),
++        0xffe2 => (VK_RSHIFT, 0),
++        0xffe3 => (VK_LCONTROL, 0),
++        0xffe4 => (VK_RCONTROL, 0),
++        0xffe9 => (VK_LMENU, 0),
++        0xffea => (VK_RMENU, 0),
++        0xffeb => (VK_LWIN, 0),
++        0xffec => (VK_RWIN, 0),
++        0xffbe..=0xffd5 => (VK_F1 + (sym - 0xffbe) as u16, 0),
++        _ => return None,
++    })
++}
++impl Source for Desktop {
++    fn capture(&mut self) -> io::Result<Frame> {
++        active_desktop()?;
++        if metrics()? != (self.width, self.height) {
++            return Err(io::Error::other(
++                "Primary display resized; restart VNC sharing",
++            ));
++        }
++        unsafe {
++            let screen = GetDC(ptr::null_mut());
++            if screen.is_null() {
++                return Err(fail());
++            }
++            let memory = CreateCompatibleDC(screen);
++            if memory.is_null() {
++                ReleaseDC(ptr::null_mut(), screen);
++                return Err(fail());
++            }
++            let bitmap =
++                CreateCompatibleBitmap(screen, i32::from(self.width), i32::from(self.height));
++            if bitmap.is_null() {
++                DeleteDC(memory);
++                ReleaseDC(ptr::null_mut(), screen);
++                return Err(fail());
++            }
++            let old = SelectObject(memory, bitmap);
++            if old.is_null() || old as isize == -1 {
++                DeleteObject(bitmap);
++                DeleteDC(memory);
++                ReleaseDC(ptr::null_mut(), screen);
++                return Err(io::Error::other(
++                    "Could not select the Windows capture bitmap",
++                ));
++            }
++            let mut rgba = vec![0u8; usize::from(self.width) * usize::from(self.height) * 4];
++            let mut info: BITMAPINFO = zeroed();
++            info.bmiHeader = BITMAPINFOHEADER {
++                biSize: size_of::<BITMAPINFOHEADER>() as u32,
++                biWidth: i32::from(self.width),
++                biHeight: -i32::from(self.height),
++                biPlanes: 1,
++                biBitCount: 32,
++                biCompression: BI_RGB,
++                ..zeroed()
++            };
++            let copied = BitBlt(
++                memory,
++                0,
++                0,
++                i32::from(self.width),
++                i32::from(self.height),
++                screen,
++                0,
++                0,
++                SRCCOPY | CAPTUREBLT,
++            );
++            // A bitmap must be deselected before GetDIBits.
++            SelectObject(memory, old);
++            let read = if copied != 0 {
++                GetDIBits(
++                    screen,
++                    bitmap,
++                    0,
++                    u32::from(self.height),
++                    rgba.as_mut_ptr().cast(),
++                    &mut info,
++                    DIB_RGB_COLORS,
++                )
++            } else {
++                0
++            };
++            DeleteObject(bitmap);
++            DeleteDC(memory);
++            ReleaseDC(ptr::null_mut(), screen);
++            if read != i32::from(self.height) {
++                return Err(fail());
++            }
++            for pixel in rgba.chunks_exact_mut(4) {
++                pixel.swap(0, 2);
++                pixel[3] = 255;
++            }
++            Ok(Frame {
++                width: self.width,
++                height: self.height,
++                rgba,
++            })
++        }
++    }
++    fn input(&mut self, event: Input) -> io::Result<()> {
++        if !self.control {
++            return Ok(());
++        }
++        active_desktop()?;
++        match event {
++            Input::Key { down, keysym } => self.keyboard_event(keysym, down)?,
++            Input::Pointer { buttons, x, y } => {
++                Self::mouse(
++                    i32::from(x) * 65535 / i32::from(self.width.saturating_sub(1).max(1)),
++                    i32::from(y) * 65535 / i32::from(self.height.saturating_sub(1).max(1)),
++                    MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE,
++                    0,
++                )?;
++                for (i, (down, up)) in [
++                    (MOUSEEVENTF_LEFTDOWN, MOUSEEVENTF_LEFTUP),
++                    (MOUSEEVENTF_MIDDLEDOWN, MOUSEEVENTF_MIDDLEUP),
++                    (MOUSEEVENTF_RIGHTDOWN, MOUSEEVENTF_RIGHTUP),
++                ]
++                .into_iter()
++                .enumerate()
++                {
++                    if (buttons ^ self.buttons) & (1 << i) != 0 {
++                        Self::mouse(0, 0, if buttons & (1 << i) != 0 { down } else { up }, 0)?;
++                    }
++                }
++                if buttons & 8 != 0 && self.buttons & 8 == 0 {
++                    Self::mouse(0, 0, MOUSEEVENTF_WHEEL, 120)?;
++                }
++                if buttons & 16 != 0 && self.buttons & 16 == 0 {
++                    Self::mouse(0, 0, MOUSEEVENTF_WHEEL, (-120i32) as u32)?;
++                }
++                self.buttons = buttons;
++            }
++            Input::Release => self.release()?,
++        }
++        Ok(())
++    }
++}
++impl Drop for Desktop {
++    fn drop(&mut self) {
++        if self.control && active_desktop().is_ok() {
++            let _ = self.release();
++        }
++    }
++}
++
++impl Desktop {
++    fn keyboard_event(&mut self, sym: u32, down: bool) -> io::Result<()> {
++        let sym = super::keyboard::canonical_keysym(sym);
++        let old = self.held.iter().position(|h| h.sym == sym);
++        if !down && old.is_none() {
++            return Ok(());
++        }
++        let pressed = |code: u16| unsafe { GetAsyncKeyState(i32::from(code)) < 0 };
++        let shortcut = [VK_CONTROL, VK_MENU, VK_LWIN, VK_RWIN]
++            .iter()
++            .any(|k| pressed(*k));
++        let character = super::keyboard::windows_character(sym, shortcut, |character| unsafe {
++            let foreground = GetForegroundWindow();
++            let thread = GetWindowThreadProcessId(foreground, ptr::null_mut());
++            VkKeyScanExW(character, GetKeyboardLayout(thread))
++        });
++        let (code, flags, required) = if let Some(index) = old {
++            let h = &self.held[index];
++            (h.code, h.flags, h.required)
++        } else if let Some(plan) = character {
++            (
++                plan.code,
++                if plan.unicode { KEYEVENTF_UNICODE } else { 0 },
++                plan.required,
++            )
++        } else {
++            match keycode(sym) {
++                Some((code, flags)) => (code, flags, 0),
++                None => return Ok(()),
++            }
++        };
++        let owned = old
++            .map(|i| self.held[i].owned)
++            .unwrap_or_else(|| flags & KEYEVENTF_UNICODE != 0 || !pressed(code));
++        if down && old.is_none() {
++            if self.held.len() >= 64 {
++                return Err(io::Error::other("Too many pressed VNC keys"));
++            }
++            self.held.push(Held {
++                sym,
++                code,
++                flags,
++                owned,
++                required,
++            });
++        }
++        let start = self.temporary.len();
++        for (bit, key) in [(1, VK_LSHIFT), (2, VK_LCONTROL), (4, VK_LMENU)] {
++            let generic = match bit {
++                1 => VK_SHIFT,
++                2 => VK_CONTROL,
++                _ => VK_MENU,
++            };
++            if required & bit != 0 && !pressed(generic) {
++                self.temporary.push(key);
++                Self::key(key, 0)?;
++            }
++        }
++        let result = if owned
++            && (down
++                || !self
++                    .held
++                    .iter()
++                    .any(|h| h.sym != sym && h.code == code && h.flags == flags && h.owned))
++        {
++            Self::key(code, flags | if down { 0 } else { KEYEVENTF_KEYUP })
++        } else {
++            Ok(())
++        };
++        while self.temporary.len() > start {
++            let key = *self.temporary.last().unwrap();
++            Self::key(key, KEYEVENTF_KEYUP)?;
++            self.temporary.pop();
++        }
++        if !down {
++            self.held.retain(|h| h.sym != sym);
++        }
++        result
++    }
++}
+--- /dev/null
++++ b/src/services/vnc/keyboard.rs
+@@ -0,0 +1,110 @@
++//! Character aliases are normalized without turning function or keypad keysyms into text.
++pub(super) fn keysym_character(sym: u32) -> Option<char> {
++    if sym >= 0xfe00 && !(0x01000000..=0x0110ffff).contains(&sym) {
++        return None;
++    }
++    xkeysym::Keysym::new(sym)
++        .key_char()
++        .filter(|ch| !ch.is_control())
++}
++pub(super) fn canonical_keysym(sym: u32) -> u32 {
++    keysym_character(sym).map_or(sym, |ch| 0x01000000 | u32::from(ch))
++}
++#[cfg(any(windows, test))]
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub(super) struct CharacterPlan {
++    pub code: u16,
++    pub unicode: bool,
++    pub required: u8,
++}
++#[cfg(any(windows, test))]
++pub(super) fn windows_character(
++    sym: u32,
++    shortcut: bool,
++    lookup: impl FnOnce(u16) -> i16,
++) -> Option<CharacterPlan> {
++    let value = u16::try_from(u32::from(keysym_character(sym)?)).ok()?;
++    if !shortcut {
++        return Some(CharacterPlan {
++            code: value,
++            unicode: true,
++            required: 0,
++        });
++    }
++    let mapping = lookup(value);
++    if mapping == -1 {
++        return None;
++    }
++    let mapping = mapping as u16;
++    let required = (mapping >> 8) as u8;
++    if required & !7 != 0 {
++        return None;
++    }
++    Some(CharacterPlan {
++        code: mapping & 255,
++        unicode: false,
++        required,
++    })
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn character_aliases_share_identity_without_converting_function_keys() {
++        for (legacy, unicode, character) in [(0x20ac, 0x010020ac, '€'), (0x07e1, 0x010003b1, 'α')]
++        {
++            assert_eq!(keysym_character(legacy), Some(character));
++            assert_eq!(keysym_character(unicode), Some(character));
++            assert_eq!(canonical_keysym(legacy), canonical_keysym(unicode));
++        }
++        for special in [0xff08, 0xff0d, 0xff51, 0xffe1, 0xfe03, 0xffb1, 0x0100d800] {
++            assert_eq!(keysym_character(special), None);
++            assert_eq!(canonical_keysym(special), special);
++        }
++    }
++    #[test]
++    fn windows_case_and_shifted_punctuation_use_literal_unicode_without_shortcuts() {
++        for sym in [
++            u32::from(b'A'),
++            u32::from(b'#'),
++            u32::from(b'a'),
++            0x20ac,
++            0x010020ac,
++            0x07e1,
++            0x010003b1,
++        ] {
++            let p = windows_character(sym, false, |_| {
++                panic!("literal text must not depend on CapsLock, Shift or the target layout")
++            })
++            .unwrap();
++            assert!(p.unicode);
++            assert_eq!(u32::from(p.code), u32::from(keysym_character(sym).unwrap()));
++            assert_eq!(p.required, 0);
++        }
++    }
++    #[test]
++    fn windows_shortcut_mapping_retains_shift_and_altgr_requirements() {
++        for (sym, mapping, code, required) in [
++            (b'A' as u32, 0x0141, 0x41, 1),
++            (b'#' as u32, 0x0133, 0x33, 1),
++            (0x010020ac, 0x0645, 0x45, 6),
++            (0x20ac, 0x0645, 0x45, 6),
++            (0x07e1, 0x0041, 0x41, 0),
++            (0x010003b1, 0x0041, 0x41, 0),
++        ] {
++            assert_eq!(
++                windows_character(sym, true, |value| {
++                    assert_eq!(u32::from(value), u32::from(keysym_character(sym).unwrap()));
++                    mapping
++                }),
++                Some(CharacterPlan {
++                    code,
++                    unicode: false,
++                    required
++                })
++            );
++        }
++        assert!(windows_character(b'a' as u32, true, |_| -1).is_none());
++        assert!(windows_character(b'a' as u32, true, |_| 0x0841).is_none());
++    }
++}
+--- /dev/null
++++ b/src/services/vnc/x11/keyboard.rs
+@@ -0,0 +1,308 @@
++//! Translate keysyms through the selected server's current XKB key types and group.
++//! Temporary transitions touch only this controller's owned keys and are restored per event.
++use super::*;
++use x11rb::protocol::xkb::{self, ConnectionExt as _, MapPart, VMod};
++const DEVICE: u16 = 256; // XkbUseCoreKbd
++pub(super) struct Held {
++    pub sym: u32,
++    pub code: u8,
++    pub owned: bool,
++}
++pub(super) struct Keyboard {
++    first: u8,
++    syms: Vec<xkb::KeySymMap>,
++    types: Vec<xkb::KeyType>,
++    mods: [Vec<u8>; 8],
++}
++impl Keyboard {
++    pub fn load(conn: &RustConnection<Timed>) -> io::Result<Self> {
++        if !conn
++            .xkb_use_extension(1, 0)
++            .map_err(error)?
++            .reply()
++            .map_err(error)?
++            .supported
++        {
++            return Err(error("XKB keyboard translation is unavailable"));
++        }
++        let map = conn
++            .xkb_get_map(
++                DEVICE,
++                MapPart::KEY_TYPES | MapPart::KEY_SYMS,
++                MapPart::default(),
++                0,
++                0,
++                0,
++                0,
++                0,
++                0,
++                0,
++                0,
++                VMod::default(),
++                0,
++                0,
++                0,
++                0,
++                0,
++                0,
++            )
++            .map_err(error)?
++            .reply()
++            .map_err(error)?;
++        let syms = map
++            .map
++            .syms_rtrn
++            .ok_or_else(|| error("Missing XKB symbols"))?;
++        let types = map
++            .map
++            .types_rtrn
++            .ok_or_else(|| error("Missing XKB key types"))?;
++        let modifier = conn
++            .get_modifier_mapping()
++            .map_err(error)?
++            .reply()
++            .map_err(error)?;
++        let n = usize::from(modifier.keycodes_per_modifier());
++        if n == 0 || modifier.keycodes.len() != 8 * n || syms.len() > 256 || types.len() > 256 {
++            return Err(error("Invalid XKB keyboard map"));
++        }
++        let mods = std::array::from_fn(|i| {
++            modifier.keycodes[i * n..(i + 1) * n]
++                .iter()
++                .copied()
++                .filter(|c| *c != 0)
++                .collect()
++        });
++        Ok(Self {
++            first: map.first_key_sym,
++            syms,
++            types,
++            mods,
++        })
++    }
++    fn code_for(&self, sym: u32) -> Option<u8> {
++        self.syms
++            .iter()
++            .position(|row| row.syms.contains(&sym))
++            .and_then(|i| self.first.checked_add(i as u8))
++    }
++    fn locking(&self, code: u8) -> bool {
++        code.checked_sub(self.first)
++            .and_then(|i| self.syms.get(usize::from(i)))
++            .is_some_and(|row| {
++                row.syms
++                    .iter()
++                    .any(|s| matches!(*s, 0xffe5 | 0xff7f | 0xff14))
++            })
++    }
++    fn group(row: &xkb::KeySymMap, group: u8) -> Option<usize> {
++        let n = row.group_info & 15;
++        if n == 0 {
++            return None;
++        }
++        Some(usize::from(if group < n {
++            group
++        } else {
++            match row.group_info & 0xc0 {
++                0x40 => n - 1,
++                0x80 => ((row.group_info >> 4) & 3).min(n - 1),
++                _ => group % n,
++            }
++        }))
++    }
++    fn symbol(&self, index: usize, group: u8, mods: u8) -> Option<u32> {
++        let row = self.syms.get(index)?;
++        let group = Self::group(row, group)?;
++        let ty = self.types.get(usize::from(*row.kt_index.get(group)?))?;
++        let mask = u16::from(ty.mods_mask) as u8;
++        let level = ty
++            .map
++            .iter()
++            .find(|entry| entry.active && (u16::from(entry.mods_mask) as u8) == mods & mask)
++            .map_or(0, |entry| usize::from(entry.level));
++        if level >= usize::from(row.width) {
++            return None;
++        }
++        row.syms
++            .get(group * usize::from(row.width) + level)
++            .copied()
++    }
++}
++fn pressed(keys: &[u8; 32], code: u8) -> bool {
++    keys[usize::from(code / 8)] & (1 << (code % 8)) != 0
++}
++impl X11 {
++    pub(super) fn keyboard_event(&mut self, sym: u32, down: bool) -> io::Result<()> {
++        let sym = super::super::keyboard::canonical_keysym(sym);
++        // Refresh the server map rather than caching a client keyboard layout across MappingNotify.
++        let keyboard = Keyboard::load(&self.conn)?;
++        let old = self.held.iter().position(|h| h.sym == sym);
++        if !down && old.is_none() {
++            return Ok(());
++        }
++        let character = super::super::keyboard::keysym_character(sym);
++        let keys = self
++            .conn
++            .query_keymap()
++            .map_err(error)?
++            .reply()
++            .map_err(error)?
++            .keys;
++        let state = self
++            .conn
++            .xkb_get_state(DEVICE)
++            .map_err(error)?
++            .reply()
++            .map_err(error)?;
++        let actual = u16::from(state.mods) as u8;
++        let locked = (u16::from(state.locked_mods) as u8) | (u16::from(state.latched_mods) as u8);
++        let group = u8::from(state.group);
++        let mut changes = Vec::new();
++        let code = if !down {
++            self.held[old.unwrap()].code
++        } else if character.is_some() {
++            let mut candidates = Vec::new();
++            for (index, row) in keyboard.syms.iter().enumerate() {
++                let Some(code) = keyboard.first.checked_add(index as u8) else {
++                    continue;
++                };
++                if !down && self.held[old.unwrap()].code != code {
++                    continue;
++                }
++                let Some(g) = Keyboard::group(row, group) else {
++                    continue;
++                };
++                let Some(ty) = row
++                    .kt_index
++                    .get(g)
++                    .and_then(|i| keyboard.types.get(usize::from(*i)))
++                else {
++                    continue;
++                };
++                let affect = (u16::from(ty.mods_mask) as u8) & !locked & !2; // Never toggle CapsLock or latched/locked state.
++                for desired in 0u8..=255 {
++                    if desired & !affect != actual & !affect
++                        || desired & (actual & 0x4c) != (actual & 0x4c)
++                        || keyboard
++                            .symbol(index, group, desired)
++                            .and_then(super::super::keyboard::keysym_character)
++                            != character
++                    {
++                        continue;
++                    }
++                    let mut transitions = Vec::new();
++                    let mut valid = true;
++                    for bit in 0..8 {
++                        let mask = 1 << bit;
++                        if (actual ^ desired) & mask == 0 {
++                            continue;
++                        }
++                        if desired & mask == 0 {
++                            for key in &keyboard.mods[bit] {
++                                if pressed(&keys, *key) {
++                                    if !self.held.iter().any(|h| h.code == *key && h.owned) {
++                                        valid = false;
++                                        break;
++                                    }
++                                    transitions.push((*key, false));
++                                }
++                            }
++                        } else if let Some(key) = keyboard.mods[bit]
++                            .iter()
++                            .find(|key| !keyboard.locking(**key) && !pressed(&keys, **key))
++                        {
++                            transitions.push((*key, true));
++                        } else {
++                            valid = false
++                        }
++                    }
++                    if valid {
++                        candidates.push((transitions.len(), code, transitions));
++                    }
++                }
++            }
++            candidates.sort_by_key(|(n, code, _)| (*n, *code));
++            let Some((_, code, transitions)) = candidates.into_iter().next() else {
++                // Unsupported input is a bounded no-op, not a framebuffer/source failure.
++                // No held keys or modifier transitions have been changed at this point.
++                return Ok(());
++            };
++            changes = transitions;
++            code
++        } else {
++            match old {
++                Some(index) => self.held[index].code,
++                None => match keyboard.code_for(sym) {
++                    Some(code) => code,
++                    None => return Ok(()),
++                },
++            }
++        };
++        // Own only presses introduced by this source. A pre-existing physical press is borrowed.
++        let owned = old
++            .map(|i| self.held[i].owned)
++            .unwrap_or_else(|| !pressed(&keys, code));
++        if down && old.is_none() {
++            if self.held.len() >= 64 {
++                return Err(error("Too many pressed VNC keys"));
++            }
++            self.held.push(Held { sym, code, owned });
++        }
++        for (key, press) in &changes {
++            if *press {
++                self.temporary.push(*key);
++            }
++            self.fake(
++                if *press {
++                    KEY_PRESS_EVENT
++                } else {
++                    KEY_RELEASE_EVENT
++                },
++                *key,
++                0,
++                0,
++            )?;
++        }
++        let should_send = owned
++            && (down
++                || !self
++                    .held
++                    .iter()
++                    .any(|h| h.sym != sym && h.code == code && h.owned));
++        let result = if should_send {
++            self.fake(
++                if down {
++                    KEY_PRESS_EVENT
++                } else {
++                    KEY_RELEASE_EVENT
++                },
++                code,
++                0,
++                0,
++            )
++        } else {
++            Ok(())
++        };
++        // Restore explicit client-held modifiers immediately, without keeping synthesized Shift down.
++        for (key, press) in changes.into_iter().rev() {
++            self.fake(
++                if press {
++                    KEY_RELEASE_EVENT
++                } else {
++                    KEY_PRESS_EVENT
++                },
++                key,
++                0,
++                0,
++            )?;
++            if press {
++                self.temporary.retain(|k| *k != key);
++            }
++        }
++        if !down {
++            self.held.retain(|h| h.sym != sym);
++        }
++        self.keyboard = Some(keyboard);
++        result
++    }
++}
+--- /dev/null
++++ b/src/services/vnc_fixture_keyboard.rs
+@@ -0,0 +1,100 @@
++//! Independent target-window key interpretation for the isolated native fixture only.
++use std::{
++    ffi::{c_char, c_void},
++    io::Write,
++    net::TcpStream,
++    path::Path,
++    thread,
++    time::{Duration, Instant},
++};
++use x11rb::{connection::Connection, protocol::xproto::KeyPressEvent};
++pub(super) fn interpreted_press(display: &str, authority: &Path, event: &KeyPressEvent) -> u32 {
++    let output = std::process::Command::new("/usr/bin/xkbcomp")
++        .args(["-xkb", display, "-"])
++        .env("XAUTHORITY", authority)
++        .output()
++        .unwrap();
++    assert!(
++        output.status.success(),
++        "{}",
++        String::from_utf8_lossy(&output.stderr)
++    );
++    let map = std::ffi::CString::new(output.stdout).unwrap();
++    unsafe {
++        let lib = libloading::Library::new("libxkbcommon.so.0").unwrap();
++        let context_new = *lib
++            .get::<unsafe extern "C" fn(u32) -> *mut c_void>(b"xkb_context_new\0")
++            .unwrap();
++        let keymap_new = *lib
++            .get::<unsafe extern "C" fn(*mut c_void, *const c_char, u32, u32) -> *mut c_void>(
++                b"xkb_keymap_new_from_string\0",
++            )
++            .unwrap();
++        let state_new = *lib
++            .get::<unsafe extern "C" fn(*mut c_void) -> *mut c_void>(b"xkb_state_new\0")
++            .unwrap();
++        let update = *lib
++            .get::<unsafe extern "C" fn(*mut c_void, u32, u32, u32, u32, u32, u32) -> u32>(
++                b"xkb_state_update_mask\0",
++            )
++            .unwrap();
++        let lookup = *lib
++            .get::<unsafe extern "C" fn(*mut c_void, u32) -> u32>(b"xkb_state_key_get_one_sym\0")
++            .unwrap();
++        let context_unref = *lib
++            .get::<unsafe extern "C" fn(*mut c_void)>(b"xkb_context_unref\0")
++            .unwrap();
++        let keymap_unref = *lib
++            .get::<unsafe extern "C" fn(*mut c_void)>(b"xkb_keymap_unref\0")
++            .unwrap();
++        let state_unref = *lib
++            .get::<unsafe extern "C" fn(*mut c_void)>(b"xkb_state_unref\0")
++            .unwrap();
++        let context = context_new(0);
++        assert!(!context.is_null());
++        let keymap = keymap_new(context, map.as_ptr(), 1, 0);
++        assert!(!keymap.is_null());
++        let state = state_new(keymap);
++        assert!(!state.is_null());
++        let mask = u16::from(event.state);
++        update(
++            state,
++            u32::from(mask & 255),
++            0,
++            0,
++            0,
++            0,
++            u32::from((mask >> 13) & 3),
++        );
++        let result = lookup(state, u32::from(event.detail));
++        state_unref(state);
++        keymap_unref(keymap);
++        context_unref(context);
++        result
++    }
++}
++pub(super) fn send_key(viewer: &mut TcpStream, sym: u32, down: bool) {
++    let mut b = vec![4, u8::from(down), 0, 0];
++    b.extend_from_slice(&sym.to_be_bytes());
++    viewer.write_all(&b).unwrap();
++}
++pub(super) fn next_character(
++    x: &x11rb::rust_connection::RustConnection,
++    display: &str,
++    authority: &Path,
++) -> (u32, KeyPressEvent) {
++    let deadline = Instant::now() + Duration::from_secs(5);
++    loop {
++        if let Some(x11rb::protocol::Event::KeyPress(event)) = x.poll_for_event().unwrap() {
++            let sym = interpreted_press(display, authority, &event);
++            if !(0xffe0..=0xffef).contains(&sym) && sym != 0xfe03 {
++                return (sym, event);
++            }
++        }
++        assert!(
++            Instant::now() < deadline,
++            "target window received no interpreted character"
++        );
++        thread::sleep(Duration::from_millis(10));
++    }
++}
+--- /dev/null
++++ b/src/services/vnc_service_tests.rs
+@@ -0,0 +1,524 @@
++#[cfg(target_os = "linux")]
++#[path = "vnc_fixture_keyboard.rs"]
++mod fixture_keyboard;
++use crate::{
++    credentials::Secret,
++    services::{ServiceSupervisor, VncServiceConfig, VncSource},
++};
++#[test]
++fn vnc_requires_explicit_source_password_and_transport_consent() {
++    let s = ServiceSupervisor::default();
++    let mut c = VncServiceConfig::local(
++        VncSource::X11 {
++            display: String::new(),
++        },
++        Secret::new("12345678"),
++    );
++    assert!(!c.allow_control);
++    assert!(!c.allow_clipboard);
++    assert!(s.start_vnc(c).is_err());
++    c = VncServiceConfig::local(
++        VncSource::X11 {
++            display: ":99999".into(),
++        },
++        Secret::new("123456789"),
++    );
++    c.allow_unencrypted = true;
++    assert!(s.start_vnc(c).is_err());
++    let mut network = VncServiceConfig::local(
++        VncSource::X11 {
++            display: ":1".into(),
++        },
++        Secret::new("fixture"),
++    );
++    network.allow_unencrypted = true;
++    network.bind = "0.0.0.0:5900".parse().unwrap();
++    assert!(s.start_vnc(network).unwrap_err().contains("network access"));
++}
++
++#[test]
++fn vnc_unsupported_sources_and_clipboard_fail_closed() {
++    let s = ServiceSupervisor::default();
++    for source in [
++        VncSource::WaylandPortal,
++        VncSource::MacOsDisplay { display_id: 0 },
++    ] {
++        let mut c = VncServiceConfig::local(source, Secret::new("fixture"));
++        c.allow_unencrypted = true;
++        assert!(s.start_vnc(c).is_err());
++    }
++    let mut c = VncServiceConfig::local(
++        VncSource::X11 {
++            display: ":1".into(),
++        },
++        Secret::new("fixture"),
++    );
++    c.allow_unencrypted = true;
++    c.allow_clipboard = true;
++    assert!(s.start_vnc(c).unwrap_err().contains("clipboard"));
++}
++
++#[cfg(target_os = "linux")]
++mod isolated {
++    use super::fixture_keyboard::{next_character, send_key};
++    use super::*;
++    use crate::{
++        desktop::{
++            DesktopConfig, DesktopEvent, DesktopInput, DesktopSession,
++            rdp_options::ClipboardPolicy,
++            vnc::{Security, VncOptions},
++        },
++        model::Session,
++        x11::{XServerManager, XServerOptions},
++    };
++    use std::{
++        io::{Read, Write},
++        net::{TcpListener, TcpStream},
++        thread,
++        time::{Duration, Instant},
++    };
++    use x11rb::{connection::Connection, protocol::xproto::*};
++    fn read(s: &mut TcpStream, n: usize) -> Vec<u8> {
++        let mut b = vec![0; n];
++        s.read_exact(&mut b).unwrap();
++        b
++    }
++    fn wire(address: std::net::SocketAddr, password: &str) -> Result<TcpStream, ()> {
++        let mut s = TcpStream::connect(address).unwrap();
++        s.set_read_timeout(Some(Duration::from_secs(5))).unwrap();
++        s.set_write_timeout(Some(Duration::from_secs(5))).unwrap();
++        assert_eq!(read(&mut s, 12), b"RFB 003.008\n");
++        s.write_all(b"RFB 003.008\n").unwrap();
++        assert_eq!(read(&mut s, 2), [1, 2]);
++        s.write_all(&[2]).unwrap();
++        let challenge: [u8; 16] = read(&mut s, 16).try_into().unwrap();
++        let response = super::super::vnc::auth_response(&Secret::new(password), &challenge);
++        s.write_all(&*response).unwrap();
++        let result = read(&mut s, 4);
++        if result != [0, 0, 0, 0] {
++            return Err(());
++        }
++        s.write_all(&[1]).unwrap();
++        let init = read(&mut s, 24);
++        let n = u32::from_be_bytes(init[20..24].try_into().unwrap()) as usize;
++        read(&mut s, n);
++        Ok(s)
++    }
++    fn wait_state(
++        s: &ServiceSupervisor,
++        id: crate::services::ServiceId,
++        expected: crate::services::ServiceState,
++    ) {
++        let deadline = Instant::now() + Duration::from_secs(5);
++        while s.status(id).unwrap().state != expected {
++            assert!(Instant::now() < deadline, "state {:?}", s.status(id));
++            thread::sleep(Duration::from_millis(20));
++        }
++    }
++    fn frame(s: &mut TcpStream) -> Vec<u8> {
++        s.write_all(&[3, 0, 0, 24, 0, 24, 0, 4, 0, 4]).unwrap();
++        assert_eq!(read(s, 4), [0, 0, 0, 1]);
++        let h = read(s, 12);
++        assert_eq!(h[8..], [0, 0, 0, 0]);
++        let w = u16::from_be_bytes(h[4..6].try_into().unwrap()) as usize;
++        let height = u16::from_be_bytes(h[6..8].try_into().unwrap()) as usize;
++        read(s, w * height * 4)
++    }
++    #[test]
++    #[ignore = "requires private bwrap/Cage display; never run on a host display"]
++    fn owned_x11_vnc_dynamic_auth_control_stop_and_app_client() {
++        assert_eq!(
++            std::env::var("TERMCRAFT_TEST_XSERVER_ISOLATED").as_deref(),
++            Ok("1")
++        );
++        assert_eq!(std::env::var("DISPLAY").as_deref(), Ok(":0"));
++        let root =
++            std::path::PathBuf::from(std::env::var_os("TERMCRAFT_TEST_XSERVER_PACKAGE").unwrap());
++        let manager = XServerManager::for_installation(root);
++        let mut lease = manager.start(XServerOptions::default()).unwrap();
++        let display = lease.display().to_string();
++        let authority = lease.authority_path().to_path_buf();
++        // Authenticate to only the owned fixture display, without mutating process environment.
++        let record = std::fs::read(&authority).unwrap();
++        let cookie = record[record.len() - 16..].to_vec();
++        let socket = std::os::unix::net::UnixStream::connect(format!(
++            "/tmp/.X11-unix/X{}",
++            display.trim_start_matches(':')
++        ))
++        .unwrap();
++        let (stream, _) = x11rb::rust_connection::DefaultStream::from_unix_stream(socket).unwrap();
++        let x = x11rb::rust_connection::RustConnection::connect_to_stream_with_auth_info(
++            stream,
++            0,
++            b"MIT-MAGIC-COOKIE-1".to_vec(),
++            cookie,
++        )
++        .unwrap();
++        let screen = &x.setup().roots[0];
++        let window = x.generate_id().unwrap();
++        x.create_window(
++            x11rb::COPY_DEPTH_FROM_PARENT,
++            window,
++            screen.root,
++            24,
++            24,
++            120,
++            100,
++            0,
++            WindowClass::INPUT_OUTPUT,
++            screen.root_visual,
++            &CreateWindowAux::new()
++                .background_pixel(0xff0000)
++                .event_mask(
++                    EventMask::KEY_PRESS
++                        | EventMask::KEY_RELEASE
++                        | EventMask::BUTTON_PRESS
++                        | EventMask::BUTTON_RELEASE,
++                ),
++        )
++        .unwrap()
++        .check()
++        .unwrap();
++        x.map_window(window).unwrap().check().unwrap();
++        x.set_input_focus(InputFocus::PARENT, window, 0u32)
++            .unwrap()
++            .check()
++            .unwrap();
++        x.flush().unwrap();
++        let supervisor = ServiceSupervisor::default();
++        let make = |control| {
++            let mut c = VncServiceConfig::local(
++                VncSource::X11 {
++                    display: display.clone(),
++                },
++                Secret::new("fixture"),
++            );
++            c.x11_authority = Some(authority.clone());
++            c.allow_unencrypted = true;
++            c.allow_control = control;
++            c
++        };
++        let id = supervisor.start_vnc(make(false)).unwrap();
++        let address = supervisor.status(id).unwrap().address.unwrap();
++        assert!(wire(address, "wrong").is_err());
++        let occupied = TcpListener::bind("127.0.0.1:0").unwrap();
++        let mut occupied_config = make(false);
++        occupied_config.bind = occupied.local_addr().unwrap();
++        assert!(supervisor.start_vnc(occupied_config).is_err());
++        assert!(TcpStream::connect(occupied.local_addr().unwrap()).is_ok());
++        for message in [&[2, 0, 1, 1][..], &[6, 0, 0, 0, 0, 1, 0, 1][..]] {
++            let mut malformed = wire(address, "fixture").unwrap();
++            malformed.write_all(message).unwrap();
++            match malformed.read(&mut [0]) {
++                Ok(n) => assert_eq!(n, 0),
++                Err(e) => assert_eq!(e.kind(), std::io::ErrorKind::ConnectionReset),
++            }
++        }
++
++        let mut viewer = wire(address, "fixture").unwrap();
++        thread::sleep(Duration::from_millis(160));
++        let red = frame(&mut viewer);
++        assert_eq!(red[..4], [0, 0, 255, 0]);
++        x.change_window_attributes(
++            window,
++            &ChangeWindowAttributesAux::new().background_pixel(0x00ff00),
++        )
++        .unwrap()
++        .check()
++        .unwrap();
++        x.clear_area(false, window, 0, 0, 0, 0)
++            .unwrap()
++            .check()
++            .unwrap();
++        let deadline = Instant::now() + Duration::from_secs(5);
++        let green = loop {
++            let pixels = frame(&mut viewer);
++            if pixels[..4] == [0, 255, 0, 0] {
++                break pixels;
++            }
++            assert!(
++                Instant::now() < deadline,
++                "live source did not capture the changed owned window"
++            );
++            thread::sleep(Duration::from_millis(30));
++        };
++        assert_eq!(green[..4], [0, 255, 0, 0]);
++        assert_ne!(red, green);
++        // Server-side read-only enforcement even for a client that sends input anyway.
++        while x.poll_for_event().unwrap().is_some() {}
++        viewer
++            .write_all(&[
++                4, 1, 0, 0, 0, 0, 0, b'a', 4, 0, 0, 0, 0, 0, 0, b'a', 5, 1, 0, 30, 0, 30, 5, 0, 0,
++                30, 0, 30,
++            ])
++            .unwrap();
++        thread::sleep(Duration::from_millis(150));
++        assert!(x.poll_for_event().unwrap().is_none());
++        let session = Session {
++            protocol: "VNC".into(),
++            host: "127.0.0.1".into(),
++            port: address.port(),
++            vnc_options: VncOptions {
++                embedded: true,
++                allow_unencrypted: true,
++                security: Security::Password,
++                clipboard: ClipboardPolicy::Disabled,
++                ..Default::default()
++            },
++            ..Default::default()
++        };
++        let mut client =
++            DesktopSession::connect(DesktopConfig::new(909, session, Default::default())).unwrap();
++        let deadline = Instant::now() + Duration::from_secs(6);
++        let mut got_frame = false;
++        while !got_frame {
++            for e in client.poll() {
++                match e {
++                    DesktopEvent::Authentication { id, .. } => {
++                        client
++                            .send(DesktopInput::Authenticate {
++                                id,
++                                user: "vnc".into(),
++                                password: Secret::new("fixture"),
++                                domain: String::new(),
++                            })
++                            .unwrap();
++                    }
++                    DesktopEvent::Frame(f) => {
++                        let index = (24 * usize::from(f.width) + 24) * 4;
++                        assert_eq!(f.pixels[index..index + 4], [0, 255, 0, 255]);
++                        got_frame = true
++                    }
++                    DesktopEvent::Disconnected { message } => panic!("{message}"),
++                    _ => {}
++                }
++            }
++            assert!(Instant::now() < deadline);
++            thread::sleep(Duration::from_millis(10));
++        }
++        client.close();
++        // Independent maintained vncdotool client: captures the owned live framebuffer in memory.
++        {
++            let python=std::env::var_os("TERMCRAFT_TEST_VNCDOTOOL_PYTHON").expect("Set the private vncdotool Python path for independent interoperability qualification");
++            let code = "from vncdotool import api; import sys; c=api.connect(sys.argv[1],password='fixture'); c.refreshScreen(); assert c.screen.getpixel((24,24))[:3] == (0,255,0); c.disconnect(); api.shutdown()";
++            let output = std::process::Command::new(python)
++                .args(["-c", code, &format!("127.0.0.1::{}", address.port())])
++                .output()
++                .unwrap();
++            assert!(
++                output.status.success(),
++                "{}",
++                String::from_utf8_lossy(&output.stderr)
++            );
++            eprintln!(
++                "Independent vncdotool 1.3.0 authenticated and observed the live green owned-window pixels"
++            );
++        }
++        let unrelated = TcpListener::bind("127.0.0.1:0").unwrap();
++        let unrelated_addr = unrelated.local_addr().unwrap();
++        let sibling = supervisor.start_vnc(make(false)).unwrap();
++        let sibling_address = supervisor.status(sibling).unwrap().address.unwrap();
++        let mut sibling_viewer = wire(sibling_address, "fixture").unwrap();
++        let _unfinished_auth = TcpStream::connect(address).unwrap();
++        let mut slow = wire(address, "fixture").unwrap();
++        slow.write_all(&[3, 0, 0, 0, 0, 0, 255, 255, 255, 255])
++            .unwrap();
++        let started = Instant::now();
++        supervisor.stop(id).unwrap();
++        wait_state(&supervisor, id, crate::services::ServiceState::Stopped);
++        assert!(started.elapsed() < Duration::from_secs(3));
++        assert!(TcpStream::connect(address).is_err());
++        assert!(TcpStream::connect(unrelated_addr).is_ok());
++        assert!(lease.is_running().unwrap());
++        assert_eq!(frame(&mut sibling_viewer)[..4], [0, 255, 0, 0]);
++        supervisor.stop(sibling).unwrap();
++        wait_state(&supervisor, sibling, crate::services::ServiceState::Stopped);
++        let mut timed = make(false);
++        timed.lifetime = Some(Duration::from_secs(1));
++        let timed = supervisor.start_vnc(timed).unwrap();
++        wait_state(&supervisor, timed, crate::services::ServiceState::Stopped);
++        let original_keys = x.query_keymap().unwrap().reply().unwrap().keys;
++        let controlled = supervisor.start_vnc(make(true)).unwrap();
++        let controlled_address = supervisor.status(controlled).unwrap().address.unwrap();
++        let mut controller = wire(controlled_address, "fixture").unwrap();
++        while x.poll_for_event().unwrap().is_some() {}
++        controller
++            .write_all(&[
++                4, 1, 0, 0, 0, 0, 0, b'a', 4, 0, 0, 0, 0, 0, 0, b'a', 5, 1, 0, 30, 0, 30, 5, 0, 0,
++                30, 0, 30,
++            ])
++            .unwrap();
++        let mut key = false;
++        let mut button = false;
++        let deadline = Instant::now() + Duration::from_secs(5);
++        while !(key && button) {
++            while let Some(event) = x.poll_for_event().unwrap() {
++                match event {
++                    x11rb::protocol::Event::KeyPress(_) => key = true,
++                    x11rb::protocol::Event::ButtonPress(_) => button = true,
++                    _ => {}
++                }
++            }
++            assert!(
++                Instant::now() < deadline,
++                "owned fixture did not receive optional input"
++            );
++            thread::sleep(Duration::from_millis(10));
++        }
++        send_key(&mut controller, u32::from(b'A'), true);
++        send_key(&mut controller, u32::from(b'A'), false);
++        assert_eq!(
++            next_character(&x, &display, &authority).0,
++            u32::from(b'A'),
++            "RFB uppercase A must not require a client Shift event"
++        );
++        send_key(&mut controller, u32::from(b'#'), true);
++        send_key(&mut controller, u32::from(b'#'), false);
++        assert_eq!(
++            next_character(&x, &display, &authority).0,
++            u32::from(b'#'),
++            "RFB shifted punctuation must retain its character"
++        );
++        // Explicit client Shift is restored after literal lowercase translation.
++        send_key(&mut controller, 0xffe1, true);
++        send_key(&mut controller, u32::from(b'a'), true);
++        send_key(&mut controller, u32::from(b'a'), false);
++        assert_eq!(next_character(&x, &display, &authority).0, u32::from(b'a'));
++        send_key(&mut controller, u32::from(b'A'), true);
++        send_key(&mut controller, u32::from(b'A'), false);
++        let (symbol, shifted) = next_character(&x, &display, &authority);
++        assert_eq!(symbol, u32::from(b'A'));
++        assert_ne!(
++            u16::from(shifted.state) & 1,
++            0,
++            "explicit Shift was not restored"
++        );
++        send_key(&mut controller, 0xffe1, false);
++        for (modifier, mask) in [(0xffe3, 4), (0xffe9, 8)] {
++            send_key(&mut controller, modifier, true);
++            send_key(&mut controller, u32::from(b'c'), true);
++            send_key(&mut controller, u32::from(b'c'), false);
++            let (symbol, event) = next_character(&x, &display, &authority);
++            assert_eq!(symbol, u32::from(b'c'));
++            assert_ne!(
++                u16::from(event.state) & mask,
++                0,
++                "shortcut modifier was lost"
++            );
++            send_key(&mut controller, modifier, false);
++        }
++        // Lock state is respected without silently toggling the user's CapsLock.
++        send_key(&mut controller, 0xffe5, true);
++        send_key(&mut controller, 0xffe5, false);
++        for symbol in [u32::from(b'a'), u32::from(b'A')] {
++            send_key(&mut controller, symbol, true);
++            send_key(&mut controller, symbol, false);
++            assert_eq!(next_character(&x, &display, &authority).0, symbol);
++        }
++        send_key(&mut controller, 0xffe5, true);
++        send_key(&mut controller, 0xffe5, false);
++        // Change only the explicitly owned fixture server to a different real layout.
++        let layout = std::process::Command::new("/usr/bin/setxkbmap")
++            .args(["-display", &display, "-layout", "de"])
++            .env("XAUTHORITY", &authority)
++            .output()
++            .unwrap();
++        assert!(
++            layout.status.success(),
++            "{}",
++            String::from_utf8_lossy(&layout.stderr)
++        );
++        for symbol in [u32::from(b'#'), u32::from(b'A'), 0x20ac, 0x010020ac] {
++            send_key(&mut controller, symbol, true);
++            send_key(&mut controller, symbol, false);
++            assert_eq!(
++                next_character(&x, &display, &authority).0,
++                if symbol == 0x010020ac { 0x20ac } else { symbol },
++                "cross-layout / AltGr translation failed"
++            );
++        }
++        // Explicit AltGr must also remain held through a level-three character.
++        send_key(&mut controller, 0xfe03, true);
++        send_key(&mut controller, 0x20ac, true);
++        send_key(&mut controller, 0x20ac, false);
++        let (symbol, event) = next_character(&x, &display, &authority);
++        assert_eq!(symbol, 0x20ac);
++        assert_ne!(u16::from(event.state) & 128, 0);
++        send_key(&mut controller, 0xfe03, false);
++        let layout = std::process::Command::new("/usr/bin/setxkbmap")
++            .args(["-display", &display, "-layout", "gr"])
++            .env("XAUTHORITY", &authority)
++            .output()
++            .unwrap();
++        assert!(
++            layout.status.success(),
++            "{}",
++            String::from_utf8_lossy(&layout.stderr)
++        );
++        for (press, release) in [(0x07e1, 0x010003b1), (0x010003b1, 0x07e1)] {
++            send_key(&mut controller, press, true);
++            send_key(&mut controller, release, false);
++            assert_eq!(
++                next_character(&x, &display, &authority).0,
++                0x07e1,
++                "Greek legacy/Unicode aliases must reach the same target character"
++            );
++        }
++        // A valid Unicode scalar absent from this map must not stop the managed source.
++        send_key(&mut controller, 0x0101f680, true);
++        send_key(&mut controller, 0x0101f680, false);
++        send_key(&mut controller, 0x010003b1, true);
++        send_key(&mut controller, 0x010003b1, false);
++        assert_eq!(next_character(&x, &display, &authority).0, 0x07e1);
++        assert_eq!(frame(&mut controller)[..4], [0, 255, 0, 0]);
++        assert_eq!(
++            supervisor.status(controlled).unwrap().state,
++            crate::services::ServiceState::Running
++        );
++        let layout = std::process::Command::new("/usr/bin/setxkbmap")
++            .args(["-display", &display, "-layout", "de"])
++            .env("XAUTHORITY", &authority)
++            .output()
++            .unwrap();
++        assert!(
++            layout.status.success(),
++            "{}",
++            String::from_utf8_lossy(&layout.stderr)
++        );
++
++        send_key(&mut controller, 0xffe1, true);
++        send_key(&mut controller, u32::from(b'b'), true);
++        let (symbol, event) = next_character(&x, &display, &authority);
++        assert_eq!(symbol, u32::from(b'b'));
++        let held_code = event.detail;
++        drop(controller);
++        let deadline = Instant::now() + Duration::from_secs(5);
++        loop {
++            if let Some(x11rb::protocol::Event::KeyRelease(event)) = x.poll_for_event().unwrap() {
++                if event.detail == held_code {
++                    break;
++                }
++            }
++            assert!(
++                Instant::now() < deadline,
++                "disconnect did not release owned remote key"
++            );
++            thread::sleep(Duration::from_millis(10));
++        }
++        let deadline = Instant::now() + Duration::from_secs(5);
++        while x.query_keymap().unwrap().reply().unwrap().keys != original_keys {
++            assert!(
++                Instant::now() < deadline,
++                "disconnect left owned modifier or character pressed"
++            );
++            thread::sleep(Duration::from_millis(10));
++        }
++        supervisor.stop(controlled).unwrap();
++        wait_state(
++            &supervisor,
++            controlled,
++            crate::services::ServiceState::Stopped,
++        );
++        assert!(lease.is_running().unwrap());
++    }
++}
+--- /dev/null
++++ b/src/ui/managed_vnc.rs
+@@ -0,0 +1,152 @@
++use super::*;
++use harbor_workspace::{
++    credentials::Secret,
++    services::{ServiceId, ServiceState, ServiceSupervisor, VncServiceConfig, VncSource},
++};
++use zeroize::{Zeroize, Zeroizing};
++pub(super) struct ManagedVnc {
++    supervisor: ServiceSupervisor,
++    id: Option<ServiceId>,
++    display: String,
++    authority: String,
++    bind: String,
++    password: Zeroizing<String>,
++    control: bool,
++    network: bool,
++    consent: bool,
++    lifetime: u32,
++    error: Option<String>,
++}
++impl Default for ManagedVnc {
++    fn default() -> Self {
++        Self {
++            supervisor: Default::default(),
++            id: None,
++            display: String::new(),
++            authority: String::new(),
++            bind: "127.0.0.1:5900".into(),
++            password: Zeroizing::new(String::new()),
++            control: false,
++            network: false,
++            consent: false,
++            lifetime: 3600,
++            error: None,
++        }
++    }
++}
++impl ManagedVnc {
++    pub(super) fn card(&mut self, ui: &mut Ui) {
++        ui.add_space(17.);
++        surface(ui).show(ui,|ui|{
++            ui.label(RichText::new("VNC desktop sharing server").size(18.).strong());
++            ui.label("Share an explicitly selected display. Classic VNC uses weak password authentication and does not encrypt screen contents or input. Use an SSH tunnel on untrusted networks.");
++            let status=self.id.and_then(|id|self.supervisor.status(id));
++            let busy=status.as_ref().is_some_and(|s|matches!(s.state,ServiceState::Starting|ServiceState::Running|ServiceState::Stopping));
++            ui.add_enabled_ui(!busy,|ui|{
++                Grid::new("managed-vnc-form").num_columns(2).show(ui,|ui|{
++                    #[cfg(target_os="linux")]{ui.label("X11 display");ui.add(TextEdit::singleline(&mut self.display).hint_text("Explicit display, e.g. :2"));ui.end_row();ui.label("Xauthority file (optional)");ui.text_edit_singleline(&mut self.authority);ui.end_row();}
++                    #[cfg(windows)]{ui.label("Display source");ui.label("Primary display on the current Windows desktop");ui.end_row();}
++                    #[cfg(target_os="macos")]{ui.label("Display source");ui.label("Native macOS sharing is not implemented");ui.end_row();}
++                    ui.label("Listen address");ui.text_edit_singleline(&mut self.bind);ui.end_row();
++                    ui.label("VNC password");super::managed_servers::service_password_field(ui,&mut self.password,210.);ui.end_row();
++                    ui.label("Access");ui.checkbox(&mut self.control,"Allow remote keyboard and pointer (view-only by default)");ui.end_row();
++                    ui.label("Network access");ui.checkbox(&mut self.network,"Allow non-loopback listening");ui.end_row();
++                    ui.label("Transport");ui.checkbox(&mut self.consent,"I accept unencrypted classic VNC for this listener");ui.end_row();
++                    ui.label("Stop after");ui.add(DragValue::new(&mut self.lifetime).range(0..=86400).suffix(" seconds (0 = until stopped)"));ui.end_row();
++                });
++                ui.small("Password: 1–8 printable ASCII bytes. Clipboard transfer and browser HTTP viewer are not implemented. Wayland requires a user-approved portal backend, which is not implemented. One controlling client at a time; view-only servers allow multiple viewers.");
++            });
++            if let Some(s)=status {
++                ui.label(format!("{:?}",s.state));
++                if s.state==ServiceState::Running {if let Some(address)=s.address{ui.monospace(address.to_string());}}
++                if let Some(error)=s.error{ui.colored_label(ui.visuals().error_fg_color,error);}
++                if busy {ui.ctx().request_repaint_after(Duration::from_millis(50));if ui.button("Stop VNC server").clicked(){let _=self.supervisor.stop(s.id);}}
++            }
++            if !busy&&ui.button("Start VNC server").clicked(){
++                let result=(||{
++                    #[cfg(target_os="linux")]let source=VncSource::X11{display:self.display.clone()};
++                    #[cfg(windows)]let source=VncSource::WindowsPrimaryDesktop;
++                    #[cfg(not(any(target_os="linux",windows)))]let source=VncSource::MacOsDisplay{display_id:0};
++                    let mut config=VncServiceConfig::local(source,Secret::new(self.password.as_str()));
++                    config.bind=self.bind.parse().map_err(|_|"Enter a listen IP address and port.".to_string())?;
++                    config.x11_authority=(!self.authority.is_empty()).then(||self.authority.clone().into());config.allow_non_loopback=self.network;config.allow_unencrypted=self.consent;config.allow_control=self.control;config.lifetime=(self.lifetime!=0).then(||Duration::from_secs(u64::from(self.lifetime)));
++                    self.supervisor.begin_vnc(config)
++                })();self.password.zeroize();match result{Ok(id)=>{self.id=Some(id);self.error=None},Err(e)=>self.error=Some(e)}
++            }
++            if let Some(error)=&self.error{ui.colored_label(ui.visuals().error_fg_color,error);}
++        });
++    }
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn vnc_service_password_field_leaves_no_undo_history() {
++        let mut form = ManagedVnc::default();
++        super::super::managed_servers::tests::password_history(
++            &mut form,
++            |form, ui| form.card(ui),
++            |form| {
++                assert_eq!(form.password.as_str(), "FAKE_SERVICE_PASSWORD");
++                form.password.zeroize();
++            },
++            "VNC password",
++        );
++    }
++    #[cfg(target_os = "linux")]
++    #[test]
++    #[ignore = "requires private bwrap/Cage display; never run on a host display"]
++    fn servers_vnc_pointer_start_stop_owns_only_selected_display() {
++        use super::super::managed_servers::tests::{click, frame};
++        assert_eq!(
++            std::env::var("TERMCRAFT_TEST_XSERVER_ISOLATED").as_deref(),
++            Ok("1")
++        );
++        let ctx = Context::default();
++        let data = tempfile::tempdir().unwrap();
++        let mut work = Workspace::new_context(&ctx, None, data.path().to_owned());
++        work.page = Page::Servers;
++        let package =
++            std::path::PathBuf::from(std::env::var_os("TERMCRAFT_TEST_XSERVER_PACKAGE").unwrap());
++        let manager = harbor_workspace::x11::XServerManager::for_installation(package);
++        let mut lease = manager.start(Default::default()).unwrap();
++        work.managed_vnc.display = lease.display().into();
++        work.managed_vnc.authority = lease.authority_path().to_string_lossy().into_owned();
++        work.managed_vnc.bind = "127.0.0.1:0".into();
++        *work.managed_vnc.password = "fixture".into();
++        work.managed_vnc.consent = true;
++        click(&ctx, &mut work, "Start VNC server");
++        let id = work
++            .managed_vnc
++            .id
++            .expect("pointer start must own VNC service");
++        let deadline = Instant::now() + Duration::from_secs(5);
++        let address = loop {
++            frame(&ctx, &mut work, vec![]);
++            let status = work.managed_vnc.supervisor.status(id).unwrap();
++            assert_ne!(status.state, ServiceState::Failed, "{status:?}");
++            if status.state == ServiceState::Running {
++                break status.address.unwrap();
++            }
++            assert!(Instant::now() < deadline);
++            std::thread::sleep(Duration::from_millis(10));
++        };
++        assert!(work.managed_vnc.password.is_empty());
++        assert!(
++            !serde_json::to_string(&work.store)
++                .unwrap()
++                .contains("fixture")
++        );
++        assert!(std::net::TcpStream::connect(address).is_ok());
++        click(&ctx, &mut work, "Stop VNC server");
++        let deadline = Instant::now() + Duration::from_secs(5);
++        while work.managed_vnc.supervisor.status(id).unwrap().state != ServiceState::Stopped {
++            frame(&ctx, &mut work, vec![]);
++            assert!(Instant::now() < deadline);
++            std::thread::sleep(Duration::from_millis(10));
++        }
++        assert!(std::net::TcpStream::connect(address).is_err());
++        assert!(lease.is_running().unwrap());
++        assert!(std::os::unix::net::UnixStream::connect("/tmp/.X11-unix/X0").is_ok());
++    }
++}

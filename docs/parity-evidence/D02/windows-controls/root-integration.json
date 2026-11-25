@@ -1,0 +1,61 @@
+{
+  "files": {
+    "engines/rdp/src/serial_windows.rs": {
+      "baseline": "69252c515c77dbf37865f2177f2f92169a95910985241c9af7f6d1a0bcf58f22",
+      "candidate": "f25d06a2eeea77bbe98ab5d3fb4a591aae1226127fe38438b00db0437bbe7572",
+      "payload": "f25d06a2eeea77bbe98ab5d3fb4a591aae1226127fe38438b00db0437bbe7572"
+    },
+    "engines/rdp/src/serial_windows_control.rs": {
+      "baseline": null,
+      "candidate": "34164cbe0724d8e2781aa6897bb6c4cf5d72a45e2c627d11dd8672398c1a2f23",
+      "payload": "34164cbe0724d8e2781aa6897bb6c4cf5d72a45e2c627d11dd8672398c1a2f23"
+    },
+    "engines/rdp/Cargo.toml": {
+      "baseline": "e5eec2847a6b81ab955ef92d659dfcfd2a5e2c1990de3aa2e1473982b6bdef4b",
+      "candidate": "979513e82d4357f342ff4b869d1bfe3fabc209acb102dc32ccce27d73a4ddec3",
+      "payload": "79b2cafbe2a8da7a90773959e0d429e35a4ed8c3843263b647aa35e0b8d1b557"
+    },
+    "tests/rdp-native-component/Cargo.toml": {
+      "baseline": "287a9536a73612223181f293720b183d41c52f6e1e5faaff4e4ab5b61b707fde",
+      "candidate": "081b54bf978033eb4a1cb8f84f1a0e5ffe4805fa25e51e5fb223a4d14c5aec36",
+      "payload": "081b54bf978033eb4a1cb8f84f1a0e5ffe4805fa25e51e5fb223a4d14c5aec36"
+    },
+    "tests/rdp-native-component/src/lib.rs": {
+      "baseline": "1d594dc99ea11c2be30d24c365cf435d13ac3470054bf471753f1be2c6559605",
+      "candidate": "0ecfcced4b854381d998556e2be1a5bfe57834218e248df240d0f1f5ec1d45ed",
+      "payload": "0ecfcced4b854381d998556e2be1a5bfe57834218e248df240d0f1f5ec1d45ed"
+    },
+    "tests/windows-serial-control-component/Cargo.toml": {
+      "baseline": null,
+      "candidate": "e2ecbb4416e6895f0a7fcea8b23079e8f1a9cc80d4eb798e234716838f904976",
+      "payload": "e2ecbb4416e6895f0a7fcea8b23079e8f1a9cc80d4eb798e234716838f904976"
+    },
+    "tests/windows-serial-control-component/Cargo.lock": {
+      "baseline": null,
+      "candidate": "875ebe8e4062a01ce19b006bc33aaf3925080f5342e741badbf730bd47d60777",
+      "payload": "875ebe8e4062a01ce19b006bc33aaf3925080f5342e741badbf730bd47d60777"
+    },
+    "tests/windows-serial-control-component/generate.py": {
+      "baseline": null,
+      "candidate": "fd000c729b751b40277b75ff230deca96c57c3d53f58df51ca5f4b82404a0f11",
+      "payload": "fd000c729b751b40277b75ff230deca96c57c3d53f58df51ca5f4b82404a0f11"
+    },
+    "tests/windows-serial-control-component/src/lib.rs": {
+      "baseline": null,
+      "candidate": "45b934ac0994ba50ca0d9f608337b71907e57941dcef8f71ea0dfbc877e2c574",
+      "payload": "45b934ac0994ba50ca0d9f608337b71907e57941dcef8f71ea0dfbc877e2c574"
+    },
+    "tests/windows-serial-control-component/src/completion_helpers.rs": {
+      "baseline": null,
+      "candidate": "ffea7878bae7f5f45ba9ac144bceacceae9868b14b7eb13603518407830e66df",
+      "payload": "ffea7878bae7f5f45ba9ac144bceacceae9868b14b7eb13603518407830e66df"
+    },
+    "tests/rdp-native-component/generate.py": {
+      "baseline": "91931f23cfa5bebb69ed4d35bf238309241c94157c569415b3577d0fd5ca86d2",
+      "candidate": "b5f56c834bff464baebe7a88aaf604caa16d7ee77582cbc71705e8c853ed4f9d",
+      "payload": "b5f56c834bff464baebe7a88aaf604caa16d7ee77582cbc71705e8c853ed4f9d"
+    }
+  },
+  "review": "review.md",
+  "exact_payload_including_original_package_identity": true
+}

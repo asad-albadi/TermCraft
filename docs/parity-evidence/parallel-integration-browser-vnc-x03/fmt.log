@@ -1,0 +1,243 @@
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/runtime/mod.rs:1:
+ //! Explicit provider selection for TermCraft sessions and native tools.
+-mod discovery;
+ mod browser_bundle;
++mod discovery;
+ #[cfg(test)]
+ pub(crate) use browser_bundle::VERIFIED_CHUNKS;
+ mod manifest;
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/runtime/mod.rs:68:
+ 
+ impl RuntimeCatalog {
+     #[cfg(unix)]
+-    pub(crate) fn bundled_browser_snapshot(&self, cancelled: &std::sync::atomic::AtomicBool) -> Result<(PathBuf, tempfile::TempDir), String> {
++    pub(crate) fn bundled_browser_snapshot(
++        &self,
++        cancelled: &std::sync::atomic::AtomicBool,
++    ) -> Result<(PathBuf, tempfile::TempDir), String> {
+         let (provider, snapshot) = browser_bundle::prepare(&self.resources, cancelled)?;
+         Ok((provider.executable()?, snapshot))
+     }
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/runtime/mod.rs:319:
+     #[test]
+     fn missing_bundle_never_falls_back_to_host_chromium() {
+         let root = tempfile::tempdir().unwrap();
+-        let error = RuntimeCatalog::new(root.path()).resolve(ToolId::BundledChromium).unwrap_err();
++        let error = RuntimeCatalog::new(root.path())
++            .resolve(ToolId::BundledChromium)
++            .unwrap_err();
+         assert!(error.contains("bundled Chromium"), "{error}");
+     }
+ }
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/ui/managed_servers.rs:265:
+             .map_err(|_| "Enter an IP address and port, for example 127.0.0.1:2121.")?;
+         let make_password = || Secret::new(self.password.as_str());
+         let mut config = match self.protocol {
+-            ServiceProtocol::Vnc | ServiceProtocol::Ssh | ServiceProtocol::Iperf | ServiceProtocol::Cron => {
++            ServiceProtocol::Vnc
++            | ServiceProtocol::Ssh
++            | ServiceProtocol::Iperf
++            | ServiceProtocol::Cron => {
+                 return Err("Use the SSH or Iperf service card.".into());
+             }
+             ServiceProtocol::Ftp => ServiceConfig::ftp(
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/ui/pages.rs:13:
+         .inner;
+     let id = Id::new("termcraft-runtime-providers");
+     let previous = ui.ctx().data(|data| data.get_temp::<RuntimeRows>(id));
+-    let rows = previous.filter(|rows| !refresh || rows.get().is_none()).unwrap_or_else(|| {
+-        let rows = RuntimeRows::default();
+-        let result = rows.clone();
+-        let ctx = ui.ctx().clone();
+-        ui.ctx().data_mut(|data| data.insert_temp(id, rows.clone()));
+-        std::thread::spawn(move || {
+-            let catalog = RuntimeCatalog::for_current_executable();
+-            let items = [
+-                ("SSH", ToolId::Ssh),
+-                ("SFTP", ToolId::Sftp),
+-                ("SCP", ToolId::Scp),
+-                ("RDP", ToolId::Rdp),
+-                ("VNC", ToolId::Vnc),
+-                ("FTP / FTPS", ToolId::Ftp),
+-                ("Telnet", ToolId::Telnet),
+-                ("Rlogin", ToolId::Rlogin),
+-                ("Rsh", ToolId::Rsh),
+-                ("Serial", ToolId::Serial),
+-                ("Packaged Mosh", ToolId::Mosh),
+-                ("Installed Mosh", ToolId::SystemMosh),
+-                ("Packaged Chromium browser", ToolId::BundledChromium),
+-                ("Installed Chromium browser (compatibility)", ToolId::SystemChromium),
+-                ("Managed X display", ToolId::XServer),
+-                ("XDMCP", ToolId::Xdmcp),
+-                ("Installed SSH", ToolId::OpenSsh),
+-                ("Installed SFTP", ToolId::OpenSftp),
+-                ("Installed RDP", ToolId::ExternalRdp),
+-                ("Installed VNC", ToolId::ExternalVnc),
+-                ("Local shell", ToolId::Shell),
+-                ("SSH keys", ToolId::KeyGenerator),
+-                ("Live packet capture", ToolId::PcapLibrary),
+-            ];
+-            let _ = result.set(
+-                items
+-                    .into_iter()
+-                    .map(|(name, tool)| {
+-                        if tool == ToolId::Rdp && cfg!(debug_assertions) {
+-                            let path =
+-                                harbor_workspace::desktop::DesktopConfig::default_engine_path();
+-                            if path.is_file() {
++    let rows = previous
++        .filter(|rows| !refresh || rows.get().is_none())
++        .unwrap_or_else(|| {
++            let rows = RuntimeRows::default();
++            let result = rows.clone();
++            let ctx = ui.ctx().clone();
++            ui.ctx().data_mut(|data| data.insert_temp(id, rows.clone()));
++            std::thread::spawn(move || {
++                let catalog = RuntimeCatalog::for_current_executable();
++                let items = [
++                    ("SSH", ToolId::Ssh),
++                    ("SFTP", ToolId::Sftp),
++                    ("SCP", ToolId::Scp),
++                    ("RDP", ToolId::Rdp),
++                    ("VNC", ToolId::Vnc),
++                    ("FTP / FTPS", ToolId::Ftp),
++                    ("Telnet", ToolId::Telnet),
++                    ("Rlogin", ToolId::Rlogin),
++                    ("Rsh", ToolId::Rsh),
++                    ("Serial", ToolId::Serial),
++                    ("Packaged Mosh", ToolId::Mosh),
++                    ("Installed Mosh", ToolId::SystemMosh),
++                    ("Packaged Chromium browser", ToolId::BundledChromium),
++                    (
++                        "Installed Chromium browser (compatibility)",
++                        ToolId::SystemChromium,
++                    ),
++                    ("Managed X display", ToolId::XServer),
++                    ("XDMCP", ToolId::Xdmcp),
++                    ("Installed SSH", ToolId::OpenSsh),
++                    ("Installed SFTP", ToolId::OpenSftp),
++                    ("Installed RDP", ToolId::ExternalRdp),
++                    ("Installed VNC", ToolId::ExternalVnc),
++                    ("Local shell", ToolId::Shell),
++                    ("SSH keys", ToolId::KeyGenerator),
++                    ("Live packet capture", ToolId::PcapLibrary),
++                ];
++                let _ = result.set(
++                    items
++                        .into_iter()
++                        .map(|(name, tool)| {
++                            if tool == ToolId::Rdp && cfg!(debug_assertions) {
++                                let path =
++                                    harbor_workspace::desktop::DesktopConfig::default_engine_path();
++                                if path.is_file() {
++                                    return (
++                                        name,
++                                        "Development helper".into(),
++                                        path.display().to_string(),
++                                    );
++                                }
+                                 return (
+                                     name,
+-                                    "Development helper".into(),
+-                                    path.display().to_string(),
++                                    "Unavailable".into(),
++                                    "Build the development RDP helper with scripts/run-dev.sh."
++                                        .into(),
+                                 );
+                             }
+-                            return (
+-                                name,
+-                                "Unavailable".into(),
+-                                "Build the development RDP helper with scripts/run-dev.sh.".into(),
+-                            );
+-                        }
+-                        let provider = catalog
+-                            .as_ref()
+-                            .map_err(Clone::clone)
+-                            .and_then(|catalog| catalog.resolve(tool));
+-                        let (label, detail) = match provider {
+-                            Ok(ToolProvider::Embedded) => ("Embedded".into(), String::new()),
+-                            Ok(ToolProvider::Bundled { path, version }) => {
+-                                (format!("Packaged · {version}"), path.display().to_string())
+-                            }
+-                            Ok(ToolProvider::System { path, version }) => {
+-                                ("Installed".into(), format!("{version}\n{}", path.display()))
+-                            }
+-                            Err(error) => ("Unavailable".into(), error),
+-                        };
+-                        (name, label, detail)
+-                    })
+-                    .collect(),
+-            );
+-            ctx.request_repaint();
++                            let provider = catalog
++                                .as_ref()
++                                .map_err(Clone::clone)
++                                .and_then(|catalog| catalog.resolve(tool));
++                            let (label, detail) = match provider {
++                                Ok(ToolProvider::Embedded) => ("Embedded".into(), String::new()),
++                                Ok(ToolProvider::Bundled { path, version }) => {
++                                    (format!("Packaged · {version}"), path.display().to_string())
++                                }
++                                Ok(ToolProvider::System { path, version }) => {
++                                    ("Installed".into(), format!("{version}\n{}", path.display()))
++                                }
++                                Err(error) => ("Unavailable".into(), error),
++                            };
++                            (name, label, detail)
++                        })
++                        .collect(),
++                );
++                ctx.request_repaint();
++            });
++            rows
+         });
+-        rows
+-    });
+     if let Some(rows) = rows.get() {
+         Grid::new("clients")
+             .num_columns(2)
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/ui/web_browser.rs:112:
+     });
+     if options.embedded {
+         ui.horizontal_wrapped(|ui| {
+-            ui.selectable_value(&mut options.runtime, harbor_workspace::browser::Runtime::BundledChromium, "Packaged Chromium");
+-            ui.selectable_value(&mut options.runtime, harbor_workspace::browser::Runtime::SystemChromium, "Installed Chromium (compatibility)");
++            ui.selectable_value(
++                &mut options.runtime,
++                harbor_workspace::browser::Runtime::BundledChromium,
++                "Packaged Chromium",
++            );
++            ui.selectable_value(
++                &mut options.runtime,
++                harbor_workspace::browser::Runtime::SystemChromium,
++                "Installed Chromium (compatibility)",
++            );
+         });
+         ui.horizontal(|ui| {
+             ui.label("Proxy endpoint");
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/ui.rs:916:
+             port: protocol_port(protocol),
+             browser_options: harbor_workspace::browser::Options {
+                 embedded: protocol == "Browser",
+-                runtime: if protocol == "Browser" { harbor_workspace::browser::Runtime::BundledChromium } else { harbor_workspace::browser::Runtime::SystemChromium },
++                runtime: if protocol == "Browser" {
++                    harbor_workspace::browser::Runtime::BundledChromium
++                } else {
++                    harbor_workspace::browser::Runtime::SystemChromium
++                },
+                 ..Default::default()
+             },
+             ftp_options: if protocol == "FTP" {
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/ui.rs:1024:
+                 proxy: s.browser_options.proxy.clone(),
+                 size: [960, 640],
+             };
+-            match harbor_workspace::browser::Session::start_with_runtime(config, s.browser_options.runtime) {
++            match harbor_workspace::browser::Session::start_with_runtime(
++                config,
++                s.browser_options.runtime,
++            ) {
+                 Ok(handle) => tab.web_browser = Some(web_browser::State::new(handle)),
+                 Err(error) => tab.error = error,
+             }

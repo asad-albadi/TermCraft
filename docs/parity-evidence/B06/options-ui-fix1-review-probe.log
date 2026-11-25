@@ -1,0 +1,18 @@
+   Compiling harbor-workspace v0.1.809 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-options-review809)
+warning: unused variable: `i`
+    --> src/ui/games/play.rs:1330:24
+     |
+1330 |                 .map(|(i, &d)| if d != 0 { d.to_string() } else { String::new() })
+     |                        ^ help: if this is intentional, prefix it with an underscore: `_i`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (bin "termcraft-options-review809" test) generated 1 warning (run `cargo fix --bin "termcraft-options-review809" -p harbor-workspace --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.32s
+     Running unittests src/main.rs (target/debug/deps/termcraft_options_review809-659a4c11fc934a68)
+
+running 1 test
+test ui::games::play::options_ui_tests::review_options_keyboard_focus_does_not_edit_current_guess ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 198 filtered out; finished in 1.17s
+

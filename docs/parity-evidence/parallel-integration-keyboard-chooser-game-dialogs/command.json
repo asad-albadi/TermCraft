@@ -1,0 +1,12 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "--all-targets",
+    "--no-fail-fast"
+  ],
+  "CARGO_BUILD_JOBS": "2",
+  "RUST_MIN_STACK": "134217728"
+}

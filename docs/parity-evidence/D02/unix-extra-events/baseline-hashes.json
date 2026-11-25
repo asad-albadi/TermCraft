@@ -1,0 +1,9 @@
+{
+  "engines/rdp/src/serial.rs": "709a83e09988d35ea0e4e2010167b1aeee5f8a9c201c63e82171bff1882f73b4",
+  "engines/rdp/Cargo.toml": "7f846bc4636c7a42c4cc8778f1f6408d21b336e9e806c5641b1c5c12416adb24",
+  "engines/rdp/Cargo.lock": "117db70a720c3cd3410f8454d28804c642eca478d9ebc6415fd6f24a39400eea",
+  "src/desktop/options.rs": "44ef5d2dc9a68b44e5853326e0e4e62b2cabf3338aade123adf7b9affbcca75e",
+  "src/desktop/wire.rs": "25fc322a05aabbfa41bb569d168fb0294685e488899e61a1838d6976024c9718",
+  "engines/rdp/src/devices.rs": "454b0d6121e5004875d77a6af5b8584bf53f8ba090deef9716b1e4b0a85705c8",
+  "engines/rdp/src/devices_tests.rs": "f9b8ec2849182a1b9bd00b0d347f48766b910d51e7d9723d5a7e1ac79d76685c"
+}

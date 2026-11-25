@@ -1,0 +1,24 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.65s
+     Running tests/terminal_conformance.rs (app/target/debug/deps/terminal_conformance-f1f1293098e096af)
+
+running 1 test
+test origin_insert_and_dec_graphics_modes_follow_vt_commands ... FAILED
+
+failures:
+
+---- origin_insert_and_dec_graphics_modes_follow_vt_commands stdout ----
+
+thread 'origin_insert_and_dec_graphics_modes_follow_vt_commands' (356849) panicked at tests/terminal_conformance.rs:131:52:
+assertion `left == right` failed
+  left: [27, 91, 50, 59, 50, 82]
+ right: [27, 91, 49, 59, 50, 82]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    origin_insert_and_dec_graphics_modes_follow_vt_commands
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test terminal_conformance`

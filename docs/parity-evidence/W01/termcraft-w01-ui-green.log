@@ -1,0 +1,10 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.72s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-127cf14f51e8fab8)
+
+running 2 tests
+test ui::layout::tests::dragging_real_divider_persists_the_ratio_and_small_views_fall_back ... ok
+test ui::layout::tests::four_painted_panes_route_input_once_to_the_clicked_owner ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 57 filtered out; finished in 1.33s
+

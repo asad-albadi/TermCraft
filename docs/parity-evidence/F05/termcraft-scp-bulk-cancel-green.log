@@ -1,0 +1,9 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.11s
+     Running tests/scp_browser.rs (app/target/debug/deps/scp_browser-c29d0c75c0879a2f)
+
+running 1 test
+test scp_bulk_cancel_finishes_the_current_entry_and_preserves_the_rest ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.61s
+

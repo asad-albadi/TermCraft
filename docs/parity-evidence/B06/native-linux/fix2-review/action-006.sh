@@ -1,0 +1,3 @@
+set -euo pipefail
+export DISPLAY=:77
+xdotool mousemove --sync 740 470 click 1; sleep .3; import -window root /evidence/008-map-cancel-preserved.png; xdotool mousemove --sync 58 70 click 1; sleep .2; xdotool mousemove --sync 570 470 click 1; sleep 2; import -window root /evidence/009-map-seed2-failure-preserved.png; xdotool mousemove --sync 58 70 click 1; sleep .2; import -window root /evidence/010-map-retry-consent.png; xdotool mousemove --sync 740 470 click 1; sleep .3; import -window root /evidence/011-map-retry-cancel.png; xdotool mousemove --sync 58 70 click 1; sleep .2; xdotool mousemove --sync 570 470 click 1; sleep 2; import -window root /evidence/012-map-seed3-unreasonable.png

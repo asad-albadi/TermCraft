@@ -1,0 +1,595 @@
+{
+  "schema": "static-original-recovery-v1",
+  "product": "MobaXterm Personal 26.6.0.5560",
+  "observation_kind": "recovered",
+  "runtime_measured": false,
+  "original_sha256": "e9a66144b3a1c4d32f8062b1eb34e26e9ed5298106abf1982b4654ab107f13a5",
+  "menu": {
+    "offset": "0xfc364c",
+    "end": "0xfc3cb7",
+    "class": "TMenuItem",
+    "name": "Games1",
+    "properties": {
+      "Caption": "Games",
+      "SubMenuImages": "Form1.Im16",
+      "OnClick": "FormClick"
+    },
+    "property_offsets": {
+      "Caption": "0xfc365d",
+      "SubMenuImages": "0xfc366c",
+      "OnClick": "0xfc3686"
+    },
+    "children": [
+      {
+        "offset": "0xfc369a",
+        "end": "0xfc36d6",
+        "class": "TMenuItem",
+        "name": "TerminalGames1",
+        "properties": {
+          "Caption": "Terminal games",
+          "Enabled": false
+        },
+        "property_offsets": {
+          "Caption": "0xfc36b3",
+          "Enabled": "0xfc36cb"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc36d6",
+        "end": "0xfc3732",
+        "class": "TMenuItem",
+        "name": "Soliterm1",
+        "properties": {
+          "Caption": "Soliterm",
+          "Hint": "soliterm",
+          "ImageIndex": 345,
+          "OnClick": "ExecuterAppli"
+        },
+        "property_offsets": {
+          "Caption": "0xfc36ea",
+          "Hint": "0xfc36fc",
+          "ImageIndex": "0xfc370b",
+          "OnClick": "0xfc3719"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc3732",
+        "end": "0xfc378d",
+        "class": "TMenuItem",
+        "name": "Termwalk1",
+        "properties": {
+          "Caption": "Termwalk",
+          "Hint": "termwalk",
+          "ImageIndex": 127,
+          "OnClick": "ExecuterAppli"
+        },
+        "property_offsets": {
+          "Caption": "0xfc3746",
+          "Hint": "0xfc3758",
+          "ImageIndex": "0xfc3767",
+          "OnClick": "0xfc3774"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc378d",
+        "end": "0xfc37e3",
+        "class": "TMenuItem",
+        "name": "MenuItem1",
+        "properties": {
+          "Caption": "Ctris",
+          "Hint": "ctris",
+          "ImageIndex": 282,
+          "OnClick": "ExecuterAppli"
+        },
+        "property_offsets": {
+          "Caption": "0xfc37a1",
+          "Hint": "0xfc37b0",
+          "ImageIndex": "0xfc37bc",
+          "OnClick": "0xfc37ca"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc37e3",
+        "end": "0xfc383b",
+        "class": "TMenuItem",
+        "name": "MenuItem2",
+        "properties": {
+          "Caption": "Sudoku",
+          "Hint": "sudoku",
+          "ImageIndex": 283,
+          "OnClick": "ExecuterAppli"
+        },
+        "property_offsets": {
+          "Caption": "0xfc37f7",
+          "Hint": "0xfc3807",
+          "ImageIndex": "0xfc3814",
+          "OnClick": "0xfc3822"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc383b",
+        "end": "0xfc389d",
+        "class": "TMenuItem",
+        "name": "MenuItem3",
+        "properties": {
+          "Caption": "Nimesweeper",
+          "Hint": "nimesweeper",
+          "ImageIndex": 284,
+          "OnClick": "ExecuterAppli"
+        },
+        "property_offsets": {
+          "Caption": "0xfc384f",
+          "Hint": "0xfc3864",
+          "ImageIndex": "0xfc3876",
+          "OnClick": "0xfc3884"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc389d",
+        "end": "0xfc38fb",
+        "class": "TMenuItem",
+        "name": "MenuItem4",
+        "properties": {
+          "Caption": "Ninvaders",
+          "Hint": "ninvaders",
+          "ImageIndex": 267,
+          "OnClick": "ExecuterAppli"
+        },
+        "property_offsets": {
+          "Caption": "0xfc38b1",
+          "Hint": "0xfc38c4",
+          "ImageIndex": "0xfc38d4",
+          "OnClick": "0xfc38e2"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc38fb",
+        "end": "0xfc3951",
+        "class": "TMenuItem",
+        "name": "MenuItem5",
+        "properties": {
+          "Caption": "Greed",
+          "Hint": "greed",
+          "ImageIndex": 286,
+          "OnClick": "ExecuterAppli"
+        },
+        "property_offsets": {
+          "Caption": "0xfc390f",
+          "Hint": "0xfc391e",
+          "ImageIndex": "0xfc392a",
+          "OnClick": "0xfc3938"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc3951",
+        "end": "0xfc39b8",
+        "class": "TMenuItem",
+        "name": "MenuItem6",
+        "properties": {
+          "Caption": "Typespeed",
+          "Hint": "typespeed",
+          "ImageIndex": 286,
+          "Visible": false,
+          "OnClick": "ExecuterAppli"
+        },
+        "property_offsets": {
+          "Caption": "0xfc3965",
+          "Hint": "0xfc3978",
+          "ImageIndex": "0xfc3988",
+          "Visible": "0xfc3996",
+          "OnClick": "0xfc399f"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc39b8",
+        "end": "0xfc3a0e",
+        "class": "TMenuItem",
+        "name": "Netgame5",
+        "properties": {
+          "Caption": "Netwalk",
+          "Hint": "net",
+          "ImageIndex": 276,
+          "OnClick": "ExecuterSTGame"
+        },
+        "property_offsets": {
+          "Caption": "0xfc39cb",
+          "Hint": "0xfc39dc",
+          "ImageIndex": "0xfc39e6",
+          "OnClick": "0xfc39f4"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc3a0e",
+        "end": "0xfc3a64",
+        "class": "TMenuItem",
+        "name": "Netgame4",
+        "properties": {
+          "Caption": "Mines",
+          "Hint": "mines",
+          "ImageIndex": 284,
+          "OnClick": "ExecuterSTGame"
+        },
+        "property_offsets": {
+          "Caption": "0xfc3a21",
+          "Hint": "0xfc3a30",
+          "ImageIndex": "0xfc3a3c",
+          "OnClick": "0xfc3a4a"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc3a64",
+        "end": "0xfc3ab8",
+        "class": "TMenuItem",
+        "name": "Netgame3",
+        "properties": {
+          "Caption": "Solo",
+          "Hint": "solo",
+          "ImageIndex": 263,
+          "OnClick": "ExecuterSTGame"
+        },
+        "property_offsets": {
+          "Caption": "0xfc3a77",
+          "Hint": "0xfc3a85",
+          "ImageIndex": "0xfc3a90",
+          "OnClick": "0xfc3a9e"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc3ab8",
+        "end": "0xfc3b0e",
+        "class": "TMenuItem",
+        "name": "Netgame2",
+        "properties": {
+          "Caption": "Guess",
+          "Hint": "guess",
+          "ImageIndex": 342,
+          "OnClick": "ExecuterSTGame"
+        },
+        "property_offsets": {
+          "Caption": "0xfc3acb",
+          "Hint": "0xfc3ada",
+          "ImageIndex": "0xfc3ae6",
+          "OnClick": "0xfc3af4"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc3b0e",
+        "end": "0xfc3b60",
+        "class": "TMenuItem",
+        "name": "Netgame1",
+        "properties": {
+          "Caption": "Map",
+          "Hint": "map",
+          "ImageIndex": 287,
+          "OnClick": "ExecuterSTGame"
+        },
+        "property_offsets": {
+          "Caption": "0xfc3b21",
+          "Hint": "0xfc3b2e",
+          "ImageIndex": "0xfc3b38",
+          "OnClick": "0xfc3b46"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc3b60",
+        "end": "0xfc3bb6",
+        "class": "TMenuItem",
+        "name": "N40",
+        "properties": {
+          "Caption": "Untangle",
+          "Hint": "untangle",
+          "ImageIndex": 20,
+          "OnClick": "ExecuterSTGame"
+        },
+        "property_offsets": {
+          "Caption": "0xfc3b6e",
+          "Hint": "0xfc3b80",
+          "ImageIndex": "0xfc3b8f",
+          "OnClick": "0xfc3b9c"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc3bb6",
+        "end": "0xfc3c16",
+        "class": "TMenuItem",
+        "name": "MenuItem7",
+        "properties": {
+          "Caption": "Tux consolesaver",
+          "ImageIndex": 269,
+          "OnClick": "Pingusconsolesaver1Click"
+        },
+        "property_offsets": {
+          "Caption": "0xfc3bca",
+          "ImageIndex": "0xfc3be4",
+          "OnClick": "0xfc3bf2"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc3c16",
+        "end": "0xfc3c30",
+        "class": "TMenuItem",
+        "name": "N6",
+        "properties": {
+          "Caption": "-"
+        },
+        "property_offsets": {
+          "Caption": "0xfc3c23"
+        },
+        "children": []
+      },
+      {
+        "offset": "0xfc3c30",
+        "end": "0xfc3cb6",
+        "class": "TMenuItem",
+        "name": "HowtoremovegamesfromMobaXterm1",
+        "properties": {
+          "Caption": "Remove games from MobaXterm",
+          "ImageIndex": 260,
+          "OnClick": "RemovegamesfromMobaXterm1Click"
+        },
+        "property_offsets": {
+          "Caption": "0xfc3c59",
+          "ImageIndex": "0xfc3c7e",
+          "OnClick": "0xfc3c8c"
+        },
+        "children": []
+      }
+    ]
+  },
+  "toolbar": {
+    "offset": "0xfbb10d",
+    "end": "0xfbb252",
+    "class": "TsSpeedButton",
+    "name": "BtnGames",
+    "properties": {
+      "Tag": 1,
+      "Left": 151,
+      "Top": 1,
+      "Width": 49,
+      "Height": 54,
+      "Hint": "Start a terminal game",
+      "HelpType": "htKeyword",
+      "HelpKeyword": "Games",
+      "AllowAllUp": true,
+      "GroupIndex": 200,
+      "Caption": "Games",
+      "Flat": true,
+      "Layout": "blGlyphTop",
+      "Margin": 2,
+      "Spacing": 6,
+      "OnClick": "DropperLeMenu",
+      "OnMouseMove": "EventuellementDropperLeMenu",
+      "Align": "alLeft",
+      "ImageIndex": 320,
+      "Images": "Form1.Im22"
+    },
+    "property_offsets": {
+      "Tag": "0xfbb124",
+      "Left": "0xfbb12a",
+      "Top": "0xfbb132",
+      "Width": "0xfbb138",
+      "Height": "0xfbb140",
+      "Hint": "0xfbb149",
+      "HelpType": "0xfbb165",
+      "HelpKeyword": "0xfbb179",
+      "AllowAllUp": "0xfbb18c",
+      "GroupIndex": "0xfbb198",
+      "Caption": "0xfbb1a6",
+      "Flat": "0xfbb1b5",
+      "Layout": "0xfbb1bb",
+      "Margin": "0xfbb1ce",
+      "Spacing": "0xfbb1d7",
+      "OnClick": "0xfbb1e1",
+      "OnMouseMove": "0xfbb1f8",
+      "Align": "0xfbb221",
+      "ImageIndex": "0xfbb22f",
+      "Images": "0xfbb23d"
+    },
+    "children": []
+  },
+  "screensaver_resources": [
+    {
+      "path": "FormXterm/sPanel1/BtnPub",
+      "offset": "0xfb3d21",
+      "end": "0xfb3f02",
+      "class": "TsSpeedButton",
+      "name": "BtnPub",
+      "properties": {
+        "Left": 0,
+        "Top": 0,
+        "Width": 827,
+        "Height": 28,
+        "Caption": "This is MobaXterm Home Edition. Please consider subscribing to MobaXterm Professional Edition.\r\nIt allows you to customize the program, disable this screensaver, disable games and much more!",
+        "Font.Charset": "DEFAULT_CHARSET",
+        "Font.Color": "clWindowText",
+        "Font.Height": -11,
+        "Font.Name": "Tahoma",
+        "Font.Style": [],
+        "ParentFont": false,
+        "Spacing": 36,
+        "Visible": false,
+        "OnClick": "BtnPubClick",
+        "Align": "alTop",
+        "ImageIndex": 266,
+        "Images": "Form1.Im16",
+        "TextAlignment": "taLeftJustify"
+      },
+      "property_offsets": {
+        "Left": "0xfb3d36",
+        "Top": "0xfb3d3d",
+        "Width": "0xfb3d43",
+        "Height": "0xfb3d4c",
+        "Caption": "0xfb3d55",
+        "Font.Charset": "0xfb3e1d",
+        "Font.Color": "0xfb3e3b",
+        "Font.Height": "0xfb3e54",
+        "Font.Name": "0xfb3e62",
+        "Font.Style": "0xfb3e74",
+        "ParentFont": "0xfb3e81",
+        "Spacing": "0xfb3e8d",
+        "Visible": "0xfb3e97",
+        "OnClick": "0xfb3ea0",
+        "Align": "0xfb3eb5",
+        "ImageIndex": "0xfb3ec2",
+        "Images": "0xfb3ed0",
+        "TextAlignment": "0xfb3ee3"
+      },
+      "children": []
+    },
+    {
+      "path": "FormXterm/sPanel1/Panel1/PanPingus",
+      "offset": "0xfb4c81",
+      "end": "0xfb4d9a",
+      "class": "TPanel",
+      "name": "PanPingus",
+      "properties": {
+        "Left": 0,
+        "Top": 360,
+        "Width": 637,
+        "Height": 339,
+        "BevelOuter": "bvNone",
+        "Color": "clBlack",
+        "ParentBackground": false,
+        "TabOrder": 0,
+        "Visible": false,
+        "OnClick": "Panel1Click",
+        "OnDblClick": "Panel1Click"
+      },
+      "property_offsets": {
+        "Left": "0xfb4c92",
+        "Top": "0xfb4c99",
+        "Width": "0xfb4ca0",
+        "Height": "0xfb4ca9",
+        "BevelOuter": "0xfb4cb3",
+        "Color": "0xfb4cc6",
+        "ParentBackground": "0xfb4cd5",
+        "TabOrder": "0xfb4ce7",
+        "Visible": "0xfb4cf2",
+        "OnClick": "0xfb4cfb",
+        "OnDblClick": "0xfb4d10"
+      },
+      "children": [
+        {
+          "offset": "0xfb4d29",
+          "end": "0xfb4d99",
+          "class": "TImage",
+          "name": "TermImage",
+          "properties": {
+            "Left": 0,
+            "Top": 0,
+            "Width": 637,
+            "Height": 339,
+            "Align": "alClient",
+            "OnClick": "Panel1Click",
+            "OnDblClick": "Panel1Click"
+          },
+          "property_offsets": {
+            "Left": "0xfb4d3a",
+            "Top": "0xfb4d41",
+            "Width": "0xfb4d47",
+            "Height": "0xfb4d50",
+            "Align": "0xfb4d5a",
+            "OnClick": "0xfb4d6a",
+            "OnDblClick": "0xfb4d7f"
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "path": "FormXterm/TimPingus",
+      "offset": "0xfc5f3a",
+      "end": "0xfc5f88",
+      "class": "TTimer",
+      "name": "TimPingus",
+      "properties": {
+        "Enabled": false,
+        "Interval": 120,
+        "OnTimer": "TimPingusTimer",
+        "Left": 388,
+        "Top": 164
+      },
+      "property_offsets": {
+        "Enabled": "0xfc5f4b",
+        "Interval": "0xfc5f54",
+        "OnTimer": "0xfc5f5f",
+        "Left": "0xfc5f77",
+        "Top": "0xfc5f7f"
+      },
+      "children": []
+    },
+    {
+      "path": "FormXterm/TimLaunchPingus",
+      "offset": "0xfc5f88",
+      "end": "0xfc5fe3",
+      "class": "TTimer",
+      "name": "TimLaunchPingus",
+      "properties": {
+        "Enabled": false,
+        "Interval": 3600,
+        "OnTimer": "TimLaunchPingusTimer",
+        "Left": 612,
+        "Top": 164
+      },
+      "property_offsets": {
+        "Enabled": "0xfc5f9f",
+        "Interval": "0xfc5fa8",
+        "OnTimer": "0xfc5fb4",
+        "Left": "0xfc5fd2",
+        "Top": "0xfc5fda"
+      },
+      "children": []
+    }
+  ],
+  "interpretation": {
+    "catalog_status": "Resource-declared catalog, not runtime-exposed catalog",
+    "inherited_properties": "Absent Visible/Enabled fields are absent in stream; no runtime override inferred",
+    "Typespeed": "Explicit Visible=false in menu resource",
+    "Terminal games": "Disabled heading sibling, not parent of subsequent games",
+    "Tux consolesaver": "Explicit menu item with handler, not separate game executable",
+    "pro_removal": "Embedded HtmlHelp2.txt confirms Professional can remove games/menu and screensaver, and can retain them; does not prove current Personal runtime behavior"
+  },
+  "unresolved": [
+    "Runtime menu exposure or initialization overrides",
+    "Puzzle game stgames.exe payload, rules and controls",
+    "Rules/control actions for Ctris beyond command-line help",
+    "nInvaders in-game controls beyond SPACE start",
+    "Screensaver animation, inactivity trigger, exit behavior and timer effective values"
+  ],
+  "stgames": {
+    "provenance": "recovered",
+    "source": "main EXEFILE/MOBASE LZMA decoded ZIP stored member bin/stgames.exe",
+    "main_resource_raw_offset": "0x89fb00",
+    "main_resource_bytes": 2555942,
+    "zip_local_header_offset": "0xb456ed",
+    "decoded_member_bytes": 292864,
+    "decoded_member_sha256": "8a3239672bb359934b42696f383e13bcf35859e646d89bd20a7d4bd319b000fe",
+    "warning": "ZIP declared CRC32 0x46c80442 mismatches recovered stored bytes CRC32 0x02c5f575. This is not treated as runtime-qualified or checksum-clean. Twenty-one of 56 MOBASE members mismatch; cause unestablished.",
+    "version_string": {
+      "raw_offset": "0x40a24",
+      "text": "Version 20150612.f306b9d"
+    },
+    "identity_string": {
+      "raw_offset": "0x40f4c",
+      "text": "Simon Tatham's Portable Puzzle Collection"
+    },
+    "selectors_table_region": "0x44194-0x441be contains Puzzles, mines, net, solo, guess, map, untangle",
+    "rules_correspondence": "Version identifies upstream source revision candidate, not proof of identical MobaXterm behavior. Exact historical manual fetch from primary git.tartarus.org returned HTTP403, no substitute rules asserted."
+  }
+}

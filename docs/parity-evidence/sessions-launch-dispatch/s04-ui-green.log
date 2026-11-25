@@ -1,0 +1,12 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.14s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-06fc25a664999da9)
+
+running 4 tests
+test ui::cli_dispatch::tests::exit_when_done_preserves_preexisting_user_terminals ... ok
+test ui::cli_dispatch::tests::forwarded_new_tab_opens_once_in_the_actual_workspace ... ok
+test ui::cli_dispatch::tests::command_dispatch_uses_its_own_process_and_exact_local_cwd ... ok
+test ui::cli_dispatch::tests::named_macro_targets_its_new_terminal_and_respects_paste_confirmation ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 84 filtered out; finished in 1.33s
+

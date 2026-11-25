@@ -1,0 +1,138 @@
+warning: methods `send` and `poll` are never used
+   --> src/ui.rs:168:8
+    |
+150 | impl TerminalTab {
+    | ---------------- methods in this implementation
+...
+168 |     fn send(&mut self, data: &[u8]) {
+    |        ^^^^
+...
+212 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+    --> src/ui/shared_sessions.rs:691:19
+     |
+ 640 | impl Workspace {
+     | -------------- methods in this implementation
+...
+ 691 |     pub(super) fn shared_sources_busy(&self) -> bool {
+     |                   ^^^^^^^^^^^^^^^^^^^
+...
+1006 |     pub(super) fn refresh_shared_source_with(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "termcraft-tunnel-fixture937") generated 3 warnings
+warning: variants `PasswordThenMfa` and `ScpStartup` are never constructed
+  --> tests/support/auth_server.rs:18:5
+   |
+16 | pub enum Mode {
+   |          ---- variants in this enum
+17 |     Password,
+18 |     PasswordThenMfa,
+   |     ^^^^^^^^^^^^^^^
+...
+22 |     ScpStartup,
+   |     ^^^^^^^^^^
+   |
+   = note: `Mode` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `attempts` and `startup` are never read
+   --> tests/support/auth_server.rs:271:5
+    |
+270 | pub struct AuthServer {
+    |            ---------- fields in this struct
+271 |     attempts: Arc<Attempts>,
+    |     ^^^^^^^^
+272 |     startup: Arc<StartupState>,
+    |     ^^^^^^^
+
+warning: methods `startup_requests`, `active_startup_helpers`, `allow_startup_helpers`, and `attempts` are never used
+   --> tests/support/auth_server.rs:345:12
+    |
+281 | impl AuthServer {
+    | --------------- methods in this implementation
+...
+345 |     pub fn startup_requests(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^
+...
+348 |     pub fn active_startup_helpers(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+351 |     pub fn allow_startup_helpers(&self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+...
+370 |     pub fn attempts(&self) -> [usize; 4] {
+    |            ^^^^^^^^
+
+   Compiling harbor-workspace v0.1.937 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/tunnel-listener-fixture/source)
+warning: `harbor-workspace` (test "ssh_authentication") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.39s
+     Running tests/ssh_authentication.rs (target/debug/deps/ssh_authentication-0245b9ad150c4d44)
+
+running 4 tests
+
+running 1 test
+test x11_cookie_forwarding_shares_the_authenticated_connection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.13s
+
+test x11_cookie_forwarding_shares_the_authenticated_connection ... ok
+test keyboard_interactive_preserves_prompt_echo_flags ... ok
+test password_auth_and_stalled_sftp_preserve_shell ... ok
+test public_key_then_mfa_uses_updated_methods ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/ssh_interop.rs (target/debug/deps/ssh_interop-1f78053c329a5ea5)
+
+running 4 tests
+test independent_dropbear_key_shell_and_sftp_roundtrip ... ignored, requires private signed Dropbear staging; check-ssh-interop.sh executes this fixture explicitly
+test ssh_interop_auth_and_host_keys ... ok
+test sftp_interop_failure_and_reconnect ... ok
+test encrypted_key_agent_authenticates_pinned_openssh_then_expires ... ok
+
+test result: ok. 3 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 3.02s
+
+     Running tests/ssh_lifecycle.rs (target/debug/deps/ssh_lifecycle-7f2dd782a0e1b770)
+
+running 15 tests
+test credential_titles_identify_the_role_host_and_port ... ok
+test password_credential_binding_uses_verified_endpoint_and_typed_method ... ok
+test password_then_mfa_uses_the_new_methods_without_repeating_password ... ok
+test browser_retry_does_not_reauthenticate ... ok
+test cancelling_encrypted_key_unlock_rejects_late_passphrases ... ok
+test reconnect_discards_old_challenges_and_listings ... ok
+test server_disconnect_retires_a_visible_password_prompt_without_an_answer ... ok
+test prompted_username_identity_survives_fresh_editor_recovery_without_implicit_upload ... ok
+test gateway_credential_title_identifies_the_gateway_before_target_authentication ... ok
+test reconnect_rejects_real_old_directory_snapshots ... ok
+test recovery_from_an_unsuccessful_open_cannot_replace_a_fresh_document ... ok
+test recovery_import_preserves_unsaved_destination_edits ... ok
+test cancel_auth_stops_the_entire_attempt ... ok
+test recovery_never_crosses_a_changed_trust_once_server_key ... ok
+test recovery_never_crosses_a_changed_trust_once_gateway_key ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+

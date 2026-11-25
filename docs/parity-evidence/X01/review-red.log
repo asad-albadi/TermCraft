@@ -1,0 +1,26 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.60s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-c95ec83546c98485)
+
+running 2 tests
+
+thread 'x11::platform::linux::tests::verified_executable_survives_in_place_mutation' (363542) panicked at src/x11/platform.rs:498:13:
+assertion `left == right` failed
+  left: [116, 105, 111, 110]
+ right: [111, 114, 105, 103, 105, 110, 97, 108, 32, 118, 101, 114, 105, 102, 105, 101, 100, 32, 98, 121, 116, 101, 115]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test x11::platform::linux::tests::verified_executable_survives_in_place_mutation ... FAILED
+
+thread 'x11::platform::linux::tests::full_listener_queue_cancels_and_cleans_owned_startup' (363541) panicked at src/x11/platform.rs:547:18:
+startup remained blocked after cancellation: Timeout
+test x11::platform::linux::tests::full_listener_queue_cancels_and_cleans_owned_startup ... FAILED
+
+failures:
+
+failures:
+    x11::platform::linux::tests::full_listener_queue_cancels_and_cleans_owned_startup
+    x11::platform::linux::tests::verified_executable_survives_in_place_mutation
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 56 filtered out; finished in 1.35s
+
+error: test failed, to rerun pass `--lib`

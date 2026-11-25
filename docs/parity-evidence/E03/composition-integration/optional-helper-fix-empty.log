@@ -1,0 +1,33 @@
+test_optional_helper_stages_hash_source_lock_notices_and_native_requirements (packaging_wayland.OptionalWayland.test_optional_helper_stages_hash_source_lock_notices_and_native_requirements) ... readelf: Error: '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6' is not an ordinary file
+ERROR
+
+======================================================================
+ERROR: test_optional_helper_stages_hash_source_lock_notices_and_native_requirements (packaging_wayland.OptionalWayland.test_optional_helper_stages_hash_source_lock_notices_and_native_requirements)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/packaging_wayland.py", line 26, in test_optional_helper_stages_hash_source_lock_notices_and_native_requirements
+    archive=package.package_release('linux',base/'selected',app,rdp,source=ROOT,cargo_settings={},wayland_helper_binary=real)
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/scripts/package-release.py", line 517, in package_release
+    if target != "linux" or binary_arch(wayland_helper_binary, target) != arch:
+                            ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/scripts/package-release.py", line 275, in binary_arch
+    header = capture("readelf", "-h", path, env={**os.environ, "LC_ALL": "C"})
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/scripts/package-release.py", line 39, in capture
+    return subprocess.check_output(command, text=True, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 473, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               **kwargs).stdout
+               ^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '('readelf', '-h', PosixPath('/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6'))' returned non-zero exit status 1.
+
+----------------------------------------------------------------------
+Ran 1 test in 0.098s
+
+FAILED (errors=1)
+
+EXPECTED NEGATIVE EXIT: 1

@@ -1,0 +1,48 @@
+{
+  "utc": "2026-11-24T23:07:34.645116+00:00",
+  "active_fixture_processes": [],
+  "cleanup": [
+    {
+      "session": "x11-1",
+      "owned_services": 5,
+      "descendants": 6,
+      "survivors": 0
+    },
+    {
+      "session": "x11-1.5",
+      "owned_services": 5,
+      "descendants": 6,
+      "survivors": 0
+    },
+    {
+      "session": "x11-2",
+      "owned_services": 5,
+      "descendants": 6,
+      "survivors": 0
+    },
+    {
+      "session": "wayland-1",
+      "owned_services": 6,
+      "descendants": 7,
+      "survivors": 0
+    },
+    {
+      "session": "wayland-1.5",
+      "owned_services": 6,
+      "descendants": 7,
+      "survivors": 0
+    },
+    {
+      "session": "wayland-2",
+      "owned_services": 6,
+      "descendants": 7,
+      "survivors": 0
+    },
+    {
+      "session": "wayland-1-engine",
+      "owned_services": 6,
+      "descendants": 5,
+      "survivors": 0
+    }
+  ]
+}

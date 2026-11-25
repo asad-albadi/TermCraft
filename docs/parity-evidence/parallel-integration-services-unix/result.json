@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "outer_targets": 60,
+  "passed": 585,
+  "failed": 0,
+  "ignored": 28,
+  "source_unchanged_during_gate": true,
+  "scope": "Reviewed merged B01 and P05 source. P06/B03/B05 private source excluded; opt-in real Unix workflow/library/UI tests recorded separately in P05."
+}

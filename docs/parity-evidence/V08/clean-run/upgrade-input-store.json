@@ -1,0 +1,24 @@
+{
+  "sessions": [
+    {
+      "name": "Legacy clean fixture",
+      "protocol": "SSH",
+      "host": "example.invalid",
+      "user": "fixture",
+      "port": 22,
+      "folder": "Preserved"
+    }
+  ],
+  "preferences": {
+    "appearance": "Dark",
+    "font_size": 18.0,
+    "sidebar_width": 280.0
+  },
+  "macros": [
+    {
+      "name": "Legacy clean macro",
+      "text": "printf LEGACY_MACRO_PRESERVED",
+      "append_enter": false
+    }
+  ]
+}

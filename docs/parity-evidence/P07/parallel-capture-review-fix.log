@@ -1,0 +1,126 @@
++ CARGO_BUILD_JOBS=2
++ cargo test --manifest-path app/Cargo.toml --locked --lib tools::capture::staging
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 30.77s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-2305f54344f0940d)
+
+running 2 tests
+test tools::capture::staging::platform::tests::cleanup_does_not_remove_a_replaced_staging_directory ... ok
+test tools::capture::staging::platform::tests::output_directory_replacement_keeps_capture_in_original_directory ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 53 filtered out; finished in 0.00s
+
++ CARGO_BUILD_JOBS=2
++ cargo test --manifest-path app/Cargo.toml --locked --test packet_capture --test tools
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: method `poll` is never used
+   --> src/ui.rs:175:8
+    |
+130 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+175 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 34.59s
+     Running tests/packet_capture.rs (app/target/debug/deps/packet_capture-d34ce396d6aff0b8)
+
+running 4 tests
+test captures_only_selected_loopback_packets_and_honors_limits ... ignored, run only in a fresh network namespace with loopback enabled
+test reports_kernel_capture_permission_denied ... ignored, run in an isolated namespace with CAP_NET_RAW dropped
+test rejects_invalid_configuration_and_pcap ... ok
+test reads_big_endian_nanosecond_headers_and_rejects_truncation ... ok
+
+test result: ok. 2 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/tools.rs (app/target/debug/deps/tools-5b1be2306113d0e7)
+
+running 13 tests
+test folder_comparison_checks_cancellation ... ok
+test file_diff_reports_utf8_insertion_and_distinguishes_binary ... ok
+test file_diff_rejects_oversized_input ... ok
+test folder_diff_rejects_symlinks_without_following_them ... ok
+test port_check_configuration_accepts_ipv4_and_ipv6_without_connecting ... ok
+test image_preview_decodes_known_pixels ... ok
+test oversized_image_is_rejected_before_allocation ... ok
+test folder_diff_reports_added_removed_changed ... ok
+test image_preview_decodes_jpeg_pixels ... ok
+test scan_rejects_wildcard_addresses_and_invalid_port_lists ... ok
+test scan_cancel_joins_worker ... ok
+test scan_reports_configured_loopback_ports ... ok
+test folder_diff_enforces_depth_limit ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+++ readlink /proc/self/ns/net
++ export 'HARBOR_TEST_PARENT_NETNS=net:[4026531833]'
++ HARBOR_TEST_PARENT_NETNS='net:[4026531833]'
++ unshare -Urn sh -eu -c 'ip link set lo up; exec "$1" --ignored --exact captures_only_selected_loopback_packets_and_honors_limits --nocapture' sh app/target/debug/deps/packet_capture-d34ce396d6aff0b8
+
+running 1 test
+test captures_only_selected_loopback_packets_and_honors_limits ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.41s
+
++ unshare -Urn sh -eu -c 'ip link set lo up; exec setpriv --inh-caps=-all --ambient-caps=-all --bounding-set=-net_raw "$1" --ignored --exact reports_kernel_capture_permission_denied --nocapture' sh app/target/debug/deps/packet_capture-d34ce396d6aff0b8
+
+running 1 test
+test reports_kernel_capture_permission_denied ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
++ CARGO_BUILD_JOBS=2
++ cargo check --manifest-path /tmp/harbor-pcap-windows.jHpm2b/Cargo.toml --target x86_64-pc-windows-msvc --offline
+    Checking harbor-capture-component-check v0.1.0 (/tmp/harbor-pcap-windows.jHpm2b)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.13s
++ CARGO_BUILD_JOBS=2
++ cargo test --manifest-path app/Cargo.toml --locked --lib tools::capture::staging
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.62s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-2305f54344f0940d)
+
+running 3 tests
+test tools::capture::staging::platform::tests::publishes_owned_capture_and_removes_private_staging ... ok
+test tools::capture::staging::platform::tests::output_directory_replacement_keeps_capture_in_original_directory ... ok
+test tools::capture::staging::platform::tests::cleanup_does_not_remove_a_replaced_staging_directory ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 53 filtered out; finished in 0.00s
+
++ CARGO_BUILD_JOBS=2
++ cargo check --manifest-path /tmp/harbor-pcap-windows.jHpm2b/Cargo.toml --target x86_64-pc-windows-msvc --offline
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.03s

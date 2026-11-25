@@ -1,0 +1,7 @@
+
+running 2 tests
+test ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source ... ok
+test ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 136 filtered out; finished in 7.82s
+

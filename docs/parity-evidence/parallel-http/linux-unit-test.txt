@@ -1,0 +1,11 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.45s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-2abab2a1b45b408a)
+
+running 3 tests
+test http_server::tests::listing_writer_checks_cancellation_after_partial_progress ... ok
+test http_server::tests::rejects_encoded_traversal ... ok
+test http_server::tests::listing_writer_checks_deadline_after_partial_progress ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 48 filtered out; finished in 0.03s
+

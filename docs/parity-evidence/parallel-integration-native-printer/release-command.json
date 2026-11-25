@@ -1,0 +1,35 @@
+{
+  "command": [
+    "python3",
+    "scripts/package-release.py",
+    "--platform",
+    "linux",
+    "--output",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-45-native-printer-reviewed",
+    "--xwayland-archive",
+    "/var/cache/pacman/pkg/xorg-xwayland-24.1.15-1-x86_64.pkg.tar.zst",
+    "--xephyr-archive",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04/source-packages/xephyr.pkg.tar.zst",
+    "--mosh-archive",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/mosh-1.4.0-35-x86_64.pkg.tar.zst",
+    "--mosh-source",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/mosh-1.4.0.tar.gz",
+    "--mosh-recipe",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/PKGBUILD",
+    "--mosh-dependencies",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p01-mosh-closure/cache",
+    "--iperf-runtime",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b03",
+    "--unix-cache",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/p05-cache",
+    "--browser-inputs",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p01-browser/browser-inputs",
+    "--wayland-helper-binary",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-vnc-composed/wayland-helper-release"
+  ],
+  "env": {
+    "TERMCRAFT_OFFLINE": "1",
+    "CARGO_BUILD_JOBS": "2"
+  },
+  "scope": "Prepared from reviewed production source; whole-app gate has one unresolved tunnel fixture failure. Artifact remains unqualified until checks pass."
+}

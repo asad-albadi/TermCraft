@@ -1,0 +1,20 @@
+[
+  {
+    "source": "target/debug/deps/harbor_workspace-3ee8f53b37a04f7a",
+    "copy": "target/qualification-games-v03/lib-tests",
+    "sha256": "5c1a93e0bd59830ef5625f917e4ce23543c781bb26933107c36362c5c7ce9d0b",
+    "compiled_source_inventory": "docs/parity-evidence/parallel-integration-games-v03/source-sha256.json"
+  },
+  {
+    "source": "target/debug/deps/harbor_workspace-ea89b59a37ffdadd",
+    "copy": "target/qualification-games-v03/ui-tests",
+    "sha256": "9f9a34e8eec1bf70ef1a3a70f99ff1f4f792472e79c40190c7e281ee1bf11ee2",
+    "compiled_source_inventory": "docs/parity-evidence/parallel-integration-games-v03/source-sha256.json"
+  },
+  {
+    "source": "target/debug/deps/x11_extensions-52ba657849af6837",
+    "copy": "target/qualification-games-v03/x11_extensions",
+    "sha256": "ea34429759171e42e7e666b9ef338dee68d32161bd572765dcd10f49445357ca",
+    "compiled_source_inventory": "docs/parity-evidence/parallel-integration-games-v03/source-sha256.json"
+  }
+]

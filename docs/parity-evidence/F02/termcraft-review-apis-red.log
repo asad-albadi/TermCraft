@@ -1,0 +1,59 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: unused import: `super::*`
+ --> src/remote_files/transfer/operations/source.rs:3:9
+  |
+3 |     use super::*;
+  |         ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0433]: cannot find type `SourceDir` in this scope
+ --> src/remote_files/transfer/operations/source.rs:8:20
+  |
+8 |         let source=SourceDir::open(root.join("selected")).await.unwrap();let entries=source.entries().await.unwrap();
+  |                    ^^^^^^^^^ use of undeclared type `SourceDir`
+
+error[E0609]: no field `summary` on type `TransferEvent`
+   --> src/remote_files/transfer.rs:217:53
+    |
+217 | ...   let events=manager.poll();assert!(events[0].summary.contains("source-a"));assert!(events[1].summary.contains("source-b"));ass...
+    |                                                   ^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `bytes`, `outcome`, `recovery`
+
+error[E0609]: no field `summary` on type `TransferEvent`
+   --> src/remote_files/transfer.rs:217:101
+    |
+217 | ...   let events=manager.poll();assert!(events[0].summary.contains("source-a"));assert!(events[1].summary.contains("source-b"));ass...
+    |                                                                                                   ^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `bytes`, `outcome`, `recovery`
+
+error[E0609]: no field `summary` on type `TransferEvent`
+   --> src/remote_files/transfer.rs:217:149
+    |
+217 | ...s[1].summary.contains("source-b"));assert!(events[0].summary.contains("Upload"));assert_ne!(events[0].summary,events[1].summary);
+    |                                                         ^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `bytes`, `outcome`, `recovery`
+
+error[E0609]: no field `summary` on type `TransferEvent`
+   --> src/remote_files/transfer.rs:217:198
+    |
+217 | ...[0].summary.contains("Upload"));assert_ne!(events[0].summary,events[1].summary);
+    |                                                         ^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `bytes`, `outcome`, `recovery`
+
+error[E0609]: no field `summary` on type `TransferEvent`
+   --> src/remote_files/transfer.rs:217:216
+    |
+217 | ...ns("Upload"));assert_ne!(events[0].summary,events[1].summary);
+    |                                                         ^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `bytes`, `outcome`, `recovery`
+
+Some errors have detailed explanations: E0433, E0609.
+For more information about an error, try `rustc --explain E0433`.
+warning: `harbor-workspace` (lib test) generated 1 warning
+error: could not compile `harbor-workspace` (lib test) due to 6 previous errors; 1 warning emitted

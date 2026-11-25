@@ -1,0 +1,142 @@
+--- a/packaging/runtime/stage-mosh-dependencies.py
++++ b/packaging/runtime/stage-mosh-dependencies.py
+@@ -34,6 +34,14 @@
+         stream.write(data)
+     path.chmod(0o755 if executable else 0o644)
+ 
++def portable_source_basename(name):
++    # Escape unsafe UTF-8 bytes and the escape marker itself. In particular,
++    # Arch's epoch separator (:) must never become a portable TAR path byte.
++    safe = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._+-"
++    if not name or name in (".", ".."):
++        raise ValueError("Invalid pinned source basename")
++    return "".join(chr(byte) if byte in safe else f"~{byte:02X}" for byte in name.encode("utf-8"))
++
+ def stage(manifest_path, destination, cache):
+     manifest_bytes = manifest_path.read_bytes()
+     info = json.loads(manifest_bytes)
+@@ -43,6 +51,7 @@
+     runtime.mkdir(parents=True, exist_ok=False)
+     if len(info["files"]) > 4096 or sum(e["size"] for e in info["files"]) > 256 * 1024 * 1024:
+         raise ValueError("Mosh dependency inventory exceeds bounds")
++    sources = {}
+     for package in info["packages"]:
+         raw = input_file(cache, package["filename"], package["archive_sha256"])
+         sig = input_file(cache, package["filename"] + ".sig", package["signature_sha256"])
+@@ -62,15 +71,26 @@
+             for entry in package.get("notices", []):
+                 data = member(tar, entry["archive_path"], entry["sha256"], entry["size"])
+                 output(runtime, "notices/" + package["name"] + "/" + entry["archive_path"], data)
+-        for name, data in [(package["source_filename"], source), (package["recipe_filename"], recipe), (package["filename"] + ".sig", sig)]:
+-            relative = "sources/" + name
++        package_sources = {}
++        for role, name, pin, data in (
++            ("source", package["source_filename"], package["source_sha256"], source),
++            ("recipe", package["recipe_filename"], package["recipe_sha256"], recipe),
++            ("signature", package["filename"] + ".sig", package["signature_sha256"], sig),
++        ):
++            relative = "sources/" + portable_source_basename(name)
+             existing = runtime / relative
+             if existing.exists():
+                 if existing.is_symlink() or existing.read_bytes() != data:
+                     raise ValueError("Conflicting shared source input")
+             else:
+                 output(runtime, relative, data)
++            package_sources[role] = {"original_filename": name, "path": relative, "sha256": pin}
++        sources[package["name"]] = package_sources
++    # Keep the runtime's byte-for-byte pinned manifest (and its upstream URLs)
++    # intact. The sidecar describes only the filenames shipped under sources/.
+     output(runtime, "MOSH-DEPENDENCIES.json", manifest_bytes)
++    provenance = {"schema_version": 1, "packages": sources}
++    output(runtime, "MOSH-SOURCES.json", (json.dumps(provenance, indent=2, sort_keys=True) + "\n").encode("utf-8"))
+ 
+ if __name__ == "__main__":
+     import sys
+--- a/tests/mosh_dependency_staging.py
++++ b/tests/mosh_dependency_staging.py
+@@ -1,15 +1,23 @@
+ """Focused offline-input safety checks for the Mosh dependency packager."""
+ import hashlib
+ import importlib.util
++import io
++import json
+ from pathlib import Path
++import sys
++import tarfile
+ import tempfile
+ import unittest
++from unittest.mock import patch
+ 
+ ROOT = Path(__file__).resolve().parents[1]
+ spec = importlib.util.spec_from_file_location("stage_mosh_dependencies", ROOT / "packaging/runtime/stage-mosh-dependencies.py")
+ stage = importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(stage)
+ 
++sys.path.insert(0, str(ROOT / "scripts"))
++from portable_archive import extract_tar
++
+ class DependencyInputs(unittest.TestCase):
+     def test_exact_input_is_accepted_but_replacement_is_rejected(self):
+         with tempfile.TemporaryDirectory() as directory:
+@@ -45,5 +53,61 @@
+                     stage.output(root, name, b"bad")
+             self.assertEqual((root / "bin/perl").read_bytes(), b"first")
+ 
++    def test_pinned_source_notices_survive_strict_portable_extraction(self):
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory)
++            cache = root / "cache"
++            cache.mkdir()
++            binary = io.BytesIO()
++            with tarfile.open(fileobj=binary, mode="w"):
++                pass
++
++            packages = []
++            expected = {}
++            for package, filename in (
++                ("epoch", "zlib-1:1.4-1-x86_64.pkg.tar.zst"),
++                ("literal-escape", "zlib-1~3A1.4-1-x86_64.pkg.tar.zst"),
++            ):
++                package_info = {"name": package, "filename": filename, "inventory": {}}
++                for role, name, data, pin_key in (
++                    ("archive", filename, binary.getvalue(), "archive_sha256"),
++                    ("signature", filename + ".sig", package.encode(), "signature_sha256"),
++                    ("source", "shared-source.tar.gz", b"shared source", "source_sha256"),
++                    ("recipe", "shared-recipe.tar.gz", b"shared recipe", "recipe_sha256"),
++                ):
++                    (cache / name).write_bytes(data)
++                    pin = hashlib.sha256(data).hexdigest()
++                    package_info[pin_key] = pin
++                    if role in ("source", "recipe"):
++                        package_info[role + "_filename"] = name
++                    if role != "archive":
++                        expected[package, role] = name, pin, data
++                packages.append(package_info)
++            info = {"schema_version": 1, "platform": "linux", "architecture": "x86_64",
++                    "root": "mosh-deps", "packages": packages, "files": []}
++            manifest = root / "pins.json"
++            manifest.write_text(json.dumps(info))
++            payload = root / "payload"
++            with patch.object(stage.subprocess, "run", side_effect=lambda *args, **kw:
++                              stage.subprocess.CompletedProcess(args[0], 0, stdout=kw["input"])):
++                stage.stage(manifest, payload, cache)
++            archive = root / "portable.tar"
++            with tarfile.open(archive, "w") as bundle:
++                bundle.add(payload / "mosh-deps", arcname="mosh-deps")
++            extract_tar(archive, root / "extracted")
++            runtime = root / "extracted" / "mosh-deps"
++
++            self.assertEqual((runtime / "MOSH-DEPENDENCIES.json").read_bytes(), manifest.read_bytes())
++            provenance = json.loads((runtime / "MOSH-SOURCES.json").read_bytes())
++            self.assertEqual(provenance["schema_version"], 1)
++            staged = set()
++            for (package, role), (name, pin, data) in expected.items():
++                record = provenance["packages"][package][role]
++                self.assertEqual((record["original_filename"], record["sha256"]), (name, pin))
++                self.assertEqual((runtime / record["path"]).read_bytes(), data)
++                staged.add(record["path"])
++            self.assertEqual(len(staged), 4)
++            self.assertEqual(staged, {p.relative_to(runtime).as_posix() for p in (runtime / "sources").iterdir()})
++
+ if __name__ == "__main__":
+     unittest.main()

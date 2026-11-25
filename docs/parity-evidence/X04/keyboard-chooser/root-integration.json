@@ -1,0 +1,73 @@
+{
+  "review": "SPEC/QUALITY ACCEPT after scoped cancellation FIX1",
+  "files": [
+    {
+      "path": "packaging/x11/xdmcp/manifest.json",
+      "base_sha256": "c2fc702f204086de8f33e90df002e3d56f23570459f0b3ecf262577ceb7bbb21",
+      "sha256": "c4dd5b743e201cdfbdc0d8d9ba84bd7c12c1e2e880b087342bf6fe002c4c6156"
+    },
+    {
+      "path": "packaging/x11/xdmcp/readiness/Xephyr-session-ready.xz",
+      "base_sha256": "1591b56085492f31c2e5f5c5ad7b4f914b3818f3b4d5444c7b20d827c9d78c6a",
+      "sha256": "90256d9c41e451c402b8deff69cc589d976b20340ef5d4e0452d508214b9b875"
+    },
+    {
+      "path": "packaging/x11/xdmcp/readiness/executable.sha256.bin",
+      "base_sha256": "154b51c6a371c3127dfd8e60ff0c1451d2d5595469e48b236a37a377e8c865e0",
+      "sha256": "beea9e6728556e5ed0419a72fd512d635319c5d4ae16207eef0a1de81756bee2"
+    },
+    {
+      "path": "packaging/x11/xdmcp/readiness/xephyr.patch",
+      "base_sha256": "6399192635349fc2cb090bb2d76fd0a6c1c1973676e5fae5245c3bad43cc6a85",
+      "sha256": "2d03a69b2f3a0aee25141890b98b9524082de39af350a6df56e586c15fd9a344"
+    },
+    {
+      "path": "src/ui/xdmcp.rs",
+      "base_sha256": "e27e634479d43bbf98bbae9332b8df205692198c2d62f23569b93d4395a3929b",
+      "sha256": "7fade5defe182e81634828650dc5486924960b78c1bcd13d764ce0cc79337034"
+    },
+    {
+      "path": "src/x11/xdmcp.rs",
+      "base_sha256": "21f09c36f9453e66801d2bf843156a9a3797a17d6a9e1e40aa1f4779d869a1bb",
+      "sha256": "6fb05a01b6b7330be99bc7dbb44d289c4506ee97eda40bdd708f2fc8452f417c"
+    },
+    {
+      "path": "src/x11/xdmcp_chooser_test.rs",
+      "base_sha256": null,
+      "sha256": "e30bfbbd0c5d5093b1cb18bcc6e614a4a3bd4a47603dbdc08f55a388229b7947"
+    },
+    {
+      "path": "src/x11/xdmcp_engine.rs",
+      "base_sha256": "f3821c03aa61ff118581a5e05e41e42efa102828fd5742e0eebb41647c114e32",
+      "sha256": "fd6931cc199d24ba69da6a9543fcb03c7099d4a7137de3fe115cba6165d86e34"
+    },
+    {
+      "path": "tests/support/prepare_xdmcp_chooser_fixture.sh",
+      "base_sha256": null,
+      "sha256": "ab6e4d1ab3580a4a110b286ebb3067b740d0d8adc693f53c9cf6ce44484ea8f3"
+    },
+    {
+      "path": "tests/support/run_xdmcp_isolated.sh",
+      "base_sha256": "8469fc84e2565e0cce38b73d3003d6cc9009d27b47eba0583fc07806074c51fa",
+      "sha256": "d9580652a42d597fc10d53286429edef1199ce8b8ff5cf71c19d1948941b1a5a"
+    },
+    {
+      "path": "tests/support/xdmcp_chooser_managers.py",
+      "base_sha256": null,
+      "sha256": "46def73914c89a8da8bbd46d4caa7c78f84496415243ce9db0a1305c0a164c2f"
+    },
+    {
+      "path": "tests/support/xdmcp_chooser_select.py",
+      "base_sha256": null,
+      "sha256": "6d71fc99fd7c2666c3e3149b30668d78805145133bde4c1a61fc23758f24aa92"
+    },
+    {
+      "path": "tests/support/xdmcp_window.py",
+      "base_sha256": "c6f4b506dbc28f7194ea84b464864a1409b26227b24d7444d999c96849b50eea",
+      "sha256": "8740a643b1a6782e772fd1a6854d0286e2f7084b4c829e8e28dd5e1b962294f0"
+    }
+  ],
+  "base_map_note": "Canonical baseline omits added files; absent preimages verified before mutation. Initial direct-key preflight stopped without writes.",
+  "integration_note": "All13sourcecopies succeeded and hashes verified; missing durable chooser-review report interrupted evidence copying only. Reviewer then persisted original accepted review without redoing checks; current source13reverified here.",
+  "scope": "Linux single registered XKB IDs and actual Indirect chooser, German after reset plus Unicode tested; variants/groups, unusual delayed-manager ordering, PAM/final logout, physical/native/original remain unqualified. Root combined gate/new genuine package pending game overwrite UI fix."
+}

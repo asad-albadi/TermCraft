@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "method": "apply corrected adapter to independently reconstructed historical base; compare every resulting src file against frozen .706 source",
+  "source_files_matched": 275,
+  "tested_base_ui_sha256": "710ea401d58b44183b90811095af4958627063fd6e5bd8d1e2a0ce21b951b22c",
+  "patch_sha256": "dec07f1e469e151db2774b45d102c83fe00a2d567cee1c4a986ffda950aa16cd"
+}

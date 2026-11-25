@@ -1,0 +1,78 @@
+XDP: load portals from /tmp/real-data/xdg-desktop-portal/portals
+XDP: loading /tmp/real-data/xdg-desktop-portal/portals/wlr.portal
+XDP: portal implementation supports org.freedesktop.impl.portal.Screenshot
+XDP: portal implementation supports org.freedesktop.impl.portal.ScreenCast
+XDP: Looking for portals configuration in '/tmp/real-data/xdg-desktop-portal/portals/sway-portals.conf'
+XDP: Looking for portals configuration in '/tmp/real-data/xdg-desktop-portal/portals/portals.conf'
+
+(/usr/lib/xdg-desktop-portal:13): xdg-desktop-portal-WARNING **: 12:48:01.007: Document portal fuse mount point unknown: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name :1.5 was not provided by any .service files
+XDP: Providing portal org.freedesktop.portal.MemoryMonitor
+XDP: Providing portal org.freedesktop.portal.PowerProfileMonitor
+XDP: Providing portal org.freedesktop.portal.NetworkMonitor
+XDP: Providing portal org.freedesktop.portal.ProxyResolver
+XDP: Providing portal org.freedesktop.portal.Trash
+XDP: Providing portal org.freedesktop.portal.GameMode
+
+(/usr/lib/xdg-desktop-portal:13): xdg-desktop-portal-WARNING **: 12:48:01.019: Failed to create RealtimeKit proxy: Could not connect: No such file or directory
+XDP: Providing portal org.freedesktop.portal.Realtime
+
+(/usr/lib/xdg-desktop-portal:13): xdg-desktop-portal-WARNING **: 12:48:01.019: The location portal requires an access impl
+
+(/usr/lib/xdg-desktop-portal:13): xdg-desktop-portal-WARNING **: 12:48:01.019: The camera portal requires an access impl
+
+(/usr/lib/xdg-desktop-portal:13): xdg-desktop-portal-WARNING **: 12:48:01.019: Choosing wlr.portal for org.freedesktop.impl.portal.Screenshot via the deprecated UseIn key
+
+(/usr/lib/xdg-desktop-portal:13): xdg-desktop-portal-WARNING **: 12:48:01.019: The preferred method to match portal implementations to desktop environments is to use the portals.conf(5) configuration file
+XDP: Using wlr.portal for org.freedesktop.impl.portal.Screenshot in sway (fallback)
+
+(/usr/lib/xdg-desktop-portal:13): xdg-desktop-portal-WARNING **: 12:48:01.019: The screenshot portal requires an access impl
+
+(/usr/lib/xdg-desktop-portal:13): xdg-desktop-portal-WARNING **: 12:48:01.019: Choosing wlr.portal for org.freedesktop.impl.portal.ScreenCast via the deprecated UseIn key
+XDP: Using wlr.portal for org.freedesktop.impl.portal.ScreenCast in sway (fallback)
+XDP: Providing portal org.freedesktop.portal.ScreenCast
+XDP: Providing portal org.freedesktop.host.portal.Registry
+XDP: org.freedesktop.portal.Desktop acquired
+XDP: Adding registered host app 'org.gnome.Zenity'
+XDP: Adding XdpAppInfo: XdpAppInfoHost app 'org.gnome.Zenity' for :1.7
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.10
+XDP: screen cast session owned by ':1.10' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.10
+XDP: screen cast session owned by ':1.10' closed
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.10
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.11
+XDP: screen cast session owned by ':1.11' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.11
+XDP: Handling Close
+XDP: screen cast session owned by ':1.11' closed
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.11
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.12
+XDP: screen cast session owned by ':1.12' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.12
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.12
+XDP: Replacing restore data received from portal impl with a token
+XDP: screen cast session owned by ':1.12' started
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.12
+XDP: screen cast session owned by ':1.12' closed
+
+(/usr/lib/xdg-desktop-portal:13): xdg-desktop-portal-WARNING **: 12:48:07.445: Failed to close session implementation: GDBus.Error:org.freedesktop.DBus.Error.UnknownObject: Unknown object '/org/freedesktop/portal/desktop/session/1_12/harbor_1'.
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.12
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.14
+XDP: screen cast session owned by ':1.14' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.14
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.14
+XDP: Replacing restore data received from portal impl with a token
+XDP: screen cast session owned by ':1.14' started
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.14
+XDP: screen cast session owned by ':1.14' closed
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.14
+XDP: Adding XdpAppInfo: XdpAppInfoHost app '' for :1.15
+XDP: screen cast session owned by ':1.15' created
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.15
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.15
+XDP: Replacing restore data received from portal impl with a token
+XDP: screen cast session owned by ':1.15' started
+XDP: Found XdpAppInfo in cache: XdpAppInfoHost app '' for :1.15
+XDP: screen cast session owned by ':1.15' closed
+
+(/usr/lib/xdg-desktop-portal:13): xdg-desktop-portal-WARNING **: 12:48:08.247: Failed to close session implementation: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.impl.portal.desktop.wlr was not provided by any .service files
+XDP: Deleting XdpAppInfo: XdpAppInfoHost app '' for :1.15

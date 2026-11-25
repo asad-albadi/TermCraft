@@ -1,0 +1,15 @@
+{
+  "package_version": "0.1.924",
+  "bin_name": "termcraft-mosh-closure924",
+  "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/termcraft-mosh-closure924",
+  "sha256": "251610083608682fdc64f9215cadd657da46590965a562dfae283b9ae0913a31",
+  "size": 609522096,
+  "profile": "normal app debug build; release integration belongs to root",
+  "help_exit": 0,
+  "cargo_flags": [
+    "--offline",
+    "--locked",
+    "-j",
+    "2"
+  ]
+}

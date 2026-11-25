@@ -1,0 +1,6 @@
+{
+  "executable_sha256": "bed5614108eabecf7e811a00024039e8fbbb253118e6a47c9a96c9f5f3ba4040",
+  "source_sha256": "909adcccb978607f53676f0c941cfe5174840456199c66909034fc9d089f067a",
+  "method": "standalone rustc --test with cached serde_json dependency; no native-session count added",
+  "ignored_selection": true
+}

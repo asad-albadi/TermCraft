@@ -1,0 +1,23 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/terminal_conformance.rs (target/debug/deps/terminal_conformance-db1b1c00096f1f53)
+
+running 1 test
+test shrinking_height_preserves_live_prompt_and_primary_history_even_after_alternate ... FAILED
+
+failures:
+
+---- shrinking_height_preserves_live_prompt_and_primary_history_even_after_alternate stdout ----
+
+thread 'shrinking_height_preserves_live_prompt_and_primary_history_even_after_alternate' (424176) panicked at tests/terminal_conformance.rs:247:9:
+assertion `left == right` failed
+  left: "O"
+ right: "T"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    shrinking_height_preserves_live_prompt_and_primary_history_even_after_alternate
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test terminal_conformance`

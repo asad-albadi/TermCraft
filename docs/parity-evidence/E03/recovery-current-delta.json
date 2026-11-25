@@ -1,0 +1,18 @@
+{
+  "src/services/cron.rs": {
+    "gate": "e26ea5a2c6e9f4c28e6819041361f1d12931df3111a32d6818a1cfb54e603189",
+    "current": "fc137d0d856c16e71642e123271e2b6e0d2c7961278ab0f569e57ce85af9ff2d"
+  },
+  "src/services/cron/tests.rs": {
+    "gate": "d446222bee9aea19ec5b7f9a7dfa62351f43a3515773245c484256d24a4695ec",
+    "current": "45afcc4c6dead883db58143b7c084bec427d96673315d1e844fe14b3b8032f69"
+  },
+  "src/ui.rs": {
+    "gate": "c37f4f8f257b2a9495628707b3ce4ee60d62b2ae8f7f8af856c476be29e46fa2",
+    "current": "f591f0709e2900e4f47a845e4c6d3f70a6bebbe768015885f6a9d9d60d64a9c0"
+  },
+  "src/ui/managed_servers.rs": {
+    "gate": "7c2c3a2bed27dccaea9552a2f2fa937de265138d572291f35e5c14742aa4fefa",
+    "current": "64a1715be840ea2778e274457fad96d8adbd61c00d11a95f7e191d73ba3edb61"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "scripts/check-protocols.py": {
+    "base_sha256": null,
+    "candidate_sha256": "b6b9f5f1fd1a09a7b20a4475389f79d1931e0175442e8f34d56b7d6359138f14",
+    "base_exists": false
+  },
+  "scripts/test_protocol_runner.py": {
+    "base_sha256": null,
+    "candidate_sha256": "175f6e309bbe7b1e585e5542f1e525ab03c46f310d961ea944af92831b522ce8",
+    "base_exists": false
+  },
+  "tests/protocol_interop.rs": {
+    "base_sha256": null,
+    "candidate_sha256": "0c1479cf2590ecbc7488a5517ac3cc7429378cdbc170d8112bd284a0294145e0",
+    "base_exists": false
+  },
+  "tests/support/run_protocol_reserved_isolated.sh": {
+    "base_sha256": null,
+    "candidate_sha256": "4477600f574602ea970ae2fe3b1c54a498625576819285c3461eb846d0b7ea75",
+    "base_exists": false
+  },
+  "tests/support/rdp_server.rs": {
+    "base_sha256": "7ee20c4e51d4942aac51cabb757988d183adeb242847facaee91e568548d7db4",
+    "candidate_sha256": "123f21c58522520991217cb312236f39dee879c0b0d6734e20b2444d7b9df5f6",
+    "base_exists": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "archive_sha256": "eb8145e78a000c02daf6de8327dc9f96b19222a74b53dfd0e024b926f3992eed",
+  "source_sha256": "b5893bf70362241fbff489979d315307a34549e107f24b6f0de99388fbde6f2e",
+  "test_capture_files": 739,
+  "release_source_files": 593,
+  "extracted_payload_hashes": 3372,
+  "retained_payload_hashes": 3372,
+  "mosh_refs": 60,
+  "mosh_unique": 56,
+  "escaped_refs": 1,
+  "mosh_pinned_runtime_files": 1834,
+  "mosh_runtime_bytes": 75910466,
+  "cached_genuine_release_binaries_matched": 2
+}

@@ -1,0 +1,109 @@
+v
+
+(B TermCratt — Personal edition
+
+System
+
+Sessions View Xserver Tools Games Settings Macros Help
+
+@ @ X ® O
+
+%
+
+& @
+
+=]
+
+53
+
+Session
+
+Servers
+
+Tools
+
+Games.
+
+Sessions
+
+spit
+
+MuitExee
+
+Tunneling
+
+Setings
+
+Help
+
+Xserver
+
+Bt
+
+Quick connect
+
+Home
+
+ FIXL bundled Mosh - error
+
+x
+
++
+
+jau ]
+
+Host or IP address
+
+v
+
+FIX1 bundled Mosh Mosh - Disconnected - 25
+
+Toggle split
+
+Find
+
+Reconnect
+
+More
+
+SSH
+
+Connect
+
+Bundled Mosh requires system Perl at /usr/bin/perl
+
+Sessions
+
+» Terminal profile for this tab
+
+Search sessions
+
+Keyword highlighting ~ Global
+
+on
+
+off
+
++ My sessions
+
+Single terminal v
+
+FIXL bundled Mosh
+
+MultiExec - selected targets.
+
+Read-only shared sources
+
+Manage
+
+Fix2 bundied Mosh
+
+isory:O s 001 128148
+
+Double-click a session to connect
+
+® Workspace saved
+
+0 connectons +
+
+1 saved sessions

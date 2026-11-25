@@ -1,0 +1,119 @@
+   Compiling b06-advanced-fix918 v0.1.918 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/fix2/work)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.49s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/fix2/work/target/debug/deps/b06_advanced_fix918-65eb5e93e45cc7fb)
+
+running 3 tests
+test map::fix2_generation_tests::actual_failing_ordinary_seeds_and_all_six_advanced_maps ... SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 0: success micros=18946 work=GenerationWork { candidates: 8, colour_nodes: 248, removal_replays: 237, certifications: 8 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 1: success micros=24496 work=GenerationWork { candidates: 11, colour_nodes: 373, removal_replays: 329, certifications: 11 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 2: success micros=4639 work=GenerationWork { candidates: 2, colour_nodes: 62, removal_replays: 60, certifications: 2 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 3: exhausted micros=33551 work=GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 477, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 4: success micros=4851 work=GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 5: exhausted micros=30974 work=GenerationWork { candidates: 16, colour_nodes: 502, removal_replays: 477, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 6: success micros=16887 work=GenerationWork { candidates: 8, colour_nodes: 248, removal_replays: 236, certifications: 8 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 7: exhausted micros=39080 work=GenerationWork { candidates: 16, colour_nodes: 524, removal_replays: 477, certifications: 16 }
+MATRIX MapConfig { preset: Default, regions: 30, difficulty: Hard }: 5/8
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 0: success micros=3534 work=GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 1: success micros=26980 work=GenerationWork { candidates: 11, colour_nodes: 373, removal_replays: 329, certifications: 11 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 2: exhausted micros=37070 work=GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 477, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 3: success micros=34005 work=GenerationWork { candidates: 14, colour_nodes: 434, removal_replays: 417, certifications: 14 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 4: success micros=36954 work=GenerationWork { candidates: 14, colour_nodes: 434, removal_replays: 417, certifications: 14 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 5: exhausted micros=33843 work=GenerationWork { candidates: 16, colour_nodes: 502, removal_replays: 477, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 6: success micros=20525 work=GenerationWork { candidates: 9, colour_nodes: 279, removal_replays: 266, certifications: 9 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 7: success micros=39286 work=GenerationWork { candidates: 15, colour_nodes: 493, removal_replays: 448, certifications: 15 }
+MATRIX MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }: 6/8
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 0: success micros=25825 work=GenerationWork { candidates: 1, colour_nodes: 76, removal_replays: 75, certifications: 1 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 1: success micros=181862 work=GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 2: success micros=63052 work=GenerationWork { candidates: 1, colour_nodes: 80, removal_replays: 75, certifications: 1 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 3: success micros=467435 work=GenerationWork { candidates: 13, colour_nodes: 991, removal_replays: 975, certifications: 13 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 4: success micros=128255 work=GenerationWork { candidates: 2, colour_nodes: 160, removal_replays: 150, certifications: 2 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 5: success micros=70813 work=GenerationWork { candidates: 2, colour_nodes: 160, removal_replays: 150, certifications: 2 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 6: success micros=97087 work=GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 7: success micros=199246 work=GenerationWork { candidates: 5, colour_nodes: 380, removal_replays: 375, certifications: 5 }
+MATRIX MapConfig { preset: Default, regions: 75, difficulty: Hard }: 8/8
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 0: success micros=2450 work=GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 1: exhausted micros=37573 work=GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 476, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 2: success micros=8814 work=GenerationWork { candidates: 4, colour_nodes: 124, removal_replays: 119, certifications: 4 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 3: exhausted micros=41329 work=GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 474, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 4: exhausted micros=33695 work=GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 479, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 5: success micros=26879 work=GenerationWork { candidates: 11, colour_nodes: 341, removal_replays: 327, certifications: 11 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 6: success micros=11464 work=GenerationWork { candidates: 5, colour_nodes: 155, removal_replays: 149, certifications: 5 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 7: success micros=25655 work=GenerationWork { candidates: 10, colour_nodes: 313, removal_replays: 298, certifications: 10 }
+MATRIX MapConfig { preset: Portrait, regions: 30, difficulty: Hard }: 5/8
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 0: success micros=4864 work=GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 1: success micros=33746 work=GenerationWork { candidates: 13, colour_nodes: 405, removal_replays: 387, certifications: 13 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 2: success micros=13450 work=GenerationWork { candidates: 5, colour_nodes: 155, removal_replays: 149, certifications: 5 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 3: success micros=16476 work=GenerationWork { candidates: 6, colour_nodes: 186, removal_replays: 180, certifications: 6 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 4: success micros=10751 work=GenerationWork { candidates: 4, colour_nodes: 124, removal_replays: 120, certifications: 4 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 5: success micros=3546 work=GenerationWork { candidates: 1, colour_nodes: 31, removal_replays: 30, certifications: 1 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 6: success micros=8530 work=GenerationWork { candidates: 3, colour_nodes: 93, removal_replays: 90, certifications: 3 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 7: success micros=28045 work=GenerationWork { candidates: 10, colour_nodes: 313, removal_replays: 298, certifications: 10 }
+MATRIX MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }: 8/8
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 0: success micros=140906 work=GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 1: exhausted micros=695072 work=GenerationWork { candidates: 16, colour_nodes: 1236, removal_replays: 1200, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 2: success micros=191604 work=GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 3: success micros=125528 work=GenerationWork { candidates: 3, colour_nodes: 250, removal_replays: 225, certifications: 3 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 4: success micros=196084 work=GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 5: success micros=341292 work=GenerationWork { candidates: 10, colour_nodes: 762, removal_replays: 750, certifications: 10 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 6: success micros=102676 work=GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 7: success micros=148833 work=GenerationWork { candidates: 3, colour_nodes: 231, removal_replays: 225, certifications: 3 }
+MATRIX MapConfig { preset: Portrait, regions: 75, difficulty: Hard }: 7/8
+ok
+test map::fix2_generation_tests::generation_colouring_is_bounded_randomized_and_preserves_constraints ... ok
+test map::fix2_generation_tests::held_out_ordinary_seeds_and_all_six_advanced_maps ... SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 8: exhausted micros=41858 work=GenerationWork { candidates: 16, colour_nodes: 504, removal_replays: 477, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 9: success micros=38761 work=GenerationWork { candidates: 13, colour_nodes: 403, removal_replays: 388, certifications: 13 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 10: exhausted micros=41481 work=GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 476, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 11: success micros=22832 work=GenerationWork { candidates: 9, colour_nodes: 282, removal_replays: 268, certifications: 9 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 12: exhausted micros=39538 work=GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 13: exhausted micros=37229 work=GenerationWork { candidates: 16, colour_nodes: 501, removal_replays: 474, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 14: exhausted micros=32812 work=GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 15: exhausted micros=34395 work=GenerationWork { candidates: 16, colour_nodes: 520, removal_replays: 478, certifications: 16 }
+MATRIX MapConfig { preset: Default, regions: 30, difficulty: Hard }: 2/8
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 8: success micros=12961 work=GenerationWork { candidates: 4, colour_nodes: 130, removal_replays: 120, certifications: 4 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 9: success micros=26816 work=GenerationWork { candidates: 9, colour_nodes: 279, removal_replays: 269, certifications: 9 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 10: exhausted micros=42428 work=GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 476, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 11: success micros=38231 work=GenerationWork { candidates: 14, colour_nodes: 437, removal_replays: 418, certifications: 14 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 12: exhausted micros=42228 work=GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 13: success micros=40376 work=GenerationWork { candidates: 15, colour_nodes: 470, removal_replays: 444, certifications: 15 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 14: success micros=25254 work=GenerationWork { candidates: 10, colour_nodes: 310, removal_replays: 297, certifications: 10 }
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 15: exhausted micros=36920 work=GenerationWork { candidates: 16, colour_nodes: 520, removal_replays: 478, certifications: 16 }
+MATRIX MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }: 5/8
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 8: success micros=201058 work=GenerationWork { candidates: 3, colour_nodes: 230, removal_replays: 225, certifications: 3 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 9: success micros=173495 work=GenerationWork { candidates: 4, colour_nodes: 304, removal_replays: 300, certifications: 4 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 10: success micros=108944 work=GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 11: success micros=152806 work=GenerationWork { candidates: 5, colour_nodes: 384, removal_replays: 375, certifications: 5 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 12: success micros=350867 work=GenerationWork { candidates: 8, colour_nodes: 608, removal_replays: 600, certifications: 8 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 13: success micros=162376 work=GenerationWork { candidates: 3, colour_nodes: 233, removal_replays: 225, certifications: 3 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 14: success micros=86804 work=GenerationWork { candidates: 1, colour_nodes: 76, removal_replays: 75, certifications: 1 }
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 15: success micros=337682 work=GenerationWork { candidates: 5, colour_nodes: 380, removal_replays: 375, certifications: 5 }
+MATRIX MapConfig { preset: Default, regions: 75, difficulty: Hard }: 8/8
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 8: success micros=23266 work=GenerationWork { candidates: 10, colour_nodes: 312, removal_replays: 299, certifications: 10 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 9: exhausted micros=37095 work=GenerationWork { candidates: 16, colour_nodes: 508, removal_replays: 477, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 10: exhausted micros=37010 work=GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 474, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 11: success micros=7271 work=GenerationWork { candidates: 2, colour_nodes: 62, removal_replays: 59, certifications: 2 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 12: success micros=17331 work=GenerationWork { candidates: 6, colour_nodes: 188, removal_replays: 178, certifications: 6 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 13: exhausted micros=36242 work=GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 471, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 14: exhausted micros=34243 work=GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 477, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 15: success micros=23568 work=GenerationWork { candidates: 10, colour_nodes: 310, removal_replays: 295, certifications: 10 }
+MATRIX MapConfig { preset: Portrait, regions: 30, difficulty: Hard }: 4/8
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 8: success micros=40607 work=GenerationWork { candidates: 15, colour_nodes: 473, removal_replays: 449, certifications: 15 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 9: exhausted micros=42814 work=GenerationWork { candidates: 16, colour_nodes: 508, removal_replays: 477, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 10: exhausted micros=42705 work=GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 474, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 11: exhausted micros=51002 work=GenerationWork { candidates: 16, colour_nodes: 496, removal_replays: 476, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 12: success micros=16738 work=GenerationWork { candidates: 4, colour_nodes: 126, removal_replays: 118, certifications: 4 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 13: success micros=20301 work=GenerationWork { candidates: 8, colour_nodes: 248, removal_replays: 236, certifications: 8 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 14: exhausted micros=37134 work=GenerationWork { candidates: 16, colour_nodes: 498, removal_replays: 477, certifications: 16 }
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 15: success micros=26552 work=GenerationWork { candidates: 10, colour_nodes: 310, removal_replays: 295, certifications: 10 }
+MATRIX MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }: 4/8
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 8: success micros=73905 work=GenerationWork { candidates: 1, colour_nodes: 76, removal_replays: 75, certifications: 1 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 9: success micros=178636 work=GenerationWork { candidates: 6, colour_nodes: 464, removal_replays: 450, certifications: 6 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 10: success micros=163065 work=GenerationWork { candidates: 5, colour_nodes: 604, removal_replays: 375, certifications: 5 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 11: success micros=348314 work=GenerationWork { candidates: 7, colour_nodes: 538, removal_replays: 525, certifications: 7 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 12: success micros=88928 work=GenerationWork { candidates: 2, colour_nodes: 154, removal_replays: 150, certifications: 2 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 13: success micros=55399 work=GenerationWork { candidates: 1, colour_nodes: 81, removal_replays: 75, certifications: 1 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 14: success micros=115636 work=GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 15: success micros=116047 work=GenerationWork { candidates: 2, colour_nodes: 152, removal_replays: 150, certifications: 2 }
+MATRIX MapConfig { preset: Portrait, regions: 75, difficulty: Hard }: 8/8
+ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 66 filtered out; finished in 8.39s
+

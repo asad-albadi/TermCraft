@@ -1,0 +1,57 @@
+{
+  "Cargo.toml": {
+    "base": "a9ce475ff5c40ece73be9c460a76176e821b7ce760e81114f9189f61cc5ca463",
+    "new": "714b17d047d01e0dcccf4e0fcc595d5e2ab2cafc28ab4549cd1ad4341acf08ba",
+    "private_source": "bde3f5eef1eca892990e654e04bdbf502aec70d3eeafbe861bcb56175d7d058f"
+  },
+  "Cargo.lock": {
+    "base": "8206b8cbd82ffb5ec82fa02ff1e663a8de9718f5ebd8a83f5b31094bfbdb6059",
+    "new": "0b0d1a14f77310a49face4fb6cdf27a1df6bbd294a7b1f3feb3b6c7ed6049605",
+    "private_source": "42da1b1207d4efa9b3c8d6d3b35dba8514412bb06df97330f38b4f06300e4d39"
+  },
+  "src/services/mod.rs": {
+    "base": "43bd85ad36d1fee8523b895ad4795b603301853ea802f44e97ec5bcb1ff4e943",
+    "new": "4aa4679dcbd29a6f3a6af8a8e89e799ee4010afcb6faf650ea069733d3b0b801",
+    "private_source": "4aa4679dcbd29a6f3a6af8a8e89e799ee4010afcb6faf650ea069733d3b0b801"
+  },
+  "src/services/supervisor.rs": {
+    "base": "56c26d93646f4486a9b40c4e6ee6a97db549f25864772ef0824978211776901a",
+    "new": "49c629232ac28658a50f075b0bdc34018f67c6e3bc95b997cb62fbd3e77a9e32",
+    "private_source": "49c629232ac28658a50f075b0bdc34018f67c6e3bc95b997cb62fbd3e77a9e32"
+  },
+  "src/model.rs": {
+    "base": "03806ff1c895d695e4a286035b257a77ef589e59c678504166749e3cc108c540",
+    "new": "a6ea0aae1ca9129698d976edae2a9b05bd4b5cf7e5179d14270f7b8c8c2105f9",
+    "private_source": "a6ea0aae1ca9129698d976edae2a9b05bd4b5cf7e5179d14270f7b8c8c2105f9"
+  },
+  "src/ui.rs": {
+    "base": "1ad6014e9883b43b0c2a6a7cb21a077738b8e424589939b4f771064daa341428",
+    "new": "c37f4f8f257b2a9495628707b3ce4ee60d62b2ae8f7f8af856c476be29e46fa2",
+    "private_source": "c37f4f8f257b2a9495628707b3ce4ee60d62b2ae8f7f8af856c476be29e46fa2"
+  },
+  "src/ui/servers.rs": {
+    "base": "989200dd2eec23f9995619ed3dd4c689d317c91ac2ce0ab6b48581472b6ae900",
+    "new": "2c9de51681690cb3fb7ae911c845b2b0ec96d4ab581e0062cf14b75f22a72284",
+    "private_source": "2c9de51681690cb3fb7ae911c845b2b0ec96d4ab581e0062cf14b75f22a72284"
+  },
+  "src/ui/managed_servers.rs": {
+    "base": "72792e05c688980d103a949057c5c437d7d9be20ba94ec590e9e3d5d81cf151c",
+    "new": "d00f10b51d421b6d4beaefa14e2965aca6b8a85936d671e765686d9cd7db4ee7",
+    "private_source": "d00f10b51d421b6d4beaefa14e2965aca6b8a85936d671e765686d9cd7db4ee7"
+  },
+  "src/services/cron.rs": {
+    "base": null,
+    "new": "e26ea5a2c6e9f4c28e6819041361f1d12931df3111a32d6818a1cfb54e603189",
+    "private_source": "e26ea5a2c6e9f4c28e6819041361f1d12931df3111a32d6818a1cfb54e603189"
+  },
+  "src/services/cron/tests.rs": {
+    "base": null,
+    "new": "d446222bee9aea19ec5b7f9a7dfa62351f43a3515773245c484256d24a4695ec",
+    "private_source": "d446222bee9aea19ec5b7f9a7dfa62351f43a3515773245c484256d24a4695ec"
+  },
+  "src/ui/managed_cron.rs": {
+    "base": null,
+    "new": "9547d6cd76e1256ced84568b4a6969d6338c6c0db0b81f6548f7cfab96dae2fc",
+    "private_source": "9547d6cd76e1256ced84568b4a6969d6338c6c0db0b81f6548f7cfab96dae2fc"
+  }
+}

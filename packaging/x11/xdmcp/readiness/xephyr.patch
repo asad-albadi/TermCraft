@@ -1,0 +1,162 @@
+--- a/os/xdmcp.c
++++ b/os/xdmcp.c
+@@ -35,6 +35,7 @@
+ #endif
+ 
+ #include <stdio.h>
++#include <fcntl.h>
+ #include <stdlib.h>
+ #include <X11/X.h>
+ #include <X11/Xmd.h>
+@@ -213,6 +214,7 @@
+ 
+ static unsigned short xdm_udp_port = XDM_UDP_PORT;
+ static Bool OneSession = FALSE;
++static int sessionReadyFd = -1;
+ static const char *xdm_from = NULL;
+ 
+ void
+@@ -286,6 +288,14 @@
+         get_fromaddr_by_name(argc, argv, ++i);
+         return i + 1;
+     }
++    if (strcmp(argv[i], "-termcraft-session-ready") == 0) {
++        if (sessionReadyFd != -1)
++            FatalError("Duplicate XDMCP session readiness option");
++        sessionReadyFd = fcntl(STDOUT_FILENO, F_DUPFD_CLOEXEC, 3);
++        if (sessionReadyFd < 0)
++            FatalError("Cannot retain XDMCP session readiness channel");
++        return ++i;
++    }
+     if (strcmp(argv[i], "-once") == 0) {
+         OneSession = TRUE;
+         return i + 1;
+@@ -633,6 +643,13 @@
+     state = XDM_RUN_SESSION;
+     TimerSet(xdmcp_timer, 0, XDM_DEF_DORMANCY * 1000, XdmcpTimerNotify, NULL);
+     sessionSocket = sock;
++    if (sessionReadyFd >= 0) {
++        static const char ready[] = "session-ready-v1\n";
++        if (write(sessionReadyFd, ready, sizeof(ready) - 1) != sizeof(ready) - 1)
++            FatalError("Cannot signal XDMCP session readiness");
++        close(sessionReadyFd);
++        sessionReadyFd = -1;
++    }
+ }
+ 
+ void
+--- a/include/xkbsrv.h
++++ b/include/xkbsrv.h
+@@ -772,6 +772,7 @@
+                                       Bool      /* freeRMLVO */
+     );
+ 
++extern Bool XkbRequireSessionLayout;
+ extern _X_EXPORT void XkbSetRulesDflts(XkbRMLVOSet *    /* rmlvo */
+     );
+ 
+--- a/xkb/ddxLoad.c
++++ b/xkb/ddxLoad.c
+@@ -482,6 +482,8 @@
+     return xkb;
+ }
+ 
++Bool XkbRequireSessionLayout = FALSE;
++
+ static XkbDescPtr
+ KeymapOrDefaults(DeviceIntPtr dev, XkbDescPtr xkb)
+ {
+@@ -522,6 +524,10 @@
+ 
+     xkb = XkbCompileKeymapForDevice(dev, rmlvo, need);
+ 
++    if (!xkb && XkbRequireSessionLayout) {
++        LogMessage(X_ERROR, "Cannot compile the selected session XKB keyboard layout\n");
++        return NULL;
++    }
+     return KeymapOrDefaults(dev, xkb);
+ }
+ 
+--- a/hw/kdrive/src/kinput.c
++++ b/hw/kdrive/src/kinput.c
+@@ -550,6 +550,8 @@
+         rmlvo.options = ki->xkbOptions;
+         ret = InitKeyboardDeviceStruct(pDevice, &rmlvo, KdBell, KdKbdCtrl);
+         if (!ret) {
++            if (XkbRequireSessionLayout)
++                FatalError("Cannot initialize the selected session XKB keyboard layout");
+             ErrorF("Couldn't initialise keyboard %s\n", ki->name);
+             return BadImplementation;
+         }
+--- a/hw/kdrive/ephyr/ephyrinit.c
++++ b/hw/kdrive/ephyr/ephyrinit.c
+@@ -28,6 +28,9 @@
+ #endif
+ #include "ephyr.h"
+ #include "ephyrlog.h"
++#include "xkbsrv.h"
++
++extern const char *kdGlobalXkbLayout;
+ #include "glx_extinit.h"
+ 
+ extern Window EphyrPreExistingHostWin;
+@@ -61,6 +64,11 @@
+ void
+ InitOutput(ScreenInfo * pScreenInfo, int argc, char **argv)
+ {
++    /* Core keyboard defaults are cleared between X server generations. */
++    if (XkbRequireSessionLayout) {
++        XkbRMLVOSet defaults = { .layout = (char *) kdGlobalXkbLayout };
++        XkbSetRulesDflts(&defaults);
++    }
+     KdInitOutput(pScreenInfo, argc, argv);
+ }
+ 
+@@ -193,6 +201,15 @@
+ 
+     EPHYR_DBG("mark argv[%d]='%s'", i, argv[i]);
+ 
++    if (!strcmp(argv[i], "-termcraft-keyboard-layout")) {
++        const char *layout = i + 1 < argc ? argv[i + 1] : "";
++        if (layout[0] < 'a' || layout[0] > 'z' || strlen(layout) > 32 ||
++            layout[strspn(layout, "abcdefghijklmnopqrstuvwxyz0123456789")] != '\0')
++            FatalError("Expected a single lowercase XKB keyboard layout identifier");
++        kdGlobalXkbLayout = layout;
++        XkbRequireSessionLayout = TRUE;
++        return 2;
++    }
+     if (!strcmp(argv[i], "-parent")) {
+         if (i + 1 < argc) {
+             int j;
+--- a/hw/kdrive/ephyr/ephyr.c
++++ b/hw/kdrive/ephyr/ephyr.c
+@@ -1327,17 +1327,25 @@
+     ki->driverPrivate = (EphyrKbdPrivate *)
+         calloc(sizeof(EphyrKbdPrivate), 1);
+ 
+-    if (hostx_load_keymap(&keySyms, modmap, &controls)) {
++    if (!ki->driverPrivate)
++        return BadAlloc;
++    if (XkbRequireSessionLayout) {
++        XkbDescPtr map = ki->dixdev->key->xkbInfo->desc;
++        ki->minScanCode = map->min_key_code;
++        ki->maxScanCode = map->max_key_code;
++    }
++    else if (hostx_load_keymap(&keySyms, modmap, &controls)) {
+         XkbApplyMappingChange(ki->dixdev, &keySyms,
+                               keySyms.minKeyCode,
+                               keySyms.maxKeyCode - keySyms.minKeyCode + 1,
+                               modmap, serverClient);
+         XkbDDXChangeControls(ki->dixdev, &controls, &controls);
++        ki->minScanCode = keySyms.minKeyCode;
++        ki->maxScanCode = keySyms.maxKeyCode;
+         free(keySyms.map);
+     }
+-
+-    ki->minScanCode = keySyms.minKeyCode;
+-    ki->maxScanCode = keySyms.maxKeyCode;
++    else
++        FatalError("Cannot read the inherited host X11 keyboard layout");
+ 
+     if (ki->name != NULL) {
+         free(ki->name);

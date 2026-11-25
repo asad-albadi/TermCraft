@@ -1,0 +1,107 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: methods `send` and `poll` are never used
+   --> src/ui.rs:162:8
+    |
+136 | impl TerminalTab {
+    | ---------------- methods in this implementation
+...
+162 |     fn send(&mut self, data: &[u8]) {
+    |        ^^^^
+...
+206 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+warning: variants `PasswordThenMfa` and `ScpStartup` are never constructed
+  --> tests/support/auth_server.rs:18:5
+   |
+16 | pub enum Mode {
+   |          ---- variants in this enum
+17 |     Password,
+18 |     PasswordThenMfa,
+   |     ^^^^^^^^^^^^^^^
+...
+22 |     ScpStartup,
+   |     ^^^^^^^^^^
+   |
+   = note: `Mode` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `attempts` and `startup` are never read
+   --> tests/support/auth_server.rs:271:5
+    |
+270 | pub struct AuthServer {
+    |            ---------- fields in this struct
+271 |     attempts: Arc<Attempts>,
+    |     ^^^^^^^^
+272 |     startup: Arc<StartupState>,
+    |     ^^^^^^^
+
+warning: methods `startup_requests`, `active_startup_helpers`, `allow_startup_helpers`, and `attempts` are never used
+   --> tests/support/auth_server.rs:345:12
+    |
+281 | impl AuthServer {
+    | --------------- methods in this implementation
+...
+345 |     pub fn startup_requests(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^
+...
+348 |     pub fn active_startup_helpers(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+351 |     pub fn allow_startup_helpers(&self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+...
+370 |     pub fn attempts(&self) -> [usize; 4] {
+    |            ^^^^^^^^
+
+warning: `harbor-workspace` (test "ssh_authentication") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.28s
+     Running tests/ssh_authentication.rs (target/debug/deps/ssh_authentication-039d93593a053e87)
+
+running 4 tests
+
+running 1 test
+test x11_cookie_forwarding_shares_the_authenticated_connection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.14s
+
+test x11_cookie_forwarding_shares_the_authenticated_connection ... ok
+test keyboard_interactive_preserves_prompt_echo_flags ... ok
+test password_auth_and_stalled_sftp_preserve_shell ... ok
+test public_key_then_mfa_uses_updated_methods ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+

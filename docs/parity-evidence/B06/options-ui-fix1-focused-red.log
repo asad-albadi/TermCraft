@@ -1,0 +1,42 @@
+   Compiling harbor-workspace v0.1.609 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-options-ui)
+warning: unused variable: `i`
+    --> src/ui/games/play.rs:1275:24
+     |
+1275 |                 .map(|(i, &d)| if d != 0 { d.to_string() } else { String::new() })
+     |                        ^ help: if this is intentional, prefix it with an underscore: `_i`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (bin "termcraft-games-options609" test) generated 1 warning (run `cargo fix --bin "termcraft-games-options609" -p harbor-workspace --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.47s
+     Running unittests src/main.rs (app/target/debug/deps/termcraft_games_options609-6171176519abc315)
+
+running 2 tests
+test ui::games::play::options_ui_tests::options_focused_numeric_edit_owns_digits_shortcuts_and_enter ... FAILED
+test ui::games::play::options_ui_tests::options_focused_shortcut_preserves_assisted_game ... FAILED
+
+failures:
+
+---- ui::games::play::options_ui_tests::options_focused_numeric_edit_owns_digits_shortcuts_and_enter stdout ----
+
+thread 'ui::games::play::options_ui_tests::options_focused_numeric_edit_owns_digits_shortcuts_and_enter' (426582) panicked at src/ui/games/play.rs:2781:13:
+assertion `left == right` failed: focused settings must not make a gameplay move
+  left: Puzzle(Guess(GuessScene { colours: 6, max_guesses: 10, current: [1, 2, 3, 3], held: [false, false, false, false], rows: [], solution: None }))
+ right: Puzzle(Guess(GuessScene { colours: 6, max_guesses: 10, current: [1, 2, 3, 4], held: [false, false, false, false], rows: [], solution: None }))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ui::games::play::options_ui_tests::options_focused_shortcut_preserves_assisted_game stdout ----
+
+thread 'ui::games::play::options_ui_tests::options_focused_shortcut_preserves_assisted_game' (426583) panicked at src/ui/games/play.rs:2809:9:
+assertion `left == right` failed
+  left: Puzzle(Guess(GuessScene { colours: 6, max_guesses: 10, current: [0, 0, 0, 0], held: [false, false, false, false], rows: [], solution: None }))
+ right: Puzzle(Guess(GuessScene { colours: 6, max_guesses: 10, current: [0, 0, 0, 0], held: [false, false, false, false], rows: [], solution: Some([3, 5, 6, 6]) }))
+
+
+failures:
+    ui::games::play::options_ui_tests::options_focused_numeric_edit_owns_digits_shortcuts_and_enter
+    ui::games::play::options_ui_tests::options_focused_shortcut_preserves_assisted_game
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 195 filtered out; finished in 1.22s
+
+error: test failed, to rerun pass `--bin termcraft-games-options609`

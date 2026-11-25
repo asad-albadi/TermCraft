@@ -1,0 +1,19 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.18s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-35a5b814e387799d)
+
+running 1 test
+
+thread 'ui::macro_events::tests::timed_macro_waits_for_focus_in_a_detached_terminal_on_another_root_page' (350276) panicked at src/ui/macro_events.rs:706:13:
+macro fixture did not complete
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ui::macro_events::tests::timed_macro_waits_for_focus_in_a_detached_terminal_on_another_root_page ... FAILED
+
+failures:
+
+failures:
+    ui::macro_events::tests::timed_macro_waits_for_focus_in_a_detached_terminal_on_another_root_page
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 123 filtered out; finished in 4.28s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

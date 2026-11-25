@@ -1,0 +1,49 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.10s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-a3e649926aaf12fc)
+
+running 1 test
+
+running 1 test
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.26s
+
+
+running 1 test
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.26s
+
+
+running 1 test
+
+thread 'injected_disk_full_sync_and_close_errors_preserve_destination_and_partial' (217105) panicked at tests/remote_transfers.rs:576:5:
+close: TransferEvent { summary: "Download /tmp/termcraft-ssh-test-217104-1795435151014049226/fault-source → \"/tmp/termcraft-ssh-test-217104-1795435151014049226/fault-destination\"", id: 1, bytes: 262144, outcome: Some(Completed), recovery: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... FAILED
+
+failures:
+
+failures:
+    injected_disk_full_sync_and_close_errors_preserve_destination_and_partial
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.25s
+
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... FAILED
+
+failures:
+
+---- injected_disk_full_sync_and_close_errors_preserve_destination_and_partial stdout ----
+
+thread 'injected_disk_full_sync_and_close_errors_preserve_destination_and_partial' (217062) panicked at tests/remote_transfers.rs:552:13:
+Injected close failure was not safely handled
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    injected_disk_full_sync_and_close_errors_preserve_destination_and_partial
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.89s
+
+error: test failed, to rerun pass `--test remote_transfers`

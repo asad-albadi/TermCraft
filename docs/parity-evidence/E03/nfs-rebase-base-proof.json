@@ -1,0 +1,36 @@
+{
+  "Cargo.toml": {
+    "baseline_sha256": "84e217a04918e8fab9e28a23603d2e0a276633a4b979fe2323e1afea8e9eb658",
+    "main_sha256_at_rebase": "84e217a04918e8fab9e28a23603d2e0a276633a4b979fe2323e1afea8e9eb658"
+  },
+  "src/services/mod.rs": {
+    "baseline_sha256": "4aa4679dcbd29a6f3a6af8a8e89e799ee4010afcb6faf650ea069733d3b0b801",
+    "main_sha256_at_rebase": "4aa4679dcbd29a6f3a6af8a8e89e799ee4010afcb6faf650ea069733d3b0b801"
+  },
+  "src/services/supervisor.rs": {
+    "baseline_sha256": "49c629232ac28658a50f075b0bdc34018f67c6e3bc95b997cb62fbd3e77a9e32",
+    "main_sha256_at_rebase": "49c629232ac28658a50f075b0bdc34018f67c6e3bc95b997cb62fbd3e77a9e32"
+  },
+  "src/model.rs": {
+    "baseline_sha256": "a6ea0aae1ca9129698d976edae2a9b05bd4b5cf7e5179d14270f7b8c8c2105f9",
+    "main_sha256_at_rebase": "a6ea0aae1ca9129698d976edae2a9b05bd4b5cf7e5179d14270f7b8c8c2105f9"
+  },
+  "src/ui/managed_servers.rs": {
+    "baseline_sha256": "d00f10b51d421b6d4beaefa14e2965aca6b8a85936d671e765686d9cd7db4ee7",
+    "main_sha256_at_rebase": "d00f10b51d421b6d4beaefa14e2965aca6b8a85936d671e765686d9cd7db4ee7"
+  },
+  "src/ui/servers.rs": {
+    "baseline_sha256": "2c9de51681690cb3fb7ae911c845b2b0ec96d4ab581e0062cf14b75f22a72284",
+    "main_sha256_at_rebase": "2c9de51681690cb3fb7ae911c845b2b0ec96d4ab581e0062cf14b75f22a72284"
+  },
+  "preserved": {
+    "reviewed_nfs_sha256": "59034433641a4338067b8ad20063cb098cfdaa881d82e3256b1703bcfaff89de",
+    "chrono": true,
+    "windows_registry_feature": true,
+    "cron_protocol": true,
+    "cron_runtime": true,
+    "cron_status": true,
+    "cron_page": true,
+    "cron_ui_guard": true
+  }
+}

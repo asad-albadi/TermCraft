@@ -1,0 +1,14 @@
+..E.
+======================================================================
+ERROR: test_missing_fixture_is_unavailable (__main__.RunnerContract.test_missing_fixture_is_unavailable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/scripts/test_interop_runner.py", line 17, in test_missing_fixture_is_unavailable
+    self.assertIn('ssh-keygen', runner.fixture_unavailability(['ssh-keygen']))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'runner' has no attribute 'fixture_unavailability'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.003s
+
+FAILED (errors=1)

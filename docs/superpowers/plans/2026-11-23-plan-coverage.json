@@ -1,0 +1,11 @@
+{
+  "date": "2026-11-23",
+  "checklist_points": 60,
+  "unique_planned_points": 60,
+  "order_matches": true,
+  "subsystem_plans": 10,
+  "local_links_and_anchors": "passed",
+  "required_task_fields": "passed",
+  "code_changes": false,
+  "implementation_completion": "0/60"
+}

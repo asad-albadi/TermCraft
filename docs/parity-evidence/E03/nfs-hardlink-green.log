@@ -1,0 +1,72 @@
+   Compiling e03-nfs-component v0.1.0-e03-nfs-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-nfs/component)
+warning: constant `STAGING` is never used
+  --> services/../../src/services/files.rs:13:7
+   |
+13 | const STAGING: &str = ".harbor-service-stage-";
+   |       ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `UPLOAD_LIMIT` is never used
+  --> services/../../src/services/files.rs:14:18
+   |
+14 | pub(super) const UPLOAD_LIMIT: u64 = 64 * 1024 * 1024;
+   |                  ^^^^^^^^^^^^
+
+warning: methods `stage` and `rename` are never used
+   --> services/../../src/services/files.rs:65:19
+    |
+ 22 | impl Share {
+    | ---------- methods in this implementation
+...
+ 65 |     pub(super) fn stage(&self, path: &Path) -> io::Result<Staged> {
+    |                   ^^^^^
+...
+130 |     pub(super) fn rename(&self, from: &Path, to: &Path) -> io::Result<()> {
+    |                   ^^^^^^
+
+warning: function `require_absent` is never used
+   --> services/../../src/services/files.rs:156:4
+    |
+156 | fn require_absent(dir: &Dir, name: &OsStr) -> io::Result<()> {
+    |    ^^^^^^^^^^^^^^
+
+warning: struct `Staged` is never constructed
+   --> services/../../src/services/files.rs:164:19
+    |
+164 | pub(super) struct Staged {
+    |                   ^^^^^^
+
+warning: methods `append` and `publish` are never used
+   --> services/../../src/services/files.rs:172:19
+    |
+171 | impl Staged {
+    | ----------- methods in this implementation
+172 |     pub(super) fn append(&mut self, data: &[u8]) -> io::Result<()> {
+    |                   ^^^^^^
+...
+179 |     pub(super) fn publish(mut self, confirm: impl FnOnce() -> io::Result<()>) -> io::Result<()> {
+    |                   ^^^^^^^
+
+warning: function `path` is never used
+   --> services/../../src/services/files.rs:196:15
+    |
+196 | pub(super) fn path(current: &Path, name: &str, allow_absolute: bool) -> io::Result<PathBuf> {
+    |               ^^^^
+
+warning: function `usable_name` is never used
+   --> services/../../src/services/files.rs:229:15
+    |
+229 | pub(super) fn usable_name(name: &str) -> bool {
+    |               ^^^^^^^^^^^
+
+warning: `e03-nfs-component` (lib test) generated 8 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.02s
+     Running unittests lib.rs (/tmp/e03-nfs-target/debug/deps/e03_nfs_component-82c5db627c22345d)
+
+running 2 tests
+test services::nfs::tests::hardlink_added_after_lookup_blocks_each_inode_mutation ... ok
+test services::nfs::tests::independent_libnfs_hardlink_alias_preserves_outside_bytes ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.20s
+

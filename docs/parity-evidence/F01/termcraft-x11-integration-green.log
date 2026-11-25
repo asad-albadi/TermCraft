@@ -1,0 +1,30 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: methods `terminate_owned_sftp` and `accepted_authentications` are never used
+   --> tests/support/ssh_server.rs:101:12
+    |
+ 14 | impl SshServer {
+    | -------------- methods in this implementation
+...
+101 |     pub fn terminate_owned_sftp(&self) {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub fn accepted_authentications(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (test "ssh_authentication") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.83s
+     Running tests/ssh_authentication.rs (app/target/debug/deps/ssh_authentication-27820895a5ec415c)
+
+running 1 test
+
+running 1 test
+test x11_cookie_forwarding_shares_the_authenticated_connection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.11s
+
+test x11_cookie_forwarding_shares_the_authenticated_connection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.11s
+

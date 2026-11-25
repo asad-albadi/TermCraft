@@ -1,0 +1,60 @@
+{
+  "status": "qualified private Linux candidate; fresh independent review and MAIN full integration pending",
+  "progress": "66.7% (40/60); no new checkpoint",
+  "provider_tests": {
+    "pass": 3,
+    "fail": 0,
+    "log": "logs/relocated-158-snapshot-provider.log"
+  },
+  "actual_egui_tests": {
+    "pass": 4,
+    "fail": 0,
+    "log": "logs/relocated-158-snapshot-ui-final.log"
+  },
+  "sandbox_cleanup": {
+    "pass": 1,
+    "fail": 0,
+    "log": "logs/relocated-158-snapshot-sandbox.log"
+  },
+  "whole_bundle_cancel": {
+    "red_seconds": 11.960929369,
+    "green_seconds": 0.02,
+    "pass": 1,
+    "log": "logs/verification-cancel-final.log"
+  },
+  "source_mutation_snapshot_exec": {
+    "pass": 1,
+    "log": "logs/snapshot-source-mutation.log"
+  },
+  "resource_manifest_symlink_mutation": {
+    "pass": 1,
+    "log": "logs/relocated-158-mutation.log"
+  },
+  "offline_real_input_packaging": {
+    "pass": 2,
+    "fail": 0,
+    "log": "logs/packaging-real-inputs-final.log"
+  },
+  "negative_staging": {
+    "pass": 1,
+    "log": "logs/stage-negative-final.log"
+  },
+  "native_windows_production_source": "check passed; no native execution",
+  "native_macos_production_source": "check passed; no native execution",
+  "windows_test_target": "blocked by missing host lib.exe in ring dev TLS fixture; production source check passes",
+  "browser_version": "158.0.8127.88",
+  "pinned_file_count": 243,
+  "pinned_file_bytes": 448692683,
+  "native_invocations": "PATH empty; relocated directory contains spaces; private profiles/runtime snapshots only",
+  "normal_app_binary_built": false,
+  "main_production_edits": false,
+  "commands_running_at_handoff": false,
+  "remaining": [
+    "fresh independent review",
+    "MAIN narrow integration and full gate",
+    "actual application release build and new combined qualification",
+    "clean Linux ABI matrix and host dependencies",
+    "Windows/macOS pinned signed bundle and native sandbox/TLS execution",
+    "original target parity"
+  ]
+}

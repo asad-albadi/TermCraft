@@ -1,0 +1,14 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.40s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-127cf14f51e8fab8)
+
+running 6 tests
+test ui::shortcuts::tests::edited_global_binding_respects_real_textedit_focus_and_store_reload ... ok
+test ui::shortcuts::tests::native_paste_payload_and_shortcut_do_not_request_another_clipboard_read ... ok
+test ui::shortcuts::tests::closing_shortcut_targets_focused_pane_instead_of_stale_tab_index ... ok
+test ui::shortcuts::tests::modifier_shortcut_text_event_is_consumed_before_terminal_encoding ... ok
+test ui::shortcuts::tests::shortcut_capture_keeps_typed_keys_out_of_the_focused_shell ... ok
+test ui::shortcuts::tests::real_history_pageup_changes_view_without_transport_bytes ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 62 filtered out; finished in 1.67s
+

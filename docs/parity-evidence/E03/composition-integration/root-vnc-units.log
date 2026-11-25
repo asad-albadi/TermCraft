@@ -1,0 +1,50 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 23.35s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-f954e9579d7534fe)
+
+running 38 tests
+test desktop::vnc::tests::verified_tls_modes_do_not_require_classic_unencrypted_consent ... ok
+test services::vnc::browser::tests::asset_paths_are_exact ... ok
+test desktop::vnc::tests::classic_vnc_challenge_matches_independent_openssl_vector ... ok
+test services::vnc::browser::tests::synthetic_browser_fixture ... ignored, synthetic source only; driven by private-profile browser qualification
+test desktop::vnc::tests::old_sessions_keep_external_vnc_and_new_security_is_explicit ... ok
+test services::vnc::browser::tests::binary_websocket_bounds_and_masking ... ok
+test services::vnc::browser::tests::browser_default_and_consent ... ok
+test desktop::vnc::tests::selected_security_never_falls_back_to_another_server_offer ... ok
+test services::vnc::keyboard::tests::windows_case_and_shifted_punctuation_use_literal_unicode_without_shortcuts ... ok
+test services::vnc::keyboard::tests::character_aliases_share_identity_without_converting_function_keys ... ok
+test services::vnc::tests::local_x11_display_validation_matches_u16_parser_and_tcp_boundaries ... ok
+test services::vnc::tests::vnc_clipboard_optin_validates_without_opening_display ... ok
+test services::vnc::clipboard::tests::vnc_server_clipboard_readonly_never_requests_remote_content ... ok
+test services::vnc::keyboard::tests::windows_shortcut_mapping_retains_shift_and_altgr_requirements ... ok
+test services::vnc::browser::tests::browser_bind_failure_rolls_back_owned_rfb_only ... ok
+test services::vnc::wayland::fixture::private_portal_real_pipewire_frames_control_denial_and_cancel ... ignored, requires explicit private D-Bus and PipeWire synthetic-source wrapper; never host screen or input
+test services::vnc::tests::vnc_server_framebuffer_bounds_are_enforced ... ok
+test services::vnc::tests::vnc_server_truecolor_formats_encode_channels_and_reject_overlap ... ok
+test services::vnc::tests::overflowing_x11_display_start_records_failed_before_source_open ... ok
+test desktop::vnc::tests::oversized_resize_and_disconnect_mid_rectangle_are_errors ... ok
+test services::vnc_service_tests::isolated::owned_x11_vnc_clipboard_selection_roundtrip ... ignored, requires private bwrap/Cage display; never host clipboard
+test services::vnc::wayland::helper::tests::ipc_coalesces_complete_frames_into_one_latest_slot ... ok
+test services::vnc_service_tests::isolated::owned_x11_vnc_dynamic_auth_control_stop_and_app_client ... ignored, requires private bwrap/Cage display; never run on a host display
+test services::vnc::wayland::helper::tests::ipc_rejects_malformed_header_before_pixel_allocation ... ok
+test services::vnc::wayland::helper::tests::helper_resolution_requires_optional_manifest_hash_and_native_image ... ok
+test services::vnc_service_tests::vnc_requires_explicit_source_password_and_transport_consent ... ok
+test services::vnc_service_tests::vnc_unsupported_sources_and_clipboard_fail_closed ... ok
+test services::vnc::clipboard::tests::vnc_server_clipboard_unicode_negotiation_and_request_bounds ... ok
+test services::vnc::tests::overflowing_x11_display_async_start_reaches_failed ... ok
+test services::vnc::browser::tests::disabled_browser_creates_no_endpoint ... ok
+test desktop::vnc::tests::vnc_known_frame_pointer_copyrect_and_resize_are_real_protocol_operations ... ok
+test services::vnc::wayland::helper::tests::ipc_partial_body_stop_does_not_publish_stale_frame ... ok
+test services::vnc::lifecycle_tests::uncancelled_interrupted_source_capture_or_clipboard_failure_stays_failed ... ok
+test services::vnc::lifecycle_tests::intentional_stop_during_source_capture_or_clipboard_failure_stays_stopped ... ok
+test desktop::vnc::tests::view_only_sends_no_input_even_at_transport_boundary_and_clipboard_is_directional ... ok
+test desktop::vnc::tests::vencrypt_verified_none_and_password_deliver_pixels_over_real_tls ... ok
+test desktop::vnc::tests::vencrypt_bad_trust_hostname_and_rotated_certificate_prevent_authentication ... ok
+test desktop::vnc::tests::classic_password_wait_does_not_spend_network_timeout_or_leak_plaintext ... ok
+
+test result: ok. 34 passed; 0 failed; 4 ignored; 0 measured; 121 filtered out; finished in 1.11s
+

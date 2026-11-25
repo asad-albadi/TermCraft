@@ -1,0 +1,46 @@
+warning: method `poll` is never used
+   --> src/ui.rs:150:8
+    |
+107 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+150 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:519:19
+    |
+481 | impl Workspace {
+    | -------------- methods in this implementation
+...
+519 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+832 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 2 warnings
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0425]: cannot find function `auth_profile_binding` in module `harbor_workspace::ssh`
+   --> tests/ssh_lifecycle.rs:678:136
+    |
+678 | ...et expected=harbor_workspace::ssh::auth_profile_binding(&config.session);let mut handle=ConnectionHandle::connect(config.clone()...
+    |                                       ^^^^^^^^^^^^^^^^^^^^ not found in `harbor_workspace::ssh`
+
+error[E0599]: no method named `clone` found for struct `ConnectionConfig` in the current scope
+   --> tests/ssh_lifecycle.rs:678:222
+    |
+678 | ...t handle=ConnectionHandle::connect(config.clone()).unwrap();
+    |                                              ^^^^^ method not found in `ConnectionConfig`
+
+error[E0026]: variant `Challenge` does not have a field named `credential`
+   --> tests/ssh_lifecycle.rs:680:33
+    |
+680 |  let ConnectionEvent::Challenge{credential:Some(credential),..}=event else{panic!("Password challenge must carry verified binding")};
+    |                                 ^^^^^^^^^^ variant `Challenge` does not have this field
+
+Some errors have detailed explanations: E0026, E0425, E0599.
+For more information about an error, try `rustc --explain E0026`.
+error: could not compile `harbor-workspace` (test "ssh_lifecycle") due to 3 previous errors

@@ -1,0 +1,31 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-x04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 51s
+     Running unittests src/main.rs (../../debug/deps/harbor_workspace-b17dfa1d21d5b3bd)
+
+running 3 tests
+test ui::xdmcp::tests::workspace_routes_xdmcp_to_owned_session_and_rejects_stale_endpoint ... ok
+test ui::xdmcp::tests::editor_invalidates_stale_selection_and_does_not_carry_network_choices_between_profiles ... FAILED
+test ui::xdmcp::tests::opening_broadcast_settings_never_starts_discovery ... FAILED
+
+failures:
+
+---- ui::xdmcp::tests::editor_invalidates_stale_selection_and_does_not_carry_network_choices_between_profiles stdout ----
+
+thread 'ui::xdmcp::tests::editor_invalidates_stale_selection_and_does_not_carry_network_choices_between_profiles' (96215) panicked at /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/epaint-0.36.2/src/textures.rs:337:9:
+Dropped TexturesDelta with 1 unapplied deltas. Deltas need to be handled. If you want to drop this intentionally call `clear` before dropping.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ui::xdmcp::tests::opening_broadcast_settings_never_starts_discovery stdout ----
+
+thread 'ui::xdmcp::tests::opening_broadcast_settings_never_starts_discovery' (96216) panicked at /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/epaint-0.36.2/src/textures.rs:337:9:
+Dropped TexturesDelta with 1 unapplied deltas. Deltas need to be handled. If you want to drop this intentionally call `clear` before dropping.
+
+
+failures:
+    ui::xdmcp::tests::editor_invalidates_stale_selection_and_does_not_carry_network_choices_between_profiles
+    ui::xdmcp::tests::opening_broadcast_settings_never_starts_discovery
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 150 filtered out; finished in 0.14s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

@@ -1,0 +1,12 @@
+{
+  "../../debug/termcraft-v06-native-matrix": "ea603394a68bebd30ff66472cb3b7aa9c1a9ce9589bc231c5ecae65bec7bcf6d",
+  "../../debug/v06-appearance-portal": "9183143f959845696fc2b927a11450b8f452b41dbd7d9fc82a2e73114b8f614d",
+  "../../debug/v06-clipboard-peer": "138ff97413a683e8531870f262891b5d6e914133aa95ad36fb8055761159737b",
+  "tools/usr/bin/sway": "7ba78b7531a3b3cb1852b3b1e464b4458cce1749c6c0fe3c6fb4b16ece9d5b9c",
+  "tools/usr/bin/wtype": "d760e193e31b65f6158462fdb295c101780495ae760852301a42cfb907357bc5",
+  "tools/usr/bin/xdotool": "e5c6b55bb4a9677b7d6639403e0e7e279c95b0522b792f264c32359213c20626",
+  "tools/usr/bin/v06-pointer": "7c5c3a55456785ce10c749e4412bc1c803fdc9d8d903fe9eceabd8166be1efad",
+  "../original-runtime/xvfb/usr/bin/Xvfb": "68d288d1fc8c5ad684cf6f122e4bbabf2afc8135654e70a814e37aa9ca42f333",
+  "engine-package/x11/linux-x86_64/Xwayland": "cbedd90fbc960d4cc799792cedf89b0afa1f1f74a93ba9fb05bfd4da2f27b2b8",
+  "package-extracted/TermCraft-0.1.706-linux-x86_64-arch-xwayland/harbor-workspace": "ea603394a68bebd30ff66472cb3b7aa9c1a9ce9589bc231c5ecae65bec7bcf6d"
+}

@@ -1,0 +1,31 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0425]: cannot find function `bundled_runtime` in module `crate::x11`
+  --> src/runtime/mod.rs:99:44
+   |
+99 |             ToolId::XServer => crate::x11::bundled_runtime(&self.resources)
+   |                                            ^^^^^^^^^^^^^^^ not found in `crate::x11`
+
+error[E0277]: the trait bound `Array<u8, UInt<UInt<UInt<UInt<_, B0>, B0>, B0>, B0>>: LowerHex` is not satisfied
+   --> src/runtime/manifest.rs:123:34
+    |
+123 |     let digest = format!("{:x}", Sha256::digest(&bytes));
+    |                           ----   ^^^^^^^^^^^^^^^^^^^^^^ the trait `LowerHex` is not implemented for `des::cipher::Array<u8, UInt<UInt<UInt<UInt<UInt<UInt<UTerm, B1>, B0>, B0>, B0>, B0>, B0>>`
+    |                           |
+    |                           required by this formatting parameter
+    |
+    = help: the following other types implement trait `LowerHex`:
+              &T
+              &mut T
+              AtFlags
+              BoxedUint
+              BytesMut
+              ControlModes
+              DragPanButtons
+              DupFlags
+            and 367 others
+    = note: the full name for the type has been written to '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-7d5f47d64ee4a2a5.long-type-10749720635577852604.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+Some errors have detailed explanations: E0277, E0425.
+For more information about an error, try `rustc --explain E0277`.
+error: could not compile `harbor-workspace` (lib) due to 2 previous errors

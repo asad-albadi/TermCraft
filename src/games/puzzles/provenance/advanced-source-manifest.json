@@ -1,0 +1,105 @@
+{
+  "commit": "f306b9db55453f7d7fc824bbbf89ca6ac7d2d273",
+  "upstream": "https://git.tartarus.org/simon/puzzles.git",
+  "evidence_class": "RECOVERED pinned historical primary source, no original runtime oracle",
+  "files": [
+    {
+      "file": "solo.c",
+      "sha256": "9e4954485f1222966b57b121c7648a932980cb3aa5f7da87a818c0b24024ff8a",
+      "bytes": 159861,
+      "slices": [
+        {
+          "start": 117,
+          "end": 131,
+          "utf8_sha256": "6327344a0efd9b51c850084deaad9f50a5ff8f2367f5fcad8f3f1f4761d7fd37"
+        },
+        {
+          "start": 304,
+          "end": 322,
+          "utf8_sha256": "2043c796615e4a9c6c0fda723e1508a4a019f1c6acf8c5414a0a7bb497aaf699"
+        },
+        {
+          "start": 640,
+          "end": 710,
+          "utf8_sha256": "c5ed1f74b3c09a8e8b1427a38508b24058b21933b8ad9524bf6859bf96f4a1d8"
+        },
+        {
+          "start": 878,
+          "end": 1392,
+          "utf8_sha256": "f6551602563d432f21330d3f0a3f1e9c3707111d36a566e7696b8d12fd63a53d"
+        },
+        {
+          "start": 1393,
+          "end": 1610,
+          "utf8_sha256": "fcf6ac101ffd3675ceea875cec7cdb5c56d3eeff0a47348ee8e80299d275ba9f"
+        },
+        {
+          "start": 1690,
+          "end": 2525,
+          "utf8_sha256": "6a381b8852f521be1985ddb8df3a002c51e108fe43ff14a8d62c52bf3bd750a2"
+        },
+        {
+          "start": 3370,
+          "end": 3780,
+          "utf8_sha256": "948c2679b0248cd9652e280a40d9f66ba7e758e44e809ec3c3905c18caded52b"
+        }
+      ]
+    },
+    {
+      "file": "map.c",
+      "sha256": "7e1b9ff5aeeeb925af389f4d686210afe08621c16ac6500f9052f5c16eaa7749",
+      "bytes": 90862,
+      "slices": [
+        {
+          "start": 50,
+          "end": 65,
+          "utf8_sha256": "a45eecd8ccfec809023358743913fbb4823fad93d8b8f6a4f264fa0669c3e68c"
+        },
+        {
+          "start": 116,
+          "end": 132,
+          "utf8_sha256": "bfca1dc1dcf58dff20b3b02cbea43f2725538fa1af5b372a811d5161384fac8e"
+        },
+        {
+          "start": 945,
+          "end": 1368,
+          "utf8_sha256": "75221a02d0e2d0013c9c3bd4d20c84eb6105d63616905784e78e50216a2cdc83"
+        },
+        {
+          "start": 1520,
+          "end": 1585,
+          "utf8_sha256": "020ec0432699aa7cb0d6b440a4a21348e9c955bb1eb82a21fe4ba219d40dbce6"
+        }
+      ]
+    },
+    {
+      "file": "puzzles.but",
+      "sha256": "eb04e99528067795a2b400984d0410ca29a54e695e44c6f4aad7fa16a259d242",
+      "bytes": 127798,
+      "slices": [
+        {
+          "start": 1000,
+          "end": 1045,
+          "utf8_sha256": "c439d0b8aeb15a6030fe21d07ffaf685942dcfedecea157a66025b8258cb22b7"
+        },
+        {
+          "start": 1878,
+          "end": 1908,
+          "utf8_sha256": "c4ee4910f4f3d46fd0faf94cbd293744549ebc606082cc41617d1e87b0f61042"
+        }
+      ]
+    },
+    {
+      "file": "LICENCE",
+      "sha256": "324cba4984cf02666dec301689f11806c75cee0bdef56bc81a5bdc75667dd68b",
+      "bytes": 1275,
+      "slices": [
+        {
+          "start": 1,
+          "end": 25,
+          "utf8_sha256": "9389d0e808ac83e61a44f3e6135e72ce20e4b13f5b5486b27bab5c0967a768db"
+        }
+      ]
+    }
+  ]
+}

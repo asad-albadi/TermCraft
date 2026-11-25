@@ -1,0 +1,37 @@
+{
+  "files": [
+    {
+      "path": "engines/rdp/src/serial_windows.rs",
+      "before": "8bd93833d5b51d33cb552a8c88e0843b1f3c33c002b8e021ae4f0a3ae8c3f241",
+      "after": "9b13c1a1615f23c49e585d8004bf9111f58336d9d6f46812f0e9ba50e73be489"
+    },
+    {
+      "path": "tests/windows-serial-owner-component/Cargo.toml",
+      "before": null,
+      "after": "73d8d5b7ab4d7e8f652a47cf63ca08c9e16322dfb0a65b33e3d8ce0ad67ecb48"
+    },
+    {
+      "path": "tests/windows-serial-owner-component/Cargo.lock",
+      "before": null,
+      "after": "e4e8b3f2c611e4b52100f9cda317c3a330078b6dbb9f9e2701252a91d61450be"
+    },
+    {
+      "path": "tests/windows-serial-owner-component/generate.py",
+      "before": null,
+      "after": "2524f7eaba2796f5e3eb1d8b37d651f57b0a6c40f8b9f3cb898c2f6f2a3f728f"
+    },
+    {
+      "path": "tests/windows-serial-owner-component/main.rs",
+      "before": null,
+      "after": "39e9c360d4f1de2f94828336373cb290a24a8c94781eadad02a2f54c549a30ca"
+    },
+    {
+      "path": "tests/windows-serial-owner-component/README.md",
+      "before": null,
+      "after": "8d2c28ec8cc3b99927e82a22a7758128e2255336793208d45ee5fb0dbffa230e"
+    }
+  ],
+  "unchanged_previously_accepted_files": 7,
+  "all13_final_hashes_verified": true,
+  "scope": "Bounded Windows native-owner source; controlled exact-source fixture and MSVC typecheck, not native Windows runtime"
+}

@@ -1,0 +1,15 @@
+{
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-before.rs": "4e3a96650874ff01f80f540580855924b59cc8e120e6748d855706f340fb77d6",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-before.sha256": "34da2b4540f4e87b6420397ad54d3a9a446b71d8e8e259e96699afc1f00ff0d0",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-broadcast-mutation.log": "21b9c2470aef4ef5b825aeb3dba3f484eba34ca758e6242d5df0afbd309d5bc2",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-broadcast-mutation.rs": "e14f5951521a09df51dcd66720fa85519f564471302d08d009fe474c395a3cdd",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-final.rs": "30fdde96081401e9e4f73e888a3c92fae66ce5c42c00b3d8e0020de1140b7aff",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-final.sha256": "f88931210e3a8d630e5e444d74f44d6f22ca2b676baf1f67015f9adff201a706",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-gated-green.log": "52df2df6ff8ed29598c2bc7d2c556be38ea45434133ec8cf6f35cf180c1e58a9",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-gated-green.rs": "af744f0fd699aa824bf77d2fe19131d4d50d23c018ce41f8ba9752ad129b31d1",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-red.log": "6357ba4b58af6a33df973d48038750b56f4e9d67e764bac8ccdcc0ad20b2d8fc",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-red.rs": "8726492b3732e4781e85117a82446fd9b48550bb23aeee7064275a70180518e4",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-report.md": "d44c4255ae2b59708e005b277ef8944f3e1c4ef337f1e368e2c4bfeddc444eba",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery-suite.log": "01e58ff8c71775abcbc7c1cbf94090d91beb7d1fd7c6217d106a5a417ce48ff5",
+  "docs/parity-evidence/parallel-integration-browser-vnc-x03/macro-recovery.patch": "f03a9237521afd9ec6fe2d66e6e186e63780ea6a0d927f51671b5966a8f639fa"
+}

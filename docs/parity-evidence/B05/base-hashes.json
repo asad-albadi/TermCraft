@@ -1,0 +1,10 @@
+{
+  "src/cli.rs": "fcb9d8005e4d371dd95c4332a5ab71f9892b21ffb9abe49de4e4669154c0d829",
+  "src/platform/mod.rs": "6a4043de3491f70860b0cb7177868d4545dd26bdec0a68b147583f0acd1e640f",
+  "tests/packaging_release.py": "80d75ec12428cf1bdb643b8dba376712918a2b473448a51374daea7efd243420",
+  "scripts/package-release.py": "88a694c6ec314cdfed5b65f970d4fb78b34bc12298d5861501269b6d1ad7fa24",
+  "packaging/linux/desktop-integration.py": "918e6bbf55c34cfb2e087e0864d3d9a51f966d3baf0ec1f758fc5abb795ca20d",
+  "packaging/linux/README.txt": "f404e6cb8d2a1eea258af52b5e7ddf797fb5e6710ab21a5ec8cb7f79bb510ed0",
+  "packaging/macos/Info.plist": "615d3ccf70b246e8744c5259f07222b4c7dbc9c2f935b632fa81a63ebaaf29ee",
+  "README.md": "9a5fb0fd64dc170c53fc8f1b2f45904dcd122274a01e16279028d63b128d76a3"
+}

@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.31s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-b95b454e029e541a)
+
+running 1 test
+test ui::remote_files::transfer_tests::old_listing_rows_cannot_be_selected_during_navigation ... FAILED
+
+failures:
+
+---- ui::remote_files::transfer_tests::old_listing_rows_cannot_be_selected_during_navigation stdout ----
+
+thread 'ui::remote_files::transfer_tests::old_listing_rows_cannot_be_selected_during_navigation' (213601) panicked at src/ui/remote_files.rs:754:9:
+A stale listing row became the action target while navigating
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::remote_files::transfer_tests::old_listing_rows_cannot_be_selected_during_navigation
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 20 filtered out; finished in 2.23s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

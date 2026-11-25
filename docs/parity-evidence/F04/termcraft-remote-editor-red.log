@@ -1,0 +1,9 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0432]: unresolved import `harbor_workspace::remote_files::editor`
+ --> tests/remote_editor.rs:6:32
+  |
+6 |     remote_files::{RemotePath, editor::{RemoteDocument, DocumentStatus, SavePolicy, CloseDecision}},
+  |                                ^^^^^^ could not find `editor` in `remote_files`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `harbor-workspace` (test "remote_editor") due to 1 previous error

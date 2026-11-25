@@ -1,0 +1,67 @@
+{
+  "Id": "sha256:c326d40de0700f7086d34670a6d21b0af6d8a6da71bc442fceed67bcd0648fe5",
+  "RepoTags": [
+    "termcraft-validation-v08:arch-gui"
+  ],
+  "RepoDigests": [
+    "termcraft-validation-v08@sha256:c326d40de0700f7086d34670a6d21b0af6d8a6da71bc442fceed67bcd0648fe5"
+  ],
+  "Comment": "buildkit.dockerfile.v0",
+  "Created": "2026-11-25T02:55:55.592797217+04:00",
+  "Config": {
+    "User": "1000:1000",
+    "Env": [
+      "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "LANG=C.UTF-8",
+      "WLR_BACKENDS=headless",
+      "WLR_HEADLESS_OUTPUTS=1",
+      "WLR_RENDERER=pixman",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "XDG_RUNTIME_DIR=/tmp/wayland",
+      "HOME=/tmp/home"
+    ],
+    "Cmd": [
+      "/usr/bin/bash"
+    ],
+    "WorkingDir": "/",
+    "Labels": {
+      "org.opencontainers.image.authors": "Santiago Torres-Arias <santiago@archlinux.org> (@SantiagoTorres), Christian Rebischke <Chris.Rebischke@archlinux.org> (@shibumi), Justin Kromlinger <hashworks@archlinux.org> (@hashworks)",
+      "org.opencontainers.image.created": "2026-11-22T00:09:11+00:00",
+      "org.opencontainers.image.description": "Official containerd image of Arch Linux, a simple, lightweight Linux distribution aimed for flexibility.",
+      "org.opencontainers.image.documentation": "https://wiki.archlinux.org/title/Docker#Arch_Linux",
+      "org.opencontainers.image.licenses": "GPL-3.0-or-later",
+      "org.opencontainers.image.revision": "d9f7a01562208910488140c54ffe402c3e7a231e",
+      "org.opencontainers.image.source": "https://gitlab.archlinux.org/archlinux/archlinux-docker",
+      "org.opencontainers.image.title": "Arch Linux base Image",
+      "org.opencontainers.image.url": "https://gitlab.archlinux.org/archlinux/archlinux-docker/-/blob/master/README.md",
+      "org.opencontainers.image.version": "20261122.0.629543"
+    }
+  },
+  "Architecture": "amd64",
+  "Os": "linux",
+  "Size": 1334192666,
+  "RootFS": {
+    "Type": "layers",
+    "Layers": [
+      "sha256:60c037f8cd5926ceeb4678aca5dfae862ad8cb4a45d8cb8070e55459d7bc538b",
+      "sha256:b53b29612563fcac8cf256711081a6a31b1116b3d7984fc79ba66a7f1964019f",
+      "sha256:76e5199698aeece40f586c71222b030ff7f04ac44e520c5469287a55ea09d08f"
+    ]
+  },
+  "Metadata": {
+    "LastTagTime": "2026-11-24T22:56:09.668017376Z"
+  },
+  "Descriptor": {
+    "mediaType": "application/vnd.oci.image.index.v1+json",
+    "digest": "sha256:c326d40de0700f7086d34670a6d21b0af6d8a6da71bc442fceed67bcd0648fe5",
+    "size": 855
+  },
+  "Identity": {
+    "Build": [
+      {
+        "Ref": "ifwfu0o0949z81i9r29l71asz",
+        "CreatedAt": "2026-11-25T02:56:13.039157986+04:00"
+      }
+    ]
+  }
+}

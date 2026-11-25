@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TermCraft parity EvidenceRecord",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "point_id",
+    "target",
+    "sources",
+    "capture_date",
+    "observation_kind",
+    "observed_behavior",
+    "termcraft_behavior",
+    "test_command",
+    "platform",
+    "result",
+    "remaining_limitations"
+  ],
+  "properties": {
+    "point_id": {
+      "type": "string",
+      "pattern": "^[FTWSDXPBEV][0-9]{2}$"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "product",
+        "version",
+        "edition"
+      ],
+      "properties": {
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "edition": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "capture_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "observation_kind": {
+      "enum": [
+        "static",
+        "official-source",
+        "runtime",
+        "implementation-test"
+      ]
+    },
+    "observed_behavior": {
+      "type": "string",
+      "minLength": 1
+    },
+    "termcraft_behavior": {
+      "type": "string",
+      "minLength": 1
+    },
+    "test_command": {
+      "type": "string",
+      "minLength": 1
+    },
+    "platform": {
+      "type": "string",
+      "minLength": 1
+    },
+    "result": {
+      "enum": [
+        "passed",
+        "failed",
+        "unavailable",
+        "not-applicable"
+      ]
+    },
+    "remaining_limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "artifact_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "scope_review": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "const": "not-applicable"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "scope_review"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "result": {
+            "const": "unavailable"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "remaining_limitations": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

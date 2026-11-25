@@ -1,0 +1,71 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: field `0` is never read
+ --> src/ssh/x11.rs:9:10
+  |
+9 |     Unix(std::path::PathBuf),
+  |     ---- ^^^^^^^^^^^^^^^^^^
+  |     |
+  |     field in this variant
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+  |
+9 -     Unix(std::path::PathBuf),
+9 +     Unix(()),
+  |
+
+warning: field `0` is never read
+  --> src/ssh/x11.rs:10:9
+   |
+10 |     Tcp(u16),
+   |     --- ^^^
+   |     |
+   |     field in this variant
+   |
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+   |
+10 -     Tcp(u16),
+10 +     Tcp(()),
+   |
+
+warning: field `number` is never read
+  --> src/ssh/x11.rs:12:44
+   |
+12 | struct DisplayTarget { endpoint: Endpoint, number: u16, screen: u32 }
+   |        ------------- field in this struct  ^^^^^^
+
+warning: struct `Forwarder` is never constructed
+  --> src/ssh/x11.rs:53:19
+   |
+53 | pub(super) struct Forwarder { target:DisplayTarget, real:Zeroizing<[u8;16]>, fake:Zeroizing<[u8;16]>, slots:Arc<tokio::sync::Semapho...
+   |                   ^^^^^^^^^
+
+warning: associated items `from_environment`, `cookie_hex`, `screen`, `permit`, and `bridge` are never used
+  --> src/ssh/x11.rs:55:12
+   |
+54 | impl Forwarder {
+   | -------------- associated items in this implementation
+55 |     pub fn from_environment() -> Result<Arc<Self>,String> {
+   |            ^^^^^^^^^^^^^^^^
+...
+72 |     pub fn cookie_hex(&self) -> String {self.fake.iter().map(|b|format!("{b:02x}")).collect()}
+   |            ^^^^^^^^^^
+73 |     pub fn screen(&self) -> u32 {self.target.screen}
+   |            ^^^^^^
+74 |     pub fn permit(&self) -> Option<tokio::sync::OwnedSemaphorePermit> {self.slots.clone().try_acquire_owned().ok()}
+   |            ^^^^^^
+75 |     pub async fn bridge<R:AsyncRead+AsyncWrite+Unpin>(&self, mut remote:R) -> Result<(),String> {
+   |                  ^^^^^^
+
+warning: `harbor-workspace` (lib test) generated 5 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.52s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-24bf58f824d1c24b)
+
+running 4 tests
+test ssh::x11::tests::authority_requires_matching_display_host_and_protocol ... ok
+test ssh::x11::tests::display_parser_rejects_remote_targets_and_port_overflow ... ok
+test ssh::x11::tests::rejects_wrong_cookie_and_oversized_handshakes ... ok
+test ssh::x11::tests::substitutes_only_verified_cookie_in_both_byte_orders ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.00s
+

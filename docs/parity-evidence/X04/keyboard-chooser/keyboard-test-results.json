@@ -1,0 +1,100 @@
+{
+  "binaries": {
+    "../../debug/termcraft-xdmcp-keyboard957": "8ac82489f2f53031fe820cf07c52610c5607af41c6aea5a1380ad984f463e0ed",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-6e74c6fa39763282": "46bbed0835e16568154e3a1a84b5d2872f4a86b5d7d1365773f645c1da37203d",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/termcraft_xdmcp_keyboard957-8ad35855fdc8ee40": "6191b6a0d4a4baeae2f1271df01c01101511cfa58e6b858f8ff3083c4f3f457c"
+  },
+  "isolated": {
+    "x11::xdmcp_clipboard::deadline_tests::owned_endpoint_reauthenticates_and_initializes_with_one_deadline_per_epoch": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    },
+    "x11::xdmcp_clipboard::deadline_tests::recovery_clears_owned_parent_selection_after_previous_budget_expires": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    },
+    "x11::xdmcp_clipboard::fixture::actual_owned_bidirectional_clipboard_and_independent_leases": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    },
+    "x11::xdmcp_engine::tests::actual_german_keyboard_via_hostname": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    },
+    "x11::xdmcp_engine::tests::actual_german_keyboard_with_clipboard": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    },
+    "x11::xdmcp_engine::tests::actual_hostname_connect_resolves_fresh_and_manages_authenticated_window": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    },
+    "x11::xdmcp_engine::tests::actual_us_keyboard_without_clipboard": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    },
+    "x11::xdmcp_engine::tests::actual_xdm_negotiated_clipboard_both_directions": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    },
+    "x11::xdmcp_engine::tests::actual_xdm_nondefault_port_opens_selected_display_and_cleanup_preserves_host": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    },
+    "x11::xdmcp_engine::tests::manager_wait_honors_cancellation_and_timeout_before_parent_access": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    },
+    "x11::xdmcp_engine::tests::missing_requested_symbols_fails_and_cleans_owned_display": {
+      "failed": 0,
+      "filtered": 327,
+      "ignored": 0,
+      "measured": 0,
+      "passed": 1
+    }
+  },
+  "library": {
+    "failed": 0,
+    "filtered": 276,
+    "ignored": 11,
+    "measured": 0,
+    "passed": 41
+  },
+  "ui": {
+    "failed": 0,
+    "filtered": 217,
+    "ignored": 0,
+    "measured": 0,
+    "passed": 9
+  }
+}

@@ -1,0 +1,1 @@
+Focused regression: a package containing authentic Mosh wrapper/client but absent dependency closure must be unavailable, even on this host where /usr/bin/perl and /usr/bin/ssh exist. Existing implementation accepts that package: RED expected at assert bundled_mosh_paths().is_err().

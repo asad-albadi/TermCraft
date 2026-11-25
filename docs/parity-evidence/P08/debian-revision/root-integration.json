@@ -1,0 +1,15 @@
+{
+  "files": [
+    {
+      "path": "scripts/package-debian.py",
+      "before": "687381a2d1fb3cf00a804f42c69c0db2ac41ff2e98f8bd42575f0a646019edf0",
+      "after": "ce0ea4fcc75d83f51737ab62e686c7010abd222a3e347dcb40ff50e0791df317"
+    },
+    {
+      "path": "tests/packaging_debian.py",
+      "before": "59e31df376792213086de7ce8c41b6c5eecc7e245b348335fd930999b798cce0",
+      "after": "b99b64bd6299be3605ca59efbe93deb6a0875ac31f4b293b503aaf35d16305ad"
+    }
+  ],
+  "scope": "Optional real Debian revision metadata; Cargo/application manifest version unchanged; native apt upgrade not yet qualified"
+}

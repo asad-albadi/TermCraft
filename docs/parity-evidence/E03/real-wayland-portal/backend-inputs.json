@@ -1,0 +1,17 @@
+{
+  "archive": "xdg-desktop-portal-wlr-0.8.4-1-x86_64.pkg.tar.zst",
+  "url": "https://archive.archlinux.org/packages/x/xdg-desktop-portal-wlr/xdg-desktop-portal-wlr-0.8.4-1-x86_64.pkg.tar.zst",
+  "sha256": "85efdb0e0fcafea76a24c766b4022d6a2a0176bb132a597b9e8fd5bbc634cab8",
+  "keyring_source": "/usr/share/pacman/keyrings/archlinux.gpg",
+  "keyring_sha256": "f7af717a90821803e5c366032f3135c236c4100962716b3c1ed352f8b9330f51",
+  "signature_command": [
+    "gpgv",
+    "--homedir",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/wayland-real-portal-inputs/gnupg",
+    "--keyring",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/wayland-real-portal-inputs/archlinux-keyring.gpg",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/wayland-real-portal-inputs/xdg-desktop-portal-wlr-0.8.4-1-x86_64.pkg.tar.zst.sig",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/wayland-real-portal-inputs/xdg-desktop-portal-wlr-0.8.4-1-x86_64.pkg.tar.zst"
+  ],
+  "signature_exit": 0
+}

@@ -1,0 +1,1267 @@
+     Locking 1 package to highest Rust 1.99.0 compatible version
+      Adding encoding_rs v0.8.35 (available: v0.8.42)
+    Checking encoding_rs v0.8.35
+    Checking termcraft-native-commit-check v0.0.0 (/tmp/termcraft-native-commit-check)
+warning: unused imports: `build`, `extract`, and `finalize`
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive.rs:81:27
+   |
+81 | pub(crate) use portable::{build, extract, finalize};
+   |                           ^^^^^  ^^^^^^^  ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `backend::Process`
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/process.rs:10:9
+   |
+10 | pub use backend::Process;
+   |         ^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::fs::File`
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/serial.rs:2:5
+  |
+2 | use std::fs::File;
+  |     ^^^^^^^^^^^^^
+
+warning: function `open_file` is never used
+   --> src/source.rs:272:21
+    |
+272 | pub(super) async fn open_file(path: PathBuf) -> Result<(tokio::fs::File, u32), String> {
+    |                     ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `directory_child`, `file_mode`, `rename_from`, `remove_directory`, `set_mode`, and `validate_link` are never used
+   --> src/source.rs:360:18
+    |
+341 | impl SourceDir {
+    | -------------- methods in this implementation
+...
+360 |     pub async fn directory_child(&self, name: std::ffi::OsString) -> Result<(Self, bool), String> {
+    |                  ^^^^^^^^^^^^^^^
+...
+364 |     pub async fn file_mode(&self, name: std::ffi::OsString) -> Result<Option<u32>, String> {
+    |                  ^^^^^^^^^
+...
+367 |     pub async fn rename_from(&self, source: &Self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^
+...
+370 |     pub async fn remove_directory(&self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^^^
+...
+373 |     pub async fn set_mode(&self, mode: u32) -> Result<(), String> {
+    |                  ^^^^^^^^
+...
+376 |     pub async fn validate_link(&self, target: Vec<u8>) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^
+
+warning: methods `directory_child`, `file_mode`, `rename_from`, `remove_directory`, `set_mode`, and `validate_link` are never used
+   --> src/source/cap_backend.rs:151:18
+    |
+ 67 | impl CapDir {
+    | ----------- methods in this implementation
+...
+151 |     pub async fn directory_child(&self, name: std::ffi::OsString) -> Result<(Self, bool), String> {
+    |                  ^^^^^^^^^^^^^^^
+...
+170 |     pub async fn file_mode(&self, name: std::ffi::OsString) -> Result<Option<u32>, String> {
+    |                  ^^^^^^^^^
+...
+180 |     pub async fn rename_from(&self, source: &Self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^
+...
+187 |     pub async fn remove_directory(&self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^^^
+...
+193 |     pub async fn set_mode(&self, mode: u32) -> Result<(), String> {
+    |                  ^^^^^^^^
+...
+217 |     pub async fn validate_link(&self, target: Vec<u8>) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^
+
+warning: struct `LocalStage` is never constructed
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/local_stage.rs:6:19
+  |
+6 | pub(super) struct LocalStage {
+  |                   ^^^^^^^^^^
+
+warning: enum `CommitError` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/local_stage.rs:29:17
+   |
+29 | pub(super) enum CommitError {
+   |                 ^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/local_stage.rs:214:18
+    |
+ 33 | impl LocalStage {
+    | --------------- associated items in this implementation
+...
+214 |     pub async fn create_tree(
+    |                  ^^^^^^^^^^^
+...
+232 |     pub async fn attach_merge_target(
+    |                  ^^^^^^^^^^^^^^^^^^^
+...
+251 |     pub async fn clean_tree_container(&self) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^^^^^^^
+...
+260 |     pub async fn clean_merged_tree(&self) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^^^^
+...
+267 |     pub async fn validate_merge_root(&self) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^^^^^^
+...
+276 |     pub async fn create(target: PathBuf) -> Result<(Self, tokio::fs::File), String> {
+    |                  ^^^^^^
+...
+359 |     pub fn recovery_path(&self) -> Result<PathBuf, String> {
+    |            ^^^^^^^^^^^^^
+...
+398 |     pub fn initial_path(&self) -> &Path {
+    |            ^^^^^^^^^^^^
+...
+472 |     pub async fn commit(&self, overwrite: bool) -> Result<bool, CommitError> {
+    |                  ^^^^^^
+
+warning: method `clean_merged_tree` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/local_stage/windows.rs:276:19
+    |
+ 70 | impl WindowsStage {
+    | ----------------- method in this implementation
+...
+276 |     pub(super) fn clean_merged_tree(&self) -> io::Result<()> {
+    |                   ^^^^^^^^^^^^^^^^^
+
+warning: function `error` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive.rs:3:4
+  |
+3 | fn error(e: impl std::fmt::Display) -> String {
+  |    ^^^^^
+
+warning: function `check` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive.rs:7:4
+  |
+7 | fn check(cancelled: &tokio::sync::watch::Receiver<bool>) -> Result<(), String> {
+  |    ^^^^^
+
+warning: function `components` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive.rs:14:4
+   |
+14 | fn components(path: &[u8]) -> Result<Vec<&[u8]>, String> {
+   |    ^^^^^^^^^^
+
+warning: function `link` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive.rs:28:4
+   |
+28 | fn link(target: &[u8]) -> Result<(), String> {
+   |    ^^^^
+
+warning: struct `Budget` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive.rs:42:8
+   |
+42 | struct Budget {
+   |        ^^^^^^
+
+warning: method `add` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive.rs:47:8
+   |
+46 | impl Budget {
+   | ----------- method in this implementation
+47 |     fn add(&mut self, path: &[u8]) -> Result<(), String> {
+   |        ^^^
+
+warning: function `header` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive.rs:58:4
+   |
+58 | fn header(out: &mut File, kind: u8, mode: u32, path: &[u8], size: u64) -> Result<(), String> {
+   |    ^^^^^^
+
+warning: struct `FolderModes` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive.rs:68:19
+   |
+68 | pub(crate) struct FolderModes {
+   |                   ^^^^^^^^^^^
+
+warning: function `same` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:10:4
+   |
+10 | fn same(before: &Metadata, after: &Metadata) -> bool {
+   |    ^^^^
+
+warning: function `mode` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:15:4
+   |
+15 | fn mode(info: &Metadata) -> u32 {
+   |    ^^^^
+
+warning: function `filename` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:32:4
+   |
+32 | fn filename(name: &std::ffi::OsStr) -> Result<Vec<u8>, String> {
+   |    ^^^^^^^^
+
+warning: function `target` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:47:4
+   |
+47 | fn target(path: PathBuf) -> Result<Vec<u8>, String> {
+   |    ^^^^^^
+
+warning: function `walk` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:70:4
+   |
+70 | fn walk(
+   |    ^^^^
+
+warning: function `build` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:142:21
+    |
+142 | pub(crate) async fn build(
+    |                     ^^^^^
+
+warning: function `local_component` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:314:4
+    |
+314 | fn local_component(bytes: &[u8]) -> Result<std::ffi::OsString, String> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: function `selected_parent` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:346:4
+    |
+346 | fn selected_parent(root: &Dir, parts: &[&[u8]]) -> Result<Dir, String> {
+    |    ^^^^^^^^^^^^^^^
+
+warning: enum `Node` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:356:6
+    |
+356 | enum Node {
+    |      ^^^^
+
+warning: function `link_is_directory` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:361:4
+    |
+361 | fn link_is_directory(
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: function `extract` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:397:21
+    |
+397 | pub(crate) async fn extract(
+    |                     ^^^^^^^
+
+warning: function `finalize` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive/portable.rs:455:21
+    |
+455 | pub(crate) async fn finalize(_root: File, _modes: super::FolderModes) -> Result<(), String> {
+    |                     ^^^^^^^^
+
+warning: enum `RemoteBackendKind` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/capabilities.rs:3:10
+  |
+3 | pub enum RemoteBackendKind {
+  |          ^^^^^^^^^^^^^^^^^
+
+warning: struct `RemoteCapabilities` is never constructed
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/capabilities.rs:9:12
+  |
+9 | pub struct RemoteCapabilities {
+  |            ^^^^^^^^^^^^^^^^^^
+
+warning: methods `label` and `capabilities` are never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/capabilities.rs:21:12
+   |
+20 | impl RemoteBackendKind {
+   | ---------------------- methods in this implementation
+21 |     pub fn label(self) -> &'static str {
+   |            ^^^^^
+...
+27 |     pub fn capabilities(self) -> RemoteCapabilities {
+   |            ^^^^^^^^^^^^
+
+warning: associated function `scp` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/capabilities.rs:56:19
+   |
+55 | impl RemoteCapabilities {
+   | ----------------------- associated function in this implementation
+56 |     pub(crate) fn scp(flags: u8) -> Self {
+   |                   ^^^
+
+warning: function `err` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source.rs:5:4
+  |
+5 | fn err(e: impl std::fmt::Display) -> String {
+  |    ^^^
+
+warning: struct `SourceEntry` is never constructed
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source.rs:9:46
+  |
+9 | pub(in crate::remote_files::transfer) struct SourceEntry {
+  |                                              ^^^^^^^^^^^
+
+warning: struct `SourceDir` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source.rs:16:46
+   |
+16 | pub(in crate::remote_files::transfer) struct SourceDir {
+   |                                              ^^^^^^^^^
+
+warning: enum `SourceNode` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source.rs:22:44
+   |
+22 | pub(in crate::remote_files::transfer) enum SourceNode {
+   |                                            ^^^^^^^^^^
+
+warning: function `open_file` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source.rs:277:21
+    |
+277 | pub(super) async fn open_file(path: PathBuf) -> Result<(tokio::fs::File, u32), String> {
+    |                     ^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source.rs:348:46
+    |
+347 | impl SourceDir {
+    | -------------- associated items in this implementation
+348 |     pub(in crate::remote_files::transfer) fn from_file(file: std::fs::File) -> Self {
+    |                                              ^^^^^^^^^
+...
+353 |     pub async fn open(path: PathBuf) -> Result<Self, String> {
+    |                  ^^^^
+...
+358 |     pub async fn entries(&self) -> Result<Vec<SourceEntry>, String> {
+    |                  ^^^^^^^
+...
+361 |     pub async fn open_child(&self, entry: SourceEntry) -> Result<SourceNode, String> {
+    |                  ^^^^^^^^^^
+...
+368 |     pub async fn mode(&self) -> Result<u32, String> {
+    |                  ^^^^
+...
+371 |     pub async fn directory_child(&self, name: std::ffi::OsString) -> Result<(Self, bool), String> {
+    |                  ^^^^^^^^^^^^^^^
+...
+375 |     pub async fn file_mode(&self, name: std::ffi::OsString) -> Result<Option<u32>, String> {
+    |                  ^^^^^^^^^
+...
+378 |     pub async fn rename_from(&self, source: &Self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^
+...
+381 |     pub async fn remove_directory(&self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^^^
+...
+384 |     pub async fn set_mode(&self, mode: u32) -> Result<(), String> {
+    |                  ^^^^^^^^
+...
+387 |     pub async fn validate_link(&self, target: Vec<u8>) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^
+
+warning: struct `CapDir` is never constructed
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source/cap_backend.rs:9:19
+  |
+9 | pub(super) struct CapDir {
+  |                   ^^^^^^
+
+warning: enum `CapNode` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source/cap_backend.rs:12:17
+   |
+12 | pub(super) enum CapNode {
+   |                 ^^^^^^^
+
+warning: function `mode` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source/cap_backend.rs:17:4
+   |
+17 | fn mode(metadata: &cap_std::fs::Metadata) -> u32 {
+   |    ^^^^
+
+warning: function `matches` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source/cap_backend.rs:41:4
+   |
+41 | fn matches(metadata: &cap_std::fs::Metadata, entry: &SourceEntry) -> bool {
+   |    ^^^^^^^
+
+warning: function `target_bytes` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source/cap_backend.rs:44:4
+   |
+44 | fn target_bytes(path: &Path) -> Result<Vec<u8>, String> {
+   |    ^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/operations/source/cap_backend.rs:69:19
+    |
+ 67 | impl CapDir {
+    | ----------- associated items in this implementation
+ 68 |     #[cfg(windows)]
+ 69 |     pub(super) fn from_file(file: std::fs::File) -> Self {
+    |                   ^^^^^^^^^
+...
+ 74 |     pub async fn open(path: PathBuf) -> Result<Self, String> {
+    |                  ^^^^
+...
+ 91 |     pub async fn entries(&self) -> Result<Vec<SourceEntry>, String> {
+    |                  ^^^^^^^
+...
+114 |     pub async fn open_child(&self, entry: SourceEntry) -> Result<CapNode, String> {
+    |                  ^^^^^^^^^^
+...
+151 |     pub async fn mode(&self) -> Result<u32, String> {
+    |                  ^^^^
+...
+157 |     pub async fn directory_child(&self, name: std::ffi::OsString) -> Result<(Self, bool), String> {
+    |                  ^^^^^^^^^^^^^^^
+...
+176 |     pub async fn file_mode(&self, name: std::ffi::OsString) -> Result<Option<u32>, String> {
+    |                  ^^^^^^^^^
+...
+186 |     pub async fn rename_from(&self, source: &Self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^
+...
+193 |     pub async fn remove_directory(&self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^^^
+...
+199 |     pub async fn set_mode(&self, mode: u32) -> Result<(), String> {
+    |                  ^^^^^^^^
+...
+223 |     pub async fn validate_link(&self, target: Vec<u8>) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^
+
+warning: multiple methods are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal.rs:179:12
+    |
+131 | impl Screen {
+    | ----------- methods in this implementation
+...
+179 |     pub fn mouse_mode(&self) -> mouse::MouseMode {
+    |            ^^^^^^^^^^
+...
+182 |     pub fn is_alternate(&self) -> bool {
+    |            ^^^^^^^^^^^^
+...
+185 |     pub fn resize(&mut self, cols: usize, rows: usize) {
+    |            ^^^^^^
+...
+219 |     pub fn selection_epoch(&self) -> u64 {
+    |            ^^^^^^^^^^^^^^^
+...
+222 |     pub fn first_line_id(&self) -> u64 {
+    |            ^^^^^^^^^^^^^
+...
+229 |     pub fn clear(&mut self) {
+    |            ^^^^^
+...
+240 |     pub fn cell(&self, row: usize, col: usize) -> Option<&Cell> {
+    |            ^^^^
+...
+243 |     pub fn grid(&self) -> &[Vec<Cell>] {
+    |            ^^^^
+...
+246 |     pub fn history(&self) -> HistoryView<'_> {
+    |            ^^^^^^^
+...
+270 |     pub fn search_count(&self, query: &str) -> usize {
+    |            ^^^^^^^^^^^^
+...
+317 |     pub fn stats(&self) -> ScreenStats {
+    |            ^^^^^
+...
+327 |     pub fn set_history_memory_budget(&mut self, bytes: usize) {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `builds`, `query`, `count`, and `indexed_history_lines` are never read
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/conformance.rs:5:9
+   |
+ 3 | pub(super) struct SearchIndex {
+   |                   ----------- fields in this struct
+ 4 |     pub revision: Option<u64>,
+ 5 |     pub builds: u64,
+   |         ^^^^^^
+ 6 |     pub query: String,
+   |         ^^^^^
+ 7 |     pub count: usize,
+   |         ^^^^^
+...
+11 |     pub indexed_history_lines: u64,
+   |         ^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `ScreenStats` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/conformance.rs:14:12
+   |
+14 | pub struct ScreenStats {
+   |            ^^^^^^^^^^^
+
+warning: constant `MAX_RULES` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/highlight.rs:5:11
+  |
+5 | pub const MAX_RULES: usize = 16;
+  |           ^^^^^^^^^
+
+warning: constant `MAX_PATTERN_BYTES` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/highlight.rs:6:11
+  |
+6 | pub const MAX_PATTERN_BYTES: usize = 256;
+  |           ^^^^^^^^^^^^^^^^^
+
+warning: constant `MAX_TEXT_BYTES` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/highlight.rs:7:11
+  |
+7 | pub const MAX_TEXT_BYTES: usize = 8192;
+  |           ^^^^^^^^^^^^^^
+
+warning: constant `MAX_MATCHES` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/highlight.rs:8:11
+  |
+8 | pub const MAX_MATCHES: usize = 128;
+  |           ^^^^^^^^^^^
+
+warning: struct `Compiled` is never constructed
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/highlight.rs:9:8
+  |
+9 | struct Compiled {
+  |        ^^^^^^^^
+
+warning: struct `HighlightRules` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/highlight.rs:14:12
+   |
+14 | pub struct HighlightRules {
+   |            ^^^^^^^^^^^^^^
+
+warning: struct `HighlightSpan` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/highlight.rs:18:12
+   |
+18 | pub struct HighlightSpan {
+   |            ^^^^^^^^^^^^^
+
+warning: associated items `compile` and `spans` are never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/highlight.rs:24:12
+   |
+23 | impl HighlightRules {
+   | ------------------- associated items in this implementation
+24 |     pub fn compile(rules: &[HighlightRule]) -> Result<Self, String> {
+   |            ^^^^^^^
+...
+57 |     pub fn spans(&self, text: &str) -> Vec<HighlightSpan> {
+   |            ^^^^^
+
+warning: fields `fg`, `bg`, `fg_source`, `bg_source`, `bold`, and `inverse` are never read
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/history.rs:6:5
+   |
+ 5 | pub(super) struct Rendition {
+   |                   --------- fields in this struct
+ 6 |     fg: Ink,
+   |     ^^
+ 7 |     bg: Ink,
+   |     ^^
+ 8 |     fg_source: ColorSource,
+   |     ^^^^^^^^^
+ 9 |     bg_source: ColorSource,
+   |     ^^^^^^^^^
+10 |     bold: bool,
+   |     ^^^^
+11 |     inverse: bool,
+   |     ^^^^^^^
+   |
+   = note: `Rendition` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: fields `rendition` and `columns` are never read
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/history.rs:16:9
+   |
+14 |     Compact {
+   |     ------- fields in this variant
+15 |         text: smol_str::SmolStr,
+16 |         rendition: Rendition,
+   |         ^^^^^^^^^
+17 |         columns: usize,
+   |         ^^^^^^^
+
+warning: method `cells` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/history.rs:53:12
+   |
+21 | impl HistoryLine {
+   | ---------------- method in this implementation
+...
+53 |     pub fn cells(&self) -> Vec<Cell> {
+   |            ^^^^^
+
+warning: struct `HistoryView` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/history.rs:111:12
+    |
+111 | pub struct HistoryView<'a> {
+    |            ^^^^^^^^^^^
+
+warning: methods `len`, `is_empty`, `get`, and `iter` are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/history.rs:115:12
+    |
+114 | impl<'a> HistoryView<'a> {
+    | ------------------------ methods in this implementation
+115 |     pub fn len(&self) -> usize {
+    |            ^^^
+...
+118 |     pub fn is_empty(&self) -> bool {
+    |            ^^^^^^^^
+...
+121 |     pub fn get(&self, index: usize) -> Option<Vec<Cell>> {
+    |            ^^^
+...
+124 |     pub fn iter(&self) -> impl DoubleEndedIterator<Item = Vec<Cell>> + 'a {
+    |            ^^^^
+
+warning: method `enabled` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/mouse.rs:16:12
+   |
+15 | impl MouseMode {
+   | -------------- method in this implementation
+16 |     pub fn enabled(self) -> bool {
+   |            ^^^^^^^
+
+warning: enum `MouseButton` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/mouse.rs:38:10
+   |
+38 | pub enum MouseButton {
+   |          ^^^^^^^^^^^
+
+warning: method `code` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/mouse.rs:44:8
+   |
+43 | impl MouseButton {
+   | ---------------- method in this implementation
+44 |     fn code(self) -> u8 {
+   |        ^^^^
+
+warning: enum `MouseAction` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/mouse.rs:53:10
+   |
+53 | pub enum MouseAction {
+   |          ^^^^^^^^^^^
+
+warning: struct `MouseModifiers` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/mouse.rs:61:12
+   |
+61 | pub struct MouseModifiers {
+   |            ^^^^^^^^^^^^^^
+
+warning: method `bits` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/mouse.rs:67:8
+   |
+66 | impl MouseModifiers {
+   | ------------------- method in this implementation
+67 |     fn bits(self) -> u8 {
+   |        ^^^^
+
+warning: struct `TerminalMouseEvent` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/mouse.rs:74:12
+   |
+74 | pub struct TerminalMouseEvent {
+   |            ^^^^^^^^^^^^^^^^^^
+
+warning: struct `MouseEncoder` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/mouse.rs:81:12
+   |
+81 | pub struct MouseEncoder {
+   |            ^^^^^^^^^^^^
+
+warning: methods `reset`, `position`, `encode`, and `release_all` are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/mouse.rs:88:12
+    |
+ 87 | impl MouseEncoder {
+    | ----------------- methods in this implementation
+ 88 |     pub fn reset(&mut self) {
+    |            ^^^^^
+...
+ 91 |     pub fn position(&self) -> Option<(usize, usize)> {
+    |            ^^^^^^^^
+...
+ 94 |     pub fn encode(&mut self, mode: MouseMode, event: TerminalMouseEvent) -> Option<Vec<u8>> {
+    |            ^^^^^^
+...
+168 |     pub fn release_all(&mut self, mode: MouseMode) -> Option<Vec<u8>> {
+    |            ^^^^^^^^^^^
+
+warning: constant `MAX_PASTE_BYTES` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/paste.rs:4:7
+  |
+4 | const MAX_PASTE_BYTES: usize = 4 * 1024 * 1024;
+  |       ^^^^^^^^^^^^^^^
+
+warning: constant `CHUNK` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/paste.rs:5:7
+  |
+5 | const CHUNK: usize = 16384;
+  |       ^^^^^
+
+warning: struct `PasteSettings` is never constructed
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/paste.rs:8:12
+  |
+8 | pub struct PasteSettings {
+  |            ^^^^^^^^^^^^^
+
+warning: enum `PasteDecision` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/paste.rs:23:10
+   |
+23 | pub enum PasteDecision {
+   |          ^^^^^^^^^^^^^
+
+warning: struct `PasteController` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/paste.rs:28:12
+   |
+28 | pub struct PasteController {
+   |            ^^^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/paste.rs:39:12
+    |
+ 38 | impl PasteController {
+    | -------------------- associated items in this implementation
+ 39 |     pub fn begin(text: String, mut settings: PasteSettings) -> PasteDecision {
+    |            ^^^^^
+...
+ 66 |     pub fn text(&self) -> &str {
+    |            ^^^^
+...
+ 69 |     pub fn preview(&self) -> String {
+    |            ^^^^^^^
+...
+ 82 |     pub fn awaiting_confirmation(&self) -> bool {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+...
+ 85 |     pub fn confirm_for_terminal(&mut self, now: Instant, bracketed: bool) {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+ 91 |     pub fn confirm(&mut self, now: Instant) {
+    |            ^^^^^^^
+...
+ 97 |     pub fn finished(&self) -> bool {
+    |            ^^^^^^^^
+...
+100 |     pub fn tick(&mut self, now: Instant) -> Vec<u8> {
+    |            ^^^^
+...
+150 |     pub fn retry_last_chunk(&mut self) {
+    |            ^^^^^^^^^^^^^^^^
+...
+158 |     pub fn cancel(&mut self) -> Vec<u8> {
+    |            ^^^^^^
+
+warning: enum `CloseDecision` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/paste.rs:172:10
+    |
+172 | pub enum CloseDecision {
+    |          ^^^^^^^^^^^^^
+
+warning: struct `CloseController` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/paste.rs:178:12
+    |
+178 | pub struct CloseController {
+    |            ^^^^^^^^^^^^^^^
+
+warning: methods `begin` and `resolve` are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/paste.rs:182:12
+    |
+181 | impl CloseController {
+    | -------------------- methods in this implementation
+182 |     pub fn begin(&mut self, active: bool, confirm: bool) -> CloseDecision {
+    |            ^^^^^
+...
+190 |     pub fn resolve(&mut self, approve: bool) -> CloseDecision {
+    |            ^^^^^^^
+
+warning: function `retryable_input_error` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/paste.rs:204:8
+    |
+204 | pub fn retryable_input_error(error: &str) -> bool {
+    |        ^^^^^^^^^^^^^^^^^^^^^
+
+warning: constant `MAX_COPY_BYTES` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/selection.rs:5:7
+  |
+5 | const MAX_COPY_BYTES: usize = 8 * 1024 * 1024;
+  |       ^^^^^^^^^^^^^^
+
+warning: enum `SelectionMode` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/selection.rs:7:10
+  |
+7 | pub enum SelectionMode {
+  |          ^^^^^^^^^^^^^
+
+warning: struct `SelectionPoint` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/selection.rs:13:12
+   |
+13 | pub struct SelectionPoint {
+   |            ^^^^^^^^^^^^^^
+
+warning: struct `TerminalSelection` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/selection.rs:18:12
+   |
+18 | pub struct TerminalSelection {
+   |            ^^^^^^^^^^^^^^^^^
+
+warning: function `rows` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/selection.rs:24:4
+   |
+24 | fn rows(screen: &Screen) -> usize {
+   |    ^^^^
+
+warning: function `cells` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/selection.rs:31:4
+   |
+31 | fn cells(screen: &Screen, row: usize) -> Option<Cow<'_, [Cell]>> {
+   |    ^^^^^
+
+warning: associated items `new`, `points`, `columns_for_row`, `extract`, `try_extract`, and `word` are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/selection.rs:48:12
+    |
+ 46 | impl TerminalSelection {
+    | ---------------------- associated items in this implementation
+ 47 |     /// Columns are boundary offsets: selecting 1..3 copies columns 1 and 2.
+ 48 |     pub fn new(screen: &Screen, anchor: SelectionPoint, focus: SelectionPoint) -> Self {
+    |            ^^^
+...
+ 62 |     fn points(&self, screen: &Screen) -> Option<(SelectionPoint, SelectionPoint)> {
+    |        ^^^^^^
+...
+ 73 |     pub fn columns_for_row(
+    |            ^^^^^^^^^^^^^^^
+...
+ 97 |     pub fn extract(&self, screen: &Screen, mode: SelectionMode) -> String {
+    |            ^^^^^^^
+...
+100 |     pub fn try_extract(&self, screen: &Screen, mode: SelectionMode) -> Result<String, String> {
+    |            ^^^^^^^^^^^
+...
+140 |     pub fn word(screen: &Screen, point: SelectionPoint, delimiters: &str) -> Option<Self> {
+    |            ^^^^
+
+warning: enum `InputEvent` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/selection.rs:182:10
+    |
+182 | pub enum InputEvent {
+    |          ^^^^^^^^^^
+
+warning: enum `ClipboardAction` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/selection.rs:189:10
+    |
+189 | pub enum ClipboardAction {
+    |          ^^^^^^^^^^^^^^^
+
+warning: associated function `from_input` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/selection.rs:195:12
+    |
+194 | impl ClipboardAction {
+    | -------------------- associated function in this implementation
+195 |     pub fn from_input(event: &InputEvent, settings: &ClipboardSettings) -> Option<Self> {
+    |            ^^^^^^^^^^
+
+warning: enum `TerminalFont` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:5:10
+  |
+5 | pub enum TerminalFont {
+  |          ^^^^^^^^^^^^
+
+warning: enum `CharacterEncoding` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:12:10
+   |
+12 | pub enum CharacterEncoding {
+   |          ^^^^^^^^^^^^^^^^^
+
+warning: methods `label` and `encoding` are never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:19:12
+   |
+18 | impl CharacterEncoding {
+   | ---------------------- methods in this implementation
+19 |     pub fn label(self) -> &'static str {
+   |            ^^^^^
+...
+26 |     fn encoding(self) -> &'static encoding_rs::Encoding {
+   |        ^^^^^^^^
+
+warning: enum `BackspaceMapping` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:35:10
+   |
+35 | pub enum BackspaceMapping {
+   |          ^^^^^^^^^^^^^^^^
+
+warning: method `bytes` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:41:12
+   |
+40 | impl BackspaceMapping {
+   | --------------------- method in this implementation
+41 |     pub fn bytes(self) -> &'static [u8] {
+   |            ^^^^^
+
+warning: enum `Dimensions` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:49:10
+   |
+49 | pub enum Dimensions {
+   |          ^^^^^^^^^^
+
+warning: struct `TerminalPalette` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:59:12
+   |
+59 | pub struct TerminalPalette {
+   |            ^^^^^^^^^^^^^^^
+
+warning: associated items `dark`, `light`, and `colors` are never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:70:12
+   |
+69 | impl TerminalPalette {
+   | -------------------- associated items in this implementation
+70 |     pub fn dark() -> Self {
+   |            ^^^^
+...
+77 |     pub fn light() -> Self {
+   |            ^^^^^
+...
+84 |     pub fn colors(&self, cell: &Cell) -> (Ink, Ink) {
+   |            ^^^^^^
+
+warning: struct `TerminalSettings` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:105:12
+    |
+105 | pub struct TerminalSettings {
+    |            ^^^^^^^^^^^^^^^^
+
+warning: struct `TerminalOverrides` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:129:12
+    |
+129 | pub struct TerminalOverrides {
+    |            ^^^^^^^^^^^^^^^^^
+
+warning: type alias `ResolvedTerminalSettings` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:138:10
+    |
+138 | pub type ResolvedTerminalSettings = TerminalSettings;
+    |          ^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `reset` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:140:12
+    |
+139 | impl TerminalOverrides {
+    | ---------------------- method in this implementation
+140 |     pub fn reset(&mut self) {
+    |            ^^^^^
+
+warning: associated function `resolve` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:145:12
+    |
+144 | impl TerminalSettings {
+    | --------------------- associated function in this implementation
+145 |     pub fn resolve(global: &Self, session: &TerminalOverrides) -> ResolvedTerminalSettings {
+    |            ^^^^^^^
+
+warning: struct `TerminalCodec` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:175:12
+    |
+175 | pub struct TerminalCodec {
+    |            ^^^^^^^^^^^^^
+
+warning: multiple associated items are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/terminal/settings.rs:183:12
+    |
+182 | impl TerminalCodec {
+    | ------------------ associated items in this implementation
+183 |     pub fn new(encoding: CharacterEncoding) -> Self {
+    |            ^^^
+...
+192 |     pub fn source_bytes(&self) -> u64 {
+    |            ^^^^^^^^^^^^
+...
+195 |     pub fn errors(&self) -> u64 {
+    |            ^^^^^^
+...
+198 |     pub fn encoding(&self) -> CharacterEncoding {
+    |            ^^^^^^^^
+...
+201 |     fn decode(&mut self, bytes: &[u8], last: bool) -> String {
+    |        ^^^^^^
+...
+223 |     pub fn feed(&mut self, bytes: &[u8]) -> String {
+    |            ^^^^
+...
+228 |     pub fn finish(&mut self) -> String {
+    |            ^^^^^^
+...
+237 |     pub fn set_encoding(&mut self, encoding: CharacterEncoding) -> String {
+    |            ^^^^^^^^^^^^
+...
+247 |     pub fn encode(&self, text: &str) -> Result<Vec<u8>, String> {
+    |            ^^^^^^
+
+warning: constant `PROTOCOLS` is never used
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:7:11
+  |
+7 | pub const PROTOCOLS: &[&str] = &[
+  |           ^^^^^^^^^
+
+warning: constant `SFTP_PIPELINE` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:11:11
+   |
+11 | pub const SFTP_PIPELINE: usize = 32;
+   |           ^^^^^^^^^^^^^
+
+warning: constant `DOWNLOAD_BLOCK` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:12:11
+   |
+12 | pub const DOWNLOAD_BLOCK: usize = 32 * 1024;
+   |           ^^^^^^^^^^^^^^
+
+warning: constant `UPLOAD_BLOCK` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:13:11
+   |
+13 | pub const UPLOAD_BLOCK: usize = 64 * 1024;
+   |           ^^^^^^^^^^^^
+
+warning: constant `SFTP_BUFFER` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:14:11
+   |
+14 | pub const SFTP_BUFFER: usize = 256 * 1024;
+   |           ^^^^^^^^^^^
+
+warning: function `protocol_port` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:15:8
+   |
+15 | pub fn protocol_port(p: &str) -> u16 {
+   |        ^^^^^^^^^^^^^
+
+warning: function `validate_host` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:30:8
+   |
+30 | pub fn validate_host(host: &str) -> Result<(), String> {
+   |        ^^^^^^^^^^^^^
+
+warning: function `validate_user` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:41:8
+   |
+41 | pub fn validate_user(user: &str) -> Result<(), String> {
+   |        ^^^^^^^^^^^^^
+
+warning: function `ssh_arguments` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:51:8
+   |
+51 | pub fn ssh_arguments(
+   |        ^^^^^^^^^^^^^
+
+warning: enum `SshEngine` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:107:10
+    |
+107 | pub enum SshEngine {
+    |          ^^^^^^^^^
+
+warning: function `legacy_ssh_engine` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:112:4
+    |
+112 | fn legacy_ssh_engine() -> SshEngine {
+    |    ^^^^^^^^^^^^^^^^^
+
+warning: struct `Session` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:117:12
+    |
+117 | pub struct Session {
+    |            ^^^^^^^
+
+warning: methods `title`, `sftp_session`, and `ssh_args` are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:173:12
+    |
+172 | impl Session {
+    | ------------ methods in this implementation
+173 |     pub fn title(&self) -> String {
+    |            ^^^^^
+...
+184 |     pub fn sftp_session(&self) -> Result<Self, String> {
+    |            ^^^^^^^^^^^^
+...
+195 |     pub fn ssh_args(&self) -> Result<Vec<String>, String> {
+    |            ^^^^^^^^
+
+warning: struct `Tunnel` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:209:12
+    |
+209 | pub struct Tunnel {
+    |            ^^^^^^
+
+warning: method `args` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:238:12
+    |
+237 | impl Tunnel {
+    | ----------- method in this implementation
+238 |     pub fn args(&self) -> Result<Vec<String>, String> {
+    |            ^^^^
+
+warning: struct `Macro` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:287:12
+    |
+287 | pub struct Macro {
+    |            ^^^^^
+
+warning: enum `Appearance` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:293:10
+    |
+293 | pub enum Appearance {
+    |          ^^^^^^^^^^
+
+warning: enum `HighlightMatch` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:300:10
+    |
+300 | pub enum HighlightMatch {
+    |          ^^^^^^^^^^^^^^
+
+warning: struct `HighlightStyle` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:307:12
+    |
+307 | pub struct HighlightStyle {
+    |            ^^^^^^^^^^^^^^
+
+warning: struct `HighlightRule` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:313:12
+    |
+313 | pub struct HighlightRule {
+    |            ^^^^^^^^^^^^^
+
+warning: enum `RightClickBehavior` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:342:10
+    |
+342 | pub enum RightClickBehavior {
+    |          ^^^^^^^^^^^^^^^^^^
+
+warning: struct `ClipboardSettings` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:349:12
+    |
+349 | pub struct ClipboardSettings {
+    |            ^^^^^^^^^^^^^^^^^
+
+warning: struct `Preferences` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:365:12
+    |
+365 | pub struct Preferences {
+    |            ^^^^^^^^^^^
+
+warning: methods `terminal_settings` and `set_highlight_rules` are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:400:12
+    |
+399 | impl Preferences {
+    | ---------------- methods in this implementation
+400 |     pub fn terminal_settings(&self) -> crate::terminal::settings::TerminalSettings {
+    |            ^^^^^^^^^^^^^^^^^
+...
+409 |     pub fn set_highlight_rules(&mut self, rules: Vec<HighlightRule>) -> Result<(), String> {
+    |            ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `Store` is never constructed
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:417:12
+    |
+417 | pub struct Store {
+    |            ^^^^^
+
+warning: associated items `load` and `save` are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:424:12
+    |
+423 | impl Store {
+    | ---------- associated items in this implementation
+424 |     pub fn load(path: &Path) -> Result<Self, String> {
+    |            ^^^^
+...
+432 |     pub fn save(&self, path: &Path) -> Result<(), String> {
+    |            ^^^^
+
+warning: function `home_dir` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:462:8
+    |
+462 | pub fn home_dir() -> PathBuf {
+    |        ^^^^^^^^
+
+warning: function `copy_new_file` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:468:8
+    |
+468 | pub fn copy_new_file(source: &Path, destination: &Path) -> std::io::Result<u64> {
+    |        ^^^^^^^^^^^^^
+
+warning: function `config_dir` is never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/model.rs:476:8
+    |
+476 | pub fn config_dir() -> PathBuf {
+    |        ^^^^^^^^^^
+
+warning: struct `InputQueue` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/process_input.rs:13:12
+   |
+13 | pub struct InputQueue {
+   |            ^^^^^^^^^^
+
+warning: associated items `new` and `submit` are never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/process_input.rs:20:12
+   |
+19 | impl InputQueue {
+   | --------------- associated items in this implementation
+20 |     pub fn new(mut file: File) -> Result<Self, String> {
+   |            ^^^
+...
+74 |     pub fn submit(&self, bytes: &[u8]) -> Result<(), String> {
+   |            ^^^^^^
+
+warning: struct `Handle` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/process_windows.rs:18:8
+   |
+18 | struct Handle(HANDLE);
+   |        ^^^^^^
+
+warning: struct `Console` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/process_windows.rs:26:8
+   |
+26 | struct Console(HPCON);
+   |        ^^^^^^^
+
+warning: struct `Process` is never constructed
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/process_windows.rs:34:12
+   |
+34 | pub struct Process {
+   |            ^^^^^^^
+
+warning: function `wide` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/process_windows.rs:45:4
+   |
+45 | fn wide(s: &str) -> Vec<u16> {
+   |    ^^^^
+
+warning: function `quote` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/process_windows.rs:48:4
+   |
+48 | fn quote(s: &str) -> String {
+   |    ^^^^^
+
+warning: function `error` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/process_windows.rs:68:4
+   |
+68 | fn error() -> String {
+   |    ^^^^^
+
+warning: associated items `spawn`, `write`, `poll`, and `resize` are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/process_windows.rs:72:12
+    |
+ 71 | impl Process {
+    | ------------ associated items in this implementation
+ 72 |     pub fn spawn(
+    |            ^^^^^
+...
+233 |     pub fn write(&mut self, bytes: &[u8]) -> Result<(), String> {
+    |            ^^^^^
+...
+236 |     pub fn poll(&mut self) {
+    |            ^^^^
+...
+247 |     pub fn resize(&self, cols: u16, rows: u16) {
+    |            ^^^^^^
+
+warning: struct `Serial` is never constructed
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/serial.rs:9:12
+  |
+9 | pub struct Serial {
+  |            ^^^^^^
+
+warning: associated items `open` and `write` are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/serial.rs:14:12
+    |
+ 13 | impl Serial {
+    | ----------- associated items in this implementation
+ 14 |     pub fn open(device: &str, baud: u32) -> Result<Self, String> {
+    |            ^^^^
+...
+130 |     pub fn write(&mut self, data: &[u8]) -> Result<(), String> {
+    |            ^^^^^
+
+warning: `termcraft-native-commit-check` (lib test) generated 146 warnings (run `cargo fix --lib -p termcraft-native-commit-check --tests` to apply 3 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.58s

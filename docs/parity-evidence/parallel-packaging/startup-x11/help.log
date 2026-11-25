@@ -1,0 +1,11 @@
+TermCraft remote workspace
+  --data-dir <directory>  Choose an isolated workspace
+  --session <saved-id>    Open a saved session by stable ID
+  --group <folder>        Launch folder and subfolders
+  --new-tab               Open a local terminal
+  --command <text>        Run a command in a new local or --session terminal
+  --macro <name>          Run a named saved macro in a new terminal
+  --cwd <directory>       Set local starting directory
+  --exit-when-done        Close the created terminals when they finish
+  --screenshot <file.png> Capture a separate 120-frame instance and exit
+  --help                  Show this help

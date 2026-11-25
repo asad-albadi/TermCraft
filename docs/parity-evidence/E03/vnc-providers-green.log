@@ -1,0 +1,30 @@
+   Compiling harbor-workspace v0.1.0-vnc-providers-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-vnc-providers)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.98s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-80931929de3fec25)
+
+running 22 tests
+test desktop::vnc::tests::verified_tls_modes_do_not_require_classic_unencrypted_consent ... ok
+test desktop::vnc::tests::classic_vnc_challenge_matches_independent_openssl_vector ... ok
+test desktop::vnc::tests::old_sessions_keep_external_vnc_and_new_security_is_explicit ... ok
+test desktop::vnc::tests::selected_security_never_falls_back_to_another_server_offer ... ok
+test services::vnc::keyboard::tests::character_aliases_share_identity_without_converting_function_keys ... ok
+test services::vnc::keyboard::tests::windows_shortcut_mapping_retains_shift_and_altgr_requirements ... ok
+test services::vnc_service_tests::isolated::owned_x11_vnc_clipboard_selection_roundtrip ... ignored, requires private bwrap/Cage display; never host clipboard
+test services::vnc_service_tests::isolated::owned_x11_vnc_dynamic_auth_control_stop_and_app_client ... ignored, requires private bwrap/Cage display; never run on a host display
+test services::vnc::tests::vnc_server_truecolor_formats_encode_channels_and_reject_overlap ... ok
+test services::vnc::tests::vnc_clipboard_optin_validates_without_opening_display ... ok
+test desktop::vnc::tests::oversized_resize_and_disconnect_mid_rectangle_are_errors ... ok
+test services::vnc::tests::vnc_server_framebuffer_bounds_are_enforced ... ok
+test services::vnc::keyboard::tests::windows_case_and_shifted_punctuation_use_literal_unicode_without_shortcuts ... ok
+test services::vnc::clipboard::tests::vnc_server_clipboard_readonly_never_requests_remote_content ... ok
+test services::vnc_service_tests::vnc_requires_explicit_source_password_and_transport_consent ... ok
+test services::vnc_service_tests::vnc_unsupported_sources_and_clipboard_fail_closed ... ok
+test services::vnc::clipboard::tests::vnc_server_clipboard_unicode_negotiation_and_request_bounds ... ok
+test desktop::vnc::tests::vnc_known_frame_pointer_copyrect_and_resize_are_real_protocol_operations ... ok
+test desktop::vnc::tests::view_only_sends_no_input_even_at_transport_boundary_and_clipboard_is_directional ... ok
+test desktop::vnc::tests::vencrypt_verified_none_and_password_deliver_pixels_over_real_tls ... ok
+test desktop::vnc::tests::vencrypt_bad_trust_hostname_and_rotated_certificate_prevent_authentication ... ok
+test desktop::vnc::tests::classic_password_wait_does_not_spend_network_timeout_or_leak_plaintext ... ok
+
+test result: ok. 20 passed; 0 failed; 2 ignored; 0 measured; 96 filtered out; finished in 1.11s
+

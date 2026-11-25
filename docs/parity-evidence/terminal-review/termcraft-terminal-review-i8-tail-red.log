@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.86s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-127cf14f51e8fab8)
+
+running 1 test
+test ui::terminal_review_tests::zero_budget_cannot_finalize_a_decoder_with_unread_transport_tail ... FAILED
+
+failures:
+
+---- ui::terminal_review_tests::zero_budget_cannot_finalize_a_decoder_with_unread_transport_tail stdout ----
+
+thread 'ui::terminal_review_tests::zero_budget_cannot_finalize_a_decoder_with_unread_transport_tail' (438896) panicked at src/ui/terminal_review_tests.rs:105:5:
+a skipped parse tick must not prematurely flush a pending character
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::terminal_review_tests::zero_budget_cannot_finalize_a_decoder_with_unread_transport_tail
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 56 filtered out; finished in 1.11s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

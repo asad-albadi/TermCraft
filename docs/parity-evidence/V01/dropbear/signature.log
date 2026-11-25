@@ -1,0 +1,19 @@
+gpg: keybox '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/target/interop-tools/dropbear/gnupg/pubring.kbx' created
+gpg: key 44931494F29C6773: 2 signatures not checked due to missing keys
+gpg: /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/target/interop-tools/dropbear/gnupg/trustdb.gpg: trustdb created
+gpg: key 44931494F29C6773: public key "Dropbear SSH Release Signing <matt@ucc.asn.au>" imported
+gpg: Total number processed: 1
+gpg:               imported: 1
+gpg: no ultimately trusted keys found
+[GNUPG:] NEWSIG
+gpg: Signature made Thu Jul 23 17:56:08 2026 +04
+gpg:                using RSA key F7347EF2EE2E07A267628CA944931494F29C6773
+[GNUPG:] KEY_CONSIDERED F7347EF2EE2E07A267628CA944931494F29C6773 0
+[GNUPG:] SIG_ID 1s++dcYH3xZ4w7gp6dPgZXo1e5I 2026-07-23 1784814968
+[GNUPG:] GOODSIG 44931494F29C6773 Dropbear SSH Release Signing <matt@ucc.asn.au>
+gpg: Good signature from "Dropbear SSH Release Signing <matt@ucc.asn.au>" [unknown]
+[GNUPG:] VALIDSIG F7347EF2EE2E07A267628CA944931494F29C6773 2026-07-23 1784814968 0 4 0 1 10 00 F7347EF2EE2E07A267628CA944931494F29C6773
+[GNUPG:] TRUST_UNDEFINED 0 pgp
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: F734 7EF2 EE2E 07A2 6762  8CA9 4493 1494 F29C 6773

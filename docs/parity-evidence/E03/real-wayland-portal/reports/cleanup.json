@@ -1,0 +1,62 @@
+[
+  {
+    "name": "capture",
+    "pid": 171,
+    "returncode": 0
+  },
+  {
+    "name": "normal-drop",
+    "pid": 162,
+    "returncode": 0
+  },
+  {
+    "name": "revoke",
+    "pid": 149,
+    "returncode": 0
+  },
+  {
+    "name": "cancel",
+    "pid": 142,
+    "returncode": 0
+  },
+  {
+    "name": "deny",
+    "pid": 136,
+    "returncode": 0
+  },
+  {
+    "name": "control",
+    "pid": 132,
+    "returncode": 0
+  },
+  {
+    "name": "owned-target",
+    "pid": 45,
+    "returncode": -15
+  },
+  {
+    "name": "portal",
+    "pid": 13,
+    "returncode": -15
+  },
+  {
+    "name": "wlr",
+    "pid": 12,
+    "returncode": -15
+  },
+  {
+    "name": "wireplumber",
+    "pid": 11,
+    "returncode": 0
+  },
+  {
+    "name": "pipewire",
+    "pid": 9,
+    "returncode": 0
+  },
+  {
+    "name": "sway",
+    "pid": 5,
+    "returncode": 0
+  }
+]

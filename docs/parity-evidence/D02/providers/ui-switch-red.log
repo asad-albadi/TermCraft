@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.95s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-29e3f133fb9121f7)
+
+running 1 test
+test ui::rdp_settings::tests::switching_engines_can_clear_incompatible_saved_options ... FAILED
+
+failures:
+
+---- ui::rdp_settings::tests::switching_engines_can_clear_incompatible_saved_options stdout ----
+
+thread 'ui::rdp_settings::tests::switching_engines_can_clear_incompatible_saved_options' (298) panicked at src/ui/rdp_settings.rs:263:29:
+incompatible saved option has no reachable clear control
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::rdp_settings::tests::switching_engines_can_clear_incompatible_saved_options
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 99 filtered out; finished in 0.16s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

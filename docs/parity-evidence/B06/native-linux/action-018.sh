@@ -1,0 +1,3 @@
+set -euo pipefail
+export DISPLAY=:77
+xdotool mousemove --sync 890 245 click 1; sleep .3; xdotool mousemove --sync 58 70 click 1; sleep 1; import -window root /evidence/039-solo-killer.png; xdotool mousemove --sync 332 70 click 1; sleep .3; xdotool mousemove --sync 400 106 click 1; sleep .6; import -window root /evidence/040-killer-solved.png; xdotool key Escape; sleep .4; xdotool mousemove --sync 570 470 click 1; sleep .4; xdotool mousemove --sync 252 58 click 1; sleep .2; xdotool mousemove --sync 263 475 click 1; sleep .4; import -window root /evidence/041-guess.png; xdotool mousemove --sync 35 300 click 1; xdotool key 1; sleep .3; import -window root /evidence/042-guess-move.png

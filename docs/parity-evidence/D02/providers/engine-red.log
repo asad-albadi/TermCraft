@@ -1,0 +1,35 @@
+     Locking 5 packages to highest Rust 1.99.0 compatible versions
+      Adding errno v0.3.14
+      Adding fastrand v2.5.0
+      Adding linux-raw-sys v0.12.1
+      Adding rustix v1.1.6
+      Adding tempfile v3.27.0
+   Compiling bitflags v2.13.2
+   Compiling rustix v1.1.6
+   Compiling ironrdp-pdu v0.11.0
+   Compiling winscard v0.4.0
+   Compiling cryptoki v0.12.1
+   Compiling sspi v0.23.0
+   Compiling ironrdp-svc v0.10.0
+   Compiling ironrdp-dvc v0.10.0
+   Compiling ironrdp-connector v0.12.0
+   Compiling ironrdp-graphics v0.11.0
+   Compiling linux-raw-sys v0.12.1
+   Compiling ironrdp-async v0.12.0
+   Compiling ironrdp-egfx v0.5.0
+   Compiling ironrdp-rdpei v0.3.0
+   Compiling ironrdp-displaycontrol v0.10.0
+   Compiling fastrand v2.5.0
+   Compiling tempfile v3.27.0
+   Compiling ironrdp-session v0.13.0
+   Compiling ironrdp-tokio v0.12.0
+   Compiling ironrdp-cliprdr v0.9.0
+   Compiling termcraft-rdp-engine v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/engines/rdp)
+error[E0432]: unresolved import `super::devices`
+ --> src/devices_tests.rs:1:12
+  |
+1 | use super::devices::Drives;
+  |            ^^^^^^^ could not find `devices` in the crate root
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `termcraft-rdp-engine` (bin "termcraft-rdp-engine" test) due to 1 previous error

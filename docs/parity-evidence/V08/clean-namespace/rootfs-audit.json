@@ -1,0 +1,10 @@
+{
+  "export_regular_files_content_verified": 27304,
+  "archive_links_resolved_within_root": 3961,
+  "archive_entries_beneath_link_ancestors": 0,
+  "escaping_resolved_filesystem_links": 0,
+  "added_empty_mountpoint_directories": [
+    "/opt/termcraft",
+    "/evidence"
+  ]
+}

@@ -1,0 +1,21 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.57s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-8f24421c0b68d6f2)
+
+running 1 test
+
+thread 'ui::gui_tests::dirty_remote_editor_blocks_tab_close_and_reconnect' (256448) panicked at src/ui.rs:1837:9:
+assertion `left != right` failed: A disconnected tab must reconnect while retaining its dirty recovery editor
+  left: 1
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ui::gui_tests::dirty_remote_editor_blocks_tab_close_and_reconnect ... FAILED
+
+failures:
+
+failures:
+    ui::gui_tests::dirty_remote_editor_blocks_tab_close_and_reconnect
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 23 filtered out; finished in 1.52s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

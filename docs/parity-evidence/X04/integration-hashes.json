@@ -1,0 +1,43 @@
+{
+  "status": "partial X04; Linux owned candidate, native/clipboard/custom-keyboard/hostname gaps remain",
+  "base_sha256": {
+    "src/model.rs": "49527c8623421135ce30f0dc0ab1909ec1ecd5f60e9c604900aefada77fadfd4",
+    "src/connection.rs": "63d10d75bdd3231a5a4914659fe11422844931aa652a468d9dbe459a82c5347d",
+    "src/ui.rs": "d5b8bab6f41daeb58dfb76335f1b76336e566609c5a3db9d1c3fa97baf371143",
+    "src/ui/pages.rs": "ad2e6196ce02c4bd20e77eacc6ff9e7e80d3236190ef0a2a50196cb835c4c356",
+    "src/x11/mod.rs": "6937114bc77d6eee2ee3adbce7c9c87190bfc93573c3a90de28d5470f99af1a3",
+    "scripts/package-release.py": "461ad84bb5af69ad0e99ed1cba7e10271c1a6039a1099686bab1d120d3c3bc55"
+  },
+  "patch": "evidence/changes.patch",
+  "additions": {
+    "src/x11/xdmcp.rs": "858db28ff49e97379863a343938e551990a539c8e0b3dda49b8ed241362110a7",
+    "src/x11/xdmcp_engine.rs": "530c07cb6b7ee8a7c11fe9d66ecc47044c817555520d538bd2bf900b7d0ed986",
+    "src/x11/xdmcp_listener.rs": "3a9b9b2b143b5d621ed9a8d06f17654fe1edc988e9ecf4cc89ca6e3472d8e34b",
+    "src/ui/xdmcp.rs": "415dcd95939517fb51b52828ca8c6b7a2bf2c6fd2b12a29a25cf08b2e0ccf609",
+    "tests/support/run_xdmcp_isolated.sh": "8469fc84e2565e0cce38b73d3003d6cc9009d27b47eba0583fc07806074c51fa",
+    "tests/support/xdmcp_private_net.sh": "f7ab550a0ee45e4f30d9dd3780519544d725a212c3222831223fdf501c7c4cf2",
+    "tests/support/xdmcp_window.py": "78c78a4464775ab615e0a8ef3404e5e0d6cf4571dac7abf338080d0b1588b780",
+    "tests/support/xdmcp_output.py": "5376c6c050de55abb91eb5fb8fb798edf006c7f3c47d48e111d0876ac073ea2f",
+    "tests/packaging_xdmcp.py": "7022daa86318ba039000d08d62b593d186f9bbab464aa41355d039029de0dd86",
+    "packaging/x11/xdmcp/manifest.json": "af6b62e1fcf15d1b9b9f7f5b3eee3ecd8e4c85ad542cb0799a15eafc7ec2fe0f",
+    "packaging/x11/xdmcp/prepare-linux.py": "0012d3f2ff2d0ba2d40500ea1494e8578c51c746a7eb6491fabfb4fbb68557bb",
+    "docs/parity-evidence/X04/implementation.md": "0761a9d3fb5565759c6e1ff1d16e2879acd3e9f5f7236bfc748e9bfae1aec590",
+    "src/x11/xdmcp_payload.rs": "9c16f3f744665d37b6028dba196fc38c8d60e66b81802f4835adc71a9aa0c7e3"
+  },
+  "do_not_copy": [
+    "Cargo.toml",
+    "Cargo.lock",
+    "tests/fixtures/xdmcp",
+    "source-packages",
+    "engine-package",
+    "evidence/staged-fixture",
+    "evidence/staged-engine"
+  ],
+  "current_root_bases_match": true,
+  "review_fix": {
+    "scope": "FIFO/nonregular payload loading cancellation/deadline",
+    "tests": "evidence/final-review-fix-lib.log",
+    "real_fixture": "evidence/final-review-fix-real-xdm.log",
+    "review_required": true
+  }
+}

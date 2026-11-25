@@ -1,0 +1,9 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_interop-402819b4a2c8008c' --exact encrypted_key_agent_authenticates_pinned_openssh_then_expires --nocapture --test-threads=1
+Executable SHA256: b0a1bd3777a60c56a3e7b4dcbb678df706a8bfece6b0dfb5161ef69fc1aa594b
+
+running 1 test
+test encrypted_key_agent_authenticates_pinned_openssh_then_expires ... Observed pinned OpenSSH: encrypted imported identity authenticated once; agent expiry rejected the next fresh connection
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 3.01s
+

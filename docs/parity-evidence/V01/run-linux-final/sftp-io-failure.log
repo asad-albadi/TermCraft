@@ -1,0 +1,26 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/remote_transfers-5b12b9e73ea589cb' --exact injected_disk_full_sync_and_close_errors_preserve_destination_and_partial --nocapture --test-threads=1
+Executable SHA256: 642721015042e29f7be78050c08081571314b7c1ab1be9c747ef6f029fd77c61
+
+running 1 test
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... 
+running 1 test
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.20s
+
+
+running 1 test
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.23s
+
+
+running 1 test
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.22s
+
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.74s
+

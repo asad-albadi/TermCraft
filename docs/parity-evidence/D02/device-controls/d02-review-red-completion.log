@@ -1,0 +1,66 @@
+   Compiling termcraft-rdp-engine v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/engines/rdp)
+warning: function `terminal_data` is never used
+ --> src/serial_completion.rs:4:15
+  |
+4 | pub(super) fn terminal_data(
+  |               ^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
+  --> src/../../../src/desktop/options.rs:96:9
+   |
+95 | pub struct NegotiatedRdpOptions {
+   |            -------------------- fields in this struct
+96 |     pub clipboard: ClipboardPolicy,
+   |         ^^^^^^^^^
+97 |     pub keyboard: KeyboardRouting,
+   |         ^^^^^^^^
+98 |     pub keyboard_layout: u32,
+   |         ^^^^^^^^^^^^^^^
+   |
+   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: method `is_default` is never used
+   --> src/../../../src/desktop/options.rs:101:12
+    |
+100 | impl RdpOptions {
+    | --------------- method in this implementation
+101 |     pub fn is_default(&self) -> bool {
+    |            ^^^^^^^^^^
+
+warning: `termcraft-rdp-engine` (bin "d02-device-private-rdp" test) generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.82s
+     Running unittests src/main.rs (app/target/debug/deps/d02_device_private_rdp-34a4dfff972ff5e3)
+
+running 3 tests
+
+thread 'devices::serial_completion::tests::close_forwards_exact_terminal_read_and_control_output' (148585) panicked at src/serial_completion.rs:58:9:
+assertion `left == right` failed
+  left: [32, 1, 0, 192, 0, 0, 0, 0]
+ right: [0, 0, 0, 0, 2, 0, 0, 0, 97, 98]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'devices::serial_completion::tests::close_preserves_terminal_abort_and_other_native_failure' (148586) panicked at src/serial_completion.rs:51:13:
+assertion `left == right` failed
+  left: 3221225760
+ right: 3221225629
+
+thread 'devices::serial_completion::tests::close_reports_write_success_when_normal_completion_wins_cancellation' (148587) panicked at src/serial_completion.rs:45:9:
+assertion `left == right` failed
+  left: [114, 68, 67, 73, 7, 0, 0, 0, 42, 0, 0, 0, 32, 1, 0, 192, 0, 0, 0, 0, 0]
+ right: [114, 68, 67, 73, 7, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0]
+test devices::serial_completion::tests::close_preserves_terminal_abort_and_other_native_failure ... FAILED
+test devices::serial_completion::tests::close_reports_write_success_when_normal_completion_wins_cancellation ... FAILED
+test devices::serial_completion::tests::close_forwards_exact_terminal_read_and_control_output ... FAILED
+
+failures:
+
+failures:
+    devices::serial_completion::tests::close_forwards_exact_terminal_read_and_control_output
+    devices::serial_completion::tests::close_preserves_terminal_abort_and_other_native_failure
+    devices::serial_completion::tests::close_reports_write_success_when_normal_completion_wins_cancellation
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 44 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin d02-device-private-rdp`

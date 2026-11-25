@@ -1,0 +1,30 @@
+    Updating crates.io index
+      Adding regex =1.12.2 to dependencies
+             Features:
+             + perf
+             + perf-backtrack
+             + perf-cache
+             + perf-dfa
+             + perf-inline
+             + perf-literal
+             + perf-onepass
+             + std
+             + unicode
+             + unicode-age
+             + unicode-bool
+             + unicode-case
+             + unicode-gencat
+             + unicode-perl
+             + unicode-script
+             + unicode-segment
+             - logging
+             - pattern
+             - perf-dfa-full
+             - unstable
+             - use_std
+    Updating crates.io index
+     Locking 4 packages to highest Rust 1.99.0 compatible versions
+      Adding aho-corasick v1.1.5
+      Adding regex v1.12.2 (available: v1.13.2)
+      Adding regex-automata v0.4.19
+      Adding regex-syntax v0.8.12

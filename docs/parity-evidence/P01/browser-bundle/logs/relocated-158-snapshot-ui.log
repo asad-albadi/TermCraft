@@ -1,0 +1,18 @@
+
+running 4 tests
+test ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs ... 
+thread 'ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs' (32716) panicked at src/ui/web_browser_tests.rs:263:50:
+called `Result::unwrap()` on an `Err` value: Timeout
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted ... ok
+test ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full ... ok
+test ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text ... ok
+
+failures:
+
+failures:
+    ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 141 filtered out; finished in 134.13s
+

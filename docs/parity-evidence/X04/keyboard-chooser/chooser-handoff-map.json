@@ -1,0 +1,132 @@
+{
+  "frozen_main_snapshot": "b5893bf70362241fbff489979d315307a34549e107f24b6f0de99388fbde6f2e",
+  "base": {
+    "src/x11/xdmcp.rs": {
+      "sha256": "21f09c36f9453e66801d2bf843156a9a3797a17d6a9e1e40aa1f4779d869a1bb",
+      "bytes": 19446,
+      "mode": "0o644"
+    },
+    "src/x11/xdmcp_engine.rs": {
+      "sha256": "f3821c03aa61ff118581a5e05e41e42efa102828fd5742e0eebb41647c114e32",
+      "bytes": 42426,
+      "mode": "0o644"
+    },
+    "tests/support/run_xdmcp_isolated.sh": {
+      "sha256": "8469fc84e2565e0cce38b73d3003d6cc9009d27b47eba0583fc07806074c51fa",
+      "bytes": 1269,
+      "mode": "0o755"
+    }
+  },
+  "payload": {
+    "src/x11/xdmcp.rs": {
+      "sha256": "0ef357d3e38d558eac2520c921c89b86301675b237ebf1fb7f57bce566528987",
+      "bytes": 19934,
+      "mode": "0o644"
+    },
+    "src/x11/xdmcp_chooser_test.rs": {
+      "sha256": "2814f900b5cd22e8d5298128b390f7ec7519c113348e1243e06d08c20be0f087",
+      "bytes": 7475,
+      "mode": "0o644"
+    },
+    "src/x11/xdmcp_engine.rs": {
+      "sha256": "97209f73c321e2e4f165e41e904fa2c1eef9aff5f56e560866dd26b10bd6ac04",
+      "bytes": 42562,
+      "mode": "0o644"
+    },
+    "tests/support/prepare_xdmcp_chooser_fixture.sh": {
+      "sha256": "ab6e4d1ab3580a4a110b286ebb3067b740d0d8adc693f53c9cf6ce44484ea8f3",
+      "bytes": 2128,
+      "mode": "0o755"
+    },
+    "tests/support/run_xdmcp_isolated.sh": {
+      "sha256": "5e71db0a4df32ebbe453385c966314ada030721a6935b019f82a4410dcd6604a",
+      "bytes": 1626,
+      "mode": "0o755"
+    },
+    "tests/support/xdmcp_chooser_managers.py": {
+      "sha256": "46def73914c89a8da8bbd46d4caa7c78f84496415243ce9db0a1305c0a164c2f",
+      "bytes": 3095,
+      "mode": "0o644"
+    },
+    "tests/support/xdmcp_chooser_select.py": {
+      "sha256": "6d71fc99fd7c2666c3e3149b30668d78805145133bde4c1a61fc23758f24aa92",
+      "bytes": 3718,
+      "mode": "0o644"
+    }
+  },
+  "fixture": {
+    "app-defaults/Chooser": {
+      "sha256": "9700a09b7b5422ec835168775bd0abfb7824c2bcefc6adc322c11f92fddd58f4",
+      "bytes": 1251,
+      "mode": "0o644"
+    },
+    "chooser": {
+      "sha256": "d6fa7b7777d1370dc8ebb1ecdaf8880fdd9c218cb79b0cfdd66add0781b2817e",
+      "bytes": 22928,
+      "mode": "0o755"
+    },
+    "lib/libXaw.so.7": {
+      "sha256": "63e3894d069e18a59ccc788c5c98342d95764b32b974ed19bf7417b8858dee01",
+      "bytes": 460624,
+      "mode": "0o644"
+    },
+    "lib/libXmu.so.6": {
+      "sha256": "6b828cac94588e410812e2e275f4709597bd8a39db8041278bc9d730c6106d59",
+      "bytes": 113840,
+      "mode": "0o644"
+    },
+    "lib/libXpm.so.4": {
+      "sha256": "e02df8ee6e0bff934a13563d9543e1a727620399ddf43d5c211d6846830768ac",
+      "bytes": 75784,
+      "mode": "0o644"
+    },
+    "libXdmGreet.so": {
+      "sha256": "ab10ec35cf6045a27261ac4e6003127e23b5e9be0f054005cae69cf08f0a03ae",
+      "bytes": 54112,
+      "mode": "0o644"
+    },
+    "notices/libxaw-COPYING": {
+      "sha256": "9f5adb26952f93b3e4650285b94ec6c61a27aab5a21088bfb6694001be1b360d",
+      "bytes": 7372,
+      "mode": "0o644"
+    },
+    "notices/libxmu-COPYING": {
+      "sha256": "8f0f2ca7a05cfd10bf9e307a272182de7cb52d7a603feaf17b9943c2c9a4838e",
+      "bytes": 4432,
+      "mode": "0o644"
+    },
+    "notices/libxpm-COPYING": {
+      "sha256": "a80d706759624a04aa90fd62bc644a360fc3d72e08dcbfb129f167c11ca285de",
+      "bytes": 4898,
+      "mode": "0o644"
+    },
+    "notices/xdm-COPYING": {
+      "sha256": "74cda705693518c793f05074a79bfc6876f97c8ce560856e2ba36e2d9bf0ab5a",
+      "bytes": 8197,
+      "mode": "0o644"
+    },
+    "xdm": {
+      "sha256": "d0f9df84fa1313b9e9155d2a5e5f790af7a760a8918239bd60b7b3dc3a27d946",
+      "bytes": 115336,
+      "mode": "0o755"
+    },
+    "xdmcp_window.py": {
+      "sha256": "c6f4b506dbc28f7194ea84b464864a1409b26227b24d7444d999c96849b50eea",
+      "bytes": 1962,
+      "mode": "0o644"
+    }
+  },
+  "additional_archive": {
+    "libxaw-1.0.16-2-x86_64.pkg.tar.zst": {
+      "sha256": "79966ba7df3cf46bbcac4292384247b0070bfd036f3a55dbcd9121cb4ccf8a38",
+      "bytes": 361987,
+      "mode": "0o644"
+    },
+    "libxmu-1.3.1-1.1-x86_64_v3.pkg.tar.zst": {
+      "sha256": "6719bb6abe910d67ef215bba776503f00d6346cbe1f04231f6b4f4be4fad487c",
+      "bytes": 81879,
+      "mode": "0o644"
+    }
+  },
+  "patch_sha256": "533f1af4fc3447b54c43223a2a1ea6c3476ad2d68faf27b45f11fbfa18672011"
+}

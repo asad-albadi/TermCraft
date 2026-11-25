@@ -1,0 +1,15 @@
+# Exact commands
+
+Working directory: `/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app`. All Cargo calls set CARGO_TARGET_DIR to its absolute `target` path, use --offline --locked -j 2, and reference private source/Cargo.toml. No MAIN source mutation.
+
+1. `python3 target/agent-work/tunnel-listener-fixture/snapshot.py` (canonical package inputs + complete tests/README/FEATURE; later copied required docs/parity-evidence/V01/matrix.json and added its hash).
+2. `python3 target/agent-work/tunnel-listener-fixture/identities.py` (private component identities).
+3. Reproduction build: `cargo test --offline --locked -j 2 --manifest-path target/agent-work/tunnel-listener-fixture/source/Cargo.toml --test tunnel_interop --no-run` -> build-reproduction.log. Copied test executable to reproduction-test, ran `reproduction-test released_forward_port_can_connect_to_wrong_ssh_endpoint --exact --nocapture`, with TERMCRAFT_INTEROP_LOG_DIR set to reproduction-sshd, -> reproduction.log.
+4. Implementation scaffolding: `python3 target/agent-work/tunnel-listener-fixture/repair.py`, then selected RED ownership-check omission as retained in red-ssh_server.rs.
+5. RED: `cargo test --offline --locked -j 2 --manifest-path target/agent-work/tunnel-listener-fixture/source/Cargo.toml --test tunnel_interop fixture_port_claim_survives_socket_handoff_and_releases_on_drop -- --exact --nocapture` -> red-claim.log, exit 101. Copied executable to red-test. Restored ownership check and formatted the two owned test files.
+6. GREEN/final builds: same --no-run command as step 3 -> build-green.log / build-final.log. Each frozen executable copied from target/debug/deps/tunnel_interop-8173c87d6d677af8 before execution. Final exact invocation: `TERMCRAFT_INTEROP_LOG_DIR="$PWD/target/agent-work/tunnel-listener-fixture/final-v2-sshd" target/agent-work/tunnel-listener-fixture/final-test-v2 --nocapture --test-threads=14` -> final-v2-all.log, exit 0.
+7. Helper checks: `TERMCRAFT_INTEROP_LOG_DIR="$PWD/target/agent-work/tunnel-listener-fixture/shared-support-sshd" cargo test --offline --locked -j 2 --manifest-path target/agent-work/tunnel-listener-fixture/source/Cargo.toml --test ssh_interop --test ssh_lifecycle --test ssh_authentication` -> shared-support.log, exit 0.
+8. `cargo build --offline --locked -j 2 --manifest-path target/agent-work/tunnel-listener-fixture/source/Cargo.toml --bin termcraft-tunnel-fixture937` -> normal-build.log; `target/debug/termcraft-tunnel-fixture937 --help` -> normal-help.log; both exit 0.
+9. `python3 target/agent-work/tunnel-listener-fixture/package-evidence.py` produces exact scoped patch/maps; `patch --dry-run -p1 -d . < target/agent-work/tunnel-listener-fixture/payload.patch` -> patch-dry-run.log, exit 0.
+
+The final controlled schedule and bounded worker gate were refined after repair.py's initial scaffold. The reviewed artifact is `payload.patch` / final source, not rerunning the historical scaffold. Frozen test names and hashes identify each stage unambiguously.

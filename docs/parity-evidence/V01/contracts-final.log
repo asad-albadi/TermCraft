@@ -1,0 +1,8 @@
+
+running 3 tests
+test independent_dropbear_key_shell_and_sftp_roundtrip ... ignored, requires private signed Dropbear staging; check-ssh-interop.sh executes this fixture explicitly
+test sftp_interop_failure_and_reconnect ... ok
+test ssh_interop_auth_and_host_keys ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

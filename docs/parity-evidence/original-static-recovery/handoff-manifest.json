@@ -1,0 +1,78 @@
+{
+  "kind": "RECOVERED static only",
+  "runtime_measured": false,
+  "product_changed": false,
+  "native_qualification_count_increment": 0,
+  "files": [
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/7zip-provenance.json",
+      "bytes": 543,
+      "sha256": "080ba3af3e6e4cbda77f6032538e04f780c653781e6dfe38231ea448f03517c6"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/MOBASE.catalog.json",
+      "bytes": 15460,
+      "sha256": "3180e36c18cd8d74566972f057d4c6f16a6553e459fcea8af50404faba6f74af"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/README.md",
+      "bytes": 7373,
+      "sha256": "f106350272cdfaf5b205d091d9fd4277c3781a7cf36ab459e362cdf00466d05a"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/TXTRES-HtmlHelp2.txt",
+      "bytes": 44142,
+      "sha256": "b4e2dcb21f7ecb22afc85761d0b9b9cf233189b29d851b734c782fec9db15f01"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/catalog.json",
+      "bytes": 16783,
+      "sha256": "3369646917b72c72d265c7a1aaf353b42cc339d50575805573fccb7ea586491f"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/controls.json",
+      "bytes": 15322,
+      "sha256": "657919d8dd5de35a0aebce8047e86d53b880909c89c27393d724bec39ccbe339"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/nimesweeper-help.asm",
+      "bytes": 3680,
+      "sha256": "68a908053365da14b0ef7b9c074a2369ceca07e63e7f3970da44f510aec99ce5"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/parse-summary.json",
+      "bytes": 34,
+      "sha256": "2e373c6d4d0e87438156bbc80dc5356d14858d431663a85856c642733b28f32a"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/pe-resources.json",
+      "bytes": 24023,
+      "sha256": "eedf5b2583c619e8bcaafdd91194b82fc5ccb5b484e0ec257e04a823612b6466"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/resource-decoding.json",
+      "bytes": 1994,
+      "sha256": "ff4c56b8ffaf19b27b444d40757e3f61151fc4addb612b2aacb6b7ef74e048f6"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/screensaver-handler.asm",
+      "bytes": 3389,
+      "sha256": "b9f70cf88972ab3edfa4ea398692ddb7c3568380134d2b401afb1b32b791eb50"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/sdk-decode.log",
+      "bytes": 57,
+      "sha256": "f0e69aebb7935036828434d72e2a5b202fdaa1a978b17e09083c63220a63ba6f"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/sources.json",
+      "bytes": 5753,
+      "sha256": "ccda19a72b9de0b736307ab4c32dfe80e35a9b9e4fabbfb83356ef937feca2b5"
+    },
+    {
+      "path": "app/docs/parity-evidence/original-static-recovery/stgame-handler.asm",
+      "bytes": 4238,
+      "sha256": "d1a285e4ae3436716efd2553b2e2740a77d05da01dcab38f23d0740173e6b1b1"
+    }
+  ]
+}

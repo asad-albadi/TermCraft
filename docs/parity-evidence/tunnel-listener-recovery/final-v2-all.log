@@ -1,0 +1,77 @@
+
+running 14 tests
+fixture candidate 127.0.0.1:37163 rejected while claimed, available after drop
+test fixture_port_claim_survives_socket_handoff_and_releases_on_drop ... ok
+echo peer=127.0.0.1:34312, local=127.0.0.1:44191, exact=TUNNEL_OK
+observed owned listener local=0100007F:B2A7
+echo peer=127.0.0.1:38892, local=127.0.0.1:38845, exact=TUNNEL_OK
+test dynamic_ipv4 ... ok
+deterministic wrong endpoint 127.0.0.1:40771: "SSH-2.0-O"
+observed owned listener local=00000000000000000000000001000000:8157
+echo peer=[::1]:43146, local=[::1]:34245, exact=TUNNEL_OK
+echo peer=127.0.0.1:34326, local=127.0.0.1:44191, exact=TUNNEL_OK
+observed owned listener local=0200007F:8973
+echo peer=127.0.0.1:59052, local=127.0.0.2:36525, exact=TUNNEL_OK
+test dynamic_ipv6 ... ok
+observed owned listener local=0100007F:996D
+echo peer=127.0.0.1:58150, local=127.0.0.1:42651, exact=TUNNEL_OK
+test local_ipv4 ... ok
+observed owned listener local=00000000000000000000000001000000:8E9D
+echo peer=[::1]:52246, local=[::1]:33803, exact=TUNNEL_OK
+test local_ipv6 ... ok
+real SSH process subsequently rejected occupied requested port: continue
+Error: remote port forwarding failed for listen port 40771
+
+test released_forward_port_can_connect_to_wrong_ssh_endpoint ... ok
+observed owned listener local=0100007F:8F63
+echo peer=127.0.0.1:34338, local=127.0.0.1:44191, exact=TUNNEL_OK
+echo peer=127.0.0.1:34844, local=127.0.0.1:35225, exact=TUNNEL_OK
+observed owned listener local=0100007F:A851
+echo peer=127.0.0.1:52776, local=127.0.0.1:45935, exact=TUNNEL_OK
+test remote_ipv4 ... ok
+observed owned listener local=00000000000000000000000001000000:980F
+echo peer=[::1]:39120, local=[::1]:38393, exact=TUNNEL_OK
+test remote_ipv6 ... ok
+Local: bind [127.0.0.1]:38157: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 38157
+Could not request local forwarding.
+
+test destination_failure_is_observable ... ok
+all 18 fixture claims distinct before concurrent forward handoff: [38517, 40011, 42791, 40849, 42157, 35293, 44913, 44427, 32805, 36943, 39979, 45163, 35945, 45901, 36759, 41295, 37307, 32789]
+echo peer=127.0.0.1:34344, local=127.0.0.1:44191, exact=TUNNEL_OK
+Remote: Error: remote port forwarding failed for listen port 36479
+
+echo peer=127.0.0.1:41470, local=127.0.0.1:44427, exact=TUNNEL_OK
+parallel roundtrip Dynamic 127.0.0.1:32805: exact=TUNNEL_OK; count=1; cancelled; rebound
+echo peer=[::1]:56910, local=[::1]:37307, exact=TUNNEL_OK
+echo peer=127.0.0.1:34358, local=127.0.0.1:44191, exact=TUNNEL_OK
+parallel roundtrip Dynamic [::1]:32789: exact=TUNNEL_OK; count=1; cancelled; rebound
+echo peer=[::1]:38898, local=[::1]:39979, exact=TUNNEL_OK
+parallel roundtrip Local [::1]:45163: exact=TUNNEL_OK; count=1; cancelled; rebound
+echo peer=[::1]:60322, local=[::1]:45901, exact=TUNNEL_OK
+echo peer=127.0.0.1:52142, local=127.0.0.1:40011, exact=TUNNEL_OK
+echo peer=127.0.0.1:45612, local=127.0.0.1:42157, exact=TUNNEL_OK
+parallel roundtrip Remote 127.0.0.1:35293: exact=TUNNEL_OK; count=1; cancelled; rebound
+parallel roundtrip Local 127.0.0.1:42791: exact=TUNNEL_OK; count=1; cancelled; rebound
+parallel roundtrip Remote [::1]:36759: exact=TUNNEL_OK; count=1; cancelled; rebound
+test parallel_forward_handoffs_keep_distinct_claims_and_real_roundtrips ... ok
+observed owned listener local=0200007F:A04B
+echo peer=127.0.0.1:60920, local=127.0.0.2:33565, exact=TUNNEL_OK
+observed owned listener local=0100007F:954F
+echo peer=127.0.0.1:34370, local=127.0.0.1:44191, exact=TUNNEL_OK
+echo peer=127.0.0.1:33172, local=127.0.0.1:42673, exact=TUNNEL_OK
+test closing_tunnel_releases_listener ... ok
+Dynamic: bind [127.0.0.1]:32917: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 32917
+Could not request local forwarding.
+
+test tunnel_port_conflict_is_visible ... ok
+observed owned listener local=0200007F:9155
+echo peer=127.0.0.1:57458, local=127.0.0.2:37575, exact=TUNNEL_OK
+test explicit_nondefault_loopback_bind ... ok
+observed owned listener local=0100007F:B3C9
+echo peer=127.0.0.1:58886, local=127.0.0.1:43563, exact=TUNNEL_OK
+test local_remote_dynamic_tunnels_carry_exact_payload ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.99s
+

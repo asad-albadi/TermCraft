@@ -1,0 +1,31 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.84s
+     Running tests/remote_editor.rs (target/debug/deps/remote_editor-92bf7fb3d77cd0a0)
+
+running 5 tests
+test close_cancel_retains_dirty_document ... ok
+test failed_save_keeps_recoverable_edits ... ok
+
+thread 'unsupported_atomic_replace_cleans_up_owned_remote_staging' (248809) panicked at tests/remote_editor.rs:183:5:
+Failed save leaked an unreported remote staging file
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test unsupported_atomic_replace_cleans_up_owned_remote_staging ... FAILED
+
+thread 'remote_save_conflict_preserves_both_versions' (248808) panicked at tests/remote_editor.rs:42:9:
+expected Conflict, got Saved
+test remote_save_conflict_preserves_both_versions ... FAILED
+
+thread 'a_permission_restriction_during_staging_cannot_be_reversed_by_save' (248805) panicked at tests/remote_editor.rs:42:9:
+expected Conflict, got Saved
+test a_permission_restriction_during_staging_cannot_be_reversed_by_save ... FAILED
+
+failures:
+
+failures:
+    a_permission_restriction_during_staging_cannot_be_reversed_by_save
+    remote_save_conflict_preserves_both_versions
+    unsupported_atomic_replace_cleans_up_owned_remote_staging
+
+test result: FAILED. 2 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.53s
+
+error: test failed, to rerun pass `--test remote_editor`

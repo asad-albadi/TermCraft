@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'fixture_port_claim_survives_socket_handoff_and_releases_on_drop' (67205) panicked at mutation-release.rs:62:5:
+a second fixture claimed the handed-off port 127.0.0.1:45261
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test fixture_port_claim_survives_socket_handoff_and_releases_on_drop ... FAILED
+
+failures:
+
+failures:
+    fixture_port_claim_survives_socket_handoff_and_releases_on_drop
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

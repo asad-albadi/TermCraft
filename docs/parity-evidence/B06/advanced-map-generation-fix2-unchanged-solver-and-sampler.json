@@ -1,0 +1,14 @@
+{
+  "unchanged_functions_sha256": {
+    "normal_pairs": "96fec7688d963529bb2eaa2fb730d32e3d0e62253291a85f03e63c87fdb852cc",
+    "forcing_chains": "e6f252a4acbf630ec56e2d925e93d18d85b6b81567e9a31b27fc0a1075813b19",
+    "grade_solve": "c26bfc2acb7359c6253f178381e4f3e4ff319ef4b5f43bec3ff6c266bd5a91bb",
+    "deduce_grade": "7db89c61f8c939c5f1ecc946b4cf1ac565d383b92c4c983154f4f36a6c8c0e80",
+    "deduce": "27f63c8f0426c3751cbdc460aacc249c3729d62aa7de54dbada6c77de41ba435",
+    "graph": "ae1e56c0fcb73788ff6c6a2c94d13453561e9fc04fc9e1626a23abdfecb50254",
+    "options": "2ab7504fb33bfbccde08d5e8f1daab77e12bf7bc77ea1a68d1716d2b723f4c72",
+    "solve": "a34c93e473fa44e1c8888ac494177ef18a7a5ee8b4cee73915f8b45e1efa2949",
+    "search": "cf33a0fd63f3dd1d9c5e1d8bfc9bb632c3129ebaad102d3f094e17091fe87ce9"
+  },
+  "broad_sampler_tests_rs_sha256": "0704f130e468e2b9a747a06dd159739042109a1728af4707ac3e7283fafe06be"
+}

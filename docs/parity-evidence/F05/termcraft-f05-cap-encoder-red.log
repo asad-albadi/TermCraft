@@ -1,0 +1,52 @@
+   Compiling tempfile v3.27.0
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0425]: cannot find function `build` in module `super`
+  --> src/remote_files/transfer/folder_archive/portable.rs:15:30
+   |
+15 |         let archive = super::build(source, cancelled.clone()).await.unwrap();
+   |                              ^^^^^ not found in `super`
+   |
+help: consider importing this function
+   |
+ 3 +     use crate::remote_files::transfer::folder_archive::build;
+   |
+help: if you import `build`, refer to it directly
+   |
+15 -         let archive = super::build(source, cancelled.clone()).await.unwrap();
+15 +         let archive = build(source, cancelled.clone()).await.unwrap();
+   |
+
+error[E0425]: cannot find function `build` in module `super`
+  --> src/remote_files/transfer/folder_archive/portable.rs:27:24
+   |
+27 |         assert!(super::build(root.path().join("alias"), cancelled.clone()).await.is_err());
+   |                        ^^^^^ not found in `super`
+   |
+help: consider importing this function
+   |
+ 3 +     use crate::remote_files::transfer::folder_archive::build;
+   |
+help: if you import `build`, refer to it directly
+   |
+27 -         assert!(super::build(root.path().join("alias"), cancelled.clone()).await.is_err());
+27 +         assert!(build(root.path().join("alias"), cancelled.clone()).await.is_err());
+   |
+
+error[E0425]: cannot find function `build` in module `super`
+  --> src/remote_files/transfer/folder_archive/portable.rs:29:24
+   |
+29 |         assert!(super::build(root.path().join("source"), cancelled).await.is_err());
+   |                        ^^^^^ not found in `super`
+   |
+help: consider importing this function
+   |
+ 3 +     use crate::remote_files::transfer::folder_archive::build;
+   |
+help: if you import `build`, refer to it directly
+   |
+29 -         assert!(super::build(root.path().join("source"), cancelled).await.is_err());
+29 +         assert!(build(root.path().join("source"), cancelled).await.is_err());
+   |
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `harbor-workspace` (lib test) due to 3 previous errors

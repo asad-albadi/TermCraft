@@ -1,0 +1,10 @@
+test_partial_or_mismatched_required_structure (__main__.PinnedReports.test_partial_or_mismatched_required_structure) ... ok
+test_required_objects_arrays_and_fields_missing (__main__.PinnedReports.test_required_objects_arrays_and_fields_missing) ... ok
+test_retained_full_reports_accept_real_byte_receipts (__main__.PinnedReports.test_retained_full_reports_accept_real_byte_receipts) ... ok
+test_review_reduction_rejected (__main__.PinnedReports.test_review_reduction_rejected) ... ok
+test_typed_report_summary_and_missing_interval_details (__main__.PinnedReports.test_typed_report_summary_and_missing_interval_details) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.019s
+
+OK

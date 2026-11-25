@@ -1,0 +1,70 @@
+EXTRACTED_ROOT=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-services-unix-qualified/c6f12002f71d008aee83d165f30c93e62960cf2c74c75ba4b3007a173816af57/TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix
+INSTALL_ARCHIVE=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-services-unix-qualified/c6f12002f71d008aee83d165f30c93e62960cf2c74c75ba4b3007a173816af57/TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix/unix-packages/busybox-1.31.0-linux-x86_64.tar.gz pinned_archive_sha256=b9d70f6d8b5362426c2c726e96aac005f7d8bd46450af51a9316244e472c7ba4 pinned_binary_sha256=51fcb60efbdf3e579550e9ab893730df56b33d0cc928a2a6467bd846cdfef7d8
+HOME=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-evidence/unix-1.31.0-680579/home
+PATH=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-evidence/unix-1.31.0-680579/versions/pkg-1HePHA/bin
+
+UNIX 1.31.0 PTY output=~/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-evidence/unix-1.31.0-680579/home $ test -t 0 && test -t 1 && printf 'real-%s\n' pty;
+ printf 'alphabeta\n' > note; cat note | sed s/alpha/portable/; exit
+real-pty
+portablebeta
+ PASS
+INSTALL_ARCHIVE=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-services-unix-qualified/c6f12002f71d008aee83d165f30c93e62960cf2c74c75ba4b3007a173816af57/TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix/unix-packages/busybox-1.35.0-linux-x86_64.tar.gz pinned_archive_sha256=18e547f1026c6d7f4487f073f3b2256e046c07107561f784ceacf0ec2808a753 pinned_binary_sha256=6e123e7f3202a8c1e9b1f94d8941580a25135382b99e8d3e34fb858bba311348
+HOME=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-evidence/unix-1.35.0-680579/home
+PATH=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-evidence/unix-1.35.0-680579/versions/pkg-QXZ1ZR/bin
+
+UNIX 1.35.0 PTY output=test -t 0 && test -t 1 && printf 'real-%s\n' pty; printf 'alphabeta\n' > note; cat note | sed s/alpha/portable/; exit
+~/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-evidence/unix-1.35.0-680579/home $ test -t 0 && test -t 1 && printf 'real-%s\n' pty;
+ printf 'alphabeta\n' > note; cat note | sed s/alpha/portable/; exit
+real-pty
+portablebeta
+ PASS
+IPERF_PROVIDER=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-services-unix-qualified/c6f12002f71d008aee83d165f30c93e62960cf2c74c75ba4b3007a173816af57/TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix/runtime/linux-x86_64/iperf2
+IPERF Two udp=false address=127.0.0.1:38223 status=exit status: 0 stdout=------------------------------------------------------------
+Client connecting to 127.0.0.1, TCP port 38223
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 127.0.0.1 port 52884 connected with 127.0.0.1 port 38223
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-1.03 sec   256 KBytes  2.04 Mbits/sec
+ stderr=
+IPERF Two udp=false traffic and owned stop PASS
+IPERF Two udp=true address=127.0.0.1:42307 status=exit status: 0 stdout=------------------------------------------------------------
+Client connecting to 127.0.0.1, UDP port 42307
+Sending 1470 byte datagrams, IPG target: 0.00 us (kalman adjust)
+UDP buffer size:  208 KByte (default)
+------------------------------------------------------------
+[  1] local 127.0.0.1 port 37572 connected with 127.0.0.1 port 42307
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-1.02 sec   132 KBytes  1.06 Mbits/sec
+[  1] Sent 93 datagrams
+[  1] Server Report:
+[ ID] Interval       Transfer     Bandwidth        Jitter   Lost/Total Datagrams
+[  1] 0.00-1.02 sec   132 KBytes  1.06 Mbits/sec   0.000 ms 0/92 (0%)
+ stderr=
+IPERF Two udp=true traffic and owned stop PASS
+IPERF_PROVIDER=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-services-unix-qualified/c6f12002f71d008aee83d165f30c93e62960cf2c74c75ba4b3007a173816af57/TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix/runtime/linux-x86_64/iperf3
+IPERF Three udp=false address=127.0.0.1:46737 status=exit status: 0 stdout=Connecting to host 127.0.0.1, port 46737
+[  5] local 127.0.0.1 port 35144 connected to 127.0.0.1 port 46737
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec   128 KBytes  1.05 Mbits/sec    0    465 KBytes       
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-1.00   sec   128 KBytes  1.05 Mbits/sec    0            sender
+[  5]   0.00-1.00   sec   128 KBytes  1.05 Mbits/sec                  receiver
+
+iperf Done.
+ stderr=
+IPERF Three udp=false traffic and owned stop PASS
+IPERF Three udp=true address=127.0.0.1:32967 status=exit status: 0 stdout=Connecting to host 127.0.0.1, port 32967
+[  5] local 127.0.0.1 port 37082 connected to 127.0.0.1 port 32967
+[ ID] Interval           Transfer     Bitrate         Total Datagrams
+[  5]   0.00-1.00   sec   128 KBytes  1.05 Mbits/sec  4  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams
+[  5]   0.00-1.00   sec   128 KBytes  1.05 Mbits/sec  0.000 ms  0/4 (0%)  sender
+[  5]   0.00-1.00   sec   128 KBytes  1.05 Mbits/sec  0.007 ms  0/4 (0%)  receiver
+
+iperf Done.
+ stderr=
+IPERF Three udp=true traffic and owned stop PASS
+ALL EXTRACTED PAYLOAD UNIX/IPERF CHECKS PASS

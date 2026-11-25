@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "outer_targets": 65,
+  "passed": 639,
+  "failed": 0,
+  "ignored": 33,
+  "source_unchanged_during_gate": true,
+  "scope": "Reviewed B04 Windows registration/path/registry source, strict handler-only CLI and package uninstall guard plus previous reviewed B03/B05/X05/P06/Unix release payload. Native Windows code is component-checked, not executed."
+}

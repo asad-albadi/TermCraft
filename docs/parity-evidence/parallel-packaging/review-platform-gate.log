@@ -1,0 +1,15 @@
+test_deb_layout_checksums_dependencies_and_no_replace (packaging_debian.DebianPackage.test_deb_layout_checksums_dependencies_and_no_replace) ... ok
+test_windows_zip_and_macos_bundle_keep_helper_beside_app (packaging_release.NativePackageLayout.test_windows_zip_and_macos_bundle_keep_helper_beside_app) ... ok
+test_architecture_mismatch_prevents_staging (packaging_release.PortablePackage.test_architecture_mismatch_prevents_staging) ... ok
+test_archive_relocates_with_empty_path_and_keeps_workspace_data (packaging_release.PortablePackage.test_archive_relocates_with_empty_path_and_keeps_workspace_data) ... Menu entry belongs to a different package: /tmp/package path 9h3p465i/menu data/applications/org.termcraft.TermCraft.desktop
+An existing menu entry owns /tmp/package path 9h3p465i/menu data/applications/org.termcraft.TermCraft.desktop. Remove it from the previous package first.
+ok
+test_source_tree_loader_and_runpath_are_rejected (packaging_release.PortablePackage.test_source_tree_loader_and_runpath_are_rejected) ... ok
+test_asset_allowlist_excludes_private_files_and_rejects_symlinks (packaging_release.PublicationBoundary.test_asset_allowlist_excludes_private_files_and_rejects_symlinks) ... ok
+test_cargo_ignores_live_ancestor_configuration (packaging_release.PublicationBoundary.test_cargo_ignores_live_ancestor_configuration) ... ok
+test_release_build_reads_snapshot_while_live_sources_change (packaging_release.SourceSnapshot.test_release_build_reads_snapshot_while_live_sources_change) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 3.715s
+
+OK

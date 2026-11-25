@@ -1,0 +1,33 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.63s
+     Running tests/terminal_conformance.rs (app/target/debug/deps/terminal_conformance-f1f1293098e096af)
+
+running 2 tests
+test nonprinting_reports_and_modes_preserve_pending_wrap ... FAILED
+test widening_a_pending_wrap_cursor_never_overwrites_the_last_character ... FAILED
+
+failures:
+
+---- nonprinting_reports_and_modes_preserve_pending_wrap stdout ----
+
+thread 'nonprinting_reports_and_modes_preserve_pending_wrap' (354555) panicked at tests/terminal_conformance.rs:174:119:
+assertion `left == right` failed
+  left: "X"
+ right: "d"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- widening_a_pending_wrap_cursor_never_overwrites_the_last_character stdout ----
+
+thread 'widening_a_pending_wrap_cursor_never_overwrites_the_last_character' (354556) panicked at tests/terminal_conformance.rs:169:99:
+assertion `left == right` failed
+  left: "X"
+ right: "d"
+
+
+failures:
+    nonprinting_reports_and_modes_preserve_pending_wrap
+    widening_a_pending_wrap_cursor_never_overwrites_the_last_character
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test terminal_conformance`

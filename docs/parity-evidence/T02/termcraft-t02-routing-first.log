@@ -1,0 +1,119 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0432]: unresolved import `egui`
+ --> src/ui/terminal_mouse.rs:2:5
+  |
+2 | use egui::{Context, Event, LayerId, Modifiers, MouseWheelUnit, PointerButton, Pos2, Rect};
+  |     ^^^^
+  |
+help: a similar path exists
+  |
+2 | use super::egui::{Context, Event, LayerId, Modifiers, MouseWheelUnit, PointerButton, Pos2, Rect};
+  |     +++++++
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:62:98
+   |
+62 | ...::Line,delta:egui::vec2(0.,1.),phase:egui::TouchPhase::Move,modifiers:Modifiers::default()}}
+   |                                         ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:62:74
+   |
+62 |     fn wheel()->Event {Event::MouseWheel{unit:MouseWheelUnit::Line,delta:egui::vec2(0.,1.),phase:egui::TouchPhase::Move,modifiers:Mo...
+   |                                                                          ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:68:94
+   |
+68 | ...t:Some(Rect::from_min_max(Pos2::ZERO,egui::pos2(800.,600.))),..Default::default()},|ui|{
+   |                                         ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:69:31
+   |
+69 |             ui.allocate_space(egui::vec2(800.,600.));
+   |                               ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:70:59
+   |
+70 | ...   let viewport=Viewport{clip:Rect::from_min_max(egui::pos2(200.,100.),egui::pos2(500.,400.)),rows:vec![(7,Rect::from_min_max(egu...
+   |                                                     ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:70:81
+   |
+70 | ...   let viewport=Viewport{clip:Rect::from_min_max(egui::pos2(200.,100.),egui::pos2(500.,400.)),rows:vec![(7,Rect::from_min_max(egu...
+   |                                                                           ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:70:136
+   |
+70 | ...0.)),rows:vec![(7,Rect::from_min_max(egui::pos2(180.,120.),egui::pos2(580.,140.)))],cell_width:10.,cols:40,layer:ui.layer_id()};
+   |                                         ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:70:158
+   |
+70 | ...::from_min_max(egui::pos2(180.,120.),egui::pos2(580.,140.)))],cell_width:10.,cols:40,layer:ui.layer_id()};
+   |                                         ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:72:25
+   |
+72 |             for pos in [egui::pos2(50.,130.),egui::pos2(210.,110.),egui::pos2(510.,130.)] {
+   |                         ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:72:46
+   |
+72 |             for pos in [egui::pos2(50.,130.),egui::pos2(210.,110.),egui::pos2(510.,130.)] {
+   |                                              ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:72:68
+   |
+72 |             for pos in [egui::pos2(50.,130.),egui::pos2(210.,110.),egui::pos2(510.,130.)] {
+   |                                                                    ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:75:21
+   |
+75 |             let pos=egui::pos2(205.,130.);
+   |                     ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+error[E0433]: cannot find module or crate `egui` in this scope
+  --> src/ui/terminal_mouse.rs:68:32
+   |
+68 | ...   let mut out=ctx.run_ui(egui::RawInput{screen_rect:Some(Rect::from_min_max(Pos2::ZERO,egui::pos2(800.,600.))),..Default::defaul...
+   |                              ^^^^ use of unresolved module or unlinked crate `egui`
+   |
+   = help: if you wanted to use a crate named `egui`, use `cargo add egui` to add it to your `Cargo.toml`
+
+Some errors have detailed explanations: E0432, E0433.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 14 previous errors

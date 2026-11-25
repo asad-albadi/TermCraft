@@ -1,0 +1,11 @@
+   Compiling harbor-workspace v0.1.0-b05-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b05)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.70s
+     Running unittests src/lib.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-47c17653d7c81598)
+
+running 3 tests
+test cli::desktop_tests::desktop_launch_preserves_arguments_and_workspace ... ok
+test cli::desktop_tests::received_launch_cannot_run_commands_or_override_workspace ... ok
+test cli::desktop_tests::link_file_is_bounded_strict_and_only_selects_safe_actions ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 71 filtered out; finished in 0.00s
+

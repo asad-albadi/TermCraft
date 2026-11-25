@@ -1,0 +1,54 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling libc v0.2.191
+error: rustc interrupted by SIGSEGV, printing backtrace
+
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x3bf740c) [0x7f6fb83f740c]
+/usr/lib/libc.so.6(+0x44e70) [0x7f6fb4444e70]
+rustc(+0x12d13) [0x5623ea97cd13]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x5c2b38d) [0x7f6fba42b38d]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x520999d) [0x7f6fb9a0999d]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(_RNvCs9rw89RHhIdv_19rustc_mir_transform13optimized_mir+0x38e) [0x7f6fba64bb96]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x5e4b7e3) [0x7f6fba64b7e3]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x525f8ca) [0x7f6fb9a5f8ca]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x525ef0e) [0x7f6fb9a5ef0e]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(_RNvMsE_NtCshveRzKUYIIN_12rustc_middle2tyNtNtB5_7context6TyCtxt12instance_mir+0x38e) [0x7f6fba501a22]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(_RNvNtCsjd5YX5sCbXS_18rustc_monomorphize9collector17items_of_instance+0x4b) [0x7f6fba50630f]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x5d062ab) [0x7f6fba5062ab]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x5d02de2) [0x7f6fba502de2]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x5d02a45) [0x7f6fba502a45]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x66aab75) [0x7f6fbaeaab75]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x66ac97e) [0x7f6fbaeac97e]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x66ac97e) [0x7f6fbaeac97e]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x5780ee1) [0x7f6fb9f80ee1]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(_RNvNtCsjd5YX5sCbXS_18rustc_monomorphize12partitioning32collect_and_partition_mono_items+0x27b) [0x7f6fba11c3fb]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x591c0a8) [0x7f6fba11c0a8]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x63cb0fa) [0x7f6fbabcb0fa]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x63cae90) [0x7f6fbabcae90]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(_RNvNtNtCskR6B7ZMDWD5_17rustc_codegen_ssa4back13symbol_export39exported_generic_symbols_provider_local+0x19c) [0x7f6fba576df8]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x6127d68) [0x7f6fba927d68]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x6125bab) [0x7f6fba925bab]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x61256c3) [0x7f6fba9256c3]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x613c029) [0x7f6fba93c029]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x630dffa) [0x7f6fbab0dffa]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(_RNvNtNtCsjPPzMkUJ0zo_14rustc_metadata5rmeta7encoder15encode_metadata+0xd4) [0x7f6fbab0b794]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(_RNvNtCsjPPzMkUJ0zo_14rustc_metadata2fs25encode_and_write_metadata+0x449) [0x7f6fba76d409]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(_RNvMNtCsgRu5RCEgNuF_15rustc_interface7queriesNtB2_6Linker24codegen_and_build_linker+0x1c8) [0x7f6fbababd08]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x63a613b) [0x7f6fbaba613b]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x638af7e) [0x7f6fbab8af7e]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x638b820) [0x7f6fbab8b820]
+/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin/../lib/librustc_driver-07ef66cfcebfb535.so(+0x638c6ac) [0x7f6fbab8c6ac]
+/usr/lib/libc.so.6(+0xac93f) [0x7f6fb44ac93f]
+/usr/lib/libc.so.6(+0x14eeec) [0x7f6fb454eeec]
+
+note: we would appreciate a report at https://github.com/rust-lang/rust
+help: you can increase rustc's stack size by setting RUST_MIN_STACK=268435456
+note: backtrace dumped due to SIGSEGV! resuming signal
+   Compiling subtle v2.6.1
+   Compiling typenum v1.20.1
+error: could not compile `proc-macro2` (lib)
+
+Caused by:
+  process didn't exit successfully: `rustc --crate-name proc_macro2 --edition=2021 /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro2-1.0.107/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C embed-bitcode=no --cfg 'feature="default"' --cfg 'feature="proc-macro"' --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values("default", "nightly", "proc-macro", "span-locations"))' -C metadata=921360feabac7dc0 -C extra-filename=-88d6fd9b27841ff9 --out-dir '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation-rust1961/debug/deps' -L 'dependency=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation-rust1961/debug/deps' --extern 'unicode_ident=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation-rust1961/debug/deps/libunicode_ident-266964b43afb4cce.rmeta' --cap-lints allow --cfg wrap_proc_macro --cfg proc_macro_span_location --cfg proc_macro_span_file --check-cfg 'cfg(fuzzing)' --check-cfg 'cfg(no_is_available)' --check-cfg 'cfg(no_literal_byte_character)' --check-cfg 'cfg(no_literal_c_string)' --check-cfg 'cfg(no_source_text)' --check-cfg 'cfg(proc_macro_span)' --check-cfg 'cfg(proc_macro_span_file)' --check-cfg 'cfg(proc_macro_span_location)' --check-cfg 'cfg(procmacro2_backtrace)' --check-cfg 'cfg(procmacro2_build_probe)' --check-cfg 'cfg(procmacro2_nightly_testing)' --check-cfg 'cfg(procmacro2_semver_exempt)' --check-cfg 'cfg(randomize_layout)' --check-cfg 'cfg(span_locations)' --check-cfg 'cfg(super_unstable)' --check-cfg 'cfg(wrap_proc_macro)'` (signal: 11, SIGSEGV: invalid memory reference)
+warning: build failed, waiting for other jobs to finish...

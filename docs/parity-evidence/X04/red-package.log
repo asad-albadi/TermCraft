@@ -1,0 +1,14 @@
+E
+======================================================================
+ERROR: test_actual_pinned_payload_stages_with_notices_and_rejects_corruption (__main__.XephyrPackage.test_actual_pinned_payload_stages_with_notices_and_rejects_corruption)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04/tests/packaging_xdmcp.py", line 10, in test_actual_pinned_payload_stages_with_notices_and_rejects_corruption
+    info,dependencies=packager.stage_xephyr(ROOT,output,archive)
+                      ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'package_release' has no attribute 'stage_xephyr'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (errors=1)

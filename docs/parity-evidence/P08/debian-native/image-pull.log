@@ -1,0 +1,21 @@
+1.99-bookworm: Pulling from library/rust
+197527a0befa: Pulling fs layer
+338554e9113f: Pulling fs layer
+69245854ad58: Pulling fs layer
+d6c30932f8d3: Pulling fs layer
+9bab93d346cd: Pulling fs layer
+338554e9113f: Download complete
+d6c30932f8d3: Download complete
+69245854ad58: Download complete
+b2846a19bd5f: Download complete
+6b426caaee97: Download complete
+69245854ad58: Pull complete
+338554e9113f: Pull complete
+d6c30932f8d3: Pull complete
+197527a0befa: Download complete
+9bab93d346cd: Download complete
+9bab93d346cd: Pull complete
+197527a0befa: Pull complete
+Digest: sha256:e6f2cff35d0f309acf8433b4f05878ed77092602c5065cc81801177da0bb3a9c
+Status: Downloaded newer image for rust:1.99-bookworm
+docker.io/library/rust:1.99-bookworm

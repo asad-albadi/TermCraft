@@ -1,0 +1,21 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: field `id` is never read
+  --> src/remote_files/transfer.rs:57:9
+   |
+56 | pub(crate) struct Job {
+   |                   --- field in this struct
+57 |     pub id: u64,
+   |         ^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (lib) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.48s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-e34932d23f1e276b)
+
+running 2 tests
+test literal_binary_file_round_trip_uses_sftp ... ok
+test cancellation_and_conflicts_preserve_existing_destination ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+

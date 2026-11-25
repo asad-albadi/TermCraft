@@ -1,0 +1,376 @@
+--- a/tests/tunnel_interop.rs
++++ b/tests/tunnel_interop.rs
+@@ -11,17 +11,19 @@
+     thread,
+     time::{Duration, Instant},
+ };
+-use support::ssh_server::SshServer;
++use support::ssh_server::{PortReservation, SshServer};
+ const PAYLOAD: &[u8] = b"TUNNEL_OK";
+ struct Echo {
+     address: SocketAddr,
+     stop: Arc<AtomicBool>,
+     count: Arc<AtomicUsize>,
+     worker: Option<thread::JoinHandle<()>>,
++    _port: PortReservation,
+ }
+ impl Echo {
+     fn start(ip: IpAddr) -> Self {
+-        let listener = TcpListener::bind((ip, 0)).expect("required address family unavailable");
++        let mut reservation = PortReservation::bind(ip);
++        let listener = reservation.take_listener();
+         let address = listener.local_addr().unwrap();
+         listener.set_nonblocking(true).unwrap();
+         let stop = Arc::new(AtomicBool::new(false));
+@@ -53,6 +55,7 @@
+             stop,
+             count,
+             worker: Some(worker),
++            _port: reservation,
+         }
+     }
+ }
+@@ -62,28 +65,42 @@
+         self.worker.take().unwrap().join().unwrap();
+     }
+ }
+-fn port(ip: IpAddr) -> u16 {
+-    TcpListener::bind((ip, 0))
+-        .unwrap()
+-        .local_addr()
+-        .unwrap()
+-        .port()
+-}
+-fn config(server: &SshServer, mode: &str, bind: IpAddr, destination: SocketAddr) -> Tunnel {
+-    Tunnel {
+-        host: "127.0.0.1".into(),
+-        user: std::env::var("USER").unwrap(),
+-        ssh_port: server.port,
+-        key: server.root.join("client").display().to_string(),
+-        mode: mode.into(),
+-        bind: bind.to_string(),
+-        local_port: port(bind),
+-        destination: destination.ip().to_string(),
+-        remote_port: destination.port(),
+-        ..Default::default()
+-    }
+-}
+-fn launch(server: &SshServer, tunnel: &Tunnel) -> Process {
++struct FixtureTunnel {
++    tunnel: Tunnel,
++    _port: PortReservation,
++}
++impl std::ops::Deref for FixtureTunnel {
++    type Target = Tunnel;
++    fn deref(&self) -> &Tunnel {
++        &self.tunnel
++    }
++}
++impl std::ops::DerefMut for FixtureTunnel {
++    fn deref_mut(&mut self) -> &mut Tunnel {
++        &mut self.tunnel
++    }
++}
++fn config(server: &SshServer, mode: &str, bind: IpAddr, destination: SocketAddr) -> FixtureTunnel {
++    let mut reservation = PortReservation::bind(bind);
++    let local_port = reservation.port();
++    reservation.release_listener();
++    FixtureTunnel {
++        tunnel: Tunnel {
++            host: "127.0.0.1".into(),
++            user: std::env::var("USER").unwrap(),
++            ssh_port: server.port,
++            key: server.root.join("client").display().to_string(),
++            mode: mode.into(),
++            bind: bind.to_string(),
++            local_port,
++            destination: destination.ip().to_string(),
++            remote_port: destination.port(),
++            ..Default::default()
++        },
++        _port: reservation,
++    }
++}
++fn launch_args(server: &SshServer, tunnel: &Tunnel) -> Vec<String> {
+     server.config(1, true);
+     let mut args = vec![
+         "-F".into(),
+@@ -101,7 +118,10 @@
+         "GlobalKnownHostsFile=/dev/null".into(),
+     ];
+     args.extend(tunnel.args().unwrap());
+-    Process::spawn("ssh", &args, None, 80, 24).unwrap()
++    args
++}
++fn launch(server: &SshServer, tunnel: &Tunnel) -> Process {
++    Process::spawn("ssh", &launch_args(server, tunnel), None, 80, 24).unwrap()
+ }
+ fn output(process: &Process) -> String {
+     String::from_utf8_lossy(&process.rx.try_iter().flatten().collect::<Vec<_>>()).into_owned()
+@@ -274,9 +294,9 @@
+     let server = SshServer::start(true);
+     let echo = Echo::start("127.0.0.1".parse().unwrap());
+     for mode in ["Local", "Remote", "Dynamic"] {
+-        let blocker = TcpListener::bind("127.0.0.1:0").unwrap();
++        let blocker = PortReservation::bind("127.0.0.1".parse().unwrap());
+         let mut tunnel = config(&server, mode, "127.0.0.1".parse().unwrap(), echo.address);
+-        tunnel.local_port = blocker.local_addr().unwrap().port();
++        tunnel.local_port = blocker.port();
+         let mut process = launch(&server, &tunnel);
+         let deadline = Instant::now() + Duration::from_secs(8);
+         let mut text = String::new();
+@@ -330,7 +350,9 @@
+ fn destination_failure_is_observable() {
+     let ip = "127.0.0.1".parse().unwrap();
+     let server = SshServer::start(true);
+-    let missing = SocketAddr::new(ip, port(ip));
++    let mut missing_reservation = PortReservation::bind(ip);
++    let missing = SocketAddr::new(ip, missing_reservation.port());
++    missing_reservation.release_listener();
+     for mode in ["Local", "Remote", "Dynamic"] {
+         let tunnel = config(&server, mode, ip, missing);
+         let mut process = launch(&server, &tunnel);
+@@ -358,3 +380,148 @@
+         );
+     }
+ }
++
++// Reproduce the old selection→bind gap without relying on the OS to randomly
++// give a second fixture the port. This is an owned banner fixture, not a service.
++#[test]
++fn released_forward_port_can_connect_to_wrong_ssh_endpoint() {
++    let server = SshServer::start(true);
++    let echo = Echo::start("127.0.0.1".parse().unwrap());
++    let tunnel = config(
++        &server,
++        "Remote",
++        "127.0.0.1".parse().unwrap(),
++        echo.address,
++    );
++    let address = SocketAddr::new("127.0.0.1".parse().unwrap(), tunnel.local_port);
++    let intruder = TcpListener::bind(address).unwrap();
++    let banner = thread::spawn(move || {
++        let (mut socket, _) = intruder.accept().unwrap();
++        socket.write_all(b"SSH-2.0-OwnedFixture\r\n").unwrap();
++        // Keep the conflicting listener until the real SSH process reports failure.
++        (intruder, socket)
++    });
++    // Hold the subprocess before exec so readiness definitely runs in the
++    // selection→bind interval, independent of scheduling/SSH handshake speed.
++    let mut args = vec![
++        "-c".into(),
++        "IFS= read -r ready; exec ssh \"$@\"".into(),
++        "owned-forward-collision-gate".into(),
++    ];
++    args.extend(launch_args(&server, &tunnel));
++    let mut process = Process::spawn("/bin/sh", &args, None, 80, 24).unwrap();
++    let mut socket = connect(&mut process, address);
++    let mut observed = [0; 9];
++    socket.read_exact(&mut observed).unwrap();
++    assert_eq!(&observed, b"SSH-2.0-O");
++    assert_ne!(&observed, PAYLOAD);
++    println!(
++        "deterministic wrong endpoint {address}: {:?}",
++        String::from_utf8_lossy(&observed)
++    );
++    let _intruder = banner.join().unwrap();
++    process.write(b"continue\n").unwrap();
++    let deadline = Instant::now() + Duration::from_secs(8);
++    let mut text = String::new();
++    loop {
++        process.poll();
++        text.push_str(&output(&process));
++        if process.exited {
++            break;
++        }
++        assert!(
++            Instant::now() < deadline,
++            "forward collision did not exit: {text}"
++        );
++        thread::sleep(Duration::from_millis(10));
++    }
++    text.push_str(&output(&process));
++    assert!(text.contains("forwarding failed"), "{text}");
++    assert_eq!(echo.count.load(Ordering::SeqCst), 0);
++    println!("real SSH process subsequently rejected occupied requested port: {text}");
++}
++
++#[test]
++fn fixture_port_claim_survives_socket_handoff_and_releases_on_drop() {
++    let ip = "127.0.0.1".parse().unwrap();
++    let mut reservation = PortReservation::bind(ip);
++    let address = SocketAddr::new(ip, reservation.port());
++    reservation.release_listener();
++    // Deterministically force the exact candidate that bind(0) can select in the
++    // gap. A second fixture must reject it even though the kernel accepts bind.
++    let candidate = TcpListener::bind(address).unwrap();
++    let rejected = PortReservation::claim(candidate);
++    assert!(
++        matches!(rejected, Err(ref e) if e.kind() == std::io::ErrorKind::AddrInUse),
++        "a second fixture claimed the released forward port {address}"
++    );
++    drop(rejected);
++    drop(reservation);
++    let reclaimed = PortReservation::claim(TcpListener::bind(address).unwrap()).unwrap();
++    assert_eq!(reclaimed.port(), address.port());
++    println!("fixture candidate {address} rejected while claimed, available after drop");
++}
++
++#[test]
++fn parallel_forward_handoffs_keep_distinct_claims_and_real_roundtrips() {
++    // Each worker pauses after selection and socket release. The controller
++    // checks all live claims before allowing any of the SSH forwards to bind.
++    // Bounded channels also unwind if a worker cannot start its fixture.
++    let (ready_tx, ready_rx) = std::sync::mpsc::channel();
++    thread::scope(|scope| {
++        let mut gates = Vec::new();
++        for (mode, ip) in [
++            ("Local", "127.0.0.1"),
++            ("Remote", "127.0.0.1"),
++            ("Dynamic", "127.0.0.1"),
++            ("Local", "::1"),
++            ("Remote", "::1"),
++            ("Dynamic", "::1"),
++        ] {
++            let ready_tx = ready_tx.clone();
++            let (gate_tx, gate_rx) = std::sync::mpsc::channel();
++            gates.push(gate_tx);
++            scope.spawn(move || {
++                let ip: IpAddr = ip.parse().unwrap();
++                let server = SshServer::start_with_settings(true, "", "GatewayPorts clientspecified");
++                let echo = Echo::start(ip);
++                let tunnel = config(&server, mode, ip, echo.address);
++                ready_tx.send([server.port, echo.address.port(), tunnel.local_port]).unwrap();
++                gate_rx.recv_timeout(Duration::from_secs(8)).expect("forward handoff gate");
++                let mut process = launch(&server, &tunnel);
++                let address = SocketAddr::new(ip, tunnel.local_port);
++                let mut socket = connect(&mut process, address);
++                if mode == "Dynamic" { assert_eq!(socks(&mut socket, echo.address).unwrap(), 0); }
++                socket.write_all(PAYLOAD).unwrap();
++                let mut bytes = [0; 9];
++                socket.read_exact(&mut bytes).unwrap();
++                assert_eq!(&bytes, PAYLOAD);
++                assert_eq!(echo.count.load(Ordering::SeqCst), 1);
++                drop(socket);
++                drop(process);
++                rebind(address);
++                println!("parallel roundtrip {mode} {address}: exact=TUNNEL_OK; count=1; cancelled; rebound");
++            });
++        }
++        drop(ready_tx);
++        let mut ports = Vec::new();
++        for _ in 0..6 {
++            ports.extend(
++                ready_rx
++                    .recv_timeout(Duration::from_secs(8))
++                    .expect("fixture selection"),
++            );
++        }
++        let unique: std::collections::HashSet<_> = ports.iter().collect();
++        assert_eq!(ports.len(), 18);
++        assert_eq!(
++            unique.len(),
++            ports.len(),
++            "live fixture claims overlapped: {ports:?}"
++        );
++        println!("all 18 fixture claims distinct before concurrent forward handoff: {ports:?}");
++        for gate in gates {
++            gate.send(()).unwrap();
++        }
++    });
++}
+--- a/tests/support/ssh_server.rs
++++ b/tests/support/ssh_server.rs
+@@ -6,10 +6,65 @@
+     process::{Child, Command, Stdio},
+     time::{Duration, Instant},
+ };
++// A live socket protects selection; a logical claim protects the interval after
++// handing the port to ssh/sshd, cancellation, and subsequent rebind checks.
++// Claims are conservative across address families because an IPv6 wildcard may
++// also occupy IPv4. The mutex covers allocation only, never a running test.
++static PORT_CLAIMS: std::sync::LazyLock<std::sync::Mutex<std::collections::HashSet<u16>>> =
++    std::sync::LazyLock::new(|| std::sync::Mutex::new(std::collections::HashSet::new()));
++
++pub struct PortReservation {
++    port: u16,
++    listener: Option<TcpListener>,
++}
++impl PortReservation {
++    pub fn bind(ip: std::net::IpAddr) -> Self {
++        loop {
++            let listener = TcpListener::bind((ip, 0)).unwrap();
++            if let Ok(reservation) = Self::claim(listener) {
++                return reservation;
++            }
++        }
++    }
++    pub fn claim(listener: TcpListener) -> std::io::Result<Self> {
++        let port = listener.local_addr()?.port();
++        let mut claims = PORT_CLAIMS.lock().unwrap_or_else(|p| p.into_inner());
++        if !claims.insert(port) {
++            return Err(std::io::Error::new(
++                std::io::ErrorKind::AddrInUse,
++                "port is reserved by another owned fixture",
++            ));
++        }
++        Ok(Self {
++            port,
++            listener: Some(listener),
++        })
++    }
++    pub fn port(&self) -> u16 {
++        self.port
++    }
++    pub fn release_listener(&mut self) {
++        self.listener.take();
++    }
++    pub fn take_listener(&mut self) -> TcpListener {
++        self.listener.take().unwrap()
++    }
++}
++impl Drop for PortReservation {
++    fn drop(&mut self) {
++        self.listener.take();
++        PORT_CLAIMS
++            .lock()
++            .unwrap_or_else(|p| p.into_inner())
++            .remove(&self.port);
++    }
++}
++
+ pub struct SshServer {
+     pub root: PathBuf,
+     pub port: u16,
+     child: Child,
++    _port: PortReservation,
+ }
+ impl SshServer {
+     pub fn start(sftp: bool) -> Self {
+@@ -41,9 +96,9 @@
+             assert!(result.success());
+         }
+         fs::copy(root.join("client.pub"), root.join("authorized_keys")).unwrap();
+-        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+-        let port = listener.local_addr().unwrap().port();
+-        drop(listener);
++        let mut reservation = PortReservation::bind("127.0.0.1".parse().unwrap());
++        let port = reservation.port();
++        reservation.release_listener();
+         let config = format!(
+             "Port {port}\nListenAddress 127.0.0.1\nHostKey {}/host\nPidFile {}/pid\nAuthorizedKeysFile {}/authorized_keys\nStrictModes no\nPasswordAuthentication no\nKbdInteractiveAuthentication no\nUsePAM no\nPermitRootLogin yes\nLogLevel VERBOSE\n{}\n",
+             root.display(),
+@@ -82,7 +137,12 @@
+             );
+             std::thread::sleep(Duration::from_millis(20));
+         }
+-        Self { root, port, child }
++        Self {
++            root,
++            port,
++            child,
++            _port: reservation,
++        }
+     }
+     pub fn config(&self, id: u64, trust: bool) -> ConnectionConfig {
+         let known = self.root.join("known_hosts");

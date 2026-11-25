@@ -1,0 +1,20 @@
+{
+  "product": "Dropbear",
+  "version": "2026.94",
+  "source_url": "https://matt.ucc.asn.au/dropbear/releases/dropbear-2026.94.tar.bz2",
+  "upstream_release_page": "https://matt.ucc.asn.au/dropbear/dropbear.html",
+  "sha256": "e098034a843699200c8c977a991fff73159735bf795d5f72ef672c41a6b1ae81",
+  "signature_url": "https://matt.ucc.asn.au/dropbear/releases/dropbear-2026.94.tar.bz2.asc",
+  "signing_key_url": "https://matt.ucc.asn.au/dropbear/releases/dropbear-key-2015.asc",
+  "verified_signing_key_fingerprint": "F7347EF2EE2E07A267628CA944931494F29C6773",
+  "signature_result": "Good signature; official-site key pinned by fingerprint, no independent web-of-trust certification claimed",
+  "configuration": "localoptions.h uses external /usr/lib/ssh/sftp-server, disables password and PAM; configure disables syslog, shadow and all login accounting",
+  "fixture_key_path_option": "supported upstream -D directory; no host authorized_keys/passwd modification",
+  "binaries": {
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/target/interop-tools/dropbear/.stages/verified.SFebwpA1/dropbear-2026.94/dropbear": "eb6e5be93693e5a2af8c8ba2fd324780585d607871d8ea01c52a6ba116bc3698",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/target/interop-tools/dropbear/.stages/verified.SFebwpA1/dropbear-2026.94/dropbearkey": "f4d37c043138047e24d13e8cd299e9fd5b04ac4c71c153239b2465b72c9f331e",
+    "/usr/lib/ssh/sftp-server": "c2b5421a829094b9f0d9ee2f12a8da0af076e43d08f90364effe2e59b464bb71"
+  },
+  "fixture_source_build": "Every preparation verifies the pinned signed archive, extracts a fresh owned .stages directory, configures/builds only there, and atomically replaces an owned destination symlink; prior source/objects are never executed/reused.",
+  "published_stage": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/target/interop-tools/dropbear/.stages/verified.SFebwpA1/dropbear-2026.94"
+}

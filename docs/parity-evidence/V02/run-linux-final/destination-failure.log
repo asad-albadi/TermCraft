@@ -1,0 +1,8 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact destination_failure_is_observable --nocapture --test-threads=1
+Executable SHA256: 0fa9fd1dcc9cc5e1ccd57f333145ee69b433d68fa65fda1abd5428d3790804fa
+
+running 1 test
+test destination_failure_is_observable ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.50s
+

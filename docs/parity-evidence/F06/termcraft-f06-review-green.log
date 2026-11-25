@@ -1,0 +1,20 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.07s
+     Running tests/ssh_lifecycle.rs (app/target/debug/deps/ssh_lifecycle-7068c92c1740f5cf)
+
+running 12 tests
+test credential_titles_identify_the_role_host_and_port ... ok
+test password_then_mfa_uses_the_new_methods_without_repeating_password ... ok
+test browser_retry_does_not_reauthenticate ... ok
+test reconnect_discards_old_challenges_and_listings ... ok
+test server_disconnect_retires_a_visible_password_prompt_without_an_answer ... ok
+test prompted_username_identity_survives_fresh_editor_recovery_without_implicit_upload ... ok
+test cancelling_encrypted_key_unlock_rejects_late_passphrases ... ok
+test recovery_from_an_unsuccessful_open_cannot_replace_a_fresh_document ... ok
+test reconnect_rejects_real_old_directory_snapshots ... ok
+test cancel_auth_stops_the_entire_attempt ... ok
+test recovery_import_preserves_unsaved_destination_edits ... ok
+test recovery_never_crosses_a_changed_trust_once_server_key ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.68s
+

@@ -1,0 +1,21 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/mutants/killer-completion-sum)
+    Finished `release` profile [optimized] target(s) in 4.54s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/mutation-target/release/deps/b06_puzzle_options_private-beed19bb514c887b)
+
+running 1 test
+
+thread 'solo::advanced::topology_tests::killer_wrong_sum_blocks_win_even_when_all_sudoku_units_are_valid' (423191) panicked at src/games/puzzles/solo_advanced.rs:1166:9:
+assertion `left == right` failed
+  left: Won
+ right: Playing
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test solo::advanced::topology_tests::killer_wrong_sum_blocks_win_even_when_all_sudoku_units_are_valid ... FAILED
+
+failures:
+
+failures:
+    solo::advanced::topology_tests::killer_wrong_sum_blocks_win_even_when_all_sudoku_units_are_valid
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 64 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

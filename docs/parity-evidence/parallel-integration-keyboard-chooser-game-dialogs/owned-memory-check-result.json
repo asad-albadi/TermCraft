@@ -1,0 +1,7 @@
+{
+  "exit_code": 0,
+  "seconds": 0.83,
+  "bytes": 134217728,
+  "patterns": 24,
+  "scope": "Only this process owned allocation; no physical memory mapping, mlock, global settings or other process memory touched; negative result cannot establish hardware health."
+}

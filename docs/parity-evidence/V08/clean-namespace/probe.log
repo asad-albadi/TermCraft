@@ -1,0 +1,78 @@
+outer private namespace
+uid=1000 gid=1000 groups=1000,65534(nobody)
+Name:	cat
+Umask:	0077
+State:	R (running)
+Tgid:	4
+Ngid:	0
+Pid:	4
+PPid:	2
+TracerPid:	0
+Uid:	1000	1000	1000	1000
+Gid:	1000	1000	1000	1000
+FDSize:	256
+Groups:	65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 
+NStgid:	4
+NSpid:	4
+NSpgid:	1
+NSsid:	1
+Kthread:	0
+VmPeak:	    3672 kB
+VmSize:	    3672 kB
+VmLck:	       0 kB
+VmPin:	       0 kB
+VmHWM:	    2912 kB
+VmRSS:	    2912 kB
+RssAnon:	     264 kB
+RssFile:	    2648 kB
+RssShmem:	       0 kB
+VmData:	     600 kB
+VmStk:	     132 kB
+VmExe:	      28 kB
+VmLib:	    1704 kB
+VmPTE:	      44 kB
+VmSwap:	       0 kB
+HugetlbPages:	       0 kB
+CoreDumping:	0
+THP_enabled:	1
+untag_mask:	0xffffffffffffffff
+Threads:	1
+SigQ:	0/124955
+SigPnd:	0000000000000000
+ShdPnd:	0000000000000000
+SigBlk:	0000000000000000
+SigIgn:	0000000000000000
+SigCgt:	0000000000000000
+CapInh:	0000000000000000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	0000000000000000
+CapAmb:	0000000000000000
+NoNewPrivs:	1
+Seccomp:	0
+Seccomp_filters:	0
+Speculation_Store_Bypass:	thread vulnerable
+SpeculationIndirectBranch:	conditional enabled
+Cpus_allowed:	ffff
+Cpus_allowed_list:	0-15
+Mems_allowed:	1
+Mems_allowed_list:	0
+voluntary_ctxt_switches:	0
+nonvoluntary_ctxt_switches:	0
+x86_Thread_features:	
+x86_Thread_features_locked:	
+/proc/self/ns/cgroup cgroup:[4026533179]
+/proc/self/ns/ipc ipc:[4026533176]
+/proc/self/ns/mnt mnt:[4026533174]
+/proc/self/ns/net net:[4026533293]
+/proc/self/ns/pid pid:[4026533178]
+/proc/self/ns/pid_for_children pid:[4026533178]
+/proc/self/ns/time time:[4026531834]
+/proc/self/ns/time_for_children time:[4026531834]
+/proc/self/ns/user user:[4026533628]
+/proc/self/ns/uts uts:[4026533175]
+      1000          0          1
+      1000          0          1
+Chromium 158.0.8127.88 
+headless exit=0
+browser process records 15

@@ -1,0 +1,63 @@
+   Compiling b06-advanced-fix918 v0.1.918 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/fix2/holdout)
+    Finished `release` profile [optimized] target(s) in 4.45s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/fix2/holdout/target/release/deps/b06_advanced_fix918-220bb8297dc415ce)
+
+running 1 test
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 8: exhausted micros=5205
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 9: success micros=3811
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 10: exhausted micros=4269
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 11: success micros=2295
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 12: exhausted micros=4217
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 13: exhausted micros=4005
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 14: exhausted micros=3717
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 15: exhausted micros=3829
+MATRIX MapConfig { preset: Default, regions: 30, difficulty: Hard }: 2/8
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 8: success micros=1429
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 9: success micros=2948
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 10: exhausted micros=4789
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 11: success micros=4413
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 12: exhausted micros=4699
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 13: success micros=4611
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 14: success micros=2972
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 15: exhausted micros=4225
+MATRIX MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }: 5/8
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 8: success micros=15420
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 9: success micros=13598
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 10: success micros=8673
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 11: success micros=13114
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 12: success micros=27987
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 13: success micros=12673
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 14: success micros=6119
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 15: success micros=24891
+MATRIX MapConfig { preset: Default, regions: 75, difficulty: Hard }: 8/8
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 8: success micros=2468
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 9: exhausted micros=3920
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 10: exhausted micros=3981
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 11: success micros=724
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 12: success micros=1818
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 13: exhausted micros=3962
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 14: exhausted micros=3750
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 15: success micros=2554
+MATRIX MapConfig { preset: Portrait, regions: 30, difficulty: Hard }: 4/8
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 8: success micros=4451
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 9: exhausted micros=4379
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 10: exhausted micros=4348
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 11: exhausted micros=5063
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 12: success micros=1847
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 13: success micros=2365
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 14: exhausted micros=4144
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 15: success micros=3059
+MATRIX MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }: 4/8
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 8: success micros=5574
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 9: success micros=15552
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 10: success micros=13939
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 11: success micros=27154
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 12: success micros=7346
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 13: success micros=4486
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 14: success micros=9105
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 15: success micros=9004
+MATRIX MapConfig { preset: Portrait, regions: 75, difficulty: Hard }: 8/8
+test map::fix2_seed_matrix::advanced_map_ordinary_seed_matrix_has_real_successes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 66 filtered out; finished in 0.33s
+

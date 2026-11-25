@@ -1,0 +1,9 @@
+# FTP, graphical tools and capture integration gate
+
+2026-11-24: `CARGO_BUILD_JOBS=2 cargo test --offline --no-fail-fast` exited 0: **522 outer-target tests passed, 0 failed, 8 ignored**, across 55 outer targets. Nested child-test summaries are excluded from the count. The separate RDP helper suite passed **27/27**. `source-sha256.json` identifies the source at compilation; later macro UI, X11 and RDP printer work is outside this gate.
+
+- FTP/FTPS: 12 protocol cases, 10 actor/file/folder cases and 3 actual GUI cases passed in the full run. Scope includes verified TLS, encrypted data, active/passive and ASCII, graphical browser/editor, file/folder merge conflicts, cancellation/recovery and recursive-delete confirmation. File/folder selection survives confirmation; replaced file types cannot become recursive jobs. Independent reports: `../P02/folder-review.md` and the P02 prior review evidence.
+- Tools/capture: bounded file/folder comparison, image preview, explicit-target port scan and provider-based packet capture are integrated. Normal parser/staging and tools tests passed in the full run. Live capture and kernel-denial tests run separately in isolated user/network namespaces with only fixture-owned loopback traffic; see `../P07/parallel-capture-review-fix.log`. Both Important capture findings are closed in `../P07/review.md`. No host traffic was captured.
+- The Cargo package-manifest target ran all eight Python packaging regressions. P08 artifact rebuild/launch qualification is separate and remains in progress.
+
+Limitations: FTP requires MLSD; remote rename/path races and already-committed folder merge entries remain documented. Windows/macOS runtime and independent deployed/original endpoints remain unverified. Packet capture requires the declared native provider and OS access; source compilation is not native runtime proof. The eight ignored tests are preserved, not converted into passing results.

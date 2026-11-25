@@ -1,0 +1,73 @@
+   Compiling b06-advanced-fix918 v0.1.918 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/fix2/baseline-timing)
+    Finished `release` profile [optimized] target(s) in 4.30s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/fix2/baseline-timing/target/release/deps/b06_advanced_fix918-220bb8297dc415ce)
+
+running 1 test
+test map::fix2_seed_matrix::advanced_map_ordinary_seed_matrix_has_real_successes ... SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 0: exhausted micros=6709
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 1: exhausted micros=5812
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 2: exhausted micros=3427
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 3: exhausted micros=3448
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 4: exhausted micros=3981
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 5: exhausted micros=3767
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 6: exhausted micros=3341
+SEED MapConfig { preset: Default, regions: 30, difficulty: Hard } 7: exhausted micros=4514
+MATRIX MapConfig { preset: Default, regions: 30, difficulty: Hard }: 0/8
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 0: exhausted micros=3724
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 1: exhausted micros=3550
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 2: exhausted micros=3616
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 3: exhausted micros=3602
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 4: exhausted micros=3979
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 5: exhausted micros=3864
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 6: exhausted micros=3372
+SEED MapConfig { preset: Default, regions: 30, difficulty: Unreasonable } 7: exhausted micros=3860
+MATRIX MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }: 0/8
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 0: exhausted micros=52381
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 1: success micros=38668
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 2: exhausted micros=54305
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 3: success micros=42443
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 4: success micros=57055
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 5: success micros=48980
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 6: success micros=19916
+SEED MapConfig { preset: Default, regions: 75, difficulty: Hard } 7: exhausted micros=52938
+MATRIX MapConfig { preset: Default, regions: 75, difficulty: Hard }: 5/8
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 0: exhausted micros=3281
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 1: success micros=348
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 2: exhausted micros=3316
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 3: exhausted micros=3862
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 4: exhausted micros=3150
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 5: exhausted micros=3157
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 6: exhausted micros=3023
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Hard } 7: exhausted micros=3371
+MATRIX MapConfig { preset: Portrait, regions: 30, difficulty: Hard }: 1/8
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 0: success micros=1718
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 1: exhausted micros=3672
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 2: exhausted micros=3471
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 3: exhausted micros=4067
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 4: exhausted micros=3300
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 5: success micros=3399
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 6: exhausted micros=3159
+SEED MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable } 7: exhausted micros=3570
+MATRIX MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }: 2/8
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 0: exhausted micros=50600
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 1: exhausted micros=62906
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 2: success micros=14806
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 3: success micros=13727
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 4: success micros=7322
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 5: exhausted micros=56136
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 6: success micros=33545
+SEED MapConfig { preset: Portrait, regions: 75, difficulty: Hard } 7: success micros=13371
+MATRIX MapConfig { preset: Portrait, regions: 75, difficulty: Hard }: 5/8
+
+thread 'map::fix2_seed_matrix::advanced_map_ordinary_seed_matrix_has_real_successes' (561560) panicked at src/games/puzzles/map.rs:1119:3:
+ordinary-seed matrices with zero exact-grade results: [MapConfig { preset: Default, regions: 30, difficulty: Hard }, MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    map::fix2_seed_matrix::advanced_map_ordinary_seed_matrix_has_real_successes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 66 filtered out; finished in 0.74s
+
+error: test failed, to rerun pass `--lib`

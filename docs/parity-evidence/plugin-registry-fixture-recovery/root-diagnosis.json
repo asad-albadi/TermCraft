@@ -1,0 +1,6 @@
+{
+  "producer_exit_before_input": 0,
+  "unsolicited_stdout": "{\"protocol\":1,\"ok\":true}\n",
+  "request_write_broken_pipe": true,
+  "source": "src/plugins/registry.rs exact embedded C with value=true"
+}

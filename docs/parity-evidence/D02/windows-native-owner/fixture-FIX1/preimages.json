@@ -1,0 +1,8 @@
+{
+  "tests/windows-serial-owner-component/Cargo.toml": "73d8d5b7ab4d7e8f652a47cf63ca08c9e16322dfb0a65b33e3d8ce0ad67ecb48",
+  "tests/windows-serial-owner-component/Cargo.lock": "e4e8b3f2c611e4b52100f9cda317c3a330078b6dbb9f9e2701252a91d61450be",
+  "tests/windows-serial-owner-component/generate.py": "2524f7eaba2796f5e3eb1d8b37d651f57b0a6c40f8b9f3cb898c2f6f2a3f728f",
+  "tests/windows-serial-owner-component/README.md": "8d2c28ec8cc3b99927e82a22a7758128e2255336793208d45ee5fb0dbffa230e",
+  "tests/windows-serial-owner-component/main.rs": "39e9c360d4f1de2f94828336373cb290a24a8c94781eadad02a2f54c549a30ca",
+  "tests/windows-serial-owner-component/src/lib.rs": null
+}

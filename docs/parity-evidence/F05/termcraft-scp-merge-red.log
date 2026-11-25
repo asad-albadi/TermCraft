@@ -1,0 +1,23 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s
+     Running tests/scp_browser.rs (app/target/debug/deps/scp_browser-c29d0c75c0879a2f)
+
+running 1 test
+test scp_folder_merge_preserves_unrelated_entries_and_existing_modes ... FAILED
+
+failures:
+
+---- scp_folder_merge_preserves_unrelated_entries_and_existing_modes stdout ----
+
+thread 'scp_folder_merge_preserves_unrelated_entries_and_existing_modes' (298196) panicked at tests/scp_browser.rs:635:144:
+assertion `left == right` failed
+  left: Failed("SCP helper failed: SCP helper: SCP folder merge is not available yet; choose a new destination")
+ right: Completed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    scp_folder_merge_preserves_unrelated_entries_and_existing_modes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.38s
+
+error: test failed, to rerun pass `--test scp_browser`

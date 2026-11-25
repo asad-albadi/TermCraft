@@ -1,0 +1,11 @@
+{
+  "exit_code": 101,
+  "seconds": 5.54,
+  "captured_files": 743,
+  "source_changes": [],
+  "targets": 0,
+  "passed": 0,
+  "failed": 0,
+  "ignored": 0,
+  "results": []
+}

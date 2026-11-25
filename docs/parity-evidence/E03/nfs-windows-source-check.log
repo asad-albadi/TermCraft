@@ -1,0 +1,248 @@
+    Checking e03-nfs-component v0.1.0-e03-nfs-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-nfs/component)
+warning: constant `STAGING` is never used
+  --> services/../../src/services/files.rs:13:7
+   |
+13 | const STAGING: &str = ".harbor-service-stage-";
+   |       ^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: constant `UPLOAD_LIMIT` is never used
+  --> services/../../src/services/files.rs:14:18
+   |
+14 | pub(super) const UPLOAD_LIMIT: u64 = 64 * 1024 * 1024;
+   |                  ^^^^^^^^^^^^
+
+warning: struct `Share` is never constructed
+  --> services/../../src/services/files.rs:16:19
+   |
+16 | pub(super) struct Share {
+   |                   ^^^^^
+
+warning: multiple associated items are never used
+   --> services/../../src/services/files.rs:23:19
+    |
+ 22 | impl Share {
+    | ---------- associated items in this implementation
+ 23 |     pub(super) fn open(path: &Path, writable: bool) -> io::Result<Self> {
+    |                   ^^^^
+...
+ 31 |     pub(super) fn directory(&self, path: &Path) -> io::Result<Dir> {
+    |                   ^^^^^^^^^
+...
+ 39 |     fn parent<'a>(&self, path: &'a Path) -> io::Result<(Dir, &'a OsStr)> {
+    |        ^^^^^^
+...
+ 46 |     pub(super) fn read(&self, path: &Path) -> io::Result<File> {
+    |                   ^^^^
+...
+ 65 |     pub(super) fn stage(&self, path: &Path) -> io::Result<Staged> {
+    |                   ^^^^^
+...
+ 93 |     pub(super) fn check_write(&self) -> io::Result<()> {
+    |                   ^^^^^^^^^^^
+...
+101 |     pub(super) fn create_directory(&self, path: &Path) -> io::Result<()> {
+    |                   ^^^^^^^^^^^^^^^^
+...
+108 |     pub(super) fn kind(&self, path: &Path) -> io::Result<cap_std::fs::FileType> {
+    |                   ^^^^
+...
+118 |     pub(super) fn remove(&self, path: &Path, directory: bool) -> io::Result<()> {
+    |                   ^^^^^^
+...
+130 |     pub(super) fn rename(&self, from: &Path, to: &Path) -> io::Result<()> {
+    |                   ^^^^^^
+
+warning: function `require_absent` is never used
+   --> services/../../src/services/files.rs:156:4
+    |
+156 | fn require_absent(dir: &Dir, name: &OsStr) -> io::Result<()> {
+    |    ^^^^^^^^^^^^^^
+
+warning: struct `Staged` is never constructed
+   --> services/../../src/services/files.rs:164:19
+    |
+164 | pub(super) struct Staged {
+    |                   ^^^^^^
+
+warning: methods `append` and `publish` are never used
+   --> services/../../src/services/files.rs:172:19
+    |
+171 | impl Staged {
+    | ----------- methods in this implementation
+172 |     pub(super) fn append(&mut self, data: &[u8]) -> io::Result<()> {
+    |                   ^^^^^^
+...
+179 |     pub(super) fn publish(mut self, confirm: impl FnOnce() -> io::Result<()>) -> io::Result<()> {
+    |                   ^^^^^^^
+
+warning: function `path` is never used
+   --> services/../../src/services/files.rs:196:15
+    |
+196 | pub(super) fn path(current: &Path, name: &str, allow_absolute: bool) -> io::Result<PathBuf> {
+    |               ^^^^
+
+warning: function `usable_name` is never used
+   --> services/../../src/services/files.rs:229:15
+    |
+229 | pub(super) fn usable_name(name: &str) -> bool {
+    |               ^^^^^^^^^^^
+
+warning: function `rename_windows` is never used
+   --> services/../../src/services/files.rs:264:4
+    |
+264 | fn rename_windows(
+    |    ^^^^^^^^^^^^^^
+
+warning: constant `MAX_OBJECTS` is never used
+  --> services/../../src/services/nfs.rs:17:7
+   |
+17 | const MAX_OBJECTS: usize = 4096;
+   |       ^^^^^^^^^^^
+
+warning: constant `MAX_CREATED` is never used
+  --> services/../../src/services/nfs.rs:18:7
+   |
+18 | const MAX_CREATED: usize = 256;
+   |       ^^^^^^^^^^^
+
+warning: constant `MAX_TRANSFER` is never used
+  --> services/../../src/services/nfs.rs:19:7
+   |
+19 | const MAX_TRANSFER: u32 = 64 * 1024;
+   |       ^^^^^^^^^^^^
+
+warning: constant `MAX_BYTES` is never used
+  --> services/../../src/services/nfs.rs:20:7
+   |
+20 | const MAX_BYTES: u64 = 64 * 1024 * 1024;
+   |       ^^^^^^^^^
+
+warning: struct `Listener` is never constructed
+  --> services/../../src/services/nfs.rs:22:19
+   |
+22 | pub(super) struct Listener {
+   |                   ^^^^^^^^
+
+warning: associated items `bind`, `address`, and `serve` are never used
+  --> services/../../src/services/nfs.rs:27:19
+   |
+26 | impl Listener {
+   | ------------- associated items in this implementation
+27 |     pub(super) fn bind(bind: SocketAddr, root: &Path, writable: bool) -> Result<Self, String> {
+   |                   ^^^^
+...
+38 |     pub(super) fn address(&self) -> io::Result<SocketAddr> {
+   |                   ^^^^^^^
+...
+41 |     pub(super) fn serve(self, cancelled: impl Fn() -> bool) -> io::Result<()> {
+   |                   ^^^^^
+
+warning: function `limits` is never used
+  --> services/../../src/services/nfs.rs:62:4
+   |
+62 | fn limits() -> ServerLimits {
+   |    ^^^^^^
+
+warning: enum `Handle` is never used
+  --> services/../../src/services/nfs.rs:84:6
+   |
+84 | enum Handle {
+   |      ^^^^^^
+
+warning: method `metadata` is never used
+  --> services/../../src/services/nfs.rs:89:8
+   |
+88 | impl Handle {
+   | ----------- method in this implementation
+89 |     fn metadata(&self) -> io::Result<Metadata> {
+   |        ^^^^^^^^
+
+warning: struct `Object` is never constructed
+  --> services/../../src/services/nfs.rs:96:8
+   |
+96 | struct Object {
+   |        ^^^^^^
+
+warning: struct `State` is never constructed
+   --> services/../../src/services/nfs.rs:101:8
+    |
+101 | struct State {
+    |        ^^^^^
+
+warning: struct `Export` is never constructed
+   --> services/../../src/services/nfs.rs:109:8
+    |
+109 | struct Export {
+    |        ^^^^^^
+
+warning: multiple associated items are never used
+   --> services/../../src/services/nfs.rs:116:8
+    |
+115 | impl Export {
+    | ----------- associated items in this implementation
+116 |     fn open(root: &Path, writable: bool) -> io::Result<Self> {
+    |        ^^^^
+...
+144 |     fn validate<'a>(&self, state: &'a State, key: ObjectKey) -> Result<&'a Object, NfsError> {
+    |        ^^^^^^^^
+...
+161 |     fn child(&self, state: &State, parent: ObjectKey, name: &NfsName) -> Result<PathBuf, NfsError> {
+    |        ^^^^^
+...
+171 |     fn open_handle(&self, path: &Path, write: bool) -> io::Result<Handle> {
+    |        ^^^^^^^^^^^
+...
+195 |     fn intern(
+    |        ^^^^^^
+...
+238 |     fn writeable(&self) -> Result<(), NfsError> {
+    |        ^^^^^^^^^
+...
+245 |     fn mutation<T>(&self, value: T) -> MutationResult<T> {
+    |        ^^^^^^^^
+...
+252 |     fn check_attributes(&self, attrs: &SetAttributes) -> Result<(), NfsError> {
+    |        ^^^^^^^^^^^^^^^^
+
+warning: function `os_name` is never used
+   --> services/../../src/services/nfs.rs:265:4
+    |
+265 | fn os_name(name: &NfsName) -> Result<OsString, NfsError> {
+    |    ^^^^^^^
+
+warning: function `wire_name` is never used
+   --> services/../../src/services/nfs.rs:289:4
+    |
+289 | fn wire_name(name: OsString) -> Result<NfsName, NfsError> {
+    |    ^^^^^^^^^
+
+warning: function `check_mutable_file` is never used
+   --> services/../../src/services/nfs.rs:307:4
+    |
+307 | fn check_mutable_file(file: &File) -> io::Result<()> {
+    |    ^^^^^^^^^^^^^^^^^^
+
+warning: function `err` is never used
+   --> services/../../src/services/nfs.rs:317:4
+    |
+317 | fn err(e: io::Error) -> NfsError {
+    |    ^^^
+
+warning: function `attributes` is never used
+   --> services/../../src/services/nfs.rs:327:4
+    |
+327 | fn attributes(id: u64, m: &Metadata, writable: bool) -> FileAttributes {
+    |    ^^^^^^^^^^
+
+warning: method `remove_object` is never used
+   --> services/../../src/services/nfs.rs:817:8
+    |
+816 | impl Export {
+    | ----------- method in this implementation
+817 |     fn remove_object(
+    |        ^^^^^^^^^^^^^
+
+warning: `e03-nfs-component` (lib) generated 29 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.32s

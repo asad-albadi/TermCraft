@@ -1,0 +1,580 @@
+{
+  "exit_code": 0,
+  "seconds": 350.8,
+  "captured_files": 715,
+  "source_changes": [],
+  "targets": 71,
+  "passed": 940,
+  "failed": 0,
+  "ignored": 59,
+  "results": [
+    {
+      "target": "unittests src/lib.rs (target/debug/deps/harbor_workspace-3ee8f53b37a04f7a)",
+      "status": "ok",
+      "passed": 277,
+      "failed": 0,
+      "ignored": 16,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "unittests src/main.rs (target/debug/deps/harbor_workspace-ea89b59a37ffdadd)",
+      "status": "ok",
+      "passed": 212,
+      "failed": 0,
+      "ignored": 8,
+      "nested_summaries_excluded": 1
+    },
+    {
+      "target": "tests/browser_session.rs (target/debug/deps/browser_session-f375bbddb4a0bc3a)",
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/cli_dispatch.rs (target/debug/deps/cli_dispatch-20716cea3fb4574a)",
+      "status": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/connection.rs (target/debug/deps/connection-2a7add4f677e6706)",
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/credential_vault.rs (target/debug/deps/credential_vault-816fd97babb215f0)",
+      "status": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/desktop_carrier.rs (target/debug/deps/desktop_carrier-ac9baab0d769ab13)",
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/desktop_fullscreen.rs (target/debug/deps/desktop_fullscreen-20123b7edefb10a7)",
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/desktop_gateway.rs (target/debug/deps/desktop_gateway-44dfb4fbb7a10fa9)",
+      "status": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/desktop_gateway_adapters.rs (target/debug/deps/desktop_gateway_adapters-fde468e3fc488135)",
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/desktop_integration.rs (target/debug/deps/desktop_integration-9bdeaaae53b8af6d)",
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/ftp_ftps.rs (target/debug/deps/ftp_ftps-f8ea7ff35d5020ec)",
+      "status": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/ftp_workspace.rs (target/debug/deps/ftp_workspace-e085bb1876254e0b)",
+      "status": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/games.rs (target/debug/deps/games-47610b276a188bda)",
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/highlighting.rs (target/debug/deps/highlighting-fa1bf15291d6e941)",
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/http_sharing.rs (target/debug/deps/http_sharing-d578fb782df1e86d)",
+      "status": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/legacy_protocols.rs (target/debug/deps/legacy_protocols-51c596ab15b0362a)",
+      "status": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/linux_desktop.rs (target/debug/deps/linux_desktop-461fd752df3ffb55)",
+      "status": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 3,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/macro_events.rs (target/debug/deps/macro_events-7a98c57ef6d92d18)",
+      "status": "ok",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/model.rs (target/debug/deps/model-05180916ab947969)",
+      "status": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/multiexec.rs (target/debug/deps/multiexec-7b06f1ee6c6c0194)",
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/package_manager.rs (target/debug/deps/package_manager-b5d78db9c50a3040)",
+      "status": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 4,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/package_manifest.rs (target/debug/deps/package_manifest-2f26be88a4c34f2a)",
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/packet_capture.rs (target/debug/deps/packet_capture-861ba96e6cf0b6ea)",
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 2,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/plugins.rs (target/debug/deps/plugins-ba6eb9f9a002058b)",
+      "status": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/process_input.rs (target/debug/deps/process_input-714fa5fe15d777f3)",
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/protocol_interop.rs (target/debug/deps/protocol_interop-b9175250f12b0ef4)",
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/rdp_credentials.rs (target/debug/deps/rdp_credentials-82c572db622ec0ee)",
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/rdp_options.rs (target/debug/deps/rdp_options-caa10008a4dae006)",
+      "status": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/rdp_serial_options.rs (target/debug/deps/rdp_serial_options-78858167c4b59a5a)",
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/rdp_session.rs (target/debug/deps/rdp_session-78d7b6dd5598701d)",
+      "status": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/remote_editor.rs (target/debug/deps/remote_editor-ef31dc3cf9b34587)",
+      "status": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/remote_environment.rs (target/debug/deps/remote_environment-f5f399864f402bc5)",
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 5,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/remote_paths.rs (target/debug/deps/remote_paths-2b53ab13c6c57769)",
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/remote_transfers.rs (target/debug/deps/remote_transfers-f60a710989b93473)",
+      "status": "ok",
+      "passed": 19,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 3
+    },
+    {
+      "target": "tests/runtime_manifest.rs (target/debug/deps/runtime_manifest-68f378fc8b16cbec)",
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 2,
+      "nested_summaries_excluded": 1
+    },
+    {
+      "target": "tests/scp_browser.rs (target/debug/deps/scp_browser-1c15934b9ec3766c)",
+      "status": "ok",
+      "passed": 24,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/serial_settings.rs (target/debug/deps/serial_settings-1587120f222a6cb9)",
+      "status": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/service_adapters.rs (target/debug/deps/service_adapters-17c8cf8e348e84d4)",
+      "status": "ok",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/services.rs (target/debug/deps/services-53c83bc1fb6f8b0f)",
+      "status": "ok",
+      "passed": 17,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/session_groups.rs (target/debug/deps/session_groups-813a9f0f7d6af06d)",
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/session_import.rs (target/debug/deps/session_import-6e5f343befb69773)",
+      "status": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/shared_sessions.rs (target/debug/deps/shared_sessions-bea2f1e19b033585)",
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/shared_source_ssh.rs (target/debug/deps/shared_source_ssh-6348cb71b29493b2)",
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/shared_sources_network.rs (target/debug/deps/shared_sources_network-d670ad33e80abe15)",
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/shell_directory.rs (target/debug/deps/shell_directory-fde14792afc22537)",
+      "status": "ok",
+      "passed": 7,
+      "failed": 0,
+      "ignored": 2,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/shortcuts.rs (target/debug/deps/shortcuts-5c73c5b088e9aa96)",
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/ssh_agent.rs (target/debug/deps/ssh_agent-6c74045cfbb5a232)",
+      "status": "ok",
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/ssh_authentication.rs (target/debug/deps/ssh_authentication-f0c0fd6d3f0e7a99)",
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 1
+    },
+    {
+      "target": "tests/ssh_browser.rs (target/debug/deps/ssh_browser-81031a85fa7d83ed)",
+      "status": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/ssh_interop.rs (target/debug/deps/ssh_interop-2193006b5a31c67b)",
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 1,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/ssh_lifecycle.rs (target/debug/deps/ssh_lifecycle-e16dcf0a7944955a)",
+      "status": "ok",
+      "passed": 15,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/ssh_options.rs (target/debug/deps/ssh_options-db52a9d5bab717fc)",
+      "status": "ok",
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 1
+    },
+    {
+      "target": "tests/tab_activity.rs (target/debug/deps/tab_activity-bf5ce3b7445db029)",
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/terminal_conformance.rs (target/debug/deps/terminal_conformance-c14b7c28c5a5adbc)",
+      "status": "ok",
+      "passed": 20,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/terminal_mouse.rs (target/debug/deps/terminal_mouse-70f42ddbf8da25c7)",
+      "status": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/terminal_performance.rs (target/debug/deps/terminal_performance-e3c31647e513aaa9)",
+      "status": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 1,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/terminal_programs.rs (target/debug/deps/terminal_programs-a4d63f98f9bff705)",
+      "status": "ok",
+      "passed": 2,
+      "failed": 0,
+      "ignored": 1,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/terminal_safety.rs (target/debug/deps/terminal_safety-16fe3f0344c1429b)",
+      "status": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/terminal_search.rs (target/debug/deps/terminal_search-4affcc19c97a375d)",
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/terminal_selection.rs (target/debug/deps/terminal_selection-83ae4e2b1dded53e)",
+      "status": "ok",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/terminal_settings.rs (target/debug/deps/terminal_settings-8cbb378abdd6c905)",
+      "status": "ok",
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/tools.rs (target/debug/deps/tools-b896c429a75a3c92)",
+      "status": "ok",
+      "passed": 13,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/tunnel_interop.rs (target/debug/deps/tunnel_interop-a90029d494481325)",
+      "status": "ok",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/vnc_session.rs (target/debug/deps/vnc_session-26c4530a10c96385)",
+      "status": "ok",
+      "passed": 12,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/windows_integration.rs (target/debug/deps/windows_integration-be45eb0a163897e0)",
+      "status": "ok",
+      "passed": 16,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/workspace_layout.rs (target/debug/deps/workspace_layout-63a0383e6d7ad97b)",
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/workspace_windows.rs (target/debug/deps/workspace_windows-7ef1506be8eab941)",
+      "status": "ok",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/x11_extensions.rs (target/debug/deps/x11_extensions-52ba657849af6837)",
+      "status": "ok",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 6,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/x11_forwarding.rs (target/debug/deps/x11_forwarding-cf8055bb57407cb4)",
+      "status": "ok",
+      "passed": 0,
+      "failed": 0,
+      "ignored": 3,
+      "nested_summaries_excluded": 0
+    },
+    {
+      "target": "tests/xserver_lifecycle.rs (target/debug/deps/xserver_lifecycle-354dcd29e8162506)",
+      "status": "ok",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 5,
+      "nested_summaries_excluded": 0
+    }
+  ]
+}

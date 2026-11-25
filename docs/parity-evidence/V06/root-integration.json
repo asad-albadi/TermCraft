@@ -1,0 +1,16 @@
+[
+  {
+    "path": "tests/linux_desktop.rs",
+    "accepted_sha256": "909adcccb978607f53676f0c941cfe5174840456199c66909034fc9d089f067a",
+    "base_absent": true,
+    "integrated_sha256": "9ae9d22babc50aecb85fff9822a52e2ab9ce0feef350edd9497e3e7225554fcc",
+    "normalization": "cargo fmt edition2024 only"
+  },
+  {
+    "path": "scripts/check-linux-desktop.sh",
+    "accepted_sha256": "0cb4785df2c6a3baeaca9677e9fa3fefbb62b5a7fe92860b97eeed2fdc708a66",
+    "base_absent": true,
+    "integrated_sha256": "0cb4785df2c6a3baeaca9677e9fa3fefbb62b5a7fe92860b97eeed2fdc708a66",
+    "normalization": "byte exact"
+  }
+]

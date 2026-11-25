@@ -1,0 +1,60 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/work)
+error[E0425]: cannot find function `forcing_chains` in this scope
+   --> src/games/puzzles/map.rs:779:17
+    |
+779 |         assert!(forcing_chains(&colours, &mut p, &edges)>0);
+    |                 ^^^^^^^^^^^^^^ not found in this scope
+
+error[E0599]: no variant, associated function, or constant named `Hard` found for enum `map::MapDifficulty` in the current scope
+   --> src/games/puzzles/map.rs:784:43
+    |
+ 16 | pub enum MapDifficulty {
+    | ---------------------- variant, associated function, or constant `Hard` not found for this enum
+...
+784 |         for difficulty in [MapDifficulty::Hard,MapDifficulty::Unreasonable] {
+    |                                           ^^^^ variant, associated function, or constant not found in `map::MapDifficulty`
+
+error[E0599]: no variant, associated function, or constant named `Unreasonable` found for enum `map::MapDifficulty` in the current scope
+   --> src/games/puzzles/map.rs:784:63
+    |
+ 16 | pub enum MapDifficulty {
+    | ---------------------- variant, associated function, or constant `Unreasonable` not found for this enum
+...
+784 |         for difficulty in [MapDifficulty::Hard,MapDifficulty::Unreasonable] {
+    |                                                               ^^^^^^^^^^^^ variant, associated function, or constant not found in `map::MapDifficulty`
+
+error[E0609]: no field `achieved` on type `map::MapCertificate`
+   --> src/games/puzzles/map.rs:789:46
+    |
+789 |                     assert_eq!(m.certificate.achieved, difficulty);
+    |                                              ^^^^^^^^ unknown field
+    |
+    = note: available fields are: `single_steps`, `pair_eliminations`, `requires_normal`
+
+error[E0599]: no variant, associated function, or constant named `Unreasonable` found for enum `map::MapDifficulty` in the current scope
+   --> src/games/puzzles/map.rs:791:51
+    |
+ 16 | pub enum MapDifficulty {
+    | ---------------------- variant, associated function, or constant `Unreasonable` not found for this enum
+...
+791 |                     if difficulty==MapDifficulty::Unreasonable {
+    |                                                   ^^^^^^^^^^^^ variant, associated function, or constant not found in `map::MapDifficulty`
+
+error[E0599]: no variant, associated function, or constant named `Hard` found for enum `map::MapDifficulty` in the current scope
+   --> src/games/puzzles/map.rs:792:80
+    |
+ 16 | pub enum MapDifficulty {
+    | ---------------------- variant, associated function, or constant `Hard` not found for this enum
+...
+792 |                         assert!(grade_solve(&m.colours,&m.edges,MapDifficulty::Hard).is_none());
+    |                                                                                ^^^^ variant, associated function, or constant not found in `map::MapDifficulty`
+
+error[E0425]: cannot find function `grade_solve` in this scope
+   --> src/games/puzzles/map.rs:792:33
+    |
+792 |                         assert!(grade_solve(&m.colours,&m.edges,MapDifficulty::Hard).is_none());
+    |                                 ^^^^^^^^^^^ not found in this scope
+
+Some errors have detailed explanations: E0425, E0599, E0609.
+For more information about an error, try `rustc --explain E0425`.
+error: could not compile `b06-puzzle-options-private` (lib test) due to 7 previous errors

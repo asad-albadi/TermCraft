@@ -1,0 +1,11 @@
+{
+  "optional-helper-fix-absent.log": "758baa2b2980355acd4197b9a224be5d0bd15404c9e22d89595053636c710cd9",
+  "optional-helper-fix-bad.log": "11c80971a32487530d933fd29ae514d8d205740665e0dbd1e650066b78ee5548",
+  "optional-helper-fix-base.sha256": "7ccec929aff22a3b36d6a2dd86a823e1b8e6c846e8ac29b4989b664f726e9e44",
+  "optional-helper-fix-candidate.sha256": "b767f09b89492e5d5fc32f3c7ee90d11562a37202fa0bba90c149574a0fc160c",
+  "optional-helper-fix-empty.log": "d51f8a70664d7e00290012307cb8508408a866cb21361f4d17bd743a58bdd82a",
+  "optional-helper-fix-real.log": "912168f5cb046b0a63201f7f92032fd27da7a84c7232475a63c5294100c7f6ce",
+  "optional-helper-fix-red.log": "b87fc87ef41165f076f90b5feefa0758ed532733e3c9082bee060fda5b2dcddb",
+  "optional-helper-fix.md": "330d4885b91e238882a1ff497d60c0fa2f1ec34e9f7ac6f65c4ee01c01d377d8",
+  "optional-helper-fix.patch": "98f03c67192144b1dd310364f4fa1f0b774c205ff231e131909137d909304043"
+}

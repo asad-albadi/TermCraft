@@ -1,0 +1,17 @@
+[
+  "src/cli.rs",
+  "src/platform/mod.rs",
+  "src/platform/launch.rs",
+  "src/platform/linux_integration.rs",
+  "src/platform/macos_integration.rs",
+  "tests/desktop_integration.rs",
+  "scripts/test-desktop-integration.py",
+  "tests/packaging_release.py",
+  "scripts/package-release.py",
+  "packaging/linux/desktop-integration.py",
+  "packaging/linux/README.txt",
+  "packaging/macos/Info.plist",
+  "packaging/macos/desktop-launcher.m",
+  "packaging/macos/desktop-integration.py",
+  "README.md"
+]

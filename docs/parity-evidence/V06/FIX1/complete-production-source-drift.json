@@ -1,0 +1,86 @@
+[
+  {
+    "path": "src/games/library.rs",
+    "change": "added",
+    "tested_historical_sha256": null,
+    "current_parent_sha256": "169729dbe3df50144b23fd473d745c7bb30146dd4e099a016cb5371ca3b05e03"
+  },
+  {
+    "path": "src/games/mod.rs",
+    "change": "modified",
+    "tested_historical_sha256": "ef55b5884e0a2ca3fc13dc856bd96ef0aba7000a3af7c99d0565ae70fd7d71e0",
+    "current_parent_sha256": "1c0406c0d682bfdce3b484203a409bbb146ab2d71c9406ea04250254825e5b69"
+  },
+  {
+    "path": "src/games/terminal/API.md",
+    "change": "added",
+    "tested_historical_sha256": null,
+    "current_parent_sha256": "c9cb5428d994a756fec69cb181defecaff9ef4ae21d14b8564406e8550460962"
+  },
+  {
+    "path": "src/games/terminal/PROVENANCE.md",
+    "change": "added",
+    "tested_historical_sha256": null,
+    "current_parent_sha256": "f55604ca641ced8e93f6ee7d29a9343981ece8406fdafadb3542698af2d857d7"
+  },
+  {
+    "path": "src/games/terminal/blocks.rs",
+    "change": "added",
+    "tested_historical_sha256": null,
+    "current_parent_sha256": "d5cb8488b6af4fd1fc3a4b616fffa11c05553950c79533ad88c856a8ffc0401d"
+  },
+  {
+    "path": "src/games/terminal/cards.rs",
+    "change": "added",
+    "tested_historical_sha256": null,
+    "current_parent_sha256": "eec79b73222f95a8613ef717ec26a4a62deb2ed7e7361397bb6841ee48a0b855"
+  },
+  {
+    "path": "src/games/terminal/grids.rs",
+    "change": "added",
+    "tested_historical_sha256": null,
+    "current_parent_sha256": "9542675e8dfedd976161c334ffddca5a2121b181bc219e0ec97e9462ea0d057c"
+  },
+  {
+    "path": "src/games/terminal/invaders.rs",
+    "change": "added",
+    "tested_historical_sha256": null,
+    "current_parent_sha256": "40bd4817919dee05ef7602321b50b7e7f05307ca042da3d78dacb42fab323ed8"
+  },
+  {
+    "path": "src/games/terminal/mod.rs",
+    "change": "added",
+    "tested_historical_sha256": null,
+    "current_parent_sha256": "640c9c76974c34b2cdf8c4f24993e7be40470db7e4a9400989239e5021f0713c"
+  },
+  {
+    "path": "src/games/terminal/tests.rs",
+    "change": "added",
+    "tested_historical_sha256": null,
+    "current_parent_sha256": "a1ed8ab284807242360a2b83237051e8e96609372f35057e0cf143bfa884ee7e"
+  },
+  {
+    "path": "src/ui.rs",
+    "change": "modified",
+    "tested_historical_sha256": "710ea401d58b44183b90811095af4958627063fd6e5bd8d1e2a0ce21b951b22c",
+    "current_parent_sha256": "698e55be9c8fd8c101660ed9e887cb13230134c64fb93af718bdf18ff966279a"
+  },
+  {
+    "path": "src/ui/games.rs",
+    "change": "modified",
+    "tested_historical_sha256": "f9498e6444dc483c3719991c71105c2b5b1fae710435b41a415844f5379e25d6",
+    "current_parent_sha256": "52f57bffea9ed82867533b100a96ee4586cfd2492b992a3446fd9cfe5c2e4c3f"
+  },
+  {
+    "path": "src/ui/games/play.rs",
+    "change": "added",
+    "tested_historical_sha256": null,
+    "current_parent_sha256": "feff31a26d6f819840c2fab0043531697fee41290d3b18fef22c4cfd255ffb00"
+  },
+  {
+    "path": "src/ui/windows.rs",
+    "change": "modified",
+    "tested_historical_sha256": "d67917e5d92dc10077116b561b25ef9af1a45554f773025886a15de85c73d701",
+    "current_parent_sha256": "b312974d14594bfcaae5572cc383e8d986babd2cc87db00232630f1fa8f835d2"
+  }
+]

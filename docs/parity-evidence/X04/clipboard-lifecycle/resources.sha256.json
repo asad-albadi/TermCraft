@@ -1,0 +1,24 @@
+{
+  "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04-clipboard/fixture": {
+    "lib/libXpm.so.4": "e02df8ee6e0bff934a13563d9543e1a727620399ddf43d5c211d6846830768ac",
+    "libXdmGreet.so": "ab10ec35cf6045a27261ac4e6003127e23b5e9be0f054005cae69cf08f0a03ae",
+    "xdm": "d0f9df84fa1313b9e9155d2a5e5f790af7a760a8918239bd60b7b3dc3a27d946",
+    "xdmcp_output.py": "5376c6c050de55abb91eb5fb8fb798edf006c7f3c47d48e111d0876ac073ea2f",
+    "xdmcp_window.py": "c6f4b506dbc28f7194ea84b464864a1409b26227b24d7444d999c96849b50eea"
+  },
+  "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04-clipboard/rebased-hostnames/engine-package": {
+    "x11/linux-x86_64/XEPHYR_BUILDINFO": "e27c71e041c672fe757e6abd3dd626fbf6ee2adc96f26b75fe827130299e239a",
+    "x11/linux-x86_64/XEPHYR_COPYING": "c9f90a6669109aad6c9a7c3b46cc2c574221a73b792afa419336816b49da5c11",
+    "x11/linux-x86_64/XEPHYR_PKGINFO": "a87fef8984962035ab8bbd47a7cdaff44c9ad10cc6d43309f4e8fced0eab31a2",
+    "x11/linux-x86_64/XTRANS_COPYING": "af61583b470afb73de1bc704a34e593183c1e8ae76882991ea54a64b6d846c0d",
+    "x11/linux-x86_64/Xephyr": "d7f1f49ee428fd06b26707a79ba6d65b4e9ada4e6b53aca4146baaa92c79e593",
+    "x11/linux-x86_64/Xephyr-session-ready": "d30ddae6bc24462b35cca045018acb6ae9f437054d29fcd36f936be28b49cf51"
+  },
+  "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/x11-arch-package": {
+    "x11/linux-x86_64/BUILDINFO": "83a2dc6be2bc357bec017e7ce3aed79474bd16e8a255177dc35f4cb9c7f4f246",
+    "x11/linux-x86_64/COPYING": "c9f90a6669109aad6c9a7c3b46cc2c574221a73b792afa419336816b49da5c11",
+    "x11/linux-x86_64/PKGINFO": "bb43f460881f825f9918f9faffd99cb8ac2a46c9a7e505de9411f201a344c691",
+    "x11/linux-x86_64/Xwayland": "cbedd90fbc960d4cc799792cedf89b0afa1f1f74a93ba9fb05bfd4da2f27b2b8",
+    "x11/linux-x86_64/manifest.json": "455aaf0d452e3cdd7070af2e873bbe5a3022b884595211fe0fba3e13f38f42a1"
+  }
+}

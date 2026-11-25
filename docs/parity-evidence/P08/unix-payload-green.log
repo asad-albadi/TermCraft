@@ -1,0 +1,19 @@
+test_absent_option_has_no_payload (__main__.UnixRelease.test_absent_option_has_no_payload) ... ok
+test_archive_digest_native_format_and_notice_tampering_rejected (__main__.UnixRelease.test_archive_digest_native_format_and_notice_tampering_rejected) ... ok
+test_cli_exposes_offline_option (__main__.UnixRelease.test_cli_exposes_offline_option) ... ok
+test_composes_with_xwayland_and_mosh (__main__.UnixRelease.test_composes_with_xwayland_and_mosh) ... ok
+test_corrupt_binary_source_and_missing_cache_fail_closed (__main__.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed) ... Unix payload staging failed: Unix payload checksum mismatch: 51fcb60efbdf3e579550e9ab893730df56b33d0cc928a2a6467bd846cdfef7d8
+Unix payload staging failed: Unix payload checksum mismatch: 0e4925392fd9f3743cc517e031b68b012b24a63b0cf6c1ff03cce7bb3846cc99
+Unix payload staging failed: Unix payload checksum mismatch: bc04f0222c39f0edf35eeb034fae3dc35a6e38a048c259d4c977ba915b9d57a6
+ok
+test_frozen_source_snapshot_remains_independent_and_unchanged (__main__.UnixRelease.test_frozen_source_snapshot_remains_independent_and_unchanged) ... ok
+test_missing_or_symlink_input_never_downloads (__main__.UnixRelease.test_missing_or_symlink_input_never_downloads) ... ok
+test_optional_payload_inventory_sources_notices_and_no_overwrite (__main__.UnixRelease.test_optional_payload_inventory_sources_notices_and_no_overwrite) ... ok
+test_unsupported_target_and_architecture_rejected (__main__.UnixRelease.test_unsupported_target_and_architecture_rejected) ... ok
+test_windows_payload_verified_without_execution (__main__.UnixRelease.test_windows_payload_verified_without_execution) ... ok
+test_windows_zip_layout_contains_native_payload_and_source_inventory (__main__.UnixRelease.test_windows_zip_layout_contains_native_payload_and_source_inventory) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 23.314s
+
+OK

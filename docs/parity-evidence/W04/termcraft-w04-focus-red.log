@@ -1,0 +1,24 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.87s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-127cf14f51e8fab8)
+
+running 1 test
+test ui::shortcuts::tests::closing_shortcut_targets_focused_pane_instead_of_stale_tab_index ... FAILED
+
+failures:
+
+---- ui::shortcuts::tests::closing_shortcut_targets_focused_pane_instead_of_stale_tab_index stdout ----
+
+thread 'ui::shortcuts::tests::closing_shortcut_targets_focused_pane_instead_of_stale_tab_index' (478473) panicked at src/ui/shortcuts.rs:52:9:
+assertion `left == right` failed
+  left: [1]
+ right: [2]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::shortcuts::tests::closing_shortcut_targets_focused_pane_instead_of_stale_tab_index
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 63 filtered out; finished in 1.19s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

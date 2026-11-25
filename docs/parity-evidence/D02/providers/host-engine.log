@@ -1,0 +1,46 @@
+warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
+  --> src/../../../src/desktop/options.rs:78:9
+   |
+77 | pub struct NegotiatedRdpOptions {
+   |            -------------------- fields in this struct
+78 |     pub clipboard: ClipboardPolicy,
+   |         ^^^^^^^^^
+79 |     pub keyboard: KeyboardRouting,
+   |         ^^^^^^^^
+80 |     pub keyboard_layout: u32,
+   |         ^^^^^^^^^^^^^^^
+   |
+   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `is_default` is never used
+  --> src/../../../src/desktop/options.rs:83:12
+   |
+82 | impl RdpOptions {
+   | --------------- method in this implementation
+83 |     pub fn is_default(&self) -> bool {
+   |            ^^^^^^^^^^
+
+warning: `termcraft-rdp-engine` (bin "termcraft-rdp-engine" test) generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s
+     Running unittests src/main.rs (engines/rdp/target/debug/deps/termcraft_rdp_engine-092b9e17b901608b)
+
+running 15 tests
+test config::tests::administrative_session_requests_console_without_advertising_redirects ... ok
+test devices_tests::drive_announcements_use_unicode_v2_names_and_saturated_io_replies_without_disconnect ... ok
+test devices_tests::redirected_drives_reject_fifos_without_opening_a_blocking_stream ... ok
+test clipboard::tests::empty_local_clipboard_still_initializes_the_channel ... ok
+test devices_tests::drive_channel_handshake_advertises_only_after_logon_and_processes_io ... ok
+test devices_tests::redirected_drive_reads_writes_and_retires_real_handles ... ok
+test devices_tests::redirected_volume_reports_actual_capacity ... ok
+test devices_tests::redirected_file_resize_preserves_unsupported_rename_and_delete ... ok
+test devices_tests::opened_drive_handles_keep_the_original_object_after_a_local_rename ... ok
+test devices_tests::redirected_read_only_drive_blocks_mutations_and_escape ... ok
+test devices_tests::drive_handles_enforce_requested_access_and_exclusive_sharing ... ok
+test devices_tests::unsupported_drive_mutations_never_change_files ... ok
+test clipboard::tests::text_channel_enforces_both_directions_and_rejects_invalid_data ... ok
+test devices_tests::redirected_drives_reject_malformed_pdus_and_bound_handles ... ok
+test devices_tests::redirected_folder_listing_uses_rdpefs_layout_and_never_loses_late_matches ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

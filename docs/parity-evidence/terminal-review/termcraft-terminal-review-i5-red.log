@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.09s
+     Running tests/terminal_conformance.rs (target/debug/deps/terminal_conformance-db1b1c00096f1f53)
+
+running 1 test
+test alternate_visible_copy_and_search_exclude_primary_history ... FAILED
+
+failures:
+
+---- alternate_visible_copy_and_search_exclude_primary_history stdout ----
+
+thread 'alternate_visible_copy_and_search_exclude_primary_history' (424150) panicked at tests/terminal_conformance.rs:231:36:
+assertion failed: !screen.plain().contains("needle")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    alternate_visible_copy_and_search_exclude_primary_history
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test terminal_conformance`

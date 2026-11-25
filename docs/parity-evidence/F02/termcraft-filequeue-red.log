@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.98s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-e34932d23f1e276b)
+
+running 1 test
+test missing_sftp_rejects_file_jobs_without_stranding_the_queue ... FAILED
+
+failures:
+
+---- missing_sftp_rejects_file_jobs_without_stranding_the_queue stdout ----
+
+thread 'missing_sftp_rejects_file_jobs_without_stranding_the_queue' (206009) panicked at tests/remote_transfers.rs:305:197:
+Missing SFTP stranded the file job
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    missing_sftp_rejects_file_jobs_without_stranding_the_queue
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 2.22s
+
+error: test failed, to rerun pass `--test remote_transfers`

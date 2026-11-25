@@ -1,0 +1,20 @@
+
+running 1 test
+test filled_map_region_rejects_pencil_transactionally ... FAILED
+
+failures:
+
+---- filled_map_region_rejects_pencil_transactionally stdout ----
+
+thread 'filled_map_region_rejects_pencil_transactionally' (261059) panicked at docs/parity-evidence/B06/puzzle-review-probe.rs:13:5:
+assertion failed: g.input(PuzzleInput::MapPencil { region, colour: 2 }).is_err()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    filled_map_region_rejects_pencil_transactionally
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 21 filtered out; finished in 0.00s
+
+
+exit_code=101

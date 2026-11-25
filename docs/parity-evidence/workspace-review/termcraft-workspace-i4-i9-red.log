@@ -1,0 +1,24 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.19s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-127cf14f51e8fab8)
+
+running 1 test
+test ui::workspace_review_tests::detach_reconciles_root_toolbar_and_reconnect_preserves_window_and_peers ... FAILED
+
+failures:
+
+---- ui::workspace_review_tests::detach_reconciles_root_toolbar_and_reconnect_preserves_window_and_peers stdout ----
+
+thread 'ui::workspace_review_tests::detach_reconciles_root_toolbar_and_reconnect_preserves_window_and_peers' (497244) panicked at src/ui/workspace_review_tests.rs:160:5:
+assertion `left == right` failed: root toolbar must name the attached pane it shows
+  left: 2
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::workspace_review_tests::detach_reconciles_root_toolbar_and_reconnect_preserves_window_and_peers
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 73 filtered out; finished in 1.18s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

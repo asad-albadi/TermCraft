@@ -1,0 +1,81 @@
+[
+  {
+    "game": "Soliterm",
+    "board": "002-soliterm.png",
+    "action": "003-soliterm-move.png",
+    "observation": "Column 1 bottom 3 hearts moved to Reserve 1; Undo 004 returned it; fast Redo attempt 005 is not used as proof."
+  },
+  {
+    "game": "Termwalk",
+    "board": "008-termwalk.png",
+    "action": "009-termwalk-move.png",
+    "observation": "First tile rotated; unsaved state and Undo enabled."
+  },
+  {
+    "game": "Ctris",
+    "board": "010-ctris.png",
+    "action": "011-ctris-move.png",
+    "observation": "Left/Up/Space advanced Next 0 to 1 and locked dropped piece."
+  },
+  {
+    "game": "Sudoku",
+    "board": "012-sudoku.png",
+    "action": "013-sudoku-move.png",
+    "observation": "Invalid 1 was rejected with visible conflict error in 013; valid 8 at row 1 column 3 accepted in 087.",
+    "successful_action": "087-sudoku-valid-move.png"
+  },
+  {
+    "game": "Nimesweeper",
+    "board": "014-nimesweeper.png",
+    "action": "015-nimesweeper-move.png",
+    "observation": "First tile left click revealed 1; unsaved state and Undo enabled."
+  },
+  {
+    "game": "Ninvaders",
+    "board": "016-ninvaders.png",
+    "action": "017-ninvaders-move.png",
+    "observation": "Space Start/Fire and Right removed Press Start; unsaved state and Undo enabled."
+  },
+  {
+    "game": "Greed",
+    "board": "018-greed.png",
+    "action": "019-greed-move.png",
+    "observation": "Right moved player; 0 to 7 squares erased."
+  },
+  {
+    "game": "Netwalk",
+    "board": "020-netwalk.png",
+    "action": "021-netwalk-move.png",
+    "observation": "First tile rotation; dirty state and Undo enabled."
+  },
+  {
+    "game": "Mines",
+    "board": "022-mines.png",
+    "action": "023-mines-move.png",
+    "observation": "Flag first tile; 0 to 1 flags before first reveal."
+  },
+  {
+    "game": "Solo",
+    "board": "024-solo.png",
+    "action": "025-solo-move.png",
+    "observation": "First editable tile 1 visible with conflict marking; Jigsaw/Advanced/Killer followups included."
+  },
+  {
+    "game": "Guess",
+    "board": "041-guess.png",
+    "action": "042-guess-move.png",
+    "observation": "First peg 0 to 1; dirty state and Undo enabled."
+  },
+  {
+    "game": "Map",
+    "board": "062-map-75-unreasonable.png",
+    "action": "063-map-unreasonable-move.png",
+    "observation": "75 regions Unreasonable seed 2; first blank region painted orange with colour 2."
+  },
+  {
+    "game": "Untangle",
+    "board": "052-untangle.png",
+    "action": "053-untangle-drag.png",
+    "observation": "Actual drag of selected yellow vertex from (68,516) to (110,540); dirty state and Undo enabled."
+  }
+]

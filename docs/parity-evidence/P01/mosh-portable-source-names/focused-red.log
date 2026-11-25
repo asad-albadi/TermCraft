@@ -1,0 +1,20 @@
+test_absent_and_symlinked_inputs_never_use_another_source (__main__.DependencyInputs.test_absent_and_symlinked_inputs_never_use_another_source) ... ok
+test_exact_input_is_accepted_but_replacement_is_rejected (__main__.DependencyInputs.test_exact_input_is_accepted_but_replacement_is_rejected) ... ok
+test_output_does_not_overwrite_existing_files_or_escape (__main__.DependencyInputs.test_output_does_not_overwrite_existing_files_or_escape) ... ok
+test_pinned_source_notices_survive_strict_portable_extraction (__main__.DependencyInputs.test_pinned_source_notices_survive_strict_portable_extraction) ... ERROR
+
+======================================================================
+ERROR: test_pinned_source_notices_survive_strict_portable_extraction (__main__.DependencyInputs.test_pinned_source_notices_survive_strict_portable_extraction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/mosh-portable-source-names/source/tests/mosh_dependency_staging.py", line 97, in test_pinned_source_notices_survive_strict_portable_extraction
+    extract_tar(archive, root / "extracted")
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/mosh-portable-source-names/source/scripts/portable_archive.py", line 44, in extract_tar
+    raise ValueError(f"Invalid archive member: {name}")
+ValueError: Invalid archive member: mosh-deps/sources/zlib-1:1.4-1-x86_64.pkg.tar.zst.sig
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.010s
+
+FAILED (errors=1)

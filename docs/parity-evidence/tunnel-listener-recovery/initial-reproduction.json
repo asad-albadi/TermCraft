@@ -1,0 +1,14 @@
+{
+  "frozen_binary_sha256": "0b4be4ea4cdd271ae04a5afb1a2248e59dad0a94d8a5d26f917503b39a83d2a0",
+  "source": "tests/tunnel_interop.rs unchanged from701capture",
+  "results": [
+    {
+      "run": "isolated-remote",
+      "exit_code": 0
+    },
+    {
+      "run": "parallel-all",
+      "exit_code": 0
+    }
+  ]
+}

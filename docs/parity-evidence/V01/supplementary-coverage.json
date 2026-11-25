@@ -1,0 +1,14 @@
+[
+  {
+    "id": "local-encrypted-agent-lifecycle",
+    "target": "ssh_agent",
+    "test": "protected_import_preserves_encryption_and_agent_lifetime_expires",
+    "endpoint": "local owned ssh-agent only; no SSH server",
+    "version": "installed ssh-agent",
+    "auth": "local encrypted key import/list/expiry",
+    "trust": "not a network host-policy observation",
+    "jump": "not applicable to local-only coverage",
+    "operation": "encryption retention and agent identity lifecycle",
+    "expected": "encryption retained; local agent add/list/expiry; supplementary only"
+  }
+]

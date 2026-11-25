@@ -1,0 +1,6 @@
+    PID    PPID COMMAND
+      1       0 bwrap --unshare-all --uid 1000 --gid 1000 --cap-drop ALL --die-with-parent --new-session --ro-bind /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/v08-clean-namespace/rootfs / --proc /proc --dev /dev --tmpfs /tmp --tmpfs /home --dir /home/validation --ro-bind /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-native-games /opt/termcraft --bind /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/B06/native-linux /evidence --clearenv --setenv HOME /home/validation --setenv PATH /usr/bin --setenv LANG C.UTF-8 --chdir /tmp /usr/bin/bash /evidence/session2.sh
+      2       1 /usr/bin/bash /evidence/session2.sh
+      5       2 Xvfb :77 -screen 0 1440x1000x24 -nolisten tcp
+   1257       2 bash /evidence/action-043.sh
+   1268    1257 ps -eo pid,ppid,args

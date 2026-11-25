@@ -1,0 +1,8 @@
+{
+  "result": "Restored missing X0 name as a no-replace alias of the held X0_ socket used by the same existing Xwayland server.",
+  "existing_compositor_pid": 1796,
+  "existing_xwayland_pid": 1885,
+  "verified_same_listener_credentials": true,
+  "server_restarted": false,
+  "existing_socket_replaced": false
+}

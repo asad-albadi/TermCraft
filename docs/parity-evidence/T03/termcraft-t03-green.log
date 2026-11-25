@@ -1,0 +1,12 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.44s
+     Running tests/highlighting.rs (target/debug/deps/highlighting-105ab00f2ffaa39b)
+
+running 4 tests
+test old_settings_and_session_override_roundtrip ... ok
+test invalid_pattern_is_reported_before_save ... ok
+test keyword_ranges_preserve_unicode_and_output ... ok
+test precedence_regex_case_and_resource_limits_are_deterministic ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

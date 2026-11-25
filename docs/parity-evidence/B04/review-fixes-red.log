@@ -1,0 +1,33 @@
+   Compiling b04-components v0.1.0-b04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b04/component)
+error[E0599]: no method named `uninstall_guard_in` found for struct `WindowsIntegration` in the current scope
+   --> tests/../../source/tests/windows_integration.rs:401:25
+    |
+401 |     assert!(integration.uninstall_guard_in(&registry,&cancel).is_err());
+    |                         ^^^^^^^^^^^^^^^^^^ method not found in `WindowsIntegration`
+
+error[E0599]: no method named `uninstall_guard_in` found for struct `WindowsIntegration` in the current scope
+   --> tests/../../source/tests/windows_integration.rs:403:25
+    |
+403 |     assert!(integration.uninstall_guard_in(&registry,&cancel).is_err());
+    |                         ^^^^^^^^^^^^^^^^^^ method not found in `WindowsIntegration`
+
+error[E0599]: no method named `uninstall_guard_in` found for struct `WindowsIntegration` in the current scope
+   --> tests/../../source/tests/windows_integration.rs:406:25
+    |
+406 |     assert!(integration.uninstall_guard_in(&registry,&cancel).is_ok());
+    |                         ^^^^^^^^^^^^^^^^^^ method not found in `WindowsIntegration`
+
+error[E0599]: no method named `install_into_cancellable` found for struct `WindowsIntegration` in the current scope
+   --> tests/../../source/tests/windows_integration.rs:419:76
+    |
+419 |     let result=WindowsIntegration::new(r"C:\Tools\TermCraft.exe").unwrap().install_into_cancellable(&mut store,&cancel);
+    |                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a method `install_into` with a similar name, but with different arguments
+   --> src/platform/../../../source/src/platform/windows_integration.rs:156:5
+    |
+156 |     pub fn install_into(&self, store: &mut impl RegistryStore) -> Result<(), String> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `b04-components` (test "windows_integration") due to 4 previous errors

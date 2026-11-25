@@ -1,0 +1,22 @@
+{
+  "base": "MAIN after P05 fairness/pinned-license/cancellable quarantine and B01 services integration, 2026-11-24",
+  "sha256": {
+    "src/lib.rs": "23673b63e97f33d1076bfd834972c8689258f62a116f14448daa166d60aa15ba",
+    "src/main.rs": "4a8fe327535bf97844a0ab221e33aed3878a93c927bbc12653cc6d47dae1715d",
+    "src/ui.rs": "72cf6168cdf2f6844af411e5a86c68e344c557180de15303de201af98752fe7f",
+    "src/ui/pages.rs": "cfd5555abeaec4b94a764f16254b93f90c538eea826a2c1f31c13914bcd6fb73",
+    "src/packages/mod.rs": "2561dccc22ed17b6d85e33a93d80c699a4ad6f8dc45e91592eaa2ba8c4466297",
+    "src/packages/install.rs": "4402eef4ad3caf04240d1e35cbee49e89adfa0917f56a43ffef8de2901e29e59",
+    "src/packages/index.rs": "e17d6b906f9fe9c4fc4e8288e50a75db26d0ed068c0ae23c43e18be883277704",
+    "packaging/unix-runtime/manifest.json": "a0e0a7c52959caac4e7d7d9125483524f618925195257d8d5d246e30d98d24c4",
+    "Cargo.toml": "7551669eb5140f744535fce72f721999a30f702eaab1171d68d36c0b5fae8efa",
+    "Cargo.lock": "8206b8cbd82ffb5ec82fa02ff1e663a8de9718f5ebd8a83f5b31094bfbdb6059"
+  },
+  "private_version": "0.1.6; omit private Cargo identity from integration",
+  "shared_patch": "shared-after-p05.patch",
+  "new_sources": [
+    "src/plugins",
+    "src/ui/plugins.rs",
+    "tests/plugins.rs"
+  ]
+}

@@ -1,0 +1,3 @@
+set -euo pipefail
+export DISPLAY=:77
+xdotool mousemove --sync 600 550 click 1; sleep .3; xdotool type --clearmodifiers "y!"; sleep .5; import -window root /evidence/086-fresh-pty-resume-focused.png; od -An -tx1 /evidence/pty-input.bin; xdotool mousemove --sync 252 58 click 1; sleep .3; xdotool mousemove --sync 242 641 click 1; sleep .3; xdotool key Escape; sleep .2; xdotool mousemove --sync 252 58 click 1; sleep .3; xdotool mousemove --sync 263 209 click 1; sleep .5; xdotool mousemove --sync 111 195 click 1; sleep .2; xdotool key 8; sleep .4; import -window root /evidence/087-sudoku-valid-move.png

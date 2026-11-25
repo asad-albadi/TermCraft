@@ -1,0 +1,32 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.27s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-29e3f133fb9121f7)
+
+running 1 test
+test ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input ... FAILED
+
+failures:
+
+---- ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input stdout ----
+
+thread 'ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input' (665977) panicked at src/ui/desktop.rs:867:13:
+Ctrl+C ordering was not preserved: CLOSED true
+mouse:Move { x: 45, y: 27 }
+mouse:LeftPressed
+mouse:Move { x: 45, y: 27 }
+mouse:LeftReleased
+key:Pressed { code: 77, extended: true }
+key:Released { code: 77, extended: true }
+key:UnicodePressed(122)
+key:UnicodeReleased(122)
+mouse:VerticalScroll { value: 120 }
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 94 filtered out; finished in 5.13s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

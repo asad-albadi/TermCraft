@@ -1,0 +1,110 @@
+{
+  "review": "puzzle-fix1-review.md",
+  "qualification": "Reviewed pure cores integrated; common module and UI wiring pending; B06 incomplete",
+  "files": [
+    {
+      "destination": "src/games/puzzles/PROVENANCE.md",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/PROVENANCE.md",
+      "base_sha256": "d23556acbacbc2e93531b03145f378a92ba5bc108a8a1ec22d87e59de0988d83",
+      "sha256": "74537642a72af61db94b46e31d43264b3e9cfde162f6ef6dd32339f99979a85e",
+      "bytes": 11164,
+      "changed": true
+    },
+    {
+      "destination": "src/games/puzzles/guess.rs",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/guess.rs",
+      "base_sha256": "1253fddbee5b8cf41e9476471df9ce5ca9ec88f0e8206d6f1e57409548fb1b48",
+      "sha256": "1253fddbee5b8cf41e9476471df9ce5ca9ec88f0e8206d6f1e57409548fb1b48",
+      "bytes": 4667,
+      "changed": false
+    },
+    {
+      "destination": "src/games/puzzles/map.rs",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/map.rs",
+      "base_sha256": "bb618a6ea16d73c6456a2e443b9f81d1ccca08963c318a4138a90919cbe44f39",
+      "sha256": "b21a3251d66e7b86aec882cfb72001bd6317f8ae35157c09bc5a25f72d40435f",
+      "bytes": 22484,
+      "changed": true
+    },
+    {
+      "destination": "src/games/puzzles/mines.rs",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/mines.rs",
+      "base_sha256": "df4f349e97c2e66bd3c7bd50a2a781d3510b602fe8590771a7f6b88b56e421fa",
+      "sha256": "df4f349e97c2e66bd3c7bd50a2a781d3510b602fe8590771a7f6b88b56e421fa",
+      "bytes": 11343,
+      "changed": false
+    },
+    {
+      "destination": "src/games/puzzles/mod.rs",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/mod.rs",
+      "base_sha256": "82767d6745e80729a4b16b10fe9305936336da37ca5078f783b95bf81f57ad23",
+      "sha256": "0e5ad42fd80fc9f115b68c66cea383e5f6998edd736262029d5b8de6a1f30b38",
+      "bytes": 9755,
+      "changed": true
+    },
+    {
+      "destination": "src/games/puzzles/net.rs",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/net.rs",
+      "base_sha256": "0db476876572f76a5d71d6a250af3cfe21499dd4c3be1382e7cfe352813ee47a",
+      "sha256": "31e420b4b106aa6d36427d7b35844a286841743cc2476d16f09cc8e42ce263f7",
+      "bytes": 9772,
+      "changed": true
+    },
+    {
+      "destination": "src/games/puzzles/provenance/UPSTREAM-LICENCE",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/provenance/UPSTREAM-LICENCE",
+      "base_sha256": "324cba4984cf02666dec301689f11806c75cee0bdef56bc81a5bdc75667dd68b",
+      "sha256": "324cba4984cf02666dec301689f11806c75cee0bdef56bc81a5bdc75667dd68b",
+      "bytes": 1275,
+      "changed": false
+    },
+    {
+      "destination": "src/games/puzzles/provenance/recovered-manual-sections.but",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/provenance/recovered-manual-sections.but",
+      "base_sha256": "ef6c371b62dc4ca074f8808f84d4dd657f50f2c8a22f96b439716915bb052abe",
+      "sha256": "ef6c371b62dc4ca074f8808f84d4dd657f50f2c8a22f96b439716915bb052abe",
+      "bytes": 22466,
+      "changed": false
+    },
+    {
+      "destination": "src/games/puzzles/provenance/recovered-source-excerpts.txt",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/provenance/recovered-source-excerpts.txt",
+      "base_sha256": "9a1ccd86997d7ae99b89d8da7d6b79c67f4b63c6b060b2efdfe2ff105a342f20",
+      "sha256": "8274950155663828b00dfd319c81a765974eaf18331122f3a0af3aeda65f2e90",
+      "bytes": 64309,
+      "changed": true
+    },
+    {
+      "destination": "src/games/puzzles/provenance/source-manifest.json",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/provenance/source-manifest.json",
+      "base_sha256": "a73de483d8ff323fd6612fe9844ce18c3cdf758af90d95dd94fa085d1c766a43",
+      "sha256": "2def57c10f6675907ad7bdd7815f7fc44bdde3c54115bc586f2c576cf8f93dda",
+      "bytes": 5862,
+      "changed": true
+    },
+    {
+      "destination": "src/games/puzzles/solo.rs",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/solo.rs",
+      "base_sha256": "d01a7b1774c9384bcc31a1d1726e052ed7b1efd0962d465b203f4bb055b7f1f0",
+      "sha256": "d01a7b1774c9384bcc31a1d1726e052ed7b1efd0962d465b203f4bb055b7f1f0",
+      "bytes": 7264,
+      "changed": false
+    },
+    {
+      "destination": "src/games/puzzles/tests.rs",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/tests.rs",
+      "base_sha256": "a8838f6127aacd2bcc13f6b6e50b1d49042fa6e73eb64643fed58fcbf49477ef",
+      "sha256": "26d5c8f600d1d71465d8b50ddaefddea28b14ff972021974f8ae976b438155e0",
+      "bytes": 8989,
+      "changed": true
+    },
+    {
+      "destination": "src/games/puzzles/untangle.rs",
+      "source": "app/target/agent-work/b06-puzzles/component/src/games/puzzles/untangle.rs",
+      "base_sha256": "67b9235a9fa31c175c8fa402a1c2b972191e91ddfd619c889d057f981afc5b49",
+      "sha256": "67b9235a9fa31c175c8fa402a1c2b972191e91ddfd619c889d057f981afc5b49",
+      "bytes": 6242,
+      "changed": false
+    }
+  ]
+}

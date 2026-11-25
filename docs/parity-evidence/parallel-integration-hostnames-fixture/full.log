@@ -1,0 +1,45 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: variants `PasswordThenMfa` and `ScpStartup` are never constructed
+  --> tests/support/auth_server.rs:18:5
+   |
+16 | pub enum Mode {
+   |          ---- variants in this enum
+17 |     Password,
+18 |     PasswordThenMfa,
+   |     ^^^^^^^^^^^^^^^
+...
+22 |     ScpStartup,
+   |     ^^^^^^^^^^
+   |
+   = note: `Mode` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `attempts` and `startup` are never read
+   --> tests/support/auth_server.rs:271:5
+    |
+270 | pub struct AuthServer {
+    |            ---------- fields in this struct
+271 |     attempts: Arc<Attempts>,
+    |     ^^^^^^^^
+272 |     startup: Arc<StartupState>,
+    |     ^^^^^^^
+
+warning: methods `startup_requests`, `active_startup_helpers`, `allow_startup_helpers`, and `attempts` are never used
+   --> tests/support/auth_server.rs:345:12
+    |
+281 | impl AuthServer {
+    | --------------- methods in this implementation
+...
+345 |     pub fn startup_requests(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^
+...
+348 |     pub fn active_startup_helpers(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+351 |     pub fn allow_startup_helpers(&self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+...
+370 |     pub fn attempts(&self) -> [usize; 4] {
+    |            ^^^^^^^^
+

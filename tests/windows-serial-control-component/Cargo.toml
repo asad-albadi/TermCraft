@@ -1,0 +1,4 @@
+[package]
+name="windows-serial-control-component"
+version="0.1.926"
+edition="2024"

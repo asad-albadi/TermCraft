@@ -1,0 +1,430 @@
+{
+  "status": "partial",
+  "strict_native_original": 0,
+  "executed_passed": 2,
+  "failed": 0,
+  "unavailable": 3,
+  "cases": [
+    {
+      "case": "udp-rebind-loss-reordering",
+      "status": "passed",
+      "scope": "owned UDP relay source-IP/port rebinding on loopback",
+      "network_before": [
+        {
+          "ifindex": 1,
+          "ifname": "lo",
+          "flags": [
+            "LOOPBACK",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 65536,
+          "qdisc": "noqueue",
+          "operstate": "UNKNOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "loopback",
+          "address": "00:00:00:00:00:00",
+          "broadcast": "00:00:00:00:00:00",
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "127.0.0.1",
+              "prefixlen": 8,
+              "scope": "host",
+              "label": "lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            },
+            {
+              "family": "inet6",
+              "local": "::1",
+              "prefixlen": 128,
+              "scope": "host",
+              "protocol": "kernel_lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        }
+      ],
+      "network_after": [
+        {
+          "ifindex": 1,
+          "ifname": "lo",
+          "flags": [
+            "LOOPBACK",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 65536,
+          "qdisc": "noqueue",
+          "operstate": "UNKNOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "loopback",
+          "address": "00:00:00:00:00:00",
+          "broadcast": "00:00:00:00:00:00",
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "127.0.0.1",
+              "prefixlen": 8,
+              "scope": "host",
+              "label": "lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            },
+            {
+              "family": "inet6",
+              "local": "::1",
+              "prefixlen": 128,
+              "scope": "host",
+              "protocol": "kernel_lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        }
+      ],
+      "outage_seconds": 1.2,
+      "events": [
+        "ready",
+        "source-ip-and-port-rebound",
+        "loss-recovered"
+      ],
+      "counters": {
+        "forward": 8,
+        "return": 12,
+        "drop": 8,
+        "reordered": 1
+      },
+      "relay_upstream_addresses": [
+        [
+          "127.0.0.2",
+          47969
+        ],
+        [
+          "127.0.0.3",
+          51102
+        ]
+      ],
+      "authenticated_server_peers": [
+        [
+          "127.0.0.2",
+          "47969"
+        ],
+        [
+          "127.0.0.3",
+          "51102"
+        ]
+      ],
+      "journal": [
+        {
+          "pid": 376001,
+          "n": 1,
+          "value": "before"
+        },
+        {
+          "pid": 376001,
+          "n": 2,
+          "value": "during_loss"
+        },
+        {
+          "pid": 376001,
+          "n": 3,
+          "value": "reorder_one"
+        },
+        {
+          "pid": 376001,
+          "n": 4,
+          "value": "reorder_two"
+        },
+        {
+          "pid": 376001,
+          "n": 5,
+          "value": "after"
+        }
+      ],
+      "cancel_seconds": 0.04005918899929384,
+      "server_pid": 376000,
+      "client_pid": 376003,
+      "owned_process_cleanup": "passed"
+    },
+    {
+      "case": "private-interface-migration",
+      "status": "passed",
+      "scope": "private Linux dummy-interface source-address migration through owned UDP relay",
+      "network_before": [
+        {
+          "ifindex": 1,
+          "ifname": "lo",
+          "flags": [
+            "LOOPBACK",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 65536,
+          "qdisc": "noqueue",
+          "operstate": "UNKNOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "loopback",
+          "address": "00:00:00:00:00:00",
+          "broadcast": "00:00:00:00:00:00",
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "127.0.0.1",
+              "prefixlen": 8,
+              "scope": "host",
+              "label": "lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            },
+            {
+              "family": "inet6",
+              "local": "::1",
+              "prefixlen": 128,
+              "scope": "host",
+              "protocol": "kernel_lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        },
+        {
+          "ifindex": 2,
+          "ifname": "v04old",
+          "flags": [
+            "BROADCAST",
+            "NOARP",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 1500,
+          "qdisc": "noqueue",
+          "operstate": "UNKNOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "ether",
+          "address": "ca:52:e6:f5:af:70",
+          "broadcast": "ff:ff:ff:ff:ff:ff",
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "10.203.0.1",
+              "prefixlen": 32,
+              "scope": "global",
+              "label": "v04old",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            },
+            {
+              "family": "inet6",
+              "local": "fe80::c852:e6ff:fef5:af70",
+              "prefixlen": 64,
+              "scope": "link",
+              "protocol": "kernel_ll",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        },
+        {
+          "ifindex": 3,
+          "ifname": "v04new",
+          "flags": [
+            "BROADCAST",
+            "NOARP",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 1500,
+          "qdisc": "noqueue",
+          "operstate": "UNKNOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "ether",
+          "address": "d6:c9:40:7f:8a:e8",
+          "broadcast": "ff:ff:ff:ff:ff:ff",
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "10.203.0.2",
+              "prefixlen": 32,
+              "scope": "global",
+              "label": "v04new",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            },
+            {
+              "family": "inet6",
+              "local": "fe80::d4c9:40ff:fe7f:8ae8",
+              "prefixlen": 64,
+              "scope": "link",
+              "protocol": "kernel_ll",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        }
+      ],
+      "network_after": [
+        {
+          "ifindex": 1,
+          "ifname": "lo",
+          "flags": [
+            "LOOPBACK",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 65536,
+          "qdisc": "noqueue",
+          "operstate": "UNKNOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "loopback",
+          "address": "00:00:00:00:00:00",
+          "broadcast": "00:00:00:00:00:00",
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "127.0.0.1",
+              "prefixlen": 8,
+              "scope": "host",
+              "label": "lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            },
+            {
+              "family": "inet6",
+              "local": "::1",
+              "prefixlen": 128,
+              "scope": "host",
+              "protocol": "kernel_lo",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        },
+        {
+          "ifindex": 3,
+          "ifname": "v04new",
+          "flags": [
+            "BROADCAST",
+            "NOARP",
+            "UP",
+            "LOWER_UP"
+          ],
+          "mtu": 1500,
+          "qdisc": "noqueue",
+          "operstate": "UNKNOWN",
+          "group": "default",
+          "txqlen": 1000,
+          "link_type": "ether",
+          "address": "d6:c9:40:7f:8a:e8",
+          "broadcast": "ff:ff:ff:ff:ff:ff",
+          "addr_info": [
+            {
+              "family": "inet",
+              "local": "10.203.0.2",
+              "prefixlen": 32,
+              "scope": "global",
+              "label": "v04new",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            },
+            {
+              "family": "inet6",
+              "local": "fe80::d4c9:40ff:fe7f:8ae8",
+              "prefixlen": 64,
+              "scope": "link",
+              "protocol": "kernel_ll",
+              "valid_life_time": 4294967295,
+              "preferred_life_time": 4294967295
+            }
+          ]
+        }
+      ],
+      "outage_seconds": 1.2,
+      "events": [
+        "ready",
+        "source-ip-and-port-rebound-old-interface-deleted",
+        "loss-recovered"
+      ],
+      "counters": {
+        "forward": 8,
+        "return": 12,
+        "drop": 8,
+        "reordered": 1
+      },
+      "relay_upstream_addresses": [
+        [
+          "10.203.0.1",
+          59291
+        ],
+        [
+          "10.203.0.2",
+          54902
+        ]
+      ],
+      "authenticated_server_peers": [
+        [
+          "10.203.0.1",
+          "59291"
+        ],
+        [
+          "10.203.0.2",
+          "54902"
+        ]
+      ],
+      "journal": [
+        {
+          "pid": 376099,
+          "n": 1,
+          "value": "before"
+        },
+        {
+          "pid": 376099,
+          "n": 2,
+          "value": "during_loss"
+        },
+        {
+          "pid": 376099,
+          "n": 3,
+          "value": "reorder_one"
+        },
+        {
+          "pid": 376099,
+          "n": 4,
+          "value": "reorder_two"
+        },
+        {
+          "pid": 376099,
+          "n": 5,
+          "value": "after"
+        }
+      ],
+      "cancel_seconds": 0.04006700399986585,
+      "server_pid": 376098,
+      "client_pid": 376101,
+      "owned_process_cleanup": "passed"
+    },
+    {
+      "case": "physical-network-adapter-migration",
+      "status": "unavailable",
+      "reason": "No designated physical network fixture; private dummy interfaces are emulated."
+    },
+    {
+      "case": "physical-serial-loopback-unplug",
+      "status": "unavailable",
+      "reason": "No designated adapter/device/wiring; no host devices opened."
+    },
+    {
+      "case": "native-Windows-macOS-original",
+      "status": "unavailable",
+      "reason": "No designated native/original runtime fixture."
+    }
+  ]
+}

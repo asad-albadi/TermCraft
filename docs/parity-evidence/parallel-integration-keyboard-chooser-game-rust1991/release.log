@@ -1,0 +1,60 @@
+Building source snapshot c7fe0daa74512a18adbcdda680aa07d6ecf1d1cc82dd70f4f3a7994dbca8b31a
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling cfg-if v1.0.5
+   Compiling libc v0.2.191
+
+thread 'rustc' (187584) panicked at /rustc-dev/58cf8f9c35b355199727627d07ae34a4e2846d67/compiler/rustc_resolve/src/late.rs:703:50:
+no entry found for key
+stack backtrace:
+   0:     0x7f684431f476 - <<std[68c81ae915296b05]::sys::backtrace::BacktraceLock>::print::DisplayBacktrace as core[efd5e57aef94d71e]::fmt::Display>::fmt
+   1:     0x7f6844a0eecf - core[efd5e57aef94d71e]::fmt::write
+   2:     0x7f6845c5ce2c - <std[68c81ae915296b05]::sys::stdio::unix::Stderr as core[efd5e57aef94d71e]::io::write::Write>::write_fmt
+   3:     0x7f68442f28da - std[68c81ae915296b05]::panicking::default_hook::{closure#0}
+   4:     0x7f6844313723 - std[68c81ae915296b05]::panicking::default_hook
+   5:     0x7f6843289eda - std[68c81ae915296b05]::panicking::update_hook::<alloc[c23e483dde3f7cfb]::boxed::Box<rustc_driver_impl[adbd623b30937d3b]::install_ice_hook::{closure#1}>>::{closure#0}
+   6:     0x7f6844313bc2 - std[68c81ae915296b05]::panicking::panic_with_hook
+   7:     0x7f68442f2992 - std[68c81ae915296b05]::panicking::panic_handler::{closure#0}
+   8:     0x7f68442e9879 - std[68c81ae915296b05]::sys::backtrace::__rust_end_short_backtrace::<std[68c81ae915296b05]::panicking::panic_handler::{closure#0}, !>
+   9:     0x7f68442f439d - __rustc[3d2f79520d6fa809]::rust_begin_unwind
+  10:     0x7f68406dcccc - core[efd5e57aef94d71e]::panicking::panic_fmt
+  11:     0x7f68412cf504 - core[efd5e57aef94d71e]::option::expect_failed
+  12:     0x7f68453350db - <rustc_resolve[825d0074811af3]::late::LateResolutionVisitor>::resolve_doc_links
+  13:     0x7f684533acdc - <rustc_resolve[825d0074811af3]::late::LateResolutionVisitor as rustc_ast[e0987aa086956577]::visit::Visitor>::visit_item::{closure#0}::{closure#0}
+  14:     0x7f6845339f21 - rustc_ast[e0987aa086956577]::visit::visit_items::<rustc_resolve[825d0074811af3]::late::LateResolutionVisitor>
+  15:     0x7f6845341440 - <rustc_resolve[825d0074811af3]::late::LateResolutionVisitor as rustc_ast[e0987aa086956577]::visit::Visitor>::visit_item::{closure#0}::{closure#0}
+  16:     0x7f6845339f21 - rustc_ast[e0987aa086956577]::visit::visit_items::<rustc_resolve[825d0074811af3]::late::LateResolutionVisitor>
+  17:     0x7f6844e6392b - <rustc_resolve[825d0074811af3]::Resolver>::resolve_crate::{closure#0}
+  18:     0x7f6845072751 - <rustc_resolve[825d0074811af3]::Resolver>::resolve_crate
+  19:     0x7f684506ba87 - rustc_interface[8fa331b5442ffbb0]::passes::resolver_for_lowering_raw
+  20:     0x7f684506add6 - rustc_query_impl[a29dffa3fa494aa1]::query_vtables::resolver_for_lowering_raw::invoke_provider_fn::__rust_begin_short_backtrace
+  21:     0x7f6845c6516f - rustc_query_impl[a29dffa3fa494aa1]::execution::try_execute_query::<rustc_middle[a1b25c71ebdbabb6]::query::caches::SingleCache<rustc_middle[a1b25c71ebdbabb6]::query::erase::ErasedData<[u8; 24usize]>>, false>
+  22:     0x7f6845c64f24 - rustc_query_impl[a29dffa3fa494aa1]::query_vtables::resolver_for_lowering_raw::execute_query_non_incr::__rust_end_short_backtrace
+  23:     0x7f6845d38a87 - rustc_interface[8fa331b5442ffbb0]::interface::run_compiler::<(), rustc_driver_impl[adbd623b30937d3b]::run_compiler::{closure#0}>::{closure#2}
+  24:     0x7f6845cf58e4 - std[68c81ae915296b05]::sys::backtrace::__rust_begin_short_backtrace::<rustc_interface[8fa331b5442ffbb0]::util::run_in_thread_with_globals<rustc_interface[8fa331b5442ffbb0]::util::run_in_thread_pool_with_globals<rustc_interface[8fa331b5442ffbb0]::interface::run_compiler<(), rustc_driver_impl[adbd623b30937d3b]::run_compiler::{closure#0}>::{closure#2}, ()>::{closure#0}, ()>::{closure#0}::{closure#0}, ()>
+  25:     0x7f6845cf56ad - <std[68c81ae915296b05]::thread::lifecycle::spawn_unchecked<rustc_interface[8fa331b5442ffbb0]::util::run_in_thread_with_globals<rustc_interface[8fa331b5442ffbb0]::util::run_in_thread_pool_with_globals<rustc_interface[8fa331b5442ffbb0]::interface::run_compiler<(), rustc_driver_impl[adbd623b30937d3b]::run_compiler::{closure#0}>::{closure#2}, ()>::{closure#0}, ()>::{closure#0}::{closure#0}, ()>::{closure#1} as core[efd5e57aef94d71e]::ops::function::FnOnce<()>>::call_once::{shim:vtable#0}
+  26:     0x7f6845e0c607 - <std[68c81ae915296b05]::sys::thread::unix::Thread>::new::thread_start
+  27:     0x7f683f0ac93f - <unknown>
+  28:     0x7f683f14eeec - <unknown>
+  29:                0x0 - <unknown>
+
+error: the compiler unexpectedly panicked. This is a bug
+
+note: we would appreciate a bug report: https://github.com/rust-lang/rust/issues/new?labels=C-bug%2C+I-ICE%2C+T-compiler&template=ice.md
+
+note: rustc 1.99.1 (58cf8f9c3 2026-10-13) running on x86_64-unknown-linux-gnu
+
+note: compiler flags: --crate-type lib -C opt-level=3 -C embed-bitcode=no -C strip=debuginfo
+
+note: some of the compiler flags provided by cargo are hidden
+
+query stack during panic:
+#0 [resolver_for_lowering_raw] getting the resolver for lowering
+end of query stack
+error: could not compile `libc` (lib)
+
+Caused by:
+  process didn't exit successfully: `rustc --crate-name libc --edition=2021 '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1991/package-cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.191/src/lib.rs' --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C opt-level=3 -C embed-bitcode=no --cfg 'feature="default"' --cfg 'feature="std"' --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values("align", "const-extern-fn", "default", "extra_traits", "rustc-dep-of-std", "rustc-std-workspace-core", "std", "use_std"))' -C metadata=162f095103730330 -C extra-filename=-34e983634f114512 --out-dir '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1991/package-helper/release/deps' -C strip=debuginfo -L 'dependency=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1991/package-helper/release/deps' --cap-lints allow --cfg linux_time_bits64 --check-cfg 'cfg(libc_deny_warnings)' --check-cfg 'cfg(emscripten_old_stat_abi)' --check-cfg 'cfg(emscripten_fsblkcnt_is_32bit)' --check-cfg 'cfg(emscripten_sigset_large)' --check-cfg 'cfg(emscripten_nfds_is_ulong)' --check-cfg 'cfg(espidf_picolibc)' --check-cfg 'cfg(espidf_time32)' --check-cfg 'cfg(freebsd10)' --check-cfg 'cfg(freebsd11)' --check-cfg 'cfg(freebsd12)' --check-cfg 'cfg(freebsd13)' --check-cfg 'cfg(freebsd14)' --check-cfg 'cfg(freebsd15)' --check-cfg 'cfg(libc_elfv2)' --check-cfg 'cfg(vxworks_lt_25_09)' --check-cfg 'cfg(libc_pauthtest)' --check-cfg 'cfg(gnu_file_offset_bits64)' --check-cfg 'cfg(gnu_time_bits64)' --check-cfg 'cfg(linux_time_bits64)' --check-cfg 'cfg(musl_v1_2)' --check-cfg 'cfg(musl32_time64)' --check-cfg 'cfg(musl_redir_time64)' --check-cfg 'cfg(uclibc32_time64)' --check-cfg 'cfg(target_os,values("switch","aix","ohos","hurd","rtems","visionos","nuttx","cygwin","qurt","qnx","helenos"))' --check-cfg 'cfg(target_env,values("illumos","wasi","aix","ohos","nto71_iosock"))' --check-cfg 'cfg(target_arch,values("loongarch64","mips32r6","mips64r6","csky"))'` (exit status: 101)
+warning: build failed, waiting for other jobs to finish...
+Packaging failed: Command '['cargo', 'build', '--release', '--locked', '--offline', '--manifest-path', PosixPath('/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1991/package-sources/c7fe0daa74512a18adbcdda680aa07d6ecf1d1cc82dd70f4f3a7994dbca8b31a/engines/rdp/Cargo.toml'), '--target-dir', PosixPath('/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1991/package-helper')]' returned non-zero exit status 101.

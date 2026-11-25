@@ -1,0 +1,19 @@
+{
+  "files": {
+    "src/games/library.rs": {
+      "base": "9ca0c763794220c8a3399cc89f836642b96246c463b7a30c7ef80b705af7c18d",
+      "candidate": "310bc21c795e6081876eb22e68d663ca8e5fd9080f6aeec87df95fd56967c16c"
+    },
+    "src/games/mod.rs": {
+      "base": "1c0406c0d682bfdce3b484203a409bbb146ab2d71c9406ea04250254825e5b69",
+      "candidate": "4dd43fa71ef16d02df645233369b6fc50458bcc96bf6c468b684ba24ba6dd4dd"
+    },
+    "src/games/persistence.rs": {
+      "base": null,
+      "candidate": "56b61c2c334a5976869da7fa7319950d4bfaec41d01fc598bb07cbca547540d8"
+    }
+  },
+  "review": "review.md",
+  "exact": true,
+  "focused_tests": 14
+}

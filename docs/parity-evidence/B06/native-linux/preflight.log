@@ -1,0 +1,9 @@
+/usr/bin/Xvfb
+/usr/bin/xdotool
+/usr/bin/import
+/usr/bin/python
+/usr/lib/libGL.so
+/usr/lib/libGL.so.1
+/usr/lib/libGL.so.1.7.0
+      1000          0          1
+net:[4026533293]

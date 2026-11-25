@@ -1,0 +1,49 @@
+
+running 5 tests
+test ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full ... FAILED
+test ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source ... FAILED
+test ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text ... FAILED
+test ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted ... FAILED
+test ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs ... FAILED
+
+failures:
+
+---- ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full stdout ----
+
+thread 'ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full' (516334) panicked at /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/epaint-0.36.2/src/textures.rs:337:9:
+Dropped TexturesDelta with 2 unapplied deltas. Deltas need to be handled. If you want to drop this intentionally call `clear` before dropping.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source stdout ----
+
+thread 'ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source' (516331) panicked at src/ui/ssh_key_tests.rs:93:9:
+No shared source snapshot. Shared source: Some(("Refreshing", "")); SSH public-key authentications: 1
+
+---- ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text stdout ----
+
+thread 'ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text' (516335) panicked at src/ui/web_browser_tests.rs:69:9:
+Some("Chromium timed out while completing Target.getTargets.")
+
+---- ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted stdout ----
+
+thread 'ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted' (516333) panicked at /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/epaint-0.36.2/src/textures.rs:337:9:
+Dropped TexturesDelta with 2 unapplied deltas. Deltas need to be handled. If you want to drop this intentionally call `clear` before dropping.
+
+---- ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs stdout ----
+
+thread 'ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs' (516332) panicked at /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/epaint-0.36.2/src/textures.rs:337:9:
+Dropped TexturesDelta with 2 unapplied deltas. Deltas need to be handled. If you want to drop this intentionally call `clear` before dropping.
+
+thread '<unnamed>' (517886) panicked at src/ui/web_browser_tests.rs:231:54:
+called `Result::unwrap()` on an `Err` value: Disconnected
+
+
+failures:
+    ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source
+    ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs
+    ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted
+    ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full
+    ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text
+
+test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 132 filtered out; finished in 45.03s
+

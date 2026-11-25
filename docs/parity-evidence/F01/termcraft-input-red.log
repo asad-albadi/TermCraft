@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.84s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-b18108431b4d106d)
+
+running 1 test
+test ui::gui_tests::unauthenticated_terminal_input_cannot_be_recorded_or_queued ... FAILED
+
+failures:
+
+---- ui::gui_tests::unauthenticated_terminal_input_cannot_be_recorded_or_queued stdout ----
+
+thread 'ui::gui_tests::unauthenticated_terminal_input_cannot_be_recorded_or_queued' (170226) panicked at src/ui.rs:1767:9:
+assertion failed: tab.recorded.is_empty()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::gui_tests::unauthenticated_terminal_input_cannot_be_recorded_or_queued
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 13 filtered out; finished in 1.39s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

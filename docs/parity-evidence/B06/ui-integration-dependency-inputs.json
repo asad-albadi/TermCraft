@@ -1,0 +1,128 @@
+[
+  {
+    "path": "src/games/puzzles/PROVENANCE.md",
+    "candidate_sha256": "74537642a72af61db94b46e31d43264b3e9cfde162f6ef6dd32339f99979a85e",
+    "main_sha256": "74537642a72af61db94b46e31d43264b3e9cfde162f6ef6dd32339f99979a85e",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/guess.rs",
+    "candidate_sha256": "1253fddbee5b8cf41e9476471df9ce5ca9ec88f0e8206d6f1e57409548fb1b48",
+    "main_sha256": "1253fddbee5b8cf41e9476471df9ce5ca9ec88f0e8206d6f1e57409548fb1b48",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/map.rs",
+    "candidate_sha256": "b21a3251d66e7b86aec882cfb72001bd6317f8ae35157c09bc5a25f72d40435f",
+    "main_sha256": "b21a3251d66e7b86aec882cfb72001bd6317f8ae35157c09bc5a25f72d40435f",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/mines.rs",
+    "candidate_sha256": "df4f349e97c2e66bd3c7bd50a2a781d3510b602fe8590771a7f6b88b56e421fa",
+    "main_sha256": "df4f349e97c2e66bd3c7bd50a2a781d3510b602fe8590771a7f6b88b56e421fa",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/mod.rs",
+    "candidate_sha256": "0e5ad42fd80fc9f115b68c66cea383e5f6998edd736262029d5b8de6a1f30b38",
+    "main_sha256": "0e5ad42fd80fc9f115b68c66cea383e5f6998edd736262029d5b8de6a1f30b38",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/net.rs",
+    "candidate_sha256": "31e420b4b106aa6d36427d7b35844a286841743cc2476d16f09cc8e42ce263f7",
+    "main_sha256": "31e420b4b106aa6d36427d7b35844a286841743cc2476d16f09cc8e42ce263f7",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/provenance/UPSTREAM-LICENCE",
+    "candidate_sha256": "324cba4984cf02666dec301689f11806c75cee0bdef56bc81a5bdc75667dd68b",
+    "main_sha256": "324cba4984cf02666dec301689f11806c75cee0bdef56bc81a5bdc75667dd68b",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/provenance/recovered-manual-sections.but",
+    "candidate_sha256": "ef6c371b62dc4ca074f8808f84d4dd657f50f2c8a22f96b439716915bb052abe",
+    "main_sha256": "ef6c371b62dc4ca074f8808f84d4dd657f50f2c8a22f96b439716915bb052abe",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/provenance/recovered-source-excerpts.txt",
+    "candidate_sha256": "8274950155663828b00dfd319c81a765974eaf18331122f3a0af3aeda65f2e90",
+    "main_sha256": "8274950155663828b00dfd319c81a765974eaf18331122f3a0af3aeda65f2e90",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/provenance/source-manifest.json",
+    "candidate_sha256": "2def57c10f6675907ad7bdd7815f7fc44bdde3c54115bc586f2c576cf8f93dda",
+    "main_sha256": "2def57c10f6675907ad7bdd7815f7fc44bdde3c54115bc586f2c576cf8f93dda",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/solo.rs",
+    "candidate_sha256": "d01a7b1774c9384bcc31a1d1726e052ed7b1efd0962d465b203f4bb055b7f1f0",
+    "main_sha256": "d01a7b1774c9384bcc31a1d1726e052ed7b1efd0962d465b203f4bb055b7f1f0",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/tests.rs",
+    "candidate_sha256": "26d5c8f600d1d71465d8b50ddaefddea28b14ff972021974f8ae976b438155e0",
+    "main_sha256": "26d5c8f600d1d71465d8b50ddaefddea28b14ff972021974f8ae976b438155e0",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/puzzles/untangle.rs",
+    "candidate_sha256": "67b9235a9fa31c175c8fa402a1c2b972191e91ddfd619c889d057f981afc5b49",
+    "main_sha256": "67b9235a9fa31c175c8fa402a1c2b972191e91ddfd619c889d057f981afc5b49",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/terminal/API.md",
+    "candidate_sha256": "c9cb5428d994a756fec69cb181defecaff9ef4ae21d14b8564406e8550460962",
+    "main_sha256": "c9cb5428d994a756fec69cb181defecaff9ef4ae21d14b8564406e8550460962",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/terminal/PROVENANCE.md",
+    "candidate_sha256": "f55604ca641ced8e93f6ee7d29a9343981ece8406fdafadb3542698af2d857d7",
+    "main_sha256": "f55604ca641ced8e93f6ee7d29a9343981ece8406fdafadb3542698af2d857d7",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/terminal/blocks.rs",
+    "candidate_sha256": "d5cb8488b6af4fd1fc3a4b616fffa11c05553950c79533ad88c856a8ffc0401d",
+    "main_sha256": "196dbf81c213f25250c9c57d52c6addbfaa698cb4dfea90158802253c5cd2f52",
+    "exact_main_match": false
+  },
+  {
+    "path": "src/games/terminal/cards.rs",
+    "candidate_sha256": "eec79b73222f95a8613ef717ec26a4a62deb2ed7e7361397bb6841ee48a0b855",
+    "main_sha256": "f68b2d3b8bfdf0f6a8e4f083f034f386d48b2f531896189e0111e5dc45404ea8",
+    "exact_main_match": false
+  },
+  {
+    "path": "src/games/terminal/grids.rs",
+    "candidate_sha256": "9542675e8dfedd976161c334ffddca5a2121b181bc219e0ec97e9462ea0d057c",
+    "main_sha256": "c40a6bf0f0ce1b274abfd83233e9fe510f6b56925160850ddcfc4c345be5496e",
+    "exact_main_match": false
+  },
+  {
+    "path": "src/games/terminal/invaders.rs",
+    "candidate_sha256": "40bd4817919dee05ef7602321b50b7e7f05307ca042da3d78dacb42fab323ed8",
+    "main_sha256": "40bd4817919dee05ef7602321b50b7e7f05307ca042da3d78dacb42fab323ed8",
+    "exact_main_match": true
+  },
+  {
+    "path": "src/games/terminal/mod.rs",
+    "candidate_sha256": "640c9c76974c34b2cdf8c4f24993e7be40470db7e4a9400989239e5021f0713c",
+    "main_sha256": "e6b2d32fadb24c6bd8144e0fd6dee3345989739cc884fdccde4139e0f968cf1f",
+    "exact_main_match": false
+  },
+  {
+    "path": "src/games/terminal/tests.rs",
+    "candidate_sha256": "a1ed8ab284807242360a2b83237051e8e96609372f35057e0cf143bfa884ee7e",
+    "main_sha256": "bcc74410c8d4421b028df99dd39cc2c130a18573d32f5a4380a33a51a0f919c0",
+    "exact_main_match": false
+  }
+]

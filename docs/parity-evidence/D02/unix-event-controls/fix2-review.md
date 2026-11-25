@@ -1,0 +1,7 @@
+# D02 Unix serial controls FIX2 re-review
+
+**SPEC ACCEPT. QUALITY ACCEPT.** FIX1's sole new P3 finding is **ADDRESSED**. The two original findings remain **ADDRESSED**. No new findings in the FIX2 delta.
+
+At `engines/rdp/src/devices.rs:1172–1184`, only the Unix mapped-serial MajorFunction 14 wait-mask escape gains a MinorFunction 0 requirement. The worker already rejects nonzero minors at `serial.rs:422–424`. The header length is verified before this code, so offset 20 is safe to read. At 16 occupied ordinary credits, a nonzero-minor SET follows the ordinary threshold and returns DEVICE_BUSY immediately without enqueuing. A following valid reset still has the escape and the CLOSE admission arm is unchanged. The regression at `devices_tests.rs:746–766` checks a well-shaped SET with minor 1 before sending valid minor 0 without polling; downstream checks still verify successful reset and wait completion, same-handle retry, separate room for CLOSE, and credit recovery.
+
+I independently verified all three manifests and sealed evidence and reconstructed the scoped two-file FIX2 and cumulative three-file patches in private preimage copies with zero fuzz. Reconstructed bytes match both the sealed payloads and tested source files, including unchanged serial.rs. Inspected the supplied FIX2 Linux Channel results (12 passed, 64 filtered) and scoped formatting evidence. FIX1's 76 helper plus 10 PCSC and Apple ARM component results belong to FIX1, not a full test rerun of FIX2. No builds, fixtures, or writes to MAIN or candidates.

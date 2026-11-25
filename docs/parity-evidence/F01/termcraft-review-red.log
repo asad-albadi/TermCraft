@@ -1,0 +1,45 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.92s
+     Running tests/ssh_browser.rs (app/target/debug/deps/ssh_browser-88b75d919c394c19)
+
+running 10 tests
+test unknown_host_can_be_rejected_before_authentication ... ok
+test changed_key_prevents_authentication ... ok
+test tab_separated_wildcard_host_pin_is_enforced ... FAILED
+test cancelling_a_host_prompt_stops_the_connection ... ok
+test revoked_host_key_overrides_a_matching_app_pin ... FAILED
+test missing_sftp_keeps_shell_usable ... ok
+test embedded_shell_and_browser_share_one_authentication ... ok
+test single_jump_host_authenticates_each_hop_and_opens_files ... ok
+test full_output_queue_cannot_prevent_cancellation ... ok
+test exit_reason_survives_a_saturated_event_queue ... FAILED
+
+failures:
+
+---- tab_separated_wildcard_host_pin_is_enforced stdout ----
+
+thread 'tab_separated_wildcard_host_pin_is_enforced' (169790) panicked at tests/ssh_browser.rs:216:50:
+Existing host policy was incorrectly treated as unknown
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- revoked_host_key_overrides_a_matching_app_pin stdout ----
+
+thread 'revoked_host_key_overrides_a_matching_app_pin' (169785) panicked at tests/ssh_browser.rs:215:50:
+Host policy was bypassed
+
+---- exit_reason_survives_a_saturated_event_queue stdout ----
+
+thread 'exit_reason_survives_a_saturated_event_queue' (169782) panicked at tests/ssh_browser.rs:246:5:
+assertion failed: handle.poll().iter().any(|e|
+        matches!(e,ConnectionEvent::Exited{message,..} if
+            message.contains("cancelled")))
+
+
+failures:
+    exit_reason_survives_a_saturated_event_queue
+    revoked_host_key_overrides_a_matching_app_pin
+    tab_separated_wildcard_host_pin_is_enforced
+
+test result: FAILED. 7 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s
+
+error: test failed, to rerun pass `--test ssh_browser`

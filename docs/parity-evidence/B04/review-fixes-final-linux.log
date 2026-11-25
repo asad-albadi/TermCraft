@@ -1,0 +1,36 @@
+   Compiling b04-components v0.1.0-b04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b04/component)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.63s
+     Running unittests src/lib.rs (app/target/agent-work/b04/component/target/debug/deps/b04_components-6bdf91bb519a1925)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/windows_integration.rs (app/target/agent-work/b04/component/target/debug/deps/windows_integration-81d2ef32650b2940)
+
+running 16 tests
+test actual_tests::cancelled_registry_write_does_not_attempt_platform_access ... ok
+test actual_tests::drive_path_mapping_handles_unicode ... ok
+test actual_tests::cancellation_after_creation_stops_remaining_mutations_without_deleting_completed_entries ... ok
+test actual_tests::shell_registration_rejects_substitution_in_the_executable ... ok
+test actual_tests::local_launch_preserves_spaces_unicode_and_metacharacters ... ok
+test actual_tests::explorer_command_handles_drive_roots_without_a_quoted_trailing_backslash ... ok
+test actual_tests::install_does_not_shadow_an_existing_machine_handler ... ok
+test actual_tests::multistring_editor_preserves_literal_separators_and_newlines ... ok
+test actual_tests::typed_registry_value_input_is_bounded_and_literal ... ok
+test actual_tests::cancellation_during_preflight_prevents_all_later_registry_mutations ... ok
+test actual_tests::windows_activation_rejects_extra_workspace_options_but_trusted_cli_keeps_them ... ok
+test actual_tests::uninstall_guard_refuses_owned_or_edited_references_and_preserves_unrelated_entries ... ok
+test actual_tests::status_reports_conflicts_even_when_other_entries_are_missing ... ok
+test actual_tests::registration_preserves_existing_or_changed_handlers ... ok
+test actual_tests::uninstall_removes_only_owned_registry_entries ... ok
+test actual_tests::binary_editor_does_not_truncate_existing_values ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests b04_components
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

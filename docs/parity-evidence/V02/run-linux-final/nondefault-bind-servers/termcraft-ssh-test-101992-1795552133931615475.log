@@ -1,0 +1,13 @@
+Server listening on 127.0.0.1 port 39023.
+Connection from 127.0.0.1 port 40292 on 127.0.0.1 port 39023 rdomain ""
+Connection from 127.0.0.1 port 40296 on 127.0.0.1 port 39023 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 40292 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Accepted key ED25519 SHA256:SBwb0WVYUCu860N+F0s9gOruKkdj/P+awZgEBUVRTE0 found at /tmp/termcraft-ssh-test-101992-1795552133931615475/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 40296 ssh2 [preauth]
+Accepted key ED25519 SHA256:SBwb0WVYUCu860N+F0s9gOruKkdj/P+awZgEBUVRTE0 found at /tmp/termcraft-ssh-test-101992-1795552133931615475/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 40296 ssh2: ED25519 SHA256:SBwb0WVYUCu860N+F0s9gOruKkdj/P+awZgEBUVRTE0
+User child is on pid 102157
+Received disconnect from 127.0.0.1 port 40296:11: disconnected by user
+Disconnected from user asad 127.0.0.1 port 40296

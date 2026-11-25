@@ -1,0 +1,15 @@
+{
+  "packaging/x11/xdmcp/manifest.json": "c4dd5b743e201cdfbdc0d8d9ba84bd7c12c1e2e880b087342bf6fe002c4c6156",
+  "packaging/x11/xdmcp/readiness/Xephyr-session-ready.xz": "90256d9c41e451c402b8deff69cc589d976b20340ef5d4e0452d508214b9b875",
+  "packaging/x11/xdmcp/readiness/executable.sha256.bin": "beea9e6728556e5ed0419a72fd512d635319c5d4ae16207eef0a1de81756bee2",
+  "packaging/x11/xdmcp/readiness/xephyr.patch": "2d03a69b2f3a0aee25141890b98b9524082de39af350a6df56e586c15fd9a344",
+  "src/ui/xdmcp.rs": "7fade5defe182e81634828650dc5486924960b78c1bcd13d764ce0cc79337034",
+  "src/x11/xdmcp.rs": "6fb05a01b6b7330be99bc7dbb44d289c4506ee97eda40bdd708f2fc8452f417c",
+  "src/x11/xdmcp_chooser_test.rs": "e30bfbbd0c5d5093b1cb18bcc6e614a4a3bd4a47603dbdc08f55a388229b7947",
+  "src/x11/xdmcp_engine.rs": "fd6931cc199d24ba69da6a9543fcb03c7099d4a7137de3fe115cba6165d86e34",
+  "tests/support/prepare_xdmcp_chooser_fixture.sh": "ab6e4d1ab3580a4a110b286ebb3067b740d0d8adc693f53c9cf6ce44484ea8f3",
+  "tests/support/run_xdmcp_isolated.sh": "d9580652a42d597fc10d53286429edef1199ce8b8ff5cf71c19d1948941b1a5a",
+  "tests/support/xdmcp_chooser_managers.py": "46def73914c89a8da8bbd46d4caa7c78f84496415243ce9db0a1305c0a164c2f",
+  "tests/support/xdmcp_chooser_select.py": "6d71fc99fd7c2666c3e3149b30668d78805145133bde4c1a61fc23758f24aa92",
+  "tests/support/xdmcp_window.py": "8740a643b1a6782e772fd1a6854d0286e2f7084b4c829e8e28dd5e1b962294f0"
+}

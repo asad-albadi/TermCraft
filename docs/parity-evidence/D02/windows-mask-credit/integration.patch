@@ -1,0 +1,73 @@
+--- a/engines/rdp/src/devices.rs
++++ b/engines/rdp/src/devices.rs
+@@ -750,7 +750,7 @@
+     confirmed: bool,
+     announced: bool,
+     pending: usize,
+-    #[cfg(unix)]
++    #[cfg(any(unix, windows))]
+     serial_ids: std::ops::Range<u32>,
+     closed: Arc<AtomicBool>,
+ }
+@@ -939,15 +939,15 @@
+             .clone()
+             .zip(printer_id)
+             .map(|(binding, id)| printer::Printer::new(binding, id));
+-        #[cfg(unix)]
++        #[cfg(any(unix, windows))]
+         let serial_ids = (drives.len() as u32 + 1)..((drives.len() + names.len()) as u32 + 1);
+         let drives = drives.to_vec();
+         #[cfg(any(unix, windows))]
+         let ports = serial.ports.clone();
+-        // Keep one close position beyond all other requests, including the Unix
++        // Keep one close position beyond all other requests, including the serial
+         // mask reset escape that can release a wait without closing its handle.
+         let queue_limit = DEVICE_IO_CREDITS + 1;
+-        #[cfg(unix)]
++        #[cfg(any(unix, windows))]
+         let queue_limit = queue_limit + usize::from(!serial_ids.is_empty());
+         let (tx, jobs) = mpsc::sync_channel::<Vec<u8>>(queue_limit);
+         let (results, rx) = mpsc::sync_channel(queue_limit);
+@@ -1040,7 +1040,7 @@
+             confirmed: false,
+             announced: false,
+             pending: 0,
+-            #[cfg(unix)]
++            #[cfg(any(unix, windows))]
+             serial_ids,
+             closed,
+         })
+@@ -1171,7 +1171,7 @@
+                 }
+                 let major = u32_at(p, 16);
+                 let limit = DEVICE_IO_CREDITS + usize::from(major == Ok(2));
+-                #[cfg(unix)]
++                #[cfg(any(unix, windows))]
+                 let limit = limit
+                     + usize::from(
+                         !self.serial_ids.is_empty()
+--- a/engines/rdp/src/serial_windows.rs
++++ b/engines/rdp/src/serial_windows.rs
+@@ -2,6 +2,7 @@
+ //! Native overlapped operations run only on the bounded device worker.
+ #[path = "serial_windows_control.rs"]
+ mod control;
++pub(super) use control::is_wait_mask_set;
+ 
+ use super::{DENIED, INVALID, MAX_IO, UNSUPPORTED, complete, length_data, status, u32_at};
+ use crate::rdp_options::SerialMapping;
+--- a/engines/rdp/src/serial_windows_control.rs
++++ b/engines/rdp/src/serial_windows_control.rs
+@@ -28,6 +28,12 @@
+             .unwrap(),
+     ))
+ }
++// Classify wire shape only. The device worker still checks live handle identity,
++// real access rights, and native driver support before this request can run.
++pub(crate) fn is_wait_mask_set(body: &[u8]) -> bool {
++    word(body, 8) == Ok(SET_WAIT_MASK) && validate(body, true, true, false).is_ok()
++}
++
+ pub(super) fn validate(
+     body: &[u8],
+     reads: bool,

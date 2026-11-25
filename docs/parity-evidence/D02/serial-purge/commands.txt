@@ -1,0 +1,14 @@
+Working directory: /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6
+Private helper: app/target/agent-work/d02-serial-events/candidate/engines/rdp/Cargo.toml
+
+RED and focused GREEN (different source snapshots):
+CARGO_BUILD_JOBS=2 cargo test --offline --locked --manifest-path app/target/agent-work/d02-serial-events/candidate/engines/rdp/Cargo.toml serial_purge -- --nocapture
+
+Pure mapping RED:
+CARGO_BUILD_JOBS=2 cargo test --offline --locked --manifest-path app/target/agent-work/d02-serial-events/candidate/engines/rdp/Cargo.toml serial_purge_maps -- --nocapture
+
+Complete private helper GREEN:
+CARGO_BUILD_JOBS=2 cargo test --offline --locked --manifest-path app/target/agent-work/d02-serial-events/candidate/engines/rdp/Cargo.toml
+
+Scoped format:
+rustfmt --edition 2024 --check app/target/agent-work/d02-serial-events/candidate/engines/rdp/src/serial.rs

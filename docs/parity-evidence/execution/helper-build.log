@@ -1,0 +1,26 @@
+   Compiling termcraft-rdp-engine v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/engines/rdp)
+warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
+  --> src/../../../src/desktop/options.rs:78:9
+   |
+77 | pub struct NegotiatedRdpOptions {
+   |            -------------------- fields in this struct
+78 |     pub clipboard: ClipboardPolicy,
+   |         ^^^^^^^^^
+79 |     pub keyboard: KeyboardRouting,
+   |         ^^^^^^^^
+80 |     pub keyboard_layout: u32,
+   |         ^^^^^^^^^^^^^^^
+   |
+   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `is_default` is never used
+  --> src/../../../src/desktop/options.rs:83:12
+   |
+82 | impl RdpOptions {
+   | --------------- method in this implementation
+83 |     pub fn is_default(&self) -> bool {
+   |            ^^^^^^^^^^
+
+warning: `termcraft-rdp-engine` (bin "termcraft-rdp-engine") generated 2 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.17s

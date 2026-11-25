@@ -1,0 +1,7 @@
+{
+  "target/validation/p08-debian-native/qualification/input/scripts/package-check-startup.py": "eb88c5123edccb70a2f675660e08f9a01318b6934e8fd770918ea974654ad7a4",
+  "target/validation/p08-debian-native/qualification/input/scripts/package-debian.py": "687381a2d1fb3cf00a804f42c69c0db2ac41ff2e98f8bd42575f0a646019edf0",
+  "target/validation/p08-debian-native/qualification/input/scripts/portable_archive.py": "d27b93aa99e538b5a031ea7a4b53667c027e40b266a7a2537cdb6d5fd1b4d922",
+  "target/validation/p08-debian-native/qualification/input/packaging/debian/org.termcraft.TermCraft.desktop": "577f82262d549f15e97da90d4e01dae57ca1661985e0ee36a6e1030c474c9fb9",
+  "target/validation/p08-debian-native/build/verified-out/TermCraft-0.1.0-linux-x86_64.tar.gz": "08969e0223e0b74ec954a1440a8f70c1eab03c9ba7d53fe7c8129b29e08b12f4"
+}

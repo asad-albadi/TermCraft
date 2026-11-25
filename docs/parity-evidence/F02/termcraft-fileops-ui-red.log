@@ -1,0 +1,15 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0433]: cannot find type `FileActionForm` in this scope
+   --> src/ui/remote_files.rs:450:18
+    |
+450 |         let form=FileActionForm::Delete{target:target.clone()};
+    |                  ^^^^^^^^^^^^^^ use of undeclared type `FileActionForm`
+
+error[E0433]: cannot find type `FileActionForm` in this scope
+   --> src/ui/remote_files.rs:452:18
+    |
+452 |         let form=FileActionForm::NewFolder{parent:target,name:"../outside".into()};
+    |                  ^^^^^^^^^^^^^^ use of undeclared type `FileActionForm`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 2 previous errors

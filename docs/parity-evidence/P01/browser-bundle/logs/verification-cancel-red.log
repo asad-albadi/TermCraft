@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'browser::bundled_cancellation_qualification::close_during_whole_resource_verification_is_chunk_cancellable' (24877) panicked at /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p01-browser/src/browser/mod.rs:355:9:
+UI close waited 11.960929369s for verification
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test browser::bundled_cancellation_qualification::close_during_whole_resource_verification_is_chunk_cancellable ... FAILED
+
+failures:
+
+failures:
+    browser::bundled_cancellation_qualification::close_during_whole_resource_verification_is_chunk_cancellable
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 12 filtered out; finished in 11.97s
+

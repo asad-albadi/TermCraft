@@ -1,0 +1,1 @@
+RED: fixture exited before input (status=0, output=b'{"protocol":1,"ok":true}\n'); write raised BrokenPipeError

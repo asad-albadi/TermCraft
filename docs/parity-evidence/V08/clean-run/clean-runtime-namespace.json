@@ -1,0 +1,5 @@
+{
+  "unshare_CLONE_NEWUSER_return": -1,
+  "errno": 1,
+  "error": "Operation not permitted"
+}

@@ -1,0 +1,5 @@
+# Run from app/; CARGO_BUILD_JOBS=2, shared target used only within parent-approved integration-build window.
+CARGO_BUILD_JOBS=2 CARGO_TARGET_DIR="$PWD/target" cargo test --offline --manifest-path target/agent-work/x05/Cargo.toml --test remote_environment
+# Derive the test executable from cargo's emitted Executable line; final tested candidate was:
+tests/support/run_xserver_isolated.sh target/package-platforms-qualified/e7315e1082bc354c4f002835b1ba138d7107bb89d91ed993b360ea525626429a/TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh target/debug/deps/remote_environment-43ec367de5c9670c live:: --ignored --skip desktop_window_helper --nocapture --test-threads=1
+cargo fmt --manifest-path target/agent-work/x05/Cargo.toml --check

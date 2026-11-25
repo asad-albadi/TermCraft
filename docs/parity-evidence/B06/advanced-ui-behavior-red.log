@@ -1,0 +1,63 @@
+   Compiling harbor-workspace v0.1.610 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced-ui/work)
+warning: unused variable: `i`
+    --> src/ui/games/play.rs:1332:24
+     |
+1332 |                 .map(|(i, &d)| if d != 0 { d.to_string() } else { String::new() })
+     |                        ^ help: if this is intentional, prefix it with an underscore: `_i`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (bin "termcraft-advanced-ui610" test) generated 1 warning (run `cargo fix --bin "termcraft-advanced-ui610" -p harbor-workspace --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.20s
+     Running unittests src/main.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/termcraft_advanced_ui610-aef57433844c9f8f)
+
+running 5 tests
+test ui::games::play::options_ui_tests::advanced_ui_actual_menu_selects_intermediate_and_creates_new_board ... FAILED
+test ui::games::play::options_ui_tests::advanced_ui_all_51_presets_available_and_15_samples_paint_exact_grade ... FAILED
+test ui::games::play::options_ui_tests::advanced_ui_custom_flags_regular_help_and_focus_quarantine ... FAILED
+test ui::games::play::options_ui_tests::advanced_ui_jigsaw_exact_region_edges_and_diagonals ... FAILED
+test ui::games::play::options_ui_tests::advanced_ui_killer_cages_sums_arithmetic_and_history ... FAILED
+
+failures:
+
+---- ui::games::play::options_ui_tests::advanced_ui_actual_menu_selects_intermediate_and_creates_new_board stdout ----
+
+thread 'ui::games::play::options_ui_tests::advanced_ui_actual_menu_selects_intermediate_and_creates_new_board' (455823) panicked at src/ui/games/play.rs:3191:9:
+assertion `left == right` failed
+  left: Some(Solo(SoloConfig { block_width: 3, block_height: 3, diagonal: false, difficulty: Trivial, symmetry: Rotate2 }))
+ right: Some(Solo(SoloConfig { block_width: 3, block_height: 3, diagonal: false, difficulty: Intermediate, symmetry: Rotate2 }))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ui::games::play::options_ui_tests::advanced_ui_all_51_presets_available_and_15_samples_paint_exact_grade stdout ----
+
+thread 'ui::games::play::options_ui_tests::advanced_ui_all_51_presets_available_and_15_samples_paint_exact_grade' (455927) panicked at src/ui/games/play.rs:3175:60:
+20x15, 30 regions, Hard
+
+---- ui::games::play::options_ui_tests::advanced_ui_custom_flags_regular_help_and_focus_quarantine stdout ----
+
+thread 'ui::games::play::options_ui_tests::advanced_ui_custom_flags_regular_help_and_focus_quarantine' (456117) panicked at src/ui/games/play.rs:2483:29:
+missing visible control Jigsaw regions (9×9 only)
+
+---- ui::games::play::options_ui_tests::advanced_ui_jigsaw_exact_region_edges_and_diagonals stdout ----
+
+thread 'ui::games::play::options_ui_tests::advanced_ui_jigsaw_exact_region_edges_and_diagonals' (456465) panicked at src/ui/games/play.rs:3084:9:
+assertion `left == right` failed
+  left: [[[0.0 0.0], [0.0 342.0]], [[114.0 0.0], [114.0 342.0]], [[228.0 0.0], [228.0 342.0]], [[342.0 0.0], [342.0 342.0]], [[0.0 0.0], [342.0 0.0]], [[0.0 114.0], [342.0 114.0]], [[0.0 228.0], [342.0 228.0]], [[0.0 342.0], [342.0 342.0]]]
+ right: [[[0.0 0.0], [38.0 0.0]], [[0.0 0.0], [0.0 38.0]], [[38.0 0.0], [76.0 0.0]], [[76.0 0.0], [114.0 0.0]], [[114.0 0.0], [114.0 38.0]], [[114.0 0.0], [152.0 0.0]], [[114.0 38.0], [152.0 38.0]], [[152.0 0.0], [190.0 0.0]], [[190.0 0.0], [228.0 0.0]], [[228.0 0.0], [228.0 38.0]], [[190.0 38.0], [228.0 38.0]], [[228.0 0.0], [266.0 0.0]], [[266.0 0.0], [304.0 0.0]], [[304.0 0.0], [342.0 0.0]], [[342.0 0.0], [342.0 38.0]], [[0.0 38.0], [0.0 76.0]], [[76.0 76.0], [114.0 76.0]], [[152.0 38.0], [152.0 76.0]], [[114.0 76.0], [152.0 76.0]], [[190.0 38.0], [190.0 76.0]], [[228.0 38.0], [228.0 76.0]], [[342.0 38.0], [342.0 76.0]], [[304.0 76.0], [342.0 76.0]], [[0.0 76.0], [0.0 114.0]], [[0.0 114.0], [38.0 114.0]], [[76.0 76.0], [76.0 114.0]], [[38.0 114.0], [76.0 114.0]], [[76.0 114.0], [114.0 114.0]], [[190.0 76.0], [190.0 114.0]], [[228.0 76.0], [228.0 114.0]], [[304.0 76.0], [304.0 114.0]], [[266.0 114.0], [304.0 114.0]], [[342.0 76.0], [342.0 114.0]], [[0.0 114.0], [0.0 152.0]], [[114.0 114.0], [114.0 152.0]], [[114.0 152.0], [152.0 152.0]], [[190.0 114.0], [190.0 152.0]], [[152.0 152.0], [190.0 152.0]], [[228.0 114.0], [228.0 152.0]], [[266.0 114.0], [266.0 152.0]], [[228.0 152.0], [266.0 152.0]], [[342.0 114.0], [342.0 152.0]], [[0.0 152.0], [0.0 190.0]], [[114.0 152.0], [114.0 190.0]], [[114.0 190.0], [152.0 190.0]], [[152.0 190.0], [190.0 190.0]], [[228.0 152.0], [228.0 190.0]], [[266.0 190.0], [304.0 190.0]], [[342.0 152.0], [342.0 190.0]], [[0.0 190.0], [0.0 228.0]], [[0.0 228.0], [38.0 228.0]], [[38.0 228.0], [76.0 228.0]], [[114.0 190.0], [114.0 228.0]], [[76.0 228.0], [114.0 228.0]], [[190.0 190.0], [190.0 228.0]], [[228.0 190.0], [228.0 228.0]], [[266.0 190.0], [266.0 228.0]], [[304.0 190.0], [304.0 228.0]], [[342.0 190.0], [342.0 228.0]], [[304.0 228.0], [342.0 228.0]], [[0.0 228.0], [0.0 266.0]], [[114.0 228.0], [114.0 266.0]], [[190.0 228.0], [190.0 266.0]], [[228.0 228.0], [228.0 266.0]], [[266.0 228.0], [266.0 266.0]], [[228.0 266.0], [266.0 266.0]], [[342.0 228.0], [342.0 266.0]], [[0.0 266.0], [0.0 304.0]], [[114.0 266.0], [114.0 304.0]], [[190.0 266.0], [190.0 304.0]], [[228.0 266.0], [228.0 304.0]], [[190.0 304.0], [228.0 304.0]], [[342.0 266.0], [342.0 304.0]], [[0.0 304.0], [0.0 342.0]], [[0.0 342.0], [38.0 342.0]], [[38.0 342.0], [76.0 342.0]], [[114.0 304.0], [114.0 342.0]], [[76.0 342.0], [114.0 342.0]], [[114.0 342.0], [152.0 342.0]], [[152.0 342.0], [190.0 342.0]], [[228.0 304.0], [228.0 342.0]], [[190.0 342.0], [228.0 342.0]], [[228.0 342.0], [266.0 342.0]], [[266.0 342.0], [304.0 342.0]], [[342.0 304.0], [342.0 342.0]], [[304.0 342.0], [342.0 342.0]]]
+
+---- ui::games::play::options_ui_tests::advanced_ui_killer_cages_sums_arithmetic_and_history stdout ----
+
+thread 'ui::games::play::options_ui_tests::advanced_ui_killer_cages_sums_arithmetic_and_history' (456624) panicked at src/ui/games/play.rs:3105:13:
+missing sum at cage anchor 0
+
+
+failures:
+    ui::games::play::options_ui_tests::advanced_ui_actual_menu_selects_intermediate_and_creates_new_board
+    ui::games::play::options_ui_tests::advanced_ui_all_51_presets_available_and_15_samples_paint_exact_grade
+    ui::games::play::options_ui_tests::advanced_ui_custom_flags_regular_help_and_focus_quarantine
+    ui::games::play::options_ui_tests::advanced_ui_jigsaw_exact_region_edges_and_diagonals
+    ui::games::play::options_ui_tests::advanced_ui_killer_cages_sums_arithmetic_and_history
+
+test result: FAILED. 0 passed; 5 failed; 0 ignored; 0 measured; 198 filtered out; finished in 8.70s
+
+error: test failed, to rerun pass `--bin termcraft-advanced-ui610`

@@ -1,0 +1,191 @@
+--- a/src/games/terminal/blocks.rs
++++ b/src/games/terminal/blocks.rs
+@@ -271,10 +271,11 @@
+                     x: i32::MAX,
+                     y: i32::MAX,
+                 };
+-                assert!(p
+-                    .cells()
+-                    .iter()
+-                    .all(|&(x, y)| x == i32::MAX && y == i32::MAX));
++                assert!(
++                    p.cells()
++                        .iter()
++                        .all(|&(x, y)| x == i32::MAX && y == i32::MAX)
++                );
+                 let p = Piece {
+                     kind,
+                     rotation,
+--- a/src/games/terminal/cards.rs
++++ b/src/games/terminal/cards.rs
+@@ -141,12 +141,13 @@
+                 if self.variant != SolitaireVariant::Freecell || count != 1 {
+                     return Err("Invalid reserve move");
+                 }
+-                vec![self
+-                    .reserve
+-                    .get(n)
+-                    .copied()
+-                    .flatten()
+-                    .ok_or("Empty or invalid reserve")?]
++                vec![
++                    self.reserve
++                        .get(n)
++                        .copied()
++                        .flatten()
++                        .ok_or("Empty or invalid reserve")?,
++                ]
+             }
+             CardPile::Waste => {
+                 if count != 1 {
+@@ -282,13 +283,14 @@
+         .unwrap();
+         assert_eq!(s.tableau[1].len(), 3);
+         s.tableau[2] = vec![card(7, 0)];
+-        assert!(s
+-            .apply(TerminalInput::Transfer {
++        assert!(
++            s.apply(TerminalInput::Transfer {
+                 from: CardPile::Tableau(1),
+                 to: CardPile::Tableau(2),
+                 count: 2
+             })
+-            .is_err());
++            .is_err()
++        );
+     }
+     #[test]
+     fn klondike_king_empty_and_turns_exposed_card() {
+@@ -304,13 +306,14 @@
+         })
+         .unwrap();
+         assert!(s.tableau[0][0].face_up);
+-        assert!(s
+-            .apply(TerminalInput::Transfer {
++        assert!(
++            s.apply(TerminalInput::Transfer {
+                 from: CardPile::Tableau(0),
+                 to: CardPile::Tableau(2),
+                 count: 1
+             })
+-            .is_err());
++            .is_err()
++        );
+     }
+     #[test]
+     fn draw_and_recycle_respect_pass_limit() {
+@@ -391,13 +394,14 @@
+             face_up: true,
+         }); 4];
+         let before = s.clone();
+-        assert!(s
+-            .apply(TerminalInput::Transfer {
++        assert!(
++            s.apply(TerminalInput::Transfer {
+                 from: CardPile::Tableau(0),
+                 to: CardPile::Tableau(1),
+                 count: 2
+             })
+-            .is_err());
++            .is_err()
++        );
+         assert_eq!(s, before);
+     }
+     #[test]
+@@ -408,13 +412,14 @@
+             suit: 2,
+             face_up: true,
+         }];
+-        assert!(s
+-            .apply(TerminalInput::Transfer {
++        assert!(
++            s.apply(TerminalInput::Transfer {
+                 from: CardPile::Tableau(0),
+                 to: CardPile::Foundation(0),
+                 count: 1
+             })
+-            .is_err());
++            .is_err()
++        );
+         s.apply(TerminalInput::Transfer {
+             from: CardPile::Tableau(0),
+             to: CardPile::Foundation(2),
+--- a/src/games/terminal/grids.rs
++++ b/src/games/terminal/grids.rs
+@@ -1,4 +1,4 @@
+-use super::{neighbours, Outcome, Rng, TerminalInput};
++use super::{Outcome, Rng, TerminalInput, neighbours};
+ #[derive(Clone, Debug, PartialEq, Eq)]
+ pub struct SudokuScene {
+     pub cells: [u8; 81],
+--- a/src/games/terminal/mod.rs
++++ b/src/games/terminal/mod.rs
+@@ -42,13 +42,28 @@
+     }
+     pub fn help(self) -> &'static str {
+         match self {
+- Self::Soliterm=>"Select a source pile and destination. Build alternating colours descending in tableau; suit foundations ascend Ace to King. Freecell has four reserves. Klondike uses draw-one stock and King-only empty columns. Undo/reset available.",
+- Self::Termwalk=>"Rotate tiles clockwise or anticlockwise to connect every server to the central router. No wrapping; all pipe ends must match. Undo/reset available.",
+- Self::Ctris=>"Left/right move, up rotates clockwise, down soft-drops, Space hard-drops. P pauses. Complete horizontal rows to clear them; blocked spawn loses. Independent conventional controls.",
+- Self::Sudoku=>"Digits 1–9 fill each row, column and 3×3 box once. 0 erases. Starting digits are fixed. Undo/reset available.",
+- Self::Nimesweeper=>"Reveal every safe square. F toggles flag; Space reveals; open numbered squares chord when adjacent flags match. P pauses. Undo/reset available.",
+- Self::Ninvaders=>"Space starts/fires. Left/right move. Tick advances one simulation step. P pauses. Destroy the wave; enemy shots cost lives, enemies reaching the player lose. Independent conventional controls.",
+- Self::Greed=>"Move in eight directions (hjklyubn/keypad). The first digit sets distance. Erase that many squares; crossing erased squares or leaving the board is illegal. No legal moves ends the game; clear all digits to win."}
++            Self::Soliterm => {
++                "Select a source pile and destination. Build alternating colours descending in tableau; suit foundations ascend Ace to King. Freecell has four reserves. Klondike uses draw-one stock and King-only empty columns. Undo/reset available."
++            }
++            Self::Termwalk => {
++                "Rotate tiles clockwise or anticlockwise to connect every server to the central router. No wrapping; all pipe ends must match. Undo/reset available."
++            }
++            Self::Ctris => {
++                "Left/right move, up rotates clockwise, down soft-drops, Space hard-drops. P pauses. Complete horizontal rows to clear them; blocked spawn loses. Independent conventional controls."
++            }
++            Self::Sudoku => {
++                "Digits 1–9 fill each row, column and 3×3 box once. 0 erases. Starting digits are fixed. Undo/reset available."
++            }
++            Self::Nimesweeper => {
++                "Reveal every safe square. F toggles flag; Space reveals; open numbered squares chord when adjacent flags match. P pauses. Undo/reset available."
++            }
++            Self::Ninvaders => {
++                "Space starts/fires. Left/right move. Tick advances one simulation step. P pauses. Destroy the wave; enemy shots cost lives, enemies reaching the player lose. Independent conventional controls."
++            }
++            Self::Greed => {
++                "Move in eight directions (hjklyubn/keypad). The first digit sets distance. Erase that many squares; crossing erased squares or leaving the board is illegal. No legal moves ends the game; clear all digits to win."
++            }
++        }
+     }
+ }
+ #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+--- a/src/games/terminal/tests.rs
++++ b/src/games/terminal/tests.rs
+@@ -2,9 +2,11 @@
+ #[test]
+ fn seven_declared_terminal_games() {
+     assert_eq!(TerminalKind::ALL.len(), 7);
+-    assert!(!TerminalKind::ALL
+-        .iter()
+-        .any(|k| k.selector() == "typespeed"));
++    assert!(
++        !TerminalKind::ALL
++            .iter()
++            .any(|k| k.selector() == "typespeed")
++    );
+ }
+ #[test]
+ fn deterministic_reset_and_invalid_input_atomicity() {
+@@ -176,11 +178,12 @@
+             assert_eq!(s.history.len(), history);
+         }
+         s.apply(TerminalInput::Pause).unwrap();
+-        assert!(s
+-            .apply(TerminalInput::Digit {
++        assert!(
++            s.apply(TerminalInput::Digit {
+                 cell: usize::MAX,
+                 value: 255
+             })
+-            .is_err());
++            .is_err()
++        );
+     }
+ }

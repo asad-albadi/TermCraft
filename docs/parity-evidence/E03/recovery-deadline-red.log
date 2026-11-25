@@ -1,0 +1,20 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 45.65s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-80877b55ca4b4e50)
+
+running 1 test
+
+thread 'ui::managed_servers::tests::refusal_probe_rejects_late_refusal_and_retries_timeout' (32719) panicked at src/ui/managed_servers.rs:457:9:
+a refusal observed after the deadline was accepted
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ui::managed_servers::tests::refusal_probe_rejects_late_refusal_and_retries_timeout ... FAILED
+
+failures:
+
+failures:
+    ui::managed_servers::tests::refusal_probe_rejects_late_refusal_and_retries_timeout
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 147 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

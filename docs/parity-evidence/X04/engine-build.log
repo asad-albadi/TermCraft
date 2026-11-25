@@ -1,0 +1,4 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-x04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 39.50s
+  Executable unittests src/lib.rs (../../debug/deps/harbor_workspace-a4bd4fbc14f695ce)

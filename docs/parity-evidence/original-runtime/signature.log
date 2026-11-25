@@ -1,0 +1,12 @@
+[GNUPG:] NEWSIG
+gpg: Signature made Sat Nov 14 12:36:17 2026 +04
+gpg:                using EDDSA key D2E95FEC015CF1F911AAAB0C3D4C5008BB5C8D29
+[GNUPG:] KEY_CONSIDERED D2E95FEC015CF1F911AAAB0C3D4C5008BB5C8D29 0
+[GNUPG:] SIG_ID kcx9zSN4zXm0QEPkg4KgoMi/4qA 2026-11-14 1794645377
+[GNUPG:] GOODSIG 3D4C5008BB5C8D29 Peter Jung <ptr1337@archlinux.org>
+gpg: Good signature from "Peter Jung <ptr1337@archlinux.org>" [unknown]
+[GNUPG:] VALIDSIG D2E95FEC015CF1F911AAAB0C3D4C5008BB5C8D29 2026-11-14 1794645377 0 4 0 22 10 00 D2E95FEC015CF1F911AAAB0C3D4C5008BB5C8D29
+[GNUPG:] TRUST_UNDEFINED 0 pgp
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: D2E9 5FEC 015C F1F9 11AA  AB0C 3D4C 5008 BB5C 8D29

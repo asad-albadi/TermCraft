@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/fix1/work/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 1 test
+test tests::redo_restores_moves_and_only_changed_branch_clears_it ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.00s
+

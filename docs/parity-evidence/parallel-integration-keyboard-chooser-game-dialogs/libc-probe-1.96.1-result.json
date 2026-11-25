@@ -1,0 +1,18 @@
+{
+  "version": "1.96.1",
+  "exit_code": 0,
+  "seconds": 1.02,
+  "command": [
+    "cargo",
+    "run",
+    "--offline",
+    "--locked",
+    "-j",
+    "1",
+    "--manifest-path",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/build-host-diagnostics/libc-probe/Cargo.toml"
+  ],
+  "CARGO_BUILD_JOBS": "2",
+  "explicit_diagnostic_jobs": 1,
+  "actual_compiler": "rustc 1.96.1 (31fca3adb 2026-06-26)\nbinary: rustc\ncommit-hash: 31fca3adb283cc9dfd56b49cdee9a96eb9c96ffd\ncommit-date: 2026-06-26\nhost: x86_64-unknown-linux-gnu\nrelease: 1.96.1\nLLVM version: 22.1.2\n"
+}

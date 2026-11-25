@@ -1,0 +1,28 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-puzzle-options)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.50s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-puzzle-options/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 2 tests
+
+thread 'tests::net_solve_locks_every_configured_tile_atomically_through_history' (383975) panicked at src/games/puzzles/tests.rs:571:5:
+assertion `left == right` failed
+  left: 2
+ right: 35
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'tests::net_solve_locks_every_default_tile_atomically_through_history' (383976) panicked at src/games/puzzles/tests.rs:571:5:
+assertion `left == right` failed
+  left: 1
+ right: 25
+test tests::net_solve_locks_every_configured_tile_atomically_through_history ... FAILED
+test tests::net_solve_locks_every_default_tile_atomically_through_history ... FAILED
+
+failures:
+
+failures:
+    tests::net_solve_locks_every_configured_tile_atomically_through_history
+    tests::net_solve_locks_every_default_tile_atomically_through_history
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 48 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

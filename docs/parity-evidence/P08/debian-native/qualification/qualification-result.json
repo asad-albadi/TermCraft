@@ -1,0 +1,7 @@
+{
+  "result": "pass",
+  "archive_sha256": "08969e0223e0b74ec954a1440a8f70c1eab03c9ba7d53fe7c8129b29e08b12f4",
+  "deb_sha256": "2bad678090823cf3aeb990ddf785cd364fd81b52fa3eaf823c50120251a6e53f",
+  "runtime_image": "sha256:1d04200c2ece1d4d75a2a6f8e11ebce7d86a2ae28b34bb2c9cbb3ee9f4953e75",
+  "scope": "genuine native release core archive; older default 13-games snapshot; clean Debian 12 install, network-disconnected nonroot Xvfb portable and installed startup, verified helper child, uninstall preservation"
+}

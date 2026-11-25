@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.46s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-127cf14f51e8fab8)
+
+running 1 test
+test ui::shortcuts::tests::native_paste_payload_and_shortcut_do_not_request_another_clipboard_read ... FAILED
+
+failures:
+
+---- ui::shortcuts::tests::native_paste_payload_and_shortcut_do_not_request_another_clipboard_read stdout ----
+
+thread 'ui::shortcuts::tests::native_paste_payload_and_shortcut_do_not_request_another_clipboard_read' (479178) panicked at src/ui/shortcuts.rs:52:9:
+native paste already carries the bytes; do not read the clipboard again
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::shortcuts::tests::native_paste_payload_and_shortcut_do_not_request_another_clipboard_read
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 64 filtered out; finished in 1.19s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

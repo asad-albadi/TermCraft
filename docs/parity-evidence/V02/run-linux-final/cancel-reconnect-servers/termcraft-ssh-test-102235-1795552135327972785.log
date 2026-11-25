@@ -1,0 +1,53 @@
+Server listening on 127.0.0.1 port 38087.
+Connection from 127.0.0.1 port 43176 on 127.0.0.1 port 38087 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 43176 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Connection from 127.0.0.1 port 43184 on 127.0.0.1 port 38087 rdomain ""
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 43184 ssh2 [preauth]
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 43184 ssh2: ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94
+User child is on pid 102248
+Received disconnect from 127.0.0.1 port 43184:11: disconnected by user
+Disconnected from user asad 127.0.0.1 port 43184
+Connection from 127.0.0.1 port 43196 on 127.0.0.1 port 38087 rdomain ""
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 43196 ssh2 [preauth]
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 43196 ssh2: ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94
+User child is on pid 102254
+Received disconnect from 127.0.0.1 port 43196:11: disconnected by user
+Disconnected from user asad 127.0.0.1 port 43196
+Connection from 127.0.0.1 port 43202 on 127.0.0.1 port 38087 rdomain ""
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 43202 ssh2 [preauth]
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 43202 ssh2: ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94
+User child is on pid 102260
+Received disconnect from 127.0.0.1 port 43202:11: disconnected by user
+Disconnected from user asad 127.0.0.1 port 43202
+Connection from 127.0.0.1 port 43206 on 127.0.0.1 port 38087 rdomain ""
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 43206 ssh2 [preauth]
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 43206 ssh2: ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94
+User child is on pid 102266
+Received disconnect from 127.0.0.1 port 43206:11: disconnected by user
+Disconnected from user asad 127.0.0.1 port 43206
+Connection from 127.0.0.1 port 43208 on 127.0.0.1 port 38087 rdomain ""
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 43208 ssh2 [preauth]
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 43208 ssh2: ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94
+User child is on pid 102272
+Received disconnect from 127.0.0.1 port 43208:11: disconnected by user
+Disconnected from user asad 127.0.0.1 port 43208
+Connection from 127.0.0.1 port 43214 on 127.0.0.1 port 38087 rdomain ""
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 43214 ssh2 [preauth]
+Accepted key ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94 found at /tmp/termcraft-ssh-test-102235-1795552135327972785/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 43214 ssh2: ED25519 SHA256:hin0/EJqOHBTni73ydz9V1xUMH8Ck181FI5OeL/XE94
+User child is on pid 102293
+Received disconnect from 127.0.0.1 port 43214:11: disconnected by user
+Disconnected from user asad 127.0.0.1 port 43214

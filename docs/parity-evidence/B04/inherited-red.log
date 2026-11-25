@@ -1,0 +1,15 @@
+   Compiling b04-components v0.1.0-b04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b04/component)
+error[E0599]: no method named `put_inherited` found for struct `MemoryRegistry` in the current scope
+   --> tests/../../source/tests/windows_integration.rs:377:11
+    |
+377 |  registry.put_inherited("Software\\Classes\\termcraft");
+    |           ^^^^^^^^^^^^^
+    |
+help: there is a method `put_unrelated` with a similar name, but with different arguments
+   --> src/platform/../../../source/src/platform/windows_integration.rs:17:5
+    |
+ 17 |     pub fn put_unrelated(&mut self, key: &str, value: &str) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `b04-components` (test "windows_integration") due to 1 previous error

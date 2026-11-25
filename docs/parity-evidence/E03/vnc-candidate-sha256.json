@@ -1,0 +1,18 @@
+{
+  "Cargo.toml": "1e70c77d786e62ed8483123e6b23068ddb031bac9f1b6deb804203afbc92e821",
+  "Cargo.lock": "48820fc0b700399aab4f305248ec92a6594fc8cd9f4c351d6e792c7c577f27ed",
+  "src/services/mod.rs": "79915acee16f2567e6d3b2a9b7dabc3216afc7ad31404b946894052ee99ea42e",
+  "src/services/supervisor.rs": "214eb4e66760d20efa8360d5a006c1c4c7e0c3f400d7c1cc5058cdb2c040d289",
+  "src/model.rs": "980ea36edd6ba53393616b47b1807022e8d5c59f6383210ccf5934fc0ca2608f",
+  "src/ui.rs": "3cd8999db9dde3690c9edaabd203e7456e19bc497b06d7d9ed6cf835d981e54f",
+  "src/ui/managed_servers.rs": "6b887ecb43ec03b9e91bdab322ab36dd34b6db4ac3bc878d946592b6543950f0",
+  "src/ui/servers.rs": "104ea76a31b45f7ae3fcffbbbbc978fe2b4c138368679cac2f19a43410001dc0",
+  "src/services/vnc.rs": "f695faad0ff7621c6d9cc4da1703dc648779109f6cc9bcfb1035d3369d4e3b2b",
+  "src/services/vnc/x11.rs": "3e9d9f4827157e3c9693198d89163a9caf83cd2f84fc9ddec7f1abb4a76bbbb8",
+  "src/services/vnc/windows.rs": "3914ae746e065c57a48bdc1555a6049f2daf8f767b378a0c99a03bd6af37311a",
+  "src/services/vnc/keyboard.rs": "46be1e0351d0f030ba9efec630203c7cb33970ec5f3c4dde3aef247a29afe700",
+  "src/services/vnc/x11/keyboard.rs": "54ee3c03c1589b03fdd9039da4284dc99be6ff08617672281f0bd5447c42ab06",
+  "src/services/vnc_fixture_keyboard.rs": "a26922df175405e6c83ca21a308eba6a4e5de7038742a00db500f0ed11f1710b",
+  "src/services/vnc_service_tests.rs": "4a2c7a86f1af9c025e1da15b55511330f4396c06c29133eed8c488f6d295be94",
+  "src/ui/managed_vnc.rs": "350578ad9f627323ee76a29539accdcbae8074658c759b525d4b9199abd46992"
+}

@@ -1,0 +1,40 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0432]: unresolved import `harbor_workspace::terminal::mouse`
+ --> tests/terminal_mouse.rs:1:42
+  |
+1 | use harbor_workspace::terminal::{Screen, mouse::{MouseButton, MouseEncoder, MouseMode, MouseTracking, TerminalMouseEvent, MouseAction...
+  |                                          ^^^^^ could not find `mouse` in `terminal`
+
+error[E0599]: no method named `mouse_mode` found for struct `Screen` in the current scope
+  --> tests/terminal_mouse.rs:20:21
+   |
+20 |     assert!(!screen.mouse_mode().enabled());
+   |                     ^^^^^^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `mouse_mode` found for struct `Screen` in the current scope
+  --> tests/terminal_mouse.rs:22:23
+   |
+22 |     assert_eq!(screen.mouse_mode(),sgr());
+   |                       ^^^^^^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `mouse_mode` found for struct `Screen` in the current scope
+  --> tests/terminal_mouse.rs:24:23
+   |
+24 |     assert_eq!(screen.mouse_mode().tracking,MouseTracking::ButtonMotion);
+   |                       ^^^^^^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `mouse_mode` found for struct `Screen` in the current scope
+  --> tests/terminal_mouse.rs:26:21
+   |
+26 |     assert!(!screen.mouse_mode().enabled());
+   |                     ^^^^^^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `mouse_mode` found for struct `Screen` in the current scope
+  --> tests/terminal_mouse.rs:28:23
+   |
+28 |     assert_eq!(screen.mouse_mode(),MouseMode::default());
+   |                       ^^^^^^^^^^ method not found in `Screen`
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `harbor-workspace` (test "terminal_mouse") due to 6 previous errors

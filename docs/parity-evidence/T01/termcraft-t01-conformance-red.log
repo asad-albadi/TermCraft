@@ -1,0 +1,189 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+ --> tests/terminal_conformance.rs:5:23
+  |
+5 |     assert_eq!(screen.cell(0,0).unwrap().text,"e\u{301}");assert_eq!(screen.cell(0,1).unwrap().width,2);assert!(screen.cell(0,2).unwr...
+  |                       ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+ --> tests/terminal_conformance.rs:5:77
+  |
+5 |     assert_eq!(screen.cell(0,0).unwrap().text,"e\u{301}");assert_eq!(screen.cell(0,1).unwrap().width,2);assert!(screen.cell(0,2).unwr...
+  |                                                                             ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+ --> tests/terminal_conformance.rs:5:120
+  |
+5 | ...reen.cell(0,1).unwrap().width,2);assert!(screen.cell(0,2).unwrap().continuation);assert_eq!(screen.col,3);
+  |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+ --> tests/terminal_conformance.rs:6:43
+  |
+6 |     screen.resize(10,4);assert_eq!(screen.cell(0,1).unwrap().text,"界");assert!(screen.cell(0,2).unwrap().continuation);
+  |                                           ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+ --> tests/terminal_conformance.rs:6:87
+  |
+6 |     screen.resize(10,4);assert_eq!(screen.cell(0,1).unwrap().text,"界");assert!(screen.cell(0,2).unwrap().continuation);
+  |                                                                                        ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+ --> tests/terminal_conformance.rs:7:64
+  |
+7 |     screen.feed("\r\ne\u{1ab0}X".as_bytes());assert_eq!(screen.cell(1,0).unwrap().text,"e\u{1ab0}");assert_eq!(screen.cell(1,1).unwra...
+  |                                                                ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+ --> tests/terminal_conformance.rs:7:119
+  |
+7 | ...0).unwrap().text,"e\u{1ab0}");assert_eq!(screen.cell(1,1).unwrap().text,"X");
+  |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:12:23
+   |
+12 |     assert_eq!(screen.cell(0,0).unwrap().text,"👩\u{200d}💻");assert_eq!(screen.cell(0,0).unwrap().width,2);assert!(screen.cell(0,1)...
+   |                       ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:12:79
+   |
+12 |     assert_eq!(screen.cell(0,0).unwrap().text,"👩\u{200d}💻");assert_eq!(screen.cell(0,0).unwrap().width,2);assert!(screen.cell(0,1)...
+   |                                                                                 ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:12:122
+   |
+12 | ...reen.cell(0,0).unwrap().width,2);assert!(screen.cell(0,1).unwrap().continuation);assert_eq!(screen.cell(0,2).unwrap().text,"X");
+   |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:12:173
+   |
+12 | ...l(0,1).unwrap().continuation);assert_eq!(screen.cell(0,2).unwrap().text,"X");
+   |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:13:90
+   |
+13 |     let mut screen=Screen::new(4,3,100);screen.feed("abc界".as_bytes());assert_eq!(screen.cell(0,3).unwrap().text," ");assert_eq!(sc...
+   |                                                                                           ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:13:137
+   |
+13 | ....cell(0,3).unwrap().text," ");assert_eq!(screen.cell(1,0).unwrap().text,"界");assert_eq!(screen.col,2);
+   |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:19:106
+   |
+19 | ...d\x1b[?1049hALT\x1b[?1049lX");assert_eq!(screen.cell(0,3).unwrap().text,"d");assert_eq!(screen.cell(1,0).unwrap().text,"X");
+   |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:19:153
+   |
+19 | ....cell(0,3).unwrap().text,"d");assert_eq!(screen.cell(1,0).unwrap().text,"X");
+   |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:24:148
+   |
+24 | ... must not append scrollback");assert_eq!(screen.cell(3,0).unwrap().text,"b");
+   |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:28:115
+   |
+28 | ...));screen.feed(b"\x1b[1;2Hq");assert_eq!(screen.cell(0,0).unwrap().text," ");assert!(!screen.cell(0,1).unwrap().continuation);ass...
+   |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:28:160
+   |
+28 | ...en.cell(0,0).unwrap().text," ");assert!(!screen.cell(0,1).unwrap().continuation);assert_eq!(screen.cell(0,1).unwrap().text,"q");
+   |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:28:211
+   |
+28 | ...l(0,1).unwrap().continuation);assert_eq!(screen.cell(0,1).unwrap().text,"q");
+   |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:29:69
+   |
+29 |     screen.feed("\r界X\x1b[1;2H\x1b[X".as_bytes());assert_eq!(screen.cell(0,0).unwrap().text," ");assert!(!screen.cell(0,1).unwrap()...
+   |                                                                      ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:29:114
+   |
+29 | ...en.cell(0,0).unwrap().text," ");assert!(!screen.cell(0,1).unwrap().continuation);
+   |                                                    ^^^^ method not found in `Screen`
+
+error[E0599]: no method named `search_count` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:34:23
+   |
+34 |     assert_eq!(screen.search_count("needle"),500);let builds=screen.stats().index_builds;
+   |                       ^^^^^^^^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `stats` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:34:69
+   |
+34 |     assert_eq!(screen.search_count("needle"),500);let builds=screen.stats().index_builds;
+   |                                                                     ^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `search_count` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:35:39
+   |
+35 |     for _ in 0..100{assert_eq!(screen.search_count("needle"),500);}assert_eq!(screen.stats().index_builds,builds);screen.feed(b"need...
+   |                                       ^^^^^^^^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `stats` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:35:86
+   |
+35 |     for _ in 0..100{assert_eq!(screen.search_count("needle"),500);}assert_eq!(screen.stats().index_builds,builds);screen.feed(b"need...
+   |                                                                                      ^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `search_count` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:35:156
+   |
+35 | ...s);screen.feed(b"needle");assert_eq!(screen.search_count("needle"),501);assert_eq!(screen.stats().index_builds,builds+1);
+   |                                                ^^^^^^^^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `stats` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:35:202
+   |
+35 | ....search_count("needle"),501);assert_eq!(screen.stats().index_builds,builds+1);
+   |                                                   ^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `set_history_memory_budget` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:39:53
+   |
+39 |     let mut screen=Screen::new(40,4,360_000);screen.set_history_memory_budget(128*1024);for _ in 0..3000{screen.feed(b"bounded histo...
+   |                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `stats` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:40:20
+   |
+40 |     assert!(screen.stats().history_bytes<=128*1024);assert!(screen.history.len()<3000);assert!(screen.stats().discarded_lines>0);
+   |                    ^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `stats` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:40:103
+   |
+40 |     assert!(screen.stats().history_bytes<=128*1024);assert!(screen.history.len()<3000);assert!(screen.stats().discarded_lines>0);
+   |                                                                                                       ^^^^^ method not found in `Screen`
+
+error[E0599]: no method named `cell` found for struct `Screen` in the current scope
+  --> tests/terminal_conformance.rs:41:120
+   |
+41 | ...');}screen.feed(text.as_bytes());assert!(screen.cell(screen.row,0).unwrap().text.len()<=128);
+   |                                                    ^^^^ method not found in `Screen`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (test "terminal_conformance") due to 31 previous errors

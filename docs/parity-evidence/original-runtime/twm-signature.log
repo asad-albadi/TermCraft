@@ -1,0 +1,14 @@
+[GNUPG:] NEWSIG
+gpg: Signature made Tue May  6 09:16:18 2025 +04
+gpg:                using RSA key ADC8A1FCC15E01D45310419E94657AB20F2A092B
+[GNUPG:] KEY_CONSIDERED ADC8A1FCC15E01D45310419E94657AB20F2A092B 0
+[GNUPG:] SIG_ID zV0+LVRAX/psZteSpAbNEEnLy+8 2025-05-06 1746508578
+[GNUPG:] GOODSIG 94657AB20F2A092B Andreas Radke <andyrtr@archlinux.org>
+gpg: Good signature from "Andreas Radke <andyrtr@archlinux.org>" [unknown]
+gpg:                 aka "Andreas Radke <andreas.radke@mailbox.org>" [unknown]
+gpg:                 aka "Andreas Radke <andyrtr@mailbox.org>" [unknown]
+[GNUPG:] VALIDSIG ADC8A1FCC15E01D45310419E94657AB20F2A092B 2025-05-06 1746508578 0 4 0 1 10 00 ADC8A1FCC15E01D45310419E94657AB20F2A092B
+[GNUPG:] TRUST_UNDEFINED 0 pgp
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: ADC8 A1FC C15E 01D4 5310  419E 9465 7AB2 0F2A 092B

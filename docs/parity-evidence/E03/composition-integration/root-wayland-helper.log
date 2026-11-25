@@ -1,0 +1,13 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling termcraft-wayland-engine v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/engines/wayland)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.43s
+     Running unittests src/lib.rs (target/debug/deps/termcraft_wayland_engine-a2622d799da1ac29)
+
+running 2 tests
+test tests::mapped_rows_respect_chunk_offset_padding_and_channel_order ... ok
+test tests::invalid_mapping_format_and_frame_bounds_are_rejected ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

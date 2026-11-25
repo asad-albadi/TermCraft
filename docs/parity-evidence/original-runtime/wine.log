@@ -1,0 +1,83 @@
+6658.380:002c:fixme:ntdll:init_logical_proc_info Failed to get logical processor information, status 0xc0000002.
+6658.390:002c:err:wineboot:process_run_key Error running cmd L"C:\\windows\\system32\\winemenubuilder.exe -a -r" (126).
+6658.665:00a4:err:ntoskrnl:ZwLoadDriver failed to create driver L"\\Registry\\Machine\\System\\CurrentControlSet\\Services\\winebth": c00000e5
+6658.665:003c:fixme:service:scmdatabase_autostart_services Auto-start service L"winebth" failed to start: 1359
+6658.894:00e0:fixme:ntdll:init_logical_proc_info Failed to get logical processor information, status 0xc0000002.
+MESA-EGL: warning: DRI3 error: Could not get DRI3 device
+MESA-EGL: warning: Ensure your X server supports DRI3 to get accelerated rendering
+6659.284:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.294:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.337:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.344:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.346:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.350:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.377:00e0:fixme:secur32:GetUserNameExW NameFormat 12 not implemented
+6659.442:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.444:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.444:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.445:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.446:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.447:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.448:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.448:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.451:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.454:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.455:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.455:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.457:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.467:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.470:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.471:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.473:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.502:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.508:00e0:fixme:win:SetWindowCompositionAttribute (002B0098, 0026F980): stub
+6659.508:00e0:fixme:dwmapi:DwmSetWindowAttribute (002B0098, 13, 00B55E2C, 4) stub
+6659.594:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.602:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.605:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.668:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.669:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.672:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.675:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.678:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.679:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.680:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.682:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.684:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.686:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.687:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.694:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.695:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.705:00e0:err:comboex:COMBOEX_WindowProc unknown msg 1701, wp 0x168, lp 0
+6659.713:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.716:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.722:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.775:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.777:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.801:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.803:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.836:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6659.841:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.452:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.607:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.613:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.614:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.616:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.617:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.618:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.622:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.623:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.625:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.627:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.629:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.638:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.640:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.649:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.659:00e0:err:comboex:COMBOEX_WindowProc unknown msg 1701, wp 0x168, lp 0
+6661.660:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.661:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.675:00e0:err:comboex:COMBOEX_WindowProc unknown msg 1701, wp 0x168, lp 0
+6661.678:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6661.683:00e0:fixme:win:create_window_handle DPI context 0x22 not implemented
+6666.677:0164:err:sync:RtlpWaitForCriticalSection section 7AF91300 "../wine/dlls/ntdll/loader.c: loader_section" wait timed out in thread 0164, blocked by 0154, retrying (60 sec)
+6666.677:00e0:err:sync:RtlpWaitForCriticalSection section 7AF91300 "../wine/dlls/ntdll/loader.c: loader_section" wait timed out in thread 00e0, blocked by 0154, retrying (60 sec)

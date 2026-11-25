@@ -1,0 +1,7 @@
+# D02 Unix serial controls FIX2
+
+The Unix mask-reset reserve now admits only MinorFunction 0, matching the serial worker. Other requests retain their previous admission rules. The existing channel regression now sends a well-shaped SET with MinorFunction 1 at 16 pending operations, asserts DEVICE_BUSY, and immediately sends the valid reset before any completions are polled. It still verifies a success/zero wait completion, same-handle retry, capacity for CLOSE after another reset, and full credit reuse following reopen. No changes were made to serial.rs, handle or permission checks, or queue limits.
+
+The Linux serial Channel suite ran once against FIX2 and passed all 12 tests, none ignored, with 64 filtered. Scoped formatting passed. The FIX1 helper (76 unit and 10 PCSC-worker tests) and aarch64 Apple component checks are prior FIX1 evidence and were not rerun for this admission-only change. No app build, host integration, native Apple execution, or physical serial adapter was used.
+
+fix2.patch is the two-file scoped diff from FIX1. integration.patch is the three-file cumulative patch from MAIN. Both apply with zero fuzz and reconstruct the exact tested source bytes. The maps contain all three owned paths, including the unchanged serial.rs in the FIX1 comparison. The original FIX1 evidence and source, and all three MAIN preimages, remain untouched. See COMMANDS.md for reproduction.

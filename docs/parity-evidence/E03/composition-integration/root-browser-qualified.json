@@ -1,0 +1,83 @@
+{
+  "browser": "/usr/bin/chromium",
+  "qualification": [
+    {
+      "serverControl": false,
+      "canvasPixel": [
+        19,
+        111,
+        173,
+        255
+      ],
+      "dimensions": [
+        64,
+        48
+      ],
+      "checks": [
+        "password rejection",
+        "RFB authentication",
+        "actual WebSocket framebuffer",
+        "view-only input suppressed",
+        "server control policy",
+        "owned input events",
+        "disconnect/reconnect",
+        "same-origin",
+        "literal Host",
+        "unsupported/query/traversal paths",
+        "oversized headers",
+        "oversized WebSocket",
+        "no password URL/storage",
+        "offline local assets",
+        "CSP/cache",
+        "Stop closes RFB + HTTP + active viewer + stalled request",
+        "private profile removed"
+      ],
+      "moduleRequests": 55,
+      "events": [
+        "release"
+      ]
+    },
+    {
+      "serverControl": true,
+      "canvasPixel": [
+        19,
+        111,
+        173,
+        255
+      ],
+      "dimensions": [
+        64,
+        48
+      ],
+      "checks": [
+        "password rejection",
+        "RFB authentication",
+        "actual WebSocket framebuffer",
+        "view-only input suppressed",
+        "server control policy",
+        "owned input events",
+        "disconnect/reconnect",
+        "same-origin",
+        "literal Host",
+        "unsupported/query/traversal paths",
+        "oversized headers",
+        "oversized WebSocket",
+        "no password URL/storage",
+        "offline local assets",
+        "CSP/cache",
+        "Stop closes RFB + HTTP + active viewer + stalled request",
+        "private profile removed"
+      ],
+      "moduleRequests": 55,
+      "events": [
+        "pointer 0 1 1",
+        "pointer 1 1 1",
+        "pointer 0 1 1",
+        "key true 98",
+        "key false 98",
+        "release",
+        "release"
+      ]
+    }
+  ]
+}

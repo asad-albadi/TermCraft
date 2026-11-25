@@ -1,0 +1,29 @@
+warning: unused import: `super::*`
+ --> src/x11/xdmcp_listener.rs:4:9
+  |
+4 |     use super::*;
+  |         ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0425]: cannot find function `verify_tcp_listener` in this scope
+ --> src/x11/xdmcp_listener.rs:8:9
+  |
+8 |         verify_tcp_listener(port,std::process::id()).unwrap();
+  |         ^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `verify_tcp_listener` in this scope
+ --> src/x11/xdmcp_listener.rs:9:17
+  |
+9 |         assert!(verify_tcp_listener(port,1).is_err());
+  |                 ^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `verify_tcp_listener` in this scope
+  --> src/x11/xdmcp_listener.rs:10:32
+   |
+10 |         drop(listener);assert!(verify_tcp_listener(port,std::process::id()).is_err());
+   |                                ^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error: aborting due to 3 previous errors; 1 warning emitted
+
+For more information about this error, try `rustc --explain E0425`.

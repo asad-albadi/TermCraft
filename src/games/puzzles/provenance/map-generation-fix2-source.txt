@@ -1,0 +1,277 @@
+===== map.c:684-812 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+ * pseudo-recursion using some sort of explicit stack array, for
+ * the sake of the Palm port and its limited stack.
+ */
+
+static int fourcolour_recurse(int *graph, int n, int ngraph,
+			      int *colouring, int *scratch, random_state *rs)
+{
+    int nfree, nvert, start, i, j, k, c, ci;
+    int cs[FOUR];
+
+    /*
+     * Find the smallest number of free colours in any uncoloured
+     * vertex, and count the number of such vertices.
+     */
+
+    nfree = FIVE;		       /* start off bigger than FOUR! */
+    nvert = 0;
+    for (i = 0; i < n; i++)
+	if (colouring[i] < 0 && scratch[i*FIVE+FOUR] <= nfree) {
+	    if (nfree > scratch[i*FIVE+FOUR]) {
+		nfree = scratch[i*FIVE+FOUR];
+		nvert = 0;
+	    }
+	    nvert++;
+	}
+
+    /*
+     * If there aren't any uncoloured vertices at all, we're done.
+     */
+    if (nvert == 0)
+	return TRUE;		       /* we've got a colouring! */
+
+    /*
+     * Pick a random vertex in that set.
+     */
+    j = random_upto(rs, nvert);
+    for (i = 0; i < n; i++)
+	if (colouring[i] < 0 && scratch[i*FIVE+FOUR] == nfree)
+	    if (j-- == 0)
+		break;
+    assert(i < n);
+    start = graph_vertex_start(graph, n, ngraph, i);
+
+    /*
+     * Loop over the possible colours for i, and recurse for each
+     * one.
+     */
+    ci = 0;
+    for (c = 0; c < FOUR; c++)
+	if (scratch[i*FIVE+c] == 0)
+	    cs[ci++] = c;
+    shuffle(cs, ci, sizeof(*cs), rs);
+
+    while (ci-- > 0) {
+	c = cs[ci];
+
+	/*
+	 * Fill in this colour.
+	 */
+	colouring[i] = c;
+
+	/*
+	 * Update the scratch space to reflect a new neighbour
+	 * of this colour for each neighbour of vertex i.
+	 */
+	for (j = start; j < ngraph && graph[j] < n*(i+1); j++) {
+	    k = graph[j] - i*n;
+	    if (scratch[k*FIVE+c] == 0)
+		scratch[k*FIVE+FOUR]--;
+	    scratch[k*FIVE+c]++;
+	}
+
+	/*
+	 * Recurse.
+	 */
+	if (fourcolour_recurse(graph, n, ngraph, colouring, scratch, rs))
+	    return TRUE;	       /* got one! */
+
+	/*
+	 * If that didn't work, clean up and try again with a
+	 * different colour.
+	 */
+	for (j = start; j < ngraph && graph[j] < n*(i+1); j++) {
+	    k = graph[j] - i*n;
+	    scratch[k*FIVE+c]--;
+	    if (scratch[k*FIVE+c] == 0)
+		scratch[k*FIVE+FOUR]++;
+	}
+	colouring[i] = -1;
+    }
+
+    /*
+     * If we reach here, we were unable to find a colouring at all.
+     * (This doesn't necessarily mean the Four Colour Theorem is
+     * violated; it might just mean we've gone down a dead end and
+     * need to back up and look somewhere else. It's only an FCT
+     * violation if we get all the way back up to the top level and
+     * still fail.)
+     */
+    return FALSE;
+}
+
+static void fourcolour(int *graph, int n, int ngraph, int *colouring,
+		       random_state *rs)
+{
+    int *scratch;
+    int i;
+
+    /*
+     * For each vertex and each colour, we store the number of
+     * neighbours that have that colour. Also, we store the number
+     * of free colours for the vertex.
+     */
+    scratch = snewn(n * FIVE, int);
+    for (i = 0; i < n * FIVE; i++)
+	scratch[i] = (i % FIVE == FOUR ? FOUR : 0);
+
+    /*
+     * Clear the colouring to start with.
+     */
+    for (i = 0; i < n; i++)
+	colouring[i] = -1;
+
+    i = fourcolour_recurse(graph, n, ngraph, colouring, scratch, rs);
+    assert(i);			       /* by the Four Colour Theorem :-) */
+
+    sfree(scratch);
+}
+
+
+===== map.c:1418-1480 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+    graph = snewn(n*n, int);
+    colouring = snewn(n, int);
+    colouring2 = snewn(n, int);
+    regions = snewn(n, int);
+
+    /*
+     * This is the minimum difficulty below which we'll completely
+     * reject a map design. Normally we set this to one below the
+     * requested difficulty, ensuring that we have the right
+     * result. However, for particularly dense maps or maps with
+     * particularly few regions it might not be possible to get the
+     * desired difficulty, so we will eventually drop this down to
+     * -1 to indicate that any old map will do.
+     */
+    mindiff = params->diff;
+    tries = 50;
+
+    while (1) {
+
+        /*
+         * Create the map.
+         */
+        genmap(w, h, n, map, rs);
+
+#ifdef GENERATION_DIAGNOSTICS
+        for (y = 0; y < h; y++) {
+            for (x = 0; x < w; x++) {
+                int v = map[y*w+x];
+                if (v >= 62)
+                    putchar('!');
+                else if (v >= 36)
+                    putchar('a' + v-36);
+                else if (v >= 10)
+                    putchar('A' + v-10);
+                else
+                    putchar('0' + v);
+            }
+            putchar('\n');
+        }
+#endif
+
+        /*
+         * Convert the map into a graph.
+         */
+        ngraph = gengraph(w, h, n, map, graph);
+
+#ifdef GENERATION_DIAGNOSTICS
+        for (i = 0; i < ngraph; i++)
+            printf("%d-%d\n", graph[i]/n, graph[i]%n);
+#endif
+
+        /*
+         * Colour the map.
+         */
+        fourcolour(graph, n, ngraph, colouring, rs);
+
+#ifdef GENERATION_DIAGNOSTICS
+        for (i = 0; i < n; i++)
+            printf("%d: %d\n", i, colouring[i]);
+
+        for (y = 0; y < h; y++) {
+            for (x = 0; x < w; x++) {
+                int v = colouring[map[y*w+x]];
+
+===== map.c:1510-1588 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+            strcpy(ret + retlen, buf);
+            retlen += len;
+        }
+        *aux = ret;
+
+        /*
+         * Remove the region colours one by one, keeping
+         * solubility. Also ensure that there always remains at
+         * least one region of every colour, so that the user can
+         * drag from somewhere.
+         */
+        for (i = 0; i < FOUR; i++)
+            cfreq[i] = 0;
+        for (i = 0; i < n; i++) {
+            regions[i] = i;
+            cfreq[colouring[i]]++;
+        }
+        for (i = 0; i < FOUR; i++)
+            if (cfreq[i] == 0)
+                continue;
+
+        shuffle(regions, n, sizeof(*regions), rs);
+
+        if (sc) free_scratch(sc);
+        sc = new_scratch(graph, n, ngraph);
+
+        for (i = 0; i < n; i++) {
+            j = regions[i];
+
+            if (cfreq[colouring[j]] == 1)
+                continue;              /* can't remove last region of colour */
+
+            memcpy(colouring2, colouring, n*sizeof(int));
+            colouring2[j] = -1;
+            solveret = map_solver(sc, graph, n, ngraph, colouring2,
+				  params->diff);
+            assert(solveret >= 0);	       /* mustn't be impossible! */
+            if (solveret == 1) {
+                cfreq[colouring[j]]--;
+                colouring[j] = -1;
+            }
+        }
+
+#ifdef GENERATION_DIAGNOSTICS
+        for (i = 0; i < n; i++)
+            if (colouring[i] >= 0) {
+                if (i >= 62)
+                    putchar('!');
+                else if (i >= 36)
+                    putchar('a' + i-36);
+                else if (i >= 10)
+                    putchar('A' + i-10);
+                else
+                    putchar('0' + i);
+                printf(": %d\n", colouring[i]);
+            }
+#endif
+
+        /*
+         * Finally, check that the puzzle is _at least_ as hard as
+         * required, and indeed that it isn't already solved.
+         * (Calling map_solver with negative difficulty ensures the
+         * latter - if a solver which _does nothing_ can solve it,
+         * it's too easy!)
+         */
+        memcpy(colouring2, colouring, n*sizeof(int));
+        if (map_solver(sc, graph, n, ngraph, colouring2,
+                       mindiff - 1) == 1) {
+	    /*
+	     * Drop minimum difficulty if necessary.
+	     */
+	    if (mindiff > 0 && (n < 9 || n > 2*wh/3)) {
+		if (tries-- <= 0)
+		    mindiff = 0;       /* give up and go for Easy */
+	    }
+            continue;
+	}
+
+        break;
+

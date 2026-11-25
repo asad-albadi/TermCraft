@@ -1,0 +1,12 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/fix1/work/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 5 tests
+test solo::advanced::topology_tests::unsupported_advanced_size_is_rejected_before_allocation ... ok
+test solo::advanced::topology_tests::cage_minmax_and_sum_sets_really_prune_candidates ... ok
+test solo::advanced::topology_tests::jigsaw_peer_conflicts_follow_irregular_regions_instead_of_boxes ... ok
+test solo::advanced::topology_tests::killer_wrong_sum_blocks_win_even_when_all_sudoku_units_are_valid ... ok
+test solo::advanced::topology_tests::killer_stock_requires_source_intersection_grade ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 61 filtered out; finished in 0.07s
+

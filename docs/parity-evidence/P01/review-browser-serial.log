@@ -1,0 +1,33 @@
+
+running 4 tests
+test browser_settings_keep_legacy_launch_and_remove_proxy_credentials ... ok
+test chromium_cancels_site_auth_without_credentials_and_rejects_untrusted_tls ... ok
+test chromium_renders_and_submits_browser_input ... 
+thread 'chromium_renders_and_submits_browser_input' (440122) panicked at tests/browser_session.rs:208:5:
+Chromium fixture timed out at Submitted (loading: false, error: None, notice: None)
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+             at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/std/src/panicking.rs:679:5
+   1: core::panicking::panic_fmt
+             at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/core/src/panicking.rs:80:14
+   2: browser_session::wait_until::<browser_session::chromium_renders_and_submits_browser_input::{closure#5}>
+             at ./tests/browser_session.rs:208:5
+   3: browser_session::chromium_renders_and_submits_browser_input
+             at ./tests/browser_session.rs:81:5
+   4: browser_session::chromium_renders_and_submits_browser_input::{closure#0}
+             at ./tests/browser_session.rs:27:48
+   5: <browser_session::chromium_renders_and_submits_browser_input::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/core/src/ops/function.rs:250:5
+   6: <fn() -> core::result::Result<(), alloc::string::String> as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+FAILED
+test chromium_routes_through_configured_proxy_and_signs_in_only_after_consent ... ok
+
+failures:
+
+failures:
+    chromium_renders_and_submits_browser_input
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 27.51s
+

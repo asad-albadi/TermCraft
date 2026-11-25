@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/parallel-integration-clipboard-serial-package/release-review-check.py", line 76, in <module>
+    assert engine in observations and engine in (snapshot/'packaging/x11/manifest.json').read_text()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

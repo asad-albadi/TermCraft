@@ -1,0 +1,50 @@
+{
+  "rustc": {
+    "path": "/usr/bin/rustc",
+    "sha256": "dc2d9a1c6099766c0089ead77d8a9f935ad444b5dce3a2a8dd26d80385b28d73",
+    "version": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "exit_code": 0
+  },
+  "cargo": {
+    "path": "/usr/bin/cargo",
+    "sha256": "dc2d9a1c6099766c0089ead77d8a9f935ad444b5dce3a2a8dd26d80385b28d73",
+    "version": "cargo 1.99.0 (5f94df478 2026-08-27)",
+    "exit_code": 0
+  },
+  "bwrap": {
+    "path": "/usr/bin/bwrap",
+    "sha256": "a7adb079800910ff28fc05c7e1dd2441ff87fb09b369dbb7e82bcededdab079b",
+    "version": "bubblewrap 0.13.1",
+    "exit_code": 0
+  },
+  "cage": {
+    "path": "/usr/bin/cage",
+    "sha256": "dd75c4f4f6739f2d1488cc693b760a143e2b3c7f495fc7d8f1ba3d335b9edba3",
+    "version": "Cage version 0.3.1-b7b774a (branch 'makepkg')",
+    "exit_code": 0
+  },
+  "ip": {
+    "path": "/usr/bin/ip",
+    "sha256": "2173039592a0730e52f43f38c6f9171aeeea544f986e1c97b50ae8c00cbe413f",
+    "version": "ip utility, iproute2-7.3.0, libbpf 1.8.0",
+    "exit_code": 0
+  },
+  "openssl": {
+    "path": "/usr/bin/openssl",
+    "sha256": "3c852df717ce7321bc9f38ceeb5c41244324e4d6a43a6b48ad0e5f274c3b52e0",
+    "version": "OpenSSL 4.1.0 23 Oct 2026 (Library: OpenSSL 4.1.0 23 Oct 2026)",
+    "exit_code": 0
+  },
+  "python3": {
+    "path": "/usr/bin/python3",
+    "sha256": "a38210a53e07ac5eb912ee35c2d92ddb7eaa349301b60c188a5f496c7c87449d",
+    "version": "Python 3.14.10",
+    "exit_code": 0
+  },
+  "Xwayland": {
+    "path": "/usr/bin/Xwayland",
+    "sha256": "cbedd90fbc960d4cc799792cedf89b0afa1f1f74a93ba9fb05bfd4da2f27b2b8",
+    "version": "The X.Org Foundation Xwayland Version 24.1.15 (12401015)\nX Protocol Version 11, Revision 0",
+    "exit_code": 0
+  }
+}

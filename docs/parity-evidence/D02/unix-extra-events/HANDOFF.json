@@ -1,0 +1,15 @@
+{
+  "REPORT.md": "8003eef50646e8c2e07a72bd40a88f1607fe0f13ddeaa95368bd99931727036d",
+  "baseline-hashes.json": "24337122e5b53692353b11d5b4db7de04eae6be0d8d3abef8ea3db9fe481a4b8",
+  "candidate-hashes.json": "439fc5899a4a2a09eacf67000c70e916473c1a3926bc595e1ca5d67922d862ea",
+  "main-preservation.json": "5b249db1abc7a0657608569f7780cf575433312b7bdc4d6ada6499b0449c14b7",
+  "predecessor-hashes.json": "3306900e44b7a3646230dafbdf0ba2684b83577c31a6787c9ff37ee2ee670af9",
+  "predecessor-preservation.json": "c2a02d0c5dee0bf2b72e70f34f6c3da11d9bf4cf28d0b3a35b007465e19895a9",
+  "delta.patch": "4893754315a8470ac983617977ea1bcd65a3b612c8bf0ee07f146362caf431a6",
+  "cumulative.patch": "eb3092d403dbe5e43e25ebbfae3acce63fc4114e4647e6c8f5a5c36262939f80",
+  "payload/engines/rdp/src/serial.rs": "15d258935e8678b5dad71f757dd05e65efe31e037a9041003483dffb958c1132",
+  "red.log": "353e7f9e30a30b73dc2af036816cce8122d422e190eedae5edbd1e2b63b82a0a",
+  "green-targeted.log": "f3cf9523b723661b62465ee13cb8ee5bffc0c7ecea13d1ee2995e536c0ebd2db",
+  "green-full.log": "5fb21e69522e4f67383ec922a2998ba4b079650fbe06952b2740fd567631b18b",
+  "fmt-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

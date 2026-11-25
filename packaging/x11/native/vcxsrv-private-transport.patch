@@ -1,0 +1,61 @@
+--- a/X11/xtrans/Xtranssock.c
++++ b/X11/xtrans/Xtranssock.c
+@@ -1087,6 +1087,18 @@
+      * Using this prevents the bind() check for an existing server listening
+      * on the same port, but it is required for other reasons.
+      */
++#ifdef WIN32
++    /* TermCraft private build: never steal/share another display's listener. */
++    {
++        int exclusive = 1;
++        if (setsockopt(ciptr->fd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
++                       (const char *)&exclusive, sizeof(exclusive)) != 0) {
++            close(ciptr->fd);
++            free(ciptr);
++            return NULL;
++        }
++    }
++#else
+ #ifdef SO_REUSEADDR
+ 
+     /*
+@@ -1104,6 +1116,7 @@
+ 		    (char *) &one, sizeof (int));
+     }
+ #endif
++#endif /* WIN32 */
+ #ifdef IPV6_V6ONLY
+     if (Sockettrans2devtab[i].family == AF_INET6)
+     {
+@@ -1369,7 +1382,7 @@
+ #endif
+ 	((struct sockaddr_in *)&sockname)->sin_family = AF_INET;
+ 	((struct sockaddr_in *)&sockname)->sin_port = htons(sport);
+-	((struct sockaddr_in *)&sockname)->sin_addr.s_addr = htonl(INADDR_ANY);
++	((struct sockaddr_in *)&sockname)->sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+     } else {
+ #ifdef IPv6
+ 	namelen = sizeof (struct sockaddr_in6);
+@@ -1378,7 +1391,7 @@
+ #endif
+ 	((struct sockaddr_in6 *)&sockname)->sin6_family = AF_INET6;
+ 	((struct sockaddr_in6 *)&sockname)->sin6_port = htons(sport);
+-	((struct sockaddr_in6 *)&sockname)->sin6_addr = in6addr_any;
++	((struct sockaddr_in6 *)&sockname)->sin6_addr = in6addr_loopback;
+ #else
+         prmsg (1,
+                "SocketINETCreateListener: unsupported address family %d\n",
+--- a/xorg-server/os/connection.c
++++ b/xorg-server/os/connection.c
+@@ -273,6 +273,11 @@
+     /* display is initialized to "0" by main(). It is then set to the display
+      * number if specified on the command line. */
+ 
++#ifdef WIN32
++    /* The provider chooses one reserved port; the engine never scans displays. */
++    if (!explicit_display || displayfd >= 0)
++        FatalError("TermCraft private X server requires one explicit display");
++#endif
+     if (NoListenAll) {
+         ListenTransCount = 0;
+     }

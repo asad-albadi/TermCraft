@@ -1,0 +1,14 @@
+Server listening on 127.0.0.1 port 36061.
+Connection from 127.0.0.1 port 33310 on 127.0.0.1 port 36061 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 33310 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Connection from 127.0.0.1 port 33312 on 127.0.0.1 port 36061 rdomain ""
+Accepted key ED25519 SHA256:9644XmIqrrlq8zL55ns6TR8PSdnXSe9BZ3h65p1o824 found at /tmp/termcraft-ssh-test-122948-1795552456760535435/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 33312 ssh2 [preauth]
+Accepted key ED25519 SHA256:9644XmIqrrlq8zL55ns6TR8PSdnXSe9BZ3h65p1o824 found at /tmp/termcraft-ssh-test-122948-1795552456760535435/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 33312 ssh2: ED25519 SHA256:9644XmIqrrlq8zL55ns6TR8PSdnXSe9BZ3h65p1o824
+User child is on pid 122965
+Connection closed by 127.0.0.1 port 33312
+Transferred: sent 9296, received 6296 bytes
+Closing connection to 127.0.0.1 port 33312

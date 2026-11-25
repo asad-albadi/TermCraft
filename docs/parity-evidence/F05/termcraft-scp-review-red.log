@@ -1,0 +1,36 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.68s
+     Running tests/scp_browser.rs (target/debug/deps/scp_browser-8ade13c5a5dbd886)
+
+running 6 tests
+
+thread 'completed_scp_staging_does_not_authorize_remote_publication_on_eof' (265560) panicked at tests/scp_browser.rs:193:5:
+assertion `left == right` failed: EOF after staging is cancellation, not commit authority
+  left: [109, 105, 110, 101]
+ right: [107, 101, 101, 112]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test completed_scp_staging_does_not_authorize_remote_publication_on_eof ... FAILED
+test unsupported_enumerator_reports_capability_error ... ok
+test sftp_disabled_endpoint_supports_explicit_scp ... ok
+test scp_names_cannot_be_interpreted_as_commands ... ok
+
+thread 'virtual_file_sizes_cannot_silently_publish_empty_content' (265565) panicked at tests/scp_browser.rs:173:5:
+assertion `left != right` failed: Zero-sized readable virtual source was uploaded as empty
+  left: Completed
+ right: Completed
+test virtual_file_sizes_cannot_silently_publish_empty_content ... FAILED
+
+thread 'silent_terminal_does_not_delay_initial_scp_listing' (265563) panicked at tests/scp_browser.rs:154:9:
+Initial listing was waiting on terminal output
+test silent_terminal_does_not_delay_initial_scp_listing ... FAILED
+
+failures:
+
+failures:
+    completed_scp_staging_does_not_authorize_remote_publication_on_eof
+    silent_terminal_does_not_delay_initial_scp_listing
+    virtual_file_sizes_cannot_silently_publish_empty_content
+
+test result: FAILED. 3 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.13s
+
+error: test failed, to rerun pass `--test scp_browser`

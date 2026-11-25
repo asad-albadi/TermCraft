@@ -1,0 +1,55 @@
+{
+  "status": "PASS",
+  "scope": "current-parent integrated default inactive-game normal terminal/clipboard/desktop paths; focused1.5x replay only",
+  "sessions": 2,
+  "native_observations": 28,
+  "additional_default_guard_observations": 2,
+  "ignored": 0,
+  "app_sha256": "77289a5766bf8fa6a3e81cf7e8d1c0088e8acf6bb683cfc5a1dac33c86cb298a",
+  "sessions_detail": [
+    {
+      "backend": "x11",
+      "scale": 1.5,
+      "status": "PASS",
+      "native_observations": 14,
+      "additional_default_guard_observation": 1,
+      "guard_callbacks": 924,
+      "viewports": [
+        "\"1B41\"",
+        "\"F062\"",
+        "\"FFFF\""
+      ],
+      "recomputed_pixel_differences": {
+        "theme-System-2 vs theme-System-1": 640.2714626736112,
+        "theme-Light-1 vs theme-Light-2": 0.10898533950617284,
+        "theme-Dark-1 vs theme-Dark-2": 0.0
+      },
+      "payload_sha256": "25ee609bb08ce01756e215b886dc580b744a793ffcecaee6741422087deb47e0",
+      "survivors": 0
+    },
+    {
+      "backend": "wayland",
+      "scale": 1.5,
+      "status": "PASS",
+      "native_observations": 14,
+      "additional_default_guard_observation": 1,
+      "guard_callbacks": 1016,
+      "viewports": [
+        "\"1B41\"",
+        "\"F062\"",
+        "\"FFFF\""
+      ],
+      "recomputed_pixel_differences": {
+        "theme-System-2 vs theme-System-1": 640.7831404320988,
+        "theme-Light-1 vs theme-Light-2": 0.0,
+        "theme-Dark-1 vs theme-Dark-2": 0.0
+      },
+      "payload_sha256": "25ee609bb08ce01756e215b886dc580b744a793ffcecaee6741422087deb47e0",
+      "survivors": 0
+    }
+  ],
+  "active_games_native_qualified": false,
+  "historical706_evidence_unchanged": true,
+  "strict_original_native_all_platform_complete": 0,
+  "verification_semantics": "read-only audit recomputes retained pixels/raw clipboard/SGR/VNC/guard outcomes and verifies source/executable bytes; fresh native execution is separately recorded by matrix.py runs"
+}

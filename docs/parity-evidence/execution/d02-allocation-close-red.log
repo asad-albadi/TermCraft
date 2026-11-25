@@ -1,0 +1,46 @@
+   Compiling termcraft-rdp-engine v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/engines/rdp)
+warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
+  --> src/../../../src/desktop/options.rs:78:9
+   |
+77 | pub struct NegotiatedRdpOptions {
+   |            -------------------- fields in this struct
+78 |     pub clipboard: ClipboardPolicy,
+   |         ^^^^^^^^^
+79 |     pub keyboard: KeyboardRouting,
+   |         ^^^^^^^^
+80 |     pub keyboard_layout: u32,
+   |         ^^^^^^^^^^^^^^^
+   |
+   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `is_default` is never used
+  --> src/../../../src/desktop/options.rs:83:12
+   |
+82 | impl RdpOptions {
+   | --------------- method in this implementation
+83 |     pub fn is_default(&self) -> bool {
+   |            ^^^^^^^^^^
+
+warning: `termcraft-rdp-engine` (bin "termcraft-rdp-engine" test) generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.65s
+     Running unittests src/main.rs (app/engines/rdp/target/debug/deps/termcraft_rdp_engine-092b9e17b901608b)
+
+running 1 test
+test devices_tests::drive_allocation_is_released_on_last_remote_close_and_disconnect ... FAILED
+
+failures:
+
+---- devices_tests::drive_allocation_is_released_on_last_remote_close_and_disconnect stdout ----
+
+thread 'devices_tests::drive_allocation_is_released_on_last_remote_close_and_disconnect' (225) panicked at src/devices_tests.rs:524:9:
+unused remote allocation leaked after close
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    devices_tests::drive_allocation_is_released_on_last_remote_close_and_disconnect
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 16 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin termcraft-rdp-engine`

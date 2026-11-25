@@ -1,0 +1,24 @@
+{
+  "commit": "f306b9db55453f7d7fc824bbbf89ca6ac7d2d273",
+  "upstream": "https://git.tartarus.org/simon/puzzles.git",
+  "raw_map_c_sha256": "7e1b9ff5aeeeb925af389f4d686210afe08621c16ac6500f9052f5c16eaa7749",
+  "slices": [
+    {
+      "start": 684,
+      "end": 812,
+      "utf8_sha256": "71a7fa1bca4864bce5ba88edd7cbd56ecd38a878c726d7b441b4db68d6f03f25"
+    },
+    {
+      "start": 1418,
+      "end": 1480,
+      "utf8_sha256": "daad864ccea7fc56a9b808caab0eae8247585b7e2accd1628da17cd2902fe72e"
+    },
+    {
+      "start": 1510,
+      "end": 1588,
+      "utf8_sha256": "29e3a75c2b26a4e04ea6637c138386fde53aecb511e6b4298e1080cc190d823a"
+    }
+  ],
+  "scope": "source randomized MRV colourer, random clue removal and final lower-grade rejection; degree priority is an independent heuristic",
+  "licence": "UPSTREAM-LICENCE retained"
+}

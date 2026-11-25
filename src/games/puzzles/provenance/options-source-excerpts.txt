@@ -1,0 +1,1116 @@
+===== net.c:160-208 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+    ret->width = 5;
+    ret->height = 5;
+    ret->wrapping = FALSE;
+    ret->unique = TRUE;
+    ret->barrier_probability = 0.0;
+
+    return ret;
+}
+
+static const struct game_params net_presets[] = {
+    {5, 5, FALSE, TRUE, 0.0},
+    {7, 7, FALSE, TRUE, 0.0},
+    {9, 9, FALSE, TRUE, 0.0},
+    {11, 11, FALSE, TRUE, 0.0},
+#ifndef SMALL_SCREEN
+    {13, 11, FALSE, TRUE, 0.0},
+#endif
+    {5, 5, TRUE, TRUE, 0.0},
+    {7, 7, TRUE, TRUE, 0.0},
+    {9, 9, TRUE, TRUE, 0.0},
+    {11, 11, TRUE, TRUE, 0.0},
+#ifndef SMALL_SCREEN
+    {13, 11, TRUE, TRUE, 0.0},
+#endif
+};
+
+static int game_fetch_preset(int i, char **name, game_params **params)
+{
+    game_params *ret;
+    char str[80];
+
+    if (i < 0 || i >= lenof(net_presets))
+        return FALSE;
+
+    ret = snew(game_params);
+    *ret = net_presets[i];
+
+    sprintf(str, "%dx%d%s", ret->width, ret->height,
+            ret->wrapping ? " wrapping" : "");
+
+    *name = dupstr(str);
+    *params = ret;
+    return TRUE;
+}
+
+
+===== net.c:273-367 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+
+    ret = snewn(6, config_item);
+
+    ret[0].name = "Width";
+    ret[0].type = C_STRING;
+    sprintf(buf, "%d", params->width);
+    ret[0].sval = dupstr(buf);
+    ret[0].ival = 0;
+
+    ret[1].name = "Height";
+    ret[1].type = C_STRING;
+    sprintf(buf, "%d", params->height);
+    ret[1].sval = dupstr(buf);
+    ret[1].ival = 0;
+
+    ret[2].name = "Walls wrap around";
+    ret[2].type = C_BOOLEAN;
+    ret[2].sval = NULL;
+    ret[2].ival = params->wrapping;
+
+    ret[3].name = "Barrier probability";
+    ret[3].type = C_STRING;
+    sprintf(buf, "%g", params->barrier_probability);
+    ret[3].sval = dupstr(buf);
+    ret[3].ival = 0;
+
+    ret[4].name = "Ensure unique solution";
+    ret[4].type = C_BOOLEAN;
+    ret[4].sval = NULL;
+    ret[4].ival = params->unique;
+
+    ret[5].name = NULL;
+    ret[5].type = C_END;
+    ret[5].sval = NULL;
+    ret[5].ival = 0;
+
+    return ret;
+}
+
+static game_params *custom_params(const config_item *cfg)
+{
+    game_params *ret = snew(game_params);
+
+    ret->width = atoi(cfg[0].sval);
+    ret->height = atoi(cfg[1].sval);
+    ret->wrapping = cfg[2].ival;
+    ret->barrier_probability = (float)atof(cfg[3].sval);
+    ret->unique = cfg[4].ival;
+
+    return ret;
+}
+
+static char *validate_params(const game_params *params, int full)
+{
+    if (params->width <= 0 || params->height <= 0)
+	return "Width and height must both be greater than zero";
+    if (params->width <= 1 && params->height <= 1)
+	return "At least one of width and height must be greater than one";
+    if (params->barrier_probability < 0)
+	return "Barrier probability may not be negative";
+    if (params->barrier_probability > 1)
+	return "Barrier probability may not be greater than 1";
+
+    /*
+     * Specifying either grid dimension as 2 in a wrapping puzzle
+     * makes it actually impossible to ensure a unique puzzle
+     * solution.
+     * 
+     * Proof:
+     * 
+     * Without loss of generality, let us assume the puzzle _width_
+     * is 2, so we can conveniently discuss rows without having to
+     * say `rows/columns' all the time. (The height may be 2 as
+     * well, but that doesn't matter.)
+     * 
+     * In each row, there are two edges between tiles: the inner
+     * edge (running down the centre of the grid) and the outer
+     * edge (the identified left and right edges of the grid).
+     * 
+     * Lemma: In any valid 2xn puzzle there must be at least one
+     * row in which _exactly one_ of the inner edge and outer edge
+     * is connected.
+     * 
+     *   Proof: No row can have _both_ inner and outer edges
+     *   connected, because this would yield a loop. So the only
+     *   other way to falsify the lemma is for every row to have
+     *   _neither_ the inner nor outer edge connected. But this
+     *   means there is no connection at all between the left and
+     *   right columns of the puzzle, so there are two disjoint
+     *   subgraphs, which is also disallowed. []
+     * 
+     * Given such a row, it is always possible to make the
+     * disconnected edge connected and the connected edge
+     * disconnected without changing the state of any other edge.
+     * (This is easily seen by case analysis on the various tiles:
+
+===== net.c:1510-1558 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+    }
+
+    /*
+     * And now choose barrier locations. (We carefully do this
+     * _after_ shuffling, so that changing the barrier rate in the
+     * params while keeping the random seed the same will give the
+     * same shuffled grid and _only_ change the barrier locations.
+     * Also the way we choose barrier locations, by repeatedly
+     * choosing one possibility from the list until we have enough,
+     * is designed to ensure that raising the barrier rate while
+     * keeping the seed the same will provide a superset of the
+     * previous barrier set - i.e. if you ask for 10 barriers, and
+     * then decide that's still too hard and ask for 20, you'll get
+     * the original 10 plus 10 more, rather than getting 20 new
+     * ones and the chance of remembering your first 10.)
+     */
+    nbarriers = (int)(params->barrier_probability * count234(barriertree));
+    assert(nbarriers >= 0 && nbarriers <= count234(barriertree));
+
+    while (nbarriers > 0) {
+	int i;
+	struct xyd *xyd;
+	int x1, y1, d1, x2, y2, d2;
+
+	/*
+	 * Extract a randomly chosen barrier from the list.
+	 */
+	i = random_upto(rs, count234(barriertree));
+	xyd = delpos234(barriertree, i);
+
+	assert(xyd != NULL);
+
+	x1 = xyd->x;
+	y1 = xyd->y;
+	d1 = xyd->direction;
+	sfree(xyd);
+
+	OFFSET(x2, y2, x1, y1, d1, params);
+	d2 = F(d1);
+
+	index(params, barriers, x1, y1) |= d1;
+	index(params, barriers, x2, y2) |= d2;
+
+	nbarriers--;
+    }
+
+    /*
+     * Clean up the rest of the barrier list.
+     */
+
+===== net.c:1746-1825 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static char *solve_game(const game_state *state, const game_state *currstate,
+                        const char *aux, char **error)
+{
+    unsigned char *tiles;
+    char *ret;
+    int retlen, retsize;
+    int i;
+
+    tiles = snewn(state->width * state->height, unsigned char);
+
+    if (!aux) {
+	/*
+	 * Run the internal solver on the provided grid. This might
+	 * not yield a complete solution.
+	 */
+	memcpy(tiles, state->tiles, state->width * state->height);
+	net_solver(state->width, state->height, tiles,
+		   state->barriers, state->wrapping);
+    } else {
+        for (i = 0; i < state->width * state->height; i++) {
+            int c = aux[i];
+
+            if (c >= '0' && c <= '9')
+                tiles[i] = c - '0';
+            else if (c >= 'a' && c <= 'f')
+                tiles[i] = c - 'a' + 10;
+            else if (c >= 'A' && c <= 'F')
+                tiles[i] = c - 'A' + 10;
+
+	    tiles[i] |= LOCKED;
+        }
+    }
+
+    /*
+     * Now construct a string which can be passed to execute_move()
+     * to transform the current grid into the solved one.
+     */
+    retsize = 256;
+    ret = snewn(retsize, char);
+    retlen = 0;
+    ret[retlen++] = 'S';
+
+    for (i = 0; i < state->width * state->height; i++) {
+	int from = currstate->tiles[i], to = tiles[i];
+	int ft = from & (R|L|U|D), tt = to & (R|L|U|D);
+	int x = i % state->width, y = i / state->width;
+	int chr = '\0';
+	char buf[80], *p = buf;
+
+	if (from == to)
+	    continue;		       /* nothing needs doing at all */
+
+	/*
+	 * To transform this tile into the desired tile: first
+	 * unlock the tile if it's locked, then rotate it if
+	 * necessary, then lock it if necessary.
+	 */
+	if (from & LOCKED)
+	    p += sprintf(p, ";L%d,%d", x, y);
+
+	if (tt == A(ft))
+	    chr = 'A';
+	else if (tt == C(ft))
+	    chr = 'C';
+	else if (tt == F(ft))
+	    chr = 'F';
+	else {
+	    assert(tt == ft);
+	    chr = '\0';
+	}
+	if (chr)
+	    p += sprintf(p, ";%c%d,%d", chr, x, y);
+
+	if (to & LOCKED)
+	    p += sprintf(p, ";L%d,%d", x, y);
+
+	if (p > buf) {
+	    if (retlen + (p - buf) >= retsize) {
+		retsize = retlen + (p - buf) + 512;
+		ret = sresize(ret, retsize, char);
+
+===== mines.c:94-139 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+    ret->w = ret->h = 9;
+    ret->n = 10;
+    ret->unique = TRUE;
+
+    return ret;
+}
+
+static const struct game_params mines_presets[] = {
+  {9, 9, 10, TRUE},
+  {9, 9, 35, TRUE},
+  {16, 16, 40, TRUE},
+  {16, 16, 99, TRUE},
+#ifndef SMALL_SCREEN
+  {30, 16, 99, TRUE},
+  {30, 16, 170, TRUE},
+#endif
+};
+
+static int game_fetch_preset(int i, char **name, game_params **params)
+{
+    game_params *ret;
+    char str[80];
+
+    if (i < 0 || i >= lenof(mines_presets))
+        return FALSE;
+
+    ret = snew(game_params);
+    *ret = mines_presets[i];
+
+    sprintf(str, "%dx%d, %d mines", ret->w, ret->h, ret->n);
+
+    *name = dupstr(str);
+    *params = ret;
+    return TRUE;
+}
+
+static void free_params(game_params *params)
+{
+    sfree(params);
+}
+
+static game_params *dup_params(const game_params *params)
+
+===== mines.c:248-275 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static char *validate_params(const game_params *params, int full)
+{
+    /*
+     * Lower limit on grid size: each dimension must be at least 3.
+     * 1 is theoretically workable if rather boring, but 2 is a
+     * real problem: there is often _no_ way to generate a uniquely
+     * solvable 2xn Mines grid. You either run into two mines
+     * blocking the way and no idea what's behind them, or one mine
+     * and no way to know which of the two rows it's in. If the
+     * mine count is even you can create a soluble grid by packing
+     * all the mines at one end (so what when you hit a two-mine
+     * wall there are only as many covered squares left as there
+     * are mines); but if it's odd, you are doomed, because you
+     * _have_ to have a gap somewhere which you can't determine the
+     * position of.
+     */
+    if (full && params->unique && (params->w <= 2 || params->h <= 2))
+	return "Width and height must both be greater than two";
+    if (params->n > params->w * params->h - 9)
+	return "Too many mines for grid size";
+
+    /*
+     * FIXME: Need more constraints here. Not sure what the
+     * sensible limits for Minesweeper actually are. The limits
+     * probably ought to change, however, depending on uniqueness.
+     */
+
+    return NULL;
+
+===== mines.c:2306-2316 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static char *solve_game(const game_state *state, const game_state *currstate,
+                        const char *aux, char **error)
+{
+    if (!state->layout->mines) {
+	*error = "Game has not been started yet";
+	return NULL;
+    }
+
+    return dupstr("S");
+}
+
+
+===== mines.c:2600-2661 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+    if (!strcmp(move, "S")) {
+	int yy, xx;
+
+	ret = dup_game(from);
+        if (!ret->dead) {
+            /*
+             * If the player is still alive at the moment of pressing
+             * Solve, expose the entire grid as if it were a completed
+             * solution.
+             */
+            for (yy = 0; yy < ret->h; yy++)
+                for (xx = 0; xx < ret->w; xx++) {
+
+                    if (ret->layout->mines[yy*ret->w+xx]) {
+                        ret->grid[yy*ret->w+xx] = -1;
+                    } else {
+                        int dx, dy, v;
+
+                        v = 0;
+
+                        for (dx = -1; dx <= +1; dx++)
+                            for (dy = -1; dy <= +1; dy++)
+                                if (xx+dx >= 0 && xx+dx < ret->w &&
+                                    yy+dy >= 0 && yy+dy < ret->h &&
+                                    ret->layout->mines[(yy+dy)*ret->w+(xx+dx)])
+                                    v++;
+
+                        ret->grid[yy*ret->w+xx] = v;
+                    }
+                }
+        } else {
+            /*
+             * If the player pressed Solve _after dying_, show a full
+             * corrections grid in the style of standard Minesweeper.
+             * Players who don't like Mines's behaviour on death of
+             * only showing the mine that killed you (so that in case
+             * of a typo you can undo and carry on without the rest of
+             * the grid being spoiled) can use this to get the display
+             * that ordinary Minesweeper would have given them.
+             */
+            for (yy = 0; yy < ret->h; yy++)
+                for (xx = 0; xx < ret->w; xx++) {
+                    int pos = yy*ret->w+xx;
+                    if ((ret->grid[pos] == -2 || ret->grid[pos] == -3) &&
+                        ret->layout->mines[pos]) {
+                        ret->grid[pos] = 64;
+                    } else if (ret->grid[pos] == -1 &&
+                               !ret->layout->mines[pos]) {
+                        ret->grid[pos] = 66;
+                    }
+                }
+        }
+        ret->used_solve = TRUE;
+
+	return ret;
+    } else {
+	ret = dup_game(from);
+
+	while (*move) {
+	    if (move[0] == 'F' &&
+		sscanf(move+1, "%d,%d", &cx, &cy) == 2 &&
+		cx >= 0 && cx < from->w && cy >= 0 && cy < from->h) {
+
+===== solo.c:117-131 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+enum { SYMM_NONE, SYMM_ROT2, SYMM_ROT4, SYMM_REF2, SYMM_REF2D, SYMM_REF4,
+       SYMM_REF4D, SYMM_REF8 };
+
+enum { DIFF_BLOCK,
+       DIFF_SIMPLE, DIFF_INTERSECT, DIFF_SET, DIFF_EXTREME, DIFF_RECURSIVE,
+       DIFF_AMBIGUOUS, DIFF_IMPOSSIBLE };
+
+enum { DIFF_KSINGLE, DIFF_KMINMAX, DIFF_KSUMS, DIFF_KINTERSECT };
+
+enum {
+    COL_BACKGROUND,
+    COL_XDIAGONALS,
+    COL_GRID,
+    COL_CLUE,
+    COL_USER,
+
+===== solo.c:273-331 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+    ret->c = ret->r = 3;
+    ret->xtype = FALSE;
+    ret->killer = FALSE;
+    ret->symm = SYMM_ROT2;	       /* a plausible default */
+    ret->diff = DIFF_BLOCK;	       /* so is this */
+    ret->kdiff = DIFF_KINTERSECT;      /* so is this */
+
+    return ret;
+}
+
+static void free_params(game_params *params)
+{
+    sfree(params);
+}
+
+static game_params *dup_params(const game_params *params)
+{
+    game_params *ret = snew(game_params);
+    *ret = *params;		       /* structure copy */
+    return ret;
+}
+
+static int game_fetch_preset(int i, char **name, game_params **params)
+{
+    static struct {
+        char *title;
+        game_params params;
+    } presets[] = {
+        { "2x2 Trivial", { 2, 2, SYMM_ROT2, DIFF_BLOCK, DIFF_KMINMAX, FALSE, FALSE } },
+        { "2x3 Basic", { 2, 3, SYMM_ROT2, DIFF_SIMPLE, DIFF_KMINMAX, FALSE, FALSE } },
+        { "3x3 Trivial", { 3, 3, SYMM_ROT2, DIFF_BLOCK, DIFF_KMINMAX, FALSE, FALSE } },
+        { "3x3 Basic", { 3, 3, SYMM_ROT2, DIFF_SIMPLE, DIFF_KMINMAX, FALSE, FALSE } },
+        { "3x3 Basic X", { 3, 3, SYMM_ROT2, DIFF_SIMPLE, DIFF_KMINMAX, TRUE } },
+        { "3x3 Intermediate", { 3, 3, SYMM_ROT2, DIFF_INTERSECT, DIFF_KMINMAX, FALSE, FALSE } },
+        { "3x3 Advanced", { 3, 3, SYMM_ROT2, DIFF_SET, DIFF_KMINMAX, FALSE, FALSE } },
+        { "3x3 Advanced X", { 3, 3, SYMM_ROT2, DIFF_SET, DIFF_KMINMAX, TRUE } },
+        { "3x3 Extreme", { 3, 3, SYMM_ROT2, DIFF_EXTREME, DIFF_KMINMAX, FALSE, FALSE } },
+        { "3x3 Unreasonable", { 3, 3, SYMM_ROT2, DIFF_RECURSIVE, DIFF_KMINMAX, FALSE, FALSE } },
+        { "3x3 Killer", { 3, 3, SYMM_NONE, DIFF_BLOCK, DIFF_KINTERSECT, FALSE, TRUE } },
+        { "9 Jigsaw Basic", { 9, 1, SYMM_ROT2, DIFF_SIMPLE, DIFF_KMINMAX, FALSE, FALSE } },
+        { "9 Jigsaw Basic X", { 9, 1, SYMM_ROT2, DIFF_SIMPLE, DIFF_KMINMAX, TRUE } },
+        { "9 Jigsaw Advanced", { 9, 1, SYMM_ROT2, DIFF_SET, DIFF_KMINMAX, FALSE, FALSE } },
+#ifndef SLOW_SYSTEM
+        { "3x4 Basic", { 3, 4, SYMM_ROT2, DIFF_SIMPLE, DIFF_KMINMAX, FALSE, FALSE } },
+        { "4x4 Basic", { 4, 4, SYMM_ROT2, DIFF_SIMPLE, DIFF_KMINMAX, FALSE, FALSE } },
+#endif
+    };
+
+    if (i < 0 || i >= lenof(presets))
+        return FALSE;
+
+    *name = dupstr(presets[i].title);
+    *params = dup_params(&presets[i].params);
+
+    return TRUE;
+
+===== solo.c:1800-1830 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+         * one, so I'm apologetically resorting to a goto.
+         */
+        cont:
+
+	/*
+	 * Blockwise positional elimination.
+	 */
+	for (b = 0; b < cr; b++)
+	    for (n = 1; n <= cr; n++)
+		if (!usage->blk[b*cr+n-1]) {
+		    for (i = 0; i < cr; i++)
+			scratch->indexlist[i] = cubepos2(usage->blocks->blocks[b][i],n);
+		    ret = solver_elim(usage, scratch->indexlist
+#ifdef STANDALONE_SOLVER
+				      , "positional elimination,"
+				      " %d in block %s", n,
+				      usage->blocks->blocknames[b]
+#endif
+				      );
+		    if (ret < 0) {
+			diff = DIFF_IMPOSSIBLE;
+			goto got_result;
+		    } else if (ret > 0) {
+			diff = max(diff, DIFF_BLOCK);
+			goto cont;
+		    }
+		}
+
+	if (usage->kclues != NULL) {
+	    int changed = FALSE;
+
+
+===== solo.c:2062-2179 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+	if (dlev->maxdiff <= DIFF_BLOCK)
+	    break;
+
+	/*
+	 * Row-wise positional elimination.
+	 */
+	for (y = 0; y < cr; y++)
+	    for (n = 1; n <= cr; n++)
+		if (!usage->row[y*cr+n-1]) {
+		    for (x = 0; x < cr; x++)
+			scratch->indexlist[x] = cubepos(x, y, n);
+		    ret = solver_elim(usage, scratch->indexlist
+#ifdef STANDALONE_SOLVER
+				      , "positional elimination,"
+				      " %d in row %d", n, 1+y
+#endif
+				      );
+		    if (ret < 0) {
+			diff = DIFF_IMPOSSIBLE;
+			goto got_result;
+		    } else if (ret > 0) {
+			diff = max(diff, DIFF_SIMPLE);
+			goto cont;
+		    }
+                }
+	/*
+	 * Column-wise positional elimination.
+	 */
+	for (x = 0; x < cr; x++)
+	    for (n = 1; n <= cr; n++)
+		if (!usage->col[x*cr+n-1]) {
+		    for (y = 0; y < cr; y++)
+			scratch->indexlist[y] = cubepos(x, y, n);
+		    ret = solver_elim(usage, scratch->indexlist
+#ifdef STANDALONE_SOLVER
+				      , "positional elimination,"
+				      " %d in column %d", n, 1+x
+#endif
+				      );
+		    if (ret < 0) {
+			diff = DIFF_IMPOSSIBLE;
+			goto got_result;
+		    } else if (ret > 0) {
+			diff = max(diff, DIFF_SIMPLE);
+			goto cont;
+		    }
+                }
+
+	/*
+	 * X-diagonal positional elimination.
+	 */
+	if (usage->diag) {
+	    for (n = 1; n <= cr; n++)
+		if (!usage->diag[n-1]) {
+		    for (i = 0; i < cr; i++)
+			scratch->indexlist[i] = cubepos2(diag0(i), n);
+		    ret = solver_elim(usage, scratch->indexlist
+#ifdef STANDALONE_SOLVER
+				      , "positional elimination,"
+				      " %d in \\-diagonal", n
+#endif
+				      );
+		    if (ret < 0) {
+			diff = DIFF_IMPOSSIBLE;
+			goto got_result;
+		    } else if (ret > 0) {
+			diff = max(diff, DIFF_SIMPLE);
+			goto cont;
+		    }
+                }
+	    for (n = 1; n <= cr; n++)
+		if (!usage->diag[cr+n-1]) {
+		    for (i = 0; i < cr; i++)
+			scratch->indexlist[i] = cubepos2(diag1(i), n);
+		    ret = solver_elim(usage, scratch->indexlist
+#ifdef STANDALONE_SOLVER
+				      , "positional elimination,"
+				      " %d in /-diagonal", n
+#endif
+				      );
+		    if (ret < 0) {
+			diff = DIFF_IMPOSSIBLE;
+			goto got_result;
+		    } else if (ret > 0) {
+			diff = max(diff, DIFF_SIMPLE);
+			goto cont;
+		    }
+                }
+	}
+
+	/*
+	 * Numeric elimination.
+	 */
+	for (x = 0; x < cr; x++)
+	    for (y = 0; y < cr; y++)
+		if (!usage->grid[y*cr+x]) {
+		    for (n = 1; n <= cr; n++)
+			scratch->indexlist[n-1] = cubepos(x, y, n);
+		    ret = solver_elim(usage, scratch->indexlist
+#ifdef STANDALONE_SOLVER
+				      , "numeric elimination at (%d,%d)",
+				      1+x, 1+y
+#endif
+				      );
+		    if (ret < 0) {
+			diff = DIFF_IMPOSSIBLE;
+			goto got_result;
+		    } else if (ret > 0) {
+			diff = max(diff, DIFF_SIMPLE);
+			goto cont;
+		    }
+                }
+
+	if (dlev->maxdiff <= DIFF_SIMPLE)
+	    break;
+
+        /*
+         * Intersectional analysis, rows vs blocks.
+
+===== solo.c:3066-3124 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static int symmetries(const game_params *params, int x, int y,
+                      int *output, int s)
+{
+    int c = params->c, r = params->r, cr = c*r;
+    int i = 0;
+
+#define ADD(x,y) (*output++ = (x), *output++ = (y), i++)
+
+    ADD(x, y);
+
+    switch (s) {
+      case SYMM_NONE:
+	break;			       /* just x,y is all we need */
+      case SYMM_ROT2:
+        ADD(cr - 1 - x, cr - 1 - y);
+        break;
+      case SYMM_ROT4:
+        ADD(cr - 1 - y, x);
+        ADD(y, cr - 1 - x);
+        ADD(cr - 1 - x, cr - 1 - y);
+        break;
+      case SYMM_REF2:
+        ADD(cr - 1 - x, y);
+        break;
+      case SYMM_REF2D:
+        ADD(y, x);
+        break;
+      case SYMM_REF4:
+        ADD(cr - 1 - x, y);
+        ADD(x, cr - 1 - y);
+        ADD(cr - 1 - x, cr - 1 - y);
+        break;
+      case SYMM_REF4D:
+        ADD(y, x);
+        ADD(cr - 1 - x, cr - 1 - y);
+        ADD(cr - 1 - y, cr - 1 - x);
+        break;
+      case SYMM_REF8:
+        ADD(cr - 1 - x, y);
+        ADD(x, cr - 1 - y);
+        ADD(cr - 1 - x, cr - 1 - y);
+        ADD(y, x);
+        ADD(y, cr - 1 - x);
+        ADD(cr - 1 - y, x);
+        ADD(cr - 1 - y, cr - 1 - x);
+        break;
+    }
+
+#undef ADD
+
+    return i;
+}
+
+static char *encode_solve_move(int cr, digit *grid)
+{
+    int i, len;
+    char *ret, *p, *sep;
+
+    /*
+
+===== solo.c:3568-3579 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+    /*
+     * Adjust the maximum difficulty level to be consistent with
+     * the puzzle size: all 2x2 puzzles appear to be Trivial
+     * (DIFF_BLOCK) so we cannot hold out for even a Basic
+     * (DIFF_SIMPLE) one.
+     */
+    dlev.maxdiff = params->diff;
+    dlev.maxkdiff = params->kdiff;
+    if (c == 2 && r == 2)
+        dlev.maxdiff = DIFF_BLOCK;
+
+    grid = snewn(area, digit);
+
+===== solo.c:3595-3613 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+     * difficult grids otherwise.
+     */
+    while (1) {
+        /*
+         * Generate a random solved state, starting by
+         * constructing the block structure.
+         */
+	if (r == 1) {		       /* jigsaw mode */
+	    int *dsf = divvy_rectangle(cr, cr, cr, rs);
+
+	    dsf_to_blocks (dsf, blocks, cr, cr);
+
+	    sfree(dsf);
+	} else {		       /* basic Sudoku mode */
+	    for (y = 0; y < cr; y++)
+		for (x = 0; x < cr; x++)
+		    blocks->whichblock[y*cr+x] = (y/c) * c + (x/r);
+	}
+	make_blocks_from_whichblock(blocks);
+
+===== guess.c:49-101 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+    /* AFAIK this is the canonical Mastermind ruleset. */
+    ret->ncolours = 6;
+    ret->npegs = 4;
+    ret->nguesses = 10;
+
+    ret->allow_blank = 0;
+    ret->allow_multiple = 1;
+
+    return ret;
+}
+
+static void free_params(game_params *params)
+{
+    sfree(params);
+}
+
+static game_params *dup_params(const game_params *params)
+{
+    game_params *ret = snew(game_params);
+    *ret = *params;		       /* structure copy */
+    return ret;
+}
+
+static const struct {
+    char *name;
+    game_params params;
+} guess_presets[] = {
+    {"Standard", {6, 4, 10, FALSE, TRUE}},
+    {"Super", {8, 5, 12, FALSE, TRUE}},
+};
+
+
+static int game_fetch_preset(int i, char **name, game_params **params)
+{
+    if (i < 0 || i >= lenof(guess_presets))
+        return FALSE;
+
+    *name = dupstr(guess_presets[i].name);
+    /*
+     * get round annoying const issues
+     */
+    {
+        game_params tmp = guess_presets[i].params;
+        *params = dup_params(&tmp);
+    }
+
+    return TRUE;
+}
+
+
+===== guess.c:214-229 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+}
+
+static char *validate_params(const game_params *params, int full)
+{
+    if (params->ncolours < 2 || params->npegs < 2)
+	return "Trivial solutions are uninteresting";
+    /* NB as well as the no. of colours we define, max(ncolours) must
+     * also fit in an unsigned char; see new_game_desc. */
+    if (params->ncolours > 10)
+	return "Too many colours";
+    if (params->nguesses < 1)
+	return "Must have at least one guess";
+    if (!params->allow_multiple && params->ncolours < params->npegs)
+        return "Disallowing multiple colours requires at least as many colours as pegs";
+    return NULL;
+}
+
+===== guess.c:266-285 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+
+static char *new_game_desc(const game_params *params, random_state *rs,
+			   char **aux, int interactive)
+{
+    unsigned char *bmp = snewn(params->npegs, unsigned char);
+    char *ret;
+    int i, c;
+    pegrow colcount = new_pegrow(params->ncolours);
+
+    for (i = 0; i < params->npegs; i++) {
+newcol:
+        c = random_upto(rs, params->ncolours);
+        if (!params->allow_multiple && colcount->pegs[c]) goto newcol;
+        colcount->pegs[c]++;
+        bmp[i] = (unsigned char)(c+1);
+    }
+    obfuscate_bitmap(bmp, params->npegs*8, FALSE);
+
+    ret = bin2hex(bmp, params->npegs);
+    sfree(bmp);
+
+===== guess.c:369-410 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static char *solve_game(const game_state *state, const game_state *currstate,
+                        const char *aux, char **error)
+{
+    return dupstr("S");
+}
+
+static int game_can_format_as_text_now(const game_params *params)
+{
+    return TRUE;
+}
+
+static char *game_text_format(const game_state *state)
+{
+    return NULL;
+}
+
+static int is_markable(const game_params *params, pegrow pegs)
+{
+    int i, nset = 0, nrequired, ret = 0;
+    pegrow colcount = new_pegrow(params->ncolours);
+
+    nrequired = params->allow_blank ? 1 : params->npegs;
+
+    for (i = 0; i < params->npegs; i++) {
+        int c = pegs->pegs[i];
+        if (c > 0) {
+            colcount->pegs[c-1]++;
+            nset++;
+        }
+    }
+    if (nset < nrequired) goto done;
+
+    if (!params->allow_multiple) {
+        for (i = 0; i < params->ncolours; i++) {
+            if (colcount->pegs[i] > 1) goto done;
+        }
+    }
+    ret = 1;
+done:
+    free_pegrow(colcount);
+    return ret;
+}
+
+===== guess.c:574-607 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static int mark_pegs(pegrow guess, pegrow solution, int ncols)
+{
+    int nc_place = 0, nc_colour = 0, i, j;
+
+    assert(guess && solution && (guess->npegs == solution->npegs));
+
+    for (i = 0; i < guess->npegs; i++) {
+        if (guess->pegs[i] == solution->pegs[i]) nc_place++;
+    }
+
+    /* slight bit of cleverness: we have the following formula, from
+     * http://mathworld.wolfram.com/Mastermind.html that gives:
+     *
+     * nc_colour = sum(colours, min(#solution, #guess)) - nc_place
+     *
+     * I think this is due to Knuth.
+     */
+    for (i = 1; i <= ncols; i++) {
+        int n_guess = 0, n_solution = 0;
+        for (j = 0; j < guess->npegs; j++) {
+            if (guess->pegs[j] == i) n_guess++;
+            if (solution->pegs[j] == i) n_solution++;
+        }
+        nc_colour += min(n_guess, n_solution);
+    }
+    nc_colour -= nc_place;
+
+    debug(("mark_pegs, %d pegs, %d right place, %d right colour",
+           guess->npegs, nc_place, nc_colour));
+    assert((nc_colour + nc_place) <= guess->npegs);
+
+    memset(guess->feedback, 0, guess->npegs*sizeof(int));
+    for (i = 0, j = 0; i < nc_place; i++)
+        guess->feedback[j++] = FEEDBACK_CORRECTPLACE;
+
+===== guess.c:791-800 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+    const char *p;
+
+    if (!strcmp(move, "S")) {
+	ret = dup_game(from);
+	ret->solved = -1;
+	return ret;
+    } else if (move[0] == 'G') {
+	p = move+1;
+
+	ret = dup_game(from);
+
+===== map.c:50-65 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+ * Difficulty levels. I do some macro ickery here to ensure that my
+ * enum and the various forms of my name list always match up.
+ */
+#define DIFFLIST(A) \
+    A(EASY,Easy,e) \
+    A(NORMAL,Normal,n) \
+    A(HARD,Hard,h) \
+    A(RECURSE,Unreasonable,u)
+#define ENUM(upper,title,lower) DIFF_ ## upper,
+#define TITLE(upper,title,lower) #title,
+#define ENCODE(upper,title,lower) #lower
+#define CONFIG(upper,title,lower) ":" #title
+enum { DIFFLIST(ENUM) DIFFCOUNT };
+static char const *const map_diffnames[] = { DIFFLIST(TITLE) };
+static char const map_diffchars[] = DIFFLIST(ENCODE);
+#define DIFFCONFIG DIFFLIST(CONFIG)
+
+===== map.c:99-156 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+#ifdef PORTRAIT_SCREEN
+    ret->w = 16;
+    ret->h = 18;
+#else
+    ret->w = 20;
+    ret->h = 15;
+#endif
+    ret->n = 30;
+    ret->diff = DIFF_NORMAL;
+
+    return ret;
+}
+
+static const struct game_params map_presets[] = {
+#ifdef PORTRAIT_SCREEN
+    {16, 18, 30, DIFF_EASY},
+    {16, 18, 30, DIFF_NORMAL},
+    {16, 18, 30, DIFF_HARD},
+    {16, 18, 30, DIFF_RECURSE},
+    {25, 30, 75, DIFF_NORMAL},
+    {25, 30, 75, DIFF_HARD},
+#else
+    {20, 15, 30, DIFF_EASY},
+    {20, 15, 30, DIFF_NORMAL},
+    {20, 15, 30, DIFF_HARD},
+    {20, 15, 30, DIFF_RECURSE},
+    {30, 25, 75, DIFF_NORMAL},
+    {30, 25, 75, DIFF_HARD},
+#endif
+};
+
+static int game_fetch_preset(int i, char **name, game_params **params)
+{
+    game_params *ret;
+    char str[80];
+
+    if (i < 0 || i >= lenof(map_presets))
+        return FALSE;
+
+    ret = snew(game_params);
+    *ret = map_presets[i];
+
+    sprintf(str, "%dx%d, %d regions, %s", ret->w, ret->h, ret->n,
+	    map_diffnames[ret->diff]);
+
+    *name = dupstr(str);
+    *params = ret;
+    return TRUE;
+}
+
+static void free_params(game_params *params)
+{
+    sfree(params);
+}
+
+===== untangle.c:119-155 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+    ret->n = 10;
+
+    return ret;
+}
+
+static int game_fetch_preset(int i, char **name, game_params **params)
+{
+    game_params *ret;
+    int n;
+    char buf[80];
+
+    switch (i) {
+      case 0: n = 6; break;
+      case 1: n = 10; break;
+      case 2: n = 15; break;
+      case 3: n = 20; break;
+      case 4: n = 25; break;
+      default: return FALSE;
+    }
+
+    sprintf(buf, "%d points", n);
+    *name = dupstr(buf);
+
+    *params = ret = snew(game_params);
+    ret->n = n;
+
+    return TRUE;
+}
+
+static void free_params(game_params *params)
+{
+    sfree(params);
+}
+
+===== untangle.c:208-213 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+static char *validate_params(const game_params *params, int full)
+{
+    if (params->n < 4)
+        return "Number of points must be at least four";
+    return NULL;
+}
+
+===== puzzles.but:130-168 @ f306b9db55453f7d7fc824bbbf89ca6ac7d2d273 =====
+session.)
+
+\dt \ii\e{Redo} (\q{R}, Ctrl+\q{R})
+
+\dd Redoes a previously undone move.
+
+\dt \ii\e{Copy}
+
+\dd Copies the current state of your game to the clipboard in text
+format, so that you can paste it into (say) an e-mail client or a
+web message board if you're discussing the game with someone else.
+(Not all games support this feature.)
+
+\dt \ii\e{Solve}
+
+\dd Transforms the puzzle instantly into its solved state. For some
+games (Cube) this feature is not supported at all because it is of
+no particular use. For other games (such as Pattern), the solved
+state can be used to give you information, if you can't see how a
+solution can exist at all or you want to know where you made a
+mistake. For still other games (such as Sixteen), automatic solution
+tells you nothing about how to \e{get} to the solution, but it does
+provide a useful way to get there quickly so that you can experiment
+with set-piece moves and transformations.
+
+\lcont{
+
+Some games (such as Solo) are capable of solving a game ID you have
+typed in from elsewhere. Other games (such as Rectangles) cannot
+solve a game ID they didn't invent themself, but when they did
+invent the game ID they know what the solution is already. Still
+other games (Pattern) can solve \e{some} external game IDs, but only
+if they aren't too difficult.
+
+The \q{Solve} command adds the solved state to the end of the undo
+chain for the puzzle. In other words, if you want to go back to
+solving it yourself after seeing the answer, you can just press Undo.
+
+}
+

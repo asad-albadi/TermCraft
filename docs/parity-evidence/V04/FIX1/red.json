@@ -1,0 +1,19 @@
+{
+  "status": "RED-confirmed",
+  "results": [
+    {
+      "probe": "launcher-wait-timeout-before-owner",
+      "expected": "no live descendants",
+      "actual_launcher_alive": true,
+      "exception": "owned descendants not fully reaped",
+      "red_reproduced": true
+    },
+    {
+      "probe": "outer-timeout-detached-descendant",
+      "expected": "no live descendants",
+      "actual_descendant_alive": true,
+      "red_reproduced": true
+    }
+  ],
+  "probe_processes_reaped": true
+}

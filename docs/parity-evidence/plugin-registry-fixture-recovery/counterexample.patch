@@ -1,0 +1,10 @@
+--- a/src/plugins/registry.rs
++++ b/src/plugins/registry.rs
+@@ -318,6 +318,7 @@
+         cancelled(cancel)?;
+         let directory = self.store.root().join("versions").join(&record.directory);
+         after_verification(&directory);
++        executable = File::open(directory.join("bin").join(&record.manifest.executable))?;
+         let invocation = host::Invocation::start(
+             &directory,
+             &record.manifest.executable,

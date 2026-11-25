@@ -1,0 +1,10 @@
+{
+  "current_parent_ui_sha256": "698e55be9c8fd8c101660ed9e887cb13230134c64fb93af718bdf18ff966279a",
+  "current_parent_detached_windows_sha256": "b312974d14594bfcaae5572cc383e8d986babd2cc87db00232630f1fa8f835d2",
+  "root_games_frame_call_count": 2,
+  "detached_games_frame_call_count": 1,
+  "all_current_models_retained": true,
+  "all_current_production_source_before_adapter_matches_parent": true,
+  "source_patch": "current708-instrumentation-only.patch",
+  "native_scope": "default inactive games only; current active games remain B06 pending"
+}

@@ -1,0 +1,871 @@
+--- a/src/browser/mod.rs
++++ b/src/browser/mod.rs
+@@ -28,10 +28,26 @@
+ 
+ use serde::{Deserialize, Serialize};
+ 
++/// Explicit engine choice. Absent values preserve existing system-managed profiles.
++#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
++pub enum Runtime {
++    #[default]
++    SystemChromium,
++    BundledChromium,
++}
++
++impl Runtime {
++    fn is_system(&self) -> bool {
++        *self == Self::SystemChromium
++    }
++}
++
+ #[derive(Clone, Default, Deserialize, Serialize)]
+ #[serde(default)]
+ pub struct Options {
+     pub embedded: bool,
++    #[serde(skip_serializing_if = "Runtime::is_system")]
++    pub runtime: Runtime,
+     #[serde(
+         deserialize_with = "deserialize_proxy",
+         serialize_with = "serialize_proxy",
+@@ -42,7 +58,7 @@
+ 
+ impl Options {
+     pub fn is_legacy(&self) -> bool {
+-        !self.embedded && self.proxy.is_empty()
++        !self.embedded && self.proxy.is_empty() && self.runtime == Runtime::SystemChromium
+     }
+ }
+ 
+@@ -51,6 +67,7 @@
+         formatter
+             .debug_struct("Options")
+             .field("embedded", &self.embedded)
++            .field("runtime", &self.runtime)
+             .field("proxy_configured", &!self.proxy.is_empty())
+             .finish()
+     }
+@@ -165,7 +182,11 @@
+ }
+ 
+ impl Session {
+-    pub fn start(mut config: Config) -> Result<Self, String> {
++    pub fn start(config: Config) -> Result<Self, String> {
++        Self::start_with_runtime(config, Runtime::SystemChromium)
++    }
++
++    pub fn start_with_runtime(mut config: Config, runtime: Runtime) -> Result<Self, String> {
+         config.address = validated_address(&config.address, true)?;
+         config.proxy = validated_proxy(&config.proxy)?;
+         #[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
+@@ -185,7 +206,7 @@
+             let join = thread::Builder::new()
+                 .name("embedded-browser".into())
+                 .spawn(move || {
+-                    let result = engine::run(config, &worker, rx);
++                    let result = engine::run(config, runtime, &worker, rx);
+                     let mut state = worker.state.lock().unwrap();
+                     state.loading = false;
+                     state.closed = true;
+@@ -300,3 +321,61 @@
+ pub fn bounded_size([width, height]: [u32; 2]) -> [u32; 2] {
+     [width.clamp(1, 1920), height.clamp(1, 1080)]
+ }
++
++#[cfg(test)]
++mod runtime_selection_tests {
++    use super::*;
++    #[test]
++    fn old_profiles_preserve_installed_provider_and_config_api() {
++        let options: Options = serde_json::from_str(r#"{"embedded":true}"#).unwrap();
++        assert_eq!(options.runtime, Runtime::SystemChromium);
++        assert_eq!(
++            serde_json::to_value(options).unwrap(),
++            serde_json::json!({"embedded": true})
++        );
++        let options: Options =
++            serde_json::from_str(r#"{"embedded":true,"runtime":"BundledChromium"}"#).unwrap();
++        assert_eq!(options.runtime, Runtime::BundledChromium);
++        assert_eq!(
++            serde_json::to_value(options).unwrap()["runtime"],
++            "BundledChromium"
++        );
++    }
++}
++
++#[cfg(all(test, target_os = "linux"))]
++mod bundled_cancellation_qualification {
++    use super::*;
++    #[test]
++    #[ignore = "requires relocated full pinned browser bundle beside test executable"]
++    fn close_during_whole_resource_verification_is_chunk_cancellable() {
++        crate::runtime::VERIFIED_CHUNKS.store(0, Ordering::Release);
++        let session = Session::start_with_runtime(
++            Config {
++                generation: 42,
++                address: "http://127.0.0.1/".into(),
++                proxy: String::new(),
++                size: [640, 480],
++            },
++            Runtime::BundledChromium,
++        )
++        .unwrap();
++        let shared = session.shared.clone();
++        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(8);
++        while crate::runtime::VERIFIED_CHUNKS.load(Ordering::Acquire) < 4 {
++            assert!(
++                std::time::Instant::now() < deadline,
++                "verification did not begin"
++            );
++            std::thread::yield_now();
++        }
++        let started = std::time::Instant::now();
++        drop(session);
++        assert!(
++            started.elapsed() < std::time::Duration::from_millis(500),
++            "UI close waited {:?} for verification",
++            started.elapsed()
++        );
++        assert!(shared.state.lock().unwrap().closed);
++    }
++}
+--- a/src/browser/pipe.rs
++++ b/src/browser/pipe.rs
+@@ -18,10 +18,23 @@
+     reader: UnixStream,
+     pending: Vec<u8>,
+     _profile: tempfile::TempDir,
++    _runtime: Option<tempfile::TempDir>,
+ }
+ 
+ impl Pipe {
++    #[cfg(test)]
+     pub(super) fn start(proxy: &str) -> Result<Self, String> {
++        Self::start_with_runtime(
++            proxy,
++            super::Runtime::SystemChromium,
++            &AtomicBool::new(false),
++        )
++    }
++    pub(super) fn start_with_runtime(
++        proxy: &str,
++        runtime: super::Runtime,
++        cancelled: &AtomicBool,
++    ) -> Result<Self, String> {
+         let profile = tempfile::Builder::new()
+             .prefix("termcraft-browser-")
+             .permissions(Permissions::from_mode(0o700))
+@@ -37,10 +50,37 @@
+         reader
+             .set_read_timeout(Some(Duration::from_millis(30)))
+             .map_err(transport_error)?;
+-        let chromium = crate::runtime::RuntimeCatalog::for_current_executable()?
+-            .resolve(crate::runtime::ToolId::Browser)?
+-            .executable()?;
+-        let mut command = Command::new(chromium);
++        let catalog = crate::runtime::RuntimeCatalog::for_current_executable()?;
++        let (chromium, runtime_snapshot) = match runtime {
++            super::Runtime::SystemChromium => (
++                catalog
++                    .resolve(crate::runtime::ToolId::SystemChromium)?
++                    .executable()?,
++                None,
++            ),
++            super::Runtime::BundledChromium => {
++                let (path, snapshot) = catalog.bundled_browser_snapshot(cancelled)?;
++                (path, Some(snapshot))
++            }
++        };
++        if cancelled.load(Ordering::Acquire) {
++            return Err("Browser startup cancelled".into());
++        }
++        let mut command = Command::new(&chromium);
++        command
++            .env_remove("LD_LIBRARY_PATH")
++            .env_remove("LD_PRELOAD")
++            .env_remove("LD_AUDIT");
++        #[cfg(target_os = "linux")]
++        if runtime == super::Runtime::BundledChromium {
++            command.env(
++                "LD_LIBRARY_PATH",
++                chromium
++                    .parent()
++                    .ok_or("Missing browser directory")?
++                    .join("libraries"),
++            );
++        }
+         command
+             .args([
+                 "--headless",
+@@ -97,15 +137,16 @@
+                 Ok(())
+             });
+         }
+-        let process = command
+-            .spawn()
+-            .map_err(|_| "Could not launch installed Chromium for Embedded Browser.".to_owned())?;
++        let process = command.spawn().map_err(|_| {
++            "Could not launch the selected Chromium runtime for Embedded Browser.".to_owned()
++        })?;
+         Ok(Self {
+             process,
+             writer,
+             reader,
+             pending: Vec::new(),
+             _profile: profile,
++            _runtime: runtime_snapshot,
+         })
+     }
+ 
+@@ -204,3 +245,89 @@
+         assert_eq!(std::fs::read(sentinel).unwrap(), b"unrelated profile");
+     }
+ }
++
++#[cfg(all(test, target_os = "linux"))]
++mod bundled_qualification {
++    use super::*;
++    use serde_json::json;
++
++    #[test]
++    #[ignore = "requires relocated pinned browser payload beside this test executable"]
++    fn bundled_renderer_keeps_namespace_seccomp_sandbox_and_reaps_private_profile() {
++        let mut browser = Pipe::start_with_runtime(
++            "",
++            crate::browser::Runtime::BundledChromium,
++            &AtomicBool::new(false),
++        )
++        .unwrap();
++        let profile = browser._profile.path().to_owned();
++        let runtime = browser._runtime.as_ref().unwrap().path().to_owned();
++        let parent = browser.process.id();
++        assert_eq!(
++            profile.metadata().unwrap().permissions().mode() & 0o777,
++            0o700
++        );
++        let arguments = std::fs::read(format!("/proc/{parent}/cmdline")).unwrap();
++        for forbidden in [
++            b"--no-sandbox".as_slice(),
++            b"--ignore-certificate-errors".as_slice(),
++            b"--remote-debugging-port".as_slice(),
++        ] {
++            assert!(
++                !arguments
++                    .windows(forbidden.len())
++                    .any(|window| window == forbidden)
++            );
++        }
++        let cancel = AtomicBool::new(false);
++        browser
++            .send(&json!({"id":1,"method":"Target.createTarget","params":{"url":"about:blank"}}))
++            .unwrap();
++        let until = Instant::now() + Duration::from_secs(8);
++        loop {
++            let reply = browser
++                .receive(until, &cancel)
++                .unwrap()
++                .expect("target reply");
++            if reply["id"] == 1 {
++                assert!(reply.get("error").is_none());
++                break;
++            }
++        }
++        browser
++            .send(&json!({"id":2,"method":"SystemInfo.getProcessInfo"}))
++            .unwrap();
++        let reply = loop {
++            let reply = browser
++                .receive(until, &cancel)
++                .unwrap()
++                .expect("process reply");
++            if reply["id"] == 2 {
++                break reply;
++            }
++        };
++        let processes = reply["result"]["processInfo"]
++            .as_array()
++            .expect("browser process inventory");
++        let renderer = processes
++            .iter()
++            .find(|process| process["type"] == "renderer")
++            .expect("sandboxed renderer")["id"]
++            .as_i64()
++            .unwrap();
++        let status = std::fs::read_to_string(format!("/proc/{renderer}/status")).unwrap();
++        assert!(status.lines().any(|line| line == "Seccomp:\t2"), "{status}");
++        assert!(
++            status.lines().any(|line| line == "NoNewPrivs:\t1"),
++            "{status}"
++        );
++        assert_ne!(
++            std::fs::read_to_string(format!("/proc/{renderer}/uid_map")).unwrap(),
++            std::fs::read_to_string("/proc/self/uid_map").unwrap()
++        );
++        drop(browser);
++        assert!(!profile.exists());
++        assert!(!std::path::Path::new(&format!("/proc/{parent}")).exists());
++        assert!(!runtime.exists());
++    }
++}
+--- a/src/browser/engine.rs
++++ b/src/browser/engine.rs
+@@ -13,6 +13,7 @@
+ 
+ pub(super) fn run(
+     config: Config,
++    runtime: super::Runtime,
+     shared: &Shared,
+     commands: Receiver<Command>,
+ ) -> Result<(), String> {
+@@ -21,9 +22,9 @@
+     }
+     let mut browser = Browser {
+         #[cfg(not(windows))]
+-        pipe: Pipe::start(&config.proxy)?,
++        pipe: Pipe::start_with_runtime(&config.proxy, runtime, &shared.cancelled)?,
+         #[cfg(windows)]
+-        pipe: Pipe::start(&config.proxy, &shared.cancelled)?,
++        pipe: Pipe::start_with_runtime(&config.proxy, &shared.cancelled, runtime)?,
+         shared,
+         next: 1,
+         target: String::new(),
+--- a/src/browser/windows_pipe.rs
++++ b/src/browser/windows_pipe.rs
+@@ -42,7 +42,14 @@
+ }
+ 
+ impl Pipe {
+-    pub(super) fn start(proxy: &str, cancel: &AtomicBool) -> Result<Self, String> {
++    pub(super) fn start_with_runtime(
++        proxy: &str,
++        cancel: &AtomicBool,
++        runtime: super::Runtime,
++    ) -> Result<Self, String> {
++        if runtime == super::Runtime::BundledChromium {
++            return Err("No qualified bundled Chromium payload for Windows".into());
++        }
+         installed_chromium()?;
+         let security =
+             OwnerSecurity::new().map_err(|_| "Could not secure the private browser profile.")?;
+--- a/src/runtime/mod.rs
++++ b/src/runtime/mod.rs
+@@ -1,5 +1,8 @@
+ //! Explicit provider selection for TermCraft sessions and native tools.
+ mod discovery;
++mod browser_bundle;
++#[cfg(test)]
++pub(crate) use browser_bundle::VERIFIED_CHUNKS;
+ mod manifest;
+ #[cfg(target_os = "linux")]
+ mod mosh;
+@@ -26,6 +29,8 @@
+     MoshClient,
+     SystemMosh,
+     Browser,
++    SystemChromium,
++    BundledChromium,
+     XServer,
+     Xdmcp,
+     OpenSsh,
+@@ -62,6 +67,11 @@
+ }
+ 
+ impl RuntimeCatalog {
++    #[cfg(unix)]
++    pub(crate) fn bundled_browser_snapshot(&self, cancelled: &std::sync::atomic::AtomicBool) -> Result<(PathBuf, tempfile::TempDir), String> {
++        let (provider, snapshot) = browser_bundle::prepare(&self.resources, cancelled)?;
++        Ok((provider.executable()?, snapshot))
++    }
+     /// Resolve an explicitly selected command from the active private package.
+     pub fn portable_command(
+         packages: &crate::packages::PackageManager,
+@@ -136,7 +146,8 @@
+                 .map(|(path, version)| ToolProvider::Bundled { path, version }),
+             ToolId::Mosh | ToolId::MoshClient => self.pinned_mosh(tool),
+             ToolId::SystemMosh => discovery::commands(&["mosh"], "installed Mosh"),
+-            ToolId::Browser => discovery::chromium(),
++            ToolId::Browser | ToolId::SystemChromium => discovery::chromium(),
++            ToolId::BundledChromium => browser_bundle::resolve(&self.resources),
+             ToolId::OpenSsh => discovery::commands(&["ssh"], "OpenSSH compatibility"),
+             ToolId::OpenSftp => discovery::commands(&["sftp"], "OpenSSH SFTP compatibility"),
+             ToolId::ExternalRdp => discovery::commands(
+@@ -301,3 +312,14 @@
+         }
+     }
+ }
++
++#[cfg(test)]
++mod browser_bundle_contract_tests {
++    use super::*;
++    #[test]
++    fn missing_bundle_never_falls_back_to_host_chromium() {
++        let root = tempfile::tempdir().unwrap();
++        let error = RuntimeCatalog::new(root.path()).resolve(ToolId::BundledChromium).unwrap_err();
++        assert!(error.contains("bundled Chromium"), "{error}");
++    }
++}
+--- a/src/ui.rs
++++ b/src/ui.rs
+@@ -913,6 +913,7 @@
+             port: protocol_port(protocol),
+             browser_options: harbor_workspace::browser::Options {
+                 embedded: protocol == "Browser",
++                runtime: if protocol == "Browser" { harbor_workspace::browser::Runtime::BundledChromium } else { harbor_workspace::browser::Runtime::SystemChromium },
+                 ..Default::default()
+             },
+             ftp_options: if protocol == "FTP" {
+@@ -1020,7 +1021,7 @@
+                 proxy: s.browser_options.proxy.clone(),
+                 size: [960, 640],
+             };
+-            match harbor_workspace::browser::Session::start(config) {
++            match harbor_workspace::browser::Session::start_with_runtime(config, s.browser_options.runtime) {
+                 Ok(handle) => tab.web_browser = Some(web_browser::State::new(handle)),
+                 Err(error) => tab.error = error,
+             }
+--- a/src/ui/pages.rs
++++ b/src/ui/pages.rs
+@@ -13,7 +13,7 @@
+         .inner;
+     let id = Id::new("termcraft-runtime-providers");
+     let previous = ui.ctx().data(|data| data.get_temp::<RuntimeRows>(id));
+-    let rows = previous.filter(|_| !refresh).unwrap_or_else(|| {
++    let rows = previous.filter(|rows| !refresh || rows.get().is_none()).unwrap_or_else(|| {
+         let rows = RuntimeRows::default();
+         let result = rows.clone();
+         let ctx = ui.ctx().clone();
+@@ -33,7 +33,8 @@
+                 ("Serial", ToolId::Serial),
+                 ("Packaged Mosh", ToolId::Mosh),
+                 ("Installed Mosh", ToolId::SystemMosh),
+-                ("Integrated browser", ToolId::Browser),
++                ("Packaged Chromium browser", ToolId::BundledChromium),
++                ("Installed Chromium browser (compatibility)", ToolId::SystemChromium),
+                 ("Managed X display", ToolId::XServer),
+                 ("XDMCP", ToolId::Xdmcp),
+                 ("Installed SSH", ToolId::OpenSsh),
+@@ -113,7 +114,7 @@
+         let mut save = false;
+         Window::new(if self.editing.is_some(){"Edit session"}else{"New session"}).id(Id::new("session-form")).open(&mut open).collapsible(false).resizable(false).vscroll(true).max_height(650.).default_width(650.).show(ctx,|ui|{
+    ui.label(RichText::new("Choose a connection").size(20.).strong());ui.add_space(7.);
+-   ui.horizontal_wrapped(|ui|{for p in PROTOCOLS{if ui.selectable_label(s.protocol==*p,*p).clicked(){s.protocol=(*p).into();s.port=protocol_port(p);if *p=="Mosh"&&self.editing.is_none(){s.mosh_provider=harbor_workspace::model::MoshProvider::Bundled;}if *p=="FTP"{s.ftp_options=harbor_workspace::protocols::ftp_actor::SessionOptions::embedded();}if *p=="Browser"{s.browser_options.embedded=true;}}}});ui.add_space(7.);ui.separator();
++   ui.horizontal_wrapped(|ui|{for p in PROTOCOLS{if ui.selectable_label(s.protocol==*p,*p).clicked(){s.protocol=(*p).into();s.port=protocol_port(p);if *p=="Mosh"&&self.editing.is_none(){s.mosh_provider=harbor_workspace::model::MoshProvider::Bundled;}if *p=="FTP"{s.ftp_options=harbor_workspace::protocols::ftp_actor::SessionOptions::embedded();}if *p=="Browser"{s.browser_options.embedded=true;if self.editing.is_none(){s.browser_options.runtime=harbor_workspace::browser::Runtime::BundledChromium;}}}}});ui.add_space(7.);ui.separator();
+    Grid::new("session_fields").num_columns(2).spacing([20.,13.]).show(ui,|ui|{
+     field(ui,"Session name",&mut s.name,"Optional display name");field(ui,"Folder",&mut s.folder,"My sessions");
+     if s.protocol=="Local"{field(ui,"Shell executable",&mut s.command,"Use the system default");super::xserver::session_settings(ui,&mut s);ui.label("Start folder");ui.horizontal(|ui|{ui.add(TextEdit::singleline(&mut s.directory).desired_width(330.));if ui.small_button("Browse").clicked(){if let Some(p)=rfd::FileDialog::new().pick_folder(){s.directory=p.to_string_lossy().into();}}});ui.end_row();}
+--- a/src/ui/web_browser.rs
++++ b/src/ui/web_browser.rs
+@@ -111,6 +111,10 @@
+         }
+     });
+     if options.embedded {
++        ui.horizontal_wrapped(|ui| {
++            ui.selectable_value(&mut options.runtime, harbor_workspace::browser::Runtime::BundledChromium, "Packaged Chromium");
++            ui.selectable_value(&mut options.runtime, harbor_workspace::browser::Runtime::SystemChromium, "Installed Chromium (compatibility)");
++        });
+         ui.horizontal(|ui| {
+             ui.label("Proxy endpoint");
+             ui.add(TextEdit::singleline(&mut options.proxy).hint_text("http://proxy.example:8080"));
+--- a/src/ui/web_browser_tests.rs
++++ b/src/ui/web_browser_tests.rs
+@@ -51,12 +51,13 @@
+     let (ctx, _root, mut workspace) = owned_workspace();
+     workspace.new_session("Browser");
+     let mut profile = workspace.session_form.take().unwrap();
++    profile.browser_options.runtime = fixture_runtime();
+     assert!(profile.browser_options.embedded);
+     profile.host = fixture.origin.clone();
+     let persisted = serde_json::to_string(&profile).unwrap();
+     workspace.start(serde_json::from_str(&persisted).unwrap());
+     let id = workspace.tabs[workspace.active].id;
+-    let deadline = Instant::now() + Duration::from_secs(18);
++    let deadline = Instant::now() + fixture_budget(18);
+     let (canvas, [width, height]) = loop {
+         let output = render(&ctx, &mut workspace, vec![]);
+         let tab = &workspace.tabs[workspace.active];
+@@ -129,7 +130,33 @@
+     assert!(workspace.tabs.iter().all(|tab| tab.id != id));
+ }
+ 
++fn fixture_runtime() -> harbor_workspace::browser::Runtime {
++    if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
++        harbor_workspace::browser::Runtime::BundledChromium
++    } else {
++        harbor_workspace::browser::Runtime::SystemChromium
++    }
++}
++
++fn fixture_budget(normal: u64) -> Duration {
++    // Unoptimized SHA verification of the full payload precedes browser startup.
++    Duration::from_secs(
++        if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
++            60
++        } else {
++            normal
++        },
++    )
++}
++
+ fn chromium_fixture_slot() -> Option<std::sync::MutexGuard<'static, ()>> {
++    if fixture_runtime() == harbor_workspace::browser::Runtime::BundledChromium {
++        harbor_workspace::runtime::RuntimeCatalog::for_current_executable()
++            .unwrap()
++            .resolve(harbor_workspace::runtime::ToolId::BundledChromium)
++            .unwrap();
++        return Some(owned_process_fixture_slot());
++    }
+     let installed = std::path::Path::new("/usr/lib/chromium/chromium").is_file();
+     assert!(installed || std::env::var_os("TERMCRAFT_REQUIRE_CHROMIUM").is_none());
+     installed.then(owned_process_fixture_slot)
+@@ -138,6 +165,7 @@
+ fn test_tab(workspace: &mut Workspace, address: String) -> &mut TerminalTab {
+     workspace.new_session("Browser");
+     let mut profile = workspace.session_form.take().unwrap();
++    profile.browser_options.runtime = fixture_runtime();
+     profile.host = address;
+     workspace.start(profile);
+     &mut workspace.tabs[workspace.active]
+@@ -195,7 +223,7 @@
+ }
+ 
+ fn wait_for_browser(mut condition: impl FnMut() -> bool, message: &str) {
+-    let deadline = Instant::now() + Duration::from_secs(15);
++    let deadline = Instant::now() + fixture_budget(15);
+     while !condition() {
+         assert!(Instant::now() < deadline, "{message}");
+         std::thread::sleep(Duration::from_millis(20));
+@@ -242,7 +270,7 @@
+ 
+     let (ctx, _root, mut workspace) = owned_workspace();
+     let tab = test_tab(&mut workspace, original.clone());
+-    started.recv_timeout(Duration::from_secs(5)).unwrap();
++    started.recv_timeout(fixture_budget(5)).unwrap();
+     render_browser(&ctx, tab, vec![], Some(true));
+     render_browser(&ctx, tab, vec![Event::Text("/unfinished".into())], None);
+     let draft = tab.web_browser.as_ref().unwrap().address.clone();
+@@ -276,7 +304,7 @@
+     });
+     let (ctx, _root, mut workspace) = owned_workspace();
+     let tab = test_tab(&mut workspace, fixture.origin.clone());
+-    let deadline = Instant::now() + Duration::from_secs(15);
++    let deadline = Instant::now() + fixture_budget(15);
+     loop {
+         let mut output = browser_output(&ctx, tab, vec2(720., 540.), vec![], None);
+         let Some(browser) = tab.web_browser.as_ref() else {
+--- a/scripts/package-release.py
++++ b/scripts/package-release.py
+@@ -265,12 +265,14 @@
+     return ARCHES[target][machine]
+ 
+ 
+-def native_libraries(path, target):
++def native_libraries(path, target, private_libraries=None):
+     if target == "linux":
+         inspected_env = {**os.environ, "LC_ALL": "C"}
+         inspected_env.pop("LD_LIBRARY_PATH", None)
+         inspected_env.pop("LD_PRELOAD", None)
+         inspected_env.pop("LD_AUDIT", None)
++        if private_libraries is not None:
++            inspected_env["LD_LIBRARY_PATH"] = str(private_libraries)
+         dynamic = capture("readelf", "-d", path, env=inspected_env)
+         needed = re.findall(r"\(NEEDED\).*?\[(.*?)\]", dynamic)
+         if "(RPATH)" in dynamic or "(RUNPATH)" in dynamic or any("/" in name for name in needed):
+@@ -399,8 +401,46 @@
+     return json.loads(inventory.read_text())
+ 
+ 
++def stage_browser(source, resources, inputs, target, arch):
++    manifest = regular_source(source, Path("packaging/browser/runtime-manifest.json"))
++    info = json.loads(manifest.read_text())
++    if (target, arch) != (info["platform"], info["architecture"]):
++        raise ValueError("No qualified bundled Chromium payload for this platform.")
++    stage = regular_source(source, Path("packaging/browser/stage-runtime.py"))
++    subprocess.run([sys.executable, "-I", "-B", stage, manifest, resources,
++                    inputs.resolve(strict=True)], check=True)
++    libraries = {}
++    for item in info["files"]:
++        if not item["executable"]:
++            continue
++        relative = Path(info["root"]) / item["path"]
++        path = regular_source(resources, relative)
++        if ".so" not in path.name:
++            libraries[relative.as_posix()] = native_libraries(path, target, resources / info["root"] / "libraries")
++            continue
++        inspected_env = {**os.environ, "LC_ALL": "C"}
++        for name in ("LD_LIBRARY_PATH", "LD_PRELOAD", "LD_AUDIT"):
++            inspected_env.pop(name, None)
++        inspected_env["LD_LIBRARY_PATH"] = str(resources / info["root"] / "libraries")
++        dynamic = capture("readelf", "-d", path, env=inspected_env)
++        needed = re.findall(r"\(NEEDED\).*?\[(.*?)\]", dynamic)
++        if "(RPATH)" in dynamic or "(RUNPATH)" in dynamic or any("/" in name for name in needed):
++            raise ValueError("Unexpected Chromium library search path")
++        linked = capture("ldd", path, env=inspected_env)
++        if "not found" in linked:
++            raise ValueError(f"Missing browser shared libraries: {linked}")
++        versions = capture("readelf", "--version-info", path, env=inspected_env)
++        libraries[relative.as_posix()] = {
++            "direct_libraries": sorted(needed),
++            "resolved_libraries": sorted({line.strip().split()[0].rsplit("/", 1)[-1]
++                                           for line in linked.splitlines() if line.strip()}),
++            "required_glibc_versions": sorted(set(re.findall(r"Name: GLIBC_(\d+(?:\.\d+)+)", versions))),
++        }
++    return info, libraries
++
++
+ def package_release(target, output, app_binary, helper_binary, build_inputs=None, source=ROOT,
+-                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None):
++                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None):
+     packaging = source / "packaging"
+     binaries = [app_binary.resolve(strict=True), helper_binary.resolve(strict=True)]
+     if binaries[0].samefile(binaries[1]):
+@@ -422,6 +462,8 @@
+         raise ValueError("The pinned Mosh payload targets the Linux x86_64 Arch runtime ABI.")
+     if unix_cache is not None and (target, arch) not in (("linux", "x86_64"), ("windows", "x86_64")):
+         raise ValueError("Unix payload supports Linux and Windows x86_64 only.")
++    if browser_inputs is not None and (target, arch) != ("linux", "x86_64"):
++        raise ValueError("No qualified bundled Chromium payload for this platform.")
+     basename = f"TermCraft-{version}-{target}-{arch}"
+     if xwayland_archive is not None:
+         basename += "-arch-xwayland"
+@@ -429,6 +471,8 @@
+         basename += "-mosh" if xwayland_archive is not None else "-arch-mosh"
+     if unix_cache is not None:
+         basename += "-unix"
++    if browser_inputs is not None:
++        basename += "-chromium"
+     name = f"{basename}.tar.gz" if target == "linux" else f"{basename}.zip"
+     output.mkdir(parents=True, exist_ok=True)
+     archive = output / name
+@@ -465,6 +509,10 @@
+             for name in ("iperf2", "iperf3"):
+                 entry = Path("runtime/linux-x86_64") / name
+                 linked[entry.as_posix()] = native_libraries(regular_source(resources, entry), "linux")
++        browser = None
++        if browser_inputs is not None:
++            browser, browser_libraries = stage_browser(source, resources, browser_inputs, target, arch)
++            linked.update(browser_libraries)
+         unix = stage_unix(source, resources, unix_cache, target, arch) if unix_cache is not None else None
+         copy_release_assets(source, resources / "assets")
+         shutil.copyfile(source / "CREDITS.md", resources / "CREDITS.md")
+@@ -495,6 +543,8 @@
+         runtime["artifact_declarations"] = "RUNTIME-MANIFEST.json"
+         if iperf_runtime is not None:
+             runtime["managed_iperf"] = "runtime/linux-x86_64/IPERF-MANIFEST.json"
++        if browser is not None:
++            runtime["managed_browser"] = browser
+         if unix is not None:
+             runtime["portable_unix"] = unix
+         if mosh is not None:
+@@ -559,6 +609,7 @@
+     parser.add_argument("--mosh-recipe", type=Path, help="Pinned corresponding Arch Mosh PKGBUILD.")
+     parser.add_argument("--unix-cache", type=Path,
+                         help="Bundle target-matching pinned Unix archives from an offline upstream hash cache (Linux/Windows x86_64).")
++    parser.add_argument("--browser-inputs", type=Path, help="Offline pinned Chromium archive, signature and third-party notices directory (Linux x86_64).")
+     args = parser.parse_args()
+     if bool(args.app_binary) != bool(args.helper_binary):
+         parser.error("Supply both prebuilt binaries or omit both to build a native release.")
+@@ -583,7 +634,7 @@
+     try:
+         if args.app_binary:
+             archive = package_release(args.platform, args.output.resolve(), args.app_binary, args.helper_binary,
+-                                      xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache)
++                                      xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs)
+         else:
+             build_root = args.build_root.resolve() if args.build_root else ROOT / "target"
+             source, inputs = freeze_sources(ROOT, build_root / "package-sources")
+@@ -592,7 +643,7 @@
+                 print(f"Building source snapshot {source.name}", flush=True)
+                 app, helper = release_build(source, build_root, settings)
+                 archive = package_release(args.platform, args.output.resolve(), app, helper, inputs, source, settings,
+-                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache)
++                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs)
+     except (OSError, ValueError, subprocess.CalledProcessError) as error:
+         parser.exit(1, f"Packaging failed: {error}\n")
+     print(f"{sha256(archive)}  {archive}")
+--- a/packaging/browser/README.md
++++ b/packaging/browser/README.md
+@@ -1,45 +1,87 @@
+-# Embedded Browser runtime
++# Packaged Chromium runtime
+ 
+-Linux currently launches the distribution-installed Chromium payload at
+-`/usr/lib/chromium/chromium`. It uses the installed engine with an independent
+-temporary profile and two inherited anonymous stream descriptors. The app
+-never opens a DevTools TCP listener. The package manager remains responsible
+-for sandbox configuration and security updates. The measurements in
+-[manifest.json](manifest.json) identify the tested artifact and do not lock
+-users to an older distribution version.
++The optional Linux x86_64 package carries Chromium **158.0.8127.88** from the
++signed Arch Linux package published on 2026-11-24. The complete direct engine
++resource tree, sandbox/crash helpers, locale packs, ICU/V8 data and graphics
++providers are pinned in `runtime-manifest.json`. A separately signed, pinned
++simdutf 9.3.1 shared library supplies the engine's new ABI privately. This is
++Chromium, with no Google Chrome or proprietary Widevine payload.
+ 
+-The Windows source candidate launches the native installed Google Chrome or
+-Chromium payload from Windows known folders. It uses a current-user DACL,
+-private inherited handles and a kill-on-close Windows process job.
+-The production component has a Windows-target source check. Native
+-execution and distribution qualification remain open.
+-[Windows candidate evidence](../../docs/parity-evidence/E01/windows/README.md)
++New Browser session forms select **Packaged Chromium**. The session also offers
++**Installed Chromium (compatibility)**, and **Default system browser** remains
++the explicit external alternative. Existing profiles with no runtime field and
++`browser::Session::start(Config)` retain their installed Chromium behavior. The
++new `start_with_runtime` API preserves existing `Config` struct literals. A
++missing, wrong-platform, altered or incomplete bundle reports an error; it never
++selects an installed browser automatically.
+ 
+-## Packaged runtime qualification
++The runtime catalog checks the compiled platform/version pin, installed manifest,
++SHA-256 and size of every resource, native headers and executable permissions,
++and refuses symlinked resources. Unix copies all resources into an owned mode0700 runtime directory while hashing
++the same bytes, then launches that verified private snapshot and retains it until
++process cleanup. Engine files are mode0500 and data mode0400. Resource verification
++checks cancellation before and after each 64KiB read, so closing a tab during
++verification does not wait for the entire bundle. Browser work stays off the UI
++thread. Launch retains the existing private profile and anonymous DevTools pipes. Only the pinned
++private library directory is added to its loader path; inherited loader injection
++variables are removed. No DevTools TCP listener is enabled. Normal certificate
++verification and Chromium namespace/seccomp sandbox remain enabled. The sandbox
++helper is installed without setuid permissions: the target OS must allow Chromium's
++standard unprivileged namespace sandbox. There is no unsafe launch fallback.
+ 
+-- Build or extract a current patched Chromium release and verify its signed
+-  provenance, source, recipe, and SHA-256. Use the measured archive as an
+-  inventory example and derive the platform closure from the actual candidate.
+-- Stage the executable, sandbox components, resource and locale packs, ICU and
+-  V8 data, and any private graphics libraries. Record shared-library and OS
+-  requirements, rendering baseline, notices, license obligations, and security
+-  update responsibility. Use a relocatable app-owned path and test launch
+-  with the archive under a directory containing spaces.
+-- On Linux, verify a clean target distribution with a functioning Chromium
+-  sandbox, an empty PATH, and no installed Chromium. Check sandbox activation
+-  and normal trust-store behavior in the native packaged configuration.
+-- On macOS, qualify a source-built Chromium application bundle and helper app
+-  layout for each target architecture. Use inherited descriptors and verify
+-  framework resolution, app/child signing, sandbox, native trust store,
+-  notarization requirements, and cleanup on supported macOS versions.
+-- On Windows, qualify a source-built Chromium distribution and verify a
+-  private pipe transport with handle inheritance restricted to the intended
+-  child. Verify Chromium sandbox token behavior, job ownership and cleanup,
+-  trust store behavior, DLL resolution, and installed and portable launch.
+-- Repeat the local Chromium fixtures and native TermCraft tab checks on each
+-  packaged build. Artifact identity and source links are recorded per target.
+-  A default system browser remains available as an explicit compatibility
+-  setting.
++## Offline staging
+ 
+-Primary source starts at [Chromium source and build instructions](https://chromium.googlesource.com/chromium/src/)
+-and the [DevTools protocol](https://chromedevtools.github.io/devtools-protocol/).
++Supply this explicit directory to `scripts/package-release.py --browser-inputs`:
++
++- The exact Chromium archive named in the manifest and its detached `.sig`.
++- Each exact dependency archive and `.sig` listed in `dependencies`.
++- `THIRD-PARTY-NOTICES.html` with the pinned digest (the captured complete
++  `chrome://credits` document for this engine is supplied beside the manifest).
++- `CHROMIUM-SOURCE-RECIPE.tar.gz` with the pinned digest. Its PKGBUILD digest
++  matches the signed package's `.BUILDINFO`, and the archive contains all Arch
++  patches/build scripts at the version tag.
++
++The stage script verifies all explicit inputs before publishing the tree. It
++extracts only listed regular members into a temporary directory, strips privileged
++bits, and refuses an existing destination. It makes no network requests and
++never discovers an engine from the host. Package construction records native
++loader/library requirements for the engine, helpers and each private shared
++library, hashes every packaged file, and retains the six existing application
++assets and the existing Mosh, Iperf, Unix and native macOS launcher options.
++
++The engine is **not** a statically portable Linux dependency closure. It targets
++the Arch Linux x86_64 ABI and requires the system libraries/fonts/trust store in
++`SOURCE-PKGINFO` and the package manifest's `linked_libraries`. The build inventory
++is `SOURCE-BUILDINFO`; the original license and complete component notices are
++included. The exact official Chromium source archive URL and SHA-256 are recorded
++from the signed-build-matched recipe; the multi-gigabyte upstream source archive
++is not duplicated inside the browser payload. No host packages are installed.
++
++## Updates and qualification
++
++Release maintainers own browser security updates. Before each shipping release,
++check the current supported Chromium security release and distribution advisories,
++refresh the signed archive/dependency pins and notices, verify the enrolled distro
++signing key, match the recipe to signed `.BUILDINFO`, and repeat relocation,
++resource-mutation, sandbox, HTTP/authentication/TLS/input/resize and cleanup checks.
++Ship the changed engine through an application release; Chromium's background
++component updater is disabled for reproducibility. If qualification fails, keep
++the new bundle unavailable; rollback requires a deliberate reviewed package pin
++and must not silently re-enable a vulnerable engine.
++
++This candidate has Linux workflow evidence. A clean machine with no installed
++Chromium and the clean OS/ABI matrix remain separate qualification requirements.
++Windows and macOS bundled selections are explicitly unavailable until an audited
++source-built native payload/complete resources/signatures are pinned. Existing
++Windows known-folder discovery and private helper/handle/job/image checks remain
++unchanged for installed compatibility mode. The Windows helper accepts no arbitrary
++engine path. Existing macOS installed app discovery/native pipe transport likewise
++remain available. Cross-target source checks do not establish native execution,
++Windows sandbox token/job behavior, macOS signing/notarization, or native TLS trust.
++
++Primary references:
++[Arch package](https://archlinux.org/packages/extra/x86_64/chromium/),
++[exact recipe](https://gitlab.archlinux.org/archlinux/packaging/packages/chromium/-/blob/158.0.8127.88-1/PKGBUILD),
++[upstream source](https://chromium.googlesource.com/chromium/src/+/refs/tags/158.0.8127.88),
++[Linux sandbox implementation](https://chromium.googlesource.com/chromium/src/+/main/sandbox/linux),
++[headless CLI including internal-page access](https://developer.chrome.com/docs/automation-and-testing/headless-cli).
+--- a/tests/browser_session.rs
++++ b/tests/browser_session.rs
+@@ -17,6 +17,13 @@
+ 
+ #[cfg(target_os = "linux")]
+ fn chromium_available() -> bool {
++    if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
++        harbor_workspace::runtime::RuntimeCatalog::for_current_executable()
++            .unwrap()
++            .resolve(harbor_workspace::runtime::ToolId::BundledChromium)
++            .unwrap();
++        return true;
++    }
+     let present = std::path::Path::new("/usr/lib/chromium/chromium").is_file();
+     assert!(present || std::env::var_os("TERMCRAFT_REQUIRE_CHROMIUM").is_none());
+     present
+@@ -42,12 +49,20 @@
+ }
+ 
+ fn browser(generation: u64, address: String, proxy: String) -> Session {
+-    Session::start(Config {
+-        generation,
+-        address,
+-        proxy,
+-        size: [640, 480],
+-    })
++    let runtime = if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
++        harbor_workspace::browser::Runtime::BundledChromium
++    } else {
++        harbor_workspace::browser::Runtime::SystemChromium
++    };
++    Session::start_with_runtime(
++        Config {
++            generation,
++            address,
++            proxy,
++            size: [640, 480],
++        },
++        runtime,
++    )
+     .unwrap()
+ }
+ 
+@@ -278,7 +293,13 @@
+ }
+ 
+ fn wait_until(session: &Session, mut condition: impl FnMut() -> bool) {
+-    let until = Instant::now() + Duration::from_secs(18);
++    // Debug builds verify the complete 429MB bundle before starting Chromium.
++    let startup_budget = if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
++        60
++    } else {
++        18
++    };
++    let until = Instant::now() + Duration::from_secs(startup_budget);
+     while Instant::now() < until {
+         if condition() {
+             return;

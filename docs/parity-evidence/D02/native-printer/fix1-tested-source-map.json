@@ -1,0 +1,212 @@
+{
+  "sources": [
+    {
+      "path": "engines/rdp/Cargo.lock",
+      "sha256": "b4a853c11bebce975874a1b5bf3fcf92e885893df9cb2b5fbf122258a0acbd17"
+    },
+    {
+      "path": "engines/rdp/Cargo.toml",
+      "sha256": "7e492cdee8072933ab4fb0a04260e8c1b49f474ca843d7fcafc3ef621557bc39"
+    },
+    {
+      "path": "engines/rdp/src/clipboard.rs",
+      "sha256": "0400d364899a96556052f6805d309dac9ce0958a6b30aeb6cb9bad73c1cfe840"
+    },
+    {
+      "path": "engines/rdp/src/config.rs",
+      "sha256": "7e83254896665b5e9c91b9889c13004c06f24350bd60c6b1976e5bae56c8d68f"
+    },
+    {
+      "path": "engines/rdp/src/devices.rs",
+      "sha256": "829015928973781608d6c4664b66a90f8b476fe2b2f9372c9f56993db3d17c86"
+    },
+    {
+      "path": "engines/rdp/src/devices_tests.rs",
+      "sha256": "9cb7e9b54ebbb9c01a357295fb62e2efcc2e990792adec79c2c0ee8ad3c25b31"
+    },
+    {
+      "path": "engines/rdp/src/main.rs",
+      "sha256": "98068b15fe1203c2b389619622ce9d667b16bc4457b42d7bd8b14835680420f4"
+    },
+    {
+      "path": "engines/rdp/src/native_file_macos.rs",
+      "sha256": "4002f76168b7482b34afa3a611f6274dfdf8b4cf3443aee3a263ee8e68a2ee93"
+    },
+    {
+      "path": "engines/rdp/src/native_file_windows.rs",
+      "sha256": "08b06604cfd79b0a5692f651c0048991fb1c3e09eb6b9e0da890d78ee33d6835"
+    },
+    {
+      "path": "engines/rdp/src/printer.rs",
+      "sha256": "a96d6912f7f62a49ca6ab13f3735991abda711ff1f808a50ab4e2b7b574e27af"
+    },
+    {
+      "path": "engines/rdp/src/printer_ipp.rs",
+      "sha256": "2f19c4242f562158f00239c341a75cfbf533d1f3cf5af6dbe83b64d388e260f1"
+    },
+    {
+      "path": "engines/rdp/src/printer_linux.rs",
+      "sha256": "6a3ccdc2531d8a7338f5e1252391fd649c465ed6c4544417f4d6f131bfa1ace9"
+    },
+    {
+      "path": "engines/rdp/src/printer_macos.rs",
+      "sha256": "a9aae13526c455d1e406f9009fdb658fb0f015b48d717dde3ce9df1da1af9884"
+    },
+    {
+      "path": "engines/rdp/src/printer_native.rs",
+      "sha256": "16358ffdacb2556bce0f260a7db7b29ffd0cc8aa14c5b7008628dc0e4eb8dc62"
+    },
+    {
+      "path": "engines/rdp/src/printer_native_tests.rs",
+      "sha256": "d711181d522e52c6f5f2f285c7f65e5fe9bdb7fb2ef0d18d5bc3295813e4f1d1"
+    },
+    {
+      "path": "engines/rdp/src/printer_owner.rs",
+      "sha256": "a7a81487d1beb4088702c665cfe4af12bc9c58fd76d49ce6e2dc5c9954a7051b"
+    },
+    {
+      "path": "engines/rdp/src/printer_process_windows.rs",
+      "sha256": "f5e13d8c59b2577eabc583db3868d83aa9377af0822024b96616269397158643"
+    },
+    {
+      "path": "engines/rdp/src/printer_tests.rs",
+      "sha256": "aaa5168509df05f0a060ef229833fe0f61b853a1a616796c5ad7c52964b31a15"
+    },
+    {
+      "path": "engines/rdp/src/printer_windows.rs",
+      "sha256": "3e72c2aa11845b0b2c7af6fb7885bc5d0a71e3ffaac68886ac77cfb8aedd1f61"
+    },
+    {
+      "path": "engines/rdp/src/serial.rs",
+      "sha256": "2730a2be6382e93f2d0256a2390750e8605b0c92213a0064e92b8257e2d5f4de"
+    },
+    {
+      "path": "engines/rdp/src/serial_completion.rs",
+      "sha256": "1c3fe86501b75d796a397a0b25345dc33e36d96d76962fb9f7424b9070c92fbd"
+    },
+    {
+      "path": "engines/rdp/src/serial_windows.rs",
+      "sha256": "f25d06a2eeea77bbe98ab5d3fb4a591aae1226127fe38438b00db0437bbe7572"
+    },
+    {
+      "path": "engines/rdp/src/serial_windows_control.rs",
+      "sha256": "34164cbe0724d8e2781aa6897bb6c4cf5d72a45e2c627d11dd8672398c1a2f23"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/framed.rs",
+      "sha256": "2c98e1e65bb7f80c24498cc2551893865e2d04d15f67f1051090291ed8ff478a"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/library_macos.rs",
+      "sha256": "8a852c7bcf55b55323f1c5a4febf7c85479d4ad82745422f387fad842f297e73"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/library_windows.rs",
+      "sha256": "f99a10bf6e86301b573aed5438959ed5e78e964636b566d0ecce8ffd233b3ea9"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/native_pcsc.rs",
+      "sha256": "9eb1f85f8a8ea521594e59581166f970a6e7580c8ffada7538f18e1446555bca"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/native_worker.rs",
+      "sha256": "2b7868fa65755ca497d47491b4ab86c706b95bac9d314e7fc13ee549536e5954"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/ndr.rs",
+      "sha256": "6a48fd44f68d879b7d1362ce5374f9c59535c84e8af569a77fc4f296985fc0f8"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/pcsc.rs",
+      "sha256": "b0a7bc5b40a31a10670012bf0d0e8c7bc5142d1cbfaf7fbf093488f77e0f1399"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/process_command.rs",
+      "sha256": "9a998cbcd39d875b54864cdc5c6f808e82c5cd69e579fce8e99b11340a8e5145"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/process_macos.rs",
+      "sha256": "6cfbfd499756f719df9603e978d11723c8838a7d28b6678def99277d05560c25"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/process_windows.rs",
+      "sha256": "aa5be7677f32bce51178e6d8f7f7d71b665ca9b9ddbf9f60d8bc5eead77de6d4"
+    },
+    {
+      "path": "engines/rdp/src/smartcard/session.rs",
+      "sha256": "62bc90401f4090c1715ec858e41471304355b1d7f86b270daed4c0a4f6b2ac41"
+    },
+    {
+      "path": "engines/rdp/src/smartcard.rs",
+      "sha256": "3737f29a8875c8615378a864a7cb45c62a9c9d86890a659ced4df7eac1b4703f"
+    },
+    {
+      "path": "engines/rdp/src/tls.rs",
+      "sha256": "78405c717b656b93eceb3e0e836cb3772390ca34b38a95f1411c745c1370e2c2"
+    },
+    {
+      "path": "src/desktop/loader_env.rs",
+      "sha256": "42a0a403efe44625b4d53d59db45236ad0871e1eff81aaf451b3faedf890e707"
+    },
+    {
+      "path": "src/desktop/options.rs",
+      "sha256": "44ef5d2dc9a68b44e5853326e0e4e62b2cabf3338aade123adf7b9affbcca75e"
+    },
+    {
+      "path": "src/desktop/wire.rs",
+      "sha256": "25fc322a05aabbfa41bb569d168fb0294685e488899e61a1838d6976024c9718"
+    },
+    {
+      "path": "tests/printer-native-component/Cargo.lock",
+      "sha256": "d567a02e02dced5a298379fcb192a86e21edfb44111b8ac8c944647a214cfead"
+    },
+    {
+      "path": "tests/printer-native-component/Cargo.toml",
+      "sha256": "932f80cc9c1b878df091052a386c4b6235623d58064085be816d882e319f6f8e"
+    },
+    {
+      "path": "tests/printer-native-component/src/lib.rs",
+      "sha256": "3faf9c6f6c38f72d31b4ff46ba1126895035cd5e47076262334b7f2ac4708ca6"
+    },
+    {
+      "path": "tests/printer_owner_lifecycle.py",
+      "sha256": "ee934dce2216a4438adbdf09e9b499134adc3a6a5c627179ffd2fe80d2bc21da"
+    }
+  ],
+  "logs": [
+    {
+      "path": "format.log",
+      "sha256": "5ad216f8080400df036996258494bb0d3b5a489affb3d8c0a2bcc5f2cf4c0c99"
+    },
+    {
+      "path": "helper-green.log",
+      "sha256": "6af8879362fa94ddc598a3861a1ad799e3567652fedb0cac1f5228d0f72770f4"
+    },
+    {
+      "path": "owner-lifecycle.log",
+      "sha256": "9b095f6f1e7a3d646e2326913f0b4b54abdd13973065a08812b3e341f3486a26"
+    },
+    {
+      "path": "printer-darwin.log",
+      "sha256": "981a9723fe7029235e67c5437af7e8cbb85f8419f7715d6ad7f94dfa400c8147"
+    },
+    {
+      "path": "printer-green.log",
+      "sha256": "c55daeaaab7c613af924849ecd701fa01dfe1e813e7c0cd06523ea4b6c2a18ce"
+    },
+    {
+      "path": "printer-windows.log",
+      "sha256": "7e3c1ac41ffd41623e87782112f543d44c20f390e465e1723ad81c1e591ac743"
+    }
+  ],
+  "results": {
+    "helper": 69,
+    "printer_component": 12,
+    "native_checks": [
+      "x86_64-pc-windows-msvc",
+      "aarch64-apple-darwin"
+    ],
+    "lifecycle_cases": 4,
+    "native_framework_calls": false
+  }
+}

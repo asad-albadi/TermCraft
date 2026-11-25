@@ -1,0 +1,12 @@
+{
+  "binary_sha256": "ed7e7946f8c13a3f1e52c1bc4b677ca0995754ce4964b2b4c3cd8d5c8d44eb3d",
+  "original_path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/harbor-workspace",
+  "frozen_path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-native-games/harbor-workspace",
+  "original_size": 610959304,
+  "original_mtime_ns": 1795569616387521707,
+  "original_mtime_utc": "2026-11-25T01:20:16.387522+00:00",
+  "source_hash_capture": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/parallel-integration-save-map/source-sha256.json",
+  "source_capture_sha256": "9280efb23cf885b96fbb84be790bc7d6773aaed8a4457c8650f3894d658c9608",
+  "build_evidence": "docs/parity-evidence/build-cache-scp/reproduce.log",
+  "scope": "Current code binary native GUI qualification; not release package qualification"
+}

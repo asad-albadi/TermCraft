@@ -1,0 +1,30 @@
+{
+  "review": "SPEC/QUALITY ACCEPT after FIX2",
+  "files": [
+    {
+      "path": "engines/rdp/src/devices.rs",
+      "base": "829015928973781608d6c4664b66a90f8b476fe2b2f9372c9f56993db3d17c86",
+      "new": "3dae2b28c714ff28fdc1b3f2f6c44d65a462a22283ea17ab1603daa0c66e5723",
+      "source": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-unix-controls/fix2/payload/engines/rdp/src/devices.rs",
+      "subsystem": "serial",
+      "payload_mode": "0o644"
+    },
+    {
+      "path": "engines/rdp/src/devices_tests.rs",
+      "base": "9cb7e9b54ebbb9c01a357295fb62e2efcc2e990792adec79c2c0ee8ad3c25b31",
+      "new": "f9b8ec2849182a1b9bd00b0d347f48766b910d51e7d9723d5a7e1ac79d76685c",
+      "source": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-unix-controls/fix2/payload/engines/rdp/src/devices_tests.rs",
+      "subsystem": "serial",
+      "payload_mode": "0o644"
+    },
+    {
+      "path": "engines/rdp/src/serial.rs",
+      "base": "2730a2be6382e93f2d0256a2390750e8605b0c92213a0064e92b8257e2d5f4de",
+      "new": "709a83e09988d35ea0e4e2010167b1aeee5f8a9c201c63e82171bff1882f73b4",
+      "source": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-unix-controls/fix2/payload/engines/rdp/src/serial.rs",
+      "subsystem": "serial",
+      "payload_mode": "0o644"
+    }
+  ],
+  "scope": "Actual Linux PTY events; Linux hardware counters and nativeMac runtime remain unverified. COMMSTATUS/PROPERTIES and other event bits unsupported. Root helper combined gate pending."
+}

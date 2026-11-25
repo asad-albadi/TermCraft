@@ -1,0 +1,23 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: methods `terminate_owned_sftp`, `restart_with_new_host_key`, and `accepted_authentications` are never used
+   --> tests/support/ssh_server.rs:112:12
+    |
+ 14 | impl SshServer {
+    | -------------- methods in this implementation
+...
+112 |     pub fn terminate_owned_sftp(&self) {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+131 |     pub fn restart_with_new_host_key(&mut self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+160 |     pub fn accepted_authentications(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (test "tunnel_interop") generated 1 warning
+error: symbol '' is already defined
+
+error: could not compile `harbor-workspace` (test "scp_browser") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

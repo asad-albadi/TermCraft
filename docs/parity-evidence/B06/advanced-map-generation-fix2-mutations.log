@@ -1,0 +1,3 @@
+deterministic-colouring True
+weaken-final-grade True
+unbounded-colouring True

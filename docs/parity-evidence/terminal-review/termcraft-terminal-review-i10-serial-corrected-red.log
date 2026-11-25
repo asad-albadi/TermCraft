@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.74s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-df2a632a0c6609e7)
+
+running 1 test
+test ui::gui_tests::disconnected_serial_aborts_pending_broadcast_before_other_target_writes ... FAILED
+
+failures:
+
+---- ui::gui_tests::disconnected_serial_aborts_pending_broadcast_before_other_target_writes stdout ----
+
+thread 'ui::gui_tests::disconnected_serial_aborts_pending_broadcast_before_other_target_writes' (430188) panicked at src/ui.rs:2457:41:
+observed serial disconnect must retire readiness
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::gui_tests::disconnected_serial_aborts_pending_broadcast_before_other_target_writes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 48 filtered out; finished in 1.15s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

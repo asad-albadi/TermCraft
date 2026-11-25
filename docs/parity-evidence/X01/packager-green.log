@@ -1,0 +1,8 @@
+..Menu entry belongs to a different package: /tmp/package path rwvk78o6/menu data/applications/org.termcraft.TermCraft.desktop
+An existing menu entry owns /tmp/package path rwvk78o6/menu data/applications/org.termcraft.TermCraft.desktop. Remove it from the previous package first.
+..Staged verified Xwayland payload at /tmp/tmp_v1g8z6t/out/.package-72a0kucv/TermCraft-0.1.0-linux-x86_64-arch-xwayland/x11/linux-x86_64
+.....
+----------------------------------------------------------------------
+Ran 9 tests in 4.601s
+
+OK

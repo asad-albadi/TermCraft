@@ -1,0 +1,23 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-c814a3629b30588a)
+
+running 1 test
+test ui::terminal_review_tests::cursor_report_waits_until_the_paste_transaction_ends ... FAILED
+
+failures:
+
+---- ui::terminal_review_tests::cursor_report_waits_until_the_paste_transaction_ends stdout ----
+
+thread 'ui::terminal_review_tests::cursor_report_waits_until_the_paste_transaction_ends' (437096) panicked at src/ui/terminal_review_tests.rs:84:5:
+assertion `left == right` failed: protocol replies must not become bracketed-paste payload
+  left: [27, 91, 50, 48, 48, 126, 111, 110, 101, 10, 27, 91, 49, 59, 54, 82, 116, 119, 111, 27, 91, 50, 48, 49, 126]
+ right: [27, 91, 50, 48, 48, 126, 111, 110, 101, 10, 116, 119, 111, 27, 91, 50, 48, 49, 126, 27, 91, 49, 59, 54, 82]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::terminal_review_tests::cursor_report_waits_until_the_paste_transaction_ends
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 54 filtered out; finished in 1.15s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

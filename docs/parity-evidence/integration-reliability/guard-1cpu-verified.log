@@ -1,0 +1,22 @@
+
+running 5 tests
+test ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full ... FAILED
+test ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source ... ok
+test ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text ... ok
+test ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs ... ok
+test ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted ... ok
+
+failures:
+
+---- ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full stdout ----
+
+thread 'ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full' (517922) panicked at /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/epaint-0.36.2/src/textures.rs:337:9:
+Dropped TexturesDelta with 2 unapplied deltas. Deltas need to be handled. If you want to drop this intentionally call `clear` before dropping.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full
+
+test result: FAILED. 4 passed; 1 failed; 0 ignored; 0 measured; 132 filtered out; finished in 23.92s
+

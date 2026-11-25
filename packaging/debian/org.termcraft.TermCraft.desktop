@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=TermCraft
+Comment=Remote workspace and terminal
+Exec=/usr/bin/termcraft
+Icon=termcraft
+Terminal=false
+Categories=System;TerminalEmulator;Network;

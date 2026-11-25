@@ -1,0 +1,47 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0432]: unresolved import `harbor_workspace::remote_files::transfer`
+ --> tests/remote_transfers.rs:5:50
+  |
+5 | use harbor_workspace::{remote_files::{RemotePath,transfer::{TransferOperation,ConflictPolicy,TransferEvent,TransferOutcome}},ssh::{Co...
+  |                                                  ^^^^^^^^ could not find `transfer` in `remote_files`
+
+error[E0609]: no field `transfers` on type `&mut ConnectionHandle`
+  --> tests/remote_transfers.rs:15:22
+   |
+15 |     loop {for e in h.transfers.poll(){if e.id==id && e.outcome.is_some(){return e;}}h.poll();assert!(Instant::now()<deadline,"transf...
+   |                      ^^^^^^^^^ unknown field
+
+error[E0609]: no field `transfers` on type `ConnectionHandle`
+  --> tests/remote_transfers.rs:22:14
+   |
+22 |     let id=h.transfers.submit(TransferOperation::Upload{local:source,remote:path(&remote),policy:ConflictPolicy::Ask}).unwrap();
+   |              ^^^^^^^^^ unknown field
+
+error[E0609]: no field `transfers` on type `ConnectionHandle`
+  --> tests/remote_transfers.rs:24:14
+   |
+24 |     let id=h.transfers.submit(TransferOperation::Download{remote:path(&remote),local:dest.clone(),policy:ConflictPolicy::Ask}).unwra...
+   |              ^^^^^^^^^ unknown field
+
+error[E0609]: no field `transfers` on type `ConnectionHandle`
+  --> tests/remote_transfers.rs:32:14
+   |
+32 |     let id=h.transfers.submit(TransferOperation::Download{remote:path(&remote),local:dest.clone(),policy:ConflictPolicy::Ask}).unwra...
+   |              ^^^^^^^^^ unknown field
+
+error[E0609]: no field `transfers` on type `ConnectionHandle`
+  --> tests/remote_transfers.rs:34:14
+   |
+34 |     let id=h.transfers.submit(TransferOperation::Download{remote:path(&remote),local:dest.clone(),policy:ConflictPolicy::Overwrite})...
+   |              ^^^^^^^^^ unknown field
+
+error[E0609]: no field `transfers` on type `ConnectionHandle`
+  --> tests/remote_transfers.rs:34:145
+   |
+34 | ...lone(),policy:ConflictPolicy::Overwrite}).unwrap();h.transfers.cancel(id);
+   |                                                         ^^^^^^^^^ unknown field
+
+Some errors have detailed explanations: E0432, E0609.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `harbor-workspace` (test "remote_transfers") due to 7 previous errors
+warning: build failed, waiting for other jobs to finish...

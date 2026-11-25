@@ -1,0 +1,27 @@
+{
+  "review": "SPEC/QUALITY ACCEPT",
+  "files": {
+    "engines/rdp/src/devices.rs": {
+      "base": "3dae2b28c714ff28fdc1b3f2f6c44d65a462a22283ea17ab1603daa0c66e5723",
+      "main_unchanged": "3dae2b28c714ff28fdc1b3f2f6c44d65a462a22283ea17ab1603daa0c66e5723",
+      "package_c7fe": "3dae2b28c714ff28fdc1b3f2f6c44d65a462a22283ea17ab1603daa0c66e5723",
+      "candidate": "454b0d6121e5004875d77a6af5b8584bf53f8ba090deef9716b1e4b0a85705c8",
+      "payload": "454b0d6121e5004875d77a6af5b8584bf53f8ba090deef9716b1e4b0a85705c8"
+    },
+    "engines/rdp/src/serial_windows.rs": {
+      "base": "f25d06a2eeea77bbe98ab5d3fb4a591aae1226127fe38438b00db0437bbe7572",
+      "main_unchanged": "f25d06a2eeea77bbe98ab5d3fb4a591aae1226127fe38438b00db0437bbe7572",
+      "package_c7fe": "f25d06a2eeea77bbe98ab5d3fb4a591aae1226127fe38438b00db0437bbe7572",
+      "candidate": "c200f387d805afd5c6b305d620e51e2d6c22f2f54c9b9bca8024f09a0e96d557",
+      "payload": "c200f387d805afd5c6b305d620e51e2d6c22f2f54c9b9bca8024f09a0e96d557"
+    },
+    "engines/rdp/src/serial_windows_control.rs": {
+      "base": "34164cbe0724d8e2781aa6897bb6c4cf5d72a45e2c627d11dd8672398c1a2f23",
+      "main_unchanged": "34164cbe0724d8e2781aa6897bb6c4cf5d72a45e2c627d11dd8672398c1a2f23",
+      "package_c7fe": "34164cbe0724d8e2781aa6897bb6c4cf5d72a45e2c627d11dd8672398c1a2f23",
+      "candidate": "233b45caca11a8510e6044e865295130d8a6c37b185fa7e38f934dfc7359bbb2",
+      "payload": "233b45caca11a8510e6044e865295130d8a6c37b185fa7e38f934dfc7359bbb2"
+    }
+  },
+  "scope": "Windows admission/queue logic and exact-source MSVC typechecks, Linux helper76+10; native Windows drivers/hardware remain unverified. Windows GET_STATS per-logical-open baseline remains a separate source gap."
+}

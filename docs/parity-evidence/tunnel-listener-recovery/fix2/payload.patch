@@ -1,0 +1,27 @@
+--- a/tests/tunnel_interop.rs
++++ b/tests/tunnel_interop.rs
+@@ -446,18 +446,17 @@
+     let ip = "127.0.0.1".parse().unwrap();
+     let mut reservation = PortReservation::bind(ip);
+     let address = SocketAddr::new(ip, reservation.port());
+-    reservation.release_listener();
+-    // Deterministically force the exact candidate that bind(0) can select in the
+-    // gap. A second fixture must reject it even though the kernel accepts bind.
+-    let candidate = TcpListener::bind(address).unwrap();
+-    let rejected = PortReservation::claim(candidate);
++    let candidate = reservation.take_listener();
++    // Keep the underlying socket bound while exercising the logical claim.
++    // A duplicate presents the exact same port to the claim check without a rebind.
++    let rejected = PortReservation::claim(candidate.try_clone().unwrap());
+     assert!(
+         matches!(rejected, Err(ref e) if e.kind() == std::io::ErrorKind::AddrInUse),
+-        "a second fixture claimed the released forward port {address}"
++        "a second fixture claimed the handed-off port {address}"
+     );
+     drop(rejected);
+     drop(reservation);
+-    let reclaimed = PortReservation::claim(TcpListener::bind(address).unwrap()).unwrap();
++    let reclaimed = PortReservation::claim(candidate).unwrap();
+     assert_eq!(reclaimed.port(), address.port());
+     println!("fixture candidate {address} rejected while claimed, available after drop");
+ }

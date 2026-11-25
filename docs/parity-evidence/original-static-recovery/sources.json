@@ -1,0 +1,146 @@
+{
+  "inputs": [
+    {
+      "path": "app/target/agent-work/original-runtime/original/MobaXterm_Personal_26.6.exe",
+      "bytes": 16615936,
+      "sha256": "e9a66144b3a1c4d32f8062b1eb34e26e9ed5298106abf1982b4654ab107f13a5",
+      "provenance": "user-supplied original/companion"
+    },
+    {
+      "path": "app/target/agent-work/original-runtime/original/CygUtils.plugin",
+      "bytes": 19529086,
+      "sha256": "65c17f095ecbbab4c8015e24aa02bc7de1c098704aec3d8b4b7ec81b28a56602",
+      "provenance": "user-supplied original/companion"
+    },
+    {
+      "path": "app/target/agent-work/original-runtime/original/CygUtils64.plugin",
+      "bytes": 13234881,
+      "sha256": "4750dc32ba3372fa7f4b8ca38583f98d9d0477d9b0686966fee40aa181bff915",
+      "provenance": "user-supplied original/companion"
+    }
+  ],
+  "sdk": [
+    {
+      "file": "app/target/agent-work/original-static-recovery/lzma-sdk/LzmaDec.c",
+      "sha256": "b9ca2b8707400347c75d6fef288d1354a3b4cf93e8da42f26207b8bd4c4d5e59",
+      "source": "https://raw.githubusercontent.com/ip7z/7zip/25.01/C/LzmaDec.c"
+    },
+    {
+      "file": "app/target/agent-work/original-static-recovery/lzma-sdk/LzmaDec.h",
+      "sha256": "3aaf07b4ae4173a2d103179455dc7089b5ddbc7fc3db3c0e40964a7499c69266",
+      "source": "https://raw.githubusercontent.com/ip7z/7zip/25.01/C/LzmaDec.h"
+    },
+    {
+      "file": "app/target/agent-work/original-static-recovery/lzma-sdk/7zTypes.h",
+      "sha256": "5de943c886d5d7bbcf16203e9b292a9e7be327b43fe3dfd9f4ad07d6d0870ef6",
+      "source": "https://raw.githubusercontent.com/ip7z/7zip/25.01/C/7zTypes.h"
+    },
+    {
+      "file": "app/target/agent-work/original-static-recovery/lzma-sdk/Precomp.h",
+      "sha256": "fea249c753dfbbdd69d9397e91497205452b784279f70cad4658dc567cd2f85f",
+      "source": "https://raw.githubusercontent.com/ip7z/7zip/25.01/C/Precomp.h"
+    },
+    {
+      "file": "app/target/agent-work/original-static-recovery/lzma-sdk/Compiler.h",
+      "sha256": "e4b14a798e6c01bc885966249afa6b5061a5dd10c723ce86b254e89ae650de7f",
+      "source": "https://raw.githubusercontent.com/ip7z/7zip/25.01/C/Compiler.h"
+    },
+    {
+      "file": "app/target/agent-work/original-static-recovery/lzma-sdk/CpuArch.h",
+      "sha256": "0af64ee3470cd06772ea4836f08f0eb1cb39b7d4d38ce13d2224a6578fd8c7d9",
+      "source": "https://raw.githubusercontent.com/ip7z/7zip/25.01/C/CpuArch.h"
+    },
+    {
+      "file": "app/target/agent-work/original-static-recovery/lzma-sdk/decode.c",
+      "sha256": "d313c35615c86969035d420271f476746f057e90660434e5b01024cca4e90d01",
+      "source": "local bounds-checking wrapper"
+    },
+    {
+      "file": "app/target/agent-work/original-static-recovery/lzma-sdk/decode",
+      "sha256": "a2a5b9a6394063cc38636ee872ffa8fcabdaf24956a514a324c57ebaffc7defc",
+      "source": "locally compiled from recorded SDK sources plus decode.c"
+    }
+  ],
+  "decoded_members": [
+    {
+      "member": "CygUtils64.plugin/bin/termwalk.exe",
+      "decoded_bytes": 24576,
+      "sha256": "3735eec9b74ee349ae40c10d1e8d0953f73b78e7ef52403ddbde1485ed2ac10d"
+    },
+    {
+      "member": "CygUtils64.plugin/bin/soliterm.exe",
+      "decoded_bytes": 41472,
+      "sha256": "b66550de1aea2b0dc15ebca3d76a8787c6c0bc8f338c3641718a50fbb144826a"
+    },
+    {
+      "member": "CygUtils64.plugin/bin/sudoku.exe",
+      "decoded_bytes": 37888,
+      "sha256": "f233686ef80543da3271042b9fbcd89e53bc086f811d43ebf283217dfc5d279b"
+    },
+    {
+      "member": "CygUtils64.plugin/bin/ctris.exe",
+      "decoded_bytes": 50176,
+      "sha256": "b2179b4b6b89eccdb5c893a667dd854891cc3a2df22bcbb7d6830e3bb26ac059"
+    },
+    {
+      "member": "CygUtils64.plugin/bin/greed.exe",
+      "decoded_bytes": 84398,
+      "sha256": "471c176d92e162ef4df67a441a352d23b3dcc8c7084263526f3ead3b1204ce8f"
+    },
+    {
+      "member": "CygUtils64.plugin/etc/bash.bashrc",
+      "decoded_bytes": 116,
+      "sha256": "61439e888938c30c0cc3d5601dc9a59c2aa90352bf82866469f59603b02093a8"
+    },
+    {
+      "member": "CygUtils64.plugin/usr/share/sudoku/template",
+      "decoded_bytes": 24012,
+      "sha256": "92f4cb075b725becd7bf27e1a16584b2ca7d53581a9c28f7e1db5a4c1ddf0f4e"
+    },
+    {
+      "member": "CygUtils.plugin/bin/ctris.exe",
+      "decoded_bytes": 19968,
+      "sha256": "ab550fbb73e851d8a423fa08b4e77df5313177b4ca3bed09f432007e9504d365"
+    },
+    {
+      "member": "CygUtils.plugin/bin/greed.exe",
+      "decoded_bytes": 15872,
+      "sha256": "6bd41af503c2acf433d5c878c3679a07f6376440f1d19e32c08162c8b6275d0d"
+    },
+    {
+      "member": "CygUtils.plugin/bin/nimesweeper.exe",
+      "decoded_bytes": 31768,
+      "sha256": "7bf9da43fa963fd32ac6202f879dbf4f1b3229b8936563b72d0f43a825726b60"
+    },
+    {
+      "member": "CygUtils.plugin/bin/ninvaders.exe",
+      "decoded_bytes": 20992,
+      "sha256": "0afc333055ef30d40923705d264077a1359ea76480d531d6b385cc9fbb33a9d4"
+    },
+    {
+      "member": "CygUtils.plugin/bin/sudoku.exe",
+      "decoded_bytes": 32768,
+      "sha256": "2bed2565a72468fc5c5b1b706913df4c46e4f2add886cf50f71303025cea909d"
+    },
+    {
+      "member": "CygUtils.plugin/bin/soliterm.exe",
+      "decoded_bytes": 37390,
+      "sha256": "61135275b72804d4eac811c7f71e53c9c65c3029acba7e2912a62f98fa1ab610"
+    },
+    {
+      "member": "CygUtils.plugin/bin/termwalk.exe",
+      "decoded_bytes": 23054,
+      "sha256": "209ab4832c9e8627b561655e665bee2620d80ae1d219ac3cc89897201c4377c4"
+    },
+    {
+      "member": "CygUtils.plugin/etc/bash.bashrc",
+      "decoded_bytes": 116,
+      "sha256": "61439e888938c30c0cc3d5601dc9a59c2aa90352bf82866469f59603b02093a8"
+    },
+    {
+      "member": "CygUtils.plugin/usr/share/sudoku/template",
+      "decoded_bytes": 24012,
+      "sha256": "92f4cb075b725becd7bf27e1a16584b2ca7d53581a9c28f7e1db5a4c1ddf0f4e"
+    }
+  ]
+}

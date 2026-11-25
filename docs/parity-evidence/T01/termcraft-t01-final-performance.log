@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running tests/terminal_performance.rs (app/target/debug/deps/terminal_performance-efdac92c38f9ffd5)
+
+running 1 test
+T01 benchmark: profile=debug cols=110 rows=30 input_lines=360000 retained_lines=359972 retained_bytes=107991600 budget_bytes=134217728 discarded=0 feed_ms=16783 initial_search_us=77630 cached_search_p50_ns=50 cached_search_p95_ns=51 incremental_feed_and_search_us=342 VmRSS:	   81560 kB model name	: AMD Ryzen 7 PRO 4750U with Radeon Graphics
+test benchmark_360000_lines_with_a_retained_memory_budget ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.90s
+

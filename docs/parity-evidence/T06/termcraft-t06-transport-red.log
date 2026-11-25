@@ -1,0 +1,51 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.06s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-df2a632a0c6609e7)
+
+running 1 test
+test ui::gui_tests::selected_legacy_transport_decodes_once_and_encodes_keyboard_input ... FAILED
+
+failures:
+
+---- ui::gui_tests::selected_legacy_transport_decodes_once_and_encodes_keyboard_input stdout ----
+
+thread 'ui::gui_tests::selected_legacy_transport_decodes_once_and_encodes_keyboard_input' (412501) panicked at src/ui.rs:2397:9:
+�READY
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::gui_tests::selected_legacy_transport_decodes_once_and_encodes_keyboard_input
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 41 filtered out; finished in 1.17s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

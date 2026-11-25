@@ -1,0 +1,69 @@
+{
+  "default_bin_clippy_exit": 0,
+  "owned_file_diagnostics": [
+    {
+      "file": "src/ui/games/play.rs",
+      "line": 782,
+      "code": "clippy::suspicious_assignment_formatting",
+      "message": "this looks like you are trying to use `.. != ..`, but you really are doing `.. = (! ..)`",
+      "primary_source_unchanged_from_paired_base": true
+    },
+    {
+      "file": "src/ui/games/play.rs",
+      "line": 799,
+      "code": "clippy::possible_missing_else",
+      "message": "this looks like an `else if` but the `else` is missing",
+      "primary_source_unchanged_from_paired_base": true
+    },
+    {
+      "file": "src/ui/games/play.rs",
+      "line": 185,
+      "code": "clippy::collapsible_if",
+      "message": "this `if` statement can be collapsed",
+      "primary_source_unchanged_from_paired_base": true
+    },
+    {
+      "file": "src/ui/games/play.rs",
+      "line": 410,
+      "code": "clippy::collapsible_if",
+      "message": "this `if` statement can be collapsed",
+      "primary_source_unchanged_from_paired_base": true
+    },
+    {
+      "file": "src/ui/games/play.rs",
+      "line": 1154,
+      "code": "clippy::collapsible_if",
+      "message": "this `if` statement can be collapsed",
+      "primary_source_unchanged_from_paired_base": true
+    },
+    {
+      "file": "src/ui/games/play.rs",
+      "line": 1167,
+      "code": "clippy::too_many_arguments",
+      "message": "this function has too many arguments (8/7)",
+      "primary_source_unchanged_from_paired_base": true
+    },
+    {
+      "file": "src/ui/games/play.rs",
+      "line": 1755,
+      "code": "clippy::manual_clamp",
+      "message": "clamp-like pattern without using clamp function",
+      "primary_source_unchanged_from_paired_base": true
+    },
+    {
+      "file": "src/ui/games/play.rs",
+      "line": 1800,
+      "code": "clippy::collapsible_if",
+      "message": "this `if` statement can be collapsed",
+      "primary_source_unchanged_from_paired_base": true
+    },
+    {
+      "file": "src/ui/games/play.rs",
+      "line": 1835,
+      "code": "clippy::collapsible_if",
+      "message": "this `if` statement can be collapsed",
+      "primary_source_unchanged_from_paired_base": true
+    }
+  ],
+  "new_owned_file_diagnostics": 0
+}

@@ -1,0 +1,2 @@
+Command: rustfmt --edition 2024 --check app/target/agent-work/d02-serial-events/candidate/engines/rdp/src/serial.rs
+Exit code: 0

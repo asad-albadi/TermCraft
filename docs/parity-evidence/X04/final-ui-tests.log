@@ -1,0 +1,11 @@
+   Compiling harbor-workspace v0.1.0-x04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.81s
+     Running unittests src/main.rs (../../debug/deps/harbor_workspace-b17dfa1d21d5b3bd)
+
+running 3 tests
+test ui::xdmcp::tests::workspace_routes_xdmcp_to_owned_session_and_rejects_stale_endpoint ... ok
+test ui::xdmcp::tests::opening_broadcast_settings_never_starts_discovery ... ok
+test ui::xdmcp::tests::editor_invalidates_stale_selection_and_does_not_carry_network_choices_between_profiles ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 150 filtered out; finished in 0.29s
+

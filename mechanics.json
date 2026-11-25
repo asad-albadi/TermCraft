@@ -1,0 +1,225 @@
+{
+  "version": 1,
+  "values": [
+    {
+      "name": "SSH default port",
+      "group": "connections",
+      "value": 22,
+      "estimated": true
+    },
+    {
+      "name": "SFTP default port",
+      "group": "connections",
+      "value": 22,
+      "estimated": true
+    },
+    {
+      "name": "Telnet default port",
+      "group": "connections",
+      "value": 23,
+      "estimated": true
+    },
+    {
+      "name": "FTP default port",
+      "group": "connections",
+      "value": 21,
+      "estimated": true
+    },
+    {
+      "name": "RDP default port",
+      "group": "connections",
+      "value": 3389,
+      "estimated": true
+    },
+    {
+      "name": "VNC default port",
+      "group": "connections",
+      "value": 5900,
+      "estimated": true
+    },
+    {
+      "name": "Rsh default port",
+      "group": "connections",
+      "value": 514,
+      "estimated": true
+    },
+    {
+      "name": "Rlogin default port",
+      "group": "connections",
+      "value": 513,
+      "estimated": true
+    },
+    {
+      "name": "Mosh default port",
+      "group": "connections",
+      "value": 60000,
+      "estimated": true
+    },
+    {
+      "name": "XDMCP default port",
+      "group": "connections",
+      "value": 177,
+      "estimated": true
+    },
+    {
+      "name": "serial baud fallback",
+      "group": "serial",
+      "value": 9600,
+      "source": "function 0x8d9830",
+      "unit": "baud"
+    },
+    {
+      "name": "serial data bits",
+      "group": "serial",
+      "value": 8,
+      "estimated": true
+    },
+    {
+      "name": "serial parity",
+      "group": "serial",
+      "value": "none",
+      "estimated": true
+    },
+    {
+      "name": "serial stop bits",
+      "group": "serial",
+      "value": 1,
+      "estimated": true
+    },
+    {
+      "name": "SFTP pipeline length",
+      "group": "transfer",
+      "value": 32,
+      "source": "function 0x9182d4"
+    },
+    {
+      "name": "SFTP download block",
+      "group": "transfer",
+      "value": 32768,
+      "source": "function 0x9182d4",
+      "unit": "bytes"
+    },
+    {
+      "name": "SFTP upload block",
+      "group": "transfer",
+      "value": 65536,
+      "source": "function 0x9182d4",
+      "unit": "bytes"
+    },
+    {
+      "name": "SFTP buffer",
+      "group": "transfer",
+      "value": 262144,
+      "source": "function 0x9182d4",
+      "unit": "bytes"
+    },
+    {
+      "name": "SSH compression enabled option",
+      "group": "SSH",
+      "value": "-C -o Compression=yes",
+      "source": "function 0x8d9830"
+    },
+    {
+      "name": "SSH compression disabled option",
+      "group": "SSH",
+      "value": "-o Compression=no",
+      "source": "function 0x8d9830"
+    },
+    {
+      "name": "X11 enabled option",
+      "group": "SSH",
+      "value": "-Y",
+      "source": "function 0x8d9830"
+    },
+    {
+      "name": "X11 disabled options",
+      "group": "SSH",
+      "value": "ForwardX11=no ForwardX11Trusted=no",
+      "source": "function 0x8d9830"
+    },
+    {
+      "name": "terminal encoding",
+      "group": "terminal",
+      "value": "UTF-8",
+      "source": "function 0xb521fc (TCP capture profile)"
+    },
+    {
+      "name": "terminal type",
+      "group": "terminal",
+      "value": "xterm-256color",
+      "source": "function 0xb521fc (TCP capture profile)"
+    },
+    {
+      "name": "scrollback capacity",
+      "group": "terminal",
+      "value": 360000,
+      "source": "function 0xb521fc (TCP capture profile)",
+      "unit": "lines"
+    },
+    {
+      "name": "saved tunnel maximum",
+      "group": "tunnels",
+      "value": 5,
+      "source": "function 0x91fd40"
+    },
+    {
+      "name": "keepalive interval",
+      "group": "SSH",
+      "value": 60,
+      "estimated": true,
+      "unit": "s"
+    },
+    {
+      "name": "SSH default window (backend controlled)",
+      "group": "original evidence",
+      "value": 2097152,
+      "source": "function 0x9182d4",
+      "unit": "bytes"
+    },
+    {
+      "name": "SSH minimum window (backend controlled)",
+      "group": "original evidence",
+      "value": 2048,
+      "source": "function 0x9182d4",
+      "unit": "bytes"
+    },
+    {
+      "name": "SSH maximum packet (backend controlled)",
+      "group": "original evidence",
+      "value": 262144,
+      "source": "function 0x9182d4",
+      "unit": "bytes"
+    },
+    {
+      "name": "HTTP default listen address",
+      "group": "servers",
+      "value": "127.0.0.1:8080",
+      "estimated": true
+    },
+    {
+      "name": "HTTP default stop duration",
+      "group": "servers",
+      "value": 3600,
+      "unit": "s",
+      "estimated": true
+    },
+    {
+      "name": "SSH server default port",
+      "group": "servers",
+      "value": 2222,
+      "estimated": true
+    },
+    {
+      "name": "HTTP privileged port warning threshold",
+      "group": "original evidence",
+      "value": 1025,
+      "source": "function 0x8a67c8; comparison iVar3 < 0x401"
+    },
+    {
+      "name": "Iperf server argument",
+      "group": "servers",
+      "value": "-s",
+      "source": "function 0x8aac54"
+    }
+  ]
+}

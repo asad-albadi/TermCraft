@@ -1,0 +1,9 @@
+
+running 4 tests
+test browser_settings_keep_legacy_launch_and_remove_proxy_credentials ... ok
+test chromium_cancels_site_auth_without_credentials_and_rejects_untrusted_tls ... ok
+test chromium_renders_and_submits_browser_input ... ok
+test chromium_routes_through_configured_proxy_and_signs_in_only_after_consent ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 104.42s
+

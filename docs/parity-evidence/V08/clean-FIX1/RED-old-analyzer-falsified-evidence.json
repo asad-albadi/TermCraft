@@ -1,0 +1,11 @@
+{
+  "exit_code": 0,
+  "falsifications": [
+    "empty Iperf list",
+    "empty Unix list",
+    "garbage browser version",
+    "minimal browser scenario exit99"
+  ],
+  "old_gate_incorrectly_accepted": true,
+  "original_sources_untouched": true
+}

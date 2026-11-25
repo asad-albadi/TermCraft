@@ -1,0 +1,30 @@
+
+running 4 tests
+test display_collision_does_not_kill_existing_server ... 
+thread 'display_collision_does_not_kill_existing_server' (345112) panicked at src/x11/platform.rs:304:23:
+copy_from_slice: source slice length (18) does not match destination slice length (17)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test packaged_xserver_starts_without_external_install ... 
+thread 'packaged_xserver_starts_without_external_install' (345132) panicked at src/x11/platform.rs:304:23:
+copy_from_slice: source slice length (18) does not match destination slice length (17)
+FAILED
+test stop_only_terminates_owned_engine ... 
+thread 'stop_only_terminates_owned_engine' (345155) panicked at src/x11/platform.rs:304:23:
+copy_from_slice: source slice length (18) does not match destination slice length (17)
+FAILED
+test wrong_cookie_is_rejected ... 
+thread 'wrong_cookie_is_rejected' (345171) panicked at src/x11/platform.rs:304:23:
+copy_from_slice: source slice length (18) does not match destination slice length (17)
+FAILED
+
+failures:
+
+failures:
+    display_collision_does_not_kill_existing_server
+    packaged_xserver_starts_without_external_install
+    stop_only_terminates_owned_engine
+    wrong_cookie_is_rejected
+
+test result: FAILED. 0 passed; 4 failed; 0 ignored; 0 measured; 3 filtered out; finished in 1.12s
+

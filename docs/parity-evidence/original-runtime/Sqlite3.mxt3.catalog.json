@@ -1,0 +1,82 @@
+{
+  "source": "https://mobaxterm.mobatek.net/plugins/Sqlite3.mxt3",
+  "sha256": "3bd4979a8b7241b8a27b7020bb2eb08ab950ad15b2dde854c840da465f311c77",
+  "container": "ZIP",
+  "entries": [
+    {
+      "path": "bin/",
+      "size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "bin/cygsqlite3-0.dll",
+      "size": 822301,
+      "crc32": "c66052ed"
+    },
+    {
+      "path": "bin/cygsqlite3vfslog-0.dll",
+      "size": 19485,
+      "crc32": "8f8f31b4"
+    },
+    {
+      "path": "bin/sqldiff.exe",
+      "size": 28701,
+      "crc32": "12d313c2"
+    },
+    {
+      "path": "bin/sqlite3.exe",
+      "size": 73757,
+      "crc32": "e08f9703"
+    },
+    {
+      "path": "etc/",
+      "size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/",
+      "size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/doc/",
+      "size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/doc/Cygwin/",
+      "size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/doc/Cygwin/sqlite3.README",
+      "size": 8299,
+      "crc32": "9c00eab3"
+    },
+    {
+      "path": "usr/share/doc/sqlite3/",
+      "size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/doc/sqlite3/README",
+      "size": 1144,
+      "crc32": "4c19e610"
+    },
+    {
+      "path": "usr/share/man/",
+      "size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/man/man1/",
+      "size": 0,
+      "crc32": "00000000"
+    },
+    {
+      "path": "usr/share/man/man1/sqlite3.1.gz",
+      "size": 3771,
+      "crc32": "681b3241"
+    }
+  ]
+}

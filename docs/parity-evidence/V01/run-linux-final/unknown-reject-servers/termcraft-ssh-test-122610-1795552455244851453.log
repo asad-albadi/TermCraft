@@ -1,0 +1,7 @@
+Server listening on 127.0.0.1 port 41641.
+Connection from 127.0.0.1 port 45184 on 127.0.0.1 port 41641 rdomain ""
+Connection from 127.0.0.1 port 45196 on 127.0.0.1 port 41641 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 45184 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Connection closed by 127.0.0.1 port 45196 [preauth]

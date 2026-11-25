@@ -1,0 +1,971 @@
+{
+  "schema": 1,
+  "goal": "All approved 60-point parity outcomes, including native/original verification.",
+  "runner": {
+    "automatic_continuation_configured": false,
+    "observed": "Craft Anything 0.6.1 exposes start/resume/status/check but no backlog-aware automatic continuation hook. User moved execution to this Codex chat with explicitly authorized parallel subagents. Current local endpoint tests execute successfully here. This is active in-session execution; no background scheduler or Codex goal-tool state is claimed."
+  },
+  "items": [
+    {
+      "id": "F01",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Automatically open a graphical remote directory pane with an SSH connection.",
+      "validation_remaining": "Reviewed implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "F02",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Browse and manage remote entries; support graphical upload/download and drag-and-drop, including folders.",
+      "validation_remaining": "Implementation checkpoint; native/interoperability validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "F03",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Follow the active shell directory, with an explicit fallback when synchronization is unavailable.",
+      "validation_remaining": "Implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "F04",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Open a remote file in an editor and upload saved changes; report failed saves and preserve recoverable edits.",
+      "validation_remaining": "Implementation checkpoint; native/interoperability validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "F05",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Offer SCP browser compatibility for endpoints that cannot use SFTP; make the chosen transport visible.",
+      "validation_remaining": "Implementation checkpoint; native/original/endpoint validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "F06",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Coordinate SSH and transfer authentication; handle repeated prompts and reconnects predictably rather than relying on independent terminal sessions.",
+      "validation_remaining": "Implementation checkpoint; native/original and stated retry evidence pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "T01",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Complete terminal conformance: Unicode cell widths, combining text, resizing, scrolling regions, alternate-screen state, and advanced escape modes. Exercise full-screen terminal programs.",
+      "validation_remaining": "Reviewed implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "T02",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Forward terminal mouse events in the application modes requested by terminal programs.",
+      "validation_remaining": "Reviewed implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "T03",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Add configurable keyword/syntax highlighting; ANSI colors and search highlighting alone do not supply it.",
+      "validation_remaining": "Reviewed implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "T04",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Add terminal-specific selection and clipboard behavior, including rectangular selection and configurable right-click paste.",
+      "validation_remaining": "Reviewed implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "T05",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Add configurable multiline-paste confirmation, paste delay, and protection against accidentally closing an active session.",
+      "validation_remaining": "Reviewed implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "T06",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Expose terminal font family, color customization, character encoding, and keyboard options per session as well as globally.",
+      "validation_remaining": "Reviewed implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "W01",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Add vertical and four-terminal split layouts beyond the existing two-column view.",
+      "validation_remaining": "Implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "W02",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Detach and reattach terminal tabs; support session-tab rename and fullscreen workflows.",
+      "validation_remaining": "Implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "W03",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Expand MultiExec from input broadcast/two-pane display to a manageable view of multiple target terminals.",
+      "validation_remaining": "Implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "W04",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Make keyboard shortcuts configurable and complete terminal scroll/navigation controls.",
+      "validation_remaining": "Implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "W05",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Indicate new output in inactive tabs; the current running-process dot does not indicate unread activity.",
+      "validation_remaining": "Implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "S01",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Import MobaXterm session/configuration files and PuTTY sessions; preserve supported settings and report unsupported ones.",
+      "validation_remaining": "Implementation checkpoint; native/original format validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "S02",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Load shared session definitions without overwriting local sessions; define refresh, read-only, and conflict behavior.",
+      "validation_remaining": "Implementation checkpoint; native/original and vault integration pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "S03",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Launch a session folder as a group and create shortcuts for saved sessions/groups.",
+      "validation_remaining": "Implementation checkpoint; native shortcut/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "S04",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Add command-line operations for opening a bookmark, running a command/macro, choosing a starting folder, and opening a tab in an existing instance. Current flags only cover help, screenshots, and the data directory.",
+      "validation_remaining": "Implementation checkpoint; native IPC/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "S05",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Add opt-in encrypted credential storage, master-password management, and credential deletion. Current passwords are deliberately not saved.",
+      "validation_remaining": "Implementation checkpoint; native ACL/UI and power-loss validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "S06",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Add app-level SSH key/agent management. Existing key generation invokes `ssh-keygen`; using an existing system agent is not agent lifecycle management.",
+      "validation_remaining": "Implementation checkpoint; native agent/UI and broader format validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "S07",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Add explicit proxy and advanced SSH session settings, including configurable keepalive. The adapter currently sets a fixed 60-second interval; other behavior may come from external SSH configuration.",
+      "validation_remaining": "Reviewed implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "D01",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Embed RDP sessions in the workspace rather than opening an external client.",
+      "validation_remaining": "Reviewed implementation checkpoint; native/original validation pending",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Collect outstanding native/original evidence; retain existing implementation."
+    },
+    {
+      "id": "D02",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [
+        "D01",
+        "S05"
+      ],
+      "dependency": "",
+      "remaining": "Reviewed native printer/smartcard source, Unix RXCHAR/per-open Linux statistics and Windows serial mask-reset queue admission are merged. Further serial status/properties/event families, Windows statistics candidate review, bounded Windows data cancellation, POSIX identity-safe mutations and native/device/original qualification remain.",
+      "validation_remaining": "Current host full suite plus native RDP admin/drive/device/clipboard/security and original workflow comparison.",
+      "evidence": [
+        "docs/parity-evidence/D02/providers/host-full.log",
+        "docs/parity-evidence/execution/d02-engine-green.log",
+        "docs/parity-evidence/parallel-rdp-serial/README.md",
+        "docs/parity-evidence/D02/printer-review.md",
+        "docs/parity-evidence/D02/smartcard-review.md",
+        "docs/parity-evidence/parallel-integration-clean/result.json",
+        "docs/parity-evidence/D02/native-printer/root-helper-result.json",
+        "docs/parity-evidence/D02/native-printer/root-integration.json",
+        "docs/parity-evidence/D02/native-smartcard/root-integration.json",
+        "docs/parity-evidence/parallel-integration-native-printer/result.json",
+        "docs/parity-evidence/D02/unix-event-controls/root-integration.json",
+        "docs/parity-evidence/D02/windows-mask-credit/root-integration.json",
+        "docs/parity-evidence/parallel-integration-clipboard-serial-package/result.json"
+      ],
+      "next_action": "Finish locally implementable serial controls, independently review Windows statistics FIX1 and qualify the combined app/helper. Do not weaken opened-object identity guarantees or count unavailable devices as passing."
+    },
+    {
+      "id": "D03",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "D01"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Collect native/third-party VNC interoperability, original workflow comparison and remaining documented protocol/security differences.",
+      "evidence": [
+        "docs/parity-evidence/execution/vnc-tls-green.log",
+        "docs/parity-evidence/execution/settings-ui-tls.log",
+        "docs/parity-evidence/execution/build-tls.log",
+        "docs/parity-evidence/parallel-vnc/README.md",
+        "docs/parity-evidence/parallel-integration/final-full.log"
+      ],
+      "next_action": "Collect native/third-party VNC interoperability, original workflow comparison and remaining documented protocol/security differences."
+    },
+    {
+      "id": "D04",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "F01",
+        "D01"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Collect native Windows/macOS gateway, deployed proxy/agent and original workflow evidence.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/parallel-gateway/README.md",
+        "docs/parity-evidence/parallel-integration/final-full.log"
+      ],
+      "next_action": "Collect native Windows/macOS gateway, deployed proxy/agent and original workflow evidence."
+    },
+    {
+      "id": "X01",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Reviewed Windows owned-job/loopback/PID/authentication and macOS private-socket/process-group source candidates are merged, with pinned upstream patches and offline source preparation. Native built engines, compiled checksum approvals and redistribution/runtime qualification remain unavailable; production gates reject stock engines. Linux owned Xwayland remains implemented.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/X01/implementation.md",
+        "docs/parity-evidence/X01/review.md",
+        "docs/parity-evidence/parallel-integration-reviewed/result.json",
+        "docs/parity-evidence/X01/native-providers.md",
+        "docs/parity-evidence/X01/native-providers-review.md",
+        "docs/parity-evidence/parallel-integration-native-clipboard/result.json"
+      ],
+      "next_action": "Build and qualify patched native engine payloads before enabling either candidate; retain Linux behavior and exact unavailable capabilities."
+    },
+    {
+      "id": "X02",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [
+        "F01"
+      ],
+      "dependency": "",
+      "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. Complete Windows/macOS owned-engine integration, native clipboard/display behavior and native/original qualification.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/X02/review.md",
+        "docs/parity-evidence/parallel-integration-clean/result.json"
+      ],
+      "next_action": "Retain reviewed per-session Linux X authorization and forwarding; finish native owned-engine integrations alongside X01 and explicit platform clipboard/display tests.",
+      "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
+    },
+    {
+      "id": "X03",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Reviewed actual Linux GLX rendering, Composite readback and RandR change/restoration are integrated and qualified in private fixtures, including actual extracted release app/engine. Native Windows/macOS graphics, hardware/GPU/monitor coverage and original comparison remain pending.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/X03/implementation-report.md",
+        "docs/parity-evidence/X03/review.md",
+        "docs/parity-evidence/parallel-integration-browser-vnc-x03/release-verification.json"
+      ],
+      "next_action": "Preserve verified Linux graphics and bounded disposable probe lifecycle; qualify native engines before enabling native probes.",
+      "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
+    },
+    {
+      "id": "X04",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Reviewed Linux IPv4 hostname/direct/Indirect chooser, single installed XKB layout IDs, session-ready engine, bidirectional clipboard and cancellation source are merged. Latest combined source release remains unqualified after compiler crashes. Native engines and original workflow evidence remain; variants/groups/IPv6 require explicit scope reconciliation.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/X04/hostnames/root-integration.json",
+        "docs/parity-evidence/X04/clipboard-lifecycle/root-integration.json",
+        "docs/parity-evidence/X04/keyboard-chooser/root-integration.json"
+      ],
+      "next_action": "Recover build, qualify the genuine new package and exercise actual packaged chooser/layout/clipboard/cancel workflows; retain native/original limitations.",
+      "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
+    },
+    {
+      "id": "X05",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "F01",
+        "X02"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Actual full XFCE/MATE/LXQt/GNOME desktop interaction, native Windows/macOS X providers and original comparison remain unverified; mapped fixture proves launch/lifecycle only.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/X05/implementation.md",
+        "docs/parity-evidence/X05/review-fixes.md",
+        "docs/parity-evidence/X05/merged-isolated-live.log",
+        "docs/parity-evidence/parallel-integration-platform-services/result.json"
+      ],
+      "next_action": "Retain reviewed isolated SSH environment startup and collect actual desktop/native interoperability evidence."
+    },
+    {
+      "id": "P01",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [
+        "F01"
+      ],
+      "dependency": "",
+      "remaining": "Supply and integrate required protocol clients instead of depending on users to install every client separately. Validate a clean-machine setup.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Supply and integrate required protocol clients instead of depending on users to install every client separately. Validate a clean-machine setup."
+    },
+    {
+      "id": "P02",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "F01",
+        "F02"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Collect native Windows/macOS and independent FTP/FTPS server/original interoperability, legacy LIST fallback requirements and server-side publication race evidence. Current browser requires MLSD.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/P02/folder-review.md",
+        "docs/parity-evidence/parallel-integration-ftp-tools/README.md"
+      ],
+      "next_action": "Collect native Windows/macOS and independent FTP/FTPS server/original interoperability, legacy LIST fallback requirements and server-side publication race evidence. Current browser requires MLSD."
+    },
+    {
+      "id": "P03",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "T01"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Collect native Windows/macOS and independent Telnet/Rlogin/Rsh daemon interoperability/original evidence; preserve explicit reserved-port errors.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/parallel-legacy/README.md",
+        "docs/parity-evidence/parallel-integration/final-full.log"
+      ],
+      "next_action": "Collect native Windows/macOS and independent Telnet/Rlogin/Rsh daemon interoperability/original evidence; preserve explicit reserved-port errors."
+    },
+    {
+      "id": "P04",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Collect native Windows/macOS driver and physical serial parity/flow-control evidence; source checks and Linux PTY tests are not hardware proof.",
+      "evidence": [
+        "docs/parity-evidence/execution/serial-green.log",
+        "docs/parity-evidence/execution/settings-ui.log",
+        "docs/parity-evidence/execution/windows-serial-source-check.log",
+        "docs/parity-evidence/parallel-vnc/README.md",
+        "docs/parity-evidence/parallel-integration/final-full.log"
+      ],
+      "next_action": "Collect native Windows/macOS driver and physical serial parity/flow-control evidence; source checks and Linux PTY tests are not hardware proof."
+    },
+    {
+      "id": "P05",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "P01"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Native Windows BusyBox-w32/ConPTY and drive behavior, broader original tool catalog and MobApt compatibility observations remain pending; generic release payload inclusion continues under P08.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/P05/implementation.md",
+        "docs/parity-evidence/P05/review.md",
+        "docs/parity-evidence/P05/merged-library-live.log",
+        "docs/parity-evidence/P05/merged-workflows-live.log",
+        "docs/parity-evidence/P05/merged-ui-live.log",
+        "docs/parity-evidence/parallel-integration-services-unix/result.json"
+      ],
+      "next_action": "Retain reviewed transactional package workflow, integrate verified bundles into P08 distributions, and collect native Windows/original package comparisons without claiming original archive compatibility."
+    },
+    {
+      "id": "P06",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "P05"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Native Windows/macOS plugin execution, permissions and process lifetime require native runs; original .mxt3/MobApt loader compatibility remains unproven and is not advertised.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/P06/implementation.md",
+        "docs/parity-evidence/P06/review-fixes.md",
+        "docs/parity-evidence/P06/p06-ui-pointer.log",
+        "docs/parity-evidence/P06/merged-package-regression.log",
+        "docs/parity-evidence/parallel-integration-plugins/result.json"
+      ],
+      "next_action": "Retain reviewed disabled-by-default, release-granted independent plugin workflow; collect native execution and original compatibility evidence."
+    },
+    {
+      "id": "P07",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Collect native Windows/Npcap and macOS capture/permissions, deployed-tool and original workflow evidence; Linux namespace capture is fixture evidence only.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/P07/review.md",
+        "docs/parity-evidence/parallel-integration-ftp-tools/README.md"
+      ],
+      "next_action": "Collect native Windows/Npcap and macOS capture/permissions, deployed-tool and original workflow evidence; Linux namespace capture is fixture evidence only."
+    },
+    {
+      "id": "P08",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Qualified Linux archive eb8145/sourceb589 has3372 entries including full Mosh dependency closure and advanced games; native Debian12 core package lifecycle is separately qualified on older source4726eebad. Latest keyboard/chooser/overwrite/Windows-mask source awaits genuine release qualification. Other distributions, Windows/macOS lifecycle and signing remain.",
+      "validation_remaining": "Exact Arch-compatible Linux archive integrity, isolated clean startup/helper and configured-host packaged XDMCP are qualified for b589 only. New source, native Windows/macOS and newer Debian lifecycle remain open.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/parallel-packaging/review.md",
+        "docs/parity-evidence/parallel-packaging/reviewed-artifact.json",
+        "docs/parity-evidence/P01/combined-release-verification.json",
+        "docs/parity-evidence/P08/debian-native/qualification/evidence-summary.md"
+      ],
+      "next_action": "After current source integration gate, qualify the next coherent release; preserve measured Debian/default13game and Arch/optional payload scopes. Finish native Windows/macOS packaging and signing in their supported environments.",
+      "interface_prerequisite_note": "Pinned Linux runtime/package manifests already exist and qualified immutable artifacts demonstrate the packaging interface; remaining full P01/native closure is separate from further Linux package validation."
+    },
+    {
+      "id": "B01",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "P01"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Collect native Windows/macOS and independent original FTP/TFTP/Telnet server interoperability and configuration comparisons; tested managed implementations and merged source gate are complete.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/B01/implementation.md",
+        "docs/parity-evidence/B01/review-fixes.md",
+        "docs/parity-evidence/B01/merged-protocols.log",
+        "docs/parity-evidence/parallel-integration-services-unix/result.json"
+      ],
+      "next_action": "Retain reviewed managed servers and collect native/original validation while implementing dependent SSH/SFTP/Iperf services."
+    },
+    {
+      "id": "B02",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "F02"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Collect native Windows/macOS and measured original HTTP sharing evidence; FAT/exFAT uploads unsupported because atomic no-replace publication requires hard links.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/parallel-http/README.md",
+        "docs/parity-evidence/parallel-integration/final-full.log"
+      ],
+      "next_action": "Collect native Windows/macOS and measured original HTTP sharing evidence; FAT/exFAT uploads unsupported because atomic no-replace publication requires hard links."
+    },
+    {
+      "id": "B03",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "B01",
+        "F01",
+        "P01"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Native Windows/macOS managed service and packaged Iperf providers plus original server behavior remain unverified; tested source-built Iperf payload is Linux x86_64/glibc2.44 only.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/B03/implementation.md",
+        "docs/parity-evidence/B03/review-fixes.md",
+        "docs/parity-evidence/B03/ui-credentials-review.md",
+        "docs/parity-evidence/parallel-integration-platform-services/result.json"
+      ],
+      "next_action": "Retain reviewed SSH/SFTP/Iperf service integration; collect native provider/original interoperability evidence."
+    },
+    {
+      "id": "B04",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "S04",
+        "P05",
+        "P08"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Native Windows Explorer/URL/file launch, real registry ACL/ownership/typed editor and PowerShell package lifecycle execution remain unavailable. Component checks and Linux contract tests do not establish native parity.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/B04/implementation.md",
+        "docs/parity-evidence/B04/review-fixes-verdict.md",
+        "docs/parity-evidence/parallel-integration-windows-hooks/result.json"
+      ],
+      "next_action": "Retain reviewed strict Windows activation/owned registration/path mapping/registry source; run authored native HKCU and package/Explorer workflows on an actual Windows runner."
+    },
+    {
+      "id": "B05",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "S04",
+        "P08"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Native macOS compilation, URL/file events, Finder Services/registration and Linux desktop variants/original comparisons remain unverified.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/B05/implementation.md",
+        "docs/parity-evidence/B05/review-fixes.md",
+        "docs/parity-evidence/B05/merged-python-final.log",
+        "docs/parity-evidence/parallel-integration-platform-services/result.json"
+      ],
+      "next_action": "Retain reviewed owned Linux integration and native Mac launcher source candidate; collect native qualification without changing defaults."
+    },
+    {
+      "id": "B06",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Reviewed default-off idle screen and thirteen independent games with all51 stock presets, bounded own-format Save/Load, redo/Solve, dirty/overwrite/native-close/input guards and fresh failed-New attempts are merged.",
+      "validation_remaining": "Implementation checkpoint; original behavior/saved-game format compatibility, native Windows/macOS, native Save/Load portal and earlier long-game idle-sequence observation remain unverified.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/parallel-integration-checkpoint-batch/result.json",
+        "docs/parity-evidence/B06/native-root-review.md",
+        "docs/parity-evidence/B06/game-save-ui/fix1-review.md",
+        "docs/parity-evidence/B06/game-new-retry-fix2/review.md"
+      ],
+      "next_action": "Retain accepted source and940-pass merged gate; qualify release/native desktop file chooser, Windows/macOS and original gameplay/saved formats without representing them as observed."
+    },
+    {
+      "id": "E01",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Reviewed embedded Chromium workflow and private pipe/process source backends are present for Linux, Windows and macOS. Finish packaged browser runtime closure and native provider qualification.",
+      "validation_remaining": "Native Windows/Linux/macOS and original runtime comparisons remain pending; static exact-target and official scope evidence established.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/original-scope/README.md",
+        "docs/parity-evidence/E01/implementation.md",
+        "docs/parity-evidence/E01/review.md",
+        "docs/parity-evidence/parallel-integration-reviewed/result.json",
+        "docs/parity-evidence/E01/macos/README.md",
+        "docs/parity-evidence/E01/windows/README.md",
+        "docs/parity-evidence/E01/resize-macos-review.md"
+      ],
+      "next_action": "Package and qualify the browser engine; run native Windows/macOS private profile, input and lifecycle workflows. Keep System Chromium and legacy external-browser choices explicit."
+    },
+    {
+      "id": "E02",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Collect native Windows/macOS and original graphical macro timing/focus/interoperability observations. Recurring calendar scheduling remains unresolved scope.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/original-scope/README.md",
+        "docs/parity-evidence/E02/ui-report.md",
+        "docs/parity-evidence/E02/review.md",
+        "docs/parity-evidence/E02/ssh-startup-fixture-report.md",
+        "docs/parity-evidence/parallel-integration-reviewed/result.json"
+      ],
+      "next_action": "Retain reviewed recorder/player/editor/startup/named invocation; collect native/original timing and scheduling evidence."
+    },
+    {
+      "id": "E03",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Reviewed Cron/NFS/VNC/native provider source and offline noVNC viewer are merged. Exact Linux production provider now passes real private Sway/ScreenCast/wlr/PipeWire view-only pixel, denial/cancel/revocation/drop checks. Current release GUI, native remote control/backend compatibility, physical consent/GPU/monitors, Windows/macOS and original services remain.",
+      "validation_remaining": "Native Windows/Linux/macOS and original runtime comparisons remain pending; static exact-target and official scope evidence established.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/original-scope/README.md",
+        "docs/parity-evidence/E03/vnc-provider-implementation.md",
+        "docs/parity-evidence/E03/vnc-providers-review.md",
+        "docs/parity-evidence/parallel-integration-native-clipboard/full.log",
+        "docs/parity-evidence/parallel-integration-native-clipboard/result.json",
+        "docs/parity-evidence/E03/vnc-composition-review.md",
+        "docs/parity-evidence/E03/composition-integration/root-browser-qualified.json",
+        "docs/parity-evidence/E03/real-wayland-portal/HANDOFF.md"
+      ],
+      "next_action": "Preserve real configured-headless capture scope; qualify the current genuine release and retain unsupported wlr RemoteDesktop input, physical/native/original cells explicitly."
+    },
+    {
+      "id": "E04",
+      "state": "Blocked",
+      "implementation_checkpoint": false,
+      "requires": [],
+      "dependency": "Original Personal 26.6 limits/defaults/package/plugin format measurements.",
+      "remaining": "Confirm version-specific session/tunnel limits and protocol defaults rather than treating estimated values as recovered facts.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/original-scope/README.md"
+      ],
+      "next_action": "Confirm version-specific session/tunnel limits and protocol defaults rather than treating estimated values as recovered facts."
+    },
+    {
+      "id": "E05",
+      "state": "Blocked",
+      "implementation_checkpoint": false,
+      "requires": [],
+      "dependency": "Native Personal About/Settings/Tools/import inventory to finish checking remaining edition ambiguities; Professional Customizer exclusion is established.",
+      "remaining": "Keep Professional-only customization outside the Personal baseline unless the target scope is explicitly expanded. The Professional Customizer is not established as a missing Personal feature.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/original-scope/README.md"
+      ],
+      "next_action": "Retain confirmed exclusion of standalone Professional Customizer; capture remaining Personal menus without removing ordinary preferences or plugins."
+    },
+    {
+      "id": "V01",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "F01",
+        "F06",
+        "S07"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Native Windows/macOS and original SSH/SFTP workflow comparison; further independently supported endpoint profiles remain separate evidence.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/V01/README.md",
+        "docs/parity-evidence/V01/review.md",
+        "docs/parity-evidence/parallel-integration-interop-xdmcp-devices-final/result.json",
+        "docs/parity-evidence/V01/review-fixes.md"
+      ],
+      "next_action": "Run the recorded native/original observation protocol when the designated environments are available; preserve the reviewed matrix runner and actual Linux transport results."
+    },
+    {
+      "id": "V02",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "F01",
+        "D04"
+      ],
+      "dependency": "",
+      "remaining": "",
+      "validation_remaining": "Native Windows/macOS, rendered tab/app close during tunnel traffic, and original workflow comparison remain separate evidence.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/V02/README.md",
+        "docs/parity-evidence/V02/review.md",
+        "docs/parity-evidence/parallel-integration-interop-xdmcp-devices-final/result.json"
+      ],
+      "next_action": "Run the recorded native/original observation protocol when the designated environments are available; preserve the reviewed matrix runner and actual Linux transport results."
+    },
+    {
+      "id": "V03",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [
+        "D03",
+        "D04",
+        "X04",
+        "P02",
+        "P03"
+      ],
+      "dependency": "",
+      "remaining": "Reviewed reproducible controlled Linux endpoint matrix and runner integrated;30 exact endpoint cases pass across FTP/FTPS, Telnet, Rlogin/Rsh, RDP, VNC, XDMCP and owned gateways.",
+      "validation_remaining": "Native Windows/macOS, original comparison, independent deployed daemons and end-to-end RDP clipboard/device redirection remain unverified.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/V03/README.md",
+        "docs/parity-evidence/V03/review.md",
+        "docs/parity-evidence/V03/root-tcp-tls.log",
+        "docs/parity-evidence/V03/root-runner-contracts.log"
+      ],
+      "next_action": "Retain reviewed runner and exact frozen fixture inputs; collect independent deployed/native/original and end-to-end device evidence without counting missing endpoints as passes."
+    },
+    {
+      "id": "V04",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [
+        "P04"
+      ],
+      "dependency": "",
+      "remaining": "Exercise Mosh through network changes and serial sessions with actual hardware; inspect adapter shutdown and error reporting.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Retain controlled encrypted-UDP Mosh roaming and PTY evidence already recorded; actual network changes and physical serial adapters remain separate unverified requirements."
+    },
+    {
+      "id": "V05",
+      "state": "Blocked",
+      "implementation_checkpoint": false,
+      "requires": [],
+      "dependency": "Native Windows and macOS runners with interactive desktop access.",
+      "remaining": "Run native Windows and macOS builds and interactive workflows. Windows cross-target `cargo check` proves compilation only.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Run native Windows and macOS builds and interactive workflows. Windows cross-target `cargo check` proves compilation only."
+    },
+    {
+      "id": "V06",
+      "state": "Implemented, validation remaining",
+      "implementation_checkpoint": true,
+      "requires": [],
+      "dependency": "",
+      "remaining": "Reviewed reproducible native Linux matrix and evidence validators: X11/Wayland each1x/1.5x/2x;84 observed cases plus owned Xwayland lifecycle, then current-parent1.5x replays28+2 with games guards retained.",
+      "validation_remaining": "Hardware/GPU/physical display variations, active games native B06 coverage, X11 peer keyboard-paste shortcut and native/original all-platform comparisons remain open.",
+      "evidence": [
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/V06/README.md",
+        "docs/parity-evidence/V06/FIX1/README.md",
+        "docs/parity-evidence/V06/FIX1/review.md",
+        "docs/parity-evidence/V06/root-evidence-validators.log"
+      ],
+      "next_action": "Retain reviewed historic706 and current-parent708 source/package bounds; extend hardware/real-desktop coverage and active-game workflows without relabeling validators as native runs."
+    },
+    {
+      "id": "V07",
+      "state": "Blocked",
+      "implementation_checkpoint": false,
+      "requires": [],
+      "dependency": "Original Personal 26.6 executable running on a supported host with paired captures.",
+      "remaining": "Capture the original Personal 26.6 workflows and compare them with equivalent TermCraft sessions; reconcile the mechanics evidence with measured behavior.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Capture the original Personal 26.6 workflows and compare them with equivalent TermCraft sessions; reconcile the mechanics evidence with measured behavior."
+    },
+    {
+      "id": "V08",
+      "state": "Implementation remaining",
+      "implementation_checkpoint": false,
+      "requires": [
+        "B04",
+        "B05"
+      ],
+      "dependency": "",
+      "remaining": "Exercise packaged builds on clean machines, including absent dependencies, upgrades, and persisted settings.",
+      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "evidence": [
+        "PARITY_PROGRESS.md"
+      ],
+      "next_action": "Exercise packaged builds on clean machines, including absent dependencies, upgrades, and persisted settings.",
+      "interface_prerequisite_note": "Qualified immutable Linux packages already supply the validation input. Outstanding native distributions in P08 do not block controlled clean Linux/upgrade/persistence tests."
+    }
+  ]
+}

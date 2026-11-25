@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.64s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-29e3f133fb9121f7)
+
+running 1 test
+test ui::rdp_settings::tests::embedded_rdp_controls_add_read_only_folder_and_enable_admin ... FAILED
+
+failures:
+
+---- ui::rdp_settings::tests::embedded_rdp_controls_add_read_only_folder_and_enable_admin stdout ----
+
+thread 'ui::rdp_settings::tests::embedded_rdp_controls_add_read_only_folder_and_enable_admin' (298) panicked at src/ui/rdp_settings.rs:151:90:
+missing RDP control
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::rdp_settings::tests::embedded_rdp_controls_add_read_only_folder_and_enable_admin
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 98 filtered out; finished in 0.09s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

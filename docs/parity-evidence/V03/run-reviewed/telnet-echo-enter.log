@@ -1,0 +1,7 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e' --exact telnet_enter_completes_line_and_echo_tracks_peer_negotiation --nocapture --test-threads=1
+
+running 1 test
+test telnet_enter_completes_line_and_echo_tracks_peer_negotiation ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.13s
+

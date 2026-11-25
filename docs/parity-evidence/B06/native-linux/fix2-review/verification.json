@@ -1,0 +1,21 @@
+{
+  "checks": {
+    "old_254_sealed_artifacts_still_exact": true,
+    "new_frozen_binary_exact": true,
+    "solo_failure_preserves_seed1_board": true,
+    "solo_next_new_changes_board": true,
+    "map_cancel_preserves_dirty_board": true,
+    "map_failure_preserves_dirty_board": true,
+    "map_retry_cancel_preserves_dirty_board": true,
+    "map_success_changes_board": true,
+    "map_undo_survives_failed_new": true,
+    "map_redo_restores_after_failed_new": true,
+    "no_action_nonzero_exit_artifacts": true,
+    "owned_app_native_exit_asserted": true,
+    "final_display_empty": true,
+    "cleanup_reaped_owned_processes": true
+  },
+  "passed": 14,
+  "total": 14,
+  "visual_semantic_review": "REPORT.md records the titles, grades, errors and exact consent sequence inspected in native screenshots. Pixel checks corroborate transitions; they are not grade/seed OCR or independent solver proofs."
+}

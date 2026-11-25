@@ -1,0 +1,24 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-puzzle-options)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.45s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-puzzle-options/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 1 test
+test net::barrier_rate_tests::source_barrier_fraction_is_exact_and_rates_are_nested_on_same_candidate ... FAILED
+
+failures:
+
+---- net::barrier_rate_tests::source_barrier_fraction_is_exact_and_rates_are_nested_on_same_candidate stdout ----
+
+thread 'net::barrier_rate_tests::source_barrier_fraction_is_exact_and_rates_are_nested_on_same_candidate' (347531) panicked at src/games/puzzles/net.rs:550:4:
+assertion `left == right` failed
+  left: 5
+ right: 4
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    net::barrier_rate_tests::source_barrier_fraction_is_exact_and_rates_are_nested_on_same_candidate
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 47 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

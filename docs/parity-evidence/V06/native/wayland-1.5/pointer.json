@@ -1,0 +1,8 @@
+{
+  "cells": "[Some((20, 5))]",
+  "events": "[PointerButton { pos: [173.0 199.0], button: Primary, pressed: false, modifiers: Modifiers::NONE }]",
+  "focused": true,
+  "mode": "MouseMode { tracking: Press, sgr: true }",
+  "ppp": 1.5,
+  "widget_focus": true
+}

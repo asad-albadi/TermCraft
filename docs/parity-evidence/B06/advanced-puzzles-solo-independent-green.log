@@ -1,0 +1,38 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/work)
+    Finished `release` profile [optimized] target(s) in 5.35s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/work/target/release/deps/b06_puzzle_options_private-beed19bb514c887b)
+
+running 12 tests
+test solo::advanced::rule_tests::extreme_fish_eliminates_common_columns ... ok
+test solo::advanced::rule_tests::full_set_rule_eliminates_naked_triple ... ok
+testing 3x3 Intermediate
+test solo::advanced::rule_tests::intersections_remove_only_candidates_outside_overlap ... ok
+test solo::advanced::rule_tests::extreme_forcing_traverses_bivalue_peer_chain ... ok
+test solo::advanced::rule_tests::killer_distinct_sum_table_matches_independent_enumeration ... ok
+test solo::advanced::topology_tests::cage_minmax_and_sum_sets_really_prune_candidates ... ok
+test solo::advanced::rule_tests::search_exhaustion_never_certifies_uniqueness ... ok
+test solo::advanced::topology_tests::unsupported_advanced_size_is_rejected_before_allocation ... ok
+test solo::advanced::topology_tests::killer_wrong_sum_blocks_win_even_when_all_sudoku_units_are_valid ... ok
+test solo::advanced::topology_tests::killer_stock_requires_source_intersection_grade ... ok
+test solo::advanced::topology_tests::jigsaw_peer_conflicts_follow_irregular_regions_instead_of_boxes ... ok
+success 3x3 Intermediate seed 0
+testing 3x3 Advanced
+success 3x3 Advanced seed 0
+testing 3x3 Advanced X
+success 3x3 Advanced X seed 0
+testing 3x3 Extreme
+success 3x3 Extreme seed 0
+testing 3x3 Unreasonable
+success 3x3 Unreasonable seed 0
+testing 3x3 Killer
+success 3x3 Killer seed 0
+testing 9 Jigsaw Basic
+success 9 Jigsaw Basic seed 0
+testing 9 Jigsaw Basic X
+success 9 Jigsaw Basic X seed 0
+testing 9 Jigsaw Advanced
+success 9 Jigsaw Advanced seed 0
+test solo::advanced::tests::remaining_solo_presets_generate_real_certified_boards ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 53 filtered out; finished in 1.95s
+

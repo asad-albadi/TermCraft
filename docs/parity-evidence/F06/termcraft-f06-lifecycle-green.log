@@ -1,0 +1,26 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> src/ssh/lifecycle.rs:17:30
+   |
+17 | ...   let id = NEXT_PROMPT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1)).map_err(|_| "Authentication pr...
+   |                            ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+17 -         let id = NEXT_PROMPT.fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1)).map_err(|_| "Authentication prompt identities exhausted")?;
+17 +         let id = NEXT_PROMPT.try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1)).map_err(|_| "Authentication prompt identities exhausted")?;
+   |
+
+warning: `harbor-workspace` (lib) generated 1 warning (run `cargo fix --lib -p harbor-workspace` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.60s
+     Running tests/ssh_lifecycle.rs (app/target/debug/deps/ssh_lifecycle-7068c92c1740f5cf)
+
+running 4 tests
+test reconnect_discards_old_challenges_and_listings ... ok
+test prompted_username_identity_survives_fresh_editor_recovery_without_implicit_upload ... ok
+test browser_retry_does_not_reauthenticate ... ok
+test cancel_auth_stops_the_entire_attempt ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+

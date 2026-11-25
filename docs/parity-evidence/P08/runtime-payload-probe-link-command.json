@@ -1,0 +1,15 @@
+[
+  "rustc",
+  "--edition=2024",
+  "target/qualification-evidence/payload_probe.rs",
+  "--extern",
+  "harbor_workspace=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/libharbor_workspace.rlib",
+  "-L",
+  "dependency=target/debug/deps",
+  "-L",
+  "native=target/debug/build/libsqlite3-sys-b2f084e34107b295/out",
+  "-o",
+  "target/qualification-evidence/payload-probe",
+  "-L",
+  "native=target/debug/build/ring-f49ab490e052bf6d/out"
+]

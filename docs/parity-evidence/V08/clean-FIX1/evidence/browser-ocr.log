@@ -1,0 +1,3 @@
+Estimating resolution as 129
+Estimating resolution as 129
+[{"mode": "minimal", "actual_ui_error_observed": true, "screenshot": "browser-minimal.png", "ocr": "browser-minimal-ocr.txt"}, {"mode": "runtime", "actual_ui_error_observed": true, "screenshot": "browser-runtime.png", "ocr": "browser-runtime-ocr.txt"}]

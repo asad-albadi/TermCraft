@@ -1,0 +1,18 @@
+{
+  "version": "0.1.946",
+  "bin": "termcraft-xdmcp-host-fix946",
+  "source_files": 574,
+  "test_resource_files": 142,
+  "source_archive_sha256": "4d79e75fec1b9c6f98ebe091e7b411e8f825ae72186798ae7bc92ad0e7d1fb59",
+  "payload_archive_sha256": "ec483de053e559cfb151f38d1af7761844272cddc08f373e3453a5b05ef18d88",
+  "binary_sha256": "888e79587364793df32d121bffdd6ff5bd2a6f8d2313853387d18d7c8c2aa9b7",
+  "patch_files": [
+    "src/x11/mod.rs",
+    "src/x11/xdmcp_host.rs",
+    "src/x11/xdmcp_engine.rs",
+    "src/ui/xdmcp.rs",
+    "src/ui/pages.rs",
+    "src/ui.rs",
+    "src/ui/shared_sessions.rs"
+  ]
+}

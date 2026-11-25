@@ -1,0 +1,14 @@
+E
+======================================================================
+ERROR: test_xwayland_archive_rejects_missing_wrong_hash_and_wrong_target (__main__.PortablePackage.test_xwayland_archive_rejects_missing_wrong_hash_and_wrong_target)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/packaging_release.py", line 141, in test_xwayland_archive_rejects_missing_wrong_hash_and_wrong_target
+    package.package_release("linux", output, app, helper, xwayland_archive=payload)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: package_release() got an unexpected keyword argument 'xwayland_archive'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.078s
+
+FAILED (errors=1)

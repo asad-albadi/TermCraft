@@ -1,0 +1,33 @@
+
+running 146 tests
+test ui::activity::tests::real_background_output_is_unread_until_painted_and_detached_output_is_seen ... ok
+test ui::appearance::tests::portal_values_follow_the_desktop_specification ... ok
+test ui::appearance::tests::reads_live_desktop_appearance_portal ... ignored, requires a running desktop appearance portal
+test ui::appearance::tests::system_theme_updates_do_not_override_explicit_appearance ... ok
+test ui::broadcast::tests::painted_keyboard_and_paste_use_only_the_selected_real_transports ... ok
+test ui::cli_dispatch::tests::command_dispatch_uses_its_own_process_and_exact_local_cwd ... ok
+test ui::cli_dispatch::tests::exit_when_done_preserves_preexisting_user_terminals ... ok
+test ui::cli_dispatch::tests::exit_when_done_retires_telnet_job_when_gateway_cannot_connect ... ok
+test ui::cli_dispatch::tests::forwarded_new_tab_opens_once_in_the_actual_workspace ... ok
+test ui::cli_dispatch::tests::named_macro_targets_its_new_terminal_and_respects_paste_confirmation ... ok
+test ui::credential_tests::explicit_proxy_save_links_only_proxy_reference_and_encrypts_both_fields ... ok
+test ui::credential_tests::optional_saved_password_stays_encrypted_and_requires_a_matching_live_challenge ... ok
+test ui::desktop::clipboard_tests::remote_clipboard_is_bounded_directional_and_cleared_on_disconnect ... ok
+test ui::desktop::cursor_tests::cursor_shape_is_bounded_and_hotspot_tracks_scaled_canvas ... ok
+test ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input ... ok
+test ui::desktop::tests::real_rdp_vault_save_use_delete_and_session_fullscreen ... ok
+test ui::desktop_gateway::tests::rdp_tab_retries_after_certificate_trust_with_original_nla_identity ... ok
+test ui::desktop_gateway::tests::telnet_tab_signs_in_to_gateway_and_closes_its_target ... ok
+test ui::ftp::tests::ftp_confirmation_carries_the_source_kind_into_transfer_jobs ... ok
+test ui::ftp::tests::ftp_recursive_delete_requires_explicit_contents_choice_and_exact_path ... ok
+test ui::ftp::tests::graphical_ftp_session_connects_opens_edits_and_guards_tab_close ... ok
+test ui::gui_tests::all_workspace_pages_and_dialogs_render ... ok
+test ui::gui_tests::appearance_tracks_system_and_honors_overrides ... ok
+test ui::gui_tests::broadcast_paste_cancel_and_stale_target_send_no_payload ... ok
+test ui::gui_tests::cancel_active_tab_close_preserves_real_process ... ok
+test ui::gui_tests::closing_an_earlier_tab_preserves_active_session ... ok
+test ui::gui_tests::dirty_remote_editor_blocks_tab_close_and_reconnect ... ok
+test ui::gui_tests::disconnected_serial_aborts_pending_broadcast_before_other_target_writes ... ok
+test ui::gui_tests::embedded_ssh_creates_browser_even_when_sidebar_collapsed ... ok
+test ui::gui_tests::generated_sftp_filename_keeps_native_bytes_outside_keyboard_codec ... 
+STOPPED: this exploratory run used libtest default 1 thread after affinity change, so it did not exercise parallel contention; no pass claim. Replaced by explicit16-thread six-fixture reproduction. No owned children existed at termination.

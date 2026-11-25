@@ -1,0 +1,19 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.26s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-5a341aa582ef476c)
+
+running 1 test
+
+thread 'ui::ftp::tests::graphical_ftp_session_connects_opens_edits_and_guards_tab_close' (286235) panicked at src/ui/ftp_tests.rs:80:9:
+FTP workspace omitted "Save or discard changes before closing this FTP document.". Status: FTPS connected
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ui::ftp::tests::graphical_ftp_session_connects_opens_edits_and_guards_tab_close ... FAILED
+
+failures:
+
+failures:
+    ui::ftp::tests::graphical_ftp_session_connects_opens_edits_and_guards_tab_close
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 110 filtered out; finished in 10.32s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

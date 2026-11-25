@@ -1,0 +1,53 @@
+
+running 11 tests
+test closing_tunnel_releases_listener ... echo peer=127.0.0.1:56244, local=127.0.0.1:33759, exact=TUNNEL_OK
+echo peer=127.0.0.1:56250, local=127.0.0.1:33759, exact=TUNNEL_OK
+echo peer=127.0.0.1:56254, local=127.0.0.1:33759, exact=TUNNEL_OK
+echo peer=127.0.0.1:56266, local=127.0.0.1:33759, exact=TUNNEL_OK
+echo peer=127.0.0.1:56282, local=127.0.0.1:33759, exact=TUNNEL_OK
+echo peer=127.0.0.1:56286, local=127.0.0.1:33759, exact=TUNNEL_OK
+ok
+test destination_failure_is_observable ... 
+thread 'destination_failure_is_observable' (94391) panicked at tests/tunnel_interop.rs:155:35:
+called `Result::unwrap()` on an `Err` value: Error { kind: UnexpectedEof, message: "failed to fill whole buffer" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test dynamic_ipv4 ... echo peer=127.0.0.1:39572, local=127.0.0.1:42705, exact=TUNNEL_OK
+ok
+test dynamic_ipv6 ... echo peer=[::1]:37676, local=[::1]:41611, exact=TUNNEL_OK
+ok
+test explicit_nondefault_loopback_bind ... echo peer=127.0.0.1:60970, local=127.0.0.2:44281, exact=TUNNEL_OK
+echo peer=127.0.0.1:50830, local=127.0.0.2:40035, exact=TUNNEL_OK
+echo peer=127.0.0.1:38622, local=127.0.0.2:33897, exact=TUNNEL_OK
+ok
+test local_ipv4 ... echo peer=127.0.0.1:41148, local=127.0.0.1:34197, exact=TUNNEL_OK
+ok
+test local_ipv6 ... echo peer=[::1]:52610, local=[::1]:33739, exact=TUNNEL_OK
+ok
+test local_remote_dynamic_tunnels_carry_exact_payload ... echo peer=127.0.0.1:52722, local=127.0.0.1:45883, exact=TUNNEL_OK
+echo peer=127.0.0.1:58900, local=127.0.0.1:39673, exact=TUNNEL_OK
+echo peer=127.0.0.1:40296, local=127.0.0.1:44647, exact=TUNNEL_OK
+ok
+test remote_ipv4 ... echo peer=127.0.0.1:44820, local=127.0.0.1:46609, exact=TUNNEL_OK
+ok
+test remote_ipv6 ... echo peer=[::1]:37176, local=[::1]:41111, exact=TUNNEL_OK
+ok
+test tunnel_port_conflict_is_visible ... Local: bind [127.0.0.1]:38735: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 38735
+Could not request local forwarding.
+
+Remote: Error: remote port forwarding failed for listen port 44163
+
+Dynamic: bind [127.0.0.1]:38197: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 38197
+Could not request local forwarding.
+
+ok
+
+failures:
+
+failures:
+    destination_failure_is_observable
+
+test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.10s
+

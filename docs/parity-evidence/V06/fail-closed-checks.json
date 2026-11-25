@@ -1,0 +1,26 @@
+[
+  {
+    "case": "tampered executable hash",
+    "status": "PASS rejected",
+    "exit": 1,
+    "diagnostic": "AssertionError: changed executable: /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/termcraft-v06-native-matrix"
+  },
+  {
+    "case": "missing executable",
+    "status": "PASS rejected",
+    "exit": 1,
+    "diagnostic": "AssertionError: missing executable: /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v06/negative-w2p82ws_/missing-executable"
+  },
+  {
+    "case": "zero native sessions",
+    "status": "PASS rejected",
+    "exit": 1,
+    "diagnostic": "FileNotFoundError: [Errno 2] No such file or directory: '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v06/negative-w2p82ws_/empty/x11-1/observations.json'"
+  },
+  {
+    "case": "zero observations falsely marked PASS",
+    "status": "PASS rejected",
+    "exit": 1,
+    "diagnostic": "AssertionError: zero/partial native cases are not a pass"
+  }
+]

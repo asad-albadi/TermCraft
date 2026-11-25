@@ -1,0 +1,93 @@
+name: Release artifacts
+on:
+  workflow_dispatch:
+    inputs:
+      native_gui:
+        description: Attempt GUI and RDP startup on Windows and macOS runners
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  CARGO_BUILD_JOBS: "2"
+  PYTHONDONTWRITEBYTECODE: "1"
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            artifact: linux-amd64
+          - runner: windows-2025
+            artifact: windows-amd64
+          - runner: macos-15-intel
+            artifact: macos-intel
+          - runner: macos-15
+            artifact: macos-arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install Pillow
+      - shell: bash
+        run: rustup update stable && rustup default stable
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y binutils libx11-dev libxkbcommon-dev libwayland-dev libegl1-mesa-dev libgl1-mesa-dev libgl1-mesa-dri xvfb xauth
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (!(Get-Command llvm-objdump -ErrorAction SilentlyContinue)) {
+            $reader = Join-Path $env:ProgramFiles 'LLVM\bin\llvm-objdump.exe'
+            if (!(Test-Path -LiteralPath $reader)) { throw 'LLVM import inspection tool unavailable.' }
+            Split-Path $reader | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
+      - run: cargo test --locked --test package_manifest
+      - run: python scripts/package-release.py --output dist
+      - if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          archive=(dist/TermCraft-*.tar.gz)
+          test "${#archive[@]}" -eq 1
+          python scripts/package-debian.py "${archive[0]}" --output dist
+          dpkg-deb --info dist/termcraft_*.deb
+          stage=$(mktemp -d)
+          dpkg-deb --raw-extract dist/termcraft_*.deb "$stage"
+          (cd "$stage" && md5sum --quiet -c DEBIAN/md5sums)
+          env PATH= "$stage/opt/termcraft/harbor-workspace" --help
+          xvfb-run -a -s '-screen 0 1440x1024x24' bash -c 'python scripts/package-check-startup.py "$1" --display "$DISPLAY" --evidence startup-evidence' _ "${archive[0]}"
+      - if: runner.os != 'Linux' && inputs.native_gui
+        shell: bash
+        run: |
+          archive=(dist/TermCraft-*.zip)
+          test "${#archive[@]}" -eq 1
+          python scripts/package-check-startup.py "${archive[0]}" --evidence startup-evidence
+      - if: success()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          dist = Path("dist")
+          with (dist / "SHA256SUMS").open("w", encoding="utf-8", newline="\n") as checksums:
+              for artifact in sorted(dist.iterdir()):
+                  if artifact.suffix not in {".zip", ".gz", ".deb"}:
+                      continue
+                  with artifact.open("rb") as file:
+                      digest = hashlib.file_digest(file, "sha256").hexdigest()
+                  checksums.write(f"{digest}  {artifact.name}\n")
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: termcraft-${{ matrix.artifact }}-unsigned
+          path: |
+            dist/*
+            startup-evidence/
+          if-no-files-found: ignore

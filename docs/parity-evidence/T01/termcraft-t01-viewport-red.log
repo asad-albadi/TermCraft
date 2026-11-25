@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.56s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-9a2e8410f611c3b2)
+
+running 1 test
+test ui::pages::appearance_tests::the_entire_live_screen_fits_the_terminal_viewport ... FAILED
+
+failures:
+
+---- ui::pages::appearance_tests::the_entire_live_screen_fits_the_terminal_viewport stdout ----
+
+thread 'ui::pages::appearance_tests::the_entire_live_screen_fits_the_terminal_viewport' (367679) panicked at src/ui/pages.rs:1401:9:
+The first live row was virtualized out of the viewport
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::pages::appearance_tests::the_entire_live_screen_fits_the_terminal_viewport
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 28 filtered out; finished in 1.11s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

@@ -1,0 +1,13 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.83s
+     Running tests/terminal_selection.rs (target/debug/deps/terminal_selection-e04963500ba979cf)
+
+running 5 tests
+test selection_padding_uses_the_terminal_column_bound ... ok
+test rectangle_selection_preserves_columns_and_unicode ... ok
+test right_click_mode_keeps_context_menu_reachable ... ok
+test linear_history_selection_survives_scroll_and_expires_without_retargeting ... ok
+test configured_delimiters_word_selection_and_alternate_epoch ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

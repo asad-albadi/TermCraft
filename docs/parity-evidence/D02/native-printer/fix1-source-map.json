@@ -1,0 +1,17 @@
+[
+  {
+    "path": "engines/rdp/src/printer_native.rs",
+    "base_sha256": "484a5e290787f96857963299b22d1a7c561605572979175c8559c4de90af133d",
+    "payload_sha256": "16358ffdacb2556bce0f260a7db7b29ffd0cc8aa14c5b7008628dc0e4eb8dc62"
+  },
+  {
+    "path": "engines/rdp/src/printer_owner.rs",
+    "base_sha256": null,
+    "payload_sha256": "a7a81487d1beb4088702c665cfe4af12bc9c58fd76d49ce6e2dc5c9954a7051b"
+  },
+  {
+    "path": "tests/printer_owner_lifecycle.py",
+    "base_sha256": null,
+    "payload_sha256": "ee934dce2216a4438adbdf09e9b499134adc3a6a5c627179ffd2fe80d2bc21da"
+  }
+]

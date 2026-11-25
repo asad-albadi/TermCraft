@@ -1,0 +1,19 @@
+Server listening on 127.0.0.1 port 37509.
+Connection from 127.0.0.1 port 60586 on 127.0.0.1 port 37509 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 60586 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Connection from 127.0.0.1 port 60600 on 127.0.0.1 port 37509 rdomain ""
+Accepted key ECDSA SHA256:OlZz4SxwztkmNPsiUcM0W0co/krc5yDh+n6r6XDJ33o found at /tmp/termcraft-ssh-test-123361-1795552466477432445/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 60600 ssh2 [preauth]
+Accepted key ECDSA SHA256:OlZz4SxwztkmNPsiUcM0W0co/krc5yDh+n6r6XDJ33o found at /tmp/termcraft-ssh-test-123361-1795552466477432445/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 60600 ssh2: ECDSA SHA256:OlZz4SxwztkmNPsiUcM0W0co/krc5yDh+n6r6XDJ33o
+User child is on pid 123371
+Attempt to write login records by non-root user (aborting)
+Starting session: command on pts/0 for asad from 127.0.0.1 port 60600 id 0
+Starting session: subsystem 'sftp' for asad from 127.0.0.1 port 60600 id 1
+Connection closed by 127.0.0.1 port 60600
+Close session: user asad from 127.0.0.1 port 60600 id 0
+Close session: user asad from 127.0.0.1 port 60600 id 1
+Transferred: sent 3436, received 2852 bytes
+Closing connection to 127.0.0.1 port 60600

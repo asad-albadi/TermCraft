@@ -1,0 +1,68 @@
+{
+  "status": "GREEN",
+  "cases": [
+    {
+      "case": "launcher-timeout-before-owner",
+      "status": "passed",
+      "original_failure_preserved": "TimeoutExpired",
+      "elapsed_seconds": 0.02290135000112059,
+      "pids_absent_and_reaped": [
+        388268
+      ]
+    },
+    {
+      "case": "launcher-exits-before-owner-parse",
+      "status": "passed",
+      "original_failure_preserved": "AssertionError",
+      "elapsed_seconds": 0.054354699999748846,
+      "pids_absent_and_reaped": [
+        388269,
+        388270
+      ]
+    },
+    {
+      "case": "popen-startup-failure",
+      "status": "passed",
+      "original_failure_preserved": "OSError",
+      "elapsed_seconds": 0.00044277499910094775,
+      "pids_absent_and_reaped": []
+    },
+    {
+      "case": "outer-timeout-namespace-detached-descendant",
+      "status": "passed",
+      "original_failure_preserved": "TimeoutExpired",
+      "elapsed_seconds": 0.528126663999501,
+      "pids_absent_and_reaped": [
+        388274,
+        388275
+      ]
+    },
+    {
+      "case": "outer-nonzero-detached-descendant",
+      "status": "passed",
+      "original_failure_preserved": "exit 7",
+      "elapsed_seconds": 0.05595041900051001,
+      "pids_absent_and_reaped": [
+        388284,
+        388285
+      ]
+    },
+    {
+      "case": "outer-SIGTERM-stack-unwind",
+      "status": "passed",
+      "preserved_exit": 143,
+      "pids_absent_and_reaped": [
+        388288,
+        388289
+      ]
+    },
+    {
+      "case": "owned-helper-stdin-success",
+      "status": "passed",
+      "payload_exact": true
+    }
+  ],
+  "preexisting_unrelated_child_preserved": true,
+  "probe_processes_reaped": true,
+  "scope": "FIX1 cleanup-only fault injection; original Mosh/serial observation records unchanged"
+}

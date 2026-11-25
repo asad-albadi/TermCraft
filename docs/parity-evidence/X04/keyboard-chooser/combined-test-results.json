@@ -1,0 +1,45 @@
+{
+  "binaries": {
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-a8c1431dc62fd8f8": "34d368ac3eb1521d0b45d3b485766e5985cbe3e1dfd1cb95222b9be198944eeb",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/termcraft_xdmcp_combined962-bcc2d8d9b4453630": "a7f139b9b624332f88ef0289a1c0dbb7ff913298c63ed5f1002b477eb2dda642",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/termcraft-xdmcp-combined962": "8cac58329ef1e677fd9d7706e91acfc41174610775eb5060d2270b3830543bc9"
+  },
+  "build_log_sha256": "ac6e18c7f6290a7e82745d42743f9817be6d88c0cb19ee0ec7b4e4929071d21e",
+  "tests": {
+    "actual_german_keyboard_via_hostname.log": {
+      "ignored": 0,
+      "passed": 1,
+      "sha256": "0aae5ae8cb46a9d59c31b04716d83200d1cd23aa089e113464d8f8e2ae7705f2"
+    },
+    "actual_hostname_connect_resolves_fresh_and_manages_authenticated_window.log": {
+      "ignored": 0,
+      "passed": 1,
+      "sha256": "46e9c02ff5c63262a82f0d308420b99572cff98e66aaacddea7f73c3323a13f1"
+    },
+    "actual_indirect_chooser_handoff.log": {
+      "ignored": 0,
+      "passed": 1,
+      "sha256": "a3958bc6c0f714291d819902afb3e75b234ce8c18d2e59d9b39d7ed901460ed3"
+    },
+    "actual_indirect_chooser_handoff_with_clipboard.log": {
+      "ignored": 0,
+      "passed": 1,
+      "sha256": "794cb9c5e66a24d572ae92cc47889bb3d53a9d7bf48feb15cdf29850d3a5a461"
+    },
+    "final-library.log": {
+      "ignored": 13,
+      "passed": 41,
+      "sha256": "7e7f8f9ad5c9bd2b84ec283d36c9f71ae8731f63b784a98e7e85d32c6f7aace6"
+    },
+    "manager_wait_honors_cancellation_and_timeout_before_parent_access.log": {
+      "ignored": 0,
+      "passed": 1,
+      "sha256": "a3efc6cc5e1acb9dbc6103b2d05ccda3967a9d088be719481ffb4aa941aafd20"
+    },
+    "ui.log": {
+      "ignored": 0,
+      "passed": 9,
+      "sha256": "b6bf2fee1215c85acbbf949f6aebeaa48ee8ece6d28041461625966e8c24d01e"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+
+running 3 tests
+test chromium_cancels_site_auth_without_credentials_and_rejects_untrusted_tls ... WAIT tests/browser_session.rs:197:5
+WAIT tests/browser_session.rs:207:5
+WAIT tests/browser_session.rs:220:5
+ok
+test chromium_renders_and_submits_browser_input ... WAIT tests/browser_session.rs:103:5
+
+thread 'chromium_renders_and_submits_browser_input' (13841) panicked at tests/browser_session.rs:103:5:
+Chromium fixture timed out from tests/browser_session.rs:103:5 at Fixture (loading: false, error: None, notice: None)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test chromium_routes_through_configured_proxy_and_signs_in_only_after_consent ... WAIT tests/browser_session.rs:264:5
+WAIT tests/browser_session.rs:285:5
+ok
+
+failures:
+
+failures:
+    chromium_renders_and_submits_browser_input
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 92.76s
+

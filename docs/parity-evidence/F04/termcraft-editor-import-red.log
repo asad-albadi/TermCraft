@@ -1,0 +1,29 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+warning: field `endpoint` is never read
+  --> src/remote_files/editor.rs:32:82
+   |
+32 | pub struct RemoteDocument { state: Arc<Mutex<State>>, sender: mpsc::Sender<Job>, endpoint: Option<Endpoint> }
+   |            -------------- field in this struct                                   ^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (lib) generated 1 warning
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `import_recovery_from` found for struct `RemoteDocument` in the current scope
+   --> tests/remote_editor.rs:213:12
+    |
+213 |     target.import_recovery_from(&source).unwrap();
+    |            ^^^^^^^^^^^^^^^^^^^^ method not found in `RemoteDocument`
+
+error[E0599]: no method named `import_recovery_from` found for struct `RemoteDocument` in the current scope
+   --> tests/remote_editor.rs:222:19
+    |
+222 |     assert!(wrong.import_recovery_from(&source).is_err());
+    |                   ^^^^^^^^^^^^^^^^^^^^ method not found in `RemoteDocument`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (test "remote_editor") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

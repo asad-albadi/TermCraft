@@ -1,0 +1,11 @@
+   Compiling harbor-workspace v0.1.0-x04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.00s
+     Running unittests src/lib.rs (../../debug/deps/harbor_workspace-a4bd4fbc14f695ce)
+
+running 3 tests
+test x11::xdmcp_payload::tests::cancellation_and_expired_deadline_prevent_payload_open ... ok
+test x11::xdmcp_payload::tests::cancellation_during_a_real_file_read_finishes_worker_before_copy ... ok
+test x11::xdmcp_payload::tests::fifo_directory_symlink_and_oversize_finish_without_an_x_display ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 138 filtered out; finished in 0.00s
+

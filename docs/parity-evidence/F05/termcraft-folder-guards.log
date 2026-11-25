@@ -1,0 +1,11 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.54s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-c3ff65252a01102c)
+
+running 3 tests
+test remote_files::transfer::folder_archive::tests::cancelled_folder_preparation_stops_before_copying ... ok
+test remote_files::transfer::local_stage::tests::replaced_folder_containers_and_archives_are_never_published_or_cleaned ... ok
+test remote_files::transfer::folder_archive::tests::hostile_folder_payloads_cannot_escape_or_follow_directory_links ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 28 filtered out; finished in 0.00s
+

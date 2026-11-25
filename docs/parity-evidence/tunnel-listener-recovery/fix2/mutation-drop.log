@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'fixture_port_claim_survives_socket_handoff_and_releases_on_drop' (67285) panicked at mutation-drop.rs:64:55:
+called `Result::unwrap()` on an `Err` value: Custom { kind: AddrInUse, error: "port is reserved by another owned fixture" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test fixture_port_claim_survives_socket_handoff_and_releases_on_drop ... FAILED
+
+failures:
+
+failures:
+    fixture_port_claim_survives_socket_handoff_and_releases_on_drop
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

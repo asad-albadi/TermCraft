@@ -1,0 +1,8 @@
+{
+  "image": "sha256:bf6f096f91837e486cd919767f8862912d418d7f4343bd25c0269db7b6995563",
+  "parent": "sha256:bf83b781e2d467fe7cbafb6c4235c3263260fd56cec7cfb9b22dafde0a914a12",
+  "parent_layer_prefix_verified": true,
+  "package_inventory": "evidence/ocr-image-packages.txt",
+  "signed_package_build_log": "ocr-image-build.log",
+  "instrumentation": "Tesseract English OCR only; immutable application bytes unchanged"
+}

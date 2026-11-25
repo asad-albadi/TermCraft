@@ -1,0 +1,20 @@
+Server listening on 127.0.0.1 port 38343.
+Connection from 127.0.0.1 port 54320 on 127.0.0.1 port 38343 rdomain ""
+Connection from 127.0.0.1 port 54334 on 127.0.0.1 port 38343 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 54320 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Accepted key ED25519 SHA256:FiHMqEH8s5pnbXXZ9bJ2M3UnfnxAbb5I9sDTJbM2dR8 found at /tmp/termcraft-ssh-test-123490-1795552469470176556/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 54334 ssh2 [preauth]
+Accepted key ED25519 SHA256:FiHMqEH8s5pnbXXZ9bJ2M3UnfnxAbb5I9sDTJbM2dR8 found at /tmp/termcraft-ssh-test-123490-1795552469470176556/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 54334 ssh2: ED25519 SHA256:FiHMqEH8s5pnbXXZ9bJ2M3UnfnxAbb5I9sDTJbM2dR8
+User child is on pid 123500
+Attempt to write login records by non-root user (aborting)
+Starting session: command on pts/0 for asad from 127.0.0.1 port 54334 id 0
+Starting session: subsystem 'sftp' for asad from 127.0.0.1 port 54334 id 1
+Connection closed by 127.0.0.1 port 54334
+Close session: user asad from 127.0.0.1 port 54334 id 0
+Close session: user asad from 127.0.0.1 port 54334 id 1
+Transferred: sent 156296, received 154588 bytes
+Closing connection to 127.0.0.1 port 54334
+Attempt to write login records by non-root user (aborting)

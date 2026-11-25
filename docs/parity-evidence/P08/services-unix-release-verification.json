@@ -1,0 +1,82 @@
+{
+  "archive_sha256": "c6f12002f71d008aee83d165f30c93e62960cf2c74c75ba4b3007a173816af57",
+  "source_snapshot_sha256": "6251fcea2b9f7dbb5c2853016c78d6d262126c60fb4981ed5574231f1a0c20a8",
+  "files_verified": 1007,
+  "package_root": "target/package-services-unix-qualified/c6f12002f71d008aee83d165f30c93e62960cf2c74c75ba4b3007a173816af57/TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix",
+  "qualification": "Arch-compatible Linux x86_64 with declared libraries, system Perl/OpenSSH and installed Chromium; unsigned",
+  "startup": {
+    "wayland": {
+      "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix.tar.gz",
+      "archive_sha256": "c6f12002f71d008aee83d165f30c93e62960cf2c74c75ba4b3007a173816af57",
+      "manifest_schema": 1,
+      "platform": "linux",
+      "display_backend": "Wayland",
+      "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+      "screen_size": [
+        938,
+        990
+      ],
+      "rdp_helper_wire_version": 1,
+      "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+      "rdp_helper_child_location_verified": true
+    },
+    "x11": {
+      "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix.tar.gz",
+      "archive_sha256": "c6f12002f71d008aee83d165f30c93e62960cf2c74c75ba4b3007a173816af57",
+      "manifest_schema": 1,
+      "platform": "linux",
+      "display_backend": "X11",
+      "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+      "screen_size": [
+        938,
+        990
+      ],
+      "rdp_helper_wire_version": 1,
+      "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+      "rdp_helper_child_location_verified": true
+    }
+  },
+  "live_runtime_checks": {
+    "status": "passed on declared Arch-compatible Linux x86_64 host",
+    "evidence": "runtime-payload-qualification.md",
+    "xserver": {
+      "passed": 5,
+      "isolation": "bwrap private network/PID/tmp X11 namespace plus headless Cage",
+      "test_binary": "target/debug/deps/xserver_lifecycle-89bf74f0ef0f0612",
+      "log": "runtime-payload-xserver-live.log"
+    },
+    "mosh": {
+      "passed": true,
+      "transport": "genuine SSH bootstrap + UDP terminal frame, empty client PATH",
+      "test_binary": "target/debug/deps/runtime_manifest-da99e8eacc1f7e49",
+      "log": "runtime-payload-mosh-live.log"
+    },
+    "unix": {
+      "passed_versions": [
+        "1.31.0",
+        "1.35.0"
+      ],
+      "source": "archives inside extracted package unix-packages directory",
+      "checks": "PackageIndex pinned hashes, PackageManager installation, real PTY, private child HOME/PATH, pipeline/file output, removal",
+      "log": "runtime-payload-unix-iperf-live.log"
+    },
+    "iperf": {
+      "passed": [
+        "2 TCP",
+        "2 UDP",
+        "3 TCP",
+        "3 UDP"
+      ],
+      "source": "RuntimeCatalog explicit extracted root; ServiceSupervisor verified bundled providers; extracted clients; empty PATH; loopback only",
+      "log": "runtime-payload-unix-iperf-live.log"
+    },
+    "probe_sha256": "26e07b6bfc3b41f79406b0c43509343a6bf76c27807650458f8d84a716297f51",
+    "probe_source_sha256": "ba46a502b2d8bc83b70372d3f301ca26817c9357fd0091101470b4895c42b478",
+    "root_rlib_sha256_at_probe_build": "65e38a5332c9ae67d8b6877feb662e45ed403258a705ab881609150e178b594e",
+    "existing_test_binary_sha256": {
+      "xserver_lifecycle-89bf74f0ef0f0612": "ebe8dafe6692d87962b4b6679bb13037ef4d23fa476e1bf28de147d88377a7d9",
+      "runtime_manifest-da99e8eacc1f7e49": "01de69808e2b0ab9562e1397be97c0f3421f6a0a46b6ba01ac5adfd8b22253b6"
+    }
+  },
+  "scope": "Frozen reviewed B04/B03/B05/X05/P06 and optional Unix runtime package, before Cron/NFS/VNC work."
+}

@@ -1,0 +1,11 @@
+   Compiling harbor-workspace v0.1.0-e03-vnc-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-vnc)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.30s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-38ec09d2f5687b9e)
+
+running 3 tests
+test services::vnc_service_tests::isolated::owned_x11_vnc_dynamic_auth_control_stop_and_app_client ... ignored, requires private bwrap/Cage display; never run on a host display
+test services::vnc_service_tests::vnc_requires_explicit_source_password_and_transport_consent ... ok
+test services::vnc_service_tests::vnc_unsupported_sources_and_clipboard_fail_closed ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 80 filtered out; finished in 0.00s
+

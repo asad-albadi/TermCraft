@@ -1,0 +1,9 @@
+
+running 4 tests
+test failed_package_install_rolls_back ... ok
+test portable_shell_runs_in_real_pty_with_private_child_environment ... ok
+test real_portable_tools_survive_upgrade_and_home_survives_restart ... ok
+test retired_cleanup_preserves_tampered_receipt_extras_and_special_files ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 24.47s
+

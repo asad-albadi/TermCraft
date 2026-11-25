@@ -1,0 +1,25 @@
+00:00:00.000 [INFO] [backend/backend.c:342] Loading user-specified backends due to WLR_BACKENDS: headless
+00:00:00.000 [INFO] [backend/headless/backend.c:60] Creating headless backend
+00:00:00.000 [INFO] [../cage/cage.c:201] Running as root user, this is dangerous
+00:00:00.000 [INFO] [util/env.c:25] Loading WLR_RENDERER option: pixman
+00:00:00.000 [INFO] [render/pixman/renderer.c:328] Creating pixman renderer
+00:00:00.000 [INFO] [../cage/cage.c:521] Failed to create wlr_drm_lease_manager_v1
+00:00:00.005 [INFO] [backend/headless/backend.c:17] Starting headless backend
+00:00:00.040 [INFO] [xwayland/server.c:108] Starting Xwayland on :0
+Xwayland glamor: GBM Wayland interfaces not available
+Failed to initialize glamor, falling back to sw
+
+running 1 test
+00:00:01.186 [ERROR] [xwayland/xwm.c:1984] xcb error: op ConfigureWindow (no minor), code Window (no extension), sequence 252, value 6291457
+00:00:01.186 [ERROR] [xwayland/xwm.c:1984] xcb error: op ChangeProperty (no minor), code Window (no extension), sequence 255, value 6291457
+00:00:01.186 [ERROR] [xwayland/xwm.c:1984] xcb error: op DeleteProperty (no minor), code Window (no extension), sequence 256, value 6291457
+Real xdm discovery on UDP 1177, MANAGE and authenticated mapped window on :177; wrong cookie rejected; second session survived first close; both owned PID/auth cleaned; isolated Cage display survived. Clipboard Disabled: no host bridge created.
+00:00:01.199 [ERROR] [xwayland/xwm.c:1984] xcb error: op ConfigureWindow (no minor), code Window (no extension), sequence 259, value 8388609
+00:00:01.199 [ERROR] [xwayland/xwm.c:1984] xcb error: op ChangeProperty (no minor), code Window (no extension), sequence 262, value 8388609
+00:00:01.199 [ERROR] [xwayland/xwm.c:1984] xcb error: op DeleteProperty (no minor), code Window (no extension), sequence 263, value 8388609
+00:00:01.199 [ERROR] [xwayland/xwm.c:1984] xcb error: op DeleteProperty (no minor), code Window (no extension), sequence 266, value 8388609
+test x11::xdmcp_engine::tests::actual_xdm_nondefault_port_opens_selected_display_and_cleanup_preserves_host ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 142 filtered out; finished in 1.11s
+
+(EE) failed to read Wayland events: Broken pipe

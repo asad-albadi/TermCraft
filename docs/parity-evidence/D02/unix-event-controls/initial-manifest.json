@@ -1,0 +1,26 @@
+{
+  "owned": {
+    "engines/rdp/src/serial.rs": {
+      "base": "2730a2be6382e93f2d0256a2390750e8605b0c92213a0064e92b8257e2d5f4de",
+      "payload": "af50608f38b941658c6f304c2026b0cd5faa37cd9b94bfb235b38319748f42e3"
+    }
+  },
+  "evidence": {
+    "red-serial.rs": "60d60c39f6c6181cc3435030b0685f2d447e7e376216d05206512cf3ba1aae91",
+    "red.log": "f6c11fb9f92a713f3524b71837b84ca0b3fb73744d82e06005c727a247d0d6d9",
+    "green.log": "9af5bcf21f5356f6cf913c95465bb60a1fab375dfadb09d22c96b2e112380979",
+    "green-full.log": "2262397d352d293925ec2c1f50cb1f30f63dc710d2c2e02552a5d6584a95aec4",
+    "mac-component.log": "50b29f696508aa16ef09537f1a82bfb5d00fe5d41a365fe6c8e94bcf6784a7f0",
+    "format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "REPORT.md": "6b000651613eb0670d86c9ba4a1a9e14ce9aaf10f7d5397b275b4ef754a5f284",
+    "DESIGN.md": "8417ad0e235461f1a534969679202586673ef3119dab627622cedb9de845b62f",
+    "integration.patch": "1fa16a04c00bf5d64cfd571b29d018d0fa6b2d91ebc1d124444d5e168f59fe59",
+    "source/tests/rdp-native-component/production-input-sha256.json": "db3b4999d784e81fc5ed2c5eff6c2c0dd8c4ab023e8c5a53be607ae6fdbb9fe0"
+  },
+  "identity": {
+    "app": "termcraft-unix-control947",
+    "helper": "termcraft-rdp-unix-control947",
+    "component": "d02-unix-controls-component947",
+    "version": "0.1.947"
+  }
+}

@@ -1,0 +1,14 @@
+Regular temporary-file write: OK
+AF_INET: socket() failed: errno=1: [Errno 1] Operation not permitted
+AF_UNIX: bind() failed: errno=1: [Errno 1] Operation not permitted
+Current process policy:
+Uid:	1000	1000	1000	1000
+Gid:	1000	1000	1000	1000
+CapEff:	0000000000000000
+NoNewPrivs:	1
+Seccomp:	2
+Seccomp_filters:	1
+LSM identification unavailable: errno=22: [Errno 22] Invalid argument
+Runner executable: codex-linux-sandbox
+Runner applies seccomp: True
+Runner network policy: restricted

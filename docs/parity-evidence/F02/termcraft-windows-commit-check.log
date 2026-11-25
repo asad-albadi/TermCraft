@@ -1,0 +1,5 @@
+     Locking 2 packages to highest Rust 1.99.0 compatible versions
+    Checking windows-link v0.2.1
+    Checking windows-sys v0.61.2
+    Checking termcraft-native-commit-check v0.0.0 (/tmp/termcraft-native-commit-check)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.17s

@@ -1,0 +1,23 @@
+[package]
+name = "d02-smartcard-native-component"
+version = "0.1.935"
+edition = "2024"
+[dependencies]
+libc = "0.2"
+zeroize = "1.9.2"
+ironrdp-core = "=0.3.0"
+ironrdp-svc = "=0.10.0"
+tokio = {version="1",features=["rt","sync","time","macros"]}
+[target.'cfg(windows)'.dependencies]
+windows-sys = {version="0.61",features=["Win32_Foundation","Win32_Storage_FileSystem","Win32_System_Threading","Win32_System_JobObjects","Win32_System_Pipes","Win32_System_Console","Win32_System_LibraryLoader","Win32_System_SystemInformation","Win32_Security"]}
+
+[features]
+pcsc-test-macos=[]
+pcsc-test-windows=[]
+
+[[bin]]
+name="d02-smartcard-native-fixture"
+path="src/fixture_main.rs"
+
+# Fixture features are mutually exclusive and intended only for Linux-hosted
+# controlled callbacks. Native target checks run with neither feature enabled.

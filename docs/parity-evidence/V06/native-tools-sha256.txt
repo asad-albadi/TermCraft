@@ -1,0 +1,4 @@
+68d288d1fc8c5ad684cf6f122e4bbabf2afc8135654e70a814e37aa9ca42f333  target/agent-work/original-runtime/xvfb/usr/bin/Xvfb
+7ba78b7531a3b3cb1852b3b1e464b4458cce1749c6c0fe3c6fb4b16ece9d5b9c  target/agent-work/v06/tools/usr/bin/sway
+d760e193e31b65f6158462fdb295c101780495ae760852301a42cfb907357bc5  target/agent-work/v06/tools/usr/bin/wtype
+e5c6b55bb4a9677b7d6639403e0e7e279c95b0522b792f264c32359213c20626  target/agent-work/v06/tools/usr/bin/xdotool

@@ -1,0 +1,9 @@
+[package]
+name="termcraft-v04-private"
+version="0.1.904"
+edition="2024"
+[lib]
+name="harbor_workspace"
+[dependencies]
+libc="0.2"
+serde={version="1.0",features=["derive"]}

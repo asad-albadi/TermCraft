@@ -1,0 +1,12 @@
+Official primary references (retrieved 2026-11-25):
+- https://raw.githubusercontent.com/apple-oss-distributions/SmartCardServices/main/src/PCSC/pcsclite.h (fixed-width handles, packed structures, ATR, status/error constants)
+- https://raw.githubusercontent.com/apple-oss-distributions/SmartCardServices/main/src/PCSC/winscard.h (function signatures)
+- https://raw.githubusercontent.com/apple-oss-distributions/SmartCardServices/main/src/PCSC/wintypes.h (fixed DWORD/LONG)
+- https://learn.microsoft.com/en-us/windows/win32/api/winscard/ns-winscard-scard_readerstatew
+- https://learn.microsoft.com/en-us/windows/win32/api/winscard/nf-winscard-scardgetstatuschangew
+- https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryexw
+- https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-updateprocthreadattribute
+- https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects
+- https://raw.githubusercontent.com/microsoft/win32metadata/main/generation/WinSDK/RecompiledIdlHeaders/um/winscard.h (ULONG_PTR handles, W signatures, reader layout)
+- https://raw.githubusercontent.com/microsoft/win32metadata/main/generation/WinSDK/RecompiledIdlHeaders/shared/winsmcrd.h (PCI, state/protocol constants)
+- https://raw.githubusercontent.com/microsoft/win32metadata/main/generation/WinSDK/RecompiledIdlHeaders/um/WinBase.h (Windows 10 JOB_LIST creation attribute)

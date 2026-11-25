@@ -1,0 +1,22 @@
+[
+  {
+    "case": "diagnostic",
+    "exit_code": 0,
+    "expected": 0
+  },
+  {
+    "case": "strict",
+    "exit_code": 2,
+    "expected": 2
+  },
+  {
+    "case": "strict-optimized",
+    "exit_code": 2,
+    "expected": 2
+  },
+  {
+    "case": "falsified-evidence",
+    "exit_code": 1,
+    "expected": 1
+  }
+]

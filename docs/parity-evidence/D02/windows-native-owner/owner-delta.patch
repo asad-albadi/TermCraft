@@ -1,0 +1,1587 @@
+--- a/engines/rdp/src/serial_windows.rs
++++ b/engines/rdp/src/serial_windows.rs
+@@ -1,28 +1,33 @@
+ //! Explicit Windows COM mappings pinned to one opened device for the connection.
+-//! Native overlapped operations run only on the bounded device worker.
++//! Native overlapped operations and state restoration belong to bounded per-open owners.
+ #[path = "serial_windows_control.rs"]
+ mod control;
+ #[path = "serial_stats.rs"]
+ mod stats;
+ #[path = "serial_stats_windows.rs"]
+ mod stats_windows;
+ pub(super) use control::is_wait_mask_set;
+ 
+ use super::{DENIED, INVALID, MAX_IO, UNSUPPORTED, complete, length_data, status, u32_at};
+ use crate::rdp_options::SerialMapping;
+ use std::{
+     collections::{BTreeMap, BTreeSet, VecDeque},
+     fs::File,
+     io,
+     os::windows::io::{AsRawHandle, FromRawHandle, OwnedHandle},
+-    sync::{Arc, atomic::AtomicBool},
++    sync::{
++        Arc,
++        atomic::{AtomicBool, AtomicUsize, Ordering},
++        mpsc::{self, Receiver, SyncSender, TryRecvError},
++    },
++    thread,
+ };
+ use windows_sys::Win32::{
+     Devices::Communication::{
+         COMMTIMEOUTS, ClearCommBreak, DCB, EscapeCommFunction, GetCommMask, GetCommState,
+         GetCommTimeouts, SETXON, SetCommMask, SetCommState, SetCommTimeouts,
+     },
+     Foundation::{
+         ERROR_DEVICE_NOT_CONNECTED, ERROR_INVALID_FUNCTION, ERROR_IO_INCOMPLETE, ERROR_IO_PENDING,
+         ERROR_NOT_SUPPORTED, ERROR_OPERATION_ABORTED, INVALID_HANDLE_VALUE,
+     },
+@@ -43,36 +48,43 @@
+ const CANCELLED: u32 = 0xc0000120;
+ const INVALID_HANDLE: u32 = 0xc0000008;
+ const DEVICE_BUSY: u32 = 0x80000011;
+ 
+ #[derive(Clone)]
+ pub(super) struct Binding {
+     pub(super) name: String,
+     endpoint: Result<Arc<File>, u32>,
+     read_only: bool,
+     probe_busy: Arc<AtomicBool>,
++    owner_busy: Arc<AtomicBool>,
+ }
+ struct Port {
+     binding: Binding,
+-    handle: Option<Handle>,
++    handle: Option<Session>,
+ }
+ struct Handle {
+     id: u32,
+     file: Arc<File>,
+     reads: bool,
+     writes: bool,
+     original: Option<(DCB, COMMTIMEOUTS)>,
+     original_mask: Option<u32>,
+     origin: Option<stats::Origin>,
++    probe_busy: Arc<AtomicBool>,
+ }
+ impl Drop for Handle {
+     fn drop(&mut self) {
++        // Handle exists only on its dedicated native owner. A timed-out read-only
++        // probe still owns kernel buffers; keep restoration and reopen quarantined.
++        while self.probe_busy.load(Ordering::Acquire) {
++            thread::sleep(stats::POLL);
++        }
+         if let Some((state, timeouts)) = &self.original {
+             unsafe {
+                 ClearCommBreak(self.file.as_raw_handle());
+                 EscapeCommFunction(self.file.as_raw_handle(), SETXON);
+                 SetCommState(self.file.as_raw_handle(), state);
+                 SetCommTimeouts(self.file.as_raw_handle(), timeouts);
+             }
+         }
+         if let Some(mask) = self.original_mask {
+             unsafe {
+@@ -139,20 +151,21 @@
+                     Err(last_error())
+                 } else {
+                     Ok(Arc::new(file))
+                 }
+             };
+             Ok(Binding {
+                 name,
+                 endpoint,
+                 read_only: mapping.read_only,
+                 probe_busy: Arc::default(),
++                owner_busy: Arc::default(),
+             })
+         })
+         .collect()
+ }
+ impl Port {
+     fn open(&self, id: u32, body: &[u8]) -> Result<Handle, u32> {
+         let access = u32_at(body, 0)?;
+         let len = u32_at(body, 28)? as usize;
+         if body.len() != 32 + len {
+             return Err(INVALID);
+@@ -188,37 +201,39 @@
+             return Err(last_error());
+         }
+         Ok(Handle {
+             id,
+             file,
+             reads,
+             writes,
+             original: writes.then_some((state, timeouts)),
+             original_mask: None,
+             origin: None,
++            probe_busy: self.binding.probe_busy.clone(),
+         })
+     }
+ }
+ // Buffer, OVERLAPPED and event retain stable addresses until native completion.
+ // Cancellation requests alone do not end the kernel's ownership of those buffers.
+ struct Pending {
+     request: Vec<u8>,
+     device: u32,
+     file: Arc<File>,
+     operation: Box<OVERLAPPED>,
+     _event: OwnedHandle,
+     input: Vec<u8>,
+     output: Vec<u8>,
+     major: u32,
+     code: u32,
+     wait: bool,
+     finished: bool,
++    cancelled: bool,
+     origin: Option<stats::Origin>,
+ }
+ impl Pending {
+     fn new(
+         request: Vec<u8>,
+         device: u32,
+         handle: &mut Handle,
+         major: u32,
+         wait_pending: bool,
+     ) -> Result<Self, u32> {
+@@ -278,20 +293,21 @@
+             device,
+             file: handle.file.clone(),
+             operation,
+             _event: event,
+             input,
+             output,
+             major,
+             code,
+             wait,
+             finished: false,
++            cancelled: false,
+             origin: handle.origin.filter(|_| code == control::GET_STATS),
+         };
+         let ok = unsafe {
+             match major {
+                 3 => ReadFile(
+                     pending.file.as_raw_handle(),
+                     pending.output.as_mut_ptr(),
+                     pending.output.len() as u32,
+                     std::ptr::null_mut(),
+                     &mut *pending.operation,
+@@ -342,218 +358,362 @@
+             stats::completed_count(
+                 self.origin.as_ref(),
+                 self.code,
+                 &mut self.output,
+                 transferred,
+             )
+         };
+         let result = super::serial_completion::terminal_data(self.major, &mut self.output, outcome);
+         Some(complete(&self.request, result))
+     }
+-    fn cancel_and_retire(&mut self) -> Vec<u8> {
+-        let handle = self.file.as_raw_handle();
+-        let operation = &*self.operation as *const OVERLAPPED;
+-        let code = self.code;
+-        let origin = self.origin;
+-        let response = super::serial_completion::cancel_and_collect(
+-            &self.request,
+-            self.major,
+-            &mut self.output,
+-            || unsafe {
+-                CancelIoEx(handle, operation);
+-            },
+-            || {
+-                // This wait retains self's buffers/event/handle until native
+-                // completion; CancelIoEx alone does not decide the outcome.
+-                let mut transferred = 0;
+-                let ok = unsafe { GetOverlappedResult(handle, operation, &mut transferred, 1) };
+-                if ok == 0 {
+-                    Err(last_error())
+-                } else {
+-                    Ok(transferred)
+-                }
+-            },
+-            |output, transferred| {
+-                stats::completed_count(origin.as_ref(), code, output, transferred)
+-            },
+-        );
+-        self.finished = true;
+-        response
++    fn request_cancel(&mut self) {
++        if !self.finished && !self.cancelled {
++            self.cancelled = true;
++            unsafe {
++                CancelIoEx(self.file.as_raw_handle(), &*self.operation);
++            }
++        }
+     }
+ }
+ impl Drop for Pending {
+     fn drop(&mut self) {
+         if !self.finished {
+             let mut transferred = 0;
++            self.request_cancel();
+             unsafe {
+-                CancelIoEx(self.file.as_raw_handle(), &*self.operation);
+-                // Only this filesystem/device worker can wait for a driver; the
+-                // protocol and UI threads never join it or own the native buffers.
++                // Unwind fallback runs only on the bounded issuing owner, never
++                // on the shared device worker. Retain buffers until terminal.
+                 GetOverlappedResult(
+                     self.file.as_raw_handle(),
+                     &*self.operation,
+                     &mut transferred,
+                     1,
+                 );
+             }
+         }
+     }
+ }
++// Capacity is reserved before spawning and therefore before any logical-open
++// native call. The binding flag is shared across certificate-attempt clones.
++const OWNER_LIMIT: usize = 16;
++const ORDINARY_LIMIT: usize = 16;
++const QUEUE_LIMIT: usize = ORDINARY_LIMIT + 2; // SET_WAIT_MASK escape and CLOSE
++static LIVE_OWNERS: AtomicUsize = AtomicUsize::new(0);
++struct OwnerPermit(Arc<AtomicBool>);
++impl OwnerPermit {
++    fn reserve(binding: &Arc<AtomicBool>) -> Option<Self> {
++        if binding.swap(true, Ordering::AcqRel) {
++            return None;
++        }
++        if LIVE_OWNERS
++            .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
++                (n < OWNER_LIMIT).then_some(n + 1)
++            })
++            .is_err()
++        {
++            binding.store(false, Ordering::Release);
++            return None;
++        }
++        Some(Self(binding.clone()))
++    }
++}
++impl Drop for OwnerPermit {
++    fn drop(&mut self) {
++        LIVE_OWNERS.fetch_sub(1, Ordering::AcqRel);
++        self.0.store(false, Ordering::Release);
++    }
++}
++enum OwnerEvent {
++    Opened(Vec<u8>, bool),
++    Response(Vec<u8>),
++    Closed(Vec<u8>),
++}
++struct Session {
++    id: u32,
++    sender: SyncSender<Vec<u8>>,
++    events: Receiver<OwnerEvent>,
++    published: bool,
++    closing: bool,
++}
++impl Session {
++    fn start(binding: Binding, id: u32, request: Vec<u8>) -> Result<Self, u32> {
++        let permit = OwnerPermit::reserve(&binding.owner_busy).ok_or(DEVICE_BUSY)?;
++        let (sender, commands) = mpsc::sync_channel(QUEUE_LIMIT);
++        let (responses, events) = mpsc::sync_channel(QUEUE_LIMIT + 1);
++        // Spawn failure drops the closure (including its permit) before any
++        // native data/control/open-initialization operation can have been issued.
++        thread::Builder::new()
++            .name("rdp-serial-owner".into())
++            .spawn(move || {
++                let terminal = run_owner(binding, id, request, commands, &responses);
++                drop(permit);
++                if let Some(event) = terminal {
++                    let _ = responses.send(event);
++                }
++            })
++            .map_err(|_| 0xc000009au32)?;
++        Ok(Self {
++            id,
++            sender,
++            events,
++            published: false,
++            closing: false,
++        })
++    }
++    fn submit(&mut self, request: Vec<u8>) -> Result<(), Vec<u8>> {
++        let close = u32_at(&request, 16) == Ok(2);
++        match self.sender.try_send(request) {
++            Ok(()) => {
++                self.closing |= close;
++                Ok(())
++            }
++            Err(mpsc::TrySendError::Full(request) | mpsc::TrySendError::Disconnected(request)) => {
++                Err(request)
++            }
++        }
++    }
++}
++// This is the issuing thread for every Native Pending on this logical handle.
++// Stack declaration order retires pending requests before Handle restoration on
++// unwind. Pending::drop is only an owner-thread fallback, never a worker join.
++fn run_owner(
++    binding: Binding,
++    id: u32,
++    request: Vec<u8>,
++    commands: Receiver<Vec<u8>>,
++    responses: &SyncSender<OwnerEvent>,
++) -> Option<OwnerEvent> {
++    let port = Port {
++        binding,
++        handle: None,
++    };
++    let mut handle = match port.open(id, &request[24..]) {
++        Ok(handle) => handle,
++        Err(error) => {
++            return Some(OwnerEvent::Opened(complete(&request, Err(error)), false));
++        }
++    };
++    let mut pending: VecDeque<Pending> = VecDeque::new();
++    let file = handle.file.clone();
++    let probe = stats::Probe::start(&port.binding.probe_busy, move |cancel, deadline| {
++        stats_windows::baseline(&file, cancel, deadline)
++    });
++    handle.origin = loop {
++        if let Err(TryRecvError::Disconnected) = commands.try_recv() {
++            return None;
++        }
++        match &probe {
++            None => break None,
++            Some(probe) => {
++                if let Some(origin) = probe.poll() {
++                    break origin;
++                }
++            }
++        }
++        thread::sleep(stats::POLL);
++    };
++    drop(probe);
++    let mut body = id.to_le_bytes().to_vec();
++    body.push(0);
++    if responses
++        .send(OwnerEvent::Opened(complete(&request, Ok(body)), true))
++        .is_err()
++    {
++        return None;
++    }
++    let mut close = None;
++    let mut disconnected = false;
++    loop {
++        // Bound work per poll, preserving completion and cancellation progress.
++        for _ in 0..QUEUE_LIMIT {
++            let request = match commands.try_recv() {
++                Ok(request) => request,
++                Err(TryRecvError::Empty) => break,
++                Err(TryRecvError::Disconnected) => {
++                    disconnected = true;
++                    break;
++                }
++            };
++            let major = u32_at(&request, 16).unwrap();
++            if close.is_some() || disconnected {
++                let _ = responses.send(OwnerEvent::Response(complete(&request, Err(DEVICE_BUSY))));
++            } else if major == 2 {
++                close = Some(request);
++            } else {
++                let escape = major == 14 && is_wait_mask_set(&request[24..]);
++                let limit = ORDINARY_LIMIT + usize::from(escape);
++                if pending.len() >= limit {
++                    let _ =
++                        responses.send(OwnerEvent::Response(complete(&request, Err(DEVICE_BUSY))));
++                    continue;
++                }
++                let device = u32_at(&request, 4).unwrap();
++                match Pending::new(
++                    request.clone(),
++                    device,
++                    &mut handle,
++                    major,
++                    pending.iter().any(|p| p.wait),
++                ) {
++                    Ok(operation) => pending.push_back(operation),
++                    Err(error) => {
++                        let _ =
++                            responses.send(OwnerEvent::Response(complete(&request, Err(error))));
++                    }
++                }
++            }
++        }
++        if close.is_some() || disconnected {
++            for operation in &mut pending {
++                operation.request_cancel();
++            }
++        }
++        pending.retain_mut(|operation| match operation.ready() {
++            None => true,
++            Some(response) => {
++                let _ = responses.send(OwnerEvent::Response(response));
++                false
++            }
++        });
++        if (close.is_some() || disconnected) && pending.is_empty() {
++            // May quarantine this owner for a stuck optional probe or restoration
++            // call. Its binding/global permit remains held, without a worker wait.
++            drop(handle);
++            return close.map(|request| OwnerEvent::Closed(complete(&request, Ok(vec![0; 4]))));
++        }
++        thread::sleep(stats::POLL);
++    }
++}
+ struct Opening {
+     request: Vec<u8>,
+     device: u32,
+-    handle: Handle,
+-    probe: Option<stats::Probe>,
+ }
+ pub(super) struct Serial {
+     opening: VecDeque<Opening>,
+     ports: BTreeMap<u32, Port>,
+-    pending: VecDeque<Pending>,
+-    completed: Vec<Vec<u8>>,
+     next_handle: u32,
+ }
+ impl Serial {
+     pub(super) fn new(start: u32, bindings: Vec<Binding>) -> Self {
+         Self {
+             ports: bindings
+                 .into_iter()
+                 .enumerate()
+                 .map(|(i, binding)| {
+                     (
+                         start + i as u32,
+                         Port {
+                             binding,
+                             handle: None,
+                         },
+                     )
+                 })
+                 .collect(),
+-            pending: VecDeque::new(),
+             opening: VecDeque::new(),
+-            completed: Vec::new(),
+             next_handle: 1,
+         }
+     }
+     pub(super) fn contains(&self, device: u32) -> bool {
+         self.ports.contains_key(&device)
+     }
+     pub(super) fn has_pending(&self) -> bool {
+-        !self.opening.is_empty() || !self.pending.is_empty() || !self.completed.is_empty()
++        !self.opening.is_empty() || self.ports.values().any(|port| port.handle.is_some())
+     }
+     pub(super) fn process(&mut self, request: Vec<u8>) -> Option<Vec<u8>> {
+         let device = u32_at(&request, 4).unwrap();
+         let id = u32_at(&request, 8).unwrap();
+         let major = u32_at(&request, 16).unwrap();
+         if u32_at(&request, 20).unwrap() != 0 {
+             return Some(complete(&request, Err(UNSUPPORTED)));
+         }
+         let port = self.ports.get_mut(&device).unwrap();
+         let result = if major == 0 {
+-            if self.opening.iter().any(|opening| opening.device == device) {
+-                return Some(complete(&request, Err(DEVICE_BUSY)));
+-            }
+-            match port.open(self.next_handle, &request[24..]) {
+-                Err(error) => Err(error),
+-                Ok(handle) => {
+-                    let Some(next) = self.next_handle.checked_add(1) else {
+-                        return Some(complete(&request, Err(0xc000009a)));
+-                    };
+-                    self.next_handle = next;
+-                    let file = handle.file.clone();
+-                    let probe =
+-                        stats::Probe::start(&port.binding.probe_busy, move |cancel, deadline| {
+-                            stats_windows::baseline(&file, cancel, deadline)
+-                        });
+-                    self.opening.push_back(Opening {
+-                        request,
+-                        device,
+-                        handle,
+-                        probe,
+-                    });
+-                    return None;
+-                }
+-            }
+-        } else if port.handle.as_ref().is_some_and(|handle| handle.id == id) {
+-            if major == 2 {
+-                if request.len() != 56 {
+-                    Err(INVALID)
+-                } else {
+-                    let mut active = VecDeque::new();
+-                    for mut pending in self.pending.drain(..) {
+-                        if pending.device == device {
+-                            self.completed.push(pending.cancel_and_retire());
+-                            // Retire native buffers before restoring the port state.
+-                            drop(pending);
+-                        } else {
+-                            active.push_back(pending);
+-                        }
+-                    }
+-                    self.pending = active;
+-                    port.handle = None;
+-                    Ok(vec![0; 4])
+-                }
+-            } else {
+-                match Pending::new(
+-                    request.clone(),
+-                    device,
+-                    port.handle.as_mut().unwrap(),
+-                    major,
+-                    self.pending
+-                        .iter()
+-                        .any(|pending| pending.device == device && pending.wait),
+-                ) {
+-                    Ok(pending) => {
+-                        self.pending.push_back(pending);
++            if port.handle.is_some() {
++                Err(DEVICE_BUSY)
++            } else if let Some(next) = self.next_handle.checked_add(1) {
++                match Session::start(port.binding.clone(), self.next_handle, request.clone()) {
++                    Err(error) => Err(error),
++                    Ok(session) => {
++                        self.next_handle = next;
++                        port.handle = Some(session);
++                        self.opening.push_back(Opening { request, device });
+                         return None;
+                     }
+-                    Err(error) => Err(error),
+-                }
++                }
++            } else {
++                Err(0xc000009a)
++            }
++        } else if let Some(session) = port.handle.as_mut().filter(|s| s.published && s.id == id) {
++            if session.closing {
++                Err(DEVICE_BUSY)
++            } else if major == 2 && request.len() != 56 {
++                Err(INVALID)
++            } else {
++                return match session.submit(request) {
++                    Ok(()) => None,
++                    Err(request) => Some(complete(&request, Err(DEVICE_BUSY))),
++                };
+             }
+         } else {
+             Err(INVALID_HANDLE)
+         };
+         Some(complete(&request, result))
+     }
+     pub(super) fn ready(&mut self) -> Vec<Vec<u8>> {
+-        let mut responses = std::mem::take(&mut self.completed);
+-        // Publish successful CREATE replies in admission order, including fallback opens.
++        let mut responses = Vec::new();
++        // CREATE responses preserve admission order; unpublished IDs reject I/O.
+         while let Some(first) = self.opening.front() {
+-            let origin = match &first.probe {
+-                Some(probe) => match probe.poll() {
+-                    Some(origin) => origin,
+-                    None => break,
+-                },
+-                None => None,
++            let port = self.ports.get_mut(&first.device).unwrap();
++            let session = port.handle.as_mut().unwrap();
++            match session.events.try_recv() {
++                Ok(OwnerEvent::Opened(response, success)) => {
++                    responses.push(response);
++                    if success {
++                        session.published = true;
++                    } else {
++                        port.handle = None;
++                    }
++                }
++                Err(TryRecvError::Empty) => break,
++                Err(TryRecvError::Disconnected) => {
++                    responses.push(complete(&first.request, Err(CANCELLED)));
++                    port.handle = None;
++                }
++                _ => unreachable!("owner must initialize before accepting requests"),
++            }
++            self.opening.pop_front();
++        }
++        for port in self.ports.values_mut() {
++            let Some(session) = port.handle.as_mut().filter(|s| s.published) else {
++                continue;
+             };
+-            let mut opening = self.opening.pop_front().unwrap();
+-            opening.handle.origin = origin;
+-            let mut body = opening.handle.id.to_le_bytes().to_vec();
+-            body.push(0);
+-            self.ports.get_mut(&opening.device).unwrap().handle = Some(opening.handle);
+-            responses.push(complete(&opening.request, Ok(body)));
+-        }
+-        self.pending.retain_mut(|pending| match pending.ready() {
+-            Some(response) => {
+-                responses.push(response);
+-                false
+-            }
+-            None => true,
+-        });
++            let mut closed = false;
++            while let Ok(event) = session.events.try_recv() {
++                match event {
++                    OwnerEvent::Response(response) => responses.push(response),
++                    OwnerEvent::Closed(response) => {
++                        responses.push(response);
++                        closed = true;
++                        break;
++                    }
++                    OwnerEvent::Opened(..) => unreachable!(),
++                }
++            }
++            if closed {
++                port.handle = None;
++            }
++        }
+         responses
+     }
+ }
+-impl Drop for Serial {
+-    fn drop(&mut self) {
+-        self.opening.clear();
+-        self.pending.clear(); /* retire native buffers before handle state restoration */
+-    }
+-}
++// Dropping Serial only disconnects channels. Its bounded native owners retain
++// all kernel-owned resources and restore state after terminal completion.
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+     #[test]
+     fn explicit_com_names_exclude_ambient_files_and_device_namespaces() {
+         for value in ["COM0", "COM01", "COM257", "COM1\\other", "NUL", "C:\\data"] {
+             assert!(com_name(value).is_none());
+         }
+         assert_eq!(com_name("com256").as_deref(), Some("COM256"));
+     }
+--- /dev/null
++++ b/tests/windows-serial-owner-component/Cargo.toml
+@@ -0,0 +1,7 @@
++[package]
++name = "windows-serial-owner-component"
++version = "0.1.9878"
++edition = "2024"
++
++[lib]
++path = "main.rs"
+--- /dev/null
++++ b/tests/windows-serial-owner-component/Cargo.lock
+@@ -0,0 +1,7 @@
++# This file is automatically @generated by Cargo.
++# It is not intended for manual editing.
++version = 4
++
++[[package]]
++name = "windows-serial-owner-component"
++version = "0.1.9878"
+--- /dev/null
++++ b/tests/windows-serial-owner-component/generate.py
+@@ -0,0 +1,28 @@
++from pathlib import Path
++import json,hashlib,sys
++p=Path(__file__).resolve().parent
++root=Path(sys.argv[1]).resolve() if len(sys.argv)>1 else p.parents[1]
++src=root/'engines/rdp/src'
++for name in ['serial_windows.rs','serial_stats_windows.rs']:
++ s=(src/name).read_text().replace('use windows_sys::','use crate::windows_sys::')
++ s=s.replace('    os::windows::io::{AsRawHandle, FromRawHandle, OwnedHandle},\n','')
++ # Top-level module keeps its inner documentation first.
++ pos=s.index('use ')
++ s=s[:pos]+'use crate::native_io::{AsRawHandle, FromRawHandle, OwnedHandle};\n'+s[pos:]
++ if name=='serial_windows.rs':
++  s=s.replace('thread::Builder::new()', 'crate::spawn_boundary::Builder::new()')
++  for child in ['serial_windows_control.rs','serial_stats.rs']:
++   s=s.replace('"'+child+'"',json.dumps(str(src/child)))
++ (p/name).write_text(s)
++# Preserve actual completion wire encoder and the FIX1 completion module.
++s=(src/'devices.rs').read_text()
++def fn(name):
++ a=s.index('fn '+name+'('); b=s.index('{',a); depth=1;c=b+1
++ while depth:
++  if s[c]=='{':depth+=1
++  if s[c]=='}':depth-=1
++  c+=1
++ return s[a:c]+'\n'
++(p/'helpers.rs').write_text('\n'.join(fn(n) for n in ['u32_at','word','header','length_data','complete','completion_header','failure']))
++(p/'completion.rs').write_text((src/'serial_completion.rs').read_text())
++(p/'inputs.json').write_text(json.dumps({str(q.relative_to(root)):hashlib.sha256(q.read_bytes()).hexdigest() for q in [src/n for n in ['devices.rs','serial_windows.rs','serial_stats_windows.rs','serial_stats.rs','serial_windows_control.rs','serial_completion.rs']]},indent=2)+'\n')
+--- /dev/null
++++ b/tests/windows-serial-owner-component/main.rs
+@@ -0,0 +1,862 @@
++//! Linux controlled-boundary execution of the exact Windows serial source.
++//! Win32, OS handles and thread spawning are replaced only at their boundaries.
++#![cfg(target_os = "linux")]
++#![allow(dead_code, non_snake_case, non_camel_case_types, unused_imports)]
++use std::{
++    collections::{BTreeMap, BTreeSet, VecDeque},
++    fs::File,
++    sync::{
++        Arc, Mutex, OnceLock,
++        atomic::{AtomicBool, AtomicUsize, Ordering},
++    },
++    time::{Duration, Instant},
++};
++const INVALID: u32 = 0xc000000d;
++const DENIED: u32 = 0xc0000022;
++const UNSUPPORTED: u32 = 0xc00000bb;
++const MAX_IO: usize = 64 * 1024;
++fn status(_: std::io::Error) -> u32 {
++    0xc0000001
++}
++include!("helpers.rs");
++#[path = "completion.rs"]
++mod serial_completion;
++mod rdp_options {
++    #[derive(Clone)]
++    pub struct SerialMapping {
++        pub name: String,
++        pub path: std::path::PathBuf,
++        pub read_only: bool,
++    }
++}
++#[path = "serial_windows.rs"]
++mod serial;
++mod native_io {
++    use std::{
++        fs::File,
++        os::fd::{AsRawFd, FromRawFd},
++    };
++    pub trait AsRawHandle {
++        fn as_raw_handle(&self) -> *mut std::ffi::c_void;
++    }
++    impl AsRawHandle for File {
++        fn as_raw_handle(&self) -> *mut std::ffi::c_void {
++            self.as_raw_fd() as usize as _
++        }
++    }
++    pub trait FromRawHandle {
++        unsafe fn from_raw_handle(raw: *mut std::ffi::c_void) -> Self;
++    }
++    impl FromRawHandle for File {
++        unsafe fn from_raw_handle(raw: *mut std::ffi::c_void) -> Self {
++            unsafe { Self::from_raw_fd(raw as i32) }
++        }
++    }
++    pub struct OwnedHandle(pub usize);
++    impl AsRawHandle for OwnedHandle {
++        fn as_raw_handle(&self) -> *mut std::ffi::c_void {
++            self.0 as _
++        }
++    }
++    impl FromRawHandle for OwnedHandle {
++        unsafe fn from_raw_handle(raw: *mut std::ffi::c_void) -> Self {
++            Self(raw as usize)
++        }
++    }
++    impl Drop for OwnedHandle {
++        fn drop(&mut self) {
++            let mut s = super::state().lock().unwrap();
++            if s.ops.values().any(|o| o.event == self.0) {
++                s.early_drop = true;
++            }
++            if let Some(owner) = s.event_threads.get(&self.0) {
++                if *owner != std::thread::current().id() {
++                    s.wrong_thread = true;
++                }
++            }
++            s.events_dropped += 1;
++        }
++    }
++}
++#[derive(Clone)]
++struct Op {
++    owner: std::thread::ThreadId,
++    fill: u8,
++    handle: usize,
++    output: usize,
++    len: u32,
++    event: usize,
++    terminal: Option<Result<u32, u32>>,
++    cancels: usize,
++    code: u32,
++}
++#[derive(Default)]
++struct State {
++    ops: BTreeMap<usize, Op>,
++    early_drop: bool,
++    events_dropped: usize,
++    restores: usize,
++    blocking_waits: usize,
++    issued: usize,
++    init_block: bool,
++    init_entered: bool,
++    stats_pending: bool,
++    stats_calls: usize,
++    submit_block: bool,
++    submit_entered: bool,
++    wrong_thread: bool,
++    event_threads: BTreeMap<usize, std::thread::ThreadId>,
++}
++fn state() -> &'static Mutex<State> {
++    static S: OnceLock<Mutex<State>> = OnceLock::new();
++    S.get_or_init(Default::default)
++}
++unsafe extern "C" {
++    fn __errno_location() -> *mut i32;
++}
++fn error(n: u32) {
++    unsafe {
++        *__errno_location() = n as i32;
++    }
++}
++mod api {
++    use super::*;
++    pub type HANDLE = *mut std::ffi::c_void;
++    pub const ERROR_IO_INCOMPLETE: u32 = 996;
++    pub const ERROR_IO_PENDING: u32 = 997;
++    pub const ERROR_OPERATION_ABORTED: u32 = 995;
++    pub const ERROR_DEVICE_NOT_CONNECTED: u32 = 1167;
++    pub const ERROR_INVALID_FUNCTION: u32 = 1;
++    pub const ERROR_NOT_SUPPORTED: u32 = 50;
++    pub const INVALID_HANDLE_VALUE: HANDLE = usize::MAX as _;
++    pub const SETXON: u32 = 1;
++    pub const FILE_FLAG_OVERLAPPED: u32 = 1;
++    pub const OPEN_EXISTING: u32 = 3;
++    #[derive(Default)]
++    pub struct DCB {
++        pub DCBlength: u32,
++    }
++    #[derive(Default)]
++    pub struct COMMTIMEOUTS {
++        pub a: u32,
++    }
++    #[derive(Default)]
++    pub struct OVERLAPPED {
++        pub hEvent: HANDLE,
++    }
++    pub struct SERIAL_STATUS {
++        a: [u8; 20],
++    }
++    pub struct SERIAL_COMMPROP {
++        a: [u8; 64],
++    }
++    pub struct SERIALPERF_STATS {
++        a: [u8; 24],
++    }
++    pub unsafe fn CreateFileW(
++        _: *const u16,
++        _: u32,
++        _: u32,
++        _: *const (),
++        _: u32,
++        _: u32,
++        _: HANDLE,
++    ) -> HANDLE {
++        use std::os::fd::IntoRawFd;
++        File::open("/dev/null").unwrap().into_raw_fd() as usize as _
++    }
++    pub unsafe fn GetCommState(_: HANDLE, _: *mut DCB) -> i32 {
++        loop {
++            let mut s = state().lock().unwrap();
++            s.init_entered = true;
++            if !s.init_block {
++                return 1;
++            }
++            drop(s);
++            std::thread::sleep(Duration::from_millis(1));
++        }
++    }
++    pub unsafe fn GetCommTimeouts(_: HANDLE, _: *mut COMMTIMEOUTS) -> i32 {
++        1
++    }
++    pub unsafe fn GetCommMask(_: HANDLE, m: *mut u32) -> i32 {
++        unsafe {
++            *m = 0;
++        }
++        1
++    }
++    pub unsafe fn ClearCommBreak(_: HANDLE) -> i32 {
++        1
++    }
++    pub unsafe fn EscapeCommFunction(_: HANDLE, _: u32) -> i32 {
++        1
++    }
++    pub unsafe fn SetCommState(handle: HANDLE, _: *const DCB) -> i32 {
++        let mut s = state().lock().unwrap();
++        if s.ops.values().any(|o| o.handle == handle as usize) {
++            s.early_drop = true;
++        }
++        s.restores += 1;
++        1
++    }
++    pub unsafe fn SetCommTimeouts(_: HANDLE, _: *const COMMTIMEOUTS) -> i32 {
++        1
++    }
++    pub unsafe fn SetCommMask(_: HANDLE, _: u32) -> i32 {
++        1
++    }
++    pub unsafe fn CreateEventW(_: *const (), _: i32, _: i32, _: *const u16) -> HANDLE {
++        static NEXT: AtomicUsize = AtomicUsize::new(1000);
++        NEXT.fetch_add(1, Ordering::SeqCst) as _
++    }
++    fn issue(handle: HANDLE, out: *mut u8, len: u32, op: *mut OVERLAPPED, code: u32) -> i32 {
++        let event = unsafe { (*op).hEvent as usize };
++        let mut s = state().lock().unwrap();
++        s.issued += 1;
++        s.event_threads.insert(event, std::thread::current().id());
++        s.ops.insert(
++            op as usize,
++            Op {
++                owner: std::thread::current().id(),
++                fill: 7,
++                handle: handle as usize,
++                output: out as usize,
++                len,
++                event,
++                terminal: None,
++                cancels: 0,
++                code,
++            },
++        );
++        drop(s);
++        error(ERROR_IO_PENDING);
++        0
++    }
++    pub unsafe fn ReadFile(
++        handle: HANDLE,
++        out: *mut u8,
++        n: u32,
++        _: *mut u32,
++        op: *mut OVERLAPPED,
++    ) -> i32 {
++        loop {
++            let mut s = state().lock().unwrap();
++            s.submit_entered = true;
++            if !s.submit_block {
++                break;
++            }
++            drop(s);
++            std::thread::sleep(Duration::from_millis(1));
++        }
++        issue(handle, out, n, op, 3)
++    }
++    pub unsafe fn WriteFile(
++        handle: HANDLE,
++        _: *const u8,
++        n: u32,
++        _: *mut u32,
++        op: *mut OVERLAPPED,
++    ) -> i32 {
++        issue(handle, std::ptr::null_mut(), n, op, 4)
++    }
++    pub unsafe fn DeviceIoControl(
++        handle: HANDLE,
++        code: u32,
++        _: *const std::ffi::c_void,
++        _: u32,
++        out: *mut std::ffi::c_void,
++        n: u32,
++        _: *mut u32,
++        op: *mut OVERLAPPED,
++    ) -> i32 {
++        if code == 0x001b008c {
++            let result = issue(handle, out.cast(), n, op, code);
++            let mut s = state().lock().unwrap();
++            s.stats_calls += 1;
++            let fill = if s.stats_calls == 1 { 40 } else { 43 };
++            let pending = s.stats_pending;
++            let o = s.ops.get_mut(&(op as usize)).unwrap();
++            o.fill = fill;
++            if !pending {
++                o.terminal = Some(Ok(24));
++            }
++            drop(s);
++            error(ERROR_IO_PENDING);
++            return result;
++        }
++        if code == 0x001b0044 {
++            let mut s = state().lock().unwrap();
++            for o in s.ops.values_mut() {
++                if o.code == 0x001b0048 {
++                    o.terminal = Some(Ok(4));
++                }
++            }
++            drop(s);
++            unsafe {
++                std::ptr::write_bytes(out, 0, n as usize);
++            }
++            return 1;
++        }
++        issue(handle, out.cast(), n, op, code)
++    }
++    pub unsafe fn CancelIoEx(_: HANDLE, op: *const OVERLAPPED) -> i32 {
++        let mut s = state().lock().unwrap();
++        if let Some(o) = s.ops.get_mut(&(op as usize)) {
++            o.cancels += 1;
++            if o.owner != std::thread::current().id() {
++                s.wrong_thread = true;
++            }
++        }
++        1
++    }
++    pub unsafe fn GetOverlappedResult(
++        _: HANDLE,
++        op: *const OVERLAPPED,
++        n: *mut u32,
++        wait: i32,
++    ) -> i32 {
++        loop {
++            let mut s = state().lock().unwrap();
++            if let Some(o) = s.ops.get(&(op as usize)).cloned() {
++                if o.owner != std::thread::current().id() {
++                    s.wrong_thread = true;
++                }
++                match o.terminal {
++                    None => {
++                        if wait != 0 {
++                            s.blocking_waits += 1;
++                            drop(s);
++                            std::thread::sleep(Duration::from_millis(1));
++                            continue;
++                        }
++                        error(ERROR_IO_INCOMPLETE);
++                        return 0;
++                    }
++                    Some(result) => {
++                        s.ops.remove(&(op as usize));
++                        drop(s);
++                        match result {
++                            Ok(count) => {
++                                if o.output != 0 {
++                                    unsafe {
++                                        std::ptr::write_bytes(
++                                            o.output as *mut u8,
++                                            o.fill,
++                                            count.min(o.len) as usize,
++                                        );
++                                    }
++                                }
++                                unsafe {
++                                    *n = count;
++                                }
++                                return 1;
++                            }
++                            Err(e) => {
++                                error(e);
++                                return 0;
++                            }
++                        }
++                    }
++                }
++            } else {
++                unsafe {
++                    *n = 0;
++                }
++                return 1;
++            }
++        }
++    }
++}
++mod windows_sys {
++    pub mod Win32 {
++        pub mod Foundation {
++            pub use crate::api::*;
++        }
++        pub mod Devices {
++            pub mod Communication {
++                pub use crate::api::*;
++            }
++            pub mod SerialCommunication {
++                pub use crate::api::*;
++            }
++        }
++        pub mod Storage {
++            pub mod FileSystem {
++                pub use crate::api::*;
++            }
++        }
++        pub mod System {
++            pub mod IO {
++                pub use crate::api::*;
++            }
++            pub mod Threading {
++                pub use crate::api::*;
++            }
++        }
++    }
++}
++fn req(device: u32, id: u32, major: u32, completion: u32) -> Vec<u8> {
++    let mut r = vec![114, 68, 82, 73];
++    for n in [device, id, completion, major, 0] {
++        r.extend(n.to_le_bytes());
++    }
++    r.resize(56, 0);
++    r
++}
++fn open(device: u32, completion: u32) -> Vec<u8> {
++    let mut r = req(device, 0, 0, completion);
++    r[24..28].copy_from_slice(&0xc0000000u32.to_le_bytes());
++    r[44..48].copy_from_slice(&1u32.to_le_bytes());
++    r
++}
++fn data(device: u32, id: u32, major: u32, completion: u32) -> Vec<u8> {
++    let mut r = req(device, id, major, completion);
++    r[24..28].copy_from_slice(&3u32.to_le_bytes());
++    if major == 4 {
++        r.extend([1, 2, 3]);
++    }
++    r
++}
++fn bindings(n: usize) -> Vec<serial::Binding> {
++    serial::bind(
++        &(1..=n)
++            .map(|n| rdp_options::SerialMapping {
++                name: format!("COM{n}"),
++                path: format!(r"\\.\COM{n}").into(),
++                read_only: false,
++            })
++            .collect::<Vec<_>>(),
++    )
++    .unwrap()
++}
++fn wait(mut f: impl FnMut() -> bool) {
++    let end = Instant::now() + Duration::from_secs(3);
++    while !f() {
++        assert!(Instant::now() < end, "timed out");
++        std::thread::sleep(Duration::from_millis(2));
++    }
++}
++fn finish(result: Result<u32, u32>) {
++    for op in state().lock().unwrap().ops.values_mut() {
++        op.terminal = Some(result);
++    }
++}
++#[test]
++fn stuck_close_does_not_block_shared_dispatch_and_terminal_write_wins() {
++    reset();
++    let bindings = bindings(2);
++    let (tx, rx) = std::sync::mpsc::channel::<Option<Vec<u8>>>();
++    let (done, results) = std::sync::mpsc::channel();
++    let worker = std::thread::spawn(move || {
++        let mut s = serial::Serial::new(1, bindings);
++        while let Ok(r) = rx.recv() {
++            let v = match r {
++                Some(r) if u32_at(&r, 4) == Ok(99) => vec![complete(
++                    &r,
++                    Ok(length_data(std::fs::read("/etc/hostname").unwrap())),
++                )],
++                Some(r) => s.process(r).into_iter().collect(),
++                None => s.ready(),
++            };
++            done.send(v).unwrap();
++        }
++    });
++    tx.send(Some(open(1, 1))).unwrap();
++    results.recv().unwrap();
++    let mut opened = Vec::new();
++    wait(|| {
++        tx.send(None).unwrap();
++        opened.extend(results.recv().unwrap());
++        !opened.is_empty()
++    });
++    tx.send(Some(data(1, 1, 4, 2))).unwrap();
++    results.recv().unwrap();
++    wait(|| !state().lock().unwrap().ops.is_empty());
++    tx.send(Some(req(1, 1, 2, 3))).unwrap();
++    let prompt = results.recv_timeout(Duration::from_millis(100));
++    // Always unblock an old unsafe fixture before asserting, avoiding orphan test threads.
++    if prompt.is_err() {
++        finish(Ok(3));
++        results.recv_timeout(Duration::from_secs(3)).unwrap();
++        drop(tx);
++        worker.join().unwrap();
++        panic!("CLOSE blocked shared dispatcher while native cancellation was pending");
++    }
++    assert!(prompt.unwrap().is_empty());
++    tx.send(Some(open(2, 4))).unwrap();
++    results.recv().unwrap();
++    let mut other = Vec::new();
++    wait(|| {
++        tx.send(None).unwrap();
++        other.extend(results.recv().unwrap());
++        other.iter().any(|r| u32_at(r, 8) == Ok(4))
++    });
++    tx.send(Some(req(99, 0, 3, 5))).unwrap();
++    let file = results.recv_timeout(Duration::from_millis(100)).unwrap();
++    assert_eq!(u32_at(&file[0], 8), Ok(5));
++    assert_eq!(u32_at(&file[0], 12), Ok(0));
++    assert!(u32_at(&file[0], 16).unwrap() > 0);
++    assert!(!state().lock().unwrap().early_drop);
++    assert!(!state().lock().unwrap().wrong_thread);
++    finish(Ok(3));
++    let mut completion = Vec::new();
++    wait(|| {
++        tx.send(None).unwrap();
++        completion.extend(results.recv().unwrap());
++        completion.iter().any(|r| u32_at(r, 8) == Ok(3))
++    });
++    let write = completion.iter().find(|r| u32_at(r, 8) == Ok(2)).unwrap();
++    assert_eq!(&write[12..], &[0, 0, 0, 0, 3, 0, 0, 0, 0]);
++    drop(tx);
++    worker.join().unwrap();
++    wait(|| state().lock().unwrap().ops.is_empty());
++    assert!(!state().lock().unwrap().early_drop);
++    assert!(!state().lock().unwrap().wrong_thread);
++}
++fn reset() {
++    wait(|| state().lock().unwrap().ops.is_empty());
++    std::thread::sleep(Duration::from_millis(20));
++    *state().lock().unwrap() = State::default();
++}
++fn opened(s: &mut serial::Serial, device: u32, completion: u32) -> u32 {
++    assert!(s.process(open(device, completion)).is_none());
++    let mut r = Vec::new();
++    wait(|| {
++        r.extend(s.ready());
++        !r.is_empty()
++    });
++    assert_eq!(u32_at(&r[0], 12), Ok(0));
++    u32_at(&r[0], 16).unwrap()
++}
++fn close(s: &mut serial::Serial, device: u32, id: u32, completion: u32) -> Vec<Vec<u8>> {
++    assert!(s.process(req(device, id, 2, completion)).is_none());
++    let mut r = Vec::new();
++    wait(|| {
++        r.extend(s.ready());
++        r.iter().any(|p| u32_at(p, 8) == Ok(completion))
++    });
++    r
++}
++#[test]
++fn disconnect_quarantines_binding_buffers_and_late_abort_until_terminal() {
++    reset();
++    let b = bindings(1);
++    let mut first = serial::Serial::new(1, b.clone());
++    let id = opened(&mut first, 1, 10);
++    assert!(first.process(data(1, id, 3, 11)).is_none());
++    wait(|| !state().lock().unwrap().ops.is_empty());
++    let before = Instant::now();
++    drop(first);
++    assert!(before.elapsed() < Duration::from_millis(100));
++    wait(|| state().lock().unwrap().ops.values().all(|o| o.cancels == 1));
++    let mut next = serial::Serial::new(1, b);
++    let denied = next.process(open(1, 12)).unwrap();
++    assert_eq!(u32_at(&denied, 12), Ok(0x80000011));
++    assert_eq!(state().lock().unwrap().restores, 0);
++    assert!(!state().lock().unwrap().early_drop);
++    assert!(!state().lock().unwrap().wrong_thread);
++    finish(Err(api::ERROR_OPERATION_ABORTED));
++    wait(|| state().lock().unwrap().restores == 1);
++    // Retry after quarantine release must succeed on the same pinned binding.
++    let mut response = None;
++    wait(|| {
++        response = next.process(open(1, 13));
++        response.is_none()
++    });
++    let mut r = Vec::new();
++    wait(|| {
++        r.extend(next.ready());
++        !r.is_empty()
++    });
++    let id = u32_at(&r[0], 16).unwrap();
++    close(&mut next, 1, id, 14);
++    drop(next);
++    assert!(!state().lock().unwrap().early_drop);
++    assert!(!state().lock().unwrap().wrong_thread);
++    assert_eq!(state().lock().unwrap().blocking_waits, 0);
++}
++#[test]
++fn native_abort_is_reported_before_async_close_and_no_cancel_success_fabrication() {
++    reset();
++    let mut s = serial::Serial::new(1, bindings(1));
++    let id = opened(&mut s, 1, 20);
++    s.process(data(1, id, 3, 21));
++    wait(|| !state().lock().unwrap().ops.is_empty());
++    s.process(req(1, id, 2, 22));
++    wait(|| state().lock().unwrap().ops.values().all(|o| o.cancels == 1));
++    finish(Err(api::ERROR_OPERATION_ABORTED));
++    let mut r = Vec::new();
++    wait(|| {
++        r.extend(s.ready());
++        r.len() == 2
++    });
++    assert_eq!(u32_at(&r[0], 8), Ok(21));
++    assert_eq!(u32_at(&r[0], 12), Ok(0xc0000120));
++    assert_eq!(u32_at(&r[1], 8), Ok(22));
++    assert_eq!(state().lock().unwrap().restores, 1);
++    drop(s);
++}
++#[test]
++fn process_capacity_is_sixteen_and_disconnect_retains_all_stuck_owners() {
++    reset();
++    let b = bindings(17);
++    let mut s = serial::Serial::new(1, b.clone());
++    for n in 1..=16 {
++        assert!(s.process(open(n, 100 + n)).is_none());
++    }
++    let exhausted = s.process(open(17, 117)).unwrap();
++    assert_eq!(u32_at(&exhausted, 12), Ok(0x80000011));
++    let mut responses = Vec::new();
++    wait(|| {
++        responses.extend(s.ready());
++        responses.len() == 16
++    });
++    for n in 1..=16 {
++        assert!(s.process(data(n, n, 3, 200 + n)).is_none());
++    }
++    wait(|| state().lock().unwrap().ops.len() == 16);
++    drop(s);
++    wait(|| state().lock().unwrap().ops.values().all(|o| o.cancels == 1));
++    let mut retry = serial::Serial::new(1, b);
++    assert_eq!(
++        u32_at(&retry.process(open(17, 300)).unwrap(), 12),
++        Ok(0x80000011)
++    );
++    finish(Ok(3));
++    wait(|| state().lock().unwrap().restores == 16);
++    drop(retry);
++    assert!(!state().lock().unwrap().early_drop);
++    assert!(!state().lock().unwrap().wrong_thread);
++}
++fn ctl(device: u32, id: u32, code: u32, input: &[u8], capacity: u32, completion: u32) -> Vec<u8> {
++    let mut r = req(device, id, 14, completion);
++    r[24..28].copy_from_slice(&capacity.to_le_bytes());
++    r[28..32].copy_from_slice(&(input.len() as u32).to_le_bytes());
++    r[32..36].copy_from_slice(&code.to_le_bytes());
++    r.extend(input);
++    r
++}
++#[test]
++fn saturated_native_requests_preserve_wait_mask_reset_escape_and_close() {
++    reset();
++    let mut s = serial::Serial::new(1, bindings(1));
++    let id = opened(&mut s, 1, 400);
++    s.process(ctl(1, id, 0x001b0048, &[], 4, 401));
++    for n in 0..15 {
++        s.process(data(1, id, 3, 402 + n));
++    }
++    wait(|| state().lock().unwrap().ops.len() == 16);
++    // A second wait is rejected while the first wait remains live.
++    s.process(ctl(1, id, 0x001b0048, &[], 4, 420));
++    let mut response = Vec::new();
++    wait(|| {
++        response.extend(s.ready());
++        response.iter().any(|r| u32_at(r, 8) == Ok(420))
++    });
++    assert_ne!(u32_at(response.last().unwrap(), 12), Ok(0));
++    s.process(ctl(1, id, 0x001b0044, &0u32.to_le_bytes(), 0, 421));
++    wait(|| {
++        response.extend(s.ready());
++        response.iter().any(|r| u32_at(r, 8) == Ok(401))
++    });
++    assert!(
++        response
++            .iter()
++            .any(|r| u32_at(r, 8) == Ok(421) && u32_at(r, 12) == Ok(0))
++    );
++    s.process(req(1, id, 2, 422));
++    wait(|| state().lock().unwrap().ops.values().all(|o| o.cancels == 1));
++    finish(Err(api::ERROR_OPERATION_ABORTED));
++    wait(|| {
++        response.extend(s.ready());
++        response.iter().any(|r| u32_at(r, 8) == Ok(422))
++    });
++    drop(s);
++    assert!(!state().lock().unwrap().early_drop);
++    assert!(!state().lock().unwrap().wrong_thread);
++}
++#[test]
++fn blocked_logical_initialization_keeps_dispatch_and_nonblocking_queue_bounded() {
++    reset();
++    let b = bindings(1);
++    {
++        let mut s = state().lock().unwrap();
++        s.init_block = true;
++        s.init_entered = false;
++    }
++    let mut s = serial::Serial::new(1, b);
++    let start = Instant::now();
++    assert!(s.process(open(1, 500)).is_none());
++    assert!(start.elapsed() < Duration::from_millis(100));
++    wait(|| state().lock().unwrap().init_entered);
++    assert!(s.ready().is_empty());
++    let guessed = s.process(data(1, 1, 3, 501)).unwrap();
++    assert_eq!(u32_at(&guessed, 12), Ok(0xc0000008));
++    let start = Instant::now();
++    drop(s);
++    assert!(start.elapsed() < Duration::from_millis(100));
++    state().lock().unwrap().init_block = false;
++    wait(|| state().lock().unwrap().restores == 1);
++    assert!(!state().lock().unwrap().early_drop);
++    assert!(!state().lock().unwrap().wrong_thread);
++}
++
++mod spawn_boundary {
++    pub static FAIL: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
++    pub struct Builder(std::thread::Builder);
++    impl Builder {
++        pub fn new() -> Self {
++            Self(std::thread::Builder::new())
++        }
++        pub fn name(self, name: String) -> Self {
++            Self(self.0.name(name))
++        }
++        pub fn spawn<F, T>(self, f: F) -> std::io::Result<std::thread::JoinHandle<T>>
++        where
++            F: FnOnce() -> T + Send + 'static,
++            T: Send + 'static,
++        {
++            if FAIL.swap(false, std::sync::atomic::Ordering::SeqCst) {
++                return Err(std::io::Error::other("controlled spawn failure"));
++            }
++            self.0.spawn(f)
++        }
++    }
++}
++#[test]
++fn spawn_failure_releases_binding_and_process_capacity_before_any_native_io() {
++    reset();
++    let b = bindings(1);
++    let mut s = serial::Serial::new(1, b);
++    state().lock().unwrap().init_entered = false;
++    spawn_boundary::FAIL.store(true, Ordering::SeqCst);
++    let failed = s.process(open(1, 600)).unwrap();
++    assert_eq!(u32_at(&failed, 12), Ok(0xc000009a));
++    assert_eq!(state().lock().unwrap().issued, 0);
++    assert!(!state().lock().unwrap().init_entered);
++    let id = opened(&mut s, 1, 601);
++    close(&mut s, 1, id, 602);
++    drop(s);
++}
++#[test]
++fn stuck_probe_timeout_never_restores_or_reopens_until_native_probe_retires() {
++    reset();
++    let b = bindings(1);
++    state().lock().unwrap().stats_pending = true;
++    let mut s = serial::Serial::new(1, b.clone());
++    let id = opened(&mut s, 1, 700);
++    assert!(!state().lock().unwrap().ops.is_empty());
++    assert!(s.process(req(1, id, 2, 701)).is_none());
++    std::thread::sleep(Duration::from_millis(20));
++    assert!(s.ready().is_empty());
++    assert_eq!(state().lock().unwrap().restores, 0);
++    let mut retry = serial::Serial::new(1, b);
++    assert_eq!(
++        u32_at(&retry.process(open(1, 702)).unwrap(), 12),
++        Ok(0x80000011)
++    );
++    finish(Ok(24));
++    let mut r = Vec::new();
++    wait(|| {
++        r.extend(s.ready());
++        !r.is_empty()
++    });
++    assert_eq!(u32_at(&r[0], 8), Ok(701));
++    assert_eq!(state().lock().unwrap().restores, 1);
++    drop(s);
++    drop(retry);
++    assert!(!state().lock().unwrap().early_drop);
++    assert!(!state().lock().unwrap().wrong_thread);
++}
++#[test]
++fn bounded_nonblocking_request_queue_reports_every_rejected_id() {
++    reset();
++    let mut s = serial::Serial::new(1, bindings(1));
++    let id = opened(&mut s, 1, 800);
++    {
++        let mut state = state().lock().unwrap();
++        state.submit_block = true;
++        state.submit_entered = false;
++    }
++    assert!(s.process(data(1, id, 3, 801)).is_none());
++    wait(|| state().lock().unwrap().submit_entered);
++    for n in 0..18 {
++        assert!(s.process(data(1, id, 3, 802 + n)).is_none());
++    }
++    let busy = s.process(data(1, id, 3, 820)).unwrap();
++    assert_eq!(u32_at(&busy, 8), Ok(820));
++    assert_eq!(u32_at(&busy, 12), Ok(0x80000011));
++    state().lock().unwrap().submit_block = false;
++    let mut responses = vec![busy];
++    wait(|| {
++        responses.extend(s.ready());
++        state().lock().unwrap().ops.len() == 16
++    });
++    finish(Ok(3));
++    wait(|| {
++        responses.extend(s.ready());
++        responses.len() == 20
++    });
++    for response in &responses {
++        if u32_at(response, 12) == Ok(0) {
++            assert_eq!(&response[20..], &[7, 7, 7]);
++        }
++    }
++    let ids: BTreeSet<_> = responses.iter().map(|r| u32_at(r, 8).unwrap()).collect();
++    assert_eq!(ids, (801..=820).collect());
++    close(&mut s, 1, id, 821);
++    drop(s);
++    assert!(!state().lock().unwrap().early_drop);
++    assert!(!state().lock().unwrap().wrong_thread);
++}
++#[test]
++fn successful_create_replies_stay_in_admission_order_and_ids_unpublished() {
++    reset();
++    let b = bindings(2);
++    {
++        let mut state = state().lock().unwrap();
++        state.init_block = true;
++        state.init_entered = false;
++    }
++    let mut s = serial::Serial::new(1, b);
++    s.process(open(1, 900));
++    wait(|| state().lock().unwrap().init_entered);
++    s.process(open(2, 901));
++    let duplicate = s.process(open(1, 902)).unwrap();
++    assert_eq!(u32_at(&duplicate, 12), Ok(0x80000011));
++    assert_eq!(
++        u32_at(&s.process(data(2, 2, 3, 903)).unwrap(), 12),
++        Ok(0xc0000008)
++    );
++    assert!(s.ready().is_empty());
++    state().lock().unwrap().init_block = false;
++    let mut r = Vec::new();
++    wait(|| {
++        r.extend(s.ready());
++        r.len() == 2
++    });
++    assert_eq!(
++        r.iter().map(|p| u32_at(p, 8).unwrap()).collect::<Vec<_>>(),
++        vec![900, 901]
++    );
++    close(&mut s, 1, 1, 904);
++    close(&mut s, 2, 2, 905);
++    drop(s);
++}
++#[test]
++fn actor_stats_completion_uses_its_captured_logical_open_origin() {
++    reset();
++    let mut s = serial::Serial::new(1, bindings(1));
++    let id = opened(&mut s, 1, 1000);
++    s.process(ctl(1, id, 0x001b008c, &[], 24, 1001));
++    let mut r = Vec::new();
++    wait(|| {
++        r.extend(s.ready());
++        !r.is_empty()
++    });
++    assert_eq!(&r[0][12..20], &[0, 0, 0, 0, 24, 0, 0, 0]);
++    assert_eq!(&r[0][20..], &[3; 24]);
++    close(&mut s, 1, id, 1002);
++    drop(s);
++    assert!(!state().lock().unwrap().wrong_thread);
++}
+--- /dev/null
++++ b/tests/windows-serial-owner-component/README.md
+@@ -0,0 +1,14 @@
++# Windows serial native owner component
++
++This Linux fixture compiles the production Windows Serial, Handle, Pending, statistics probe, control validation and completion encoder. The generator preserves source bodies and replaces only the Win32 namespace, Windows OS-handle adapters and owner thread-spawn boundary. It records original input SHA-256 hashes. The shared-dispatch loop is controlled test scaffolding; its file-read branch uses the local filesystem. This is not Windows hardware execution.
++
++From the app root:
++
++```sh
++python3 tests/windows-serial-owner-component/generate.py
++CARGO_BUILD_JOBS=2 cargo +1.95.0 test --manifest-path tests/windows-serial-owner-component/Cargo.toml --offline --locked -j 2 -- --test-threads=1
++```
++
++Run serially because the controlled kernel state is process-global. Tests cover stuck cancellation with other-port/file progress, actual write success and read abort, shared-binding quarantine on disconnect, sixteen retained owners/process capacity, saturation with SET_WAIT_MASK escape and CLOSE, initialization stalled inside the native owner, spawn failure before initialization/I/O, FIFO CREATE publication and unpublished/duplicate IDs, optional-probe timeout quarantine, output transformation and per-open statistics origin, and issuing-thread identity through cancellation/retirement/event drop. Every rejected queued request retains its completion ID. The fake boundary flags restoration/event destruction before native terminal completion.
++
++The generated serial_windows.rs, serial_stats_windows.rs, helpers.rs, completion.rs and inputs.json are fixture outputs. Generate before building. The real Windows native component separately checks production Win32 types and signatures with an MSVC target.

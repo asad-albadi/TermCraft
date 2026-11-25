@@ -1,0 +1,49 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.28s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-e34932d23f1e276b)
+
+running 12 tests
+test cancelled_active_download_retains_partial_and_preserves_destination ... ok
+test cancellation_and_conflicts_preserve_existing_destination ... ok
+test failed_local_and_remote_io_preserve_existing_data ... ok
+test disconnect_keeps_original_destination_and_recoverable_partial ... ok
+test file_management_is_literal_and_deletion_requires_the_confirmed_target ... ok
+test composed_symlinks_cannot_publish_an_escape_from_the_selected_tree ... FAILED
+test literal_binary_file_round_trip_uses_sftp ... ok
+test missing_sftp_rejects_file_jobs_without_stranding_the_queue ... ok
+test recursive_transfer_preserves_names_bytes_and_symlink_cycles ... ok
+test transfer_preserves_executable_modes_after_staging ... FAILED
+test repeated_tree_cancellation_releases_bounded_sftp_handles ... ok
+test overlapping_overwrite_jobs_commit_in_submission_order ... FAILED
+
+failures:
+
+---- composed_symlinks_cannot_publish_an_escape_from_the_selected_tree stdout ----
+
+thread 'composed_symlinks_cannot_publish_an_escape_from_the_selected_tree' (209243) panicked at tests/remote_transfers.rs:415:33:
+TransferEvent { id: 11, bytes: 0, outcome: Some(Completed), recovery: None }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- transfer_preserves_executable_modes_after_staging stdout ----
+
+thread 'transfer_preserves_executable_modes_after_staging' (209253) panicked at tests/remote_transfers.rs:429:200:
+assertion `left == right` failed
+  left: 384
+ right: 489
+
+---- overlapping_overwrite_jobs_commit_in_submission_order stdout ----
+
+thread 'overlapping_overwrite_jobs_commit_in_submission_order' (209250) panicked at tests/remote_transfers.rs:423:5:
+assertion `left == right` failed
+[Large byte-vector comparison omitted; see termcraft-order-red.log for the compact length reproduction.]
+ right: [110, 101, 119]
+
+
+failures:
+    composed_symlinks_cannot_publish_an_escape_from_the_selected_tree
+    overlapping_overwrite_jobs_commit_in_submission_order
+    transfer_preserves_executable_modes_after_staging
+
+test result: FAILED. 9 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.05s
+
+error: test failed, to rerun pass `--test remote_transfers`

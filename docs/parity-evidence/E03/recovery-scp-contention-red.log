@@ -1,0 +1,20 @@
+
+running 6 tests
+test ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source ... ok
+test ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs ... ok
+
+thread 'ui::gui_tests::scp_pane_never_identifies_itself_as_sftp' (16749) panicked at src/ui.rs:2547:13:
+assertion failed: Instant::now() < deadline
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ui::gui_tests::scp_pane_never_identifies_itself_as_sftp ... FAILED
+test ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted ... ok
+test ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full ... ok
+test ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text ... ok
+
+failures:
+
+failures:
+    ui::gui_tests::scp_pane_never_identifies_itself_as_sftp
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 140 filtered out; finished in 35.70s
+

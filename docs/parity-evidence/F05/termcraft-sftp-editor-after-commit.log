@@ -1,0 +1,18 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.05s
+     Running tests/remote_editor.rs (target/debug/deps/remote_editor-6776bd62610a3132)
+
+running 7 tests
+test failed_save_keeps_recoverable_edits ... ok
+test close_cancel_retains_dirty_document ... ok
+test remote_save_conflict_preserves_both_versions ... ok
+test queued_editor_operations_can_be_cancelled_without_closing_ssh ... ok
+test unsupported_atomic_replace_cleans_up_owned_remote_staging ... ok
+test reconnect_import_requires_a_fresh_matching_endpoint_and_never_uploads_implicitly ... ok
+test a_permission_restriction_during_staging_cannot_be_reversed_by_save ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.73s
+

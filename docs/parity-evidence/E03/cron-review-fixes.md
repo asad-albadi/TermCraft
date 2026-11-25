@@ -1,0 +1,21 @@
+# E03 managed Cron scoped fix review
+
+2026-11-24. **Approved for parent integration within the managed Cron slice.** Both P2 findings in `cron-review.md` are addressed, and the rollback next-run observation is addressed. No new Important issue was found in these changes. This is not whole-E03 completion, native Windows/macOS execution evidence, or original-runtime equivalence.
+
+Reviewed the refreshed private source under `target/agent-work/e03-cron`, patch SHA-256 `351ea1cd77d3d46fe1ef40761d0a866b61e25bd880c825b8e4f2b53dcadb0dc4`, updated implementation report and proof logs. All 11 private-source manifest hashes matched. No production edits or Cargo/build/test reruns were performed during this scoped review; all inspection commands ended.
+
+## Resolved findings
+
+1. **Durable attempt before launch.** `src/services/cron.rs:324–388` syncs staged contents, checks replacement, and requires the commit barrier to succeed before returning success. The Unix barrier syncs the containing directory (`cron.rs:299–304`); macOS additionally checks `F_FULLFSYNC` (`cron.rs:305–315`). Windows performs the same-directory move with checked `MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH`, closes the stage before the move, excludes copy/reboot fallbacks and rejects embedded NUL paths (`cron.rs:329–356`). The write-through API contract is supported by [Microsoft MoveFileExW documentation](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-movefileexw). Scheduler command launch is downstream of successful persistence; any barrier error marks Failed and returns before the spawn loop (`cron.rs:565–574`).
+
+   The actual filesystem fixture `src/services/cron/tests.rs:278–327` pauses after the real synced-stage replacement, reads its recorded watermark, verifies no command marker exists, injects failure and observes Failed with no execution, then advances one minute and completes through the actual native barrier to observe one command effect. This directly covers ordering and failure propagation. It does not claim physical power-cut testing or native Windows/macOS execution; OS/storage flush guarantees remain the platform boundary.
+
+2. **Consecutive edits retain identity.** The save acknowledgement carries the saved identity (`src/ui/managed_cron.rs:57–74`); snapshot adoption reselects that identity, falling back to the previous selected identity for explicit reload and resetting the editor when no valid identity survives (`managed_cron.rs:173–188`). Save captures the resulting job name before moving the job (`managed_cron.rs:263–273`), so renamed/new jobs are selected correctly too. Removal sends no saved identity and the removed old selection cannot be recovered from the refreshed list, which resets the editor. The pointer fixture now saves two consecutive schedule edits without selecting again and checks one updated persisted entry (`managed_cron.rs:372–397`), then exercises actual command/start/stop/enable behavior and a fresh controller reload (`managed_cron.rs:398–464`).
+
+3. **Rollback next-run status.** `src/services/cron.rs:537–545` searches strictly after the later of the observed clock and the recorded attempt minute end, so the displayed timestamp does not point into the interval suppressed by the watermark. The existing real rollback fixture now asserts that bound.
+
+## Verification assessed
+
+Refreshed logs show **12 service tests passed**, including the commit-order/failure fixture, and **6 managed UI tests passed**, including consecutive saves and fresh-controller reload. Changed-file formatting and actual-source Windows/macOS component checks passed. Component checks still substitute only the supervisor Context facade; they do not establish whole-app/native runtime success. The earlier missing-`lib.exe` whole-Windows attempt remains explicitly blocked, not passing. No process backend source delta was added by these fixes; Cron continues to reuse existing `Process.exit_message` reporting and ownership cleanup.
+
+Parent integration must preserve root X05 Session fields and P06 password wrapper/UI modules and run the integrated gate appropriate to the final merged source. The earlier review remains historical; its two findings are closed by this scoped follow-up.

@@ -1,0 +1,20 @@
+[
+  {
+    "mutation": "deterministic-colouring",
+    "test": "generation_colouring_is_bounded_randomized_and_preserves_constraints",
+    "exit": 101,
+    "behaviorally_caught": true
+  },
+  {
+    "mutation": "weaken-final-grade",
+    "test": "actual_failing_ordinary_seeds_and_all_six_advanced_maps",
+    "exit": 101,
+    "behaviorally_caught": true
+  },
+  {
+    "mutation": "unbounded-colouring",
+    "test": "generation_colouring_is_bounded_randomized_and_preserves_constraints",
+    "exit": 101,
+    "behaviorally_caught": true
+  }
+]

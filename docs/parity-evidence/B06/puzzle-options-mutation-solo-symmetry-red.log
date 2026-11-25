@@ -1,0 +1,21 @@
+
+running 1 test
+test solo::options_tests::default_clues_have_half_turn_symmetry ... FAILED
+
+failures:
+
+failures:
+    solo::options_tests::default_clues_have_half_turn_symmetry
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 47 filtered out; finished in 0.04s
+
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-puzzle-options)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.30s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-puzzle-options/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+thread 'solo::options_tests::default_clues_have_half_turn_symmetry' (359054) panicked at src/games/puzzles/solo.rs:540:17:
+assertion `left == right` failed: seed 0 cell 0
+  left: true
+ right: false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `--lib`

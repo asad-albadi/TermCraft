@@ -1,0 +1,36 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: unused import: `super::*`
+ --> src/ui/highlighting.rs:3:9
+  |
+3 |     use super::*;
+  |         ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0425]: cannot find function `terminal_layout_highlight` in this scope
+    --> src/ui/pages.rs:1707:25
+     |
+1707 |             let (job,_)=terminal_layout_highlight(&screen.grid()[0],&FontId::monospace(14.),dark,"",0.,None,Some(&rules));
+     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `terminal_layout_highlight` in this scope
+    --> src/ui/pages.rs:1711:25
+     |
+1711 |             let (job,_)=terminal_layout_highlight(&screen.grid()[0],&FontId::monospace(14.),dark,"ERROR",0.,None,Some(&rules));
+     |                         ^^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0599]: no associated function or constant named `from_preferences` found for struct `ui::Editor` in the current scope
+   --> src/ui/highlighting.rs:8:32
+    |
+  8 | ...   let mut editor=Editor::from_preferences(&p);editor.enabled=false;editor.rules[0].kind=HighlightMatch::Regex;editor.rules[0].p...
+    |                              ^^^^^^^^^^^^^^^^ associated function or constant not found in `ui::Editor`
+    |
+   ::: src/ui.rs:304:1
+    |
+304 | struct Editor {
+    | ------------- associated function or constant `from_preferences` not found for this struct
+
+Some errors have detailed explanations: E0425, E0599.
+For more information about an error, try `rustc --explain E0425`.
+warning: `harbor-workspace` (bin "harbor-workspace" test) generated 1 warning
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 3 previous errors; 1 warning emitted

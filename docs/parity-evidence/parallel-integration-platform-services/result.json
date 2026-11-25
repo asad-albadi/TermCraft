@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "outer_targets": 64,
+  "passed": 623,
+  "failed": 0,
+  "ignored": 33,
+  "source_unchanged_during_gate": true,
+  "scope": "Merged reviewed B03 SSH/SFTP/Iperf, B05 desktop launch, X05 environment startup, service UI credential fix and P08 Unix payload support. Private B04/Cron/NFS excluded."
+}

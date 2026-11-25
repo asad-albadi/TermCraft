@@ -1,0 +1,5 @@
+{
+  "target/qualification-vnc-composed/lib-tests": "543c12c3337bf46e4bf3ff02f0ba0ffc149a2c30124027bb8dc8b6f500750203",
+  "target/qualification-vnc-composed/wayland-helper": "4285e998a7cedc093c595877dda87564614f219993da81259ec69027430f4f78",
+  "target/qualification-vnc-composed/synthetic-source": "6d754089a76912d04f498a85094bb43adb257d0c590c63f1984f345f15ad0f4a"
+}

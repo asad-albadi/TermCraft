@@ -1,0 +1,19 @@
+{
+  "installed_launcher": "/usr/bin/termcraft",
+  "profile": "release",
+  "manifest_files_verified": 1074,
+  "screen_size": [
+    1280,
+    800
+  ],
+  "screen_stddev": [
+    32.889257775064124,
+    23.978600151248607,
+    25.767246518208154
+  ],
+  "rdp_helper_wire_version": 1,
+  "rdp_helper_child_location_verified": true,
+  "rdp_loopback_negotiation": true,
+  "workspace_preferences_preserved": true,
+  "uid": 1000
+}

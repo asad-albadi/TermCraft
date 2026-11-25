@@ -1,0 +1,317 @@
+[
+  {
+    "pid": 1,
+    "cmdline": "bwrap --unshare-all --uid 1000 --gid 1000 --cap-drop ALL --die-with-parent --new-session --ro-bind /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/v08-clean-namespace/rootfs / --proc /proc --dev /dev --tmpfs /tmp --tmpfs /home --dir /home/validation --ro-bind /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-games-v03-qualified/68f356f63c92a9a6aced6abe3d845ab9d064e5da0d37b52ff0c4c99f0fc4b117/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing /opt/termcraft --bind /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/V08/clean-namespace /evidence --clearenv --setenv HOME /home/validation --setenv PATH /usr/bin --setenv LANG C.UTF-8 --setenv LD_LIBRARY_PATH /opt/termcraft/browser/linux-x86_64/libraries --chdir /tmp /usr/bin/bash /evidence/gui2.sh ",
+    "exe": "/usr/bin/bwrap",
+    "exe_sha256": "a7adb079800910ff28fc05c7e1dd2441ff87fb09b369dbb7e82bcededdab079b",
+    "status": "Name:\tbwrap\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t1\nNgid:\t0\nPid:\t1\nPPid:\t0\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t1\nNSpid:\t1\nNSpgid:\t1\nNSsid:\t1\nKthread:\t0\nVmPeak:\t    3532 kB\nVmSize:\t    3532 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    1348 kB\nVmRSS:\t    1348 kB\nRssAnon:\t     136 kB\nRssFile:\t    1212 kB\nRssShmem:\t       0 kB\nVmData:\t     208 kB\nVmStk:\t     136 kB\nVmExe:\t      48 kB\nVmLib:\t    2136 kB\nVmPTE:\t      52 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000010000\nSigIgn:\t0000000000000000\nSigCgt:\t0000000000000000\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t0000000000000000\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t4\nnonvoluntary_ctxt_switches:\t1\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533293]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533178]",
+      "pid_for_children": "pid:[4026533178]",
+      "user": "user:[4026533628]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000          0          1\n",
+    "gid_map": "      1000          0          1\n"
+  },
+  {
+    "pid": 58,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --headless --force-device-scale-factor=1 --remote-debugging-pipe --no-first-run --no-default-browser-check --disable-background-networking --disable-component-update --disable-sync --disable-default-apps --disable-extensions --password-store=basic --disable-features=MediaRouter,OptimizationHints --use-mock-keychain --disable-breakpad --disable-crash-reporter --user-data-dir=/tmp/termcraft-browser-CJFeU5 --no-proxy-server about:blank ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t58\nNgid:\t0\nPid:\t58\nPPid:\t11\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t1024\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t58\nNSpid:\t58\nNSpgid:\t58\nNSsid:\t1\nKthread:\t0\nVmPeak:\t55308216 kB\nVmSize:\t55303908 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  219800 kB\nVmRSS:\t  218448 kB\nRssAnon:\t   39080 kB\nRssFile:\t   25452 kB\nRssShmem:\t  153916 kB\nVmData:\t  337576 kB\nVmStk:\t     132 kB\nVmExe:\t  294496 kB\nVmLib:\t   32856 kB\nVmPTE:\t    1028 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t38\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001000\nSigCgt:\t00000001418144ff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t0000000000000000\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t1018\nnonvoluntary_ctxt_switches:\t281\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533293]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533178]",
+      "pid_for_children": "pid:[4026533178]",
+      "user": "user:[4026533628]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000          0          1\n",
+    "gid_map": "      1000          0          1\n"
+  },
+  {
+    "pid": 60,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chrome_crashpad_handler --monitor-self --monitor-self-annotation=ptype=crashpad-handler --user-stream-region=6,65568 --database=/tmp/termcraft-browser-CJFeU5/chromium/Crash Reports --annotation=lsb-release=Arch Linux --annotation=plat=Linux --annotation=prod=Chrome_Linux --annotation=ver=158.0.8127.88 --initial-client-fd=9 --shared-client-connection ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chrome_crashpad_handler",
+    "exe_sha256": "5fc24752dd6834229b150e5c643b424e63212cfe9f21212795cd8138f4f55715",
+    "status": "Name:\tchrome_crashpad\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t60\nNgid:\t0\nPid:\t60\nPPid:\t1\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t60\nNSpid:\t60\nNSpgid:\t59\nNSsid:\t59\nKthread:\t0\nVmPeak:\t54542168 kB\nVmSize:\t54542168 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    5276 kB\nVmRSS:\t    5276 kB\nRssAnon:\t     408 kB\nRssFile:\t    3072 kB\nRssShmem:\t    1796 kB\nVmData:\t    8900 kB\nVmStk:\t     132 kB\nVmExe:\t    1952 kB\nVmLib:\t    2532 kB\nVmPTE:\t      80 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t2\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t000000017780feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t0000000000000000\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t3\nnonvoluntary_ctxt_switches:\t3\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533293]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533178]",
+      "pid_for_children": "pid:[4026533178]",
+      "user": "user:[4026533628]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000          0          1\n",
+    "gid_map": "      1000          0          1\n"
+  },
+  {
+    "pid": 62,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chrome_crashpad_handler --no-periodic-tasks --monitor-self-annotation=ptype=crashpad-handler --database=/tmp/termcraft-browser-CJFeU5/chromium/Crash Reports --annotation=lsb-release=Arch Linux --annotation=plat=Linux --annotation=prod=Chrome_Linux --annotation=ver=158.0.8127.88 --initial-client-fd=4 --shared-client-connection ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chrome_crashpad_handler",
+    "exe_sha256": "5fc24752dd6834229b150e5c643b424e63212cfe9f21212795cd8138f4f55715",
+    "status": "Name:\tchrome_crashpad\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t62\nNgid:\t0\nPid:\t62\nPPid:\t1\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t62\nNSpid:\t62\nNSpgid:\t61\nNSsid:\t61\nKthread:\t0\nVmPeak:\t54533884 kB\nVmSize:\t54533884 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t    4720 kB\nVmRSS:\t    4720 kB\nRssAnon:\t     348 kB\nRssFile:\t    2836 kB\nRssShmem:\t    1536 kB\nVmData:\t     420 kB\nVmStk:\t     132 kB\nVmExe:\t    1952 kB\nVmLib:\t    2532 kB\nVmPTE:\t      68 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000000000\nSigCgt:\t000000007780feff\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t0000000000000000\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t1\nnonvoluntary_ctxt_switches:\t0\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533293]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533178]",
+      "pid_for_children": "pid:[4026533178]",
+      "user": "user:[4026533628]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000          0          1\n",
+    "gid_map": "      1000          0          1\n"
+  },
+  {
+    "pid": 66,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=zygote --no-zygote-sandbox --headless --force-device-scale-factor=1 --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --change-stack-guard-on-fork=enable --no-first-run --ozone-platform=headless --ozone-override-screen-size=800,600 --use-angle=swiftshader-webgl ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t66\nNgid:\t0\nPid:\t66\nPPid:\t58\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t66\nNSpid:\t66\nNSpgid:\t58\nNSsid:\t1\nKthread:\t0\nVmPeak:\t54991956 kB\nVmSize:\t54991956 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   54108 kB\nVmRSS:\t   54108 kB\nRssAnon:\t   18168 kB\nRssFile:\t   17804 kB\nRssShmem:\t   18136 kB\nVmData:\t    6056 kB\nVmStk:\t     140 kB\nVmExe:\t  294496 kB\nVmLib:\t   32176 kB\nVmPTE:\t     444 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t0000000000010000\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t0000000000000000\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t3\nnonvoluntary_ctxt_switches:\t5\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533293]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533178]",
+      "pid_for_children": "pid:[4026533178]",
+      "user": "user:[4026533628]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000          0          1\n",
+    "gid_map": "      1000          0          1\n"
+  },
+  {
+    "pid": 67,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=zygote --headless --force-device-scale-factor=1 --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --change-stack-guard-on-fork=enable --no-first-run --ozone-platform=headless --ozone-override-screen-size=800,600 --use-angle=swiftshader-webgl ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t67\nNgid:\t0\nPid:\t67\nPPid:\t58\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t67\t1\nNSpid:\t67\t1\nNSpgid:\t58\t0\nNSsid:\t1\t0\nKthread:\t0\nVmPeak:\t54991948 kB\nVmSize:\t54991948 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   52668 kB\nVmRSS:\t   52668 kB\nRssAnon:\t   16140 kB\nRssFile:\t   17680 kB\nRssShmem:\t   18848 kB\nVmData:\t    6056 kB\nVmStk:\t     132 kB\nVmExe:\t  294496 kB\nVmLib:\t   32176 kB\nVmPTE:\t     436 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t0000000000010000\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t3\nnonvoluntary_ctxt_switches:\t3\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533633]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533632]",
+      "pid_for_children": "pid:[4026533632]",
+      "user": "user:[4026533629]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000       1000          1\n",
+    "gid_map": "      1000       1000          1\n"
+  },
+  {
+    "pid": 69,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=zygote --headless --force-device-scale-factor=1 --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --change-stack-guard-on-fork=enable --no-first-run --ozone-platform=headless --ozone-override-screen-size=800,600 --use-angle=swiftshader-webgl ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t69\nNgid:\t0\nPid:\t69\nPPid:\t67\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t69\t3\nNSpid:\t69\t3\nNSpgid:\t58\t0\nNSsid:\t1\t0\nKthread:\t0\nVmPeak:\t54991972 kB\nVmSize:\t54991972 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   21584 kB\nVmRSS:\t   21584 kB\nRssAnon:\t   16244 kB\nRssFile:\t    1724 kB\nRssShmem:\t    3616 kB\nVmData:\t    6056 kB\nVmStk:\t     156 kB\nVmExe:\t  294496 kB\nVmLib:\t   32176 kB\nVmPTE:\t     268 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t0000000000010000\nCapInh:\t0000000000000000\nCapPrm:\t0000000000200000\nCapEff:\t0000000000200000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t13\nnonvoluntary_ctxt_switches:\t11\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533633]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533632]",
+      "pid_for_children": "pid:[4026533632]",
+      "user": "user:[4026533629]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000       1000          1\n",
+    "gid_map": "      1000       1000          1\n"
+  },
+  {
+    "pid": 92,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=gpu-process --gpu-recent-crash-count=0 --disable-breakpad --headless --ozone-platform=headless --use-angle=swiftshader-webgl --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --change-stack-guard-on-fork=enable --gpu-preferences=YAAAAAAAAAAgAACBAAAAAAAAAAAAAGAASAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAMAAAAAQAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --field-trial-handle=3,i,17007898715986978119,7513691196604060537,262144 --disable-features=MediaRouter,OptimizationHints,PaintHolding --variations-seed- ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t92\nNgid:\t0\nPid:\t92\nPPid:\t66\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t512\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t92\nNSpid:\t92\nNSpgid:\t58\nNSsid:\t1\nKthread:\t0\nVmPeak:\t55236012 kB\nVmSize:\t55234200 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   85272 kB\nVmRSS:\t   80212 kB\nRssAnon:\t   25684 kB\nRssFile:\t    7816 kB\nRssShmem:\t   46712 kB\nVmData:\t  244916 kB\nVmStk:\t     140 kB\nVmExe:\t  294496 kB\nVmLib:\t   37144 kB\nVmPTE:\t     764 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t29\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t00000001018104fc\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t0000000000000000\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t66\nnonvoluntary_ctxt_switches:\t32\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533293]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533178]",
+      "pid_for_children": "pid:[4026533178]",
+      "user": "user:[4026533628]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000          0          1\n",
+    "gid_map": "      1000          0          1\n"
+  },
+  {
+    "pid": 121,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=none --use-angle=swiftshader-webgl --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17007898715986978119,7513691196604060537,262144 --disable-features=MediaRouter,OptimizationHints,PaintHolding --variations-seed-version --pseudonymization-salt-handle=7,i,866257046614647520,203007228271693774,4 --trace-process-track-uuid=3190708989122997041 ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t121\nNgid:\t0\nPid:\t121\nPPid:\t58\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t1024\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t121\nNSpid:\t121\nNSpgid:\t58\nNSsid:\t1\nKthread:\t0\nVmPeak:\t55095456 kB\nVmSize:\t55091360 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   80116 kB\nVmRSS:\t   80116 kB\nRssAnon:\t   18100 kB\nRssFile:\t   18184 kB\nRssShmem:\t   43832 kB\nVmData:\t  106932 kB\nVmStk:\t     132 kB\nVmExe:\t  294496 kB\nVmLib:\t   32176 kB\nVmPTE:\t     672 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t13\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t00000001018004fc\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t0000000000000000\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t35\nnonvoluntary_ctxt_switches:\t22\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533293]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533178]",
+      "pid_for_children": "pid:[4026533178]",
+      "user": "user:[4026533628]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000          0          1\n",
+    "gid_map": "      1000          0          1\n"
+  },
+  {
+    "pid": 128,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=utility --utility-sub-type=storage.mojom.StorageService --lang=en-US --service-sandbox-type=utility --use-angle=swiftshader-webgl --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --change-stack-guard-on-fork=enable --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17007898715986978119,7513691196604060537,262144 --disable-features=MediaRouter,OptimizationHints,PaintHolding --variations-seed-version --pseudonymization-salt-handle=7,i,866257046614647520,203007228271693774,4 --trace-process-track-uuid=3190708990060038890 ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t128\nNgid:\t0\nPid:\t128\nPPid:\t69\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t512\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t128\t4\t1\nNSpid:\t128\t4\t1\nNSpgid:\t58\t0\t0\nNSsid:\t1\t0\t0\nKthread:\t0\nVmPeak:\t55066272 kB\nVmSize:\t55066272 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   45400 kB\nVmRSS:\t   45400 kB\nRssAnon:\t   17076 kB\nRssFile:\t    2904 kB\nRssShmem:\t   25420 kB\nVmData:\t   81228 kB\nVmStk:\t     156 kB\nVmExe:\t  294496 kB\nVmLib:\t   32176 kB\nVmPTE:\t     524 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t10\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t0000000141814efd\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional force disabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t27\nnonvoluntary_ctxt_switches:\t7\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533633]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533630]",
+      "pid_for_children": "pid:[4026533630]",
+      "user": "user:[4026533629]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000       1000          1\n",
+    "gid_map": "      1000       1000          1\n"
+  },
+  {
+    "pid": 148,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=renderer --top-chrome-webui --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --change-stack-guard-on-fork=enable --disable-breakpad --force-device-scale-factor=1 --remote-debugging-pipe --ozone-platform=headless --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=5 --launch-time-ticks=19373504703 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17007898715986978119,7513691196604060537,262144 --disable-features=MediaRouter,OptimizationHints,PaintHolding --variations-seed-version --pseudonymization-salt-handl ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t148\nNgid:\t0\nPid:\t148\nPPid:\t69\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t512\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t148\t14\t1\nNSpid:\t148\t14\t1\nNSpgid:\t58\t0\t0\nNSsid:\t1\t0\t0\nKthread:\t0\nVmPeak:\t1518861836 kB\nVmSize:\t1518684296 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  136220 kB\nVmRSS:\t  136220 kB\nRssAnon:\t   32448 kB\nRssFile:\t    6780 kB\nRssShmem:\t   96992 kB\nVmData:\t  700468 kB\nVmStk:\t     156 kB\nVmExe:\t  294496 kB\nVmLib:\t   32176 kB\nVmPTE:\t    1040 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t18\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t0000000141814efd\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional force disabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t88\nnonvoluntary_ctxt_switches:\t92\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533633]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533686]",
+      "pid_for_children": "pid:[4026533686]",
+      "user": "user:[4026533629]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000       1000          1\n",
+    "gid_map": "      1000       1000          1\n"
+  },
+  {
+    "pid": 168,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=renderer --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --change-stack-guard-on-fork=enable --disable-breakpad --force-device-scale-factor=1 --remote-debugging-pipe --ozone-platform=headless --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=7 --launch-time-ticks=19373547482 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17007898715986978119,7513691196604060537,262144 --disable-features=MediaRouter,OptimizationHints,PaintHolding --variations-seed-version --pseudonymization-salt-handle=7,i,8662570466146 ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t168\nNgid:\t0\nPid:\t168\nPPid:\t69\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t512\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t168\t25\t1\nNSpid:\t168\t25\t1\nNSpgid:\t58\t0\t0\nNSsid:\t1\t0\t0\nKthread:\t0\nVmPeak:\t1518861836 kB\nVmSize:\t1518624556 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   74992 kB\nVmRSS:\t   74992 kB\nRssAnon:\t   20568 kB\nRssFile:\t    4928 kB\nRssShmem:\t   49496 kB\nVmData:\t  619736 kB\nVmStk:\t     156 kB\nVmExe:\t  294496 kB\nVmLib:\t   32176 kB\nVmPTE:\t     776 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t11\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t0000000141814efd\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional force disabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t25\nnonvoluntary_ctxt_switches:\t18\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533633]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533687]",
+      "pid_for_children": "pid:[4026533687]",
+      "user": "user:[4026533629]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000       1000          1\n",
+    "gid_map": "      1000       1000          1\n"
+  },
+  {
+    "pid": 169,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=renderer --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --change-stack-guard-on-fork=enable --disable-breakpad --force-device-scale-factor=1 --remote-debugging-pipe --ozone-platform=headless --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=6 --launch-time-ticks=19373552529 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17007898715986978119,7513691196604060537,262144 --disable-features=MediaRouter,OptimizationHints,PaintHolding --variations-seed-version --pseudonymization-salt-handle=7,i,8662570466146 ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t169\nNgid:\t0\nPid:\t169\nPPid:\t69\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t512\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t169\t26\t1\nNSpid:\t169\t26\t1\nNSpgid:\t58\t0\t0\nNSsid:\t1\t0\t0\nKthread:\t0\nVmPeak:\t1518861836 kB\nVmSize:\t1518661548 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t  136704 kB\nVmRSS:\t  136704 kB\nRssAnon:\t   26452 kB\nRssFile:\t    6876 kB\nRssShmem:\t  103376 kB\nVmData:\t  658240 kB\nVmStk:\t     156 kB\nVmExe:\t  294496 kB\nVmLib:\t   32176 kB\nVmPTE:\t     960 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t15\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t0000000141814efd\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional force disabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t484\nnonvoluntary_ctxt_switches:\t160\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533633]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533688]",
+      "pid_for_children": "pid:[4026533688]",
+      "user": "user:[4026533629]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000       1000          1\n",
+    "gid_map": "      1000       1000          1\n"
+  },
+  {
+    "pid": 197,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=renderer --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --extension-process --change-stack-guard-on-fork=enable --disable-breakpad --force-device-scale-factor=1 --remote-debugging-pipe --ozone-platform=headless --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=8 --launch-time-ticks=19373634869 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17007898715986978119,7513691196604060537,262144 --disable-features=MediaRouter,OptimizationHints,PaintHolding --variations-seed-version --pseudonymization-salt-hand ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t197\nNgid:\t0\nPid:\t197\nPPid:\t69\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t512\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t197\t52\t1\nNSpid:\t197\t52\t1\nNSpgid:\t58\t0\t0\nNSsid:\t1\t0\t0\nKthread:\t0\nVmPeak:\t1520861160 kB\nVmSize:\t1520861104 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   88476 kB\nVmRSS:\t   88476 kB\nRssAnon:\t   23588 kB\nRssFile:\t    4928 kB\nRssShmem:\t   59960 kB\nVmData:\t  632240 kB\nVmStk:\t     156 kB\nVmExe:\t  294496 kB\nVmLib:\t   32176 kB\nVmPTE:\t     832 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t12\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t0000000141814efd\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional force disabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t15\nnonvoluntary_ctxt_switches:\t15\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533633]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533689]",
+      "pid_for_children": "pid:[4026533689]",
+      "user": "user:[4026533629]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000       1000          1\n",
+    "gid_map": "      1000       1000          1\n"
+  },
+  {
+    "pid": 200,
+    "cmdline": "/tmp/termcraft-browser-runtime-R8CzNT/chromium --type=renderer --crashpad-handler-pid=60 --enable-crash-reporter=, --noerrdialogs --user-data-dir=/tmp/termcraft-browser-CJFeU5 --extension-process --change-stack-guard-on-fork=enable --disable-breakpad --force-device-scale-factor=1 --remote-debugging-pipe --ozone-platform=headless --disable-gpu-compositing --lang=en-US --num-raster-threads=4 --enable-main-frame-before-activation --renderer-client-id=9 --launch-time-ticks=19373638473 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,17007898715986978119,7513691196604060537,262144 --disable-features=MediaRouter,OptimizationHints,PaintHolding --variations-seed-version --pseudonymization-salt-hand ",
+    "exe": "/tmp/termcraft-browser-runtime-R8CzNT/chromium",
+    "exe_sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+    "status": "Name:\tchromium\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t200\nNgid:\t0\nPid:\t200\nPPid:\t69\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t512\nGroups:\t65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 65534 1000 \nNStgid:\t200\t55\t1\nNSpid:\t200\t55\t1\nNSpgid:\t58\t0\t0\nNSsid:\t1\t0\t0\nKthread:\t0\nVmPeak:\t1520861168 kB\nVmSize:\t1520861104 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   88756 kB\nVmRSS:\t   88756 kB\nRssAnon:\t   23428 kB\nRssFile:\t    4928 kB\nRssShmem:\t   60400 kB\nVmData:\t  631768 kB\nVmStk:\t     156 kB\nVmExe:\t  294496 kB\nVmLib:\t   32176 kB\nVmPTE:\t     824 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t12\nSigQ:\t0/124955\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000001002\nSigCgt:\t0000000141814efd\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t2\nSeccomp_filters:\t1\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional force disabled\nCpus_allowed:\tffff\nCpus_allowed_list:\t0-15\nMems_allowed:\t1\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t15\nnonvoluntary_ctxt_switches:\t12\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+    "namespaces": {
+      "net": "net:[4026533633]",
+      "uts": "uts:[4026533175]",
+      "ipc": "ipc:[4026533176]",
+      "pid": "pid:[4026533690]",
+      "pid_for_children": "pid:[4026533690]",
+      "user": "user:[4026533629]",
+      "mnt": "mnt:[4026533174]",
+      "cgroup": "cgroup:[4026533179]",
+      "time": "time:[4026531834]",
+      "time_for_children": "time:[4026531834]"
+    },
+    "uid_map": "      1000       1000          1\n",
+    "gid_map": "      1000       1000          1\n"
+  }
+]

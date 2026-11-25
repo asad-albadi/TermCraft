@@ -1,0 +1,121 @@
+{
+  "independent_review": "ACCEPT",
+  "files": {
+    "docs/parity-evidence/D02/printer-native-design.md": {
+      "base_sha256": null,
+      "payload_sha256": "c81e2cd767e328fd6c58969a60dc63e1416d504ce4bb3f2da1cf0a593081423d",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/docs/parity-evidence/D02/printer-native-design.md"
+    },
+    "docs/parity-evidence/D02/printer-provider.md": {
+      "base_sha256": "bbc17a9edf8b925f6e2a9940c0370f8b98f022dcd223a3535b2f0f29316555a5",
+      "payload_sha256": "6b2b0db6c3caceda64fac6caa0dda0af8d53e430013bb9b20881fbd51ae7caad",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/docs/parity-evidence/D02/printer-provider.md"
+    },
+    "engines/rdp/Cargo.lock": {
+      "base_sha256": "2acba32071437d9adeb8c205c83e2c203e550464ac5bfce09a0856131000ade4",
+      "payload_sha256": "117db70a720c3cd3410f8454d28804c642eca478d9ebc6415fd6f24a39400eea",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/Cargo.lock"
+    },
+    "engines/rdp/Cargo.toml": {
+      "base_sha256": "30c910673c6f25c05c662c9a4be3f6e52dad89b56d7ff24d90f71ec8d900e588",
+      "payload_sha256": "7f846bc4636c7a42c4cc8778f1f6408d21b336e9e806c5641b1c5c12416adb24",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/Cargo.toml"
+    },
+    "engines/rdp/src/devices.rs": {
+      "base_sha256": "0c0bbf826239b2883afed7cf100c9e83f39658a5eb0e58aa3a92d550f8faca56",
+      "payload_sha256": "829015928973781608d6c4664b66a90f8b476fe2b2f9372c9f56993db3d17c86",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/src/devices.rs"
+    },
+    "engines/rdp/src/main.rs": {
+      "base_sha256": "81c1e488cef257712a0060e4c727e45a1ab0adae0e94601a29bc157f47182a8c",
+      "payload_sha256": "98068b15fe1203c2b389619622ce9d667b16bc4457b42d7bd8b14835680420f4",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/src/main.rs"
+    },
+    "engines/rdp/src/printer.rs": {
+      "base_sha256": "e3a57bb30c7500b7b5989588b86adac34223099ecee015a9c9aa2416961f6d80",
+      "payload_sha256": "a96d6912f7f62a49ca6ab13f3735991abda711ff1f808a50ab4e2b7b574e27af",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/src/printer.rs"
+    },
+    "engines/rdp/src/printer_ipp.rs": {
+      "base_sha256": "abd4aac3301f86d9ec35e87170ab3e843005d642eaa39029c372f533c39c96ee",
+      "payload_sha256": "2f19c4242f562158f00239c341a75cfbf533d1f3cf5af6dbe83b64d388e260f1",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/src/printer_ipp.rs"
+    },
+    "engines/rdp/src/printer_linux.rs": {
+      "base_sha256": null,
+      "payload_sha256": "6a3ccdc2531d8a7338f5e1252391fd649c465ed6c4544417f4d6f131bfa1ace9",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/src/printer_linux.rs"
+    },
+    "engines/rdp/src/printer_macos.rs": {
+      "base_sha256": null,
+      "payload_sha256": "a9aae13526c455d1e406f9009fdb658fb0f015b48d717dde3ce9df1da1af9884",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/src/printer_macos.rs"
+    },
+    "engines/rdp/src/printer_native.rs": {
+      "base_sha256": null,
+      "payload_sha256": "16358ffdacb2556bce0f260a7db7b29ffd0cc8aa14c5b7008628dc0e4eb8dc62",
+      "payload": "target/agent-work/d02-native-printer/fix1/payload/files/engines/rdp/src/printer_native.rs"
+    },
+    "engines/rdp/src/printer_native_tests.rs": {
+      "base_sha256": null,
+      "payload_sha256": "d711181d522e52c6f5f2f285c7f65e5fe9bdb7fb2ef0d18d5bc3295813e4f1d1",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/src/printer_native_tests.rs"
+    },
+    "engines/rdp/src/printer_process_windows.rs": {
+      "base_sha256": null,
+      "payload_sha256": "f5e13d8c59b2577eabc583db3868d83aa9377af0822024b96616269397158643",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/src/printer_process_windows.rs"
+    },
+    "engines/rdp/src/printer_windows.rs": {
+      "base_sha256": null,
+      "payload_sha256": "3e72c2aa11845b0b2c7af6fb7885bc5d0a71e3ffaac68886ac77cfb8aedd1f61",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/engines/rdp/src/printer_windows.rs"
+    },
+    "src/desktop/options.rs": {
+      "base_sha256": "f07cf5f5e366f1b3157b1fcd53f954c70e88a96a016239e0fddd383e18bd9f35",
+      "payload_sha256": "44ef5d2dc9a68b44e5853326e0e4e62b2cabf3338aade123adf7b9affbcca75e",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/src/desktop/options.rs"
+    },
+    "src/desktop/rdp_options.rs": {
+      "base_sha256": "b7bd62e7c45e2e1e85158d2e28d0e31b23470eb348f79cdcb9848a6671ec3bce",
+      "payload_sha256": "eb55b84577322ebe2dc23440fe9b167e6a5fdf41843ab95e517888e0826b8eb3",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/src/desktop/rdp_options.rs"
+    },
+    "src/ui/rdp_settings.rs": {
+      "base_sha256": "ed85757d4d87d7ee02759cdce371900a69e0c6e6b5becf263be326eccf654d1e",
+      "payload_sha256": "690004f806b8d3819ce60c037c8502ec663f66bbbfe80e018254c3b60dc64f47",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/src/ui/rdp_settings.rs"
+    },
+    "tests/printer-native-component/Cargo.lock": {
+      "base_sha256": null,
+      "payload_sha256": "b231dc0d04e05e9e079ec4fb98fb2885231a171796b51762d3b98669fcba5beb",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/tests/printer-native-component/Cargo.lock"
+    },
+    "tests/printer-native-component/Cargo.toml": {
+      "base_sha256": null,
+      "payload_sha256": "d45acc4c3bc7838d498179d0efd38e51d7d3774bca102d72d871c19cf42ec401",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/tests/printer-native-component/Cargo.toml"
+    },
+    "tests/printer-native-component/src/lib.rs": {
+      "base_sha256": null,
+      "payload_sha256": "3faf9c6f6c38f72d31b4ff46ba1126895035cd5e47076262334b7f2ac4708ca6",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/tests/printer-native-component/src/lib.rs"
+    },
+    "tests/rdp-native-component/generate.py": {
+      "base_sha256": "b5f56c834bff464baebe7a88aaf604caa16d7ee77582cbc71705e8c853ed4f9d",
+      "payload_sha256": "756780b8f50b8b4edae77b4514da19ce2150b5d809e0030ef02c6ad7272a9aef",
+      "payload": "target/agent-work/d02-native-printer/rebase/payload/files/tests/rdp-native-component/generate.py"
+    },
+    "engines/rdp/src/printer_owner.rs": {
+      "base_sha256": null,
+      "payload_sha256": "a7a81487d1beb4088702c665cfe4af12bc9c58fd76d49ce6e2dc5c9954a7051b",
+      "payload": "target/agent-work/d02-native-printer/fix1/payload/files/engines/rdp/src/printer_owner.rs"
+    },
+    "tests/printer_owner_lifecycle.py": {
+      "base_sha256": null,
+      "payload_sha256": "ee934dce2216a4438adbdf09e9b499134adc3a6a5c627179ffd2fe80d2bc21da",
+      "payload": "target/agent-work/d02-native-printer/fix1/payload/files/tests/printer_owner_lifecycle.py"
+    }
+  },
+  "claims": "Source implementation and controlled lifecycle/component checks; actual Windows/macOS printer runtime/hardware unverified. Root combined gate pending."
+}

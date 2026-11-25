@@ -1,0 +1,24 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.26s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-a3e649926aaf12fc)
+
+running 1 test
+test explicit_folder_overwrite_merges_files_and_preserves_unrelated_entries ... FAILED
+
+failures:
+
+---- explicit_folder_overwrite_merges_files_and_preserves_unrelated_entries stdout ----
+
+thread 'explicit_folder_overwrite_merges_files_and_preserves_unrelated_entries' (220347) panicked at tests/remote_transfers.rs:595:163:
+assertion `left == right` failed: TransferEvent { summary: "Upload \"/tmp/termcraft-ssh-test-220346-1795435567423290288/merge-source\" → /tmp/termcraft-ssh-test-220346-1795435567423290288/merge-remote", id: 2, bytes: 3, outcome: Some(Failed("Failure: Failure")), recovery: Some(Remote(RemotePath([47, 116, 109, 112, 47, 116, 101, 114, 109, 99, 114, 97, 102, 116, 45, 115, 115, 104, 45, 116, 101, 115, 116, 45, 50, 50, 48, 51, 52, 54, 45, 49, 55, 57, 53, 52, 51, 53, 53, 54, 55, 52, 50, 51, 50, 57, 48, 50, 56, 56, 47, 46, 116, 101, 114, 109, 99, 114, 97, 102, 116, 45, 101, 56, 54, 57, 100, 98, 101, 98, 53, 48, 49, 49, 51, 101, 51, 55, 101, 102, 49, 51, 54, 101, 97, 98, 51, 98, 51, 57, 102, 51, 100, 53, 46, 112, 97, 114, 116]))) }
+  left: Some(Failed("Failure: Failure"))
+ right: Some(Completed)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    explicit_folder_overwrite_merges_files_and_preserves_unrelated_entries
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.27s
+
+error: test failed, to rerun pass `--test remote_transfers`

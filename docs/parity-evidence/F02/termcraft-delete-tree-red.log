@@ -1,0 +1,16 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no variant named `RemoveTree` found for enum `TransferOperation`
+   --> tests/remote_transfers.rs:753:50
+    |
+753 |     let id=h.transfers.submit(TransferOperation::RemoveTree{remote:path(&root),confirmed:path(&outside)}).unwrap();assert!(matches!...
+    |                                                  ^^^^^^^^^^ variant not found in `TransferOperation`
+
+error[E0599]: no variant named `RemoveTree` found for enum `TransferOperation`
+   --> tests/remote_transfers.rs:754:50
+    |
+754 |     let id=h.transfers.submit(TransferOperation::RemoveTree{remote:path(&root),confirmed:path(&root)}).unwrap();let event=finish(&m...
+    |                                                  ^^^^^^^^^^ variant not found in `TransferOperation`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (test "remote_transfers") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

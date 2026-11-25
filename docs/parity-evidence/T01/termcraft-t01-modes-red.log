@@ -1,0 +1,40 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s
+     Running tests/terminal_conformance.rs (app/target/debug/deps/terminal_conformance-903c05fd6b55191b)
+
+running 9 tests
+test combining_and_wide_cells_survive_resize ... ok
+test editing_either_half_of_a_wide_cell_never_leaves_an_orphan ... ok
+test alternate_resize_restores_primary ... ok
+test dec_save_restore_preserves_wrap_and_rendition ... FAILED
+test origin_insert_and_dec_graphics_modes_follow_vt_commands ... FAILED
+test scroll_region_does_not_corrupt_history ... ok
+test streamed_emoji_clusters_and_margin_wrapping_use_display_columns ... ok
+test long_scrollback_search_reuses_unchanged_index ... ok
+test scrollback_memory_and_grapheme_growth_are_bounded ... ok
+
+failures:
+
+---- dec_save_restore_preserves_wrap_and_rendition stdout ----
+
+thread 'dec_save_restore_preserves_wrap_and_rendition' (338922) panicked at tests/terminal_conformance.rs:46:94:
+assertion `left == right` failed
+  left: "Y"
+ right: "d"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- origin_insert_and_dec_graphics_modes_follow_vt_commands stdout ----
+
+thread 'origin_insert_and_dec_graphics_modes_follow_vt_commands' (338925) panicked at tests/terminal_conformance.rs:50:85:
+assertion `left == right` failed
+  left: " "
+ right: "@"
+
+
+failures:
+    dec_save_restore_preserves_wrap_and_rendition
+    origin_insert_and_dec_graphics_modes_follow_vt_commands
+
+test result: FAILED. 7 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+error: test failed, to rerun pass `--test terminal_conformance`

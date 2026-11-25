@@ -1,0 +1,12 @@
+00:00:00.000 [INFO] [backend/backend.c:342] Loading user-specified backends due to WLR_BACKENDS: headless
+00:00:00.000 [INFO] [backend/headless/backend.c:60] Creating headless backend
+00:00:00.000 [INFO] [util/env.c:25] Loading WLR_RENDERER option: pixman
+00:00:00.000 [INFO] [render/pixman/renderer.c:328] Creating pixman renderer
+00:00:00.000 [INFO] [../cage/cage.c:521] Failed to create wlr_drm_lease_manager_v1
+00:00:00.005 [INFO] [backend/headless/backend.c:17] Starting headless backend
+00:00:00.079 [INFO] [xwayland/server.c:108] Starting Xwayland on :0
+Xwayland glamor: GBM Wayland interfaces not available
+Failed to initialize glamor, falling back to sw
+xready b'\x01\x00\x0b\x00\x00\x00\x8b\x02'
+[{"id": 564, "name": "", "mapped": 2, "size": [1280, 720], "pos": [0, 0], "class": 1}, {"id": 2097157, "name": "", "mapped": 2, "size": [1, 1], "pos": [-100, -100], "class": 1}, {"id": 8388611, "name": "Default IME", "mapped": 0, "size": [1, 1], "pos": [0, 0], "class": 1}, {"id": 14680065, "name": "MobaXterm", "mapped": 0, "size": [1, 1], "pos": [640, 360], "class": 1}, {"id": 14680066, "name": "Default IME", "mapped": 0, "size": [1, 1], "pos": [0, 0], "class": 1}, {"id": 14680071, "name": "MobaXterm", "mapped": 0, "size": [1123, 732], "pos": [444, 198], "class": 1}, {"id": 14680078, "name": "MobaXterm Configuration", "mapped": 0, "size": [320, 240], "pos": [422, 320], "class": 1}, {"id": 14680080, "name": "Session settings", "mapped": 0, "size": [320, 240], "pos": [425, 211], "class": 1}]
+(EE) failed to read Wayland events: Broken pipe

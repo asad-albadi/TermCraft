@@ -1,0 +1,233 @@
+--- a/hw/xquartz/mach-startup/bundle-main.c
++++ b/hw/xquartz/mach-startup/bundle-main.c
+@@ -46,6 +46,7 @@
+ #include <dispatch/dispatch.h>
+ 
+ #include <sys/socket.h>
++#include <limits.h>
+ #include <sys/un.h>
+ 
+ #include <fcntl.h>
+@@ -71,6 +72,9 @@
+ FatalError(const char *f, ...) _X_ATTRIBUTE_PRINTF(1, 2) _X_NORETURN;
+ 
+ extern int noPanoramiXExtension;
++extern Bool NoListenAll;
++extern const char *XkbBinDirectory;
++extern const char *XkbBaseDirectory;
+ 
+ #ifdef COMPOSITE
+ extern Bool noCompositeExtension;
+@@ -633,102 +635,42 @@
+     /* Ignore SIGPIPE */
+     signal(SIGPIPE, SIG_IGN);
+ 
+-    /* Setup our environment for our children */
+-    setup_env();
+-
+-    /* The server must not run the PanoramiX operations. */
+-    noPanoramiXExtension = TRUE;
+-
++    /* TermCraft private direct entry. No Mach service, shell, startx or daemon. */
++    const char *owned_fd = getenv("TERMCRAFT_OWNED_X11_FD");
++    if (owned_fd) {
++        char *end = NULL;
++        long fd = strtol(owned_fd, &end, 10);
++        struct sockaddr_un address;
++        socklen_t address_len = sizeof(address);
++        int accepts = 0;
++        socklen_t accepts_len = sizeof(accepts);
++        if (!*owned_fd || !end || *end || fd < 3 || fd > INT_MAX ||
++            getsockname((int)fd, (struct sockaddr *)&address, &address_len) != 0 ||
++            address.sun_family != AF_UNIX ||
++            getsockopt((int)fd, SOL_SOCKET, SO_ACCEPTCONN, &accepts, &accepts_len) != 0 ||
++            !accepts)
++            return EXIT_FAILURE;
++        const char *root = getenv("TERMCRAFT_X11_ROOT");
++        if (!root || root[0] != '/' || strpbrk(root, "\"`$\\"))
++            return EXIT_FAILURE;
++        char *bin = NULL, *data = NULL;
++        if (asprintf(&bin, "%s/opt/X11/bin", root) < 0 ||
++            asprintf(&data, "%s/opt/X11/share/X11/xkb", root) < 0)
++            return EXIT_FAILURE;
++        XkbBinDirectory = bin;
++        XkbBaseDirectory = data;
++        setup_console_redirect("org.termcraft.private.X11");
++        NoListenAll = TRUE; /* Includes no global display lock/unlink. */
++        noPanoramiXExtension = TRUE;
+ #ifdef COMPOSITE
+-    /* https://gitlab.freedesktop.org/xorg/xserver/-/issues/1409 */
+-    noCompositeExtension = TRUE;
++        /* Preserve upstream's explicit known-bug limitation, never fake X03. */
++        noCompositeExtension = TRUE;
+ #endif
+-
+-    /* Setup the initial crasherporter info */
+-    strlcpy(__crashreporter_info_buff__, __crashreporter_info__base,
+-            sizeof(__crashreporter_info_buff__));
+-
+-    ErrorF("X11.app: main(): argc=%d\n", argc);
+-    for (i = 0; i < argc; i++) {
+-        ErrorF("\targv[%u] = %s\n", (unsigned)i, argv[i]);
+-        if (!strcmp(argv[i], "--listenonly")) {
+-            listenOnly = TRUE;
+-        }
+-    }
+-
+-    mp = checkin_or_register(server_bootstrap_name);
+-    if (mp == MACH_PORT_NULL) {
+-        ErrorF("NULL mach service: %s", server_bootstrap_name);
+-        return EXIT_FAILURE;
+-    }
+-
+-    /* Check if we need to do something other than listen, and make another
+-     * thread handle it.
+-     */
+-    if (!listenOnly) {
+-        pid_t child1, child2;
+-        int status;
+-
+-        pref_app_to_run = command_from_prefs("app_to_run", DEFAULT_CLIENT);
+-        assert(pref_app_to_run);
+-
+-        pref_login_shell = command_from_prefs("login_shell", DEFAULT_SHELL);
+-        assert(pref_login_shell);
+-
+-        pref_startx_script = command_from_prefs("startx_script",
+-                                                DEFAULT_STARTX);
+-        assert(pref_startx_script);
+-
+-        /* Do the fork-twice trick to avoid having to reap zombies */
+-        child1 = fork();
+-        switch (child1) {
+-        case -1:                                    /* error */
+-            FatalError("fork() failed: %s\n", strerror(errno));
+-
+-        case 0:                                     /* child1 */
+-            child2 = fork();
+-
+-            switch (child2) {
+-                int max_files;
+-
+-            case -1:                                    /* error */
+-                FatalError("fork() failed: %s\n", strerror(errno));
+-
+-            case 0:                                     /* child2 */
+-                /* close all open files except for standard streams */
+-                max_files = sysconf(_SC_OPEN_MAX);
+-                for (i = 3; i < max_files; i++)
+-                    close(i);
+-
+-                /* ensure stdin is on /dev/null */
+-                close(0);
+-                open("/dev/null", O_RDONLY);
+-
+-                return startup_trigger(argc, argv, envp);
+-
+-            default:                                    /* parent (child1) */
+-                _exit(0);
+-            }
+-            break;
+-
+-        default:                                    /* parent */
+-            waitpid(child1, &status, 0);
+-        }
+-
+-        free(pref_app_to_run);
+-        free(pref_login_shell);
+-        free(pref_startx_script);
+-    }
+-
+-    /* Main event loop */
+-    ErrorF("Waiting for startup parameters via Mach IPC.\n");
+-    kr = mach_msg_server(mach_startup_server, mxmsgsz, mp, 0);
+-    if (kr != KERN_SUCCESS) {
+-        ErrorF("%s.X11(mp): %s\n", BUNDLE_ID_PREFIX, mach_error_string(kr));
+-        return EXIT_FAILURE;
+-    }
+-
+-    return EXIT_SUCCESS;
++        return server_main(argc, argv, envp);
++    }
++    /* This private build never falls back to the stock system-service entry. */
++    return EXIT_FAILURE;
++
+ }
+ 
+ static int
+--- a/os/connection.c
++++ b/os/connection.c
+@@ -301,6 +301,18 @@
+     ResetHosts(display);
+ 
+     InitParentProcess();
++#ifdef XQUARTZ
++    /* Private main already validated this exclusively owned AF_UNIX listener. */
++    const char *owned_fd = getenv("TERMCRAFT_OWNED_X11_FD");
++    if (owned_fd) {
++        int fd = atoi(owned_fd);
++        if (!NoListenAll || fd < 3)
++            FatalError("Invalid private XQuartz listener");
++        ListenOnOpenFD(fd, 0); /* Do NOT set TRANS_NOXAUTH. */
++        fcntl(fd, F_SETFD, FD_CLOEXEC);
++    }
++#endif
++
+ 
+ #ifdef XDMCP
+     XdmcpInit();
+--- a/hw/xquartz/NSUserDefaults+XQuartzDefaults.m
++++ b/hw/xquartz/NSUserDefaults+XQuartzDefaults.m
+@@ -58,6 +58,15 @@
+         };
+ 
+         [defaults registerDefaults:defaultDefaultsDict];
++        if (getenv("TERMCRAFT_OWNED_X11_FD")) {
++            /* Runtime-only overrides never write existing XQuartz preferences. */
++            [defaults setVolatileDomain:@{XQuartzPrefKeyNoAuth: @(NO),
++                                         XQuartzPrefKeyNoTCP: @(YES),
++                                         XQuartzPrefKeyDoneXinitCheck: @(YES),
++                                         XQuartzPrefKeyNoQuitAlert: @(YES)}
++                                forName:NSArgumentDomain];
++        }
++
+     });
+ 
+     return defaults;
+@@ -137,7 +146,7 @@
+ 
+         [defaults registerDefaults:defaultDefaultsDict];
+ 
+-        NSString * const systemDefaultsPlistPath = [@(XQUARTZ_DATA_DIR) stringByAppendingPathComponent:@"defaults.plist"];
++        NSString * const systemDefaultsPlistPath = [NSBundle.mainBundle.resourcePath stringByAppendingPathComponent:@"defaults.plist"];
+         NSDictionary <NSString *, id> * const systemDefaultsDict = [NSDictionary dictionaryWithContentsOfFile:systemDefaultsPlistPath];
+         [defaults registerDefaults:systemDefaultsDict];
+     });
+--- a/hw/xquartz/X11Application.m
++++ b/hw/xquartz/X11Application.m
+@@ -860,7 +860,8 @@
+          */
+         check_xinitrc();
+ 
+-        create_thread(xpbproxy_x_thread, NULL);
++        if (!getenv("TERMCRAFT_OWNED_X11_FD"))
++            create_thread(xpbproxy_x_thread, NULL);
+ 
+ #if XQUARTZ_SPARKLE
+         [[X11App controller] setup_sparkle];
+--- a/xkb/ddxLoad.c
++++ b/xkb/ddxLoad.c
+@@ -62,6 +62,13 @@
+ static void
+ OutputDirectory(char *outdir, size_t size)
+ {
++    if (getenv("TERMCRAFT_OWNED_X11_FD")) {
++        const char *private_tmp = getenv("TMPDIR");
++        int count = private_tmp ? snprintf(outdir, size, "%s/", private_tmp) : -1;
++        if (!private_tmp || private_tmp[0] != '/' || count < 0 || count >= size)
++            FatalError("Invalid private XQuartz XKB output directory");
++        return;
++    }
+     const char *directory = NULL;
+     const char *pathsep = "";
+     int r = -1;

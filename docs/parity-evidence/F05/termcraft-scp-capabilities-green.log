@@ -1,0 +1,23 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.63s
+     Running tests/scp_browser.rs (target/debug/deps/scp_browser-8ade13c5a5dbd886)
+
+running 12 tests
+test completed_scp_staging_does_not_authorize_remote_publication_on_eof ... ok
+test explicit_scp_reports_negotiated_endpoint_capabilities ... ok
+test cancelling_scp_exec_startup_does_not_exhaust_session_channels ... ok
+test directory_download_is_rejected_before_local_staging ... ok
+test silent_terminal_does_not_delay_initial_scp_listing ... ok
+test unsupported_enumerator_reports_capability_error ... ok
+test scp_enumeration_failure_retains_the_remote_reason ... ok
+test moving_a_remote_upload_parent_cannot_publish_or_clean_up_unrelated_objects ... ok
+test moving_a_local_download_parent_cannot_publish_a_replaced_staging_name ... ok
+test sftp_disabled_endpoint_supports_explicit_scp ... ok
+test virtual_file_sizes_cannot_silently_publish_empty_content ... ok
+test scp_names_cannot_be_interpreted_as_commands ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.80s
+

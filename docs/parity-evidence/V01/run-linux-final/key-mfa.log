@@ -1,0 +1,8 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_authentication-05d6262f32c90e79' --exact public_key_then_mfa_uses_updated_methods --nocapture --test-threads=1
+Executable SHA256: c69f3f81b04b55683d5617d70d2f3d858e4207d3a2ad5484c13827bce1eef68b
+
+running 1 test
+test public_key_then_mfa_uses_updated_methods ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.20s
+

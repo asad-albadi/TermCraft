@@ -1,0 +1,79 @@
+{
+  "schema": "b06-registry-ui-handoff-v1",
+  "owned_files": [
+    {
+      "path": "src/ui.rs",
+      "base_sha256": "710ea401d58b44183b90811095af4958627063fd6e5bd8d1e2a0ce21b951b22c",
+      "candidate_sha256": "698e55be9c8fd8c101660ed9e887cb13230134c64fb93af718bdf18ff966279a"
+    },
+    {
+      "path": "src/ui/windows.rs",
+      "base_sha256": "d67917e5d92dc10077116b561b25ef9af1a45554f773025886a15de85c73d701",
+      "candidate_sha256": "b312974d14594bfcaae5572cc383e8d986babd2cc87db00232630f1fa8f835d2"
+    },
+    {
+      "path": "src/ui/games.rs",
+      "base_sha256": "f9498e6444dc483c3719991c71105c2b5b1fae710435b41a415844f5379e25d6",
+      "candidate_sha256": "52f57bffea9ed82867533b100a96ee4586cfd2492b992a3446fd9cfe5c2e4c3f"
+    },
+    {
+      "path": "src/ui/games/play.rs",
+      "base_sha256": null,
+      "candidate_sha256": "feff31a26d6f819840c2fab0043531697fee41290d3b18fef22c4cfd255ffb00"
+    },
+    {
+      "path": "src/games/mod.rs",
+      "base_sha256": "ef55b5884e0a2ca3fc13dc856bd96ef0aba7000a3af7c99d0565ae70fd7d71e0",
+      "candidate_sha256": "1c0406c0d682bfdce3b484203a409bbb146ab2d71c9406ea04250254825e5b69"
+    },
+    {
+      "path": "src/games/library.rs",
+      "base_sha256": null,
+      "candidate_sha256": "169729dbe3df50144b23fd473d745c7bb30146dd4e099a016cb5371ca3b05e03"
+    },
+    {
+      "path": "tests/games.rs",
+      "base_sha256": "fe668766f79d947109d8edff8d7934a9e61e312f7692a39698552a8d155d7eb5",
+      "candidate_sha256": "e9c7e944788ba2ff91c9120568c314cc238e58c2e5b12d53a69fa0e0b565a97b"
+    },
+    {
+      "path": "docs/parity-evidence/B06/registry-ui.md",
+      "base_sha256": null,
+      "candidate_sha256": "868b06f2bef622a5f62040a317f996f25112bf748c2f15f0b30b302f22432215"
+    }
+  ],
+  "patch_sha256": "73e6b0cbe9e4efe642003ecf7f830752ac6b583b9a73795c003b81114d46652a",
+  "format_only_dependency_patch_sha256": "eea681b89c825a7fd531c0fc130eaef7f88b616ef4098a620a8d8378b4d843aa",
+  "private_package_version": "0.1.607",
+  "private_bin": "harbor-workspace-b06-ui",
+  "ui_executable": "target/debug/deps/harbor_workspace_b06_ui-52a8646fb5a562f3",
+  "ui_executable_sha256": "8bbecf3e06f48dd83608d5b8405a511d0d2aa580dd4d9464c31b6c1e37d530a1",
+  "checks": {
+    "ui_games": {
+      "passed": 26,
+      "failed": 0
+    },
+    "registry_games": {
+      "passed": 3,
+      "failed": 0
+    },
+    "pure_games": {
+      "passed": 62,
+      "failed": 0
+    },
+    "format": "exit0",
+    "patch_dry_run": "exit0",
+    "applied_proof": "8/8 matching",
+    "dependencies_stable": true,
+    "terminal_normalization_proof": "rustfmt --edition 2024 reproduces every copied dependency byte"
+  },
+  "limits": [
+    "No original runtime or native OS qualification",
+    "No complete B06/checklist advance",
+    "No whole application/release gate",
+    "Parent owns independent review and integration"
+  ],
+  "main_edited": false,
+  "tar_sha256": "122de0ec682a0599607fe5884454dd81cf8816f20f4063ed1c64f398ac907756",
+  "fix1_manifest": "fix1/manifest.json"
+}

@@ -1,0 +1,21 @@
+{
+  "944_archived_inputs": 4133,
+  "944_loose_drift": {
+    "src/x11/xdmcp_clipboard.rs": {
+      "sealed": "f030ea0e31659f8cd0190c5975ca8098df5b39576c858140a32c40eb00265aa3",
+      "loose": "e6c67e1aed541e2a443c046f48a67295511b5a73338c899842c906a2f8ed803d",
+      "952": "7e43e8e8dd6e1cbdf624faa14a781e28ae4df8dbc4b744b000580d37f46c9c25"
+    }
+  },
+  "hostname_baseline_verified": {
+    "src/ui.rs": "ddcee41202d7b16c946d58ce37599060dd3cb88824b009d9faff871cb9687b4a",
+    "src/ui/pages.rs": "50ea0690ecfc175ce277bf2d4a63f833fe01fea28293fa5434a22a05b49af003",
+    "src/ui/shared_sessions.rs": "dca461bb5066dd30fd7a6c3dfec0df5f9bd44d166b80eb99515566b2905cc7e5",
+    "src/ui/xdmcp.rs": "31870f5fc806cc58291dad0082f0b257d502b01e561d2d98f3073df418087b03",
+    "src/x11/mod.rs": "8a6de0b76e0ed06378b047ab5bf701a821f73c99576a11a75c895f86f0974316",
+    "src/x11/xdmcp_engine.rs": "47b1704a5807dbaf073589f538e980918b13a44ebff1624116fde134d69a7505",
+    "src/x11/xdmcp_host.rs": "21a8bb9a97dad5a9e5cd87636161563b1f24ca13226120e3741607496b5056be"
+  },
+  "fix1_summary_sha256": "b9156a7df793602434db975313a0ac5b0fe1dad105e099741f55ad5a5f6fd2af",
+  "944_artifacts_sha256": "371b9db011126d2182d2399f9a39f5bdb2b5e89e7710182d8a4a2baec4b7124d"
+}

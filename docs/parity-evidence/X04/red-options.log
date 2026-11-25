@@ -1,0 +1,27 @@
+error[E0425]: cannot find function `engine_arguments` in this scope
+   --> src/x11/xdmcp.rs:134:17
+    |
+134 |         assert!(engine_arguments(&config, 120, 800,600).is_err());
+    |                 ^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `engine_arguments` in this scope
+   --> src/x11/xdmcp.rs:136:17
+    |
+136 |         assert!(engine_arguments(&config,120,800,600).unwrap_err().contains("listener"));
+    |                 ^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `engine_arguments` in this scope
+   --> src/x11/xdmcp.rs:139:18
+    |
+139 |         let args=engine_arguments(&config,120,800,600).unwrap();
+    |                  ^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `engine_arguments` in this scope
+   --> src/x11/xdmcp.rs:143:17
+    |
+143 |         assert!(engine_arguments(&config,120,800,600).unwrap_err().contains("clipboard"));
+    |                 ^^^^^^^^^^^^^^^^ not found in this scope
+
+error: aborting due to 4 previous errors
+
+For more information about this error, try `rustc --explain E0425`.

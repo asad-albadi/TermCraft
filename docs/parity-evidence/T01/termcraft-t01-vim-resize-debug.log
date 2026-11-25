@@ -1,0 +1,19 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.64s
+     Running tests/terminal_programs.rs (app/target/debug/deps/terminal_programs-7713803393870dc4)
+
+running 1 test
+
+thread 'vim_redraw_resize_and_exit_restore_the_primary_screen' (355556) panicked at tests/terminal_programs.rs:25:9:
+Owned terminal fixture never reached the expected state: rows=30, cols=100, cursor=(0,0), screen="owned-vim-marker\nsecond line\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n~\n                                                                                  1,1           All"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... FAILED
+
+failures:
+
+failures:
+    vim_redraw_resize_and_exit_restore_the_primary_screen
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 8.02s
+
+error: test failed, to rerun pass `--test terminal_programs`

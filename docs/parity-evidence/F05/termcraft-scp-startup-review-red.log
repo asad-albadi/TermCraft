@@ -1,0 +1,19 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.10s
+     Running tests/scp_browser.rs (target/debug/deps/scp_browser-8ade13c5a5dbd886)
+
+running 1 test
+
+thread 'cancelling_scp_exec_startup_does_not_exhaust_session_channels' (268440) panicked at tests/scp_browser.rs:278:63:
+Cancelled exec startup leaked its raw SSH channel
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test cancelling_scp_exec_startup_does_not_exhaust_session_channels ... FAILED
+
+failures:
+
+failures:
+    cancelling_scp_exec_startup_does_not_exhaust_session_channels
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 8 filtered out; finished in 2.19s
+
+error: test failed, to rerun pass `--test scp_browser`

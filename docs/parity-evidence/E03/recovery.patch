@@ -1,0 +1,202 @@
+--- a/src/services/cron.rs
++++ b/src/services/cron.rs
+@@ -401,13 +401,27 @@
+     };
+     save_jobs_with_timezone(path, jobs, zone)
+ }
+-fn store_lock(path: &Path) -> Result<std::fs::File, String> {
++struct StoreLock(std::fs::File);
++impl std::ops::Deref for StoreLock {
++    type Target = std::fs::File;
++    fn deref(&self) -> &Self::Target {
++        &self.0
++    }
++}
++impl Drop for StoreLock {
++    fn drop(&mut self) {
++        // A concurrent fork may hold this open file description until exec.
++        // Release ownership now, rather than waiting for its last copy to close.
++        let _ = self.0.unlock();
++    }
++}
++fn store_lock(path: &Path) -> Result<StoreLock, String> {
+     let parent = path.parent().ok_or("Choose a cron storage folder.")?;
+     std::fs::create_dir_all(parent).map_err(|_| "Could not create cron storage.")?;
+     let file = crate::platform::private_file::open(&path.with_extension("cron-lock"), true)
+         .map_err(|_| "Could not secure the cron lock file.")?;
+     file.try_lock().map_err(|_| "This cron file is already owned by an active scheduler or save; stop it before editing.")?;
+-    Ok(file)
++    Ok(StoreLock(file))
+ }
+ pub fn save_jobs_with_timezone(
+     path: &Path,
+--- a/src/services/cron/tests.rs
++++ b/src/services/cron/tests.rs
+@@ -325,3 +325,26 @@
+         }
+     }
+ }
++
++#[test]
++fn releasing_store_owner_unlocks_inherited_open_description() {
++    let dir = tempfile::tempdir().unwrap();
++    let path = dir.path().join("jobs.json");
++    let owner = store_lock(&path).unwrap();
++    // dup and fork share the same open file description. Hold the duplicate
++    // through owner teardown to reproduce a concurrent pre-exec child.
++    let inherited = owner.try_clone().unwrap();
++    assert!(
++        store_lock(&path).is_err(),
++        "live owner must remain exclusive"
++    );
++    drop(owner);
++    let replacement = store_lock(&path).expect("retired owner must explicitly release its lock");
++    drop(inherited);
++    assert!(
++        store_lock(&path).is_err(),
++        "old child teardown must not unlock the new owner"
++    );
++    drop(replacement);
++    assert!(store_lock(&path).is_ok());
++}
+--- a/src/ui.rs
++++ b/src/ui.rs
+@@ -2531,6 +2531,7 @@
+     #[cfg(unix)]
+     #[test]
+     fn scp_pane_never_identifies_itself_as_sftp() {
++        let _process_slot = terminal_review_tests::owned_process_fixture_slot();
+         use harbor_workspace::remote_files::capabilities::RemoteBackendKind;
+         let server = remote_fixture::SshServer::start(false);
+         let mut config = server.config(99, true);
+--- a/src/ui/managed_servers.rs
++++ b/src/ui/managed_servers.rs
+@@ -418,20 +418,106 @@
+         index: usize,
+         expected: ServiceState,
+     ) -> SocketAddr {
+-        let deadline = Instant::now() + Duration::from_secs(4);
++        wait_state_until(
++            ctx,
++            work,
++            index,
++            expected,
++            Instant::now() + Duration::from_secs(4),
++        )
++    }
++
++    fn wait_state_until(
++        ctx: &Context,
++        work: &mut Workspace,
++        index: usize,
++        expected: ServiceState,
++        deadline: Instant,
++    ) -> SocketAddr {
+         let id = work.managed_servers.forms[index]
+             .id
+             .expect("Servers UI did not start a service");
+         loop {
+             frame(ctx, work, vec![]);
+             let status = work.managed_servers.supervisor.status(id).unwrap();
++            assert!(
++                Instant::now() < deadline,
++                "Service state observed after deadline: {status:?}"
++            );
+             if status.state == expected {
+                 return status.address.unwrap();
+             }
+             assert_ne!(status.state, ServiceState::Failed, "{status:?}");
+-            assert!(Instant::now() < deadline, "{status:?}");
+-            std::thread::sleep(Duration::from_millis(10));
+-        }
++            std::thread::sleep(
++                deadline
++                    .saturating_duration_since(Instant::now())
++                    .min(Duration::from_millis(10)),
++            );
++        }
++    }
++
++    fn wait_refusal_until(
++        deadline: Instant,
++        mut connect: impl FnMut(Duration) -> std::io::Result<()>,
++    ) {
++        loop {
++            let remaining = deadline.saturating_duration_since(Instant::now());
++            assert!(
++                !remaining.is_zero(),
++                "Telnet stop deadline expired before probe"
++            );
++            let outcome = connect(remaining.min(Duration::from_millis(50)));
++            // Even immediate refusal is success only inside the shared deadline.
++            assert!(
++                Instant::now() < deadline,
++                "Telnet stop probe completed after deadline"
++            );
++            match outcome {
++                Err(error) if error.kind() == std::io::ErrorKind::ConnectionRefused => return,
++                Ok(()) => {}
++                Err(error)
++                    if matches!(
++                        error.kind(),
++                        std::io::ErrorKind::TimedOut
++                            | std::io::ErrorKind::WouldBlock
++                            | std::io::ErrorKind::Interrupted
++                    ) => {}
++                Err(error) => panic!("Telnet stop probe failed without proving refusal: {error}"),
++            }
++            std::thread::sleep(
++                deadline
++                    .saturating_duration_since(Instant::now())
++                    .min(Duration::from_millis(10)),
++            );
++        }
++    }
++
++    #[test]
++    fn refusal_probe_rejects_late_refusal_and_retries_timeout() {
++        let late = std::panic::catch_unwind(|| {
++            let deadline = Instant::now() + Duration::from_millis(2);
++            wait_refusal_until(deadline, |_| {
++                // Deliberately return a real refusal only after the budget expired.
++                std::thread::sleep(Duration::from_millis(3));
++                Err(std::io::ErrorKind::ConnectionRefused.into())
++            });
++        });
++        assert!(
++            late.is_err(),
++            "a refusal observed after the deadline was accepted"
++        );
++        let mut attempts = 0;
++        wait_refusal_until(Instant::now() + Duration::from_secs(1), |remaining| {
++            assert!(!remaining.is_zero());
++            attempts += 1;
++            Err(if attempts == 1 {
++                std::io::ErrorKind::TimedOut
++            } else {
++                std::io::ErrorKind::ConnectionRefused
++            }
++            .into())
++        });
++        assert_eq!(attempts, 2, "timeout must not count as listener refusal");
+     }
+ 
+     // Removing the password field's undo clearing must fail this regression.
+@@ -573,9 +659,15 @@
+             click(&ctx, &mut work, "Start Telnet server");
+             let telnet = wait_state(&ctx, &mut work, 2, ServiceState::Running);
+             assert!(TcpStream::connect(telnet).is_ok());
++            let deadline = Instant::now() + Duration::from_secs(4);
+             click(&ctx, &mut work, "Stop Telnet server");
+-            wait_state(&ctx, &mut work, 2, ServiceState::Stopped);
+-            assert!(TcpStream::connect(telnet).is_err());
++            wait_state_until(&ctx, &mut work, 2, ServiceState::Stopped, deadline);
++            // Another fixture can be between fork and exec with a copied socket
++            // descriptor even after this worker has closed its own listener.
++            // Observe OS completion within the same stop deadline.
++            wait_refusal_until(deadline, |remaining| {
++                TcpStream::connect_timeout(&telnet, remaining).map(drop)
++            });
+         }
+         click(&ctx, &mut work, "Stop TFTP server");
+         wait_state(&ctx, &mut work, 1, ServiceState::Stopped);

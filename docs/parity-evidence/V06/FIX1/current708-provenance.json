@@ -1,0 +1,26 @@
+{
+  "version": "0.1.708",
+  "build_bin": "termcraft-v06-current708",
+  "private_source": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v06-current708/source",
+  "package_archive": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v06-current708/package-output/TermCraft-0.1.708-linux-x86_64-arch-xwayland.tar.gz",
+  "package_sha256": "64840f72a1d2548917051efdbbbbe5d7ed3d1826625b7cf1f4f482746660648d",
+  "app_sha256": "77289a5766bf8fa6a3e81cf7e8d1c0088e8acf6bb683cfc5a1dac33c86cb298a",
+  "current_parent_ui_sha256": "698e55be9c8fd8c101660ed9e887cb13230134c64fb93af718bdf18ff966279a",
+  "current_parent_windows_sha256": "b312974d14594bfcaae5572cc383e8d986babd2cc87db00232630f1fa8f835d2",
+  "current_parent_games_ui_sha256": "52f57bffea9ed82867533b100a96ee4586cfd2492b992a3446fd9cfe5c2e4c3f",
+  "current_parent_games_models_sha256": "1c0406c0d682bfdce3b484203a409bbb146ab2d71c9406ea04250254825e5b69",
+  "fresh_native_execution": {
+    "sessions": 2,
+    "scale": 1.5,
+    "backends": [
+      "x11",
+      "wayland"
+    ],
+    "normal_native_observations": 28,
+    "additional_default_inactive_guard_observations": 2,
+    "ignored": 0
+  },
+  "historical706_proof_unchanged": true,
+  "current_active_games_native": "B06 pending",
+  "strict_original_native_all_platform": 0
+}

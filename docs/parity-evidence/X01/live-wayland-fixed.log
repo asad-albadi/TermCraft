@@ -1,0 +1,66 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: methods `send` and `poll` are never used
+   --> src/ui.rs:133:8
+    |
+132 | impl TerminalTab {
+    | ---------------- methods in this implementation
+133 |     fn send(&mut self, data: &[u8]) {
+    |        ^^^^
+...
+177 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.39s
+     Running tests/xserver_lifecycle.rs (target/debug/deps/xserver_lifecycle-9652e40a14eeef93)
+
+running 4 tests
+test display_collision_does_not_kill_existing_server ... 
+thread 'display_collision_does_not_kill_existing_server' (346392) panicked at tests/xserver_lifecycle.rs:97:10:
+display :0 must already exist for this test: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test packaged_xserver_starts_without_external_install ... ok
+test stop_only_terminates_owned_engine ... ok
+test wrong_cookie_is_rejected ... ok
+
+failures:
+
+failures:
+    display_collision_does_not_kill_existing_server
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 1.01s
+
+error: test failed, to rerun pass `--test xserver_lifecycle`

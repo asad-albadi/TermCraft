@@ -1,0 +1,6 @@
+[147349] Nov 25 00:45:35 Not backgrounding
+[147351] Nov 25 00:45:35 Child connection from 127.0.0.1:60558
+[147352] Nov 25 00:45:35 Child connection from 127.0.0.1:60574
+[147351] Nov 25 00:45:35 Exit before auth from <127.0.0.1:60558>: Exited normally
+[147352] Nov 25 00:45:35 Pubkey auth succeeded for 'asad' with ssh-ed25519 key SHA256:DDeODlxjHg9Grr0ujyrvAX4R3QU65O3eP1zTDUUlIPo from 127.0.0.1:60574
+[147352] Nov 25 00:45:35 Exit (asad) from <127.0.0.1:60574>: Exited normally

@@ -1,0 +1,3 @@
+missing-artifact: rejected; exit 1; unavailable
+zero-test: rejected; exit 1; failed
+false-success-unavailable: rejected; exit 1; unavailable

@@ -1,0 +1,72 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0432]: unresolved imports `harbor_workspace::remote_files::BrowserFollowMode`, `harbor_workspace::ssh::shell_integration`
+ --> tests/shell_directory.rs:2:20
+  |
+2 |     remote_files::{BrowserFollowMode,BrowserState,DirectorySnapshot,RemotePath},
+  |                    ^^^^^^^^^^^^^^^^^ no `BrowserFollowMode` in `remote_files`
+3 |     ssh::{ConnectionCommand,shell_integration::{ShellDirectoryTracker,ShellFlavor,integration_script}},
+  |                             ^^^^^^^^^^^^^^^^^ could not find `shell_integration` in `ssh`
+
+error[E0599]: no method named `set_follow_mode` found for struct `BrowserState` in the current scope
+  --> tests/shell_directory.rs:11:101
+   |
+11 | ..."/kept");browser.loading=false;browser.set_follow_mode(BrowserFollowMode::FollowShell);
+   |                                           ^^^^^^^^^^^^^^^ method not found in `BrowserState`
+
+error[E0599]: no method named `on_shell_directory` found for struct `BrowserState` in the current scope
+  --> tests/shell_directory.rs:12:21
+   |
+12 |     assert!(browser.on_shell_directory(41,notifications[0].clone()).is_none());
+   |                     ^^^^^^^^^^^^^^^^^^ method not found in `BrowserState`
+
+error[E0599]: no method named `on_shell_directory` found for struct `BrowserState` in the current scope
+  --> tests/shell_directory.rs:13:25
+   |
+13 |     let command=browser.on_shell_directory(42,notifications[0].clone()).unwrap();match command {ConnectionCommand::List{request,path...
+   |                         ^^^^^^^^^^^^^^^^^^ method not found in `BrowserState`
+
+error[E0599]: no method named `follow_mode` found for struct `BrowserState` in the current scope
+  --> tests/shell_directory.rs:19:24
+   |
+19 |     assert_eq!(browser.follow_mode(),BrowserFollowMode::Manual);assert!(browser.on_shell_directory(42,path(b"/shell")).is_none());as...
+   |                        ^^^^^^^^^^^ method not found in `BrowserState`
+
+error[E0599]: no method named `on_shell_directory` found for struct `BrowserState` in the current scope
+  --> tests/shell_directory.rs:19:81
+   |
+19 | ...erFollowMode::Manual);assert!(browser.on_shell_directory(42,path(b"/shell")).is_none());assert_eq!(browser.path.as_bytes(),b"/man...
+   |                                          ^^^^^^^^^^^^^^^^^^ method not found in `BrowserState`
+
+error[E0599]: no method named `follow_mode` found for struct `BrowserState` in the current scope
+  --> tests/shell_directory.rs:24:265
+   |
+24 | ....as_bytes(),b"/kept");assert_eq!(browser.follow_mode(),BrowserFollowMode::Manual);assert_eq!(browser.request,0);
+   |                                             ^^^^^^^^^^^ method not found in `BrowserState`
+
+error[E0599]: no method named `set_follow_mode` found for struct `BrowserState` in the current scope
+  --> tests/shell_directory.rs:28:101
+   |
+28 | ..."/kept");browser.loading=false;browser.set_follow_mode(BrowserFollowMode::FollowShell);
+   |                                           ^^^^^^^^^^^^^^^ method not found in `BrowserState`
+
+error[E0599]: no method named `on_shell_directory` found for struct `BrowserState` in the current scope
+  --> tests/shell_directory.rs:29:25
+   |
+29 |     let command=browser.on_shell_directory(42,path(b"/shell")).unwrap();let ConnectionCommand::List{request,..}=command else{panic!()};
+   |                         ^^^^^^^^^^^^^^^^^^ method not found in `BrowserState`
+
+error[E0599]: no method named `set_follow_mode` found for struct `BrowserState` in the current scope
+  --> tests/shell_directory.rs:30:13
+   |
+30 |     browser.set_follow_mode(BrowserFollowMode::Manual);assert!(!browser.loading);assert!(!browser.apply_snapshot(DirectorySnapshot{c...
+   |             ^^^^^^^^^^^^^^^ method not found in `BrowserState`
+
+error[E0599]: no method named `set_follow_mode` found for struct `BrowserState` in the current scope
+  --> tests/shell_directory.rs:31:30
+   |
+31 |     browser.begin(9);browser.set_follow_mode(BrowserFollowMode::Manual);assert!(browser.apply_snapshot(DirectorySnapshot{connection:...
+   |                              ^^^^^^^^^^^^^^^ method not found in `BrowserState`
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `harbor-workspace` (test "shell_directory") due to 11 previous errors

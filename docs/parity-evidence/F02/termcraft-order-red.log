@@ -1,0 +1,24 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.13s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-e34932d23f1e276b)
+
+running 1 test
+test overlapping_overwrite_jobs_commit_in_submission_order ... FAILED
+
+failures:
+
+---- overlapping_overwrite_jobs_commit_in_submission_order stdout ----
+
+thread 'overlapping_overwrite_jobs_commit_in_submission_order' (209559) panicked at tests/remote_transfers.rs:423:5:
+assertion `left == right` failed: An earlier job overwrote the newer destination
+  left: 8388608
+ right: 3
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    overlapping_overwrite_jobs_commit_in_submission_order
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.54s
+
+error: test failed, to rerun pass `--test remote_transfers`

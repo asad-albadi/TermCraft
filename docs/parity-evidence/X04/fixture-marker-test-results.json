@@ -1,0 +1,50 @@
+[
+  {
+    "case": "original",
+    "argv": [
+      "/usr/bin/python",
+      "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/X04/fixture-marker-test.py",
+      "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/v03/inputs/xdmcp-fixture"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "log": "fixture-marker-original.log"
+  },
+  {
+    "case": "red",
+    "argv": [
+      "/usr/bin/python",
+      "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/X04/fixture-marker-test.py",
+      "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/v03/inputs/xdmcp-fixture",
+      "--expect-atomic"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "log": "fixture-marker-red.log"
+  },
+  {
+    "case": "green",
+    "argv": [
+      "/usr/bin/python",
+      "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/X04/fixture-marker-test.py",
+      "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-games-v03/xdmcp-fixture-atomic",
+      "--expect-atomic"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "log": "fixture-marker-green.log"
+  },
+  {
+    "case": "write-failure",
+    "argv": [
+      "/usr/bin/python",
+      "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/X04/fixture-marker-test.py",
+      "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-games-v03/xdmcp-fixture-atomic",
+      "--expect-atomic",
+      "--fail-write"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "log": "fixture-marker-write-failure.log"
+  }
+]

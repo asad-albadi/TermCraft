@@ -1,0 +1,9 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/fix1/work)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.44s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/fix1/work/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 1 test
+test tests::unflagged_variant_has_truthful_regular_metadata_and_topology ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.05s
+

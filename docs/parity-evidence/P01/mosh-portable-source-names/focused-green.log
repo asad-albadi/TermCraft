@@ -1,0 +1,9 @@
+test_absent_and_symlinked_inputs_never_use_another_source (__main__.DependencyInputs.test_absent_and_symlinked_inputs_never_use_another_source) ... ok
+test_exact_input_is_accepted_but_replacement_is_rejected (__main__.DependencyInputs.test_exact_input_is_accepted_but_replacement_is_rejected) ... ok
+test_output_does_not_overwrite_existing_files_or_escape (__main__.DependencyInputs.test_output_does_not_overwrite_existing_files_or_escape) ... ok
+test_pinned_source_notices_survive_strict_portable_extraction (__main__.DependencyInputs.test_pinned_source_notices_survive_strict_portable_extraction) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.012s
+
+OK

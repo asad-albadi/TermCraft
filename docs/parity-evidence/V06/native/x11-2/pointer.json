@@ -1,0 +1,8 @@
+{
+  "cells": "[Some((20, 5)), Some((20, 5))]",
+  "events": "[MouseMoved([346.0 398.0]), PointerMoved([173.0 199.0]), ModifiersChanged(Modifiers::NONE), PointerButton { pos: [173.0 199.0], button: Primary, pressed: true, modifiers: Modifiers::NONE }, ModifiersChanged(Modifiers::NONE), ModifiersChanged(Modifiers::NONE), PointerButton { pos: [173.0 199.0], button: Primary, pressed: false, modifiers: Modifiers::NONE }, ModifiersChanged(Modifiers::NONE)]",
+  "focused": true,
+  "mode": "MouseMode { tracking: Press, sgr: true }",
+  "ppp": 2.0,
+  "widget_focus": true
+}

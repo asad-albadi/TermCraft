@@ -1,0 +1,20 @@
+[
+  {
+    "version": 2,
+    "client_exit": 0,
+    "requested_bytes": 262144,
+    "actual_sender_bytes": 262144,
+    "actual_receiver_bytes": 262144,
+    "client_report": "iperf2-client.log",
+    "server_report": "iperf2-server.log"
+  },
+  {
+    "version": 3,
+    "client_exit": 0,
+    "requested_bytes": 262144,
+    "actual_sender_bytes": 262144,
+    "actual_receiver_bytes": 262144,
+    "client_report": "iperf3-client.log",
+    "server_report": "iperf3-server.log"
+  }
+]

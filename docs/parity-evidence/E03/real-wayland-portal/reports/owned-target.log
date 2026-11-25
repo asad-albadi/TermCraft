@@ -1,0 +1,6 @@
+
+(zenity:45): Gdk-WARNING **: 12:48:03.025: Cannot get portal org.freedesktop.portal.Settings version: GDBus.Error:org.freedesktop.DBus.Error.InvalidArgs: No such interface “org.freedesktop.portal.Settings”
+
+(zenity:45): Gdk-WARNING **: 12:48:03.028: Cannot get portal org.freedesktop.portal.Inhibit version: GDBus.Error:org.freedesktop.DBus.Error.InvalidArgs: No such interface “org.freedesktop.portal.Inhibit”
+
+(zenity:45): Gtk-CRITICAL **: 12:48:03.192: Unable to connect to the accessibility bus at 'unix:path=/tmp/real-runtime/at-spi/bus': Could not connect: Connection refused

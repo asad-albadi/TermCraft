@@ -1,0 +1,42 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.64s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-a3e649926aaf12fc)
+
+running 16 tests
+
+running 1 test
+test disconnect_keeps_original_destination_and_recoverable_partial ... ok
+test cancelled_active_download_retains_partial_and_preserves_destination ... ok
+test composed_symlinks_cannot_publish_an_escape_from_the_selected_tree ... ok
+test cancellation_and_conflicts_preserve_existing_destination ... ok
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.24s
+
+
+running 1 test
+test failed_local_and_remote_io_preserve_existing_data ... ok
+test explicit_folder_overwrite_merges_files_and_preserves_unrelated_entries ... ok
+test file_management_is_literal_and_deletion_requires_the_confirmed_target ... ok
+test folder_merge_never_follows_existing_destination_directory_symlinks ... ok
+test missing_sftp_rejects_file_jobs_without_stranding_the_queue ... ok
+test folder_merge_retains_modes_without_making_staging_read_only_too_early ... ok
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.22s
+
+
+running 1 test
+test literal_binary_file_round_trip_uses_sftp ... ok
+test recursive_transfer_preserves_names_bytes_and_symlink_cycles ... ok
+test transfer_preserves_executable_modes_after_staging ... ok
+test repeated_tree_cancellation_releases_bounded_sftp_handles ... ok
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.25s
+
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+test overlapping_overwrite_jobs_commit_in_submission_order ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.86s
+

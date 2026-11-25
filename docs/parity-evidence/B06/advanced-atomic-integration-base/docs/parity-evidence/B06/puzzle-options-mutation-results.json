@@ -1,0 +1,101 @@
+[
+  {
+    "name": "solo-symmetry",
+    "file": "solo.rs",
+    "old": "SoloSymmetry::Rotate2 => vec![(x, y), (m - x, m - y)]",
+    "new": "SoloSymmetry::Rotate2 => vec![(x, y)]",
+    "test": "solo::options_tests::default_clues_have_half_turn_symmetry",
+    "exit": 101,
+    "behavioral_failure": true
+  },
+  {
+    "name": "solo-block-grade",
+    "file": "solo.rs",
+    "old": "deduction(&digits, config, config.difficulty).is_none()",
+    "new": "deduction(&digits, config, SoloDifficulty::Basic).is_none()",
+    "test": "solo::options_tests::default_is_solved_using_only_block_position_elimination",
+    "exit": 101,
+    "behavioral_failure": true
+  },
+  {
+    "name": "net-wrap",
+    "file": "net.rs",
+    "old": "else if c.wrapping",
+    "new": "else if false",
+    "test": "net::configuration_tests::wrapped_seam_connects_but_barrier_stops_it",
+    "exit": 101,
+    "behavioral_failure": true
+  },
+  {
+    "name": "net-barrier",
+    "file": "net.rs",
+    "old": "&& self.barriers[i] & a == 0\n                    && self.barriers[j] & b == 0",
+    "new": "&& true",
+    "test": "net::configuration_tests::wrapped_seam_connects_but_barrier_stops_it",
+    "exit": 101,
+    "behavioral_failure": true
+  },
+  {
+    "name": "net-loop",
+    "file": "net.rs",
+    "old": "if valid && tree && self.connected_at(0)",
+    "new": "if valid && self.connected_at(0)",
+    "test": "net::additional_configuration_tests::default_fallback_is_unique_and_loops_do_not_win",
+    "exit": 101,
+    "behavioral_failure": true
+  },
+  {
+    "name": "redo-noop",
+    "file": "mod.rs",
+    "old": "if self.state == before {\n            return Ok(false);",
+    "new": "if self.state == before {\n            self.future.clear();\n            return Ok(false);",
+    "test": "tests::redo_restores_moves_and_only_changed_branch_clears_it",
+    "exit": 101,
+    "behavioral_failure": true
+  },
+  {
+    "name": "solve-assisted",
+    "file": "mod.rs",
+    "old": "self.assisted = true;",
+    "new": "self.assisted = false;",
+    "test": "tests::explicit_solve_is_atomic_assisted_undoable_and_guess_gives_up",
+    "exit": 101,
+    "behavioral_failure": true
+  },
+  {
+    "name": "guess-distinct",
+    "file": "guess.rs",
+    "old": "if !self.config.allow_multiple\n",
+    "new": "if false\n",
+    "test": "guess::configuration_tests::super_and_blank_distinct_rules",
+    "exit": 101,
+    "behavioral_failure": true
+  },
+  {
+    "name": "guess-blanks",
+    "file": "guess.rs",
+    "old": "|| self.current.iter().all(|&c| c == 0)",
+    "new": "|| false",
+    "test": "guess::configuration_tests::super_and_blank_distinct_rules",
+    "exit": 101,
+    "behavioral_failure": true
+  },
+  {
+    "name": "mines-corrections",
+    "file": "mines.rs",
+    "old": "self.solution_revealed = true;",
+    "new": "self.solution_revealed = false;",
+    "test": "tests::mines_explicit_solve_after_death_reveals_corrections_and_undo_hides_them",
+    "exit": 101,
+    "behavioral_failure": true
+  },
+  {
+    "name": "untangle-points",
+    "file": "untangle.rs",
+    "old": "if !(4..=25).contains(&points)",
+    "new": "if !(4..=10).contains(&points)",
+    "test": "untangle::configuration_tests::stock_point_counts_have_valid_solved_embeddings",
+    "exit": 101,
+    "behavioral_failure": true
+  }
+]

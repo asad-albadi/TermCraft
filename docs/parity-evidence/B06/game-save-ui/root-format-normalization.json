@@ -1,0 +1,17 @@
+{
+  "tool": "rustfmt --edition 2024 --config skip_children=true",
+  "before": {
+    "src/ui/games.rs": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac",
+    "src/ui/games/play.rs": "20d6dc46ecde31810f4b1fd81f7d5aaa9ff807463cef9e47eb57df5e041add24",
+    "src/ui/games/save.rs": "a319751542ea82a4993bece94fef92a676cb73abce477bc5d3f8e7b43a34d9af",
+    "src/ui/session_confirmations.rs": "68f97410c75bd813b953391c69e649a25c2ae94dd70b7ee009b6ad2ea1e1e067"
+  },
+  "after": {
+    "src/ui/games.rs": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac",
+    "src/ui/games/play.rs": "8019865e83ea1864e055fa9349356bd85511acc52d30693791b383a5c2954b18",
+    "src/ui/games/save.rs": "a319751542ea82a4993bece94fef92a676cb73abce477bc5d3f8e7b43a34d9af",
+    "src/ui/session_confirmations.rs": "7394c8213179d507700236564e50493a1ef7774c1dfb5cc50c0fd12c635918de"
+  },
+  "scope": "mechanical formatter output only; reviewed semantics preserved",
+  "whole_format_check_exit": 0
+}

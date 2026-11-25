@@ -1,0 +1,2128 @@
+===== net.c lines 160–171: default_params =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+    ret->width = 5;
+    ret->height = 5;
+    ret->wrapping = FALSE;
+    ret->unique = TRUE;
+    ret->barrier_probability = 0.0;
+
+    return ret;
+}
+
+===== net.c lines 2192–2464: interpret_move =====
+static char *interpret_move(const game_state *state, game_ui *ui,
+                            const game_drawstate *ds,
+                            int x, int y, int button)
+{
+    char *nullret;
+    int tx = -1, ty = -1, dir = 0;
+    int shift = button & MOD_SHFT, ctrl = button & MOD_CTRL;
+    enum {
+        NONE, ROTATE_LEFT, ROTATE_180, ROTATE_RIGHT, TOGGLE_LOCK, JUMBLE,
+        MOVE_ORIGIN, MOVE_SOURCE, MOVE_ORIGIN_AND_SOURCE, MOVE_CURSOR
+    } action;
+
+    button &= ~MOD_MASK;
+    nullret = NULL;
+    action = NONE;
+
+    if (button == LEFT_BUTTON ||
+	button == MIDDLE_BUTTON ||
+#ifdef USE_DRAGGING
+	button == LEFT_DRAG ||
+	button == LEFT_RELEASE ||
+	button == RIGHT_DRAG ||
+	button == RIGHT_RELEASE ||
+#endif
+	button == RIGHT_BUTTON) {
+
+	if (ui->cur_visible) {
+	    ui->cur_visible = FALSE;
+	    nullret = "";
+	}
+
+	/*
+	 * The button must have been clicked on a valid tile.
+	 */
+	x -= WINDOW_OFFSET + TILE_BORDER;
+	y -= WINDOW_OFFSET + TILE_BORDER;
+	if (x < 0 || y < 0)
+	    return nullret;
+	tx = x / TILE_SIZE;
+	ty = y / TILE_SIZE;
+	if (tx >= state->width || ty >= state->height)
+	    return nullret;
+        /* Transform from physical to game coords */
+        tx = (tx + ui->org_x) % state->width;
+        ty = (ty + ui->org_y) % state->height;
+	if (x % TILE_SIZE >= TILE_SIZE - TILE_BORDER ||
+	    y % TILE_SIZE >= TILE_SIZE - TILE_BORDER)
+	    return nullret;
+
+#ifdef USE_DRAGGING
+
+        if (button == MIDDLE_BUTTON
+#ifdef STYLUS_BASED
+	    || button == RIGHT_BUTTON  /* with a stylus, `right-click' locks */
+#endif
+	    ) {
+            /*
+             * Middle button never drags: it only toggles the lock.
+             */
+            action = TOGGLE_LOCK;
+        } else if (button == LEFT_BUTTON
+#ifndef STYLUS_BASED
+                   || button == RIGHT_BUTTON /* (see above) */
+#endif
+                  ) {
+            /*
+             * Otherwise, we note down the start point for a drag.
+             */
+            ui->dragtilex = tx;
+            ui->dragtiley = ty;
+            ui->dragstartx = x % TILE_SIZE;
+            ui->dragstarty = y % TILE_SIZE;
+            ui->dragged = FALSE;
+            return nullret;            /* no actual action */
+        } else if (button == LEFT_DRAG
+#ifndef STYLUS_BASED
+                   || button == RIGHT_DRAG
+#endif
+                  ) {
+            /*
+             * Find the new drag point and see if it necessitates a
+             * rotation.
+             */
+            int x0,y0, xA,yA, xC,yC, xF,yF;
+            int mx, my;
+            int d0, dA, dC, dF, dmin;
+
+            tx = ui->dragtilex;
+            ty = ui->dragtiley;
+
+            mx = x - (ui->dragtilex * TILE_SIZE);
+            my = y - (ui->dragtiley * TILE_SIZE);
+
+            x0 = ui->dragstartx;
+            y0 = ui->dragstarty;
+            xA = ui->dragstarty;
+            yA = TILE_SIZE-1 - ui->dragstartx;
+            xF = TILE_SIZE-1 - ui->dragstartx;
+            yF = TILE_SIZE-1 - ui->dragstarty;
+            xC = TILE_SIZE-1 - ui->dragstarty;
+            yC = ui->dragstartx;
+
+            d0 = (mx-x0)*(mx-x0) + (my-y0)*(my-y0);
+            dA = (mx-xA)*(mx-xA) + (my-yA)*(my-yA);
+            dF = (mx-xF)*(mx-xF) + (my-yF)*(my-yF);
+            dC = (mx-xC)*(mx-xC) + (my-yC)*(my-yC);
+
+            dmin = min(min(d0,dA),min(dF,dC));
+
+            if (d0 == dmin) {
+                return nullret;
+            } else if (dF == dmin) {
+                action = ROTATE_180;
+                ui->dragstartx = xF;
+                ui->dragstarty = yF;
+                ui->dragged = TRUE;
+            } else if (dA == dmin) {
+                action = ROTATE_LEFT;
+                ui->dragstartx = xA;
+                ui->dragstarty = yA;
+                ui->dragged = TRUE;
+            } else /* dC == dmin */ {
+                action = ROTATE_RIGHT;
+                ui->dragstartx = xC;
+                ui->dragstarty = yC;
+                ui->dragged = TRUE;
+            }
+        } else if (button == LEFT_RELEASE
+#ifndef STYLUS_BASED
+                   || button == RIGHT_RELEASE
+#endif
+                  ) {
+            if (!ui->dragged) {
+                /*
+                 * There was a click but no perceptible drag:
+                 * revert to single-click behaviour.
+                 */
+                tx = ui->dragtilex;
+                ty = ui->dragtiley;
+
+                if (button == LEFT_RELEASE)
+                    action = ROTATE_LEFT;
+                else
+                    action = ROTATE_RIGHT;
+            } else
+                return nullret;        /* no action */
+        }
+
+#else /* USE_DRAGGING */
+
+	action = (button == LEFT_BUTTON ? ROTATE_LEFT :
+		  button == RIGHT_BUTTON ? ROTATE_RIGHT : TOGGLE_LOCK);
+
+#endif /* USE_DRAGGING */
+
+    } else if (IS_CURSOR_MOVE(button)) {
+        switch (button) {
+          case CURSOR_UP:       dir = U; break;
+          case CURSOR_DOWN:     dir = D; break;
+          case CURSOR_LEFT:     dir = L; break;
+          case CURSOR_RIGHT:    dir = R; break;
+          default:              return nullret;
+        }
+        if (shift && ctrl) action = MOVE_ORIGIN_AND_SOURCE;
+        else if (shift)    action = MOVE_ORIGIN;
+        else if (ctrl)     action = MOVE_SOURCE;
+        else               action = MOVE_CURSOR;
+    } else if (button == 'a' || button == 's' || button == 'd' ||
+	       button == 'A' || button == 'S' || button == 'D' ||
+               button == 'f' || button == 'F' ||
+               IS_CURSOR_SELECT(button)) {
+	tx = ui->cur_x;
+	ty = ui->cur_y;
+	if (button == 'a' || button == 'A' || button == CURSOR_SELECT)
+	    action = ROTATE_LEFT;
+	else if (button == 's' || button == 'S' || button == CURSOR_SELECT2)
+	    action = TOGGLE_LOCK;
+	else if (button == 'd' || button == 'D')
+	    action = ROTATE_RIGHT;
+        else if (button == 'f' || button == 'F')
+            action = ROTATE_180;
+        ui->cur_visible = TRUE;
+    } else if (button == 'j' || button == 'J') {
+	/* XXX should we have some mouse control for this? */
+	action = JUMBLE;
+    } else
+	return nullret;
+
+    /*
+     * The middle button locks or unlocks a tile. (A locked tile
+     * cannot be turned, and is visually marked as being locked.
+     * This is a convenience for the player, so that once they are
+     * sure which way round a tile goes, they can lock it and thus
+     * avoid forgetting later on that they'd already done that one;
+     * and the locking also prevents them turning the tile by
+     * accident. If they change their mind, another middle click
+     * unlocks it.)
+     */
+    if (action == TOGGLE_LOCK) {
+	char buf[80];
+	sprintf(buf, "L%d,%d", tx, ty);
+	return dupstr(buf);
+    } else if (action == ROTATE_LEFT || action == ROTATE_RIGHT ||
+               action == ROTATE_180) {
+	char buf[80];
+
+        /*
+         * The left and right buttons have no effect if clicked on a
+         * locked tile.
+         */
+        if (tile(state, tx, ty) & LOCKED)
+            return nullret;
+
+        /*
+         * Otherwise, turn the tile one way or the other. Left button
+         * turns anticlockwise; right button turns clockwise.
+         */
+	sprintf(buf, "%c%d,%d", (int)(action == ROTATE_LEFT ? 'A' :
+                                      action == ROTATE_RIGHT ? 'C' : 'F'), tx, ty);
+	return dupstr(buf);
+    } else if (action == JUMBLE) {
+        /*
+         * Jumble all unlocked tiles to random orientations.
+         */
+
+        int jx, jy, maxlen;
+	char *ret, *p;
+
+	/*
+	 * Maximum string length assumes no int can be converted to
+	 * decimal and take more than 11 digits!
+	 */
+	maxlen = state->width * state->height * 25 + 3;
+
+	ret = snewn(maxlen, char);
+	p = ret;
+	*p++ = 'J';
+
+        for (jy = 0; jy < state->height; jy++) {
+            for (jx = 0; jx < state->width; jx++) {
+                if (!(tile(state, jx, jy) & LOCKED)) {
+                    int rot = random_upto(ui->rs, 4);
+		    if (rot) {
+			p += sprintf(p, ";%c%d,%d", "AFC"[rot-1], jx, jy);
+		    }
+                }
+            }
+        }
+	*p++ = '\0';
+	assert(p - ret < maxlen);
+	ret = sresize(ret, p - ret, char);
+
+	return ret;
+    } else if (action == MOVE_ORIGIN || action == MOVE_SOURCE ||
+               action == MOVE_ORIGIN_AND_SOURCE || action == MOVE_CURSOR) {
+        assert(dir != 0);
+        if (action == MOVE_ORIGIN || action == MOVE_ORIGIN_AND_SOURCE) {
+            if (state->wrapping) {
+                 OFFSET(ui->org_x, ui->org_y, ui->org_x, ui->org_y, dir, state);
+            } else return nullret; /* disallowed for non-wrapping grids */
+        }
+        if (action == MOVE_SOURCE || action == MOVE_ORIGIN_AND_SOURCE) {
+            OFFSET(ui->cx, ui->cy, ui->cx, ui->cy, dir, state);
+        }
+        if (action == MOVE_CURSOR) {
+            OFFSET(ui->cur_x, ui->cur_y, ui->cur_x, ui->cur_y, dir, state);
+            ui->cur_visible = TRUE;
+        }
+        return "";
+    } else {
+	return NULL;
+    }
+}
+
+===== net.c lines 2466–2550: execute_move =====
+static game_state *execute_move(const game_state *from, const char *move)
+{
+    game_state *ret;
+    int tx = -1, ty = -1, n, noanim, orig;
+
+    ret = dup_game(from);
+
+    if (move[0] == 'J' || move[0] == 'S') {
+	if (move[0] == 'S')
+	    ret->used_solve = TRUE;
+
+	move++;
+	if (*move == ';')
+	    move++;
+	noanim = TRUE;
+    } else
+	noanim = FALSE;
+
+    ret->last_rotate_dir = 0;	       /* suppress animation */
+    ret->last_rotate_x = ret->last_rotate_y = 0;
+
+    while (*move) {
+	if ((move[0] == 'A' || move[0] == 'C' ||
+	     move[0] == 'F' || move[0] == 'L') &&
+	    sscanf(move+1, "%d,%d%n", &tx, &ty, &n) >= 2 &&
+	    tx >= 0 && tx < from->width && ty >= 0 && ty < from->height) {
+	    orig = tile(ret, tx, ty);
+	    if (move[0] == 'A') {
+		tile(ret, tx, ty) = A(orig);
+		if (!noanim)
+		    ret->last_rotate_dir = +1;
+	    } else if (move[0] == 'F') {
+		tile(ret, tx, ty) = F(orig);
+		if (!noanim)
+                    ret->last_rotate_dir = +2; /* + for sake of argument */
+	    } else if (move[0] == 'C') {
+		tile(ret, tx, ty) = C(orig);
+		if (!noanim)
+		    ret->last_rotate_dir = -1;
+	    } else {
+		assert(move[0] == 'L');
+		tile(ret, tx, ty) ^= LOCKED;
+	    }
+
+	    move += 1 + n;
+	    if (*move == ';') move++;
+	} else {
+	    free_game(ret);
+	    return NULL;
+	}
+    }
+    if (!noanim) {
+        if (tx == -1 || ty == -1) { free_game(ret); return NULL; }
+	ret->last_rotate_x = tx;
+	ret->last_rotate_y = ty;
+    }
+
+    /*
+     * Check whether the game has been completed.
+     * 
+     * For this purpose it doesn't matter where the source square
+     * is, because we can start from anywhere and correctly
+     * determine whether the game is completed.
+     */
+    {
+	unsigned char *active = compute_active(ret, 0, 0);
+	int x1, y1;
+	int complete = TRUE;
+
+	for (x1 = 0; x1 < ret->width; x1++)
+	    for (y1 = 0; y1 < ret->height; y1++)
+		if ((tile(ret, x1, y1) & 0xF) && !index(ret, active, x1, y1)) {
+		    complete = FALSE;
+		    goto break_label;  /* break out of two loops at once */
+		}
+	break_label:
+
+	sfree(active);
+
+	if (complete)
+	    ret->completed = TRUE;
+    }
+
+    return ret;
+}
+
+===== mines.c lines 94–103: default_params =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+    ret->w = ret->h = 9;
+    ret->n = 10;
+    ret->unique = TRUE;
+
+    return ret;
+}
+
+===== mines.c lines 2419–2593: interpret_move =====
+static char *interpret_move(const game_state *from, game_ui *ui,
+                            const game_drawstate *ds,
+                            int x, int y, int button)
+{
+    int cx, cy;
+    char buf[256];
+
+    if (from->dead || from->won)
+	return NULL;		       /* no further moves permitted */
+
+    cx = FROMCOORD(x);
+    cy = FROMCOORD(y);
+
+    if (IS_CURSOR_MOVE(button)) {
+        move_cursor(button, &ui->cur_x, &ui->cur_y, from->w, from->h, 0);
+        ui->cur_visible = 1;
+        return "";
+    }
+    if (IS_CURSOR_SELECT(button)) {
+        int v = from->grid[ui->cur_y * from->w + ui->cur_x];
+
+        if (!ui->cur_visible) {
+            ui->cur_visible = 1;
+            return "";
+        }
+        if (button == CURSOR_SELECT2) {
+            /* As for RIGHT_BUTTON; only works on covered square. */
+            if (v != -2 && v != -1)
+                return NULL;
+            sprintf(buf, "F%d,%d", ui->cur_x, ui->cur_y);
+            return dupstr(buf);
+        }
+        /* Otherwise, treat as LEFT_BUTTON, for a single square. */
+        if (v == -2 || v == -3) {
+            if (from->layout->mines &&
+                from->layout->mines[ui->cur_y * from->w + ui->cur_x])
+                ui->deaths++;
+
+            sprintf(buf, "O%d,%d", ui->cur_x, ui->cur_y);
+            return dupstr(buf);
+        }
+        cx = ui->cur_x; cy = ui->cur_y;
+        ui->validradius = 1;
+        goto uncover;
+    }
+
+    if (button == LEFT_BUTTON || button == LEFT_DRAG ||
+	button == MIDDLE_BUTTON || button == MIDDLE_DRAG) {
+	if (cx < 0 || cx >= from->w || cy < 0 || cy >= from->h)
+	    return NULL;
+
+	/*
+	 * Mouse-downs and mouse-drags just cause highlighting
+	 * updates.
+	 */
+	ui->hx = cx;
+	ui->hy = cy;
+	ui->hradius = (from->grid[cy*from->w+cx] >= 0 ? 1 : 0);
+	if (button == LEFT_BUTTON)
+	    ui->validradius = ui->hradius;
+	else if (button == MIDDLE_BUTTON)
+	    ui->validradius = 1;
+        ui->cur_visible = 0;
+	return "";
+    }
+
+    if (button == RIGHT_BUTTON) {
+	if (cx < 0 || cx >= from->w || cy < 0 || cy >= from->h)
+	    return NULL;
+
+	/*
+	 * Right-clicking only works on a covered square, and it
+	 * toggles between -1 (marked as mine) and -2 (not marked
+	 * as mine).
+	 *
+	 * FIXME: question marks.
+	 */
+	if (from->grid[cy * from->w + cx] != -2 &&
+	    from->grid[cy * from->w + cx] != -1)
+	    return NULL;
+
+	sprintf(buf, "F%d,%d", cx, cy);
+	return dupstr(buf);
+    }
+
+    if (button == LEFT_RELEASE || button == MIDDLE_RELEASE) {
+	ui->hx = ui->hy = -1;
+	ui->hradius = 0;
+
+	/*
+	 * At this stage we must never return NULL: we have adjusted
+	 * the ui, so at worst we return "".
+	 */
+	if (cx < 0 || cx >= from->w || cy < 0 || cy >= from->h)
+	    return "";
+
+	/*
+	 * Left-clicking on a covered square opens a tile. Not
+	 * permitted if the tile is marked as a mine, for safety.
+	 * (Unmark it and _then_ open it.)
+	 */
+	if (button == LEFT_RELEASE &&
+	    (from->grid[cy * from->w + cx] == -2 ||
+	     from->grid[cy * from->w + cx] == -3) &&
+	    ui->validradius == 0) {
+	    /* Check if you've killed yourself. */
+	    if (from->layout->mines && from->layout->mines[cy * from->w + cx])
+		ui->deaths++;
+
+	    sprintf(buf, "O%d,%d", cx, cy);
+	    return dupstr(buf);
+	}
+        goto uncover;
+    }
+    return NULL;
+
+uncover:
+    {
+	/*
+	 * Left-clicking or middle-clicking on an uncovered tile:
+	 * first we check to see if the number of mine markers
+	 * surrounding the tile is equal to its mine count, and if
+	 * so then we open all other surrounding squares.
+	 */
+	if (from->grid[cy * from->w + cx] > 0 && ui->validradius == 1) {
+	    int dy, dx, n;
+
+	    /* Count mine markers. */
+	    n = 0;
+	    for (dy = -1; dy <= +1; dy++)
+		for (dx = -1; dx <= +1; dx++)
+		    if (cx+dx >= 0 && cx+dx < from->w &&
+			cy+dy >= 0 && cy+dy < from->h) {
+			if (from->grid[(cy+dy)*from->w+(cx+dx)] == -1)
+			    n++;
+		    }
+
+	    if (n == from->grid[cy * from->w + cx]) {
+
+		/*
+		 * Now see if any of the squares we're clearing
+		 * contains a mine (which will happen iff you've
+		 * incorrectly marked the mines around the clicked
+		 * square). If so, we open _just_ those squares, to
+		 * reveal as little additional information as we
+		 * can.
+		 */
+		char *p = buf;
+		char *sep = "";
+
+		for (dy = -1; dy <= +1; dy++)
+		    for (dx = -1; dx <= +1; dx++)
+			if (cx+dx >= 0 && cx+dx < from->w &&
+			    cy+dy >= 0 && cy+dy < from->h) {
+			    if (from->grid[(cy+dy)*from->w+(cx+dx)] != -1 &&
+				from->layout->mines &&
+				from->layout->mines[(cy+dy)*from->w+(cx+dx)]) {
+				p += sprintf(p, "%sO%d,%d", sep, cx+dx, cy+dy);
+				sep = ";";
+			    }
+			}
+
+		if (p > buf) {
+		    ui->deaths++;
+		} else {
+		    sprintf(buf, "C%d,%d", cx, cy);
+		}
+
+		return dupstr(buf);
+	    }
+	}
+
+	return "";
+    }
+}
+
+===== mines.c lines 2595–2690: execute_move =====
+static game_state *execute_move(const game_state *from, const char *move)
+{
+    int cy, cx;
+    game_state *ret;
+
+    if (!strcmp(move, "S")) {
+	int yy, xx;
+
+	ret = dup_game(from);
+        if (!ret->dead) {
+            /*
+             * If the player is still alive at the moment of pressing
+             * Solve, expose the entire grid as if it were a completed
+             * solution.
+             */
+            for (yy = 0; yy < ret->h; yy++)
+                for (xx = 0; xx < ret->w; xx++) {
+
+                    if (ret->layout->mines[yy*ret->w+xx]) {
+                        ret->grid[yy*ret->w+xx] = -1;
+                    } else {
+                        int dx, dy, v;
+
+                        v = 0;
+
+                        for (dx = -1; dx <= +1; dx++)
+                            for (dy = -1; dy <= +1; dy++)
+                                if (xx+dx >= 0 && xx+dx < ret->w &&
+                                    yy+dy >= 0 && yy+dy < ret->h &&
+                                    ret->layout->mines[(yy+dy)*ret->w+(xx+dx)])
+                                    v++;
+
+                        ret->grid[yy*ret->w+xx] = v;
+                    }
+                }
+        } else {
+            /*
+             * If the player pressed Solve _after dying_, show a full
+             * corrections grid in the style of standard Minesweeper.
+             * Players who don't like Mines's behaviour on death of
+             * only showing the mine that killed you (so that in case
+             * of a typo you can undo and carry on without the rest of
+             * the grid being spoiled) can use this to get the display
+             * that ordinary Minesweeper would have given them.
+             */
+            for (yy = 0; yy < ret->h; yy++)
+                for (xx = 0; xx < ret->w; xx++) {
+                    int pos = yy*ret->w+xx;
+                    if ((ret->grid[pos] == -2 || ret->grid[pos] == -3) &&
+                        ret->layout->mines[pos]) {
+                        ret->grid[pos] = 64;
+                    } else if (ret->grid[pos] == -1 &&
+                               !ret->layout->mines[pos]) {
+                        ret->grid[pos] = 66;
+                    }
+                }
+        }
+        ret->used_solve = TRUE;
+
+	return ret;
+    } else {
+	ret = dup_game(from);
+
+	while (*move) {
+	    if (move[0] == 'F' &&
+		sscanf(move+1, "%d,%d", &cx, &cy) == 2 &&
+		cx >= 0 && cx < from->w && cy >= 0 && cy < from->h) {
+		ret->grid[cy * from->w + cx] ^= (-2 ^ -1);
+	    } else if (move[0] == 'O' &&
+		       sscanf(move+1, "%d,%d", &cx, &cy) == 2 &&
+		       cx >= 0 && cx < from->w && cy >= 0 && cy < from->h) {
+		open_square(ret, cx, cy);
+	    } else if (move[0] == 'C' &&
+		       sscanf(move+1, "%d,%d", &cx, &cy) == 2 &&
+		       cx >= 0 && cx < from->w && cy >= 0 && cy < from->h) {
+		int dx, dy;
+
+		for (dy = -1; dy <= +1; dy++)
+		    for (dx = -1; dx <= +1; dx++)
+			if (cx+dx >= 0 && cx+dx < ret->w &&
+			    cy+dy >= 0 && cy+dy < ret->h &&
+			    (ret->grid[(cy+dy)*ret->w+(cx+dx)] == -2 ||
+			     ret->grid[(cy+dy)*ret->w+(cx+dx)] == -3))
+			    open_square(ret, cx+dx, cy+dy);
+	    } else {
+		free_game(ret);
+		return NULL;
+	    }
+
+	    while (*move && *move != ';') move++;
+	    if (*move) move++;
+	}
+
+	return ret;
+    }
+}
+
+===== solo.c lines 273–285: default_params =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+    ret->c = ret->r = 3;
+    ret->xtype = FALSE;
+    ret->killer = FALSE;
+    ret->symm = SYMM_ROT2;	       /* a plausible default */
+    ret->diff = DIFF_BLOCK;	       /* so is this */
+    ret->kdiff = DIFF_KINTERSECT;      /* so is this */
+
+    return ret;
+}
+
+===== solo.c lines 4520–4618: interpret_move =====
+static char *interpret_move(const game_state *state, game_ui *ui,
+                            const game_drawstate *ds,
+                            int x, int y, int button)
+{
+    int cr = state->cr;
+    int tx, ty;
+    char buf[80];
+
+    button &= ~MOD_MASK;
+
+    tx = (x + TILE_SIZE - BORDER) / TILE_SIZE - 1;
+    ty = (y + TILE_SIZE - BORDER) / TILE_SIZE - 1;
+
+    if (tx >= 0 && tx < cr && ty >= 0 && ty < cr) {
+        if (button == LEFT_BUTTON) {
+            if (state->immutable[ty*cr+tx]) {
+                ui->hshow = 0;
+            } else if (tx == ui->hx && ty == ui->hy &&
+                       ui->hshow && ui->hpencil == 0) {
+                ui->hshow = 0;
+            } else {
+                ui->hx = tx;
+                ui->hy = ty;
+                ui->hshow = 1;
+                ui->hpencil = 0;
+            }
+            ui->hcursor = 0;
+            return "";		       /* UI activity occurred */
+        }
+        if (button == RIGHT_BUTTON) {
+            /*
+             * Pencil-mode highlighting for non filled squares.
+             */
+            if (state->grid[ty*cr+tx] == 0) {
+                if (tx == ui->hx && ty == ui->hy &&
+                    ui->hshow && ui->hpencil) {
+                    ui->hshow = 0;
+                } else {
+                    ui->hpencil = 1;
+                    ui->hx = tx;
+                    ui->hy = ty;
+                    ui->hshow = 1;
+                }
+            } else {
+                ui->hshow = 0;
+            }
+            ui->hcursor = 0;
+            return "";		       /* UI activity occurred */
+        }
+    }
+    if (IS_CURSOR_MOVE(button)) {
+        move_cursor(button, &ui->hx, &ui->hy, cr, cr, 0);
+        ui->hshow = ui->hcursor = 1;
+        return "";
+    }
+    if (ui->hshow &&
+        (button == CURSOR_SELECT)) {
+        ui->hpencil = 1 - ui->hpencil;
+        ui->hcursor = 1;
+        return "";
+    }
+
+    if (ui->hshow &&
+	((button >= '0' && button <= '9' && button - '0' <= cr) ||
+	 (button >= 'a' && button <= 'z' && button - 'a' + 10 <= cr) ||
+	 (button >= 'A' && button <= 'Z' && button - 'A' + 10 <= cr) ||
+	 button == CURSOR_SELECT2 || button == '\b')) {
+	int n = button - '0';
+	if (button >= 'A' && button <= 'Z')
+	    n = button - 'A' + 10;
+	if (button >= 'a' && button <= 'z')
+	    n = button - 'a' + 10;
+	if (button == CURSOR_SELECT2 || button == '\b')
+	    n = 0;
+
+        /*
+         * Can't overwrite this square. This can only happen here
+         * if we're using the cursor keys.
+         */
+	if (state->immutable[ui->hy*cr+ui->hx])
+	    return NULL;
+
+        /*
+         * Can't make pencil marks in a filled square. Again, this
+         * can only become highlighted if we're using cursor keys.
+         */
+        if (ui->hpencil && state->grid[ui->hy*cr+ui->hx])
+            return NULL;
+
+	sprintf(buf, "%c%d,%d,%d",
+		(char)(ui->hpencil && n > 0 ? 'P' : 'R'), ui->hx, ui->hy, n);
+
+        if (!ui->hcursor) ui->hshow = 0;
+
+	return dupstr(buf);
+    }
+
+    return NULL;
+}
+
+===== solo.c lines 4620–4670: execute_move =====
+static game_state *execute_move(const game_state *from, const char *move)
+{
+    int cr = from->cr;
+    game_state *ret;
+    int x, y, n;
+
+    if (move[0] == 'S') {
+	const char *p;
+
+	ret = dup_game(from);
+	ret->completed = ret->cheated = TRUE;
+
+	p = move+1;
+	for (n = 0; n < cr*cr; n++) {
+	    ret->grid[n] = atoi(p);
+
+	    if (!*p || ret->grid[n] < 1 || ret->grid[n] > cr) {
+		free_game(ret);
+		return NULL;
+	    }
+
+	    while (*p && isdigit((unsigned char)*p)) p++;
+	    if (*p == ',') p++;
+	}
+
+	return ret;
+    } else if ((move[0] == 'P' || move[0] == 'R') &&
+	sscanf(move+1, "%d,%d,%d", &x, &y, &n) == 3 &&
+	x >= 0 && x < cr && y >= 0 && y < cr && n >= 0 && n <= cr) {
+
+	ret = dup_game(from);
+        if (move[0] == 'P' && n > 0) {
+            int index = (y*cr+x) * cr + (n-1);
+            ret->pencil[index] = !ret->pencil[index];
+        } else {
+            ret->grid[y*cr+x] = n;
+            memset(ret->pencil + (y*cr+x)*cr, 0, cr);
+
+            /*
+             * We've made a real change to the grid. Check to see
+             * if the game has been completed.
+             */
+            if (!ret->completed && check_valid(cr, ret->blocks, ret->kblocks,
+					       ret->xtype, ret->grid)) {
+                ret->completed = TRUE;
+            }
+        }
+	return ret;
+    } else
+	return NULL;		       /* couldn't parse move string */
+}
+
+===== solo.c lines 2966–3064: check_valid =====
+static int check_valid(int cr, struct block_structure *blocks,
+		       struct block_structure *kblocks, int xtype, digit *grid)
+{
+    unsigned char *used;
+    int x, y, i, j, n;
+
+    used = snewn(cr, unsigned char);
+
+    /*
+     * Check that each row contains precisely one of everything.
+     */
+    for (y = 0; y < cr; y++) {
+	memset(used, FALSE, cr);
+	for (x = 0; x < cr; x++)
+	    if (grid[y*cr+x] > 0 && grid[y*cr+x] <= cr)
+		used[grid[y*cr+x]-1] = TRUE;
+	for (n = 0; n < cr; n++)
+	    if (!used[n]) {
+		sfree(used);
+		return FALSE;
+	    }
+    }
+
+    /*
+     * Check that each column contains precisely one of everything.
+     */
+    for (x = 0; x < cr; x++) {
+	memset(used, FALSE, cr);
+	for (y = 0; y < cr; y++)
+	    if (grid[y*cr+x] > 0 && grid[y*cr+x] <= cr)
+		used[grid[y*cr+x]-1] = TRUE;
+	for (n = 0; n < cr; n++)
+	    if (!used[n]) {
+		sfree(used);
+		return FALSE;
+	    }
+    }
+
+    /*
+     * Check that each block contains precisely one of everything.
+     */
+    for (i = 0; i < cr; i++) {
+	memset(used, FALSE, cr);
+	for (j = 0; j < cr; j++)
+	    if (grid[blocks->blocks[i][j]] > 0 &&
+		grid[blocks->blocks[i][j]] <= cr)
+		used[grid[blocks->blocks[i][j]]-1] = TRUE;
+	for (n = 0; n < cr; n++)
+	    if (!used[n]) {
+		sfree(used);
+		return FALSE;
+	    }
+    }
+
+    /*
+     * Check that each Killer cage, if any, contains at most one of
+     * everything.
+     */
+    if (kblocks) {
+	for (i = 0; i < kblocks->nr_blocks; i++) {
+	    memset(used, FALSE, cr);
+	    for (j = 0; j < kblocks->nr_squares[i]; j++)
+		if (grid[kblocks->blocks[i][j]] > 0 &&
+		    grid[kblocks->blocks[i][j]] <= cr) {
+		    if (used[grid[kblocks->blocks[i][j]]-1]) {
+			sfree(used);
+			return FALSE;
+		    }
+		    used[grid[kblocks->blocks[i][j]]-1] = TRUE;
+		}
+	}
+    }
+
+    /*
+     * Check that each diagonal contains precisely one of everything.
+     */
+    if (xtype) {
+	memset(used, FALSE, cr);
+	for (i = 0; i < cr; i++)
+	    if (grid[diag0(i)] > 0 && grid[diag0(i)] <= cr)
+		used[grid[diag0(i)]-1] = TRUE;
+	for (n = 0; n < cr; n++)
+	    if (!used[n]) {
+		sfree(used);
+		return FALSE;
+	    }
+	for (i = 0; i < cr; i++)
+	    if (grid[diag1(i)] > 0 && grid[diag1(i)] <= cr)
+		used[grid[diag1(i)]-1] = TRUE;
+	for (n = 0; n < cr; n++)
+	    if (!used[n]) {
+		sfree(used);
+		return FALSE;
+	    }
+    }
+
+    sfree(used);
+    return TRUE;
+}
+
+===== guess.c lines 49–62: default_params =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+    /* AFAIK this is the canonical Mastermind ruleset. */
+    ret->ncolours = 6;
+    ret->npegs = 4;
+    ret->nguesses = 10;
+
+    ret->allow_blank = 0;
+    ret->allow_multiple = 1;
+
+    return ret;
+}
+
+===== guess.c lines 636–785: interpret_move =====
+static char *interpret_move(const game_state *from, game_ui *ui,
+                            const game_drawstate *ds,
+                            int x, int y, int button)
+{
+    int over_col = 0;           /* one-indexed */
+    int over_guess = -1;        /* zero-indexed */
+    int over_past_guess_y = -1; /* zero-indexed */
+    int over_past_guess_x = -1; /* zero-indexed */
+    int over_hint = 0;          /* zero or one */
+    char *ret = NULL;
+
+    int guess_ox = GUESS_X(from->next_go, 0);
+    int guess_oy = GUESS_Y(from->next_go, 0);
+
+    /*
+     * Enable or disable labels on colours.
+     */
+    if (button == 'l' || button == 'L') {
+        ui->show_labels = !ui->show_labels;
+        return "";
+    }
+
+    if (from->solved) return NULL;
+
+    if (x >= COL_OX && x < (COL_OX + COL_W) &&
+        y >= COL_OY && y < (COL_OY + COL_H)) {
+        over_col = ((y - COL_OY) / PEGOFF) + 1;
+        assert(over_col >= 1 && over_col <= ds->colours->npegs);
+    } else if (x >= guess_ox &&
+               y >= guess_oy && y < (guess_oy + GUESS_H)) {
+        if (x < (guess_ox + GUESS_W)) {
+            over_guess = (x - guess_ox) / PEGOFF;
+            assert(over_guess >= 0 && over_guess < ds->solution->npegs);
+        } else {
+            over_hint = 1;
+        }
+    } else if (x >= guess_ox && x < (guess_ox + GUESS_W) &&
+               y >= GUESS_OY && y < guess_oy) {
+        over_past_guess_y = (y - GUESS_OY) / PEGOFF;
+        over_past_guess_x = (x - guess_ox) / PEGOFF;
+        assert(over_past_guess_y >= 0 && over_past_guess_y < from->next_go);
+        assert(over_past_guess_x >= 0 && over_past_guess_x < ds->solution->npegs);
+    }
+    debug(("make_move: over_col %d, over_guess %d, over_hint %d,"
+           " over_past_guess (%d,%d)", over_col, over_guess, over_hint,
+           over_past_guess_x, over_past_guess_y));
+
+    assert(ds->blit_peg);
+
+    /* mouse input */
+    if (button == LEFT_BUTTON) {
+        if (over_col > 0) {
+            ui->drag_col = over_col;
+            ui->drag_opeg = -1;
+            debug(("Start dragging from colours"));
+        } else if (over_guess > -1) {
+            int col = ui->curr_pegs->pegs[over_guess];
+            if (col) {
+                ui->drag_col = col;
+                ui->drag_opeg = over_guess;
+                debug(("Start dragging from a guess"));
+            }
+        } else if (over_past_guess_y > -1) {
+            int col =
+                from->guesses[over_past_guess_y]->pegs[over_past_guess_x];
+            if (col) {
+                ui->drag_col = col;
+                ui->drag_opeg = -1;
+                debug(("Start dragging from a past guess"));
+            }
+        }
+        if (ui->drag_col) {
+            ui->drag_x = x;
+            ui->drag_y = y;
+            debug(("Start dragging, col = %d, (%d,%d)",
+                   ui->drag_col, ui->drag_x, ui->drag_y));
+            ret = "";
+        }
+    } else if (button == LEFT_DRAG && ui->drag_col) {
+        ui->drag_x = x;
+        ui->drag_y = y;
+        debug(("Keep dragging, (%d,%d)", ui->drag_x, ui->drag_y));
+        ret = "";
+    } else if (button == LEFT_RELEASE && ui->drag_col) {
+        if (over_guess > -1) {
+            debug(("Dropping colour %d onto guess peg %d",
+                   ui->drag_col, over_guess));
+            set_peg(&from->params, ui, over_guess, ui->drag_col);
+        } else {
+            if (ui->drag_opeg > -1) {
+                debug(("Removing colour %d from peg %d",
+                       ui->drag_col, ui->drag_opeg));
+                set_peg(&from->params, ui, ui->drag_opeg, 0);
+            }
+        }
+        ui->drag_col = 0;
+        ui->drag_opeg = -1;
+        ui->display_cur = 0;
+        debug(("Stop dragging."));
+        ret = "";
+    } else if (button == RIGHT_BUTTON) {
+        if (over_guess > -1) {
+            /* we use ths feedback in the game_ui to signify
+             * 'carry this peg to the next guess as well'. */
+            ui->holds[over_guess] = 1 - ui->holds[over_guess];
+            ret = "";
+        }
+    } else if (button == LEFT_RELEASE && over_hint && ui->markable) {
+        /* NB this won't trigger if on the end of a drag; that's on
+         * purpose, in case you drop by mistake... */
+        ret = encode_move(from, ui);
+    }
+
+    /* keyboard input */
+    if (button == CURSOR_UP || button == CURSOR_DOWN) {
+        ui->display_cur = 1;
+        if (button == CURSOR_DOWN && (ui->colour_cur+1) < from->params.ncolours)
+            ui->colour_cur++;
+        if (button == CURSOR_UP && ui->colour_cur > 0)
+            ui->colour_cur--;
+        ret = "";
+    } else if (button == CURSOR_LEFT || button == CURSOR_RIGHT) {
+        int maxcur = from->params.npegs;
+        if (ui->markable) maxcur++;
+
+        ui->display_cur = 1;
+        if (button == CURSOR_RIGHT && (ui->peg_cur+1) < maxcur)
+            ui->peg_cur++;
+        if (button == CURSOR_LEFT && ui->peg_cur > 0)
+            ui->peg_cur--;
+        ret = "";
+    } else if (IS_CURSOR_SELECT(button)) {
+        ui->display_cur = 1;
+        if (ui->peg_cur == from->params.npegs) {
+            ret = encode_move(from, ui);
+        } else {
+            set_peg(&from->params, ui, ui->peg_cur, ui->colour_cur+1);
+            ret = "";
+        }
+    } else if (button == 'D' || button == 'd' || button == '\b') {
+        ui->display_cur = 1;
+        set_peg(&from->params, ui, ui->peg_cur, 0);
+        ret = "";
+    } else if (button == 'H' || button == 'h') {
+        ui->display_cur = 1;
+        ui->holds[ui->peg_cur] = 1 - ui->holds[ui->peg_cur];
+        ret = "";
+    }
+    return ret;
+}
+
+===== guess.c lines 787–832: execute_move =====
+static game_state *execute_move(const game_state *from, const char *move)
+{
+    int i, nc_place;
+    game_state *ret;
+    const char *p;
+
+    if (!strcmp(move, "S")) {
+	ret = dup_game(from);
+	ret->solved = -1;
+	return ret;
+    } else if (move[0] == 'G') {
+	p = move+1;
+
+	ret = dup_game(from);
+
+	for (i = 0; i < from->solution->npegs; i++) {
+	    int val = atoi(p);
+	    int min_colour = from->params.allow_blank? 0 : 1;
+	    if (val < min_colour || val > from->params.ncolours) {
+		free_game(ret);
+		return NULL;
+	    }
+	    ret->guesses[from->next_go]->pegs[i] = atoi(p);
+	    while (*p && isdigit((unsigned char)*p)) p++;
+            if (*p == '_') {
+                ret->holds[i] = 1;
+                p++;
+            } else
+                ret->holds[i] = 0;
+	    if (*p == ',') p++;
+	}
+
+	nc_place = mark_pegs(ret->guesses[from->next_go], ret->solution, ret->params.ncolours);
+
+	if (nc_place == ret->solution->npegs) {
+	    ret->solved = +1; /* win! */
+	} else {
+	    ret->next_go = from->next_go + 1;
+	    if (ret->next_go >= ret->params.nguesses)
+		ret->solved = -1; /* lose, meaning we show the pegs. */
+	}
+
+	return ret;
+    } else
+	return NULL;
+}
+
+===== guess.c lines 574–612: mark_pegs =====
+static int mark_pegs(pegrow guess, pegrow solution, int ncols)
+{
+    int nc_place = 0, nc_colour = 0, i, j;
+
+    assert(guess && solution && (guess->npegs == solution->npegs));
+
+    for (i = 0; i < guess->npegs; i++) {
+        if (guess->pegs[i] == solution->pegs[i]) nc_place++;
+    }
+
+    /* slight bit of cleverness: we have the following formula, from
+     * http://mathworld.wolfram.com/Mastermind.html that gives:
+     *
+     * nc_colour = sum(colours, min(#solution, #guess)) - nc_place
+     *
+     * I think this is due to Knuth.
+     */
+    for (i = 1; i <= ncols; i++) {
+        int n_guess = 0, n_solution = 0;
+        for (j = 0; j < guess->npegs; j++) {
+            if (guess->pegs[j] == i) n_guess++;
+            if (solution->pegs[j] == i) n_solution++;
+        }
+        nc_colour += min(n_guess, n_solution);
+    }
+    nc_colour -= nc_place;
+
+    debug(("mark_pegs, %d pegs, %d right place, %d right colour",
+           guess->npegs, nc_place, nc_colour));
+    assert((nc_colour + nc_place) <= guess->npegs);
+
+    memset(guess->feedback, 0, guess->npegs*sizeof(int));
+    for (i = 0, j = 0; i < nc_place; i++)
+        guess->feedback[j++] = FEEDBACK_CORRECTPLACE;
+    for (i = 0; i < nc_colour; i++)
+        guess->feedback[j++] = FEEDBACK_CORRECTCOLOUR;
+
+    return nc_place;
+}
+
+===== map.c lines 99–114: default_params =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+#ifdef PORTRAIT_SCREEN
+    ret->w = 16;
+    ret->h = 18;
+#else
+    ret->w = 20;
+    ret->h = 15;
+#endif
+    ret->n = 30;
+    ret->diff = DIFF_NORMAL;
+
+    return ret;
+}
+
+===== map.c lines 2366–2501: interpret_move =====
+static char *interpret_move(const game_state *state, game_ui *ui,
+                            const game_drawstate *ds,
+                            int x, int y, int button)
+{
+    char *bufp, buf[256];
+    int alt_button;
+
+    /*
+     * Enable or disable numeric labels on regions.
+     */
+    if (button == 'l' || button == 'L') {
+        ui->show_numbers = !ui->show_numbers;
+        return "";
+    }
+
+    if (IS_CURSOR_MOVE(button)) {
+        move_cursor(button, &ui->cur_x, &ui->cur_y, state->p.w, state->p.h, 0);
+        ui->cur_visible = 1;
+        ui->cur_moved = 1;
+        ui->cur_lastmove = button;
+        ui->dragx = COORD(ui->cur_x) + TILESIZE/2 + EPSILON_X(button);
+        ui->dragy = COORD(ui->cur_y) + TILESIZE/2 + EPSILON_Y(button);
+        return "";
+    }
+    if (IS_CURSOR_SELECT(button)) {
+        if (!ui->cur_visible) {
+            ui->dragx = COORD(ui->cur_x) + TILESIZE/2 + EPSILON_X(ui->cur_lastmove);
+            ui->dragy = COORD(ui->cur_y) + TILESIZE/2 + EPSILON_Y(ui->cur_lastmove);
+            ui->cur_visible = 1;
+            return "";
+        }
+        if (ui->drag_colour == -2) { /* not currently cursor-dragging, start. */
+            int r = region_from_coords(state, ds, ui->dragx, ui->dragy);
+            if (r >= 0) {
+                ui->drag_colour = state->colouring[r];
+                ui->drag_pencil = (ui->drag_colour >= 0) ? 0 : state->pencil[r];
+            } else {
+                ui->drag_colour = -1;
+                ui->drag_pencil = 0;
+            }
+            ui->cur_moved = 0;
+            return "";
+        } else { /* currently cursor-dragging; drop the colour in the new region. */
+            x = COORD(ui->cur_x) + TILESIZE/2 + EPSILON_X(ui->cur_lastmove);
+            y = COORD(ui->cur_y) + TILESIZE/2 + EPSILON_Y(ui->cur_lastmove);
+            alt_button = (button == CURSOR_SELECT2) ? 1 : 0;
+            /* Double-select removes current colour. */
+            if (!ui->cur_moved) ui->drag_colour = -1;
+            goto drag_dropped;
+        }
+    }
+
+    if (button == LEFT_BUTTON || button == RIGHT_BUTTON) {
+	int r = region_from_coords(state, ds, x, y);
+
+        if (r >= 0) {
+            ui->drag_colour = state->colouring[r];
+	    ui->drag_pencil = state->pencil[r];
+	    if (ui->drag_colour >= 0)
+		ui->drag_pencil = 0;  /* should be already, but double-check */
+	} else {
+            ui->drag_colour = -1;
+	    ui->drag_pencil = 0;
+	}
+        ui->dragx = x;
+        ui->dragy = y;
+        ui->cur_visible = 0;
+        return "";
+    }
+
+    if ((button == LEFT_DRAG || button == RIGHT_DRAG) &&
+        ui->drag_colour > -2) {
+        ui->dragx = x;
+        ui->dragy = y;
+        return "";
+    }
+
+    if ((button == LEFT_RELEASE || button == RIGHT_RELEASE) &&
+        ui->drag_colour > -2) {
+        alt_button = (button == RIGHT_RELEASE) ? 1 : 0;
+        goto drag_dropped;
+    }
+
+    return NULL;
+
+drag_dropped:
+    {
+	int r = region_from_coords(state, ds, x, y);
+        int c = ui->drag_colour;
+	int p = ui->drag_pencil;
+	int oldp;
+
+        /*
+         * Cancel the drag, whatever happens.
+         */
+        ui->drag_colour = -2;
+
+	if (r < 0)
+            return "";                 /* drag into border; do nothing else */
+
+	if (state->map->immutable[r])
+	    return "";                 /* can't change this region */
+
+        if (state->colouring[r] == c && state->pencil[r] == p)
+            return "";                 /* don't _need_ to change this region */
+
+	if (alt_button) {
+	    if (state->colouring[r] >= 0) {
+		/* Can't pencil on a coloured region */
+		return "";
+	    } else if (c >= 0) {
+		/* Right-dragging from colour to blank toggles one pencil */
+		p = state->pencil[r] ^ (1 << c);
+		c = -1;
+	    }
+	    /* Otherwise, right-dragging from blank to blank is equivalent
+	     * to left-dragging. */
+	}
+
+	bufp = buf;
+	oldp = state->pencil[r];
+	if (c != state->colouring[r]) {
+	    bufp += sprintf(bufp, ";%c:%d", (int)(c < 0 ? 'C' : '0' + c), r);
+	    if (c >= 0)
+		oldp = 0;
+	}
+	if (p != oldp) {
+	    int i;
+	    for (i = 0; i < FOUR; i++)
+		if ((oldp ^ p) & (1 << i))
+		    bufp += sprintf(bufp, ";p%c:%d", (int)('0' + i), r);
+	}
+
+	return dupstr(buf+1);	       /* ignore first semicolon */
+    }
+}
+
+===== map.c lines 2503–2578: execute_move =====
+static game_state *execute_move(const game_state *state, const char *move)
+{
+    int n = state->p.n;
+    game_state *ret = dup_game(state);
+    int c, k, adv, i;
+
+    while (*move) {
+        int pencil = FALSE;
+
+	c = *move;
+        if (c == 'p') {
+            pencil = TRUE;
+            c = *++move;
+        }
+	if ((c == 'C' || (c >= '0' && c < '0'+FOUR)) &&
+	    sscanf(move+1, ":%d%n", &k, &adv) == 1 &&
+	    k >= 0 && k < state->p.n) {
+	    move += 1 + adv;
+            if (pencil) {
+		if (ret->colouring[k] >= 0) {
+		    free_game(ret);
+		    return NULL;
+		}
+                if (c == 'C')
+                    ret->pencil[k] = 0;
+                else
+                    ret->pencil[k] ^= 1 << (c - '0');
+            } else {
+                ret->colouring[k] = (c == 'C' ? -1 : c - '0');
+                ret->pencil[k] = 0;
+            }
+	} else if (*move == 'S') {
+	    move++;
+	    ret->cheated = TRUE;
+	} else {
+	    free_game(ret);
+	    return NULL;
+	}
+
+	if (*move && *move != ';') {
+	    free_game(ret);
+	    return NULL;
+	}
+	if (*move)
+	    move++;
+    }
+
+    /*
+     * Check for completion.
+     */
+    if (!ret->completed) {
+	int ok = TRUE;
+
+	for (i = 0; i < n; i++)
+	    if (ret->colouring[i] < 0) {
+		ok = FALSE;
+		break;
+	    }
+
+	if (ok) {
+	    for (i = 0; i < ret->map->ngraph; i++) {
+		int j = ret->map->graph[i] / n;
+		int k = ret->map->graph[i] % n;
+		if (ret->colouring[j] == ret->colouring[k]) {
+		    ok = FALSE;
+		    break;
+		}
+	    }
+	}
+
+	if (ok)
+	    ret->completed = TRUE;
+    }
+
+    return ret;
+}
+
+===== untangle.c lines 119–126: default_params =====
+static game_params *default_params(void)
+{
+    game_params *ret = snew(game_params);
+
+    ret->n = 10;
+
+    return ret;
+}
+
+===== untangle.c lines 1083–1155: interpret_move =====
+static char *interpret_move(const game_state *state, game_ui *ui,
+                            const game_drawstate *ds,
+                            int x, int y, int button)
+{
+    int n = state->params.n;
+
+    if (IS_MOUSE_DOWN(button)) {
+	int i, best;
+        long bestd;
+
+	/*
+	 * Begin drag. We drag the vertex _nearest_ to the pointer,
+	 * just in case one is nearly on top of another and we want
+	 * to drag the latter. However, we drag nothing at all if
+	 * the nearest vertex is outside DRAG_THRESHOLD.
+	 */
+	best = -1;
+	bestd = 0;
+
+	for (i = 0; i < n; i++) {
+	    long px = state->pts[i].x * ds->tilesize / state->pts[i].d;
+	    long py = state->pts[i].y * ds->tilesize / state->pts[i].d;
+	    long dx = px - x;
+	    long dy = py - y;
+	    long d = dx*dx + dy*dy;
+
+	    if (best == -1 || bestd > d) {
+		best = i;
+		bestd = d;
+	    }
+	}
+
+	if (bestd <= DRAG_THRESHOLD * DRAG_THRESHOLD) {
+	    ui->dragpoint = best;
+	    ui->newpoint.x = x;
+	    ui->newpoint.y = y;
+	    ui->newpoint.d = ds->tilesize;
+	    return "";
+	}
+
+    } else if (IS_MOUSE_DRAG(button) && ui->dragpoint >= 0) {
+	ui->newpoint.x = x;
+	ui->newpoint.y = y;
+	ui->newpoint.d = ds->tilesize;
+	return "";
+    } else if (IS_MOUSE_RELEASE(button) && ui->dragpoint >= 0) {
+	int p = ui->dragpoint;
+	char buf[80];
+
+	ui->dragpoint = -1;	       /* terminate drag, no matter what */
+
+	/*
+	 * First, see if we're within range. The user can cancel a
+	 * drag by dragging the point right off the window.
+	 */
+	if (ui->newpoint.x < 0 ||
+            ui->newpoint.x >= (long)state->w*ui->newpoint.d ||
+	    ui->newpoint.y < 0 ||
+            ui->newpoint.y >= (long)state->h*ui->newpoint.d)
+	    return "";
+
+	/*
+	 * We aren't cancelling the drag. Construct a move string
+	 * indicating where this point is going to.
+	 */
+	sprintf(buf, "P%d:%ld,%ld/%ld", p,
+		ui->newpoint.x, ui->newpoint.y, ui->newpoint.d);
+	ui->just_dragged = TRUE;
+	return dupstr(buf);
+    }
+
+    return NULL;
+}
+
+===== untangle.c lines 1157–1190: execute_move =====
+static game_state *execute_move(const game_state *state, const char *move)
+{
+    int n = state->params.n;
+    int p, k;
+    long x, y, d;
+    game_state *ret = dup_game(state);
+
+    ret->just_solved = FALSE;
+
+    while (*move) {
+	if (*move == 'S') {
+	    move++;
+	    if (*move == ';') move++;
+	    ret->cheated = ret->just_solved = TRUE;
+	}
+	if (*move == 'P' &&
+	    sscanf(move+1, "%d:%ld,%ld/%ld%n", &p, &x, &y, &d, &k) == 4 &&
+	    p >= 0 && p < n && d > 0) {
+	    ret->pts[p].x = x;
+	    ret->pts[p].y = y;
+	    ret->pts[p].d = d;
+
+	    move += k+1;
+	    if (*move == ';') move++;
+	} else {
+	    free_game(ret);
+	    return NULL;
+	}
+    }
+
+    mark_crossings(ret);
+
+    return ret;
+}
+
+===== untangle.c lines 763–804: mark_crossings =====
+static void mark_crossings(game_state *state)
+{
+    int ok = TRUE;
+    int i, j;
+    edge *e, *e2;
+
+#ifdef SHOW_CROSSINGS
+    for (i = 0; (e = index234(state->graph->edges, i)) != NULL; i++)
+	state->crosses[i] = FALSE;
+#endif
+
+    /*
+     * Check correctness: for every pair of edges, see whether they
+     * cross.
+     */
+    for (i = 0; (e = index234(state->graph->edges, i)) != NULL; i++) {
+	for (j = i+1; (e2 = index234(state->graph->edges, j)) != NULL; j++) {
+	    if (e2->a == e->a || e2->a == e->b ||
+		e2->b == e->a || e2->b == e->b)
+		continue;
+	    if (cross(state->pts[e2->a], state->pts[e2->b],
+		      state->pts[e->a], state->pts[e->b])) {
+		ok = FALSE;
+#ifdef SHOW_CROSSINGS
+		state->crosses[i] = state->crosses[j] = TRUE;
+#else
+		goto done;	       /* multi-level break - sorry */
+#endif
+	    }
+	}
+    }
+
+    /*
+     * e == NULL if we've gone through all the edge pairs
+     * without finding a crossing.
+     */
+#ifndef SHOW_CROSSINGS
+    done:
+#endif
+    if (ok)
+	state->completed = TRUE;
+}
+
+===== untangle.c lines 304–385: cross =====
+static int cross(point a1, point a2, point b1, point b2)
+{
+    long b1x, b1y, b2x, b2y, px, py;
+    int64 d1, d2, d3;
+
+    /*
+     * The condition for crossing is that b1 and b2 are on opposite
+     * sides of the line a1-a2, and vice versa. We determine this
+     * by taking the dot product of b1-a1 with a vector
+     * perpendicular to a2-a1, and similarly with b2-a1, and seeing
+     * if they have different signs.
+     */
+
+    /*
+     * Construct the vector b1-a1. We don't have to worry too much
+     * about the denominator, because we're only going to check the
+     * sign of this vector; we just need to get the numerator
+     * right.
+     */
+    b1x = b1.x * a1.d - a1.x * b1.d;
+    b1y = b1.y * a1.d - a1.y * b1.d;
+    /* Now construct b2-a1, and a vector perpendicular to a2-a1,
+     * in the same way. */
+    b2x = b2.x * a1.d - a1.x * b2.d;
+    b2y = b2.y * a1.d - a1.y * b2.d;
+    px = a1.y * a2.d - a2.y * a1.d;
+    py = a2.x * a1.d - a1.x * a2.d;
+    /* Take the dot products. Here we resort to 64-bit arithmetic. */
+    d1 = dotprod64(b1x, px, b1y, py);
+    d2 = dotprod64(b2x, px, b2y, py);
+    /* If they have the same non-zero sign, the lines do not cross. */
+    if ((sign64(d1) > 0 && sign64(d2) > 0) ||
+	(sign64(d1) < 0 && sign64(d2) < 0))
+	return FALSE;
+
+    /*
+     * If the dot products are both exactly zero, then the two line
+     * segments are collinear. At this point the intersection
+     * condition becomes whether or not they overlap within their
+     * line.
+     */
+    if (sign64(d1) == 0 && sign64(d2) == 0) {
+	/* Construct the vector a2-a1. */
+	px = a2.x * a1.d - a1.x * a2.d;
+	py = a2.y * a1.d - a1.y * a2.d;
+	/* Determine the dot products of b1-a1 and b2-a1 with this. */
+	d1 = dotprod64(b1x, px, b1y, py);
+	d2 = dotprod64(b2x, px, b2y, py);
+	/* If they're both strictly negative, the lines do not cross. */
+	if (sign64(d1) < 0 && sign64(d2) < 0)
+	    return FALSE;
+	/* Otherwise, take the dot product of a2-a1 with itself. If
+	 * the other two dot products both exceed this, the lines do
+	 * not cross. */
+	d3 = dotprod64(px, px, py, py);
+	if (greater64(d1, d3) && greater64(d2, d3))
+	    return FALSE;
+    }
+
+    /*
+     * We've eliminated the only important special case, and we
+     * have determined that b1 and b2 are on opposite sides of the
+     * line a1-a2. Now do the same thing the other way round and
+     * we're done.
+     */
+    b1x = a1.x * b1.d - b1.x * a1.d;
+    b1y = a1.y * b1.d - b1.y * a1.d;
+    b2x = a2.x * b1.d - b1.x * a2.d;
+    b2y = a2.y * b1.d - b1.y * a2.d;
+    px = b1.y * b2.d - b2.y * b1.d;
+    py = b2.x * b1.d - b1.x * b2.d;
+    d1 = dotprod64(b1x, px, b1y, py);
+    d2 = dotprod64(b2x, px, b2y, py);
+    if ((sign64(d1) > 0 && sign64(d2) > 0) ||
+	(sign64(d1) < 0 && sign64(d2) < 0))
+	return FALSE;
+
+    /*
+     * The lines must cross.
+     */
+    return TRUE;
+}
+
+===== map.c lines 945–1390: map_solver =====
+static int map_solver(struct solver_scratch *sc,
+		      int *graph, int n, int ngraph, int *colouring,
+                      int difficulty)
+{
+    int i;
+
+    if (sc->depth == 0) {
+        /*
+         * Initialise scratch space.
+         */
+        for (i = 0; i < n; i++)
+            sc->possible[i] = (1 << FOUR) - 1;
+
+        /*
+         * Place clues.
+         */
+        for (i = 0; i < n; i++)
+            if (colouring[i] >= 0) {
+                if (!place_colour(sc, colouring, i, colouring[i]
+#ifdef SOLVER_DIAGNOSTICS
+                                  , "initial clue:"
+#endif
+                                  )) {
+#ifdef SOLVER_DIAGNOSTICS
+                    if (verbose)
+                        printf("%*sinitial clue set is inconsistent\n",
+                               2*sc->depth, "");
+#endif
+                    return 0;	       /* the clues aren't even consistent! */
+                }
+            }
+    }
+
+    /*
+     * Now repeatedly loop until we find nothing further to do.
+     */
+    while (1) {
+	int done_something = FALSE;
+
+        if (difficulty < DIFF_EASY)
+            break;                     /* can't do anything at all! */
+
+	/*
+	 * Simplest possible deduction: find a region with only one
+	 * possible colour.
+	 */
+	for (i = 0; i < n; i++) if (colouring[i] < 0) {
+	    int p = sc->possible[i];
+
+	    if (p == 0) {
+#ifdef SOLVER_DIAGNOSTICS
+                if (verbose)
+                    printf("%*sregion %d has no possible colours left\n",
+                           2*sc->depth, "", i);
+#endif
+		return 0;	       /* puzzle is inconsistent */
+            }
+
+	    if ((p & (p-1)) == 0) {    /* p is a power of two */
+		int c, ret;
+		for (c = 0; c < FOUR; c++)
+		    if (p == (1 << c))
+			break;
+		assert(c < FOUR);
+		ret = place_colour(sc, colouring, i, c
+#ifdef SOLVER_DIAGNOSTICS
+                                   , "placing"
+#endif
+                                   );
+                /*
+                 * place_colour() can only fail if colour c was not
+                 * even a _possibility_ for region i, and we're
+                 * pretty sure it was because we checked before
+                 * calling place_colour(). So we can safely assert
+                 * here rather than having to return a nice
+                 * friendly error code.
+                 */
+                assert(ret);
+		done_something = TRUE;
+	    }
+	}
+
+        if (done_something)
+            continue;
+
+        if (difficulty < DIFF_NORMAL)
+            break;                     /* can't do anything harder */
+
+        /*
+         * Failing that, go up one level. Look for pairs of regions
+         * which (a) both have the same pair of possible colours,
+         * (b) are adjacent to one another, (c) are adjacent to the
+         * same region, and (d) that region still thinks it has one
+         * or both of those possible colours.
+         * 
+         * Simplest way to do this is by going through the graph
+         * edge by edge, so that we start with property (b) and
+         * then look for (a) and finally (c) and (d).
+         */
+        for (i = 0; i < ngraph; i++) {
+            int j1 = graph[i] / n, j2 = graph[i] % n;
+            int j, k, v, v2;
+#ifdef SOLVER_DIAGNOSTICS
+            int started = FALSE;
+#endif
+
+            if (j1 > j2)
+                continue;              /* done it already, other way round */
+
+            if (colouring[j1] >= 0 || colouring[j2] >= 0)
+                continue;              /* they're not undecided */
+
+            if (sc->possible[j1] != sc->possible[j2])
+                continue;              /* they don't have the same possibles */
+
+            v = sc->possible[j1];
+            /*
+             * See if v contains exactly two set bits.
+             */
+            v2 = v & -v;           /* find lowest set bit */
+            v2 = v & ~v2;          /* clear it */
+            if (v2 == 0 || (v2 & (v2-1)) != 0)   /* not power of 2 */
+                continue;
+
+            /*
+             * We've found regions j1 and j2 satisfying properties
+             * (a) and (b): they have two possible colours between
+             * them, and since they're adjacent to one another they
+             * must use _both_ those colours between them.
+             * Therefore, if they are both adjacent to any other
+             * region then that region cannot be either colour.
+             * 
+             * Go through the neighbours of j1 and see if any are
+             * shared with j2.
+             */
+            for (j = graph_vertex_start(graph, n, ngraph, j1);
+                 j < ngraph && graph[j] < n*(j1+1); j++) {
+                k = graph[j] - j1*n;
+                if (graph_adjacent(graph, n, ngraph, k, j2) &&
+                    (sc->possible[k] & v)) {
+#ifdef SOLVER_DIAGNOSTICS
+                    if (verbose) {
+                        char buf[80];
+                        if (!started)
+                            printf("%*sadjacent regions %d,%d share colours"
+                                   " %s\n", 2*sc->depth, "", j1, j2,
+                                   colourset(buf, v));
+                        started = TRUE;
+                        printf("%*s  ruling out %s in region %d\n",2*sc->depth,
+                               "", colourset(buf, sc->possible[k] & v), k);
+                    }
+#endif
+                    sc->possible[k] &= ~v;
+                    done_something = TRUE;
+                }
+            }
+        }
+
+        if (done_something)
+            continue;
+
+        if (difficulty < DIFF_HARD)
+            break;                     /* can't do anything harder */
+
+        /*
+         * Right; now we get creative. Now we're going to look for
+         * `forcing chains'. A forcing chain is a path through the
+         * graph with the following properties:
+         * 
+         *  (a) Each vertex on the path has precisely two possible
+         *      colours.
+         * 
+         *  (b) Each pair of vertices which are adjacent on the
+         *      path share at least one possible colour in common.
+         * 
+         *  (c) Each vertex in the middle of the path shares _both_
+         *      of its colours with at least one of its neighbours
+         *      (not the same one with both neighbours).
+         * 
+         * These together imply that at least one of the possible
+         * colour choices at one end of the path forces _all_ the
+         * rest of the colours along the path. In order to make
+         * real use of this, we need further properties:
+         * 
+         *  (c) Ruling out some colour C from the vertex at one end
+         *      of the path forces the vertex at the other end to
+         *      take colour C.
+         * 
+         *  (d) The two end vertices are mutually adjacent to some
+         *      third vertex.
+         * 
+         *  (e) That third vertex currently has C as a possibility.
+         * 
+         * If we can find all of that lot, we can deduce that at
+         * least one of the two ends of the forcing chain has
+         * colour C, and that therefore the mutually adjacent third
+         * vertex does not.
+         * 
+         * To find forcing chains, we're going to start a bfs at
+         * each suitable vertex of the graph, once for each of its
+         * two possible colours.
+         */
+        for (i = 0; i < n; i++) {
+            int c;
+
+            if (colouring[i] >= 0 || bitcount(sc->possible[i]) != 2)
+                continue;
+
+            for (c = 0; c < FOUR; c++)
+                if (sc->possible[i] & (1 << c)) {
+                    int j, k, gi, origc, currc, head, tail;
+                    /*
+                     * Try a bfs from this vertex, ruling out
+                     * colour c.
+                     * 
+                     * Within this loop, we work in colour bitmaps
+                     * rather than actual colours, because
+                     * converting back and forth is a needless
+                     * computational expense.
+                     */
+
+                    origc = 1 << c;
+
+                    for (j = 0; j < n; j++) {
+                        sc->bfscolour[j] = -1;
+#ifdef SOLVER_DIAGNOSTICS
+                        sc->bfsprev[j] = -1;
+#endif
+                    }
+                    head = tail = 0;
+                    sc->bfsqueue[tail++] = i;
+                    sc->bfscolour[i] = sc->possible[i] &~ origc;
+
+                    while (head < tail) {
+                        j = sc->bfsqueue[head++];
+                        currc = sc->bfscolour[j];
+
+                        /*
+                         * Try neighbours of j.
+                         */
+                        for (gi = graph_vertex_start(graph, n, ngraph, j);
+                             gi < ngraph && graph[gi] < n*(j+1); gi++) {
+                            k = graph[gi] - j*n;
+
+                            /*
+                             * To continue with the bfs in vertex
+                             * k, we need k to be
+                             *  (a) not already visited
+                             *  (b) have two possible colours
+                             *  (c) those colours include currc.
+                             */
+
+                            if (sc->bfscolour[k] < 0 &&
+                                colouring[k] < 0 &&
+                                bitcount(sc->possible[k]) == 2 &&
+                                (sc->possible[k] & currc)) {
+                                sc->bfsqueue[tail++] = k;
+                                sc->bfscolour[k] =
+                                    sc->possible[k] &~ currc;
+#ifdef SOLVER_DIAGNOSTICS
+                                sc->bfsprev[k] = j;
+#endif
+                            }
+
+                            /*
+                             * One other possibility is that k
+                             * might be the region in which we can
+                             * make a real deduction: if it's
+                             * adjacent to i, contains currc as a
+                             * possibility, and currc is equal to
+                             * the original colour we ruled out.
+                             */
+                            if (currc == origc &&
+                                graph_adjacent(graph, n, ngraph, k, i) &&
+                                (sc->possible[k] & currc)) {
+#ifdef SOLVER_DIAGNOSTICS
+                                if (verbose) {
+                                    char buf[80], *sep = "";
+                                    int r;
+
+                                    printf("%*sforcing chain, colour %s, ",
+                                           2*sc->depth, "",
+                                           colourset(buf, origc));
+                                    for (r = j; r != -1; r = sc->bfsprev[r]) {
+                                        printf("%s%d", sep, r);
+                                        sep = "-";
+                                    }
+                                    printf("\n%*s  ruling out %s in region"
+                                           " %d\n", 2*sc->depth, "",
+                                           colourset(buf, origc), k);
+                                }
+#endif
+                                sc->possible[k] &= ~origc;
+                                done_something = TRUE;
+                            }
+                        }
+                    }
+
+                    assert(tail <= n);
+                }
+        }
+
+	if (!done_something)
+	    break;
+    }
+
+    /*
+     * See if we've got a complete solution, and return if so.
+     */
+    for (i = 0; i < n; i++)
+	if (colouring[i] < 0)
+            break;
+    if (i == n) {
+#ifdef SOLVER_DIAGNOSTICS
+        if (verbose)
+            printf("%*sone solution found\n", 2*sc->depth, "");
+#endif
+        return 1;                      /* success! */
+    }
+
+    /*
+     * If recursion is not permissible, we now give up.
+     */
+    if (difficulty < DIFF_RECURSE) {
+#ifdef SOLVER_DIAGNOSTICS
+        if (verbose)
+            printf("%*sunable to proceed further without recursion\n",
+                   2*sc->depth, "");
+#endif
+        return 2;                      /* unable to complete */
+    }
+
+    /*
+     * Now we've got to do something recursive. So first hunt for a
+     * currently-most-constrained region.
+     */
+    {
+        int best, bestc;
+        struct solver_scratch *rsc;
+        int *subcolouring, *origcolouring;
+        int ret, subret;
+        int we_already_got_one;
+
+        best = -1;
+        bestc = FIVE;
+
+        for (i = 0; i < n; i++) if (colouring[i] < 0) {
+            int p = sc->possible[i];
+            enum { compile_time_assertion = 1 / (FOUR <= 4) };
+            int c;
+
+            /* Count the set bits. */
+            c = (p & 5) + ((p >> 1) & 5);
+            c = (c & 3) + ((c >> 2) & 3);
+            assert(c > 1);             /* or colouring[i] would be >= 0 */
+
+            if (c < bestc) {
+                best = i;
+                bestc = c;
+            }
+        }
+
+        assert(best >= 0);             /* or we'd be solved already */
+
+#ifdef SOLVER_DIAGNOSTICS
+        if (verbose)
+            printf("%*srecursing on region %d\n", 2*sc->depth, "", best);
+#endif
+
+        /*
+         * Now iterate over the possible colours for this region.
+         */
+        rsc = new_scratch(graph, n, ngraph);
+        rsc->depth = sc->depth + 1;
+        origcolouring = snewn(n, int);
+        memcpy(origcolouring, colouring, n * sizeof(int));
+        subcolouring = snewn(n, int);
+        we_already_got_one = FALSE;
+        ret = 0;
+
+        for (i = 0; i < FOUR; i++) {
+            if (!(sc->possible[best] & (1 << i)))
+                continue;
+
+            memcpy(rsc->possible, sc->possible, n);
+            memcpy(subcolouring, origcolouring, n * sizeof(int));
+
+            place_colour(rsc, subcolouring, best, i
+#ifdef SOLVER_DIAGNOSTICS
+                         , "trying"
+#endif
+                         );
+
+            subret = map_solver(rsc, graph, n, ngraph,
+                                subcolouring, difficulty);
+
+#ifdef SOLVER_DIAGNOSTICS
+            if (verbose) {
+                printf("%*sretracting %c in region %d; found %s\n",
+                       2*sc->depth, "", colnames[i], best,
+                       subret == 0 ? "no solutions" :
+                       subret == 1 ? "one solution" : "multiple solutions");
+            }
+#endif
+
+            /*
+             * If this possibility turned up more than one valid
+             * solution, or if it turned up one and we already had
+             * one, we're definitely ambiguous.
+             */
+            if (subret == 2 || (subret == 1 && we_already_got_one)) {
+                ret = 2;
+                break;
+            }
+
+            /*
+             * If this possibility turned up one valid solution and
+             * it's the first we've seen, copy it into the output.
+             */
+            if (subret == 1) {
+                memcpy(colouring, subcolouring, n * sizeof(int));
+                we_already_got_one = TRUE;
+                ret = 1;
+            }
+
+            /*
+             * Otherwise, this guess led to a contradiction, so we
+             * do nothing.
+             */
+        }
+
+        sfree(origcolouring);
+        sfree(subcolouring);
+        free_scratch(rsc);
+
+#ifdef SOLVER_DIAGNOSTICS
+        if (verbose && sc->depth == 0) {
+            printf("%*s%s found\n",
+                   2*sc->depth, "",
+                   ret == 0 ? "no solutions" :
+                   ret == 1 ? "one solution" : "multiple solutions");
+        }
+#endif
+        return ret;
+    }
+}
+
+===== net.c lines 113–118: OFFSETWH / OFFSET =====
+#define OFFSETWH(x2,y2,x1,y1,dir,width,height) \
+    ( (x2) = ((x1) + width + X((dir))) % width, \
+      (y2) = ((y1) + height + Y((dir))) % height)
+
+#define OFFSET(x2,y2,x1,y1,dir,state) \
+	OFFSETWH(x2,y2,x1,y1,dir,(state)->width,(state)->height)

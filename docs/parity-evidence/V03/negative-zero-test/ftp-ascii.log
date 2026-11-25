@@ -1,0 +1,2 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03/evidence/zero-test-executable' --exact ascii_mode_converts_only_selected_text --nocapture --test-threads=1
+test result: ok. 0 passed; 0 failed; 0 ignored;

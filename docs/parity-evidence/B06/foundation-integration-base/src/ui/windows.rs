@@ -1,0 +1,261 @@
+use super::*;
+#[cfg(all(test, unix))]
+mod tests {
+    use super::*;
+    use crate::ui::terminal_review_tests::{captured, owned_workspace, raw_terminal};
+    #[test]
+    fn real_transport_survives_detach_paint_rename_and_reattach_once() {
+        let (ctx, _root, mut w) = owned_workspace();
+        let id = raw_terminal(&mut w, "original");
+        w.windows.rename(id, "My title".into());
+        let pointer = w.tabs[0].process.as_ref().unwrap() as *const Process;
+        w.detach_terminal(id);
+        assert!(w.layout_state.root.is_none());
+        let mut output = ctx.run_ui(
+            RawInput {
+                screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1400., 900.))),
+                ..Default::default()
+            },
+            |ui| w.detached_windows(ui.ctx()),
+        );
+        output.textures_delta.clear();
+        drop(output);
+        assert_eq!(w.tabs.len(), 1);
+        assert_eq!(
+            w.tabs[0].process.as_ref().unwrap() as *const Process,
+            pointer
+        );
+        w.tabs[0].screen.feed(b"\x1b]0;server title\x07");
+        assert_eq!(w.terminal_title(id), "My title");
+        w.tabs[0].send(b"Q");
+        let deadline = Instant::now() + Duration::from_secs(2);
+        while captured(&w.tabs[0]).is_empty() && Instant::now() < deadline {
+            w.tabs[0].poll();
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        assert_eq!(captured(&w.tabs[0]), b"Q");
+        w.reattach_terminal(id);
+        assert!(w.windows.detached().is_empty());
+        assert_eq!(w.layout_state.root.as_ref().unwrap().ids(), vec![id]);
+        assert_eq!(
+            w.tabs[0].process.as_ref().unwrap() as *const Process,
+            pointer
+        );
+        assert_eq!(w.terminal_title(id), "My title");
+        // Closing a detached terminal still passes through the existing active-session guard.
+        w.detach_terminal(id);
+        w.close_tab(0);
+        assert!(w.pending_session_close.is_some());
+        w.resolve_session_close(false, &ctx);
+        assert_eq!(w.tabs.len(), 1);
+        assert_ne!(w.windows.window(id), 0);
+        w.force_close_tab(0);
+        assert!(w.windows.detached().is_empty());
+    }
+}
+
+impl Workspace {
+    pub(super) fn collect_terminal_requests(&mut self, ctx: &Context) {
+        let requests: Vec<_> = self
+            .tabs
+            .iter_mut()
+            .filter_map(|t| t.paste_request.take().map(|text| (t.id, text)))
+            .collect();
+        for (id, text) in requests {
+            if text.after.is_empty() {
+                self.queue_paste(id, text.text);
+            } else {
+                self.queue_paste_to(self.paste_targets(id), text.text, text.after);
+            }
+        }
+        let reads: Vec<_> = self
+            .tabs
+            .iter_mut()
+            .filter_map(|t| std::mem::take(&mut t.clipboard_request).then_some(t.id))
+            .collect();
+        for id in reads {
+            self.request_clipboard(id, ctx);
+        }
+    }
+}
+use harbor_workspace::workspace::windows::{Geometry, ROOT};
+pub(super) fn viewport_id(window: u64) -> ViewportId {
+    harbor_workspace::workspace::windows::viewport_id(window)
+}
+impl Workspace {
+    pub(super) fn terminal_title(&self, id: u64) -> String {
+        let Some(tab) = self.tabs.iter().find(|t| t.id == id) else {
+            return String::new();
+        };
+        let browser_title = tab
+            .web_browser
+            .as_ref()
+            .map(|browser| browser.handle.state().title);
+        self.windows
+            .title(
+                id,
+                browser_title.as_deref().unwrap_or(&tab.screen.title),
+                &tab.session.title(),
+            )
+            .to_owned()
+    }
+    pub(super) fn sync_root_selection(&mut self) {
+        let id = self
+            .layout_state
+            .active
+            .filter(|id| {
+                self.tabs
+                    .iter()
+                    .any(|t| t.id == *id && self.windows.window(*id) == ROOT)
+            })
+            .or_else(|| {
+                self.tabs
+                    .get(self.active)
+                    .filter(|t| self.windows.window(t.id) == ROOT)
+                    .map(|t| t.id)
+            })
+            .or_else(|| {
+                self.tabs
+                    .iter()
+                    .find(|t| self.windows.window(t.id) == ROOT)
+                    .map(|t| t.id)
+            });
+        if let Some(id) = id {
+            self.active = self.tabs.iter().position(|t| t.id == id).unwrap();
+            self.layout_state.focus(id);
+        }
+    }
+    pub(super) fn detach_terminal(&mut self, id: u64) {
+        if !self.tabs.iter().any(|t| t.id == id) {
+            return;
+        }
+        let window = self.windows.detach(id);
+        self.window_active.insert(window, id);
+        self.layout_state.remove(id);
+        self.sync_root_selection();
+    }
+    pub(super) fn reattach_terminal(&mut self, id: u64) {
+        if self.windows.reattach(id, ROOT).is_err() {
+            return;
+        }
+        if let Some(index) = self.tabs.iter().position(|t| t.id == id) {
+            self.active = index;
+            self.page = Page::Terminal;
+            self.add_layout_terminal(id);
+        }
+    }
+    pub(super) fn toggle_window_fullscreen(&mut self, ctx: &Context, window: u64) {
+        if self.windows.fullscreen(window) {
+            self.windows.leave_fullscreen(window);
+            ctx.send_viewport_cmd(ViewportCommand::Fullscreen(false));
+        } else {
+            let geometry = ctx.input(|i| {
+                let info = i.viewport();
+                Some(Geometry {
+                    outer_position: info.outer_rect?.min,
+                    inner_size: info.inner_rect?.size(),
+                })
+            });
+            self.windows.enter_fullscreen(window, geometry);
+            ctx.send_viewport_cmd(ViewportCommand::Fullscreen(true));
+        }
+    }
+    pub(super) fn restore_window_geometry(&mut self, ctx: &Context, window: u64) {
+        let fullscreen = ctx.input(|i| i.viewport().fullscreen);
+        if fullscreen == Some(false) {
+            if let Some(g) = self.windows.restore_after_ack(window, false) {
+                ctx.send_viewport_cmd(ViewportCommand::OuterPosition(g.outer_position));
+                ctx.send_viewport_cmd(ViewportCommand::InnerSize(g.inner_size));
+            }
+        }
+    }
+    pub(super) fn window_title_editor(&mut self, ctx: &Context) {
+        let Some((id, mut text)) = self.title_editor.take() else {
+            return;
+        };
+        if !self.tabs.iter().any(|t| t.id == id) {
+            return;
+        }
+        let mut open = true;
+        let mut done = false;
+        Window::new("Rename terminal tab").id(Id::new("terminal-title-editor")).open(&mut open).collapsible(false).show(ctx, |ui| {
+            ui.label("A custom title takes priority over the server title. Leave empty to use the server/session title.");
+            ui.add(TextEdit::singleline(&mut text).char_limit(128));
+            ui.horizontal(|ui| {
+                if ui.button("Save").clicked() { self.windows.rename(id, text.clone()); done = true; }
+                if ui.button("Cancel").clicked() { done = true; }
+            });
+        });
+        if open && !done {
+            self.title_editor = Some((id, text));
+        }
+    }
+    pub(super) fn detached_windows(&mut self, ctx: &Context) {
+        self.restore_window_geometry(ctx, ROOT);
+        let prefs = self.store.preferences.clone();
+        let mut actions = Vec::new();
+        for window in self.windows.detached() {
+            let ids = self.windows.terminals(window);
+            let active = self
+                .window_active
+                .get(&window)
+                .copied()
+                .filter(|id| ids.contains(id))
+                .unwrap_or(ids[0]);
+            let title = self.terminal_title(active);
+            ctx.show_viewport_immediate(viewport_id(window), ViewportBuilder::default().with_title(title).with_inner_size([960.,640.]).with_min_inner_size([360.,260.]), |ui, class| {
+                if self.import_applying(){ui.disable();}
+                let child_ctx = ui.ctx().clone();
+                if class != ViewportClass::EmbeddedWindow && child_ctx.input(|i| i.viewport().close_requested()) {
+                    child_ctx.send_viewport_cmd(ViewportCommand::CancelClose);
+                    self.window_close_prompt.insert(window);
+                }
+                self.handle_shortcuts(&child_ctx, window);
+                self.restore_window_geometry(&child_ctx, window);
+                ui.horizontal(|ui| {
+                    for id in &ids {
+                        if ui.selectable_label(active == *id, self.terminal_tab_label(*id)).clicked() { self.window_active.insert(window, *id); }
+                    }
+                });
+                ui.horizontal(|ui| {
+                    if ui.button("Reattach").clicked() { actions.push((active, false)); }
+                    if ui.button("Close window…").clicked() { self.window_close_prompt.insert(window); }
+                    if class != ViewportClass::EmbeddedWindow && ui.button(if self.windows.fullscreen(window) {"Restore window"} else {"Fullscreen"}).clicked() { self.toggle_window_fullscreen(&child_ctx, window); }
+                    if ui.button("Rename…").clicked() { self.title_editor = Some((active, self.windows.override_title(active).unwrap_or("").to_owned())); }
+                });
+                if self.window_close_prompt.contains(&window) {
+                    ui.label("Reattach these terminals, or close the selected session? Active sessions and remote edits require confirmation in the main window.");
+                    ui.horizontal(|ui| {
+                        if ui.button("Reattach all").clicked() { actions.extend(ids.iter().map(|id| (*id, false))); self.window_close_prompt.remove(&window); }
+                        if ui.button("Close selected session").clicked() { actions.push((active, true)); self.window_close_prompt.remove(&window); }
+                        if ui.button("Cancel").clicked() { self.window_close_prompt.remove(&window); }
+                    });
+                }
+                if let Some(index) = self.tabs.iter().position(|t| t.id == active) {
+                    super::remote_files::authentication_ui(ui,&mut self.tabs[index]);
+                    self.tabs[index].search_ui(ui);
+                    if !self.tabs[index].error.is_empty() { ui.colored_label(ui.visuals().error_fg_color, &self.tabs[index].error); }
+                    let bytes = super::pages::terminal_view(ui, &mut self.tabs[index], &prefs);
+                    self.mark_painted_terminal(&child_ctx,active,window);
+                    self.dispatch_keyboard(active, &bytes);
+                }
+            });
+        }
+        // Only one close request may occupy the existing confirmation controller.
+        let mut close_started = false;
+        for (id, close) in actions {
+            if !close {
+                self.reattach_terminal(id);
+            } else if !close_started {
+                if let Some(index) = self.tabs.iter().position(|t| t.id == id) {
+                    self.close_tab(index);
+                    close_started = true;
+                    ctx.send_viewport_cmd_to(ViewportId::ROOT, ViewportCommand::Focus);
+                }
+            }
+        }
+        let live = self.windows.detached();
+        self.window_active.retain(|id, _| live.contains(id));
+        self.window_close_prompt.retain(|id| live.contains(id));
+    }
+}

@@ -1,0 +1,1088 @@
+--- a/src/ui/games.rs
++++ b/src/ui/games.rs
+@@ -1,5 +1,6 @@
+ use super::*;
+ mod play;
++mod save;
+ 
+ pub(super) struct State {
+     pub play: play::PlayState,
+--- a/src/ui/games/play.rs
++++ b/src/ui/games/play.rs
+@@ -1,9 +1,12 @@
+ use super::*;
++use super::save::{Action as FileAction, Files};
+ use harbor_workspace::games::{
+     GameId, GameInput, GameOutcome, GameRegistry, GameScene, GameSession, puzzles as p,
+     terminal as t,
+ };
+ pub(in crate::ui) struct PlayState {
++    files: Files,
++    exit_ready: bool,
+     launcher: bool,
+     suspended: bool,
+     pub(in crate::ui) session: Option<GameSession>,
+@@ -30,6 +33,8 @@
+ impl Default for PlayState {
+     fn default() -> Self {
+         Self {
++            files: Files::default(),
++            exit_ready: false,
+             launcher: false,
+             suspended: false,
+             session: None,
+@@ -102,6 +107,7 @@
+             ),
+             _ => GameRegistry::start(id, seed),
+         });
++        self.files.replaced();
+         self.draft = self.session.as_ref().and_then(GameSession::configuration);
+         self.solve_confirm = false;
+         self.launcher = false;
+@@ -118,6 +124,7 @@
+     fn start_config(&mut self, seed: u64, config: p::PuzzleConfig) -> bool {
+         match GameSession::new_puzzle(seed, config) {
+             Ok(session) => {
++                self.files.replaced();
+                 self.session = Some(session);
+                 self.draft = Some(config);
+                 self.launcher = false;
+@@ -142,8 +149,141 @@
+     fn apply(&mut self, i: GameInput) {
+         if let Some(s) = &mut self.session {
+             match s.input(i) {
+-                Ok(_) => self.message.clear(),
++                Ok(changed) => { if changed { self.files.changed(); } self.message.clear(); },
+                 Err(e) => self.message = player_error(e),
++            }
++        }
++    }
++    fn request_file_action(&mut self, action: FileAction, ctx: &Context) {
++        if self.files.pending.is_some() {
++            return;
++        }
++        if self.files.dirty() {
++            self.suspended = false;
++            self.files.pending = Some(action);
++        } else {
++            self.perform_file_action(action, ctx);
++        }
++    }
++    fn perform_file_action(&mut self, action: FileAction, ctx: &Context) {
++        match action {
++            FileAction::Start(id, seed) => self.start(id, seed),
++            FileAction::New => {
++                if let Some(s) = self.session.as_ref() {
++                    let (id, seed) = (s.id(), s.seed().wrapping_add(1));
++                    if let Some(c) = self.draft {
++                        self.start_config(seed, c);
++                    } else {
++                        self.start(id, seed);
++                    }
++                }
++            }
++            FileAction::Reset => {
++                if let Some(s) = self.session.as_mut() {
++                    s.reset();
++                    self.files.replaced();
++                    self.tick = None;
++                    self.dragging = None;
++                    self.source = None;
++                    self.selected = 0;
++                    self.solve_confirm = false;
++                    self.message.clear();
++                }
++            }
++            FileAction::Close => {
++                self.files.replaced();
++                self.session = None;
++                self.launcher = false;
++                self.tick = None;
++                self.dragging = None;
++                self.board = None;
++                self.board_focus = None;
++                self.close_owner = held_game_viewport(ctx);
++            }
++            FileAction::Exit => {
++                self.perform_file_action(FileAction::Close, ctx);
++                self.exit_ready = true;
++            }
++            FileAction::Load => self.files.start(None, ctx.clone()),
++            FileAction::Adopt(session) => self.adopt_file(session, ctx),
++        }
++    }
++    fn adopt_file(&mut self, session: GameSession, ctx: &Context) {
++        use harbor_workspace::games::persistence::InitialSettings;
++        self.variant = 0;
++        self.passes = 3;
++        self.preset = 1;
++        self.walk_size = 5;
++        self.portrait = false;
++        match session.initial_settings() {
++            InitialSettings::Solitaire { variant, passes } => {
++                self.variant = usize::from(variant == t::SolitaireVariant::Klondike);
++                self.passes = passes;
++            }
++            InitialSettings::Mines(preset) => {
++                self.preset = match preset {
++                    t::MinePreset::Newbie => 0,
++                    t::MinePreset::Easy => 1,
++                    t::MinePreset::Medium => 2,
++                    t::MinePreset::Hard => 3,
++                };
++            }
++            InitialSettings::Termwalk { size } => self.walk_size = size,
++            _ => {}
++        }
++        self.draft = session.configuration();
++        if let Some(p::PuzzleConfig::Map(c)) = self.draft {
++            self.portrait = c.preset == p::MapPreset::Portrait;
++        }
++        self.files.replaced();
++        self.session = Some(session);
++        self.launcher = false;
++        self.suspended = false;
++        self.selected = 0;
++        self.colour = 1;
++        self.pencil = false;
++        self.help = false;
++        self.source = None;
++        self.count = 1;
++        self.tick = None;
++        self.dragging = None;
++        self.board = None;
++        self.solve_confirm = false;
++        self.board_focus = None;
++        ctx.memory_mut(|m| {
++            if let Some(id) = m.focused() {
++                m.surrender_focus(id);
++            }
++        });
++        // Inputs queued for the previous board must not act on the candidate.
++        ctx.input_mut(|i| {
++            i.events.clear();
++            i.pointer = Default::default();
++            i.keys_down.clear();
++            i.modifiers = Default::default();
++        });
++        self.message = "Game loaded (TermCraft format).".into();
++    }
++    fn file_confirmation(&mut self, ctx: &Context) {
++        if self.files.pending.is_none() {
++            return;
++        }
++        let mut discard = false;
++        let mut cancel = false;
++        egui::Modal::new(Id::new("game_file_discard")).show(ctx, |ui| {
++            ui.heading("Unsaved game changes");
++            ui.label("Continuing discards changes to this game. Save first to keep them.");
++            ui.horizontal(|ui| {
++                discard = ui.button("Discard changes and continue").clicked();
++                cancel = ui.button("Keep playing").clicked();
++            });
++        });
++        if cancel {
++            self.files.pending = None;
++        }
++        if discard {
++            if let Some(action) = self.files.pending.take() {
++                self.perform_file_action(action, ctx);
+             }
+         }
+     }
+@@ -234,7 +374,7 @@
+         }
+         if m.ctrl && (key == Key::Y || (m.shift && key == Key::Z)) {
+             if let Some(s) = &mut self.session {
+-                s.redo();
++                if s.redo() {self.files.changed();}
+             }
+             return;
+         }
+@@ -260,7 +400,7 @@
+         }
+         if m.ctrl && key == Key::Z {
+             if let Some(s) = &mut self.session {
+-                s.undo();
++                if s.undo() {self.files.changed();}
+             }
+             return;
+         }
+@@ -667,10 +807,42 @@
+     })
+ }
+ impl Workspace {
++    // Root application exit can lose a retained game even while its surface is
++    // suspended. Detached-window close retains this global game and follows its
++    // existing terminal reattach/close workflow instead.
++    pub(in crate::ui) fn intercept_game_exit(&mut self, ctx: &Context) -> bool {
++        if ctx.viewport_id() != ViewportId::ROOT
++            || self.games.play.session.is_none()
++            || !self.games.play.files.dirty()
++        { return false; }
++        let play=&mut self.games.play;
++        play.suspended=false;
++        if !matches!(play.files.pending,Some(FileAction::Exit)) {
++            play.files.generation=play.files.generation.wrapping_add(1);
++            play.files.pending=Some(FileAction::Exit);
++        }
++        self.allow_session_exit=false;
++        self.allow_remote_exit=false;
++        ctx.send_viewport_cmd(ViewportCommand::CancelClose);
++        ctx.send_viewport_cmd(ViewportCommand::Minimized(false));
++        ctx.send_viewport_cmd(ViewportCommand::Visible(true));
++        ctx.send_viewport_cmd(ViewportCommand::Focus);
++        ctx.request_repaint();
++        true
++    }
++    fn continue_game_window_close(&mut self,ctx:&Context) {
++        if self.remote_documents_block_close(None) {
++            self.begin_ftp_document_close(None);
++            self.pending_remote_exit=true;
++            self.allow_session_exit=false;
++            self.allow_remote_exit=false;
++            ctx.send_viewport_cmd(ViewportCommand::CancelClose);
++        } else { self.request_window_session_close(ctx); }
++    }
+     pub(in crate::ui) fn games_menu(&mut self, ui: &mut Ui) {
+         for spec in GameRegistry::catalog() {
+             if ui.button(spec.label).clicked() {
+-                self.games.play.start(spec.id, 1);
++                self.games.play.request_file_action(FileAction::Start(spec.id, 1),ui.ctx());
+                 ui.close();
+             }
+         }
+@@ -681,9 +853,17 @@
+     }
+     pub(in crate::ui) fn games_frame(&mut self, ui: &mut Ui) -> bool {
+         let current = ui.ctx().viewport_id();
++        if current==ViewportId::ROOT && ui.ctx().input(|i|i.viewport().close_requested()) {
++            self.intercept_game_exit(ui.ctx());
++        }
+         let play = &mut self.games.play;
+-        if play.is_open() && ui.ctx().input(|i| i.viewport().close_requested()) {
++        if current==ViewportId::ROOT {if let Some(session)=play.files.poll(&mut play.message) {play.adopt_file(session,ui.ctx());}}
++        if play.is_open() && ui.ctx().input(|i| i.viewport().close_requested())
++            && !(current==ViewportId::ROOT && matches!(play.files.pending,Some(FileAction::Exit)))
++        {
+             play.suspended = true;
++            play.files.generation=play.files.generation.wrapping_add(1);
++            play.files.pending=None;
+             play.close_owner = held_game_viewport(ui.ctx());
+             ui.ctx().input_mut(|i| i.events.clear());
+         }
+@@ -775,28 +955,33 @@
+                 .memory(|m| m.focused().is_some_and(|id| Some(id) != play.board_focus));
+         let mut close = false;
+         ScrollArea::both().id_salt("games_surface").show(ui,|ui|{Frame::new().fill(content(ui)).inner_margin(16.).show(ui,|ui|{
++            if play.files.pending.is_some(){ui.disable();}
+             ui.horizontal(|ui|{
+                 ui.image((self.logo.id(),vec2(28.,28.)));
+                 ui.heading(play.session.as_ref().filter(|_|!play.launcher).map_or("Games",|s|s.spec().label));
+                 if ui.button("Close (Esc)").clicked(){close=true;}
++                if ui.add_enabled(play.session.is_some()&&!play.files.busy(),egui::Button::new("Save…")).clicked(){play.files.start(play.session.clone(),ui.ctx().clone());}
++                if ui.add_enabled(!play.files.busy(),egui::Button::new("Load…")).clicked(){play.request_file_action(FileAction::Load,ui.ctx());}
++                if play.files.busy(){ui.spinner();ui.label("Game file in progress…");}
++                if play.files.dirty(){ui.label("Unsaved changes");}
+                 if play.session.is_some()&&ui.button(if play.launcher{"Resume game"}else{"Library"}).clicked(){play.launcher=!play.launcher;}
+             });
+             if play.launcher {
+                 ui.label("Choose a game. Terminal sessions continue in the background.");
+-                for spec in GameRegistry::catalog(){if ui.button(spec.label).clicked(){play.start(spec.id,1);}}
++                for spec in GameRegistry::catalog(){if ui.button(spec.label).clicked(){play.request_file_action(FileAction::Start(spec.id,1),ui.ctx());}}
+             }else if let Some(s)=&play.session {
+                 let(id,seed,outcome)=(s.id(),s.seed(),s.outcome());
+                 ui.horizontal(|ui|{
+-                    if ui.button("New game").clicked(){if let Some(c)=play.draft {play.start_config(seed.wrapping_add(1),c);}else{play.start(id,seed.wrapping_add(1));}}
+-                    if ui.button("Reset").clicked(){play.session.as_mut().unwrap().reset();play.message.clear();}
+-                    if ui.add_enabled(play.session.as_ref().unwrap().can_undo(),egui::Button::new("Undo")).clicked(){play.session.as_mut().unwrap().undo();}
+-                    if ui.add_enabled(play.session.as_ref().unwrap().can_redo(),egui::Button::new("Redo")).clicked(){play.session.as_mut().unwrap().redo();}
++                    if ui.button("New game").clicked(){play.request_file_action(FileAction::New,ui.ctx());}
++                    if ui.button("Reset").clicked(){play.request_file_action(FileAction::Reset,ui.ctx());}
++                    if ui.add_enabled(play.session.as_ref().unwrap().can_undo(),egui::Button::new("Undo")).clicked(){if play.session.as_mut().unwrap().undo(){play.files.changed();}}
++                    if ui.add_enabled(play.session.as_ref().unwrap().can_redo(),egui::Button::new("Redo")).clicked(){if play.session.as_mut().unwrap().redo(){play.files.changed();}}
+                     if play.session.as_ref().unwrap().configuration().is_some() && ui.button("Solve…").clicked(){play.solve_confirm=true;}
+                     ui.toggle_value(&mut play.help,"Help");
+                     ui.label(format!("Seed {seed} · {outcome:?}"));
+                 });
+                 if play.session.as_ref().unwrap().assisted(){ui.strong("Assisted — solution revealed");}
+-                if play.solve_confirm {ui.horizontal_wrapped(|ui|{ui.label(if id==GameId::Guess {"Give up and reveal the code? This marks the game assisted."}else{"Reveal the solution? This marks the game assisted."});if ui.button("Reveal solution").clicked(){match play.session.as_mut().unwrap().solve(){Ok(_)=>play.message.clear(),Err(e)=>play.message=player_error(e)};play.solve_confirm=false;}if ui.button("Cancel").clicked(){play.solve_confirm=false;}});}
++                if play.solve_confirm {ui.horizontal_wrapped(|ui|{ui.label(if id==GameId::Guess {"Give up and reveal the code? This marks the game assisted."}else{"Reveal the solution? This marks the game assisted."});if ui.button("Reveal solution").clicked(){match play.session.as_mut().unwrap().solve(){Ok(changed)=>{if changed{play.files.changed();}play.message.clear();},Err(e)=>play.message=player_error(e)};play.solve_confirm=false;}if ui.button("Cancel").clicked(){play.solve_confirm=false;}});}
+                 puzzle_options(ui,play);
+                 ui.horizontal_wrapped(|ui|{match id {
+                     GameId::Soliterm=>{ui.label("New game variant:");ui.selectable_value(&mut play.variant,0,"Freecell");ui.selectable_value(&mut play.variant,1,"Klondike");ui.add(egui::Slider::new(&mut play.passes,1..=20).text("passes"));},
+@@ -818,7 +1003,7 @@
+             || ui
+                 .ctx()
+                 .memory(|m| m.focused().is_some_and(|id| Some(id) != play.board_focus));
+-        if !widgets_owned_keys && !widgets_own_keys {
++        if !widgets_owned_keys && !widgets_own_keys && play.files.pending.is_none() {
+             let keys = ui.ctx().input(|i| i.events.clone());
+             for event in keys {
+                 if let Event::Key {
+@@ -848,6 +1033,7 @@
+             }
+         }
+         if !play.launcher
++            && play.files.pending.is_none()
+             && play.session.as_ref().is_some_and(|s| {
+                 matches!(s.id(), GameId::Ctris | GameId::Ninvaders)
+                     && s.outcome() == GameOutcome::Playing
+@@ -872,13 +1058,10 @@
+         } else {
+             play.tick = None;
+         }
+-        if close {
+-            play.session = None;
+-            play.launcher = false;
+-            play.tick = None;
+-            play.dragging = None;
+-            play.close_owner = held_game_viewport(ui.ctx());
+-        }
++        if close {play.request_file_action(FileAction::Close,ui.ctx());}
++        play.file_confirmation(ui.ctx());
++        let exit_ready=std::mem::take(&mut play.exit_ready);
++        if exit_ready {self.continue_game_window_close(ui.ctx());}
+         ui.ctx().input_mut(|i| i.events.clear());
+         // Polling remains bounded and active while terminal rendering is suspended.
+         ui.ctx().request_repaint_after(Duration::from_millis(100));
+@@ -2230,6 +2413,8 @@
+         let window = w.windows.window(id);
+         let child = crate::ui::windows::viewport_id(window);
+         w.games.play.start(GameId::Mines, 4);
++        w.games.play.puzzle(p::PuzzleInput::Flag {cell:0});
++        assert!(w.games.play.files.dirty());
+         let saved = w.games.play.session.as_ref().unwrap().scene();
+         let once = Arc::new(AtomicBool::new(true));
+         let seen = Arc::new(AtomicBool::new(false));
+@@ -2733,6 +2918,9 @@
+         }));
+         let pos = label_position(&ctx, &mut w, "New game");
+         click(&ctx, &mut w, pos, PointerButton::Primary, size);
++        assert!(w.games.play.files.pending.is_some());
++        assert_eq!(w.games.play.session.as_ref().unwrap().scene(), before);
++        save_ui_click(&ctx, &mut w, "Discard changes and continue");
+         assert_eq!(w.games.play.session.as_ref().unwrap().scene(), before);
+         assert_eq!(
+             w.games.play.session.as_ref().unwrap().configuration(),
+@@ -3730,4 +3918,304 @@
+             assert_eq!(w.games.play.session.as_ref().unwrap().scene(), solved);
+         }
+     }
++    fn save_ui_wait(ctx: &Context, w: &mut Workspace) {
++        let deadline = Instant::now() + Duration::from_secs(5);
++        while w.games.play.files.busy() && Instant::now() < deadline {
++            frame(ctx, w, vec![], vec2(1200., 1000.));
++            std::thread::sleep(Duration::from_millis(5));
++        }
++        assert!(
++            !w.games.play.files.busy(),
++            "bounded worker did not complete"
++        );
++    }
++    fn save_ui_click(ctx: &Context, w: &mut Workspace, label: &str) {
++        let pos = label_position(ctx, w, label);
++        click(ctx, w, pos, PointerButton::Primary, vec2(1200., 1000.));
++    }
++    #[test]
++    fn save_ui_actual_all_thirteen_controls_and_save_snapshot_during_chooser() {
++        use std::sync::{Arc, Mutex, mpsc};
++        let (ctx, dir, mut w) = crate::ui::terminal_review_tests::owned_workspace();
++        for spec in GameRegistry::catalog() {
++            w.games.play.start(spec.id, 7);
++            w.games.play.files.chooser = Some(Arc::new(|_| None));
++            label_position(&ctx, &mut w, "Save…");
++            label_position(&ctx, &mut w, "Load…");
++            save_ui_click(&ctx, &mut w, "Save…");
++            save_ui_wait(&ctx, &mut w);
++            assert_eq!(w.games.play.session.as_ref().unwrap().id(), spec.id);
++        }
++        w.games.play.start(GameId::Ctris, 7);
++        let before = w.games.play.session.as_ref().unwrap().clone();
++        let path = dir.path().join("saved.termcraft-game");
++        let selected = path.clone();
++        let (tx, rx) = mpsc::sync_channel(1);
++        let rx = Arc::new(Mutex::new(rx));
++        let gui = std::thread::current().id();
++        w.games.play.files.chooser = Some(Arc::new(move |save| {
++            assert!(save);
++            assert_ne!(std::thread::current().id(), gui);
++            rx.lock().unwrap().recv().unwrap();
++            Some(selected.clone())
++        }));
++        save_ui_click(&ctx, &mut w, "Save…");
++        assert!(w.games.play.files.busy());
++        w.games.play.terminal(t::TerminalInput::Tick);
++        assert!(w.games.play.files.dirty());
++        tx.send(()).unwrap();
++        save_ui_wait(&ctx, &mut w);
++        let loaded = GameSession::load_bytes(&std::fs::read(path).unwrap()).unwrap();
++        assert_eq!(loaded.scene(), before.scene());
++        assert!(w.games.play.files.dirty());
++        assert!(w.games.play.message.contains("newer"));
++    }
++    fn save_ui_choice_output(ctx:&Context,w:&mut Workspace,label:&str)->egui::FullOutput {
++        let pos=label_position(ctx,w,label);let size=vec2(1200.,1000.);
++        frame(ctx,w,vec![Event::PointerMoved(pos),Event::PointerButton{pos,button:PointerButton::Primary,pressed:true,modifiers:Modifiers::default()}],size);
++        let mut out=ctx.run_ui(RawInput{screen_rect:Some(Rect::from_min_size(Pos2::ZERO,size)),events:vec![Event::PointerButton{pos,button:PointerButton::Primary,pressed:false,modifiers:Modifiers::default()}],..Default::default()},|ui|{w.games_frame(ui);});
++        out.textures_delta.clear();out
++    }
++    fn save_ui_root_close(ctx:&Context,w:&mut Workspace,render:bool)->egui::FullOutput {
++        let mut raw=RawInput{screen_rect:Some(Rect::from_min_size(Pos2::ZERO,vec2(1200.,1000.))),..Default::default()};
++        raw.viewports.get_mut(&ViewportId::ROOT).unwrap().events.push(egui::ViewportEvent::Close);
++        let mut out=ctx.run_ui(raw,|ui|{
++            eframe::App::logic(w,ui.ctx(),&mut eframe::Frame::_new_kittest());
++            if render {w.games_frame(ui);}
++        });out.textures_delta.clear();out
++    }
++    #[test]
++    fn save_ui_native_root_close_clean_dirty_and_suspended_without_owned_terminal() {
++        for suspended in [false,true] {
++            let (ctx,_dir,mut w)=crate::ui::terminal_review_tests::owned_workspace();
++            assert!(!w.tabs.iter().any(TerminalTab::running));
++            w.games.play.start(GameId::Netwalk,5);w.games.play.puzzle(p::PuzzleInput::Rotate{cell:0,clockwise:true});
++            w.games.play.suspended=suspended;
++            let before=w.games.play.session.as_ref().unwrap().save_bytes().unwrap();
++            let out=save_ui_root_close(&ctx,&mut w,false);
++            assert!(out.viewport_output[&ViewportId::ROOT].commands.contains(&ViewportCommand::CancelClose));
++            assert!(!out.viewport_output[&ViewportId::ROOT].commands.contains(&ViewportCommand::Close));
++            assert!(matches!(w.games.play.files.pending,Some(FileAction::Exit)));
++            assert!(w.games.play.is_open());assert_eq!(w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),before);
++            frame(&ctx,&mut w,vec![],vec2(1200.,1000.));
++            save_ui_click(&ctx,&mut w,"Keep playing");
++            assert!(w.games.play.files.pending.is_none());assert!(w.games.play.files.dirty());
++            assert_eq!(w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),before);
++            let out=save_ui_root_close(&ctx,&mut w,true);
++            assert!(out.viewport_output[&ViewportId::ROOT].commands.contains(&ViewportCommand::CancelClose));
++            let out=save_ui_choice_output(&ctx,&mut w,"Discard changes and continue");
++            assert!(out.viewport_output[&ViewportId::ROOT].commands.contains(&ViewportCommand::Close));
++            assert!(w.games.play.session.is_none());assert!(w.allow_session_exit);
++        }
++        let (ctx,_dir,mut w)=crate::ui::terminal_review_tests::owned_workspace();
++        w.games.play.start(GameId::Netwalk,5);
++        let before=w.games.play.session.as_ref().unwrap().save_bytes().unwrap();
++        let out=save_ui_root_close(&ctx,&mut w,true);
++        assert!(!out.viewport_output[&ViewportId::ROOT].commands.contains(&ViewportCommand::CancelClose));
++        assert!(w.games.play.files.pending.is_none());assert!(w.games.play.suspended);
++        assert_eq!(w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),before);
++    }
++    #[test]
++    fn save_ui_native_root_close_keeps_owned_terminal_confirmation_after_game_choice() {
++        let (ctx,_dir,mut w)=crate::ui::terminal_review_tests::owned_workspace();
++        let id=crate::ui::terminal_review_tests::raw_terminal(&mut w,"dirty-game-native-close");
++        w.games.play.start(GameId::Netwalk,5);w.games.play.puzzle(p::PuzzleInput::Rotate{cell:0,clockwise:true});
++        let before=w.games.play.session.as_ref().unwrap().save_bytes().unwrap();
++        let out=save_ui_root_close(&ctx,&mut w,true);
++        assert!(out.viewport_output[&ViewportId::ROOT].commands.contains(&ViewportCommand::CancelClose));
++        assert!(w.pending_session_close.is_none());
++        save_ui_click(&ctx,&mut w,"Keep playing");
++        assert_eq!(w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),before);assert_eq!(w.tabs[0].id,id);assert!(w.tabs[0].running());
++        save_ui_root_close(&ctx,&mut w,true);let out=save_ui_choice_output(&ctx,&mut w,"Discard changes and continue");
++        assert!(!out.viewport_output[&ViewportId::ROOT].commands.contains(&ViewportCommand::Close));
++        assert!(w.games.play.session.is_none());assert!(w.pending_session_close.is_some());assert!(!w.allow_session_exit);assert!(w.tabs[0].running());
++        w.resolve_session_close(false,&ctx);assert!(w.tabs[0].running());assert!(!w.allow_session_exit);
++        // A retained dirty game also guards an already-pending terminal Close.
++        w.request_window_session_close(&ctx);assert!(w.pending_session_close.is_some());
++        w.games.play.start(GameId::Netwalk,9);w.games.play.puzzle(p::PuzzleInput::Rotate{cell:0,clockwise:true});
++        w.resolve_session_close(true,&ctx);
++        assert!(matches!(w.games.play.files.pending,Some(FileAction::Exit)));assert!(!w.allow_session_exit);assert!(w.tabs[0].running());
++    }
++    #[test]
++    fn save_ui_adoption_quarantines_old_board_input_and_restores_draft() {
++        let (ctx,_dir,mut w)=crate::ui::terminal_review_tests::owned_workspace();
++        w.games.play.start(GameId::Guess,5);
++        let candidate=GameSession::new_puzzle(8,p::PuzzleConfig::Net(p::NetConfig::default())).unwrap();
++        let expected=candidate.save_bytes().unwrap();let config=candidate.configuration();
++        let mut out=ctx.run_ui(RawInput{
++            screen_rect:Some(Rect::from_min_size(Pos2::ZERO,vec2(1200.,1000.))),
++            events:vec![key_event(Key::ArrowRight,Modifiers::default()),Event::Text("old board input".into())],
++            ..Default::default()
++        },|ui|{w.games.play.adopt_file(candidate.clone(),ui.ctx());w.games_frame(ui);});
++        out.textures_delta.clear();
++        assert_eq!(w.games.play.selected,0);assert_eq!(w.games.play.draft,config);
++        assert_eq!(w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),expected);
++        assert!(ctx.input(|i|i.events.is_empty()&&i.keys_down.is_empty()&&!i.pointer.any_down()));
++    }
++    #[test]
++    fn save_ui_actual_discard_resets_creates_and_closes() {
++        let (ctx, _dir, mut w) = crate::ui::terminal_review_tests::owned_workspace();
++        w.games.play.start(GameId::Netwalk, 5);
++        for label in ["Reset", "New game", "Close (Esc)"] {
++            w.games.play.puzzle(p::PuzzleInput::Rotate {
++                cell: 0,
++                clockwise: true,
++            });
++            assert!(w.games.play.files.dirty());
++            save_ui_click(&ctx, &mut w, label);
++            assert!(w.games.play.files.pending.is_some());
++            save_ui_click(&ctx, &mut w, "Discard changes and continue");
++            assert!(!w.games.play.files.dirty());
++            if label == "Reset" {
++                assert!(!w.games.play.session.as_ref().unwrap().can_undo());
++            }
++            if label == "New game" {
++                assert_eq!(w.games.play.session.as_ref().unwrap().seed(), 6);
++            }
++        }
++        assert!(w.games.play.session.is_none());
++        assert!(!w.games.play.is_open());
++    }
++    #[test]
++    fn save_ui_actual_overwrite_requires_explicit_consent() {
++        use std::sync::{
++            Arc,
++            atomic::{AtomicUsize, Ordering},
++        };
++        let (ctx, dir, mut w) = crate::ui::terminal_review_tests::owned_workspace();
++        w.games.play.start(GameId::Netwalk, 5);
++        w.games.play.puzzle(p::PuzzleInput::Rotate {
++            cell: 0,
++            clockwise: true,
++        });
++        let before = w.games.play.session.as_ref().unwrap().save_bytes().unwrap();
++        let path = dir.path().join("existing");
++        std::fs::write(&path, b"keep original").unwrap();
++        let chosen = path.clone();
++        w.games.play.files.chooser = Some(Arc::new(move |save| {
++            assert!(save);
++            Some(chosen.clone())
++        }));
++        let asked = Arc::new(AtomicUsize::new(0));
++        let count = asked.clone();
++        w.games.play.files.overwrite = Some(Arc::new(move |_| {
++            count.fetch_add(1, Ordering::SeqCst);
++            false
++        }));
++        save_ui_click(&ctx, &mut w, "Save…");
++        save_ui_wait(&ctx, &mut w);
++        assert_eq!(asked.load(Ordering::SeqCst), 1);
++        assert_eq!(std::fs::read(&path).unwrap(), b"keep original");
++        assert!(w.games.play.files.dirty());
++        assert_eq!(
++            w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),
++            before
++        );
++        w.games.play.files.overwrite = Some(Arc::new(|_| true));
++        save_ui_click(&ctx, &mut w, "Save…");
++        save_ui_wait(&ctx, &mut w);
++        assert_eq!(std::fs::read(&path).unwrap(), before);
++        assert!(!w.games.play.files.dirty());
++    }
++    #[test]
++    fn save_ui_actual_load_failure_guards_and_transient_reset() {
++        use std::sync::Arc;
++        let (ctx, dir, mut w) = crate::ui::terminal_review_tests::owned_workspace();
++        w.games.play.start(GameId::Netwalk, 5);
++        w.games.play.puzzle(p::PuzzleInput::Rotate {
++            cell: 0,
++            clockwise: true,
++        });
++        let before = w.games.play.session.as_ref().unwrap().save_bytes().unwrap();
++        for label in ["New game", "Reset", "Close (Esc)", "Load…"] {
++            save_ui_click(&ctx, &mut w, label);
++            assert!(w.games.play.files.pending.is_some());
++            assert_eq!(
++                w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),
++                before
++            );
++            save_ui_click(&ctx, &mut w, "Keep playing");
++            assert!(w.games.play.files.pending.is_none());
++        }
++        let path = dir.path().join("invalid");
++        std::fs::write(&path, b"bad game file").unwrap();
++        let chosen = path.clone();
++        w.games.play.files.chooser = Some(Arc::new(move |save| {
++            assert!(!save);
++            Some(chosen.clone())
++        }));
++        save_ui_click(&ctx, &mut w, "Load…");
++        save_ui_click(&ctx, &mut w, "Discard changes and continue");
++        save_ui_wait(&ctx, &mut w);
++        assert_eq!(
++            w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),
++            before
++        );
++        assert_eq!(std::fs::read(&path).unwrap(), b"bad game file");
++        assert!(w.games.play.message.starts_with("Game file:"));
++        let candidate = GameSession::new_solitaire(10, t::SolitaireVariant::Klondike, 9);
++        std::fs::write(&path, candidate.save_bytes().unwrap()).unwrap();
++        w.games.play.dragging = Some(7);
++        w.games.play.source = Some(t::CardPile::Reserve(0));
++        w.games.play.tick = Some(Instant::now());
++        save_ui_click(&ctx, &mut w, "Load…");
++        save_ui_click(&ctx, &mut w, "Discard changes and continue");
++        save_ui_wait(&ctx, &mut w);
++        assert_eq!(
++            w.games.play.session.as_ref().unwrap().scene(),
++            candidate.scene()
++        );
++        assert_eq!((w.games.play.variant, w.games.play.passes), (1, 9));
++        assert!(w.games.play.dragging.is_none());
++        assert!(w.games.play.source.is_none());
++        assert!(w.games.play.tick.is_none());
++        assert!(!w.games.play.files.dirty());
++    }
++    #[test]
++    fn save_ui_actual_load_during_ticks_reconfirms_and_new_generation_ignores_candidate() {
++        use std::sync::{Arc, Mutex, mpsc};
++        let (ctx, dir, mut w) = crate::ui::terminal_review_tests::owned_workspace();
++        let candidate = GameRegistry::start(GameId::Guess, 13);
++        let path = dir.path().join("candidate");
++        std::fs::write(&path, candidate.save_bytes().unwrap()).unwrap();
++        w.games.play.start(GameId::Ctris, 7);
++        let (tx, rx) = mpsc::sync_channel(1);
++        let rx = Arc::new(Mutex::new(rx));
++        let chosen = path.clone();
++        w.games.play.files.chooser = Some(Arc::new(move |_| {
++            rx.lock().unwrap().recv().unwrap();
++            Some(chosen.clone())
++        }));
++        save_ui_click(&ctx, &mut w, "Load…");
++        w.games.play.terminal(t::TerminalInput::Tick);
++        let before = w.games.play.session.as_ref().unwrap().save_bytes().unwrap();
++        tx.send(()).unwrap();
++        save_ui_wait(&ctx, &mut w);
++        assert!(matches!(
++            w.games.play.files.pending,
++            Some(FileAction::Adopt(_))
++        ));
++        assert_eq!(
++            w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),
++            before
++        );
++        save_ui_click(&ctx, &mut w, "Keep playing");
++        let (tx, rx) = mpsc::sync_channel(1);
++        let rx = Arc::new(Mutex::new(rx));
++        w.games.play.files.chooser = Some(Arc::new(move |_| {
++            rx.lock().unwrap().recv().unwrap();
++            Some(path.clone())
++        }));
++        save_ui_click(&ctx, &mut w, "Load…");
++        save_ui_click(&ctx, &mut w, "Discard changes and continue");
++        w.games.play.start(GameId::Termwalk, 42);
++        let current = w.games.play.session.as_ref().unwrap().save_bytes().unwrap();
++        tx.send(()).unwrap();
++        save_ui_wait(&ctx, &mut w);
++        assert_eq!(
++            w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),
++            current
++        );
++    }
++
+ }
+--- /dev/null
++++ b/src/ui/games/save.rs
+@@ -0,0 +1,385 @@
++//! Explicit, bounded game files. No chooser, codec or filesystem work runs on the GUI.
++use cap_fs_ext::{DirExt, FollowSymlinks, OpenOptionsFollowExt};
++use cap_std::fs::{Dir, OpenOptions};
++use eframe::egui;
++use harbor_workspace::games::{GameSession, persistence::MAX_BYTES};
++use std::{
++    io::{Read, Write},
++    path::{Path, PathBuf},
++    sync::mpsc,
++};
++
++#[derive(Default)]
++pub(super) struct Files {
++    pub generation: u64,
++    pub revision: u64,
++    pub clean: u64,
++    pub pending: Option<Action>,
++    job: Option<mpsc::Receiver<Completion>>,
++    #[cfg(test)]
++    pub chooser: Option<std::sync::Arc<dyn Fn(bool) -> Option<PathBuf> + Send + Sync>>,
++    #[cfg(test)]
++    pub overwrite: Option<std::sync::Arc<dyn Fn(&Path) -> bool + Send + Sync>>,
++}
++pub(super) enum Action {
++    Start(harbor_workspace::games::GameId, u64),
++    New,
++    Reset,
++    Close,
++    Exit,
++    Load,
++    Adopt(GameSession),
++}
++pub(super) struct Completion {
++    generation: u64,
++    revision: u64,
++    result: Result<Done, String>,
++}
++enum Done {
++    Saved,
++    Loaded(GameSession),
++    Canceled,
++}
++impl Files {
++    pub fn dirty(&self) -> bool {
++        self.revision != self.clean
++    }
++    pub fn changed(&mut self) {
++        self.revision = self.revision.wrapping_add(1);
++    }
++    pub fn replaced(&mut self) {
++        self.generation = self.generation.wrapping_add(1);
++        self.revision = 0;
++        self.clean = 0;
++        self.pending = None;
++    }
++    pub fn busy(&self) -> bool {
++        self.job.is_some()
++    }
++    pub fn start(&mut self, session: Option<GameSession>, ctx: egui::Context) {
++        if self.busy() {
++            return;
++        }
++        let generation = self.generation;
++        let revision = self.revision;
++        let (tx, rx) = mpsc::sync_channel(1);
++        self.job = Some(rx);
++        // The snapshot is supplied only after an explicit Save click.
++        #[cfg(test)]
++        let chooser = self.chooser.clone();
++        #[cfg(test)]
++        let overwrite = self.overwrite.clone();
++        std::thread::spawn(move || {
++            let result = if let Some(session) = session {
++                (|| {
++                    let pick = || {
++                        rfd::FileDialog::new()
++                            .set_file_name("game.termcraft-game")
++                            .add_filter("TermCraft game", &["termcraft-game"])
++                            .save_file()
++                    };
++                    #[cfg(test)]
++                    let selected = chooser.as_ref().map_or_else(pick, |choose| choose(true));
++                    #[cfg(not(test))]
++                    let selected = pick();
++                    let Some(path) = selected else {
++                        return Ok(Done::Canceled);
++                    };
++                    let bytes = session.save_bytes().map_err(str::to_owned)?;
++                    let target = Target::new(&path)?;
++                    let exists = target.exists()?;
++                    if exists {
++                        let confirm = || {
++                            rfd::MessageDialog::new()
++                                .set_title("Replace saved game?")
++                                .set_description(format!(
++                                    "Replace {} with this TermCraft game?",
++                                    path.display()
++                                ))
++                                .set_buttons(rfd::MessageButtons::YesNo)
++                                .show()
++                                == rfd::MessageDialogResult::Yes
++                        };
++                        #[cfg(test)]
++                        let consent = overwrite
++                            .as_ref()
++                            .map_or_else(confirm, |confirm| confirm(&path));
++                        #[cfg(not(test))]
++                        let consent = confirm();
++                        if !consent {
++                            return Ok(Done::Canceled);
++                        }
++                    }
++                    target.write(&bytes, exists)?;
++                    Ok(Done::Saved)
++                })()
++            } else {
++                (|| {
++                    let pick = || {
++                        rfd::FileDialog::new()
++                            .add_filter("TermCraft game", &["termcraft-game"])
++                            .pick_file()
++                    };
++                    #[cfg(test)]
++                    let selected = chooser.as_ref().map_or_else(pick, |choose| choose(false));
++                    #[cfg(not(test))]
++                    let selected = pick();
++                    let Some(path) = selected else {
++                        return Ok(Done::Canceled);
++                    };
++                    let bytes = read(&path)?;
++                    GameSession::load_bytes(&bytes)
++                        .map(Done::Loaded)
++                        .map_err(str::to_owned)
++                })()
++            };
++            let _ = tx.send(Completion {
++                generation,
++                revision,
++                result,
++            });
++            ctx.request_repaint();
++        });
++    }
++    pub fn poll(&mut self, message: &mut String) -> Option<GameSession> {
++        let result = match self.job.as_ref()?.try_recv() {
++            Ok(result) => result,
++            Err(mpsc::TryRecvError::Empty) => return None,
++            Err(mpsc::TryRecvError::Disconnected) => {
++                self.job = None;
++                *message = "Game file worker stopped. Your current game is unchanged.".into();
++                return None;
++            }
++        };
++        self.job = None;
++        self.complete(result, message)
++    }
++    fn complete(&mut self, result: Completion, message: &mut String) -> Option<GameSession> {
++        if result.generation != self.generation {
++            return None;
++        }
++        match result.result {
++            Ok(Done::Saved) => {
++                if result.revision == self.revision {
++                    self.clean = self.revision;
++                    *message = "Game saved (TermCraft format).".into();
++                } else {
++                    *message =
++                        "Earlier game state saved; your newer moves are still unsaved.".into();
++                }
++            }
++            Ok(Done::Loaded(session)) => {
++                if result.revision != self.revision && self.dirty() {
++                    self.pending = Some(Action::Adopt(session));
++                } else {
++                    return Some(session);
++                }
++            }
++            Ok(Done::Canceled) => {}
++            Err(error) => *message = format!("Game file: {error}"),
++        }
++        None
++    }
++}
++struct Target {
++    dir: Dir,
++    name: PathBuf,
++}
++impl Target {
++    fn new(path: &Path) -> Result<Self, String> {
++        let name = path
++            .file_name()
++            .ok_or("Choose a regular game file.")?
++            .into();
++        let parent = path
++            .parent()
++            .filter(|p| !p.as_os_str().is_empty())
++            .unwrap_or(Path::new("."));
++        let absolute = std::path::absolute(parent).map_err(|e| e.to_string())?;
++        let root = absolute.ancestors().last().ok_or("Invalid game folder.")?;
++        let mut dir =
++            Dir::open_ambient_dir(root, cap_std::ambient_authority()).map_err(|e| e.to_string())?;
++        for component in absolute
++            .strip_prefix(root)
++            .map_err(|e| e.to_string())?
++            .components()
++        {
++            let std::path::Component::Normal(name) = component else {
++                return Err("Choose a folder without parent traversal.".into());
++            };
++            dir = dir
++                .open_dir_nofollow(name)
++                .map_err(|e| format!("Game folders must be real directories: {e}"))?;
++        }
++        Ok(Self { dir, name })
++    }
++    fn exists(&self) -> Result<bool, String> {
++        match self.dir.symlink_metadata(&self.name) {
++            Ok(m) if m.is_file() && !m.file_type().is_symlink() => Ok(true),
++            Ok(_) => Err("Choose a regular file; links and devices are not supported.".into()),
++            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
++            Err(e) => Err(e.to_string()),
++        }
++    }
++    fn write(&self, bytes: &[u8], overwrite: bool) -> Result<(), String> {
++        if bytes.len() > MAX_BYTES {
++            return Err("Saved game exceeds the size limit.".into());
++        }
++        // Anchor staging and publication to the same opened directory, even if
++        // an ancestor is renamed while the file chooser/overwrite dialog is open.
++        let mut random = [0u8; 16];
++        getrandom::fill(&mut random).map_err(|e| e.to_string())?;
++        let temp = format!(
++            ".termcraft-game-{}.tmp",
++            random
++                .iter()
++                .map(|b| format!("{b:02x}"))
++                .collect::<String>()
++        );
++        let mut options = OpenOptions::new();
++        options
++            .write(true)
++            .create_new(true)
++            .follow(FollowSymlinks::No);
++        let mut file = self
++            .dir
++            .open_with(&temp, &options)
++            .map_err(|e| e.to_string())?;
++        let result = (|| {
++            file.write_all(bytes)?;
++            file.sync_all()?;
++            drop(file);
++            if overwrite {
++                // Revalidate the destination after consent. rename replaces the
++                // directory entry and never follows a final symlink.
++                if !self.exists().map_err(std::io::Error::other)? {
++                    return Err(std::io::Error::other(
++                        "The target changed; choose Save again.",
++                    ));
++                }
++                self.dir.rename(&temp, &self.dir, &self.name)?;
++            } else {
++                // Atomic no-clobber publication; a racing creator is preserved.
++                self.dir.hard_link(&temp, &self.dir, &self.name)?;
++            }
++            Ok(())
++        })();
++        let _ = self.dir.remove_file(&temp);
++        result.map_err(|e: std::io::Error| e.to_string())
++    }
++}
++fn read(path: &Path) -> Result<Vec<u8>, String> {
++    let target = Target::new(path)?;
++    if !target.exists()? {
++        return Err("Game file was removed.".into());
++    }
++    let mut options = OpenOptions::new();
++    options.read(true).follow(FollowSymlinks::No);
++    #[cfg(unix)]
++    {
++        use cap_std::fs::OpenOptionsExt;
++        options.custom_flags(libc::O_NONBLOCK);
++    }
++    let file = target
++        .dir
++        .open_with(&target.name, &options)
++        .map_err(|e| e.to_string())?;
++    let metadata = file.metadata().map_err(|e| e.to_string())?;
++    if !metadata.is_file() || metadata.len() > MAX_BYTES as u64 {
++        return Err("Expected a regular game file within 256 KiB.".into());
++    }
++    let mut bytes = Vec::new();
++    file.take(MAX_BYTES as u64 + 1)
++        .read_to_end(&mut bytes)
++        .map_err(|e| e.to_string())?;
++    if bytes.len() > MAX_BYTES {
++        return Err("Game file exceeds 256 KiB.".into());
++    }
++    Ok(bytes)
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use harbor_workspace::games::{GameId, GameRegistry};
++    #[test]
++    fn save_ui_files_bounded_atomic_no_clobber_and_links() {
++        let root = tempfile::tempdir().unwrap();
++        let path = root.path().join("game");
++        let target = Target::new(&path).unwrap();
++        target.write(b"old", false).unwrap();
++        assert!(target.write(b"new", false).is_err());
++        assert_eq!(read(&path).unwrap(), b"old");
++        target.write(b"new", true).unwrap();
++        assert_eq!(read(&path).unwrap(), b"new");
++        assert!(target.write(&vec![0; MAX_BYTES + 1], true).is_err());
++        assert_eq!(read(&path).unwrap(), b"new");
++        std::fs::write(&path, vec![0; MAX_BYTES + 1]).unwrap();
++        assert!(read(&path).is_err());
++        #[cfg(unix)]
++        {
++            let link = root.path().join("link");
++            std::os::unix::fs::symlink(&path, &link).unwrap();
++            assert!(read(&link).is_err());
++            let folder_link = root.path().join("folder-link");
++            std::os::unix::fs::symlink(root.path(), &folder_link).unwrap();
++            assert!(read(&folder_link.join("game")).is_err());
++            assert!(read(root.path()).is_err());
++            assert!(Target::new(&link).unwrap().write(b"bad", true).is_err());
++        }
++    }
++    #[test]
++    fn save_ui_completions_preserve_newer_revisions_and_generations() {
++        let mut files = Files::default();
++        let mut message = String::new();
++        files.changed();
++        files.complete(
++            Completion {
++                generation: 0,
++                revision: 0,
++                result: Ok(Done::Saved),
++            },
++            &mut message,
++        );
++        assert!(files.dirty());
++        assert!(message.contains("newer"));
++        let game = GameRegistry::start(GameId::Netwalk, 1);
++        assert!(
++            files
++                .complete(
++                    Completion {
++                        generation: 0,
++                        revision: 0,
++                        result: Ok(Done::Loaded(game.clone()))
++                    },
++                    &mut message
++                )
++                .is_none()
++        );
++        assert!(matches!(files.pending, Some(Action::Adopt(_))));
++        files.replaced();
++        let before = message.clone();
++        assert!(
++            files
++                .complete(
++                    Completion {
++                        generation: 0,
++                        revision: 0,
++                        result: Ok(Done::Loaded(game))
++                    },
++                    &mut message
++                )
++                .is_none()
++        );
++        assert_eq!(message, before);
++        files.changed();
++        files.complete(
++            Completion {
++                generation: 1,
++                revision: 1,
++                result: Ok(Done::Saved),
++            },
++            &mut message,
++        );
++        assert!(!files.dirty());
++    }
++}
+--- a/src/ui/session_confirmations.rs
++++ b/src/ui/session_confirmations.rs
+@@ -271,6 +271,7 @@
+         }
+     }
+     pub(super) fn request_window_session_close(&mut self, ctx: &Context) {
++        if self.intercept_game_exit(ctx) { return; }
+         let mut controller = CloseController::default();
+         if controller.begin(
+             self.tabs.iter().any(TerminalTab::running),
+@@ -288,6 +289,9 @@
+     }
+     pub(super) fn intercept_session_close(&mut self, ctx: &Context) {
+         if self.block_import_close(ctx) {
++            return;
++        }
++        if ctx.input(|i| i.viewport().close_requested()) && self.intercept_game_exit(ctx) {
+             return;
+         }
+         if ctx.input(|i| i.viewport().close_requested())
+@@ -338,6 +342,7 @@
+                 }
+             }
+             CloseTarget::Window => {
++                if self.intercept_game_exit(ctx) { return; }
+                 if self.remote_documents_block_close(None) {
+                     self.begin_ftp_document_close(None);
+                     self.allow_remote_exit = false;

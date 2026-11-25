@@ -1,0 +1,66 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-b05-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b05)
+warning: methods `send` and `poll` are never used
+   --> src/ui.rs:161:8
+    |
+143 | impl TerminalTab {
+    | ---------------- methods in this implementation
+...
+161 |     fn send(&mut self, data: &[u8]) {
+    |        ^^^^
+...
+205 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+    --> src/ui/shared_sessions.rs:691:19
+     |
+ 640 | impl Workspace {
+     | -------------- methods in this implementation
+...
+ 691 |     pub(super) fn shared_sources_busy(&self) -> bool {
+     |                   ^^^^^^^^^^^^^^^^^^^
+...
+1006 |     pub(super) fn refresh_shared_source_with(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.70s
+     Running tests/desktop_integration.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/desktop_integration-c7bf7a5a21f3a2da)
+
+running 1 test
+
+thread 'received_link_fifo_is_rejected_without_blocking' (575150) panicked at tests/desktop_integration.rs:35:57:
+a nonregular bookmark must not block startup: Timeout
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test received_link_fifo_is_rejected_without_blocking ... FAILED
+
+failures:
+
+failures:
+    received_link_fifo_is_rejected_without_blocking
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.50s
+
+error: test failed, to rerun pass `--test desktop_integration`

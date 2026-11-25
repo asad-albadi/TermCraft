@@ -1,0 +1,296 @@
+[
+  {
+    "label": "clean-image-id",
+    "command": [
+      "docker",
+      "image",
+      "inspect",
+      "debian:bookworm",
+      "--format",
+      "{{.Id}}"
+    ],
+    "exit_code": 0,
+    "seconds": 0.06
+  },
+  {
+    "label": "clean-image-inspect",
+    "command": [
+      "docker",
+      "image",
+      "inspect",
+      "sha256:1d04200c2ece1d4d75a2a6f8e11ebce7d86a2ae28b34bb2c9cbb3ee9f4953e75"
+    ],
+    "exit_code": 0,
+    "seconds": 0.041
+  },
+  {
+    "label": "container-create",
+    "command": [
+      "docker",
+      "run",
+      "-d",
+      "--name",
+      "termcraft-p08-native-clean-install",
+      "--label",
+      "org.termcraft.validation=p08-native-qualification",
+      "--pids-limit",
+      "256",
+      "--memory",
+      "3g",
+      "--cpus",
+      "2",
+      "--security-opt",
+      "no-new-privileges",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/p08-debian-native/qualification/input,dst=/input,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/p08-debian-native/build/verified-out,dst=/archive,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/p08-debian-native/qualification/out,dst=/packages,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/p08-debian-native/qualification/installed-smoke.py,dst=/installed-smoke.py,readonly",
+      "--mount",
+      "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/P08/debian-native/qualification,dst=/evidence",
+      "sha256:1d04200c2ece1d4d75a2a6f8e11ebce7d86a2ae28b34bb2c9cbb3ee9f4953e75",
+      "sleep",
+      "infinity"
+    ],
+    "exit_code": 0,
+    "seconds": 0.451
+  },
+  {
+    "label": "clean-baseline",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "sh",
+      "-c",
+      "cat /etc/os-release; dpkg-query -W; test ! -e /opt/termcraft; test ! -e /usr/bin/termcraft"
+    ],
+    "exit_code": 0,
+    "seconds": 0.057
+  },
+  {
+    "label": "apt-update",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "apt-get",
+      "update"
+    ],
+    "exit_code": 0,
+    "seconds": 3.558
+  },
+  {
+    "label": "package-install",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "apt-get",
+      "install",
+      "-y",
+      "--no-install-recommends",
+      "/packages/termcraft_0.1.0_amd64.deb"
+    ],
+    "exit_code": 0,
+    "seconds": 15.542
+  },
+  {
+    "label": "installed-dependency-audit",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "sh",
+      "-c",
+      "dpkg-query -s termcraft; dpkg --audit; dpkg -V termcraft; ldd /usr/bin/termcraft; ldd /opt/termcraft/termcraft-rdp-engine"
+    ],
+    "exit_code": 0,
+    "seconds": 0.234
+  },
+  {
+    "label": "test-tools-install",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "apt-get",
+      "install",
+      "-y",
+      "--no-install-recommends",
+      "python3",
+      "python3-pil",
+      "xvfb",
+      "xauth",
+      "fonts-dejavu-core",
+      "fontconfig"
+    ],
+    "exit_code": 0,
+    "seconds": 15.172
+  },
+  {
+    "label": "installed-packages",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "dpkg-query",
+      "-W"
+    ],
+    "exit_code": 0,
+    "seconds": 0.052
+  },
+  {
+    "label": "network-isolation",
+    "command": [
+      "docker",
+      "network",
+      "disconnect",
+      "bridge",
+      "termcraft-p08-native-clean-install"
+    ],
+    "exit_code": 0,
+    "seconds": 0.085
+  },
+  {
+    "label": "network-state",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "sh",
+      "-c",
+      "cat /proc/net/route; cat /proc/net/dev"
+    ],
+    "exit_code": 0,
+    "seconds": 0.049
+  },
+  {
+    "label": "prepare-isolation",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "sh",
+      "-c",
+      "mkdir -p /tmp/qualification-home /tmp/qualification-runtime /evidence/portable; rmdir /evidence/portable; chmod 700 /tmp/qualification-runtime; printf \"retained user workspace\\n\" > /tmp/qualification-home/user-sentinel.txt; chown -R 1000:1000 /tmp/qualification-home /tmp/qualification-runtime /evidence; setpriv --reuid=1000 --regid=1000 --clear-groups sh -c \"Xvfb :99 -screen 0 1280x800x24 -nolisten tcp > /evidence/xvfb.log 2>&1 &\""
+    ],
+    "exit_code": 0,
+    "seconds": 0.056
+  },
+  {
+    "label": "portable-startup",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "python3",
+      "/input/scripts/package-check-startup.py",
+      "/archive/TermCraft-0.1.0-linux-x86_64.tar.gz",
+      "--evidence",
+      "/evidence/portable",
+      "--display",
+      ":99"
+    ],
+    "exit_code": 0,
+    "seconds": 5.394
+  },
+  {
+    "label": "installed-startup",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "setpriv",
+      "--reuid=1000",
+      "--regid=1000",
+      "--clear-groups",
+      "env",
+      "HOME=/tmp/qualification-home",
+      "XDG_RUNTIME_DIR=/tmp/qualification-runtime",
+      "DISPLAY=:99",
+      "LIBGL_ALWAYS_SOFTWARE=1",
+      "python3",
+      "/installed-smoke.py"
+    ],
+    "exit_code": 0,
+    "seconds": 4.487
+  },
+  {
+    "label": "userdata-before-remove",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "sh",
+      "-c",
+      "find /tmp/qualification-home -type f -exec sha256sum {} +"
+    ],
+    "exit_code": 0,
+    "seconds": 0.051
+  },
+  {
+    "label": "uninstall",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "apt-get",
+      "remove",
+      "-y",
+      "termcraft"
+    ],
+    "exit_code": 0,
+    "seconds": 1.096
+  },
+  {
+    "label": "uninstall-preservation",
+    "command": [
+      "docker",
+      "exec",
+      "termcraft-p08-native-clean-install",
+      "sh",
+      "-c",
+      "test ! -e /usr/bin/termcraft; test ! -e /opt/termcraft; test \"$(cat /tmp/qualification-home/user-sentinel.txt)\" = \"retained user workspace\"; find /tmp/qualification-home -type f -exec sha256sum {} +; dpkg --audit"
+    ],
+    "exit_code": 0,
+    "seconds": 0.063
+  },
+  {
+    "label": "cleanup-container",
+    "command": [
+      "docker",
+      "rm",
+      "-f",
+      "termcraft-p08-native-clean-install"
+    ],
+    "exit_code": 0,
+    "seconds": 0.347
+  },
+  {
+    "label": "cleanup-inventory",
+    "command": [
+      "docker",
+      "ps",
+      "-a",
+      "--filter",
+      "label=org.termcraft.validation=p08-native-qualification",
+      "--format",
+      "{{.ID}} {{.Names}}"
+    ],
+    "exit_code": 0,
+    "seconds": 0.017
+  }
+]

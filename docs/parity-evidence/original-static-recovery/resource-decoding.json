@@ -1,0 +1,32 @@
+[
+  {
+    "resource": "MOBASE",
+    "source_offset": "0x89fb00",
+    "source_bytes": 2555942,
+    "source_sha256": "0fbf4ed21a3c4082311a820467ddc51e05d8d7232fa4a386be6f5c48ccdd5e01",
+    "lzma_properties": "33010000017746e80000000000",
+    "declared_decoded_size": 15222391,
+    "exit_code": 2,
+    "stderr": "ERROR: /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/original-static-recovery/MOBASE.lzma\n/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/original-static-recovery/MOBASE.lzma\nOpen ERROR: Cannot open the file as [lzma] archive\n\n\nERRORS:\nIs not archive\n",
+    "decoded_bytes": 0,
+    "final_decoded_bytes": 15222391,
+    "final_decoded_sha256": "e5d99b7e85f95ce7bd06dc792c19d5e033864b6b7bdba6751dc9b03233cd1b82",
+    "final_method": "SDK LzmaDecode 25.01, exact declared output length and res=0,status=4 (MAYBE_FINISHED_WITHOUT_MARK)",
+    "archive_crc_integrity": "See MOBASE.catalog.json; 21 of 56 member CRCs mismatch, including stgames.exe. Static bytes retained with SHA only; no execution."
+  },
+  {
+    "resource": "XW",
+    "source_offset": "0xb3c914",
+    "source_bytes": 4093338,
+    "source_sha256": "8f6cea7542a5a88f6b63a4daa8e8cbc946751b2dd626e6e4c6a5c1abbe7a9b8d",
+    "lzma_properties": "30010000024231ae0100000000",
+    "declared_decoded_size": 28193090,
+    "exit_code": 2,
+    "stderr": "ERROR: /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/original-static-recovery/XW.lzma\n/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/original-static-recovery/XW.lzma\nOpen ERROR: Cannot open the file as [lzma] archive\n\n\nERRORS:\nIs not archive\n",
+    "decoded_bytes": 0,
+    "final_decoded_bytes": 28193090,
+    "final_decoded_sha256": "445fe0bf3b2693971c2b50ea3768df20dad6b17e12f20c3ffac1791eec49a465",
+    "final_method": "Python lzma.FORMAT_ALONE, explicit memlimit 256MiB",
+    "archive_crc_integrity": "catalog only"
+  }
+]

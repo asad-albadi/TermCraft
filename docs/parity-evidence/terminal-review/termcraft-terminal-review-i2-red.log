@@ -1,0 +1,64 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `request_clipboard_with` found for struct `ui::Workspace` in the current scope
+   --> src/ui/terminal_review_tests.rs:90:58
+    |
+ 90 |     let(send,receive)=std::sync::mpsc::sync_channel(1);w.request_clipboard_with(a,&ctx,move||receive.recv().map_err(|_|"owned clipb...
+    |                                                          ^^^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:326:1
+    |
+326 | pub struct Workspace {
+    | -------------------- method `request_clipboard_with` not found for this struct
+
+error[E0599]: no method named `poll_clipboard` found for struct `ui::Workspace` in the current scope
+   --> src/ui/terminal_review_tests.rs:92:124
+    |
+ 92 | ..._empty() && Instant::now()<deadline {w.poll_clipboard();for tab in &mut w.tabs{tab.tick_paste(Instant::now());tab.poll();}std::t...
+    |                                           ^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:326:1
+    |
+326 | pub struct Workspace {
+    | -------------------- method `poll_clipboard` not found for this struct
+
+error[E0609]: no field `clipboard_busy` on type `ui::Workspace`
+  --> src/ui/terminal_review_tests.rs:94:13
+   |
+94 |     while w.clipboard_busy.load(std::sync::atomic::Ordering::Acquire){std::thread::yield_now();}
+   |             ^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 54 others
+
+error[E0599]: no method named `request_clipboard_with` found for struct `ui::Workspace` in the current scope
+   --> src/ui/terminal_review_tests.rs:95:76
+    |
+ 95 | ...std::sync::mpsc::sync_channel(1);w.request_clipboard_with(a,&ctx,move||receive.recv().map_err(|_|"owned clipboard provider close...
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:326:1
+    |
+326 | pub struct Workspace {
+    | -------------------- method `request_clipboard_with` not found for this struct
+
+error[E0609]: no field `clipboard_busy` on type `ui::Workspace`
+  --> src/ui/terminal_review_tests.rs:96:132
+   |
+96 | ...ine=Instant::now()+Duration::from_secs(2);while w.clipboard_busy.load(std::sync::atomic::Ordering::Acquire) && Instant::now()<dea...
+   |                                                      ^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 54 others
+
+error[E0599]: no method named `poll_clipboard` found for struct `ui::Workspace` in the current scope
+   --> src/ui/terminal_review_tests.rs:97:7
+    |
+ 97 |     w.poll_clipboard();w.tabs[0].tick_paste(Instant::now());w.tabs[0].poll();assert_eq!(w.tabs[0].id,b);assert!(captured(&w.tabs[0]...
+    |       ^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:326:1
+    |
+326 | pub struct Workspace {
+    | -------------------- method `poll_clipboard` not found for this struct
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 6 previous errors

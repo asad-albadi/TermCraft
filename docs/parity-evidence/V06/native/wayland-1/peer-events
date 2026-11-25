@@ -1,0 +1,6 @@
+[WindowFocused(true), ModifiersChanged(Modifiers::NONE)]
+[ModifiersChanged(Modifiers::NONE), WindowFocused(false)]
+[WindowFocused(true), ModifiersChanged(Modifiers::NONE)]
+[ModifiersChanged(Modifiers { ctrl: true, command: true }), ModifiersChanged(Modifiers { ctrl: true, command: true }), Paste("V06 Unicode: 日本語 café Ελληνικά 🦀\nsecond line\nthird line")]
+[Key { key: V, physical_key: Some(Escape), pressed: false, repeat: false, modifiers: Modifiers { ctrl: true, command: true } }, ModifiersChanged(Modifiers::NONE)]
+[ModifiersChanged(Modifiers::NONE), WindowFocused(false)]

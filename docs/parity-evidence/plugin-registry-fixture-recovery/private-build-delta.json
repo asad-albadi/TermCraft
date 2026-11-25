@@ -1,0 +1,14 @@
+{
+  "Cargo.lock": {
+    "base": "505f6d86e9b4d71504fec28af55ca21fdcd7b745071f7052a01464eaa0f0f511",
+    "candidate": "84970f2187c8db0aa3e675f44276159b20c9c65f13b97d6b3e9bda018eb9e801"
+  },
+  "Cargo.toml": {
+    "base": "bc1b732f7bcb0cdecc5484aa2a8910413960c210770eb49fb968f240e3cb2abb",
+    "candidate": "d09bbe9eeeeb0dd910f918366d46e7a481537d081f0cca1822a11d9e541b0d84"
+  },
+  "src/plugins/registry.rs": {
+    "base": "955c2b5340cea52dea9f69b984f5c149409f25950e0a28dee255e4845df07883",
+    "candidate": "6e0dbe8fe7511de237c9d90630817106a4bf4949fc31f3c024ada8614ec89144"
+  }
+}

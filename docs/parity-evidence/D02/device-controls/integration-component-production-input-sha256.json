@@ -1,0 +1,10 @@
+{
+  "engines/rdp/src/devices.rs": "0c0bbf826239b2883afed7cf100c9e83f39658a5eb0e58aa3a92d550f8faca56",
+  "src/desktop/options.rs": "6ee2ed2025a617b4565a0fabeaf44d3a8c34aed4e743cafc95e5422661542d4d",
+  "engines/rdp/src/serial.rs": "87b0c5ca792b2703d3d190ffe8d7ecdba25290ba32dad80978487d35fd254efb",
+  "engines/rdp/src/serial_windows.rs": "69252c515c77dbf37865f2177f2f92169a95910985241c9af7f6d1a0bcf58f22",
+  "engines/rdp/src/serial_completion.rs": "1c3fe86501b75d796a397a0b25345dc33e36d96d76962fb9f7424b9070c92fbd",
+  "engines/rdp/src/native_file_windows.rs": "08b06604cfd79b0a5692f651c0048991fb1c3e09eb6b9e0da890d78ee33d6835",
+  "engines/rdp/src/native_file_macos.rs": "4002f76168b7482b34afa3a611f6274dfdf8b4cf3443aee3a263ee8e68a2ee93",
+  "generated-drives.rs": "74920da79c7eba784bc3c8e3328d1b6f0a3e6886a4bcbea331f618449cc31f50"
+}

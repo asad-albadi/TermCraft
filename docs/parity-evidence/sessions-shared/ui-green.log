@@ -1,0 +1,11 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.85s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-adadb0d45ff5e648)
+
+running 3 tests
+test ui::shared_sessions::tests::cancelled_source_prompt_cannot_send_values_to_a_later_refresh ... ok
+test ui::shared_sessions::tests::source_definition_rows_are_painted_with_readonly_and_stale_text ... ok
+test ui::shared_sessions::tests::readonly_source_cache_survives_restart_and_never_overwrites_local_names ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 80 filtered out; finished in 2.40s
+

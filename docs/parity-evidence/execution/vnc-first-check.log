@@ -1,0 +1,69 @@
+    Checking crypto-common v0.2.2
+    Checking digest v0.11.3
+    Checking cipher v0.5.2
+    Checking universal-hash v0.6.1
+    Checking hmac v0.13.0
+    Checking polyval v0.7.3
+    Checking aead v0.6.1
+    Checking ghash v0.6.0
+    Checking pbkdf2 v0.13.0
+    Checking aes v0.9.4
+    Checking ctr v0.10.1
+    Checking sha2 v0.11.1
+    Checking aes-gcm v0.11.1
+    Checking salsa20 v0.11.0
+    Checking cbc v0.2.1
+    Checking signature v3.0.0
+    Checking scrypt v0.12.0
+    Checking hkdf v0.13.0
+    Checking pkcs5 v0.8.1
+    Checking primefield v0.14.0
+    Checking wnaf v0.14.1
+    Checking pkcs8 v0.11.0
+    Checking rfc6979 v0.6.0
+    Checking chacha20 v0.10.2
+    Checking elliptic-curve v0.14.3
+    Checking poly1305 v0.9.1
+    Checking ecdsa v0.17.0
+    Checking primeorder v0.14.0
+    Checking ssh-encoding v0.3.0
+    Checking ed25519 v3.0.0
+    Checking blowfish v0.10.0
+    Checking blake2 v0.11.0
+    Checking curve25519-dalek v5.0.0
+    Checking argon2 v0.6.0
+    Checking bcrypt-pbkdf v0.11.0
+    Checking ssh-cipher v0.3.0
+    Checking p384 v0.14.0
+    Checking ed25519-dalek v3.0.0
+    Checking p256 v0.14.0
+    Checking p521 v0.14.0
+    Checking rand v0.10.4
+    Checking rsa v0.10.0
+    Checking shake v0.1.0
+    Checking sha3 v0.12.0
+    Checking sha1 v0.11.0
+    Checking kem v0.3.0
+    Checking ml-kem v0.3.4
+    Checking num-bigint v0.5.1
+    Checking ssh-key v0.7.0-rc.12
+    Checking russh-cryptovec v0.62.0
+    Checking chacha20poly1305 v0.11.0
+    Checking des v0.9.0
+    Checking russh v0.65.4
+    Checking harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0509]: cannot move out of type `desktop::DesktopInput`, which implements the `Drop` trait
+   --> src/desktop/vnc.rs:141:19
+    |
+141 |             match rx.rx.try_recv() {
+    |                   ^^^^^^^^^^^^^^^^ cannot move out of here
+142 |                 Ok(QueuedInput { input: DesktopInput::Authenticate { password, .. }, .. }) => {
+    |                                                                      -------- data moved here because `password` has type `Secret`, which does not implement the `Copy` trait
+    |
+help: consider borrowing the pattern binding
+    |
+142 |                 Ok(QueuedInput { input: DesktopInput::Authenticate { ref password, .. }, .. }) => {
+    |                                                                      +++
+
+For more information about this error, try `rustc --explain E0509`.
+error: could not compile `harbor-workspace` (lib) due to 1 previous error

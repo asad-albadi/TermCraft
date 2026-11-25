@@ -1,0 +1,32 @@
+EEE
+======================================================================
+ERROR: test_external_launcher_survives_relocation_and_preserves_literal_argv (__main__.DesktopTests.test_external_launcher_survives_relocation_and_preserves_literal_argv)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b05/scripts/test-desktop-integration.py", line 15, in test_external_launcher_survives_relocation_and_preserves_literal_argv
+    data=base/'data with % spaces';integration=desktop.DesktopIntegration(data,package);integration.install_user();shutil.rmtree(package)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'desktop' has no attribute 'DesktopIntegration'
+
+======================================================================
+ERROR: test_integration_removal_keeps_user_defaults (__main__.DesktopTests.test_integration_removal_keeps_user_defaults)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b05/scripts/test-desktop-integration.py", line 9, in test_integration_removal_keeps_user_defaults
+    integration=desktop.DesktopIntegration(data,package); integration.install_user();self.assertTrue(integration.status());integration.remove_user();self.assertFalse(integration.status()); self.assertEqual(defaults.read_bytes(),original)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'desktop' has no attribute 'DesktopIntegration'
+
+======================================================================
+ERROR: test_modified_owned_file_blocks_removal (__main__.DesktopTests.test_modified_owned_file_blocks_removal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b05/scripts/test-desktop-integration.py", line 27, in test_modified_owned_file_blocks_removal
+    integration=desktop.DesktopIntegration(data,package);integration.install_user();menu=data/'applications/org.termcraft.TermCraft.desktop';menu.write_text('user replacement')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'desktop' has no attribute 'DesktopIntegration'
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.008s
+
+FAILED (errors=3)

@@ -1,0 +1,9 @@
+solo-intersection True
+solo-set True
+solo-fish True
+solo-forcing True
+map-forcing True
+killer-sum-table True
+jigsaw-regions True
+killer-45-residual True
+killer-completion-sum True

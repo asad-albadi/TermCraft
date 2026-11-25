@@ -1,0 +1,12 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-e03-cron-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-cron)
+error[E0609]: no field `last_result` on type `CronJobStatus`
+   --> src/services/cron/tests.rs:252:93
+    |
+252 |     let status=supervisor.status(id).unwrap();assert!(status.cron.as_ref().unwrap().jobs[0].last_result.as_ref().unwrap().contains(...
+    |                                                                                             ^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `id`, `enabled`, `next_run`, `last_event`
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `harbor-workspace` (lib test) due to 1 previous error

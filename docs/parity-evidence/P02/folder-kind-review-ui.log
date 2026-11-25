@@ -1,0 +1,60 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0425]: cannot find type `Path` in this scope
+   --> src/ui/macro_events.rs:119:34
+    |
+119 | pub(super) fn read_import(path: &Path) -> Result<Vec<Macro>, String> {
+    |                                  ^^^^ not found in this scope
+    |
+help: consider importing this struct
+    |
+  1 + use std::path::Path;
+    |
+
+error[E0063]: missing field `script` in initializer of `harbor_workspace::model::Macro`
+   --> src/ui/pages.rs:771:428
+    |
+771 | ...ve];if t.recording{t.recording=false;self.macro_form=Macro{name:"Recorded input".into(),text:std::mem::take(&mut t.recorded),app...
+    |                                                         ^^^^^ missing `script`
+
+error[E0599]: no method named `macro_ready` found for reference `&ui::desktop::State` in the current scope
+   --> src/ui/macro_events.rs:140:25
+    |
+140 |                 desktop.macro_ready()
+    |                         ^^^^^^^^^^^ method not found in `&ui::desktop::State`
+
+error[E0609]: no field `macro_capture` on type `&mut ui::desktop::State`
+   --> src/ui/macro_events.rs:166:26
+    |
+166 |             &mut desktop.macro_capture
+    |                          ^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `handle`, `message`, `error`, `connected`, `fullscreen_pending` ... and 4 others
+
+error[E0599]: no method named `play_macro_action` found for mutable reference `&mut ui::desktop::State` in the current scope
+   --> src/ui/macro_events.rs:228:37
+    |
+228 |                     let _ = desktop.play_macro_action(action);
+    |                                     ^^^^^^^^^^^^^^^^^ method not found in `&mut ui::desktop::State`
+
+error[E0599]: no method named `macro_focused` found for reference `&ui::desktop::State` in the current scope
+   --> src/ui/macro_events.rs:292:39
+    |
+292 |                     |desktop| desktop.macro_focused(),
+    |                                       ^^^^^^^^^^^^^ method not found in `&ui::desktop::State`
+
+error[E0599]: no method named `play_macro_action` found for mutable reference `&mut ui::desktop::State` in the current scope
+   --> src/ui/macro_events.rs:302:41
+    |
+302 |                         let _ = desktop.play_macro_action(action);
+    |                                         ^^^^^^^^^^^^^^^^^ method not found in `&mut ui::desktop::State`
+
+error[E0599]: no method named `play_macro_action` found for mutable reference `&mut ui::desktop::State` in the current scope
+   --> src/ui/macro_events.rs:310:25
+    |
+310 |                 desktop.play_macro_action(action)?;
+    |                         ^^^^^^^^^^^^^^^^^ method not found in `&mut ui::desktop::State`
+
+Some errors have detailed explanations: E0063, E0425, E0599, E0609.
+For more information about an error, try `rustc --explain E0063`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 8 previous errors

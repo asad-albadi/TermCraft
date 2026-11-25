@@ -1,0 +1,58 @@
+[
+  {
+    "lane": "mac",
+    "path": "src/services/vnc.rs",
+    "conflict_count": 1,
+    "before_sha256": "b6712697e7a77c4a2b55b7e652c8f31a37aa4f3d86c26cb307c739deeecbacd9",
+    "approved_lane_sha256": "b5a9b3facacc2f3e38fecff256ee1575b6481044fad57674920109b6ec7de94c"
+  },
+  {
+    "lane": "mac",
+    "path": "src/ui/managed_vnc.rs",
+    "conflict_count": 2,
+    "before_sha256": "37ca79c3ee3934521a2d77bf61a3e4f0282850dd56450ad0200cb9defef5861a",
+    "approved_lane_sha256": "472e6fddef2e0cfe7b9e681d24c785d889e519ceb0cc2cff527b9896f2d98513"
+  },
+  {
+    "lane": "mac",
+    "path": "Cargo.toml",
+    "conflict_count": 0,
+    "before_sha256": "9f4c8a25bec10eba8eddfff1219a8254b0c6589f06623427ba389e6c7d33e5d6",
+    "approved_lane_sha256": "31f7ac89cd3ed8f489358da1f7432da74165212d36538e1a63c2efc7835846c9"
+  },
+  {
+    "lane": "browser",
+    "path": "src/services/vnc.rs",
+    "conflict_count": 0,
+    "before_sha256": "b35d2e557fd180c5430dbc72a03d68a312c0c37f7f66479340755cb06581bc4f",
+    "approved_lane_sha256": "3f5088ffa120b779a1b94412cf8a667ced5f8d78ea0e43c6f68930e7ab6b0497"
+  },
+  {
+    "lane": "browser",
+    "path": "src/services/supervisor.rs",
+    "conflict_count": 0,
+    "before_sha256": "6e39cd903d65ad6d6c4a4480aa542e3f55e0a3e298d9512e9d74408408ecd65e",
+    "approved_lane_sha256": "70fb2ab368fa263712a15bdd77ad13a05d233196ea6830f3e6b7c1befad0863a"
+  },
+  {
+    "lane": "browser",
+    "path": "src/ui/managed_vnc.rs",
+    "conflict_count": 2,
+    "before_sha256": "407e56c7daab7342a85e40fc90eb0427e81d93b367cd068dcb63936f1b00b4c1",
+    "approved_lane_sha256": "576b7c74bf813b0108f4e1c855522daf047db4d7002009e4fc5fb865da837f10"
+  },
+  {
+    "lane": "browser",
+    "path": "scripts/package-release.py",
+    "conflict_count": 2,
+    "before_sha256": "bec05e215e685b1dd9721ce28dd57ce86a2b511a66f787337b24a002f3bc7677",
+    "approved_lane_sha256": "500f0c55b3ac6688ef74af4d46f203fe56ffc1c34f586cf5882f3ce92a87e779"
+  },
+  {
+    "lane": "browser",
+    "path": "CREDITS.md",
+    "conflict_count": 0,
+    "before_sha256": "1b4b645b286ac466eaf83cd2cb12ebe653f4ae11b6bf8c686b6ad47d5eb5988c",
+    "approved_lane_sha256": "3bc9bbff7a2d0a9fd9dc3ea199700d3db21633848e86d477ddd72b3f2c3813fd"
+  }
+]

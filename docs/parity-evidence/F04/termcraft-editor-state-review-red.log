@@ -1,0 +1,26 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.19s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-7391643cbe6d2a78)
+
+running 2 tests
+
+thread 'remote_files::editor::review_tests::earlier_job_completion_cannot_finish_a_new_save' (249215) panicked at src/remote_files/editor.rs:315:9:
+assertion `left == right` failed
+  left: Failed("earlier failure")
+ right: Saving
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'remote_files::editor::review_tests::full_document_queue_is_retryable_and_keeps_local_recovery' (249216) panicked at src/remote_files/editor.rs:325:9:
+Disconnected
+test remote_files::editor::review_tests::earlier_job_completion_cannot_finish_a_new_save ... FAILED
+test remote_files::editor::review_tests::full_document_queue_is_retryable_and_keeps_local_recovery ... FAILED
+
+failures:
+
+failures:
+    remote_files::editor::review_tests::earlier_job_completion_cannot_finish_a_new_save
+    remote_files::editor::review_tests::full_document_queue_is_retryable_and_keeps_local_recovery
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

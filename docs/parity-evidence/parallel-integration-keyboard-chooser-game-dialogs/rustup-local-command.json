@@ -1,0 +1,14 @@
+{
+  "command": [
+    "rustup",
+    "toolchain",
+    "install",
+    "1.99.1",
+    "--profile",
+    "minimal",
+    "--no-self-update"
+  ],
+  "RUSTUP_HOME": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1991",
+  "scope": "Workspace-only compiler install; no user/default toolchain or source/dependency pin changes. Installed1.95 below nfsembed declared1.96 MSRV. Clean1.99.1 isolates current1.99.0 compiler failure.",
+  "official_release": "https://blog.rust-lang.org/2026/10/15/Rust-1.99.1/"
+}

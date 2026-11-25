@@ -1,0 +1,42 @@
+{
+  "original_manifest_sha256": "ce75ad3e9a22b0fb50ebf90f7d9ee85608e1acfcc7e5f0074387acd8fcd2a1c3",
+  "owned": {
+    "engines/rdp/src/devices.rs": {
+      "main": "829015928973781608d6c4664b66a90f8b476fe2b2f9372c9f56993db3d17c86",
+      "fix": "30428532c73577b0d70999bdce9d80686b8754c2ffec3df5432c1e0344604366"
+    },
+    "engines/rdp/src/devices_tests.rs": {
+      "main": "9cb7e9b54ebbb9c01a357295fb62e2efcc2e990792adec79c2c0ee8ad3c25b31",
+      "fix": "74f25cd5e05d7d0a32da5d557ff2b70bf017829954e547c61ad0fb02c1f33d29"
+    },
+    "engines/rdp/src/serial.rs": {
+      "main": "2730a2be6382e93f2d0256a2390750e8605b0c92213a0064e92b8257e2d5f4de",
+      "fix": "709a83e09988d35ea0e4e2010167b1aeee5f8a9c201c63e82171bff1882f73b4"
+    }
+  },
+  "evidence": {
+    "COMMANDS.md": "b8806a3fdaa639e9b5e7bf4a5e5e9a3b4c2d8529c699d2b4b36b96f6f48df030",
+    "DESIGN.md": "c518c8c4c61882b39cdddda79b73791a19ea1a035eae945074c31d35e8d3be72",
+    "REPORT.md": "1e6afe23a1c7d3b42de36e658ff15a411d476f1b7f0dfa7abda30d265a0d89b5",
+    "freeze.py": "028d2c6c68fcf1a7c0ea201268fad5946183fdde3dc7618c23e423f3782198f7",
+    "red.log": "db81d9c6e9590927f2730806a26257aec4373bd06ce250d880cb52a983f9bf98",
+    "red-stats.log": "3351f0ffbfd55bb61203c865deaf6e79de7708da821538f3e2af49cd9f4df215",
+    "red-devices_tests.rs": "a4dd240bc32fce7e7abbf35247f2d95071c18d0baadcc5dc3d93ec5f5ea32e6f",
+    "red-serial.rs": "7c62e50f144b983dd7fa7f872032de23552c60188d182abae209acb51a57f3ea",
+    "green.log": "faf4d61bc18d849f95be02410f32acb00a09305ab5263c32a48632b142b058e4",
+    "green-full.log": "3fa9fc8727759e02f0fa56cd0395edf8c484e69bcb9f15ff6f6965fa317c01bd",
+    "mac-component.log": "b3d2282a6f097d7d7ae656d9a9dc516c6e68de5acf0d0ce4722cecfd478cb53f",
+    "format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fix1.patch": "e2e6d792c25165a774b08026516f125175e7dc7200a5746c2f9b067b8dcdc3cc",
+    "integration.patch": "1d7e31ff21b7f8851242a256d1a40dea78a53ea2b92d80b41a22bfd01e47f064",
+    "review-base-vs-fix-maps.json": "a434e13e0f74794586ad61cc0ba22ceaae27acb7d6e4fc49311f4db69623b06b",
+    "main-vs-cumulative-maps.json": "0212480b21964a67cfbe3d198e5001b43631ee05b9fcb0448d5ddbc73f1d5dc2",
+    "source/tests/rdp-native-component/production-input-sha256.json": "faafd956bafec492eec259a279c6445b2c1ff916ea4554a3c5a013e3d1087414"
+  },
+  "identity": {
+    "app": "termcraft-unix-control947",
+    "helper": "termcraft-rdp-unix-control947",
+    "component": "d02-unix-controls-component947",
+    "version": "0.1.947"
+  }
+}

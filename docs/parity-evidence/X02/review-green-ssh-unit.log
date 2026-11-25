@@ -1,0 +1,12 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.21s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-c95ec83546c98485)
+
+running 5 tests
+test ssh::x11::tests::authority_requires_matching_display_host_and_protocol ... ok
+test ssh::x11::tests::display_parser_rejects_remote_targets_and_port_overflow ... ok
+test ssh::x11::tests::rejects_wrong_cookie_and_oversized_handshakes ... ok
+test ssh::x11::tests::unauthorized_x11_never_connects_to_local_server ... ok
+test ssh::x11::tests::substitutes_only_verified_cookie_in_both_byte_orders ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 58 filtered out; finished in 0.00s
+

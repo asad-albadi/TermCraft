@@ -1,0 +1,9 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.96s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-8f24421c0b68d6f2)
+
+running 1 test
+test ui::gui_tests::ssh_directory_notices_follow_only_after_opt_in ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 22 filtered out; finished in 1.35s
+

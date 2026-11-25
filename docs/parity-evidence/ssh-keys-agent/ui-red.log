@@ -1,0 +1,79 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: unused import: `super::*`
+ --> src/ui/ssh_keys.rs:1:5
+  |
+1 | use super::*;
+  |     ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0599]: no method named `poll_ssh_keys` found for mutable reference `&mut ui::Workspace` in the current scope
+ --> src/ui/ssh_key_tests.rs:5:94
+  |
+5 | ...:now()+Duration::from_secs(10);loop{w.poll_ssh_keys(ctx);if !w.ssh_keys_busy(){break}assert!(Instant::now()<end);std::thread::slee...
+  |                                          ^^^^^^^^^^^^^ method not found in `&mut ui::Workspace`
+
+error[E0599]: no method named `ssh_keys_busy` found for mutable reference `&mut ui::Workspace` in the current scope
+ --> src/ui/ssh_key_tests.rs:5:119
+  |
+5 | ...s(10);loop{w.poll_ssh_keys(ctx);if !w.ssh_keys_busy(){break}assert!(Instant::now()<end);std::thread::sleep(Duration::from_millis(5...
+  |                                          ^^^^^^^^^^^^^ method not found in `&mut ui::Workspace`
+
+error[E0599]: no method named `start_owned_agent` found for struct `ui::Workspace` in the current scope
+   --> src/ui/ssh_key_tests.rs:8:42
+    |
+  8 |  let(ctx,root,mut w)=owned_workspace();w.start_owned_agent(&ctx);wait(&ctx,&mut w);assert!(w.owned_agent_endpoint().is_some());
+    |                                          ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:386:1
+    |
+386 | pub struct Workspace {
+    | -------------------- method `start_owned_agent` not found for this struct
+
+error[E0599]: no method named `owned_agent_endpoint` found for struct `ui::Workspace` in the current scope
+   --> src/ui/ssh_key_tests.rs:8:94
+    |
+  8 |  let(ctx,root,mut w)=owned_workspace();w.start_owned_agent(&ctx);wait(&ctx,&mut w);assert!(w.owned_agent_endpoint().is_some());
+    |                                                                                              ^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:386:1
+    |
+386 | pub struct Workspace {
+    | -------------------- method `owned_agent_endpoint` not found for this struct
+
+error[E0599]: no method named `add_agent_identity` found for struct `ui::Workspace` in the current scope
+   --> src/ui/ssh_key_tests.rs:10:4
+    |
+ 10 |  w.add_agent_identity(AgentTarget::Owned,PathBuf::from(&config.session.key),None,None,&ctx);wait(&ctx,&mut w);
+    |    ^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:386:1
+    |
+386 | pub struct Workspace {
+    | -------------------- method `add_agent_identity` not found for this struct
+
+error[E0599]: no method named `generate_key_bundle` found for struct `ui::Workspace` in the current scope
+   --> src/ui/ssh_key_tests.rs:19:96
+    |
+ 19 | ....path().join("gui generated key");w.generate_key_bundle(destination.clone(),KeySettings::default(),&ctx);wait(&ctx,&mut w);let g...
+    |                                        ^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:386:1
+    |
+386 | pub struct Workspace {
+    | -------------------- method `generate_key_bundle` not found for this struct
+
+error[E0599]: no method named `generated_key_paths` found for struct `ui::Workspace` in the current scope
+   --> src/ui/ssh_key_tests.rs:19:199
+    |
+ 19 | ...);wait(&ctx,&mut w);let generated=w.generated_key_paths().unwrap();assert!(generated.private.is_file());assert!(generated.public...
+    |                                        ^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:386:1
+    |
+386 | pub struct Workspace {
+    | -------------------- method `generated_key_paths` not found for this struct
+
+For more information about this error, try `rustc --explain E0599`.
+warning: `harbor-workspace` (bin "harbor-workspace" test) generated 1 warning
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 7 previous errors; 1 warning emitted

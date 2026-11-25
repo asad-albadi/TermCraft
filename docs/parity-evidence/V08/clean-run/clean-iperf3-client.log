@@ -1,0 +1,10 @@
+Connecting to host 127.0.0.1, port 25323
+[  5] local 127.0.0.1 port 34778 connected to 127.0.0.1 port 25323
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec   256 KBytes  2.10 Mbits/sec    0    639 KBytes       
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-1.00   sec   256 KBytes  2.10 Mbits/sec    0            sender
+[  5]   0.00-1.00   sec   256 KBytes  2.09 Mbits/sec                  receiver
+
+iperf Done.

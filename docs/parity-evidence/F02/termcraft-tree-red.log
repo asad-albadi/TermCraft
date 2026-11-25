@@ -1,0 +1,24 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.23s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-e34932d23f1e276b)
+
+running 1 test
+test recursive_transfer_preserves_names_bytes_and_symlink_cycles ... FAILED
+
+failures:
+
+---- recursive_transfer_preserves_names_bytes_and_symlink_cycles stdout ----
+
+thread 'recursive_transfer_preserves_names_bytes_and_symlink_cycles' (196619) panicked at tests/remote_transfers.rs:206:165:
+assertion `left == right` failed: TransferEvent { id: 1, bytes: 0, outcome: Some(Failed("Select a regular file; symlinks are not followed")), recovery: None }
+  left: Some(Failed("Select a regular file; symlinks are not followed"))
+ right: Some(Completed)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    recursive_transfer_preserves_names_bytes_and_symlink_cycles
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.23s
+
+error: test failed, to rerun pass `--test remote_transfers`

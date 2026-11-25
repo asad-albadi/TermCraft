@@ -1,0 +1,4500 @@
+--- /dev/null
++++ b/src/games/library.rs
+@@ -0,0 +1,238 @@
++//! Typed common catalog over the independently implemented pure cores.
++use super::{puzzles as p, terminal as t};
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum GameId {
++    Soliterm,
++    Termwalk,
++    Ctris,
++    Sudoku,
++    Nimesweeper,
++    Ninvaders,
++    Greed,
++    Netwalk,
++    Mines,
++    Solo,
++    Guess,
++    Map,
++    Untangle,
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct GameSpec {
++    pub id: GameId,
++    pub label: &'static str,
++    pub selector: &'static str,
++}
++pub struct GameRegistry;
++impl GameRegistry {
++    pub fn catalog() -> &'static [GameSpec] {
++        &[
++            GameSpec {
++                id: GameId::Soliterm,
++                label: "Soliterm",
++                selector: "soliterm",
++            },
++            GameSpec {
++                id: GameId::Termwalk,
++                label: "Termwalk",
++                selector: "termwalk",
++            },
++            GameSpec {
++                id: GameId::Ctris,
++                label: "Ctris",
++                selector: "ctris",
++            },
++            GameSpec {
++                id: GameId::Sudoku,
++                label: "Sudoku",
++                selector: "sudoku",
++            },
++            GameSpec {
++                id: GameId::Nimesweeper,
++                label: "Nimesweeper",
++                selector: "nimesweeper",
++            },
++            GameSpec {
++                id: GameId::Ninvaders,
++                label: "Ninvaders",
++                selector: "ninvaders",
++            },
++            GameSpec {
++                id: GameId::Greed,
++                label: "Greed",
++                selector: "greed",
++            },
++            GameSpec {
++                id: GameId::Netwalk,
++                label: "Netwalk",
++                selector: "net",
++            },
++            GameSpec {
++                id: GameId::Mines,
++                label: "Mines",
++                selector: "mines",
++            },
++            GameSpec {
++                id: GameId::Solo,
++                label: "Solo",
++                selector: "solo",
++            },
++            GameSpec {
++                id: GameId::Guess,
++                label: "Guess",
++                selector: "guess",
++            },
++            GameSpec {
++                id: GameId::Map,
++                label: "Map",
++                selector: "map",
++            },
++            GameSpec {
++                id: GameId::Untangle,
++                label: "Untangle",
++                selector: "untangle",
++            },
++        ]
++    }
++    pub fn start(id: GameId, seed: u64) -> GameSession {
++        GameSession::new(id, seed)
++    }
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum GameOutcome {
++    Playing,
++    Won,
++    Lost,
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum GameInput {
++    Puzzle(p::PuzzleInput),
++    Terminal(t::TerminalInput),
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub enum GameScene {
++    Puzzle(p::PuzzleScene),
++    Terminal(t::TerminalScene),
++}
++#[derive(Clone, Debug)]
++enum Core {
++    Puzzle(p::PuzzleSession),
++    Terminal(t::TerminalSession),
++}
++#[derive(Clone, Debug)]
++pub struct GameSession {
++    id: GameId,
++    core: Core,
++}
++impl GameSession {
++    pub fn new(id: GameId, seed: u64) -> Self {
++        use GameId::*;
++        let core = match id {
++            Soliterm => Core::Terminal(t::TerminalSession::new(t::TerminalKind::Soliterm, seed)),
++            Termwalk => Core::Terminal(t::TerminalSession::new(t::TerminalKind::Termwalk, seed)),
++            Ctris => Core::Terminal(t::TerminalSession::new(t::TerminalKind::Ctris, seed)),
++            Sudoku => Core::Terminal(t::TerminalSession::new(t::TerminalKind::Sudoku, seed)),
++            Nimesweeper => {
++                Core::Terminal(t::TerminalSession::new(t::TerminalKind::Nimesweeper, seed))
++            }
++            Ninvaders => Core::Terminal(t::TerminalSession::new(t::TerminalKind::Ninvaders, seed)),
++            Greed => Core::Terminal(t::TerminalSession::new(t::TerminalKind::Greed, seed)),
++            Netwalk => Core::Puzzle(p::PuzzleSession::new(p::PuzzleKind::Net, seed)),
++            Mines => Core::Puzzle(p::PuzzleSession::new(p::PuzzleKind::Mines, seed)),
++            Solo => Core::Puzzle(p::PuzzleSession::new(p::PuzzleKind::Solo, seed)),
++            Guess => Core::Puzzle(p::PuzzleSession::new(p::PuzzleKind::Guess, seed)),
++            Map => Core::Puzzle(p::PuzzleSession::new(p::PuzzleKind::Map, seed)),
++            Untangle => Core::Puzzle(p::PuzzleSession::new(p::PuzzleKind::Untangle, seed)),
++        };
++        Self { id, core }
++    }
++    pub fn new_solitaire(seed: u64, variant: t::SolitaireVariant, passes: u8) -> Self {
++        Self {
++            id: GameId::Soliterm,
++            core: Core::Terminal(t::TerminalSession::new_solitaire(seed, variant, passes)),
++        }
++    }
++    pub fn new_mines(seed: u64, preset: t::MinePreset) -> Self {
++        Self {
++            id: GameId::Nimesweeper,
++            core: Core::Terminal(t::TerminalSession::new_mines(seed, preset)),
++        }
++    }
++    pub fn new_termwalk(seed: u64, size: usize) -> Result<Self, &'static str> {
++        Ok(Self {
++            id: GameId::Termwalk,
++            core: Core::Terminal(t::TerminalSession::new_termwalk(seed, size)?),
++        })
++    }
++    pub fn new_map(seed: u64, preset: p::MapPreset) -> Self {
++        Self {
++            id: GameId::Map,
++            core: Core::Puzzle(p::PuzzleSession::new_map(seed, preset)),
++        }
++    }
++    pub fn id(&self) -> GameId {
++        self.id
++    }
++    pub fn spec(&self) -> &'static GameSpec {
++        GameRegistry::catalog()
++            .iter()
++            .find(|s| s.id == self.id)
++            .unwrap()
++    }
++    pub fn seed(&self) -> u64 {
++        match &self.core {
++            Core::Puzzle(s) => s.seed(),
++            Core::Terminal(s) => s.seed(),
++        }
++    }
++    pub fn help(&self) -> &'static str {
++        match &self.core {
++            Core::Puzzle(s) => s.kind().help(),
++            Core::Terminal(s) => s.kind().help(),
++        }
++    }
++    pub fn scene(&self) -> GameScene {
++        match &self.core {
++            Core::Puzzle(s) => GameScene::Puzzle(s.scene()),
++            Core::Terminal(s) => GameScene::Terminal(s.scene()),
++        }
++    }
++    pub fn outcome(&self) -> GameOutcome {
++        match &self.core {
++            Core::Puzzle(s) => match s.outcome() {
++                p::Outcome::Playing => GameOutcome::Playing,
++                p::Outcome::Won => GameOutcome::Won,
++                p::Outcome::Lost => GameOutcome::Lost,
++            },
++            Core::Terminal(s) => match s.outcome() {
++                t::Outcome::Playing => GameOutcome::Playing,
++                t::Outcome::Won => GameOutcome::Won,
++                t::Outcome::Lost => GameOutcome::Lost,
++            },
++        }
++    }
++    pub fn input(&mut self, i: GameInput) -> Result<bool, &'static str> {
++        match (&mut self.core, i) {
++            (Core::Puzzle(s), GameInput::Puzzle(i)) => s.input(i),
++            (Core::Terminal(s), GameInput::Terminal(i)) => s.input(i),
++            _ => Err("Input belongs to another game family"),
++        }
++    }
++    pub fn reset(&mut self) {
++        match &mut self.core {
++            Core::Puzzle(s) => s.reset(),
++            Core::Terminal(s) => s.reset(),
++        }
++    }
++    pub fn undo(&mut self) -> bool {
++        match &mut self.core {
++            Core::Puzzle(s) => s.undo(),
++            Core::Terminal(s) => s.undo(),
++        }
++    }
++    pub fn can_undo(&self) -> bool {
++        match &self.core {
++            Core::Puzzle(s) => s.can_undo(),
++            Core::Terminal(s) => s.can_undo(),
++        }
++    }
++}
+--- a/src/games/mod.rs
++++ b/src/games/mod.rs
+@@ -1,3 +1,7 @@
+ //! Independent game implementations and workspace idle state.
+ //! Game-specific entries require recorded original catalog and rule evidence.
++pub mod library;
++pub mod puzzles;
+ pub mod screensaver;
++pub mod terminal;
++pub use library::{GameId, GameInput, GameOutcome, GameRegistry, GameScene, GameSession, GameSpec};
+--- /dev/null
++++ b/src/games/terminal/API.md
+@@ -0,0 +1,14 @@
++# Terminal core API (frozen)
++`TerminalKind::{Soliterm,Termwalk,Ctris,Sudoku,Nimesweeper,Ninvaders,Greed}`, `ALL`, `selector()`, `help()`.
++`TerminalSession::new(kind,seed)`, `new_solitaire(seed,SolitaireVariant::{Freecell,Klondike},passes:u8)`, `new_mines(seed,MinePreset::{Newbie,Easy,Medium,Hard})`.
++`kind/seed/outcome/scene/apply/input/undo/can_undo/reset`; `apply` returns `Result<bool,&'static str>`, noops do not enter bounded history. `Outcome::{Playing,Won,Lost}`. Scene is cloned owned data.
++`TerminalScene` has seven same-name variants wrapping `SolitermScene/TermwalkScene/CtrisScene/SudokuScene/NimesweeperScene/NinvadersScene/GreedScene`. Every field public; see modules.
++`TerminalInput`: `Rotate{cell:usize,clockwise:bool}`, `Digit{cell:usize,value:u8}`, `Reveal/Flag/Chord{cell:usize}`, `Move{dx:i8,dy:i8}`, `Tick,Drop,Fire,Start,Pause,Draw`, `Transfer{from:CardPile,to:CardPile,count:usize}`.
++CardPile: `Tableau(usize),Reserve(usize),Foundation(usize),Waste`. Card: `rank:u8` (Ace=1), `suit:u8` (0 clubs,1 diamonds,2 hearts,3 spades), `face_up:bool`. Soliterm scene: `variant,tableau:Vec<Vec<Card>>,reserve:[Option<Card>;4],foundations:[u8;4],stock_count:usize,waste:Vec<Card>,passes_left:u8`.
++CtrisScene: `width:usize,height:usize,settled:Vec<u8>,active:Piece,next:u8,score:u32,lines:u32,paused:bool`; Piece `{kind:u8,rotation:u8,x:i32,y:i32}`, `Piece::cells()->[(i32,i32);4]` public.
++NinvadersScene: `width:i32,height:i32,player_x:i32,player_y:i32,enemies:Vec<Invader>,player_shots:Vec<(i32,i32)>,enemy_shots:Vec<(i32,i32)>,lives:u8,score:u32,started:bool,paused:bool`. Invader `{x:i32,y:i32}`.
++Grids: Sudoku 81 cells/fixed; Walk width/height/router/pipes (N=1,E=2,S=4,W=8)/connected; Mines width/height/mines/cells/paused (`MineCell::{Hidden,Flagged,Open(u8),Mine}`); Greed width/height/cells (0 erased)/player/erased/legal_directions.
++Pointer coordinates should map to bounded row-major cell indices in UI; core accepts no floats and rejects invalid cells/deltas. No wall time; UI explicitly sends Tick once per desired step. Fire/Start are separate for nInvaders. Default Freecell choice and conventional controls are independent implementation choices, not original behavior claims.
++Additive constructor: `new_termwalk(seed,size)->Result<TerminalSession,&'static str>` accepts only odd grid sizes 3..=15. Default constructor remains 5×5. No scene shape changes.
++
++Review alignment: `Piece::cells()` saturates coordinate additions for arbitrary i32 x/y; valid session positions retain their exact four cells. nInvaders `player_y` is the authoritative draw/hit row (currently 22), with player projectiles originating one row above. Paused Ctris/Nimesweeper/started nInvaders ignore ordinary gameplay input before validation and return `Ok(false)` without an undo entry; pause/unpause and start remain lifecycle inputs. Invalid active input returns `Err` atomically.
+--- /dev/null
++++ b/src/games/terminal/PROVENANCE.md
+@@ -0,0 +1,23 @@
++# Independently implemented terminal game cores
++
++Status: independent rule implementations informed by RECOVERED static declarations. No original runtime behavior was measured; this package alone does not complete B06 or native game qualification. Typespeed is excluded from `TerminalKind::ALL` because the exact original DFM declares `Visible=false`.
++
++## Evidence actually used
++
++Read the reviewed original-static-recovery `README.md`, `catalog.json`, `controls.json`, `sources.json`, and `review.md`, plus B06 in `docs/superpowers/plans/2026-11-23-08-services-platform.md`. Those files identify the seven visible terminal declarations and exact help strings/byte offsets. No companion binary, original executable, original C engine, sprite or artwork was executed, linked, copied into this package, or redistributed. No additional historical source claim is made. All Rust logic and scenes were written independently for this component.
++
++- **Soliterm:** original help at 0x66d4–0x6768 declares mouse source/destination, arrows/Space; 0x69b9–0x6a6c declares Freecell/Klondike and pass count. These do not establish exact legal moves/defaults. Independent conventional Freecell implements 52-card deal to eight columns, four reserve cells, alternating descending tableau, ascending suit foundations, and empty-space sequence capacity. Independent Klondike implements seven columns with hidden cards, King-only empty columns, draw-one stock, bounded passes (1–20), reverse-order recycle, and exposed-card flip. Default Freecell and three passes are product choices. No stalemate detector, hints, original deal-number mapping, draw-three variant or measured score parity.
++- **Termwalk:** original help 0x3ed4 declares connecting every server to central router; 0x3f9d/0x3fec declares odd grid size. Independent nonwrapping spanning-tree boards support odd sizes 3–15, default 5, clockwise/counterclockwise tile rotation and connectivity. The generator does not copy an original board; original generation algorithm, wrapping/default size, exact keyboard bindings and solve-grid UI remain unmeasured.
++- **Ctris:** exact companion strings establish v0.42, Jul 25 2007, counterclockwise/old-style command options and P resume only. Independent conventional seven tetrominoes, 10×20 field, rotation in 3×3/4×4 boxes, O invariant, no wall kicks, movement, one-step gravity, hard drop, row clears, scoring 100/300/500/800 and spawn-block loss. Piece distribution, score, dimensions, timing, wall kicks, key maps and original old-style behavior are independent choices, not recovered parity.
++- **Sudoku:** exact help 0x6486–0x64b2 establishes 9×9 rows, columns, 3×3 boxes, digits 1–9; 0x64e0/0x64f1/0x6553 establish digit/erase/undo. The core independently generates valid Sudoku solutions, removes clues only if a bounded solver certifies uniqueness, fixes starting clues, rejects conflicts and detects completion. Exact historical puzzle generator/difficulty, fix-squares semantics, hints, solve/save/clear-board functions are not asserted or implemented by this core. Clear an editable digit with zero; reset restores initial board.
++- **Nimesweeper:** exact help 0x57c4–0x58f4 declares four presets: 16×16/40, 16×24/75 (help-default easy), 30×16/99, 38×20/160. Core preserves those ordered dimensions. Help/disassembly establishes arrows/F/Space/P and restart. Independent conventional reveal/flag/number flood/chord and all-safe-cells victory are implemented. First reveal is safe through deterministic mine relocation (independent choice). Original first-click policy, actual menu override, chord behavior, score/times and exact generation are unmeasured. Wrong chord flags can detonate mines.
++- **nInvaders:** exact strings establish Space start and skill command options only. Core independently implements a 32×24 logical shooter with 24 enemies, deterministic horizontal movement/descent, player/enemy projectiles, three lives, per-hit score and win/ground-contact/death outcomes. Conventional left/right/fire/P controls are supplied explicitly. Original shields, waves, art, projectile/formation timings, skill curve, score, UFO and collision details are unmeasured and not represented as parity. This core implements one finite playable wave; original skill options are not exposed.
++- **Greed:** original help establishes the first adjacent digit determines the complete move distance, all traversed squares erase, erased squares/out-of-bounds are illegal, and no legal direction ends the game. Those rules are directly implemented with eight directions and legal-direction highlighting. Board dimensions 20×10, seeded digit distribution, starting cell and clear-all win label are independent choices. No original board/score sequence parity is claimed.
++
++## Contract and bounded work
++
++No dependencies, unsafe, filesystem/network/process operations, wall clock, thread, or UI calls. Seeded SplitMix64 shuffles support deterministic new/reset/replay; seed zero is valid. APIs use row-major integer cell indices and small signed deltas. While active, invalid/unsupported inputs return an error atomically at the session boundary. Paused Ctris, Nimesweeper and started nInvaders ignore ordinary gameplay inputs before validating them, returning `Ok(false)` without changing state or history; pause/unpause and nInvaders start remain lifecycle inputs. Completed games require undo/reset. Successful state changes save at most 128 complete states; no-op input consumes no history. RNG, mine relocation, pause and outcome state undo together.
++
++Card state has exactly 52 cards; grids have at most 760 cells (mines) / 225 (Termwalk). Termwalk DFS adds/removes each cell at most once; connectivity visits once. Sudoku attempts at most 81 clue removals, keeps at least 39 clues, with at most 50,000 recursive nodes per attempt and depth at most 81; exhaustion conservatively retains the clue. Mines flood work is bounded by cell/neighbour edges. Ctris is 200 settled cells and each hard drop traverses at most 20 rows. Shooter has at most 24 enemies, 4 player shots, 8 enemy shots. One `Tick` is one simulation step, never elapsed-time catch-up.
++
++Public scenes expose owned integer data, no drawable original assets. `Piece::cells()` saturates offsets at i32 coordinate bounds for arbitrary public values; out-of-board saturation may merge cells, while session-generated board coordinates remain exact. nInvaders exposes `player_y` from the same row constant used for shot origin, enemy-shot collisions and enemy ground contact. See API.md for integration details and the component tests for conventional-rule fixtures. Fixture expectations are never labelled original-observed or MEASURED.
+--- /dev/null
++++ b/src/games/terminal/blocks.rs
+@@ -0,0 +1,292 @@
++use super::{Outcome, Rng, TerminalInput};
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct Piece {
++    pub kind: u8,
++    pub rotation: u8,
++    pub x: i32,
++    pub y: i32,
++}
++impl Piece {
++    /// Total for arbitrary public coordinates: offsets saturate at i32 bounds.
++    /// Saturation may merge cells outside the valid board; session cells stay exact.
++    pub fn cells(self) -> [(i32, i32); 4] {
++        const SHAPES: [[(i32, i32); 4]; 7] = [
++            [(0, 1), (1, 1), (2, 1), (3, 1)],
++            [(1, 0), (2, 0), (1, 1), (2, 1)],
++            [(1, 0), (0, 1), (1, 1), (2, 1)],
++            [(1, 0), (2, 0), (0, 1), (1, 1)],
++            [(0, 0), (1, 0), (1, 1), (2, 1)],
++            [(0, 0), (0, 1), (1, 1), (2, 1)],
++            [(2, 0), (0, 1), (1, 1), (2, 1)],
++        ];
++        let mut out = SHAPES[self.kind.min(6) as usize];
++        for p in &mut out {
++            if self.kind != 1 {
++                let size = if self.kind == 0 { 4 } else { 3 };
++                for _ in 0..self.rotation % 4 {
++                    *p = (size - 1 - p.1, p.0)
++                }
++            }
++            p.0 = self.x.saturating_add(p.0);
++            p.1 = self.y.saturating_add(p.1)
++        }
++        out
++    }
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct CtrisScene {
++    pub width: usize,
++    pub height: usize,
++    pub settled: Vec<u8>,
++    pub active: Piece,
++    pub next: u8,
++    pub score: u32,
++    pub lines: u32,
++    pub paused: bool,
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub(super) struct Blocks {
++    pub board: Vec<u8>,
++    pub active: Piece,
++    pub next: u8,
++    pub rng: Rng,
++    pub score: u32,
++    pub lines: u32,
++    pub paused: bool,
++    pub outcome: Outcome,
++}
++impl Blocks {
++    pub fn new(r: &mut Rng) -> Self {
++        let kind = r.below(7) as u8;
++        let next = r.below(7) as u8;
++        Self {
++            board: vec![0; 200],
++            active: Piece {
++                kind,
++                rotation: 0,
++                x: 3,
++                y: 0,
++            },
++            next,
++            rng: r.clone(),
++            score: 0,
++            lines: 0,
++            paused: false,
++            outcome: Outcome::Playing,
++        }
++    }
++    pub fn scene(&self) -> CtrisScene {
++        CtrisScene {
++            width: 10,
++            height: 20,
++            settled: self.board.clone(),
++            active: self.active,
++            next: self.next,
++            score: self.score,
++            lines: self.lines,
++            paused: self.paused,
++        }
++    }
++    fn fits(&self, p: Piece) -> bool {
++        p.cells().iter().all(|&(x, y)| {
++            x >= 0 && x < 10 && y >= 0 && y < 20 && self.board[y as usize * 10 + x as usize] == 0
++        })
++    }
++    fn lock(&mut self) {
++        for (x, y) in self.active.cells() {
++            self.board[y as usize * 10 + x as usize] = self.active.kind + 1
++        }
++        let mut rows: Vec<Vec<u8>> = self
++            .board
++            .chunks(10)
++            .filter(|row| row.iter().any(|&x| x == 0))
++            .map(|r| r.to_vec())
++            .collect();
++        let cleared = 20 - rows.len();
++        let mut board = vec![0; cleared * 10];
++        for row in rows.drain(..) {
++            board.extend(row)
++        }
++        self.board = board;
++        self.lines = self.lines.saturating_add(cleared as u32);
++        self.score = self
++            .score
++            .saturating_add([0, 100, 300, 500, 800][cleared.min(4)]);
++        self.active = Piece {
++            kind: self.next,
++            rotation: 0,
++            x: 3,
++            y: 0,
++        };
++        self.next = self.rng.below(7) as u8;
++        if !self.fits(self.active) {
++            self.outcome = Outcome::Lost
++        }
++    }
++    pub fn apply(&mut self, i: TerminalInput) -> Result<(), &'static str> {
++        if i == TerminalInput::Pause {
++            self.paused = !self.paused;
++            return Ok(());
++        }
++        if self.paused {
++            return Ok(());
++        }
++        match i {
++            TerminalInput::Rotate { clockwise, .. } => {
++                let mut p = self.active;
++                p.rotation = (p.rotation + if clockwise { 1 } else { 3 }) % 4;
++                if self.fits(p) {
++                    self.active = p
++                }
++            }
++            TerminalInput::Move { dx, dy } => {
++                if !(-1..=1).contains(&dx) || !(0..=1).contains(&dy) || (dx != 0 && dy != 0) {
++                    return Err("Invalid block direction");
++                }
++                let mut p = self.active;
++                p.x += dx as i32;
++                p.y += dy as i32;
++                if self.fits(p) {
++                    self.active = p
++                } else if dy == 1 {
++                    self.lock()
++                }
++            }
++            TerminalInput::Tick => {
++                let mut p = self.active;
++                p.y += 1;
++                if self.fits(p) {
++                    self.active = p
++                } else {
++                    self.lock()
++                }
++            }
++            TerminalInput::Drop => {
++                loop {
++                    let mut p = self.active;
++                    p.y += 1;
++                    if self.fits(p) {
++                        self.active = p
++                    } else {
++                        break;
++                    }
++                }
++                self.lock()
++            }
++            _ => return Err("Expected block movement, rotation, drop, tick or pause"),
++        }
++        Ok(())
++    }
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn hard_drop_completes_row_and_preserves_upper_cells() {
++        let mut s = Blocks::new(&mut Rng(0));
++        for x in 0..6 {
++            s.board[190 + x] = 2
++        }
++        s.active = Piece {
++            kind: 0,
++            rotation: 0,
++            x: 6,
++            y: 0,
++        };
++        s.apply(TerminalInput::Drop).unwrap();
++        assert_eq!(s.lines, 1);
++        assert!(s.board[190..].iter().all(|&x| x == 0));
++        assert_eq!(s.score, 100);
++    }
++    #[test]
++    fn wall_collision_and_pause_prevent_motion() {
++        let mut s = Blocks::new(&mut Rng(0));
++        s.active = Piece {
++            kind: 1,
++            rotation: 0,
++            x: -1,
++            y: 2,
++        };
++        let before = s.active;
++        assert!(s.apply(TerminalInput::Move { dx: -1, dy: 0 }).is_ok());
++        assert_eq!(s.active, before);
++        s.apply(TerminalInput::Pause).unwrap();
++        s.apply(TerminalInput::Tick).unwrap();
++        assert_eq!(s.active, before);
++    }
++}
++#[cfg(test)]
++mod loss_tests {
++    use super::*;
++    #[test]
++    fn blocked_next_spawn_loses_after_piece_locks() {
++        let mut s = Blocks::new(&mut Rng(1));
++        s.board[4] = 2;
++        s.next = 1;
++        s.active = Piece {
++            kind: 1,
++            rotation: 0,
++            x: 0,
++            y: 17,
++        };
++        s.apply(TerminalInput::Drop).unwrap();
++        assert_eq!(s.outcome, Outcome::Lost);
++    }
++    #[test]
++    fn rotation_cycles_and_preserves_four_distinct_cells() {
++        for kind in 0..7 {
++            let mut s = Blocks::new(&mut Rng(0));
++            s.active = Piece {
++                kind,
++                rotation: 0,
++                x: 3,
++                y: 5,
++            };
++            let original = s.active.cells();
++            for _ in 0..4 {
++                s.apply(TerminalInput::Rotate {
++                    cell: 0,
++                    clockwise: true,
++                })
++                .unwrap();
++            }
++            assert_eq!(s.active.cells(), original);
++            let mut cells = s.active.cells().to_vec();
++            cells.sort();
++            cells.dedup();
++            assert_eq!(cells.len(), 4);
++        }
++    }
++}
++#[cfg(test)]
++mod public_piece_safety {
++    use super::*;
++    #[test]
++    fn arbitrary_public_piece_coordinates_saturate_instead_of_overflowing() {
++        for kind in 0..=255 {
++            for rotation in [0, 1, 2, 3, 255] {
++                let p = Piece {
++                    kind,
++                    rotation,
++                    x: i32::MAX,
++                    y: i32::MAX,
++                };
++                assert!(
++                    p.cells()
++                        .iter()
++                        .all(|&(x, y)| x == i32::MAX && y == i32::MAX)
++                );
++                let p = Piece {
++                    kind,
++                    rotation,
++                    x: i32::MIN,
++                    y: i32::MIN,
++                };
++                assert!(p.cells().iter().all(|&(x, y)| x >= i32::MIN
++                    && x <= i32::MIN + 3
++                    && y >= i32::MIN
++                    && y <= i32::MIN + 3));
++            }
++        }
++    }
++}
+--- /dev/null
++++ b/src/games/terminal/cards.rs
+@@ -0,0 +1,433 @@
++use super::{Outcome, Rng, TerminalInput};
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum SolitaireVariant {
++    Freecell,
++    Klondike,
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct Card {
++    pub rank: u8,
++    pub suit: u8,
++    pub face_up: bool,
++}
++impl Card {
++    fn red(self) -> bool {
++        self.suit == 1 || self.suit == 2
++    }
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum CardPile {
++    Tableau(usize),
++    Reserve(usize),
++    Foundation(usize),
++    Waste,
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct SolitermScene {
++    pub variant: SolitaireVariant,
++    pub tableau: Vec<Vec<Card>>,
++    pub reserve: [Option<Card>; 4],
++    pub foundations: [u8; 4],
++    pub stock_count: usize,
++    pub waste: Vec<Card>,
++    pub passes_left: u8,
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub(super) struct Cards {
++    pub variant: SolitaireVariant,
++    pub tableau: Vec<Vec<Card>>,
++    pub reserve: [Option<Card>; 4],
++    pub foundations: [u8; 4],
++    pub stock: Vec<Card>,
++    pub waste: Vec<Card>,
++    pub passes_left: u8,
++}
++impl Cards {
++    pub fn new(r: &mut Rng, variant: SolitaireVariant, passes: u8) -> Self {
++        let mut deck: Vec<Card> = (0..4)
++            .flat_map(|suit| {
++                (1..=13).map(move |rank| Card {
++                    rank,
++                    suit,
++                    face_up: true,
++                })
++            })
++            .collect();
++        r.shuffle(&mut deck);
++        let mut tableau = vec![
++            Vec::new();
++            if variant == SolitaireVariant::Freecell {
++                8
++            } else {
++                7
++            }
++        ];
++        if variant == SolitaireVariant::Freecell {
++            for (i, c) in deck.drain(..).enumerate() {
++                tableau[i % 8].push(c)
++            }
++        } else {
++            for (i, col) in tableau.iter_mut().enumerate() {
++                for j in 0..=i {
++                    let mut c = deck.pop().unwrap();
++                    c.face_up = j == i;
++                    col.push(c)
++                }
++            }
++        }
++        Self {
++            variant,
++            tableau,
++            reserve: [None; 4],
++            foundations: [0; 4],
++            stock: deck,
++            waste: Vec::new(),
++            passes_left: passes,
++        }
++    }
++    pub fn scene(&self) -> SolitermScene {
++        SolitermScene {
++            variant: self.variant,
++            tableau: self.tableau.clone(),
++            reserve: self.reserve,
++            foundations: self.foundations,
++            stock_count: self.stock.len(),
++            waste: self.waste.clone(),
++            passes_left: self.passes_left,
++        }
++    }
++    pub fn outcome(&self) -> Outcome {
++        if self.foundations == [13; 4] {
++            Outcome::Won
++        } else {
++            Outcome::Playing
++        }
++    }
++    pub fn apply(&mut self, i: TerminalInput) -> Result<(), &'static str> {
++        if i == TerminalInput::Draw {
++            if self.variant != SolitaireVariant::Klondike {
++                return Err("Only Klondike has stock");
++            }
++            if let Some(mut c) = self.stock.pop() {
++                c.face_up = true;
++                self.waste.push(c);
++                return Ok(());
++            }
++            if self.waste.is_empty() {
++                return Ok(());
++            }
++            if self.passes_left <= 1 {
++                return Err("No passes remain");
++            }
++            self.passes_left -= 1;
++            self.stock = self.waste.drain(..).rev().collect();
++            return Ok(());
++        }
++        let TerminalInput::Transfer { from, to, count } = i else {
++            return Err("Expected card transfer or draw");
++        };
++        if from == to || count == 0 || count > 52 {
++            return Err("Invalid transfer");
++        }
++        let moving: Vec<Card> = match from {
++            CardPile::Tableau(n) => {
++                let col = self.tableau.get(n).ok_or("Invalid source column")?;
++                if count > col.len() {
++                    return Err("Not enough cards");
++                }
++                col[col.len() - count..].to_vec()
++            }
++            CardPile::Reserve(n) => {
++                if self.variant != SolitaireVariant::Freecell || count != 1 {
++                    return Err("Invalid reserve move");
++                }
++                vec![
++                    self.reserve
++                        .get(n)
++                        .copied()
++                        .flatten()
++                        .ok_or("Empty or invalid reserve")?,
++                ]
++            }
++            CardPile::Waste => {
++                if count != 1 {
++                    return Err("Only top waste card can move");
++                }
++                vec![*self.waste.last().ok_or("Waste empty")?]
++            }
++            CardPile::Foundation(n) => {
++                if n >= 4 || count != 1 || self.foundations[n] == 0 {
++                    return Err("Invalid foundation source");
++                }
++                vec![Card {
++                    rank: self.foundations[n],
++                    suit: n as u8,
++                    face_up: true,
++                }]
++            }
++        };
++        if moving.iter().any(|c| !c.face_up)
++            || !moving
++                .windows(2)
++                .all(|p| p[0].rank == p[1].rank + 1 && p[0].red() != p[1].red())
++        {
++            return Err("Cards must form a face-up descending alternating run");
++        }
++        let first = moving[0];
++        match to {
++            CardPile::Tableau(n) => {
++                let col = self.tableau.get(n).ok_or("Invalid destination column")?;
++                if let Some(last) = col.last() {
++                    if !last.face_up || last.rank != first.rank + 1 || last.red() == first.red() {
++                        return Err("Tableau requires descending alternate colours");
++                    }
++                } else if self.variant == SolitaireVariant::Klondike && first.rank != 13 {
++                    return Err("Only Kings fill empty Klondike columns");
++                }
++                if self.variant == SolitaireVariant::Freecell && count > 1 {
++                    let empty_reserves = self.reserve.iter().filter(|c| c.is_none()).count();
++                    let empty_columns = self
++                        .tableau
++                        .iter()
++                        .enumerate()
++                        .filter(|(j, c)| *j != n && c.is_empty())
++                        .count();
++                    let capacity = (empty_reserves + 1) * (1usize << empty_columns);
++                    if count > capacity {
++                        return Err("Insufficient free cells for sequence");
++                    }
++                }
++            }
++            CardPile::Reserve(n) => {
++                if self.variant != SolitaireVariant::Freecell
++                    || n >= 4
++                    || count != 1
++                    || self.reserve[n].is_some()
++                {
++                    return Err("Invalid reserve destination");
++                }
++            }
++            CardPile::Foundation(n) => {
++                if n >= 4
++                    || count != 1
++                    || first.suit as usize != n
++                    || first.rank != self.foundations[n] + 1
++                {
++                    return Err("Foundations ascend in suit from Ace");
++                }
++            }
++            CardPile::Waste => return Err("Cannot move cards to waste"),
++        }
++        match from {
++            CardPile::Tableau(n) => {
++                let len = self.tableau[n].len();
++                self.tableau[n].truncate(len - count);
++                if let Some(c) = self.tableau[n].last_mut() {
++                    c.face_up = true
++                }
++            }
++            CardPile::Reserve(n) => self.reserve[n] = None,
++            CardPile::Waste => {
++                self.waste.pop();
++            }
++            CardPile::Foundation(n) => self.foundations[n] -= 1,
++        }
++        match to {
++            CardPile::Tableau(n) => self.tableau[n].extend(moving),
++            CardPile::Reserve(n) => self.reserve[n] = Some(first),
++            CardPile::Foundation(n) => self.foundations[n] += 1,
++            CardPile::Waste => unreachable!(),
++        }
++        Ok(())
++    }
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    fn card(rank: u8, suit: u8) -> Card {
++        Card {
++            rank,
++            suit,
++            face_up: true,
++        }
++    }
++    fn board(v: SolitaireVariant) -> Cards {
++        Cards {
++            variant: v,
++            tableau: vec![vec![]; 8],
++            reserve: [None; 4],
++            foundations: [0; 4],
++            stock: vec![],
++            waste: vec![],
++            passes_left: 2,
++        }
++    }
++    #[test]
++    fn freecell_foundations_ascending_suit_and_alternating_runs() {
++        let mut s = board(SolitaireVariant::Freecell);
++        s.tableau[0] = vec![card(1, 0)];
++        s.apply(TerminalInput::Transfer {
++            from: CardPile::Tableau(0),
++            to: CardPile::Foundation(0),
++            count: 1,
++        })
++        .unwrap();
++        assert_eq!(s.foundations[0], 1);
++        s.tableau[0] = vec![card(5, 0), card(4, 1)];
++        s.tableau[1] = vec![card(6, 2)];
++        s.apply(TerminalInput::Transfer {
++            from: CardPile::Tableau(0),
++            to: CardPile::Tableau(1),
++            count: 2,
++        })
++        .unwrap();
++        assert_eq!(s.tableau[1].len(), 3);
++        s.tableau[2] = vec![card(7, 0)];
++        assert!(
++            s.apply(TerminalInput::Transfer {
++                from: CardPile::Tableau(1),
++                to: CardPile::Tableau(2),
++                count: 2
++            })
++            .is_err()
++        );
++    }
++    #[test]
++    fn klondike_king_empty_and_turns_exposed_card() {
++        let mut s = board(SolitaireVariant::Klondike);
++        s.tableau.truncate(7);
++        let mut hidden = card(6, 0);
++        hidden.face_up = false;
++        s.tableau[0] = vec![hidden, card(13, 1)];
++        s.apply(TerminalInput::Transfer {
++            from: CardPile::Tableau(0),
++            to: CardPile::Tableau(1),
++            count: 1,
++        })
++        .unwrap();
++        assert!(s.tableau[0][0].face_up);
++        assert!(
++            s.apply(TerminalInput::Transfer {
++                from: CardPile::Tableau(0),
++                to: CardPile::Tableau(2),
++                count: 1
++            })
++            .is_err()
++        );
++    }
++    #[test]
++    fn draw_and_recycle_respect_pass_limit() {
++        let mut s = board(SolitaireVariant::Klondike);
++        s.stock = vec![card(2, 0), card(3, 1)];
++        s.passes_left = 1;
++        s.apply(TerminalInput::Draw).unwrap();
++        assert_eq!(s.waste.last().unwrap().rank, 3);
++        s.apply(TerminalInput::Draw).unwrap();
++        assert!(s.apply(TerminalInput::Draw).is_err());
++    }
++}
++
++#[cfg(test)]
++mod more_tests {
++    use super::*;
++    #[test]
++    fn deals_conserve_every_card_and_have_correct_faceup_counts() {
++        for v in [SolitaireVariant::Freecell, SolitaireVariant::Klondike] {
++            for seed in 0..64 {
++                let s = Cards::new(&mut Rng(seed), v, 3);
++                let mut cards: Vec<_> = s
++                    .tableau
++                    .iter()
++                    .flatten()
++                    .chain(s.stock.iter())
++                    .map(|c| (c.suit, c.rank))
++                    .collect();
++                cards.sort();
++                assert_eq!(
++                    cards,
++                    (0..4)
++                        .flat_map(|s| (1..=13).map(move |r| (s, r)))
++                        .collect::<Vec<_>>()
++                );
++                let up = s.tableau.iter().flatten().filter(|c| c.face_up).count();
++                assert_eq!(
++                    up,
++                    if v == SolitaireVariant::Freecell {
++                        52
++                    } else {
++                        7
++                    }
++                );
++            }
++        }
++    }
++    #[test]
++    fn reserve_capacity_blocks_sequence_without_empty_spaces() {
++        let mut s = Cards::new(&mut Rng(1), SolitaireVariant::Freecell, 3);
++        for c in &mut s.tableau {
++            *c = vec![Card {
++                rank: 9,
++                suit: 0,
++                face_up: true,
++            }]
++        }
++        s.tableau[0] = vec![
++            Card {
++                rank: 5,
++                suit: 0,
++                face_up: true,
++            },
++            Card {
++                rank: 4,
++                suit: 1,
++                face_up: true,
++            },
++        ];
++        s.tableau[1] = vec![Card {
++            rank: 6,
++            suit: 1,
++            face_up: true,
++        }];
++        s.reserve = [Some(Card {
++            rank: 2,
++            suit: 0,
++            face_up: true,
++        }); 4];
++        let before = s.clone();
++        assert!(
++            s.apply(TerminalInput::Transfer {
++                from: CardPile::Tableau(0),
++                to: CardPile::Tableau(1),
++                count: 2
++            })
++            .is_err()
++        );
++        assert_eq!(s, before);
++    }
++    #[test]
++    fn foundation_requires_matching_suit_and_ace_then_two() {
++        let mut s = Cards::new(&mut Rng(0), SolitaireVariant::Freecell, 3);
++        s.tableau[0] = vec![Card {
++            rank: 1,
++            suit: 2,
++            face_up: true,
++        }];
++        assert!(
++            s.apply(TerminalInput::Transfer {
++                from: CardPile::Tableau(0),
++                to: CardPile::Foundation(0),
++                count: 1
++            })
++            .is_err()
++        );
++        s.apply(TerminalInput::Transfer {
++            from: CardPile::Tableau(0),
++            to: CardPile::Foundation(2),
++            count: 1,
++        })
++        .unwrap();
++        assert_eq!(s.foundations[2], 1);
++        s.foundations = [13; 4];
++        assert_eq!(s.outcome(), Outcome::Won);
++    }
++}
+--- /dev/null
++++ b/src/games/terminal/grids.rs
+@@ -0,0 +1,778 @@
++use super::{Outcome, Rng, TerminalInput, neighbours};
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct SudokuScene {
++    pub cells: [u8; 81],
++    pub fixed: [bool; 81],
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub(super) struct Sudoku {
++    pub cells: [u8; 81],
++    pub fixed: [bool; 81],
++}
++impl Sudoku {
++    pub fn new(r: &mut Rng) -> Self {
++        let mut digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
++        r.shuffle(&mut digits);
++        let mut bands = [0, 1, 2];
++        let mut stacks = [0, 1, 2];
++        r.shuffle(&mut bands);
++        r.shuffle(&mut stacks);
++        let mut rows = [0; 9];
++        let mut cols = [0; 9];
++        for b in 0..3 {
++            let mut local = [0, 1, 2];
++            r.shuffle(&mut local);
++            for j in 0..3 {
++                rows[b * 3 + j] = bands[b] * 3 + local[j]
++            }
++            r.shuffle(&mut local);
++            for j in 0..3 {
++                cols[b * 3 + j] = stacks[b] * 3 + local[j]
++            }
++        }
++        let mut cells = [0; 81];
++        for y in 0..9 {
++            for x in 0..9 {
++                cells[y * 9 + x] = digits[(rows[y] * 3 + rows[y] / 3 + cols[x]) % 9]
++            }
++        }
++        let mut positions: Vec<usize> = (0..81).collect();
++        r.shuffle(&mut positions);
++        let mut removed = 0;
++        for c in positions {
++            if removed >= 42 {
++                break;
++            }
++            let old = cells[c];
++            cells[c] = 0;
++            let mut board = cells;
++            if count_solutions(&mut board, 2, &mut 50_000) == 1 {
++                removed += 1
++            } else {
++                cells[c] = old
++            }
++        }
++        let fixed = cells.map(|x| x != 0);
++        Self { cells, fixed }
++    }
++    pub fn scene(&self) -> SudokuScene {
++        SudokuScene {
++            cells: self.cells,
++            fixed: self.fixed,
++        }
++    }
++    pub fn outcome(&self) -> Outcome {
++        if self.cells.iter().all(|&x| x != 0) {
++            Outcome::Won
++        } else {
++            Outcome::Playing
++        }
++    }
++    pub fn apply(&mut self, i: TerminalInput) -> Result<(), &'static str> {
++        let TerminalInput::Digit { cell, value } = i else {
++            return Err("Expected digit input");
++        };
++        if cell >= 81 || value > 9 {
++            return Err("Invalid cell or digit");
++        }
++        if self.fixed[cell] {
++            return Err("Starting digits are fixed");
++        }
++        if value != 0 && !allowed(&self.cells, cell, value) {
++            return Err("Digit conflicts with row, column or box");
++        }
++        self.cells[cell] = value;
++        Ok(())
++    }
++}
++fn allowed(cells: &[u8; 81], c: usize, v: u8) -> bool {
++    let (x, y) = (c % 9, c / 9);
++    (0..81).all(|j| {
++        j == c
++            || cells[j] != v
++            || !(j / 9 == y || j % 9 == x || (j / 27 == y / 3 && j % 9 / 3 == x / 3))
++    })
++}
++fn count_solutions(cells: &mut [u8; 81], limit: u8, budget: &mut usize) -> u8 {
++    if *budget == 0 {
++        return limit;
++    }
++    *budget -= 1;
++    let mut best = None;
++    let mut values = Vec::new();
++    for c in 0..81 {
++        if cells[c] != 0 {
++            continue;
++        }
++        let choices: Vec<u8> = (1..=9).filter(|&v| allowed(cells, c, v)).collect();
++        if choices.is_empty() {
++            return 0;
++        }
++        if best.is_none() || choices.len() < values.len() {
++            best = Some(c);
++            values = choices;
++        }
++        if values.len() == 1 {
++            break;
++        }
++    }
++    let Some(c) = best else { return 1 };
++    let mut count = 0;
++    for v in values {
++        cells[c] = v;
++        count += count_solutions(cells, limit - count, budget);
++        if count >= limit {
++            break;
++        }
++    }
++    cells[c] = 0;
++    count
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum MinePreset {
++    Newbie,
++    Easy,
++    Medium,
++    Hard,
++}
++impl MinePreset {
++    pub fn dimensions(self) -> (usize, usize, usize) {
++        match self {
++            Self::Newbie => (16, 16, 40),
++            Self::Easy => (16, 24, 75),
++            Self::Medium => (30, 16, 99),
++            Self::Hard => (38, 20, 160),
++        }
++    }
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum MineCell {
++    Hidden,
++    Flagged,
++    Open(u8),
++    Mine,
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct NimesweeperScene {
++    pub width: usize,
++    pub height: usize,
++    pub mines: usize,
++    pub cells: Vec<MineCell>,
++    pub paused: bool,
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub(super) struct Mines {
++    pub w: usize,
++    pub h: usize,
++    pub mines: Vec<bool>,
++    pub open: Vec<bool>,
++    pub flags: Vec<bool>,
++    pub outcome: Outcome,
++    pub first: bool,
++    pub paused: bool,
++}
++impl Mines {
++    pub fn new(r: &mut Rng, p: MinePreset) -> Self {
++        let (w, h, n) = p.dimensions();
++        let mut positions: Vec<usize> = (0..w * h).collect();
++        r.shuffle(&mut positions);
++        let mut mines = vec![false; w * h];
++        for &c in &positions[..n] {
++            mines[c] = true
++        }
++        Self {
++            w,
++            h,
++            mines,
++            open: vec![false; w * h],
++            flags: vec![false; w * h],
++            outcome: Outcome::Playing,
++            first: true,
++            paused: false,
++        }
++    }
++    pub fn scene(&self) -> NimesweeperScene {
++        NimesweeperScene {
++            width: self.w,
++            height: self.h,
++            mines: self.mines.iter().filter(|&&b| b).count(),
++            paused: self.paused,
++            cells: (0..self.w * self.h)
++                .map(|c| {
++                    if self.outcome == Outcome::Lost && self.mines[c] {
++                        MineCell::Mine
++                    } else if self.open[c] {
++                        MineCell::Open(self.adjacent(c))
++                    } else if self.flags[c] {
++                        MineCell::Flagged
++                    } else {
++                        MineCell::Hidden
++                    }
++                })
++                .collect(),
++        }
++    }
++    fn adjacent(&self, c: usize) -> u8 {
++        neighbours(c, self.w, self.h)
++            .iter()
++            .filter(|&&j| self.mines[j])
++            .count() as u8
++    }
++    fn reveal(&mut self, c: usize) {
++        if self.flags[c] || self.open[c] {
++            return;
++        }
++        if self.mines[c] {
++            self.open[c] = true;
++            self.outcome = Outcome::Lost;
++            return;
++        }
++        let mut stack = vec![c];
++        while let Some(j) = stack.pop() {
++            if self.open[j] || self.flags[j] || self.mines[j] {
++                continue;
++            }
++            self.open[j] = true;
++            if self.adjacent(j) == 0 {
++                stack.extend(neighbours(j, self.w, self.h));
++            }
++        }
++    }
++    pub fn apply(&mut self, i: TerminalInput) -> Result<(), &'static str> {
++        if i == TerminalInput::Pause {
++            self.paused = !self.paused;
++            return Ok(());
++        }
++        if self.paused {
++            return Ok(());
++        }
++        match i {
++            TerminalInput::Flag { cell } => {
++                if cell >= self.mines.len() {
++                    return Err("Invalid cell");
++                }
++                if !self.open[cell] {
++                    self.flags[cell] = !self.flags[cell]
++                }
++            }
++            TerminalInput::Reveal { cell } => {
++                if cell >= self.mines.len() {
++                    return Err("Invalid cell");
++                }
++                if self.flags[cell] || self.open[cell] {
++                    return Ok(());
++                }
++                if self.first {
++                    if self.mines[cell] {
++                        let replacement = (0..self.mines.len())
++                            .find(|&j| j != cell && !self.mines[j])
++                            .ok_or("No safe square")?;
++                        self.mines[cell] = false;
++                        self.mines[replacement] = true;
++                    }
++                    self.first = false;
++                }
++                self.reveal(cell)
++            }
++            TerminalInput::Chord { cell } => {
++                if cell >= self.mines.len() {
++                    return Err("Invalid cell");
++                }
++                if self.open[cell] {
++                    let ns = neighbours(cell, self.w, self.h);
++                    if ns.iter().filter(|&&j| self.flags[j]).count() == self.adjacent(cell) as usize
++                    {
++                        for j in ns {
++                            self.reveal(j);
++                            if self.outcome == Outcome::Lost {
++                                break;
++                            }
++                        }
++                    }
++                }
++            }
++            _ => return Err("Expected reveal, flag, chord or pause"),
++        }
++        if self.outcome != Outcome::Lost
++            && (0..self.mines.len()).all(|j| self.mines[j] || self.open[j])
++        {
++            self.outcome = Outcome::Won
++        }
++        Ok(())
++    }
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct TermwalkScene {
++    pub width: usize,
++    pub height: usize,
++    pub router: usize,
++    pub pipes: Vec<u8>,
++    pub connected: Vec<bool>,
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub(super) struct Walk {
++    pub size: usize,
++    pub pipes: Vec<u8>,
++}
++const DIR: [(i32, i32, u8, u8); 4] = [(0, -1, 1, 4), (1, 0, 2, 8), (0, 1, 4, 1), (-1, 0, 8, 2)];
++fn rotate(p: u8, cw: bool) -> u8 {
++    if cw {
++        ((p << 1) & 15) | (p >> 3)
++    } else {
++        (p >> 1) | ((p & 1) << 3)
++    }
++}
++impl Walk {
++    pub fn new(r: &mut Rng) -> Self {
++        Self::new_size(r, 5)
++    }
++    pub fn new_size(r: &mut Rng, size: usize) -> Self {
++        let mut pipes = vec![0; size * size];
++        let mut visited = vec![false; size * size];
++        visited[size * size / 2] = true;
++        let mut stack = vec![size * size / 2];
++        while let Some(&c) = stack.last() {
++            let (x, y) = (c % size, c / size);
++            let opts: Vec<_> = DIR
++                .iter()
++                .filter_map(|&(dx, dy, b, o)| {
++                    let (a, d) = (x as i32 + dx, y as i32 + dy);
++                    if (0..size as i32).contains(&a) && (0..size as i32).contains(&d) {
++                        let n = d as usize * size + a as usize;
++                        if !visited[n] {
++                            return Some((n, b, o));
++                        }
++                    }
++                    None
++                })
++                .collect();
++            if opts.is_empty() {
++                stack.pop();
++                continue;
++            }
++            let (n, b, o) = opts[r.below(opts.len())];
++            pipes[c] |= b;
++            pipes[n] |= o;
++            visited[n] = true;
++            stack.push(n)
++        }
++        for p in &mut pipes {
++            for _ in 0..r.below(4) {
++                *p = rotate(*p, true)
++            }
++        }
++        let mut s = Self { pipes, size };
++        if s.outcome() == Outcome::Won {
++            s.pipes[0] = rotate(s.pipes[0], true)
++        }
++        s
++    }
++    fn connected(&self) -> Vec<bool> {
++        let size = self.size;
++        let mut seen = vec![false; size * size];
++        seen[size * size / 2] = true;
++        let mut stack = vec![size * size / 2];
++        while let Some(c) = stack.pop() {
++            for &(dx, dy, b, o) in &DIR {
++                let (x, y) = (c % size, c / size);
++                let (a, d) = (x as i32 + dx, y as i32 + dy);
++                if self.pipes[c] & b != 0
++                    && (0..size as i32).contains(&a)
++                    && (0..size as i32).contains(&d)
++                {
++                    let n = d as usize * size + a as usize;
++                    if self.pipes[n] & o != 0 && !seen[n] {
++                        seen[n] = true;
++                        stack.push(n)
++                    }
++                }
++            }
++        }
++        seen
++    }
++    pub fn outcome(&self) -> Outcome {
++        if self.connected().iter().all(|&x| x) {
++            Outcome::Won
++        } else {
++            Outcome::Playing
++        }
++    }
++    pub fn scene(&self) -> TermwalkScene {
++        TermwalkScene {
++            width: self.size,
++            height: self.size,
++            router: self.size * self.size / 2,
++            pipes: self.pipes.clone(),
++            connected: self.connected(),
++        }
++    }
++    pub fn apply(&mut self, i: TerminalInput) -> Result<(), &'static str> {
++        let TerminalInput::Rotate { cell, clockwise } = i else {
++            return Err("Expected rotation");
++        };
++        if cell >= self.pipes.len() {
++            return Err("Invalid cell");
++        }
++        self.pipes[cell] = rotate(self.pipes[cell], clockwise);
++        Ok(())
++    }
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct GreedScene {
++    pub width: usize,
++    pub height: usize,
++    pub cells: Vec<u8>,
++    pub player: usize,
++    pub erased: usize,
++    pub legal_directions: Vec<(i8, i8)>,
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub(super) struct Greed {
++    pub w: usize,
++    pub h: usize,
++    pub cells: Vec<u8>,
++    pub player: usize,
++    pub erased: usize,
++}
++impl Greed {
++    pub fn new(r: &mut Rng) -> Self {
++        let mut cells: Vec<u8> = (0..200).map(|_| (r.below(9) + 1) as u8).collect();
++        let player = 105;
++        cells[player] = 0;
++        Self {
++            w: 20,
++            h: 10,
++            cells,
++            player,
++            erased: 0,
++        }
++    }
++    fn path(&self, dx: i8, dy: i8) -> Option<Vec<usize>> {
++        if !(-1..=1).contains(&dx) || !(-1..=1).contains(&dy) || (dx == 0 && dy == 0) {
++            return None;
++        }
++        let (x, y) = (self.player % self.w, self.player / self.w);
++        let (a, b) = (x as i32 + dx as i32, y as i32 + dy as i32);
++        if a < 0 || b < 0 || a >= self.w as i32 || b >= self.h as i32 {
++            return None;
++        }
++        let n = self.cells[b as usize * self.w + a as usize];
++        if n == 0 {
++            return None;
++        }
++        let mut path = Vec::new();
++        for i in 1..=n as i32 {
++            let (a, b) = (x as i32 + dx as i32 * i, y as i32 + dy as i32 * i);
++            if a < 0 || b < 0 || a >= self.w as i32 || b >= self.h as i32 {
++                return None;
++            }
++            let c = b as usize * self.w + a as usize;
++            if self.cells[c] == 0 {
++                return None;
++            }
++            path.push(c)
++        }
++        Some(path)
++    }
++    fn legal(&self) -> Vec<(i8, i8)> {
++        (-1..=1)
++            .flat_map(|dy| (-1..=1).map(move |dx| (dx, dy)))
++            .filter(|&(dx, dy)| self.path(dx, dy).is_some())
++            .collect()
++    }
++    pub fn outcome(&self) -> Outcome {
++        if self.cells.iter().all(|&x| x == 0) {
++            Outcome::Won
++        } else if self.legal().is_empty() {
++            Outcome::Lost
++        } else {
++            Outcome::Playing
++        }
++    }
++    pub fn scene(&self) -> GreedScene {
++        GreedScene {
++            width: self.w,
++            height: self.h,
++            cells: self.cells.clone(),
++            player: self.player,
++            erased: self.erased,
++            legal_directions: self.legal(),
++        }
++    }
++    pub fn apply(&mut self, i: TerminalInput) -> Result<(), &'static str> {
++        let TerminalInput::Move { dx, dy } = i else {
++            return Err("Expected movement");
++        };
++        let path = self
++            .path(dx, dy)
++            .ok_or("Direction crosses erased squares or leaves board")?;
++        self.player = *path.last().unwrap();
++        self.erased += path.len();
++        for c in path {
++            self.cells[c] = 0
++        }
++        Ok(())
++    }
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn sudoku_rejects_row_column_box_conflicts_and_fixed_edits() {
++        let mut s = Sudoku {
++            cells: [0; 81],
++            fixed: [false; 81],
++        };
++        s.cells[0] = 1;
++        s.fixed[0] = true;
++        assert!(s.apply(TerminalInput::Digit { cell: 0, value: 2 }).is_err());
++        for c in [1, 9, 10] {
++            assert!(s.apply(TerminalInput::Digit { cell: c, value: 1 }).is_err())
++        }
++        assert!(s.apply(TerminalInput::Digit { cell: 40, value: 1 }).is_ok());
++        assert_eq!(s.cells[40], 1);
++    }
++    #[test]
++    fn mine_flood_stops_at_number_flags_and_detonation() {
++        let mut s = Mines {
++            w: 3,
++            h: 3,
++            mines: vec![false, false, false, false, false, false, false, false, true],
++            open: vec![false; 9],
++            flags: vec![false; 9],
++            outcome: Outcome::Playing,
++            first: false,
++            paused: false,
++        };
++        s.apply(TerminalInput::Flag { cell: 1 }).unwrap();
++        s.apply(TerminalInput::Reveal { cell: 0 }).unwrap();
++        assert!(!s.open[1]);
++        assert!(s.open[4]);
++        assert!(!s.open[8]);
++        s.apply(TerminalInput::Reveal { cell: 8 }).unwrap();
++        assert_eq!(s.outcome, Outcome::Lost);
++    }
++    #[test]
++    fn walk_rotates_connection_ports() {
++        let mut s = Walk {
++            size: 5,
++            pipes: vec![1; 25],
++        };
++        s.apply(TerminalInput::Rotate {
++            cell: 0,
++            clockwise: true,
++        })
++        .unwrap();
++        assert_eq!(s.pipes[0], 2);
++        s.apply(TerminalInput::Rotate {
++            cell: 0,
++            clockwise: false,
++        })
++        .unwrap();
++        assert_eq!(s.pipes[0], 1);
++    }
++    #[test]
++    fn greed_uses_first_digit_erases_entire_path_and_blocks_gaps() {
++        let mut s = Greed {
++            w: 5,
++            h: 1,
++            cells: vec![0, 3, 1, 9, 1],
++            player: 0,
++            erased: 0,
++        };
++        s.apply(TerminalInput::Move { dx: 1, dy: 0 }).unwrap();
++        assert_eq!(s.player, 3);
++        assert_eq!(s.cells, vec![0, 0, 0, 0, 1]);
++        assert_eq!(s.erased, 3);
++        assert!(s.apply(TerminalInput::Move { dx: -1, dy: 0 }).is_err());
++        s.apply(TerminalInput::Move { dx: 1, dy: 0 }).unwrap();
++        assert_eq!(s.outcome(), Outcome::Won);
++    }
++}
++
++#[cfg(test)]
++mod generation_tests {
++    use super::*;
++    #[test]
++    fn sudoku_boards_have_unique_valid_solution_for_many_seeds() {
++        for seed in 0..64 {
++            let s = Sudoku::new(&mut Rng(seed));
++            assert!(s.cells.iter().filter(|&&v| v != 0).count() >= 39);
++            for c in 0..81 {
++                if s.cells[c] != 0 {
++                    assert!(allowed(&s.cells, c, s.cells[c]));
++                    assert!(s.fixed[c])
++                }
++            }
++            let mut cells = s.cells;
++            assert_eq!(count_solutions(&mut cells, 2, &mut 1_000_000), 1);
++        }
++    }
++    #[test]
++    fn sudoku_completes_only_after_last_legal_digit() {
++        let mut s = Sudoku::new(&mut Rng(42));
++        let mut solution = s.cells;
++        assert_eq!(count_solutions(&mut solution, 2, &mut 1_000_000), 1);
++        fn solve(cells: &mut [u8; 81]) -> bool {
++            if let Some(c) = cells.iter().position(|&v| v == 0) {
++                for v in 1..=9 {
++                    if allowed(cells, c, v) {
++                        cells[c] = v;
++                        if solve(cells) {
++                            return true;
++                        }
++                    }
++                }
++                cells[c] = 0;
++                false
++            } else {
++                true
++            }
++        }
++        assert!(solve(&mut solution));
++        for (c, &v) in solution.iter().enumerate() {
++            if !s.fixed[c] {
++                s.apply(TerminalInput::Digit { cell: c, value: v }).unwrap();
++            }
++        }
++        assert_eq!(s.outcome(), Outcome::Won);
++    }
++    #[test]
++    fn first_mine_reveal_preserves_mine_count_and_safe_square() {
++        for preset in [
++            MinePreset::Newbie,
++            MinePreset::Easy,
++            MinePreset::Medium,
++            MinePreset::Hard,
++        ] {
++            let mut s = Mines::new(&mut Rng(9), preset);
++            let (w, h, n) = preset.dimensions();
++            assert_eq!(s.mines.len(), w * h);
++            assert_eq!(s.mines.iter().filter(|&&x| x).count(), n);
++            let c = s.mines.iter().position(|&x| x).unwrap();
++            s.apply(TerminalInput::Reveal { cell: c }).unwrap();
++            assert!(s.open[c]);
++            assert!(!s.mines[c]);
++            assert_eq!(s.mines.iter().filter(|&&x| x).count(), n);
++            assert_ne!(s.outcome, Outcome::Lost);
++        }
++    }
++    #[test]
++    fn mine_chord_with_wrong_flag_detonates_and_correct_flag_wins() {
++        fn board() -> Mines {
++            Mines {
++                w: 2,
++                h: 2,
++                mines: vec![true, false, false, false],
++                open: vec![false, false, false, true],
++                flags: vec![false; 4],
++                outcome: Outcome::Playing,
++                first: false,
++                paused: false,
++            }
++        }
++        let mut s = board();
++        s.flags[0] = true;
++        s.apply(TerminalInput::Chord { cell: 3 }).unwrap();
++        assert_eq!(s.outcome, Outcome::Won);
++        let mut s = board();
++        s.flags[1] = true;
++        s.apply(TerminalInput::Chord { cell: 3 }).unwrap();
++        assert_eq!(s.outcome, Outcome::Lost);
++    }
++    #[test]
++    fn walk_spanning_tree_has_bounded_ports_and_can_be_oriented() {
++        for seed in 0..64 {
++            let mut s = Walk::new(&mut Rng(seed));
++            assert_eq!(s.pipes.len(), 25);
++            assert_eq!(s.pipes.iter().map(|p| p.count_ones()).sum::<u32>(), 48);
++            assert!(s.pipes.iter().all(|&p| p > 0 && p < 16));
++            assert_eq!(s.outcome(), Outcome::Playing);
++            for c in 0..25 {
++                let p = s.pipes[c];
++                for _ in 0..4 {
++                    s.apply(TerminalInput::Rotate {
++                        cell: c,
++                        clockwise: true,
++                    })
++                    .unwrap();
++                }
++                assert_eq!(s.pipes[c], p)
++            }
++        }
++    }
++    #[test]
++    fn greed_cannot_jump_over_erased_cell_or_leave_grid() {
++        let mut s = Greed {
++            w: 4,
++            h: 1,
++            cells: vec![0, 3, 0, 1],
++            player: 0,
++            erased: 0,
++        };
++        let before = s.clone();
++        assert!(s.apply(TerminalInput::Move { dx: 1, dy: 0 }).is_err());
++        assert_eq!(s, before);
++        assert_eq!(s.outcome(), Outcome::Lost);
++        for (dx, dy) in [(127, 0), (-128, 1), (0, 0), (0, -1)] {
++            assert!(s.apply(TerminalInput::Move { dx, dy }).is_err())
++        }
++    }
++}
++#[cfg(test)]
++mod walk_win_test {
++    use super::*;
++    #[test]
++    fn all_twenty_five_tiles_must_connect_to_central_router() {
++        let mut path = Vec::new();
++        for y in 0..5 {
++            for i in 0..5 {
++                path.push(y * 5 + if y % 2 == 0 { i } else { 4 - i });
++            }
++        }
++        let mut s = Walk {
++            size: 5,
++            pipes: vec![0; 25],
++        };
++        for pair in path.windows(2) {
++            let (a, b) = (pair[0], pair[1]);
++            let (da, db) = if b == a + 1 {
++                (2, 8)
++            } else if a == b + 1 {
++                (8, 2)
++            } else {
++                (4, 1)
++            };
++            s.pipes[a] |= da;
++            s.pipes[b] |= db;
++        }
++        assert_eq!(s.outcome(), Outcome::Won);
++        s.apply(TerminalInput::Rotate {
++            cell: 0,
++            clockwise: true,
++        })
++        .unwrap();
++        assert_eq!(s.outcome(), Outcome::Playing);
++        assert!(!s.scene().connected[0]);
++    }
++}
++
++#[cfg(test)]
++mod walk_size_test {
++    use super::*;
++    #[test]
++    fn odd_sizes_have_central_router_and_bounded_trees() {
++        for size in [3, 7, 9, 15] {
++            let s = Walk::new_size(&mut Rng(0), size);
++            let g = s.scene();
++            assert_eq!(g.width, size);
++            assert_eq!(g.height, size);
++            assert_eq!(g.router, size * size / 2);
++            assert_eq!(g.pipes.len(), size * size);
++            assert_eq!(
++                g.pipes.iter().map(|p| p.count_ones()).sum::<u32>(),
++                (size * size * 2 - 2) as u32
++            );
++        }
++    }
++}
+--- /dev/null
++++ b/src/games/terminal/invaders.rs
+@@ -0,0 +1,225 @@
++use super::{Outcome, TerminalInput};
++
++// Shared by the public scene, projectile origin and both collision paths.
++const PLAYER_Y: i32 = 22;
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub struct Invader {
++    pub x: i32,
++    pub y: i32,
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub struct NinvadersScene {
++    pub width: i32,
++    pub height: i32,
++    pub player_x: i32,
++    pub player_y: i32,
++    pub enemies: Vec<Invader>,
++    pub player_shots: Vec<(i32, i32)>,
++    pub enemy_shots: Vec<(i32, i32)>,
++    pub lives: u8,
++    pub score: u32,
++    pub started: bool,
++    pub paused: bool,
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub(super) struct Invaders {
++    pub player: i32,
++    pub enemies: Vec<Invader>,
++    pub shots: Vec<(i32, i32)>,
++    pub enemy_shots: Vec<(i32, i32)>,
++    pub lives: u8,
++    pub score: u32,
++    pub started: bool,
++    pub paused: bool,
++    pub ticks: u32,
++    pub direction: i32,
++    pub outcome: Outcome,
++}
++impl Invaders {
++    pub fn new() -> Self {
++        Self {
++            player: 15,
++            enemies: (0..3)
++                .flat_map(|y| {
++                    (0..8).map(move |x| Invader {
++                        x: 4 + x * 3,
++                        y: 2 + y * 2,
++                    })
++                })
++                .collect(),
++            shots: Vec::new(),
++            enemy_shots: Vec::new(),
++            lives: 3,
++            score: 0,
++            started: false,
++            paused: false,
++            ticks: 0,
++            direction: 1,
++            outcome: Outcome::Playing,
++        }
++    }
++    pub fn scene(&self) -> NinvadersScene {
++        NinvadersScene {
++            width: 32,
++            height: 24,
++            player_x: self.player,
++            player_y: PLAYER_Y,
++            enemies: self.enemies.clone(),
++            player_shots: self.shots.clone(),
++            enemy_shots: self.enemy_shots.clone(),
++            lives: self.lives,
++            score: self.score,
++            started: self.started,
++            paused: self.paused,
++        }
++    }
++    fn hits(&mut self) {
++        self.shots.retain(|&(x, y)| {
++            if let Some(i) = self.enemies.iter().position(|e| e.x == x && e.y == y) {
++                self.enemies.remove(i);
++                self.score = self.score.saturating_add(10);
++                false
++            } else {
++                true
++            }
++        });
++        self.enemy_shots.retain(|&(x, y)| {
++            if x == self.player && y == PLAYER_Y {
++                self.lives = self.lives.saturating_sub(1);
++                false
++            } else {
++                true
++            }
++        });
++        if self.lives == 0 || self.enemies.iter().any(|e| e.y >= PLAYER_Y) {
++            self.outcome = Outcome::Lost
++        } else if self.enemies.is_empty() {
++            self.outcome = Outcome::Won
++        }
++    }
++    pub fn apply(&mut self, i: TerminalInput) -> Result<(), &'static str> {
++        if i == TerminalInput::Start {
++            self.started = true;
++            return Ok(());
++        }
++        if !self.started {
++            return Err("Start the game first");
++        }
++        if i == TerminalInput::Pause {
++            self.paused = !self.paused;
++            return Ok(());
++        }
++        if self.paused {
++            return Ok(());
++        }
++        match i {
++            TerminalInput::Move { dx, dy } => {
++                if !(-1..=1).contains(&dx) || dy != 0 {
++                    return Err("Move left or right only");
++                }
++                self.player = (self.player + dx as i32).clamp(0, 31)
++            }
++            TerminalInput::Fire => {
++                if self.shots.len() < 4
++                    && !self
++                        .shots
++                        .iter()
++                        .any(|&(x, y)| x == self.player && y == PLAYER_Y - 1)
++                {
++                    self.shots.push((self.player, PLAYER_Y - 1));
++                }
++            }
++            TerminalInput::Tick => {
++                self.ticks = self.ticks.wrapping_add(1);
++                for p in &mut self.shots {
++                    p.1 -= 1
++                }
++                for p in &mut self.enemy_shots {
++                    p.1 += 1
++                }
++                self.hits();
++                if self.outcome != Outcome::Playing {
++                    return Ok(());
++                }
++                if self.ticks % 4 == 0 {
++                    if self
++                        .enemies
++                        .iter()
++                        .any(|e| e.x + self.direction < 0 || e.x + self.direction >= 32)
++                    {
++                        self.direction = -self.direction;
++                        for e in &mut self.enemies {
++                            e.y += 1
++                        }
++                    } else {
++                        for e in &mut self.enemies {
++                            e.x += self.direction
++                        }
++                    }
++                    self.hits();
++                }
++                if self.ticks % 12 == 0 && self.enemy_shots.len() < 8 {
++                    if let Some(e) = self
++                        .enemies
++                        .iter()
++                        .max_by_key(|e| e.y * 100 - (e.x - self.player).abs())
++                    {
++                        self.enemy_shots.push((e.x, e.y + 1));
++                    }
++                }
++                self.shots.retain(|&(_, y)| y >= 0);
++                self.enemy_shots.retain(|&(_, y)| y < 24);
++                self.hits();
++            }
++            _ => return Err("Expected movement, fire, tick or pause"),
++        }
++        Ok(())
++    }
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn player_shot_destroys_last_invader_and_wins() {
++        let mut s = Invaders::new();
++        s.started = true;
++        s.enemies = vec![Invader { x: 15, y: 20 }];
++        s.apply(TerminalInput::Fire).unwrap();
++        s.apply(TerminalInput::Tick).unwrap();
++        assert_eq!(s.outcome, Outcome::Won);
++        assert_eq!(s.score, 10);
++    }
++    #[test]
++    fn enemy_shot_costs_life_and_ground_contact_loses() {
++        let mut s = Invaders::new();
++        s.started = true;
++        s.lives = 1;
++        s.enemy_shots = vec![(15, 21)];
++        s.apply(TerminalInput::Tick).unwrap();
++        assert_eq!(s.outcome, Outcome::Lost);
++        assert_eq!(s.lives, 0);
++    }
++}
++
++#[cfg(test)]
++mod player_row_contract {
++    use super::*;
++    #[test]
++    fn public_player_row_matches_shot_origin_and_damage_boundary() {
++        let mut s = Invaders::new();
++        s.apply(TerminalInput::Start).unwrap();
++        let row = s.scene().player_y;
++        assert_eq!(row, 22);
++        assert!(row >= 0 && row < s.scene().height);
++        s.apply(TerminalInput::Fire).unwrap();
++        assert_eq!(s.scene().player_shots, vec![(s.scene().player_x, row - 1)]);
++        s.enemy_shots = vec![(s.scene().player_x, row - 2)];
++        s.apply(TerminalInput::Tick).unwrap();
++        assert_eq!(s.scene().lives, 3);
++        s.apply(TerminalInput::Tick).unwrap();
++        assert_eq!(s.scene().lives, 2);
++        s.enemies = vec![Invader { x: 0, y: row }];
++        s.apply(TerminalInput::Tick).unwrap();
++        assert_eq!(s.outcome, Outcome::Lost);
++    }
++}
+--- /dev/null
++++ b/src/games/terminal/mod.rs
+@@ -0,0 +1,295 @@
++//! Independent pure Rust terminal games. See PROVENANCE.md for evidence boundaries.
++mod blocks;
++mod cards;
++mod grids;
++mod invaders;
++#[cfg(test)]
++mod tests;
++pub use blocks::{CtrisScene, Piece};
++pub use cards::{Card, CardPile, SolitaireVariant, SolitermScene};
++pub use grids::{GreedScene, MineCell, MinePreset, NimesweeperScene, SudokuScene, TermwalkScene};
++pub use invaders::{Invader, NinvadersScene};
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum TerminalKind {
++    Soliterm,
++    Termwalk,
++    Ctris,
++    Sudoku,
++    Nimesweeper,
++    Ninvaders,
++    Greed,
++}
++impl TerminalKind {
++    pub const ALL: [Self; 7] = [
++        Self::Soliterm,
++        Self::Termwalk,
++        Self::Ctris,
++        Self::Sudoku,
++        Self::Nimesweeper,
++        Self::Ninvaders,
++        Self::Greed,
++    ];
++    pub fn selector(self) -> &'static str {
++        match self {
++            Self::Soliterm => "soliterm",
++            Self::Termwalk => "termwalk",
++            Self::Ctris => "ctris",
++            Self::Sudoku => "sudoku",
++            Self::Nimesweeper => "nimesweeper",
++            Self::Ninvaders => "ninvaders",
++            Self::Greed => "greed",
++        }
++    }
++    pub fn help(self) -> &'static str {
++        match self {
++            Self::Soliterm => {
++                "Select a source pile and destination. Build alternating colours descending in tableau; suit foundations ascend Ace to King. Freecell has four reserves. Klondike uses draw-one stock and King-only empty columns. Undo/reset available."
++            }
++            Self::Termwalk => {
++                "Rotate tiles clockwise or anticlockwise to connect every server to the central router. No wrapping; all pipe ends must match. Undo/reset available."
++            }
++            Self::Ctris => {
++                "Left/right move, up rotates clockwise, down soft-drops, Space hard-drops. P pauses. Complete horizontal rows to clear them; blocked spawn loses. Independent conventional controls."
++            }
++            Self::Sudoku => {
++                "Digits 1–9 fill each row, column and 3×3 box once. 0 erases. Starting digits are fixed. Undo/reset available."
++            }
++            Self::Nimesweeper => {
++                "Reveal every safe square. F toggles flag; Space reveals; open numbered squares chord when adjacent flags match. P pauses. Undo/reset available."
++            }
++            Self::Ninvaders => {
++                "Space starts/fires. Left/right move. Tick advances one simulation step. P pauses. Destroy the wave; enemy shots cost lives, enemies reaching the player lose. Independent conventional controls."
++            }
++            Self::Greed => {
++                "Move in eight directions (hjklyubn/keypad). The first digit sets distance. Erase that many squares; crossing erased squares or leaving the board is illegal. No legal moves ends the game; clear all digits to win."
++            }
++        }
++    }
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum Outcome {
++    Playing,
++    Won,
++    Lost,
++}
++#[derive(Clone, Copy, Debug, PartialEq, Eq)]
++pub enum TerminalInput {
++    Rotate {
++        cell: usize,
++        clockwise: bool,
++    },
++    Digit {
++        cell: usize,
++        value: u8,
++    },
++    Reveal {
++        cell: usize,
++    },
++    Flag {
++        cell: usize,
++    },
++    Chord {
++        cell: usize,
++    },
++    Move {
++        dx: i8,
++        dy: i8,
++    },
++    Tick,
++    Drop,
++    Fire,
++    Start,
++    Pause,
++    Draw,
++    Transfer {
++        from: CardPile,
++        to: CardPile,
++        count: usize,
++    },
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++pub enum TerminalScene {
++    Soliterm(SolitermScene),
++    Termwalk(TermwalkScene),
++    Ctris(CtrisScene),
++    Sudoku(SudokuScene),
++    Nimesweeper(NimesweeperScene),
++    Ninvaders(NinvadersScene),
++    Greed(GreedScene),
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++enum State {
++    Cards(cards::Cards),
++    Walk(grids::Walk),
++    Blocks(blocks::Blocks),
++    Sudoku(grids::Sudoku),
++    Mines(grids::Mines),
++    Invaders(invaders::Invaders),
++    Greed(grids::Greed),
++}
++#[derive(Clone, Debug)]
++pub struct TerminalSession {
++    kind: TerminalKind,
++    seed: u64,
++    state: State,
++    initial: State,
++    history: Vec<State>,
++}
++impl TerminalSession {
++    pub const UNDO_LIMIT: usize = 128;
++    pub fn new(kind: TerminalKind, seed: u64) -> Self {
++        let mut rng = Rng(seed);
++        let state = match kind {
++            TerminalKind::Soliterm => {
++                State::Cards(cards::Cards::new(&mut rng, SolitaireVariant::Freecell, 3))
++            }
++            TerminalKind::Termwalk => State::Walk(grids::Walk::new(&mut rng)),
++            TerminalKind::Ctris => State::Blocks(blocks::Blocks::new(&mut rng)),
++            TerminalKind::Sudoku => State::Sudoku(grids::Sudoku::new(&mut rng)),
++            TerminalKind::Nimesweeper => {
++                State::Mines(grids::Mines::new(&mut rng, MinePreset::Easy))
++            }
++            TerminalKind::Ninvaders => State::Invaders(invaders::Invaders::new()),
++            TerminalKind::Greed => State::Greed(grids::Greed::new(&mut rng)),
++        };
++        Self {
++            kind,
++            seed,
++            initial: state.clone(),
++            state,
++            history: Vec::new(),
++        }
++    }
++    pub fn new_solitaire(seed: u64, variant: SolitaireVariant, passes: u8) -> Self {
++        let mut s = Self::new(TerminalKind::Soliterm, seed);
++        s.state = State::Cards(cards::Cards::new(
++            &mut Rng(seed),
++            variant,
++            passes.clamp(1, 20),
++        ));
++        s.initial = s.state.clone();
++        s
++    }
++    /// Only odd sizes 3 through 15 are accepted; generation is bounded.
++    pub fn new_termwalk(seed: u64, size: usize) -> Result<Self, &'static str> {
++        if !(3..=15).contains(&size) || size % 2 == 0 {
++            return Err("Grid size must be odd, between 3 and 15");
++        }
++        let mut s = Self::new(TerminalKind::Termwalk, seed);
++        s.state = State::Walk(grids::Walk::new_size(&mut Rng(seed), size));
++        s.initial = s.state.clone();
++        Ok(s)
++    }
++    pub fn new_mines(seed: u64, preset: MinePreset) -> Self {
++        let mut s = Self::new(TerminalKind::Nimesweeper, seed);
++        s.state = State::Mines(grids::Mines::new(&mut Rng(seed), preset));
++        s.initial = s.state.clone();
++        s
++    }
++    pub fn kind(&self) -> TerminalKind {
++        self.kind
++    }
++    pub fn seed(&self) -> u64 {
++        self.seed
++    }
++    pub fn outcome(&self) -> Outcome {
++        match &self.state {
++            State::Cards(s) => s.outcome(),
++            State::Walk(s) => s.outcome(),
++            State::Blocks(s) => s.outcome,
++            State::Sudoku(s) => s.outcome(),
++            State::Mines(s) => s.outcome,
++            State::Invaders(s) => s.outcome,
++            State::Greed(s) => s.outcome(),
++        }
++    }
++    pub fn scene(&self) -> TerminalScene {
++        match &self.state {
++            State::Cards(s) => TerminalScene::Soliterm(s.scene()),
++            State::Walk(s) => TerminalScene::Termwalk(s.scene()),
++            State::Blocks(s) => TerminalScene::Ctris(s.scene()),
++            State::Sudoku(s) => TerminalScene::Sudoku(s.scene()),
++            State::Mines(s) => TerminalScene::Nimesweeper(s.scene()),
++            State::Invaders(s) => TerminalScene::Ninvaders(s.scene()),
++            State::Greed(s) => TerminalScene::Greed(s.scene()),
++        }
++    }
++    pub fn apply(&mut self, input: TerminalInput) -> Result<bool, &'static str> {
++        if self.outcome() != Outcome::Playing {
++            return Err("Game finished; undo or reset to continue");
++        }
++        let before = self.state.clone();
++        let result = match &mut self.state {
++            State::Cards(s) => s.apply(input),
++            State::Walk(s) => s.apply(input),
++            State::Blocks(s) => s.apply(input),
++            State::Sudoku(s) => s.apply(input),
++            State::Mines(s) => s.apply(input),
++            State::Invaders(s) => s.apply(input),
++            State::Greed(s) => s.apply(input),
++        };
++        if let Err(e) = result {
++            self.state = before;
++            return Err(e);
++        }
++        if before == self.state {
++            return Ok(false);
++        }
++        if self.history.len() == Self::UNDO_LIMIT {
++            self.history.remove(0);
++        }
++        self.history.push(before);
++        Ok(true)
++    }
++    pub fn input(&mut self, input: TerminalInput) -> Result<bool, &'static str> {
++        self.apply(input)
++    }
++    pub fn undo(&mut self) -> bool {
++        if let Some(s) = self.history.pop() {
++            self.state = s;
++            true
++        } else {
++            false
++        }
++    }
++    pub fn can_undo(&self) -> bool {
++        !self.history.is_empty()
++    }
++    pub fn reset(&mut self) {
++        self.state = self.initial.clone();
++        self.history.clear();
++    }
++}
++#[derive(Clone, Debug, PartialEq, Eq)]
++struct Rng(u64);
++impl Rng {
++    fn next(&mut self) -> u64 {
++        self.0 = self.0.wrapping_add(0x9e3779b97f4a7c15);
++        let mut z = self.0;
++        z = (z ^ (z >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
++        z = (z ^ (z >> 27)).wrapping_mul(0x94d049bb133111eb);
++        z ^ (z >> 31)
++    }
++    fn below(&mut self, n: usize) -> usize {
++        (self.next() % n as u64) as usize
++    }
++    fn shuffle<T>(&mut self, v: &mut [T]) {
++        for i in (1..v.len()).rev() {
++            let j = self.below(i + 1);
++            v.swap(i, j)
++        }
++    }
++}
++fn neighbours(c: usize, w: usize, h: usize) -> Vec<usize> {
++    let (x, y) = (c % w, c / w);
++    let mut v = Vec::new();
++    for dy in -1..=1i32 {
++        for dx in -1..=1i32 {
++            let (a, b) = (x as i32 + dx, y as i32 + dy);
++            if (dx != 0 || dy != 0) && a >= 0 && b >= 0 && a < w as i32 && b < h as i32 {
++                v.push(b as usize * w + a as usize)
++            }
++        }
++    }
++    v
++}
+--- /dev/null
++++ b/src/games/terminal/tests.rs
+@@ -0,0 +1,189 @@
++use super::*;
++#[test]
++fn seven_declared_terminal_games() {
++    assert_eq!(TerminalKind::ALL.len(), 7);
++    assert!(
++        !TerminalKind::ALL
++            .iter()
++            .any(|k| k.selector() == "typespeed")
++    );
++}
++#[test]
++fn deterministic_reset_and_invalid_input_atomicity() {
++    for kind in TerminalKind::ALL {
++        for seed in 0..16 {
++            let mut s = TerminalSession::new(kind, seed);
++            let initial = s.scene();
++            assert_eq!(initial, TerminalSession::new(kind, seed).scene());
++            let _ = s.apply(TerminalInput::Digit {
++                cell: usize::MAX,
++                value: 255,
++            });
++            assert_eq!(s.scene(), initial);
++            assert!(!s.can_undo());
++            s.reset();
++            assert_eq!(s.scene(), initial)
++        }
++    }
++}
++
++#[test]
++fn successful_inputs_undo_exactly_and_reset_matches_seed() {
++    for kind in TerminalKind::ALL {
++        let mut s = TerminalSession::new(kind, 8);
++        let initial = s.scene();
++        let input = match kind {
++            TerminalKind::Soliterm => TerminalInput::Transfer {
++                from: CardPile::Tableau(0),
++                to: CardPile::Reserve(0),
++                count: 1,
++            },
++            TerminalKind::Termwalk => TerminalInput::Rotate {
++                cell: 0,
++                clockwise: true,
++            },
++            TerminalKind::Ctris => TerminalInput::Tick,
++            TerminalKind::Sudoku => {
++                let TerminalScene::Sudoku(g) = s.scene() else {
++                    unreachable!()
++                };
++                let c = g.cells.iter().position(|&v| v == 0).unwrap();
++                let v = (1..=9)
++                    .find(|&v| {
++                        let mut candidate = s.clone();
++                        candidate
++                            .apply(TerminalInput::Digit { cell: c, value: v })
++                            .is_ok()
++                    })
++                    .unwrap();
++                TerminalInput::Digit { cell: c, value: v }
++            }
++            TerminalKind::Nimesweeper => TerminalInput::Flag { cell: 0 },
++            TerminalKind::Ninvaders => TerminalInput::Start,
++            TerminalKind::Greed => {
++                let TerminalScene::Greed(g) = s.scene() else {
++                    unreachable!()
++                };
++                let (dx, dy) = g.legal_directions[0];
++                TerminalInput::Move { dx, dy }
++            }
++        };
++        assert_eq!(s.apply(input), Ok(true));
++        assert_ne!(s.scene(), initial);
++        assert!(s.undo());
++        assert_eq!(s.scene(), initial);
++        assert!(!s.can_undo());
++        s.apply(input).unwrap();
++        s.reset();
++        assert_eq!(s.scene(), initial);
++    }
++}
++#[test]
++fn history_is_bounded_noops_do_not_consume_and_rng_replays() {
++    let mut s = TerminalSession::new(TerminalKind::Ctris, 0);
++    s.apply(TerminalInput::Pause).unwrap();
++    let n = s.history.len();
++    for _ in 0..400 {
++        s.apply(TerminalInput::Tick).unwrap();
++    }
++    assert_eq!(s.history.len(), n);
++    s.apply(TerminalInput::Pause).unwrap();
++    let initial = s.scene();
++    s.apply(TerminalInput::Drop).unwrap();
++    let future = s.scene();
++    s.undo();
++    assert_eq!(s.scene(), initial);
++    s.apply(TerminalInput::Drop).unwrap();
++    assert_eq!(s.scene(), future);
++    let mut s = TerminalSession::new(TerminalKind::Termwalk, 0);
++    for i in 0..300 {
++        s.apply(TerminalInput::Rotate {
++            cell: i % 25,
++            clockwise: true,
++        })
++        .unwrap();
++    }
++    assert_eq!(s.history.len(), 128);
++}
++#[test]
++fn terminal_boards_reject_moves_until_undo_or_reset() {
++    let mut s = TerminalSession::new(TerminalKind::Ninvaders, 1);
++    s.state = State::Invaders(invaders::Invaders {
++        outcome: Outcome::Won,
++        ..invaders::Invaders::new()
++    });
++    let before = s.scene();
++    assert!(s.apply(TerminalInput::Start).is_err());
++    assert_eq!(s.scene(), before);
++    s.reset();
++    assert_eq!(s.outcome(), Outcome::Playing);
++}
++#[test]
++fn adversarial_inputs_are_bounded_and_never_panic() {
++    let inputs = [
++        TerminalInput::Digit {
++            cell: usize::MAX,
++            value: 255,
++        },
++        TerminalInput::Reveal { cell: usize::MAX },
++        TerminalInput::Flag { cell: usize::MAX },
++        TerminalInput::Chord { cell: usize::MAX },
++        TerminalInput::Transfer {
++            from: CardPile::Tableau(usize::MAX),
++            to: CardPile::Reserve(usize::MAX),
++            count: usize::MAX,
++        },
++        TerminalInput::Move {
++            dx: i8::MIN,
++            dy: i8::MAX,
++        },
++    ];
++    for k in TerminalKind::ALL {
++        let mut s = TerminalSession::new(k, u64::MAX);
++        for i in inputs {
++            let before = s.scene();
++            assert!(s.apply(i).is_err());
++            assert_eq!(s.scene(), before);
++        }
++    }
++}
++
++#[test]
++fn paused_inputs_are_ignored_before_validation_without_history() {
++    for kind in [
++        TerminalKind::Ctris,
++        TerminalKind::Nimesweeper,
++        TerminalKind::Ninvaders,
++    ] {
++        let mut s = TerminalSession::new(kind, 0);
++        if kind == TerminalKind::Ninvaders {
++            s.apply(TerminalInput::Start).unwrap();
++        }
++        s.apply(TerminalInput::Pause).unwrap();
++        let before = s.scene();
++        let history = s.history.len();
++        for input in [
++            TerminalInput::Digit {
++                cell: usize::MAX,
++                value: 255,
++            },
++            TerminalInput::Move {
++                dx: i8::MIN,
++                dy: i8::MAX,
++            },
++            TerminalInput::Tick,
++        ] {
++            assert_eq!(s.apply(input), Ok(false));
++            assert_eq!(s.scene(), before);
++            assert_eq!(s.history.len(), history);
++        }
++        s.apply(TerminalInput::Pause).unwrap();
++        assert!(
++            s.apply(TerminalInput::Digit {
++                cell: usize::MAX,
++                value: 255
++            })
++            .is_err()
++        );
++    }
++}
+--- a/src/ui.rs
++++ b/src/ui.rs
+@@ -1415,7 +1415,7 @@
+                         }
+                     });
+                     ui.menu_button("Games", |ui| {
+-                        ui.label("Games are not available in this build.");
++                        self.games_menu(ui);
+                         ui.separator();
+                         self.screensaver_settings(ui);
+                     });
+@@ -1477,10 +1477,9 @@
+                     if tool_button(ui, "tools", "Tools").clicked() {
+                         self.page = Page::Tools;
+                     }
+-                    ui.add_enabled_ui(false, |ui| {
+-                        tool_button(ui, "games", "Games")
+-                            .on_hover_text("Games are not available in this build");
+-                    });
++                    if tool_button(ui, "games", "Games").clicked() {
++                        self.games.play.open();
++                    }
+                     if tool_button(ui, "folder", "Sessions").clicked() {
+                         self.store.preferences.sidebar_visible =
+                             !self.store.preferences.sidebar_visible;
+@@ -2099,6 +2098,11 @@
+             self.detached_windows(&ctx);
+             return;
+         }
++        if self.games_frame(root) {
++            self.session_confirmations(&ctx);
++            self.detached_windows(&ctx);
++            return;
++        }
+         Window::new("Feature parity and known differences")
+             .open(&mut self.parity_open)
+             .default_size([850., 580.])
+@@ -2123,6 +2127,11 @@
+                 });
+             });
+         self.top(root);
++        if self.games_frame(root) {
++            self.session_confirmations(&ctx);
++            self.detached_windows(&ctx);
++            return;
++        }
+         self.sidebar(root);
+         CentralPanel::default()
+             .frame(Frame::new().fill(content(root)).inner_margin(0))
+--- a/src/ui/games.rs
++++ b/src/ui/games.rs
+@@ -1,6 +1,8 @@
+ use super::*;
++mod play;
+ 
+ pub(super) struct State {
++    pub play: play::PlayState,
+     pub idle: harbor_workspace::games::screensaver::ScreensaverState,
+     last: Instant,
+     seconds: u64,
+@@ -10,6 +12,7 @@
+ impl Default for State {
+     fn default() -> Self {
+         Self {
++            play: Default::default(),
+             idle: Default::default(),
+             last: Instant::now(),
+             seconds: 300,
+@@ -42,6 +45,12 @@
+     /// A blocked frame is exclusively an idle-screen frame, including the wakeup
+     /// frame. Neither game keys nor wakeup events reach hidden terminal controls.
+     pub(super) fn screensaver_frame(&mut self, ui: &mut Ui) -> bool {
++        if self.games.play.is_open() && !self.games.idle.active() && self.games.wake_owner.is_none()
++        {
++            self.games.idle.on_input();
++            self.games.last = Instant::now();
++            return false;
++        }
+         let now = Instant::now();
+         let elapsed = now.saturating_duration_since(self.games.last);
+         self.games.last = now;
+@@ -228,6 +237,7 @@
+ #[cfg(all(test, unix))]
+ mod tests {
+     use super::*;
++
+     use crate::ui::terminal_review_tests::{captured, owned_workspace, raw_terminal};
+ 
+     #[test]
+@@ -383,6 +393,7 @@
+ #[cfg(all(test, unix))]
+ mod lifecycle_tests {
+     use super::*;
++
+     use crate::ui::terminal_review_tests::{captured, owned_workspace, raw_terminal};
+ 
+     fn touch(phase: TouchPhase) -> Event {
+--- /dev/null
++++ b/src/ui/games/play.rs
+@@ -0,0 +1,1856 @@
++use super::*;
++use harbor_workspace::games::{
++    GameId, GameInput, GameOutcome, GameRegistry, GameScene, GameSession, puzzles as p,
++    terminal as t,
++};
++pub(in crate::ui) struct PlayState {
++    launcher: bool,
++    suspended: bool,
++    pub(in crate::ui) session: Option<GameSession>,
++    selected: usize,
++    colour: u8,
++    pencil: bool,
++    help: bool,
++    message: String,
++    close_owner: Option<ViewportId>,
++    tick: Option<Instant>,
++    source: Option<t::CardPile>,
++    count: usize,
++    variant: usize,
++    passes: u8,
++    preset: usize,
++    portrait: bool,
++    walk_size: usize,
++    dragging: Option<usize>,
++    pub(in crate::ui) board: Option<Rect>,
++}
++impl Default for PlayState {
++    fn default() -> Self {
++        Self {
++            launcher: false,
++            suspended: false,
++            session: None,
++            selected: 0,
++            colour: 1,
++            pencil: false,
++            help: false,
++            message: String::new(),
++            close_owner: None,
++            tick: None,
++            source: None,
++            count: 1,
++            variant: 0,
++            passes: 3,
++            preset: 1,
++            portrait: false,
++            walk_size: 5,
++            dragging: None,
++            board: None,
++        }
++    }
++}
++impl PlayState {
++    pub(in crate::ui) fn open(&mut self) {
++        self.launcher = true;
++        self.suspended = false;
++    }
++    pub(in crate::ui) fn is_open(&self) -> bool {
++        !self.suspended && (self.launcher || self.session.is_some())
++    }
++    fn start(&mut self, id: GameId, seed: u64) {
++        self.session = Some(match id {
++            GameId::Soliterm => GameSession::new_solitaire(
++                seed,
++                if self.variant == 1 {
++                    t::SolitaireVariant::Klondike
++                } else {
++                    t::SolitaireVariant::Freecell
++                },
++                self.passes.max(1),
++            ),
++            GameId::Nimesweeper => GameSession::new_mines(
++                seed,
++                [
++                    t::MinePreset::Newbie,
++                    t::MinePreset::Easy,
++                    t::MinePreset::Medium,
++                    t::MinePreset::Hard,
++                ][self.preset.min(3)],
++            ),
++            GameId::Termwalk => GameSession::new_termwalk(
++                seed,
++                if self.walk_size == 0 {
++                    5
++                } else {
++                    self.walk_size
++                },
++            )
++            .expect("bounded odd UI grid"),
++            GameId::Map => GameSession::new_map(
++                seed,
++                if self.portrait {
++                    p::MapPreset::Portrait
++                } else {
++                    p::MapPreset::Default
++                },
++            ),
++            _ => GameRegistry::start(id, seed),
++        });
++        self.launcher = false;
++        self.suspended = false;
++        self.selected = 0;
++        self.source = None;
++        self.count = 1;
++        self.message.clear();
++        self.tick = None;
++        self.dragging = None;
++        self.board = None;
++    }
++    fn apply(&mut self, i: GameInput) {
++        if let Some(s) = &mut self.session {
++            match s.input(i) {
++                Ok(_) => self.message.clear(),
++                Err(e) => self.message = e.into(),
++            }
++        }
++    }
++    fn puzzle(&mut self, i: p::PuzzleInput) {
++        self.apply(GameInput::Puzzle(i))
++    }
++    fn terminal(&mut self, i: t::TerminalInput) {
++        self.apply(GameInput::Terminal(i))
++    }
++    fn dimensions(&self) -> (usize, usize) {
++        match self.session.as_ref().map(GameSession::scene) {
++            Some(GameScene::Puzzle(p::PuzzleScene::Net(s))) => (s.width, s.height),
++            Some(GameScene::Puzzle(p::PuzzleScene::Mines(s))) => (s.width, s.height),
++            Some(GameScene::Puzzle(p::PuzzleScene::Solo(_))) => (9, 9),
++            Some(GameScene::Puzzle(p::PuzzleScene::Map(s))) => (s.width, s.height),
++            Some(GameScene::Puzzle(p::PuzzleScene::Untangle(s))) => (s.vertices.len(), 1),
++            Some(GameScene::Terminal(t::TerminalScene::Soliterm(s))) => (9 + s.tableau.len(), 1),
++            Some(GameScene::Terminal(t::TerminalScene::Termwalk(s))) => (s.width, s.height),
++            Some(GameScene::Terminal(t::TerminalScene::Sudoku(_))) => (9, 9),
++            Some(GameScene::Terminal(t::TerminalScene::Nimesweeper(s))) => (s.width, s.height),
++            Some(GameScene::Terminal(t::TerminalScene::Greed(s))) => (s.width, s.height),
++            _ => (4, 1),
++        }
++    }
++    fn key(&mut self, key: Key, m: Modifiers) {
++        let Some(id) = self.session.as_ref().map(GameSession::id) else {
++            return;
++        };
++        let (w, h) = self.dimensions();
++        self.selected = self.selected.min(w * h - 1);
++        let direction = match key {
++            Key::ArrowLeft => Some((-1, 0)),
++            Key::ArrowRight => Some((1, 0)),
++            Key::ArrowUp => Some((0, -1)),
++            Key::ArrowDown => Some((0, 1)),
++            _ => None,
++        };
++        if id == GameId::Untangle {
++            if let Some(GameScene::Puzzle(p::PuzzleScene::Untangle(s))) =
++                self.session.as_ref().map(GameSession::scene)
++            {
++                self.selected = self.selected.min(s.vertices.len() - 1);
++                if key == Key::Tab {
++                    self.selected = (self.selected + 1) % s.vertices.len();
++                    return;
++                }
++                if let Some((dx, dy)) = direction {
++                    let (x, y) = s.vertices[self.selected];
++                    let step = if m.shift { 5 } else { 20 };
++                    self.puzzle(p::PuzzleInput::Move {
++                        vertex: self.selected,
++                        x: (x + dx as i32 * step).clamp(0, 1000),
++                        y: (y + dy as i32 * step).clamp(0, 1000),
++                    });
++                    return;
++                }
++            }
++        }
++        if let Some((dx, dy)) = direction {
++            if matches!(id, GameId::Ctris | GameId::Ninvaders | GameId::Greed) {
++                if id == GameId::Ctris && dy < 0 {
++                    self.terminal(t::TerminalInput::Rotate {
++                        cell: 0,
++                        clockwise: true,
++                    });
++                } else {
++                    self.terminal(t::TerminalInput::Move { dx, dy });
++                }
++                return;
++            }
++            if id == GameId::Netwalk && m.ctrl {
++                self.puzzle(p::PuzzleInput::NetSource {
++                    direction: match (dx, dy) {
++                        (-1, 0) => p::Direction::West,
++                        (1, 0) => p::Direction::East,
++                        (0, -1) => p::Direction::North,
++                        _ => p::Direction::South,
++                    },
++                });
++                return;
++            }
++            let x = (self.selected % w) as i32;
++            let y = (self.selected / w) as i32;
++            self.selected = (y + dy as i32).clamp(0, h as i32 - 1) as usize * w
++                + (x + dx as i32).clamp(0, w as i32 - 1) as usize;
++            return;
++        }
++        if m.ctrl && key == Key::Z {
++            if let Some(s) = &mut self.session {
++                s.undo();
++            }
++            return;
++        }
++        let digit = match key {
++            Key::Num0 => Some(0),
++            Key::Num1 => Some(1),
++            Key::Num2 => Some(2),
++            Key::Num3 => Some(3),
++            Key::Num4 => Some(4),
++            Key::Num5 => Some(5),
++            Key::Num6 => Some(6),
++            Key::Num7 => Some(7),
++            Key::Num8 => Some(8),
++            Key::Num9 => Some(9),
++            Key::Delete | Key::Backspace => Some(0),
++            _ => None,
++        };
++        if let Some(n) = digit {
++            if id == GameId::Greed {
++                let d = match n {
++                    1 => Some((-1, 1)),
++                    2 => Some((0, 1)),
++                    3 => Some((1, 1)),
++                    4 => Some((-1, 0)),
++                    6 => Some((1, 0)),
++                    7 => Some((-1, -1)),
++                    8 => Some((0, -1)),
++                    9 => Some((1, -1)),
++                    _ => None,
++                };
++                if let Some((dx, dy)) = d {
++                    self.terminal(t::TerminalInput::Move { dx, dy });
++                }
++            } else {
++                self.number(n);
++            }
++            return;
++        }
++        match (id, key) {
++            (GameId::Netwalk, Key::A) => self.puzzle(p::PuzzleInput::Rotate {
++                cell: self.selected,
++                clockwise: false,
++            }),
++            (GameId::Netwalk, Key::D) => self.puzzle(p::PuzzleInput::Rotate {
++                cell: self.selected,
++                clockwise: true,
++            }),
++            (GameId::Netwalk, Key::S | Key::Space) => self.puzzle(p::PuzzleInput::Lock {
++                cell: self.selected,
++            }),
++            (GameId::Netwalk, Key::F) => self.puzzle(p::PuzzleInput::HalfTurn {
++                cell: self.selected,
++            }),
++            (GameId::Netwalk, Key::J) => {
++                let seed = self.session.as_ref().unwrap().seed().wrapping_add(1);
++                self.puzzle(p::PuzzleInput::Jumble { seed });
++            }
++            (GameId::Termwalk, Key::Space | Key::D) => self.terminal(t::TerminalInput::Rotate {
++                cell: self.selected,
++                clockwise: true,
++            }),
++            (GameId::Termwalk, Key::A) => self.terminal(t::TerminalInput::Rotate {
++                cell: self.selected,
++                clockwise: false,
++            }),
++            (GameId::Mines, Key::Space | Key::F) => self.puzzle(p::PuzzleInput::Flag {
++                cell: self.selected,
++            }),
++            (GameId::Mines, Key::Enter) => self.puzzle(p::PuzzleInput::Reveal {
++                cell: self.selected,
++            }),
++            (GameId::Nimesweeper, Key::F) => self.terminal(t::TerminalInput::Flag {
++                cell: self.selected,
++            }),
++            (GameId::Nimesweeper, Key::Space) => self.terminal(t::TerminalInput::Reveal {
++                cell: self.selected,
++            }),
++            (GameId::Nimesweeper, Key::Enter) => self.terminal(t::TerminalInput::Chord {
++                cell: self.selected,
++            }),
++            (GameId::Ctris, Key::Space) => self.terminal(t::TerminalInput::Drop),
++            (GameId::Ctris | GameId::Ninvaders | GameId::Nimesweeper, Key::P) => {
++                self.terminal(t::TerminalInput::Pause)
++            }
++            (GameId::Ninvaders, Key::Space) => {
++                self.terminal(t::TerminalInput::Start);
++                self.terminal(t::TerminalInput::Fire);
++            }
++            (GameId::Soliterm, Key::Space | Key::Enter) => {
++                let pile = match self.selected {
++                    0..=3 => t::CardPile::Reserve(self.selected),
++                    4..=7 => t::CardPile::Foundation(self.selected - 4),
++                    8 => t::CardPile::Waste,
++                    n => t::CardPile::Tableau(n - 9),
++                };
++                pile_select(self, pile);
++            }
++            (GameId::Soliterm, Key::D) => self.terminal(t::TerminalInput::Draw),
++            (GameId::Guess, Key::Enter) => self.puzzle(p::PuzzleInput::Submit),
++            (GameId::Guess, Key::Space) => self.puzzle(p::PuzzleInput::Hold {
++                slot: self.selected.min(3),
++            }),
++            (GameId::Greed, k) => {
++                let d = match k {
++                    Key::H => Some((-1, 0)),
++                    Key::J => Some((0, 1)),
++                    Key::K => Some((0, -1)),
++                    Key::L => Some((1, 0)),
++                    Key::Y => Some((-1, -1)),
++                    Key::U => Some((1, -1)),
++                    Key::B => Some((-1, 1)),
++                    Key::N => Some((1, 1)),
++                    _ => None,
++                };
++                if let Some((dx, dy)) = d {
++                    self.terminal(t::TerminalInput::Move { dx, dy });
++                }
++            }
++            _ => {}
++        }
++    }
++    fn number(&mut self, n: u8) {
++        let Some(id) = self.session.as_ref().map(GameSession::id) else {
++            return;
++        };
++        match id {
++            GameId::Solo => self.puzzle(if self.pencil {
++                p::PuzzleInput::Pencil {
++                    cell: self.selected,
++                    value: n,
++                }
++            } else {
++                p::PuzzleInput::Digit {
++                    cell: self.selected,
++                    value: n,
++                }
++            }),
++            GameId::Sudoku => self.terminal(t::TerminalInput::Digit {
++                cell: self.selected,
++                value: n,
++            }),
++            GameId::Guess => self.puzzle(p::PuzzleInput::Peg {
++                slot: self.selected.min(3),
++                colour: n,
++            }),
++            GameId::Map => {
++                if let Some(GameScene::Puzzle(p::PuzzleScene::Map(s))) =
++                    self.session.as_ref().map(GameSession::scene)
++                {
++                    if let Some(&region) = s.regions.get(self.selected) {
++                        self.puzzle(if self.pencil {
++                            p::PuzzleInput::MapPencil { region, colour: n }
++                        } else {
++                            p::PuzzleInput::Colour { region, colour: n }
++                        })
++                    }
++                }
++            }
++            _ => {}
++        }
++    }
++}
++fn held_game_viewport(ctx: &Context) -> Option<ViewportId> {
++    let current = ctx.viewport_id();
++    let live = ctx.input(|i| {
++        i.raw
++            .viewports
++            .iter()
++            .filter_map(|(&id, info)| {
++                if info.focused == Some(false) || (id == current && !i.raw.focused) {
++                    None
++                } else {
++                    Some(id)
++                }
++            })
++            .collect::<Vec<_>>()
++    });
++    live.into_iter().find(|&id| {
++        ctx.input_for(id, |i| {
++            !i.keys_down.is_empty() || i.modifiers.any() || i.pointer.any_down()
++        })
++    })
++}
++impl Workspace {
++    pub(in crate::ui) fn games_menu(&mut self, ui: &mut Ui) {
++        for spec in GameRegistry::catalog() {
++            if ui.button(spec.label).clicked() {
++                self.games.play.start(spec.id, 1);
++                ui.close();
++            }
++        }
++        if ui.button("Game library…").clicked() {
++            self.games.play.open();
++            ui.close();
++        }
++    }
++    pub(in crate::ui) fn games_frame(&mut self, ui: &mut Ui) -> bool {
++        let current = ui.ctx().viewport_id();
++        let play = &mut self.games.play;
++        if play.is_open() && ui.ctx().input(|i| i.viewport().close_requested()) {
++            play.suspended = true;
++            play.close_owner = held_game_viewport(ui.ctx());
++            ui.ctx().input_mut(|i| i.events.clear());
++        }
++        if play.suspended && play.close_owner.is_none() {
++            return false;
++        }
++        if let Some(owner) = play.close_owner {
++            let missing = ui.ctx().input(|i| !i.raw.viewports.contains_key(&owner));
++            let unfocused = ui.ctx().input(|i| {
++                (owner == current && !i.raw.focused)
++                    || i.raw
++                        .viewports
++                        .get(&owner)
++                        .is_some_and(|v| v.focused == Some(false))
++            });
++            let canceled = ui.ctx().input(|i| {
++                i.events.iter().any(|e| {
++                    matches!(
++                        e,
++                        Event::PointerGone
++                            | Event::Touch {
++                                phase: TouchPhase::Cancel,
++                                ..
++                            }
++                            | Event::WindowFocused(false)
++                    )
++                })
++            });
++            if missing || unfocused {
++                play.close_owner = None;
++                if owner == current {
++                    ui.ctx().input_mut(|i| {
++                        i.pointer = Default::default();
++                        i.keys_down.clear();
++                        i.modifiers = Default::default();
++                    });
++                }
++            } else if owner == current {
++                if canceled {
++                    ui.ctx().input_mut(|i| {
++                        i.pointer = Default::default();
++                    });
++                }
++                if !ui
++                    .ctx()
++                    .input(|i| !i.keys_down.is_empty() || i.modifiers.any() || i.pointer.any_down())
++                {
++                    play.close_owner = None;
++                }
++            }
++            if play.close_owner.is_none() {
++                play.close_owner = held_game_viewport(ui.ctx());
++            }
++            ui.ctx().input_mut(|i| i.events.clear());
++            ui.ctx().request_repaint_after(Duration::from_millis(100));
++            return true;
++        }
++        if !play.is_open() {
++            return false;
++        }
++        let events = ui.ctx().input(|i| i.events.clone());
++        if events.iter().any(|e| {
++            matches!(
++                e,
++                Event::PointerGone
++                    | Event::Touch {
++                        phase: TouchPhase::Cancel,
++                        ..
++                    }
++                    | Event::WindowFocused(false)
++            )
++        }) {
++            play.dragging = None;
++            ui.ctx().input_mut(|i| {
++                i.pointer = Default::default();
++            });
++        }
++        if current != ViewportId::ROOT {
++            ui.label("A game is open in the main window. Your sessions are still running.");
++            ui.ctx().input_mut(|i| i.events.clear());
++            return true;
++        }
++        // Only the foreground game owns these keys. No global shortcut processing follows.
++        let mut close = false;
++        for event in events {
++            if let Event::Key {
++                key,
++                pressed: true,
++                modifiers,
++                ..
++            } = event
++            {
++                if key == Key::Escape {
++                    close = true
++                } else if !play.launcher {
++                    play.key(key, modifiers)
++                }
++            }
++        }
++        Frame::new().fill(content(ui)).inner_margin(16.).show(ui,|ui|{
++            ui.horizontal(|ui|{
++                ui.image((self.logo.id(),vec2(28.,28.)));
++                ui.heading(play.session.as_ref().filter(|_|!play.launcher).map_or("Games",|s|s.spec().label));
++                if ui.button("Close (Esc)").clicked(){close=true;}
++                if play.session.is_some()&&ui.button(if play.launcher{"Resume game"}else{"Library"}).clicked(){play.launcher=!play.launcher;}
++            });
++            if play.launcher {
++                ui.label("Choose a game. Terminal sessions continue in the background.");
++                for spec in GameRegistry::catalog(){if ui.button(spec.label).clicked(){play.start(spec.id,1);}}
++            }else if let Some(s)=&play.session {
++                let(id,seed,outcome)=(s.id(),s.seed(),s.outcome());
++                ui.horizontal(|ui|{
++                    if ui.button("New game").clicked(){play.start(id,seed.wrapping_add(1));}
++                    if ui.button("Reset").clicked(){play.session.as_mut().unwrap().reset();play.message.clear();}
++                    if ui.add_enabled(play.session.as_ref().unwrap().can_undo(),egui::Button::new("Undo")).clicked(){play.session.as_mut().unwrap().undo();}
++                    ui.toggle_value(&mut play.help,"Help");
++                    ui.label(format!("Seed {seed} · {outcome:?}"));
++                });
++                ui.horizontal_wrapped(|ui|{match id {
++                    GameId::Soliterm=>{ui.label("New game variant:");ui.selectable_value(&mut play.variant,0,"Freecell");ui.selectable_value(&mut play.variant,1,"Klondike");ui.add(egui::Slider::new(&mut play.passes,1..=20).text("passes"));},
++                    GameId::Nimesweeper=>{ui.label("New game preset:");for(i,n)in ["Newbie","Easy","Medium","Hard"].iter().enumerate(){ui.selectable_value(&mut play.preset,i,*n);}},
++                    GameId::Termwalk=>{ui.label("New game size:");for size in [3,5,7,9,11,13,15]{ui.selectable_value(&mut play.walk_size,size,format!("{size}×{size}"));}},
++                    GameId::Map=>{ui.checkbox(&mut play.portrait,"Portrait on new game");},_=>{}}});
++                if play.help {ui.label(play.session.as_ref().unwrap().help());ui.label("Arrows select a square. Escape closes; Ctrl+Z undoes. Untangle: Tab selects a point, arrows move it. Cards: arrows select a pile, Space selects source/destination, D draws. Buttons below expose each move. Variant selections apply to New game.");ui.label("Independent rules and controls. Original runtime behavior and some historical variants remain unverified.");}
++                if matches!(id,GameId::Solo|GameId::Map){ui.checkbox(&mut play.pencil,"Pencil marks");}
++                if matches!(id,GameId::Solo|GameId::Sudoku|GameId::Guess|GameId::Map){ui.horizontal(|ui|{let max=if id==GameId::Guess{6}else if id==GameId::Map{4}else{9};for n in 0..=max{if ui.button(n.to_string()).clicked(){play.number(n)}}});}
++                controls(ui,play,id);
++                ScrollArea::both().show(ui,|ui|{draw_scene(ui,play);});
++                if outcome!=GameOutcome::Playing{ui.strong("Game finished — Undo, Reset or New game to continue.");}
++                if !play.message.is_empty(){ui.label(RichText::new(&play.message).color(Color32::from_rgb(215,120,55)));}
++            }
++        });
++        if !play.launcher
++            && play.session.as_ref().is_some_and(|s| {
++                matches!(s.id(), GameId::Ctris | GameId::Ninvaders)
++                    && s.outcome() == GameOutcome::Playing
++            })
++        {
++            let now = Instant::now();
++            let delay = if play.session.as_ref().unwrap().id() == GameId::Ctris {
++                Duration::from_millis(500)
++            } else {
++                Duration::from_millis(100)
++            };
++            if play
++                .tick
++                .is_some_and(|last| now.saturating_duration_since(last) >= delay)
++            {
++                play.terminal(t::TerminalInput::Tick);
++                play.tick = Some(now);
++            } else if play.tick.is_none() {
++                play.tick = Some(now);
++            }
++            ui.ctx().request_repaint_after(delay);
++        } else {
++            play.tick = None;
++        }
++        if close {
++            play.session = None;
++            play.launcher = false;
++            play.tick = None;
++            play.dragging = None;
++            play.close_owner = held_game_viewport(ui.ctx());
++        }
++        ui.ctx().input_mut(|i| i.events.clear());
++        // Polling remains bounded and active while terminal rendering is suspended.
++        ui.ctx().request_repaint_after(Duration::from_millis(100));
++        true
++    }
++}
++fn controls(ui: &mut Ui, play: &mut PlayState, id: GameId) {
++    ui.horizontal_wrapped(|ui| match id {
++        GameId::Netwalk => {
++            for (name, cmd) in [
++                (
++                    "↶",
++                    p::PuzzleInput::Rotate {
++                        cell: play.selected,
++                        clockwise: false,
++                    },
++                ),
++                (
++                    "↷",
++                    p::PuzzleInput::Rotate {
++                        cell: play.selected,
++                        clockwise: true,
++                    },
++                ),
++                (
++                    "Half-turn",
++                    p::PuzzleInput::HalfTurn {
++                        cell: play.selected,
++                    },
++                ),
++                (
++                    "Lock",
++                    p::PuzzleInput::Lock {
++                        cell: play.selected,
++                    },
++                ),
++                (
++                    "Jumble",
++                    p::PuzzleInput::Jumble {
++                        seed: play.session.as_ref().unwrap().seed().wrapping_add(1),
++                    },
++                ),
++            ] {
++                if ui.button(name).clicked() {
++                    play.puzzle(cmd)
++                }
++            }
++        }
++        GameId::Termwalk => {
++            for (cw, n) in [(false, "↶"), (true, "↷")] {
++                if ui.button(n).clicked() {
++                    play.terminal(t::TerminalInput::Rotate {
++                        cell: play.selected,
++                        clockwise: cw,
++                    })
++                }
++            }
++        }
++        GameId::Mines => {
++            for (n, c) in [
++                (
++                    "Reveal",
++                    p::PuzzleInput::Reveal {
++                        cell: play.selected,
++                    },
++                ),
++                (
++                    "Flag",
++                    p::PuzzleInput::Flag {
++                        cell: play.selected,
++                    },
++                ),
++                (
++                    "Chord",
++                    p::PuzzleInput::Chord {
++                        cell: play.selected,
++                    },
++                ),
++            ] {
++                if ui.button(n).clicked() {
++                    play.puzzle(c)
++                }
++            }
++        }
++        GameId::Nimesweeper => {
++            for (n, c) in [
++                (
++                    "Reveal",
++                    t::TerminalInput::Reveal {
++                        cell: play.selected,
++                    },
++                ),
++                (
++                    "Flag",
++                    t::TerminalInput::Flag {
++                        cell: play.selected,
++                    },
++                ),
++                (
++                    "Chord",
++                    t::TerminalInput::Chord {
++                        cell: play.selected,
++                    },
++                ),
++                ("Pause", t::TerminalInput::Pause),
++            ] {
++                if ui.button(n).clicked() {
++                    play.terminal(c)
++                }
++            }
++        }
++        GameId::Ctris | GameId::Ninvaders => {
++            for (n, c) in [
++                ("←", t::TerminalInput::Move { dx: -1, dy: 0 }),
++                ("→", t::TerminalInput::Move { dx: 1, dy: 0 }),
++                ("Pause", t::TerminalInput::Pause),
++            ] {
++                if ui.button(n).clicked() {
++                    play.terminal(c)
++                }
++            }
++            if id == GameId::Ctris {
++                for (n, c) in [
++                    (
++                        "Rotate",
++                        t::TerminalInput::Rotate {
++                            cell: 0,
++                            clockwise: true,
++                        },
++                    ),
++                    ("Down", t::TerminalInput::Move { dx: 0, dy: 1 }),
++                    ("Drop", t::TerminalInput::Drop),
++                ] {
++                    if ui.button(n).clicked() {
++                        play.terminal(c)
++                    }
++                }
++            } else {
++                if ui.button("Start").clicked() {
++                    play.terminal(t::TerminalInput::Start)
++                }
++                if ui.button("Fire").clicked() {
++                    play.terminal(t::TerminalInput::Fire)
++                }
++            }
++        }
++        GameId::Greed => {
++            for (dy, names) in [
++                (-1, ["↖", "↑", "↗"]),
++                (0, ["←", "·", "→"]),
++                (1, ["↙", "↓", "↘"]),
++            ] {
++                for (dx, n) in (-1..=1).zip(names) {
++                    if (dx != 0 || dy != 0) && ui.button(n).clicked() {
++                        play.terminal(t::TerminalInput::Move { dx, dy })
++                    }
++                }
++            }
++        }
++        GameId::Guess => {
++            if ui.button("Submit guess").clicked() {
++                play.puzzle(p::PuzzleInput::Submit)
++            }
++            if ui.button("Hold selected peg").clicked() {
++                play.puzzle(p::PuzzleInput::Hold {
++                    slot: play.selected.min(3),
++                })
++            }
++        }
++        _ => {}
++    });
++}
++fn palette(n: u8) -> Color32 {
++    match n {
++        1 => Color32::from_rgb(33, 160, 125),
++        2 => Color32::from_rgb(220, 130, 60),
++        3 => Color32::from_rgb(85, 145, 220),
++        4 => Color32::from_rgb(175, 105, 200),
++        5 => Color32::from_rgb(220, 195, 70),
++        6 => Color32::from_rgb(215, 90, 115),
++        _ => Color32::from_gray(55),
++    }
++}
++fn board(
++    ui: &mut Ui,
++    play: &mut PlayState,
++    w: usize,
++    h: usize,
++    labels: &[String],
++    colours: &[Color32],
++) -> Option<(usize, PointerButton)> {
++    let size = (ui.available_width().min(880.) / w as f32).clamp(14., 38.);
++    let (rect, response) =
++        ui.allocate_exact_size(vec2(size * w as f32, size * h as f32), egui::Sense::click());
++    play.board = Some(rect);
++    for i in 0..w * h {
++        let r = Rect::from_min_size(
++            rect.min + vec2((i % w) as f32 * size, (i / w) as f32 * size),
++            vec2(size, size),
++        );
++        ui.painter().rect_filled(
++            r.shrink(1.),
++            2.,
++            colours.get(i).copied().unwrap_or(palette(0)),
++        );
++        if let Some(label) = labels.get(i) {
++            ui.painter().text(
++                r.center(),
++                Align2::CENTER_CENTER,
++                label,
++                FontId::monospace((size * 0.50).max(9.)),
++                Color32::WHITE,
++            );
++        }
++        if i == play.selected {
++            ui.painter().rect_stroke(
++                r.shrink(1.),
++                1.,
++                Stroke::new(2., Color32::from_rgb(100, 245, 180)),
++                StrokeKind::Inside,
++            );
++        }
++    }
++    let button = if response.clicked_by(PointerButton::Secondary) {
++        Some(PointerButton::Secondary)
++    } else if response.clicked_by(PointerButton::Middle) {
++        Some(PointerButton::Middle)
++    } else if response.clicked() {
++        Some(PointerButton::Primary)
++    } else {
++        None
++    };
++    if let (Some(button), Some(pos)) = (button, response.interact_pointer_pos()) {
++        if pos.is_finite() && rect.contains(pos) {
++            let x = ((pos.x - rect.left()) / size).floor() as usize;
++            let y = ((pos.y - rect.top()) / size).floor() as usize;
++            if x < w && y < h {
++                let i = y * w + x;
++                play.selected = i;
++                return Some((i, button));
++            }
++        }
++    }
++    None
++}
++fn pipes(
++    ui: &mut Ui,
++    play: &mut PlayState,
++    w: usize,
++    h: usize,
++    tiles: &[u8],
++    connected: &[bool],
++    locked: Option<&[bool]>,
++    source: usize,
++) -> Option<(usize, PointerButton)> {
++    let colours: Vec<_> = connected
++        .iter()
++        .map(|&c| if c { palette(1) } else { palette(0) })
++        .collect();
++    let labels: Vec<_> = tiles
++        .iter()
++        .enumerate()
++        .map(|(i, _)| {
++            if i == source {
++                "●".into()
++            } else if locked.is_some_and(|l| l[i]) {
++                "◆".into()
++            } else {
++                String::new()
++            }
++        })
++        .collect();
++    let hit = board(ui, play, w, h, &labels, &colours);
++    let r = play.board.unwrap();
++    let size = r.width() / w as f32;
++    for (i, &mask) in tiles.iter().enumerate() {
++        let center = r.min
++            + vec2(
++                (i % w) as f32 * size + size / 2.,
++                (i / w) as f32 * size + size / 2.,
++            );
++        for (bit, delta) in [
++            (1, vec2(0., -size / 2.)),
++            (2, vec2(size / 2., 0.)),
++            (4, vec2(0., size / 2.)),
++            (8, vec2(-size / 2., 0.)),
++        ] {
++            if mask & bit != 0 {
++                ui.painter().line_segment(
++                    [center, center + delta * 0.9],
++                    Stroke::new(3., Color32::WHITE),
++                );
++            }
++        }
++    }
++    hit
++}
++fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
++    let Some(scene) = play.session.as_ref().map(GameSession::scene) else {
++        return;
++    };
++    match scene {
++        GameScene::Puzzle(p::PuzzleScene::Net(s)) => {
++            if let Some((cell, b)) = pipes(
++                ui,
++                play,
++                s.width,
++                s.height,
++                &s.tiles,
++                &s.connected,
++                Some(&s.locked),
++                s.source,
++            ) {
++                play.puzzle(if b == PointerButton::Middle {
++                    p::PuzzleInput::Lock { cell }
++                } else {
++                    p::PuzzleInput::Rotate {
++                        cell,
++                        clockwise: b == PointerButton::Secondary,
++                    }
++                })
++            }
++        }
++        GameScene::Terminal(t::TerminalScene::Termwalk(s)) => {
++            if let Some((cell, b)) = pipes(
++                ui,
++                play,
++                s.width,
++                s.height,
++                &s.pipes,
++                &s.connected,
++                None,
++                s.router,
++            ) {
++                play.terminal(t::TerminalInput::Rotate {
++                    cell,
++                    clockwise: b != PointerButton::Secondary,
++                })
++            }
++        }
++        GameScene::Puzzle(p::PuzzleScene::Mines(s)) => {
++            ui.label(format!(
++                "{} mines · {} flags · {} deaths",
++                s.mine_count, s.flags, s.deaths
++            ));
++            let labels = s
++                .cells
++                .iter()
++                .map(|c| match c {
++                    p::MineCell::Covered => "·".into(),
++                    p::MineCell::Flagged => "⚑".into(),
++                    p::MineCell::Open(0) => "".into(),
++                    p::MineCell::Open(n) => n.to_string(),
++                    p::MineCell::Exploded => "✹".into(),
++                })
++                .collect::<Vec<_>>();
++            let colours = s
++                .cells
++                .iter()
++                .map(|c| {
++                    if matches!(c, p::MineCell::Open(_)) {
++                        Color32::from_gray(85)
++                    } else {
++                        palette(0)
++                    }
++                })
++                .collect::<Vec<_>>();
++            if let Some((cell, b)) = board(ui, play, s.width, s.height, &labels, &colours) {
++                play.puzzle(if b == PointerButton::Secondary {
++                    p::PuzzleInput::Flag { cell }
++                } else if matches!(s.cells[cell], p::MineCell::Open(_)) {
++                    p::PuzzleInput::Chord { cell }
++                } else {
++                    p::PuzzleInput::Reveal { cell }
++                })
++            }
++        }
++        GameScene::Terminal(t::TerminalScene::Nimesweeper(s)) => {
++            ui.label(format!(
++                "{} mines{}",
++                s.mines,
++                if s.paused { " · Paused" } else { "" }
++            ));
++            let labels = s
++                .cells
++                .iter()
++                .map(|c| {
++                    if s.paused {
++                        "".into()
++                    } else {
++                        match c {
++                            t::MineCell::Hidden => "·".into(),
++                            t::MineCell::Flagged => "⚑".into(),
++                            t::MineCell::Open(0) => "".into(),
++                            t::MineCell::Open(n) => n.to_string(),
++                            t::MineCell::Mine => "✹".into(),
++                        }
++                    }
++                })
++                .collect::<Vec<_>>();
++            if let Some((cell, b)) = board(ui, play, s.width, s.height, &labels, &[]) {
++                play.terminal(if b == PointerButton::Secondary {
++                    t::TerminalInput::Flag { cell }
++                } else if matches!(s.cells[cell], t::MineCell::Open(_)) {
++                    t::TerminalInput::Chord { cell }
++                } else {
++                    t::TerminalInput::Reveal { cell }
++                })
++            }
++        }
++        GameScene::Puzzle(p::PuzzleScene::Solo(s)) => {
++            let labels = s
++                .digits
++                .iter()
++                .enumerate()
++                .map(|(i, &d)| {
++                    if d != 0 {
++                        d.to_string()
++                    } else {
++                        (1..=9)
++                            .filter(|n| s.pencil[i] & (1 << n) != 0)
++                            .map(|n| char::from(b'0' + n))
++                            .collect()
++                    }
++                })
++                .collect::<Vec<_>>();
++            let colours = (0..81)
++                .map(|i| {
++                    if s.conflicts[i] {
++                        palette(6)
++                    } else if s.givens[i] {
++                        Color32::from_gray(85)
++                    } else {
++                        palette(0)
++                    }
++                })
++                .collect::<Vec<_>>();
++            board(ui, play, 9, 9, &labels, &colours);
++        }
++        GameScene::Terminal(t::TerminalScene::Sudoku(s)) => {
++            let labels = s
++                .cells
++                .iter()
++                .map(|&d| if d == 0 { String::new() } else { d.to_string() })
++                .collect::<Vec<_>>();
++            let colours = s
++                .fixed
++                .iter()
++                .map(|&v| {
++                    if v {
++                        Color32::from_gray(85)
++                    } else {
++                        palette(0)
++                    }
++                })
++                .collect::<Vec<_>>();
++            board(ui, play, 9, 9, &labels, &colours);
++        }
++        GameScene::Puzzle(p::PuzzleScene::Guess(s)) => {
++            for (i, row) in s.rows.iter().enumerate() {
++                ui.horizontal(|ui| {
++                    ui.label(format!("{}:", i + 1));
++                    for c in row.pegs {
++                        ui.colored_label(palette(c), format!("●{c}"));
++                    }
++                    ui.label(format!("{} exact · {} elsewhere", row.exact, row.misplaced));
++                });
++            }
++            let labels = (0..4)
++                .map(|i| format!("{}{}", s.current[i], if s.held[i] { "◆" } else { "" }))
++                .collect::<Vec<_>>();
++            let colours = s.current.iter().map(|&c| palette(c)).collect::<Vec<_>>();
++            if let Some((slot, b)) = board(ui, play, 4, 1, &labels, &colours) {
++                if b == PointerButton::Secondary {
++                    play.puzzle(p::PuzzleInput::Hold { slot })
++                } else {
++                    play.puzzle(p::PuzzleInput::Peg {
++                        slot,
++                        colour: s.current[slot] % 6 + 1,
++                    })
++                }
++            }
++            if let Some(answer) = s.solution {
++                ui.label(format!("Answer: {answer:?}"));
++            }
++        }
++        GameScene::Puzzle(p::PuzzleScene::Map(s)) => {
++            ui.horizontal(|ui| {
++                ui.label("Paint colour:");
++                for c in 1..=4 {
++                    ui.selectable_value(
++                        &mut play.colour,
++                        c,
++                        RichText::new(format!("● {c}")).color(palette(c)),
++                    );
++                }
++            });
++            let labels = s
++                .regions
++                .iter()
++                .map(|&region| {
++                    if s.givens[region] {
++                        "◆".into()
++                    } else if s.conflicts[region] {
++                        "!".into()
++                    } else if s.pencil[region] != 0 {
++                        (1..=4)
++                            .filter(|n| s.pencil[region] & (1 << n) != 0)
++                            .map(|n| char::from(b'0' + n))
++                            .collect()
++                    } else {
++                        String::new()
++                    }
++                })
++                .collect::<Vec<_>>();
++            let colours = s
++                .regions
++                .iter()
++                .map(|&r| palette(s.colours[r]))
++                .collect::<Vec<_>>();
++            let hit = board(ui, play, s.width, s.height, &labels, &colours);
++            let rect = play.board.unwrap();
++            let size = rect.width() / s.width as f32;
++            for i in 0..s.regions.len() {
++                let x = i % s.width;
++                let y = i / s.width;
++                let min = rect.min + vec2(x as f32 * size, y as f32 * size);
++                if x == 0 || s.regions[i - 1] != s.regions[i] {
++                    ui.painter()
++                        .line_segment([min, min + vec2(0., size)], Stroke::new(2., Color32::BLACK));
++                }
++                if y == 0 || s.regions[i - s.width] != s.regions[i] {
++                    ui.painter()
++                        .line_segment([min, min + vec2(size, 0.)], Stroke::new(2., Color32::BLACK));
++                }
++            }
++            if let Some((cell, b)) = hit {
++                let region = s.regions[cell];
++                let colour = play.colour.max(1);
++                play.puzzle(if play.pencil || b == PointerButton::Secondary {
++                    p::PuzzleInput::MapPencil { region, colour }
++                } else {
++                    p::PuzzleInput::Colour { region, colour }
++                })
++            }
++        }
++        GameScene::Puzzle(p::PuzzleScene::Untangle(s)) => {
++            let side = ui.available_width().min(520.).max(150.);
++            let (rect, response) = ui.allocate_exact_size(vec2(side, side), egui::Sense::drag());
++            play.board = Some(rect);
++            let pos = |x: i32, y: i32| {
++                rect.min
++                    + vec2(
++                        x as f32 / s.extent as f32 * side,
++                        y as f32 / s.extent as f32 * side,
++                    )
++            };
++            let pointer = response.interact_pointer_pos();
++            if response.drag_started() {
++                // A frame may contain press and motion; acquire from the press,
++                // while the current pointer position continues to drive preview.
++                let origin = ui.input(|i| {
++                    i.events
++                        .iter()
++                        .rev()
++                        .find_map(|event| match event {
++                            Event::PointerButton {
++                                pos,
++                                button: PointerButton::Primary,
++                                pressed: true,
++                                ..
++                            } => Some(*pos),
++                            _ => None,
++                        })
++                        .or_else(|| i.pointer.press_origin())
++                });
++                if let Some(p) = origin.filter(|p| p.is_finite() && rect.contains(*p)) {
++                    play.dragging = s
++                        .vertices
++                        .iter()
++                        .enumerate()
++                        .filter(|(_, v)| pos(v.0, v.1).distance(p) < 20.)
++                        .min_by(|a, b| {
++                            pos(a.1.0, a.1.1)
++                                .distance(p)
++                                .total_cmp(&pos(b.1.0, b.1.1).distance(p))
++                        })
++                        .map(|(i, _)| i);
++                }
++            }
++            let mut vertices = s.vertices.clone();
++            if let (Some(v), Some(p)) = (play.dragging, pointer) {
++                if p.is_finite() {
++                    vertices[v] = (
++                        (((p.x - rect.left()) / side * 1000.).round() as i32).clamp(0, 1000),
++                        (((p.y - rect.top()) / side * 1000.).round() as i32).clamp(0, 1000),
++                    );
++                }
++            }
++            for (i, &(a, b)) in s.edges.iter().enumerate() {
++                ui.painter().line_segment(
++                    [
++                        pos(vertices[a].0, vertices[a].1),
++                        pos(vertices[b].0, vertices[b].1),
++                    ],
++                    Stroke::new(
++                        2.,
++                        if s.crossing_edges[i] {
++                            palette(6)
++                        } else {
++                            palette(1)
++                        },
++                    ),
++                );
++            }
++            for (i, &(x, y)) in vertices.iter().enumerate() {
++                ui.painter().circle_filled(
++                    pos(x, y),
++                    9.,
++                    if Some(i) == play.dragging || i == play.selected {
++                        palette(5)
++                    } else {
++                        palette(3)
++                    },
++                );
++            }
++            if response.drag_stopped() {
++                if let Some(v) = play.dragging.take() {
++                    let (x, y) = vertices[v];
++                    play.puzzle(p::PuzzleInput::Move { vertex: v, x, y });
++                }
++            }
++        }
++        GameScene::Terminal(t::TerminalScene::Greed(s)) => {
++            ui.label(format!("{} squares erased", s.erased));
++            let labels = s
++                .cells
++                .iter()
++                .enumerate()
++                .map(|(i, &n)| {
++                    if i == s.player {
++                        "@".into()
++                    } else if n == 0 {
++                        String::new()
++                    } else {
++                        n.to_string()
++                    }
++                })
++                .collect::<Vec<_>>();
++            if let Some((cell, _)) = board(ui, play, s.width, s.height, &labels, &[]) {
++                let dx = (cell % s.width) as i32 - (s.player % s.width) as i32;
++                let dy = (cell / s.width) as i32 - (s.player / s.width) as i32;
++                if dx == 0 || dy == 0 || dx.abs() == dy.abs() {
++                    play.terminal(t::TerminalInput::Move {
++                        dx: dx.signum() as i8,
++                        dy: dy.signum() as i8,
++                    })
++                }
++            }
++        }
++        GameScene::Terminal(t::TerminalScene::Ctris(s)) => {
++            ui.label(format!(
++                "Score {} · Lines {} · Next {}{}",
++                s.score,
++                s.lines,
++                s.next,
++                if s.paused { " · Paused" } else { "" }
++            ));
++            let mut colours = s.settled.iter().map(|&n| palette(n)).collect::<Vec<_>>();
++            for (x, y) in s.active.cells() {
++                if x >= 0 && y >= 0 && (x as usize) < s.width && (y as usize) < s.height {
++                    colours[y as usize * s.width + x as usize] = palette(s.active.kind + 1);
++                }
++            }
++            board(ui, play, s.width, s.height, &[], &colours);
++        }
++        GameScene::Terminal(t::TerminalScene::Ninvaders(s)) => {
++            ui.label(format!(
++                "Lives {} · Score {}{}{}",
++                s.lives,
++                s.score,
++                if s.started { "" } else { " · Press Start" },
++                if s.paused { " · Paused" } else { "" }
++            ));
++            let w = s.width as usize;
++            let h = s.height as usize;
++            let mut labels = vec![String::new(); w * h];
++            let mut mark = |x: i32, y: i32, ch: &str| {
++                if x >= 0 && y >= 0 && (x as usize) < w && (y as usize) < h {
++                    labels[y as usize * w + x as usize] = ch.into()
++                }
++            };
++            for e in s.enemies {
++                mark(e.x, e.y, "W")
++            }
++            for (x, y) in s.player_shots {
++                mark(x, y, "↑")
++            }
++            for (x, y) in s.enemy_shots {
++                mark(x, y, "↓")
++            }
++            mark(s.player_x, s.player_y, "▲");
++            board(ui, play, w, h, &labels, &[]);
++        }
++        GameScene::Terminal(t::TerminalScene::Soliterm(s)) => {
++            ui.label(format!(
++                "{:?} · Stock {} · Passes left {}",
++                s.variant, s.stock_count, s.passes_left
++            ));
++            if ui.button("Draw from stock").clicked() {
++                play.terminal(t::TerminalInput::Draw)
++            }
++            ui.horizontal(|ui| {
++                for i in 0..4 {
++                    if ui
++                        .button(format!(
++                            "Reserve {}: {}",
++                            i + 1,
++                            s.reserve[i].map_or("—".into(), card)
++                        ))
++                        .clicked()
++                    {
++                        pile_select(play, t::CardPile::Reserve(i))
++                    }
++                }
++            });
++            ui.horizontal(|ui| {
++                for i in 0..4 {
++                    if ui
++                        .button(format!("Foundation {}: {}", i + 1, s.foundations[i]))
++                        .clicked()
++                    {
++                        pile_select(play, t::CardPile::Foundation(i))
++                    }
++                }
++            });
++            if ui
++                .button(format!(
++                    "Waste: {}",
++                    s.waste.last().copied().map_or("—".into(), card)
++                ))
++                .clicked()
++            {
++                pile_select(play, t::CardPile::Waste)
++            }
++            ui.add(egui::Slider::new(&mut play.count, 1..=13).text("Cards to move"));
++            ui.label(format!("Selected source: {:?}. Keyboard pile {}: reserves 1–4, foundations 5–8, waste 9, columns 10 onward. Select a destination pile; click source again to clear.",play.source,play.selected+1));
++            ui.horizontal_top(|ui| {
++                for (i, column) in s.tableau.iter().enumerate() {
++                    ui.vertical(|ui| {
++                        if ui.button(format!("Column {}", i + 1)).clicked() {
++                            pile_select(play, t::CardPile::Tableau(i))
++                        }
++                        for &c in column {
++                            ui.label(card(c));
++                        }
++                    });
++                }
++            });
++        }
++    }
++}
++fn card(c: t::Card) -> String {
++    if !c.face_up {
++        return "▧".into();
++    }
++    let rank = match c.rank {
++        1 => "A".into(),
++        11 => "J".into(),
++        12 => "Q".into(),
++        13 => "K".into(),
++        n => n.to_string(),
++    };
++    format!(
++        "{rank}{}",
++        ["♣", "♦", "♥", "♠"].get(c.suit as usize).unwrap_or(&"?")
++    )
++}
++fn pile_select(play: &mut PlayState, to: t::CardPile) {
++    if let Some(from) = play.source.take() {
++        if from != to {
++            play.terminal(t::TerminalInput::Transfer {
++                from,
++                to,
++                count: play.count.max(1),
++            })
++        }
++    } else {
++        play.source = Some(to)
++    }
++}
++#[cfg(all(test, unix))]
++mod tests {
++    use super::*;
++    use crate::ui::terminal_review_tests::{captured, owned_workspace, raw_terminal};
++    fn key(k: Key, pressed: bool) -> Event {
++        Event::Key {
++            key: k,
++            physical_key: None,
++            pressed,
++            repeat: false,
++            modifiers: Modifiers::default(),
++        }
++    }
++    fn frame(ctx: &Context, w: &mut Workspace, events: Vec<Event>) {
++        let mut out = ctx.run_ui(
++            RawInput {
++                screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1320., 1000.))),
++                events,
++                ..Default::default()
++            },
++            |ui| w.render(ui),
++        );
++        out.textures_delta.clear();
++    }
++    #[test]
++    fn all_thirteen_real_boards_render_and_game_keys_cannot_reach_owned_broadcast_sessions() {
++        let (ctx, _dir, mut w) = owned_workspace();
++        let a = raw_terminal(&mut w, "game-isolation-a");
++        let b = raw_terminal(&mut w, "game-isolation-b");
++        w.broadcast = true;
++        let identities = w
++            .tabs
++            .iter()
++            .map(|t| t.process.as_ref().unwrap() as *const Process)
++            .collect::<Vec<_>>();
++        w.tabs[0].send(b"background-a");
++        w.tabs[1].send(b"background-b");
++        for spec in GameRegistry::catalog() {
++            w.games.play.start(spec.id, 7);
++            if spec.id == GameId::Ninvaders {
++                frame(
++                    &ctx,
++                    &mut w,
++                    vec![key(Key::Space, true), key(Key::Space, false)],
++                );
++            }
++            let before = w.games.play.session.as_ref().unwrap().scene();
++            frame(
++                &ctx,
++                &mut w,
++                vec![
++                    Event::Text("never-send".into()),
++                    Event::Paste("never-paste".into()),
++                    key(Key::ArrowRight, true),
++                    key(Key::ArrowRight, false),
++                ],
++            );
++            assert!(ctx.input(|i| i.events.is_empty()));
++            assert_eq!(w.tabs.iter().map(|t| t.id).collect::<Vec<_>>(), vec![a, b]);
++            assert!(w.games.play.session.is_some());
++            if spec.id == GameId::Ctris || spec.id == GameId::Ninvaders {
++                assert_ne!(
++                    w.games.play.session.as_ref().unwrap().scene(),
++                    before,
++                    "real move through game keyboard"
++                );
++            }
++        }
++        let deadline = Instant::now() + Duration::from_secs(2);
++        while (captured(&w.tabs[0]).len() < 12 || captured(&w.tabs[1]).len() < 12)
++            && Instant::now() < deadline
++        {
++            frame(&ctx, &mut w, vec![]);
++            std::thread::sleep(Duration::from_millis(5));
++        }
++        assert_eq!(captured(&w.tabs[0]), b"background-a");
++        assert_eq!(captured(&w.tabs[1]), b"background-b");
++        assert_eq!(
++            w.tabs
++                .iter()
++                .map(|t| t.process.as_ref().unwrap() as *const Process)
++                .collect::<Vec<_>>(),
++            identities
++        );
++    }
++    #[test]
++    fn keyboard_pointer_moves_reset_and_undo_reach_actual_core() {
++        let (ctx, _dir, mut w) = owned_workspace();
++        w.games.play.start(GameId::Netwalk, 5);
++        frame(&ctx, &mut w, vec![]);
++        let initial = w.games.play.session.as_ref().unwrap().scene();
++        frame(&ctx, &mut w, vec![key(Key::S, true), key(Key::S, false)]);
++        assert_ne!(w.games.play.session.as_ref().unwrap().scene(), initial);
++        assert!(w.games.play.session.as_mut().unwrap().undo());
++        assert_eq!(w.games.play.session.as_ref().unwrap().scene(), initial);
++        let r = w.games.play.board.unwrap();
++        let pos = r.min + vec2(10., 10.);
++        for pressed in [true, false] {
++            frame(
++                &ctx,
++                &mut w,
++                vec![
++                    Event::PointerMoved(pos),
++                    Event::PointerButton {
++                        pos,
++                        button: PointerButton::Middle,
++                        pressed,
++                        modifiers: Modifiers::default(),
++                    },
++                ],
++            );
++        }
++        assert_ne!(
++            w.games.play.session.as_ref().unwrap().scene(),
++            initial,
++            "middle pointer really toggles core lock"
++        );
++        w.games.play.session.as_mut().unwrap().reset();
++        assert_eq!(w.games.play.session.as_ref().unwrap().scene(), initial);
++    }
++    #[test]
++    fn close_consumes_escape_repeats_release_and_recovers_canceled_pointer() {
++        let (ctx, _dir, mut w) = owned_workspace();
++        w.games.play.start(GameId::Mines, 3);
++        frame(&ctx, &mut w, vec![key(Key::Escape, true)]);
++        assert!(!w.games.play.is_open());
++        assert_eq!(w.games.play.close_owner, Some(ViewportId::ROOT));
++        frame(
++            &ctx,
++            &mut w,
++            vec![key(Key::Escape, true), Event::Text("hidden".into())],
++        );
++        assert!(ctx.input(|i| i.events.is_empty()));
++        frame(
++            &ctx,
++            &mut w,
++            vec![key(Key::Escape, false), Event::Text("release".into())],
++        );
++        assert!(ctx.input(|i| i.events.is_empty()));
++        assert!(w.games.play.close_owner.is_none());
++        w.games.play.close_owner = Some(ViewportId::ROOT);
++        frame(&ctx, &mut w, vec![Event::PointerGone]);
++        assert!(w.games.play.close_owner.is_none());
++        assert!(!ctx.input(|i| i.pointer.any_down()));
++    }
++    #[test]
++    fn library_retains_session_and_new_variants_reset_to_selected_rules() {
++        let mut play = PlayState::default();
++        play.variant = 1;
++        play.passes = 2;
++        play.start(GameId::Soliterm, 1);
++        let before = play.session.as_ref().unwrap().scene();
++        play.open();
++        assert_eq!(play.session.as_ref().unwrap().scene(), before);
++        play.launcher = false;
++        let GameScene::Terminal(t::TerminalScene::Soliterm(s)) = before else {
++            panic!()
++        };
++        assert_eq!(s.variant, t::SolitaireVariant::Klondike);
++        assert_eq!(s.passes_left, 2);
++        play.walk_size = 9;
++        play.start(GameId::Termwalk, 2);
++        let GameScene::Terminal(t::TerminalScene::Termwalk(s)) =
++            play.session.as_ref().unwrap().scene()
++        else {
++            panic!()
++        };
++        assert_eq!((s.width, s.height), (9, 9));
++        play.portrait = true;
++        play.start(GameId::Map, 2);
++        let GameScene::Puzzle(p::PuzzleScene::Map(s)) = play.session.as_ref().unwrap().scene()
++        else {
++            panic!()
++        };
++        assert_eq!((s.width, s.height), (16, 18));
++    }
++    #[test]
++    fn untangle_keyboard_move_uses_selected_vertex_and_bounded_integer_coordinates() {
++        let mut play = PlayState::default();
++        play.start(GameId::Untangle, 1);
++        let before = play.session.as_ref().unwrap().scene();
++        play.key(Key::ArrowRight, Modifiers::default());
++        assert_ne!(play.session.as_ref().unwrap().scene(), before);
++        assert!(play.session.as_mut().unwrap().undo());
++        assert_eq!(play.session.as_ref().unwrap().scene(), before);
++    }
++    #[test]
++    fn native_close_suspends_game_without_destroying_it_and_shows_owned_session_confirmation() {
++        let (ctx, _dir, mut w) = owned_workspace();
++        let id = raw_terminal(&mut w, "native-game-close");
++        w.games.play.start(GameId::Netwalk, 2);
++        let saved = w.games.play.session.as_ref().unwrap().scene();
++        let mut raw = RawInput {
++            screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1320., 1000.))),
++            ..Default::default()
++        };
++        raw.viewports
++            .get_mut(&ViewportId::ROOT)
++            .unwrap()
++            .events
++            .push(egui::ViewportEvent::Close);
++        let mut out = ctx.run_ui(raw, |ui| {
++            w.intercept_session_close(ui.ctx());
++            w.render(ui)
++        });
++        assert!(
++            out.viewport_output[&ViewportId::ROOT]
++                .commands
++                .contains(&ViewportCommand::CancelClose)
++        );
++        out.textures_delta.clear();
++        assert!(w.pending_session_close.is_some());
++        assert!(!w.games.play.is_open());
++        assert_eq!(w.games.play.session.as_ref().unwrap().scene(), saved);
++        assert_eq!(w.tabs[0].id, id);
++        w.resolve_session_close(false, &ctx);
++        w.games.play.open();
++        assert!(w.games.play.is_open());
++        assert_eq!(w.games.play.session.as_ref().unwrap().scene(), saved);
++    }
++    #[test]
++    fn detached_native_close_is_canceled_while_game_retains_owned_terminal() {
++        use std::sync::{
++            Arc,
++            atomic::{AtomicBool, Ordering},
++        };
++        let (ctx, _dir, mut w) = owned_workspace();
++        let id = raw_terminal(&mut w, "detached-game-close");
++        let process = w.tabs[0].process.as_ref().unwrap() as *const Process;
++        w.detach_terminal(id);
++        let window = w.windows.window(id);
++        let child = crate::ui::windows::viewport_id(window);
++        w.games.play.start(GameId::Mines, 4);
++        let saved = w.games.play.session.as_ref().unwrap().scene();
++        let once = Arc::new(AtomicBool::new(true));
++        let seen = Arc::new(AtomicBool::new(false));
++        let visible = seen.clone();
++        ctx.set_embed_viewports(false);
++        Context::set_immediate_viewport_renderer(move |ctx, mut viewport| {
++            let mut raw = RawInput {
++                viewport_id: viewport.ids.this,
++                screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(960., 640.))),
++                ..Default::default()
++            };
++            raw.viewports.insert(
++                viewport.ids.this,
++                egui::ViewportInfo {
++                    parent: Some(viewport.ids.parent),
++                    events: if once.swap(false, Ordering::SeqCst) {
++                        vec![egui::ViewportEvent::Close]
++                    } else {
++                        vec![]
++                    },
++                    ..Default::default()
++                },
++            );
++            let mut out = ctx.run_ui(raw, |ui| (viewport.viewport_ui_cb)(ui));
++            if out.shapes.iter().any(|s|matches!(&s.shape,egui::Shape::Text(t)if t.galley.job.text.contains("Reattach these terminals"))){visible.store(true,Ordering::SeqCst);}
++            out.textures_delta.clear();
++        });
++        let mut raw = RawInput::default();
++        raw.viewports.insert(child, egui::ViewportInfo::default());
++        let mut out = ctx.run_ui(raw, |ui| w.detached_windows(ui.ctx()));
++        assert!(
++            out.viewport_output[&child]
++                .commands
++                .contains(&ViewportCommand::CancelClose)
++        );
++        out.textures_delta.clear();
++        assert!(seen.load(Ordering::SeqCst));
++        assert!(w.window_close_prompt.contains(&window));
++        assert!(!w.games.play.is_open());
++        assert_eq!(w.games.play.session.as_ref().unwrap().scene(), saved);
++        assert_eq!(
++            w.tabs[0].process.as_ref().unwrap() as *const Process,
++            process
++        );
++    }
++    #[test]
++    fn canceled_pointer_keeps_other_held_close_keys_owned_until_their_release() {
++        let (ctx, _dir, mut w) = owned_workspace();
++        w.games.play.start(GameId::Mines, 4);
++        frame(&ctx, &mut w, vec![key(Key::Escape, true)]);
++        frame(&ctx, &mut w, vec![Event::PointerGone]);
++        assert_eq!(w.games.play.close_owner, Some(ViewportId::ROOT));
++        frame(&ctx, &mut w, vec![key(Key::Escape, false)]);
++        assert!(w.games.play.close_owner.is_none());
++    }
++    #[test]
++    fn invader_render_player_marker_uses_core_player_row() {
++        let (ctx, _dir, mut w) = owned_workspace();
++        w.games.play.start(GameId::Ninvaders, 1);
++        let GameScene::Terminal(t::TerminalScene::Ninvaders(scene)) =
++            w.games.play.session.as_ref().unwrap().scene()
++        else {
++            panic!()
++        };
++        let mut out = ctx.run_ui(
++            RawInput {
++                screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1320., 1000.))),
++                ..Default::default()
++            },
++            |ui| {
++                w.games_frame(ui);
++            },
++        );
++        let board = w.games.play.board.unwrap();
++        let cell = board.width() / scene.width as f32;
++        let expected = board.min
++            + vec2(
++                (scene.player_x as f32 + 0.5) * cell,
++                (scene.player_y as f32 + 0.5) * cell,
++            );
++        let correct = out.shapes.iter().any(|s|matches!(&s.shape,egui::Shape::Text(t)if t.galley.job.text=="▲"&&(t.pos+t.galley.rect.center().to_vec2()).distance(expected)<1.));
++        out.textures_delta.clear();
++        assert!(
++            correct,
++            "rendered marker must use the actual core collision row"
++        );
++    }
++
++    #[test]
++    fn cards_keyboard_source_and_destination_apply_a_real_transfer() {
++        let mut play = PlayState::default();
++        play.start(GameId::Soliterm, 1);
++        let before = play.session.as_ref().unwrap().scene();
++        play.selected = 9;
++        play.key(Key::Enter, Modifiers::default());
++        play.selected = 0;
++        play.key(Key::Space, Modifiers::default());
++        assert_ne!(play.session.as_ref().unwrap().scene(), before);
++        assert!(play.session.as_mut().unwrap().undo());
++        assert_eq!(play.session.as_ref().unwrap().scene(), before);
++    }
++    #[test]
++    fn closing_main_game_consumes_a_held_game_key_and_release_in_another_viewport() {
++        let (ctx, _dir, mut w) = owned_workspace();
++        let child = ViewportId::from_hash_of("game-held-child");
++        ctx.set_embed_viewports(false);
++        w.games.play.start(GameId::Mines, 1);
++        let mut raw = RawInput {
++            viewport_id: child,
++            events: vec![key(Key::ArrowLeft, true)],
++            ..Default::default()
++        };
++        raw.viewports.insert(
++            child,
++            egui::ViewportInfo {
++                parent: Some(ViewportId::ROOT),
++                focused: Some(true),
++                ..Default::default()
++            },
++        );
++        let mut out = ctx.run_ui(raw, |ui| {
++            assert!(w.games_frame(ui));
++        });
++        out.textures_delta.clear();
++        let mut raw = RawInput {
++            events: vec![key(Key::Escape, true), key(Key::Escape, false)],
++            ..Default::default()
++        };
++        raw.viewports.insert(
++            child,
++            egui::ViewportInfo {
++                parent: Some(ViewportId::ROOT),
++                focused: Some(true),
++                ..Default::default()
++            },
++        );
++        let mut out = ctx.run_ui(raw, |ui| {
++            ui.ctx()
++                .show_viewport_deferred(child, ViewportBuilder::default(), |_, _| {});
++            assert!(w.games_frame(ui));
++        });
++        out.textures_delta.clear();
++        assert_eq!(
++            w.games.play.close_owner,
++            Some(child),
++            "held game input in child must not be released by closing root"
++        );
++        let mut raw = RawInput {
++            viewport_id: child,
++            events: vec![
++                key(Key::ArrowLeft, false),
++                Event::Text("swallowed-release".into()),
++            ],
++            ..Default::default()
++        };
++        raw.viewports.insert(
++            child,
++            egui::ViewportInfo {
++                parent: Some(ViewportId::ROOT),
++                focused: Some(true),
++                ..Default::default()
++            },
++        );
++        let mut out = ctx.run_ui(raw, |ui| {
++            assert!(w.games_frame(ui));
++        });
++        out.textures_delta.clear();
++        assert!(w.games.play.close_owner.is_none());
++        assert!(ctx.input_for(child, |i| i.events.is_empty()));
++    }
++}
++
++#[cfg(all(test, unix))]
++mod untangle_fix1_regression {
++    use super::*;
++    use crate::ui::terminal_review_tests::owned_workspace;
++    fn frame(ctx: &Context, w: &mut Workspace, events: Vec<Event>) {
++        let mut out = ctx.run_ui(
++            RawInput {
++                screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1320., 1000.))),
++                events,
++                ..Default::default()
++            },
++            |ui| {
++                w.games_frame(ui);
++            },
++        );
++        out.textures_delta.clear();
++    }
++    fn drag(fast: bool) {
++        let (ctx, _dir, mut w) = owned_workspace();
++        w.games.play.start(GameId::Untangle, 1);
++        frame(&ctx, &mut w, vec![]);
++        frame(&ctx, &mut w, vec![]);
++        let before = w.games.play.session.as_ref().unwrap().scene();
++        let GameScene::Puzzle(p::PuzzleScene::Untangle(s)) = &before else {
++            panic!()
++        };
++        let r = w.games.play.board.unwrap();
++        let (x, y) = s.vertices[0];
++        let origin = r.min
++            + vec2(
++                x as f32 / s.extent as f32 * r.width(),
++                y as f32 / s.extent as f32 * r.height(),
++            );
++        let dest = origin + vec2(65., 20.);
++        assert!(r.contains(origin) && r.contains(dest));
++        let press = Event::PointerButton {
++            pos: origin,
++            button: PointerButton::Primary,
++            pressed: true,
++            modifiers: Modifiers::default(),
++        };
++        frame(&ctx, &mut w, vec![Event::PointerMoved(origin)]);
++        if fast {
++            frame(&ctx, &mut w, vec![press, Event::PointerMoved(dest)]);
++        } else {
++            frame(&ctx, &mut w, vec![press]);
++            frame(&ctx, &mut w, vec![Event::PointerMoved(dest)]);
++        }
++        frame(
++            &ctx,
++            &mut w,
++            vec![Event::PointerButton {
++                pos: dest,
++                button: PointerButton::Primary,
++                pressed: false,
++                modifiers: Modifiers::default(),
++            }],
++        );
++        let after = w.games.play.session.as_ref().unwrap().scene();
++        assert_ne!(
++            after, before,
++            "Untangle actual drag must move vertex (fast={fast})"
++        );
++        let mut expected = GameRegistry::start(GameId::Untangle, 1);
++        expected
++            .input(GameInput::Puzzle(p::PuzzleInput::Move {
++                vertex: 0,
++                x: (((dest.x - r.left()) / r.width() * 1000.).round() as i32).clamp(0, 1000),
++                y: (((dest.y - r.top()) / r.height() * 1000.).round() as i32).clamp(0, 1000),
++            }))
++            .unwrap();
++        assert_eq!(
++            after,
++            expected.scene(),
++            "drag must move the pressed vertex to the bounded current position"
++        );
++        assert!(w.games.play.session.as_mut().unwrap().undo());
++        assert_eq!(w.games.play.session.as_ref().unwrap().scene(), before);
++        assert!(
++            !w.games.play.session.as_ref().unwrap().can_undo(),
++            "one drag is one undo action"
++        );
++    }
++    #[test]
++    fn untangle_separate_press_drag() {
++        drag(false)
++    }
++    #[test]
++    fn untangle_batched_press_motion_drag() {
++        drag(true)
++    }
++}
+--- a/src/ui/windows.rs
++++ b/src/ui/windows.rs
+@@ -212,6 +212,17 @@
+                 // Lifecycle requests are always intercepted. The existing
+                 // confirmation appears after wake without requiring Close again.
+                 if self.screensaver_frame(ui) { return; }
++                if self.games_frame(ui) {
++                    if self.window_close_prompt.contains(&window) {
++                        ui.label("Reattach these terminals, or close the selected session? Active sessions and remote edits require confirmation in the main window.");
++                        ui.horizontal(|ui| {
++                            if ui.button("Reattach all").clicked() { actions.extend(ids.iter().map(|id| (*id, false))); self.window_close_prompt.remove(&window); }
++                            if ui.button("Close selected session").clicked() { actions.push((active, true)); self.window_close_prompt.remove(&window); }
++                            if ui.button("Cancel").clicked() { self.window_close_prompt.remove(&window); }
++                        });
++                    }
++                    return;
++                }
+                 if self.import_applying(){ui.disable();}
+                 self.handle_shortcuts(&child_ctx, window);
+                 self.restore_window_geometry(&child_ctx, window);

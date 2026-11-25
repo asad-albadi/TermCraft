@@ -1,0 +1,27 @@
+debian-binary
+control.tar.gz
+data.tar.gz
+Package: termcraft
+Version: 0.1.0
+Architecture: amd64
+Section: utils
+Priority: optional
+Maintainer: TermCraft local package build
+Installed-Size: 69918
+Depends: libc6 (>= 2.43), libgcc-s1, libegl1, libgl1, libwayland-client0, libwayland-cursor0, libwayland-egl1, libxkbcommon0, libxkbcommon-x11-0, libx11-6, libx11-xcb1, libxcb1, libxcursor1, libxi6, libxrandr2, ca-certificates
+Description: TermCraft remote workspace and terminal
+ Local terminal, remote sessions and bundled headless RDP worker.
+Verified 971 Debian payload checksums.
+TermCraft remote workspace
+  --data-dir <directory>  Choose an isolated workspace
+  --session <saved-id>    Open a saved session by stable ID
+  --group <folder>        Launch folder and subfolders
+  --new-tab               Open a local terminal
+  --command <text>        Run a command in a new local or --session terminal
+  --macro <name>          Run a named saved macro in a new terminal
+  --cwd <directory>       Set local starting directory
+  --exit-when-done        Close the created terminals when they finish
+  --screenshot <file.png> Capture a separate 120-frame instance and exit
+  --help                  Show this help
+Verified source snapshot 0a242a28146920d69d7fabac4c2f4b931aa02c698016c261ee32a2da84043a47 and optional libpcap declaration.
+Extracted Debian payload started its adjacent RDP helper and preserved profile/settings.

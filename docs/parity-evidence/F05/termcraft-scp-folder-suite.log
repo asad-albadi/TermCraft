@@ -1,0 +1,29 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.90s
+     Running tests/scp_browser.rs (app/target/debug/deps/scp_browser-c29d0c75c0879a2f)
+
+running 21 tests
+test completed_scp_staging_does_not_authorize_remote_publication_on_eof ... ok
+test explicit_scp_reports_negotiated_endpoint_capabilities ... ok
+test moving_a_remote_upload_parent_cannot_publish_or_clean_up_unrelated_objects ... ok
+test scp_recursive_delete_does_not_follow_links_and_requires_exact_confirmation ... ok
+test scp_enumeration_failure_retains_the_remote_reason ... ok
+test scp_folder_merge_preserves_unrelated_entries_and_existing_modes ... ok
+test cancelling_scp_exec_startup_does_not_exhaust_session_channels ... ok
+test scp_folder_round_trip_preserves_binary_names_empty_directories_and_cycles ... ok
+test late_scp_conflicts_are_typed_and_keep_complete_remote_recovery ... ok
+test silent_terminal_does_not_delay_initial_scp_listing ... ok
+test lost_remote_commit_acknowledgement_is_indeterminate_after_real_publication ... ok
+test unsupported_enumerator_reports_capability_error ... ok
+test scp_names_cannot_be_interpreted_as_commands ... ok
+test scp_upload_preserves_ordinary_new_and_existing_modes ... ok
+test special_entry_download_is_rejected_before_local_staging ... ok
+test malformed_remote_editor_commit_reply_is_indeterminate ... ok
+test moving_a_local_download_parent_cannot_publish_a_replaced_staging_name ... ok
+test sftp_disabled_endpoint_supports_explicit_scp ... ok
+test virtual_file_sizes_cannot_silently_publish_empty_content ... ok
+test scp_entry_management_keeps_confirmation_and_no_replace_semantics ... ok
+test scp_remote_editor_uses_versioned_conflicts_and_local_recovery ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.57s
+

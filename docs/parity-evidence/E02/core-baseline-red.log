@@ -1,0 +1,10 @@
+Baseline compiled library: target/debug/deps/libharbor_workspace-687d3b6f5c7bdf11.rlib
+error[E0432]: unresolved import `harbor_workspace::macros`
+ --> tests/macro_events.rs:1:23
+  |
+1 | use harbor_workspace::macros::{Action, Context, Event, Player, Recorder, Script, Target};
+  |                       ^^^^^^ could not find `macros` in `harbor_workspace`
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0432`.

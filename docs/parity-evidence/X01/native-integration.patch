@@ -1,0 +1,266 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -57,7 +57,7 @@
+ widestring = "=1.2.1"
+ cap-std = "=4.0.3"
+ cap-fs-ext = "=4.0.3"
+-windows-sys = { version = "0.61", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Console", "Win32_System_Registry", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_Services", "Win32_System_IO", "Win32_Security", "Win32_Security_Authorization", "Win32_Devices_Communication", "Win32_Storage_FileSystem", "Win32_Graphics_Gdi", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_WindowsAndMessaging", "Win32_System_StationsAndDesktops"] }
++windows-sys = { version = "0.61", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Console", "Win32_System_Registry", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_Services", "Win32_System_IO", "Win32_Security", "Win32_Security_Authorization", "Win32_Devices_Communication", "Win32_NetworkManagement_IpHelper", "Win32_Networking_WinSock", "Win32_Storage_FileSystem", "Win32_Graphics_Gdi", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_WindowsAndMessaging", "Win32_System_StationsAndDesktops"] }
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+ zbus = "5.19"
+--- a/src/x11/mod.rs
++++ b/src/x11/mod.rs
+@@ -8,6 +8,18 @@
+ mod forwarding;
+ pub mod remote_environment;
+ pub use forwarding::{XClientDisplay, XDisplaySource, XForwardingLease, XTrustMode};
++#[cfg(any(windows, target_os = "macos", test))]
++mod native_artifact;
++#[cfg(target_os = "macos")]
++mod native_macos;
++#[cfg(any(windows, target_os = "macos"))]
++mod native_policy;
++#[cfg(any(windows, target_os = "macos", test))]
++mod native_transport;
++#[cfg(windows)]
++mod native_windows;
++#[cfg(windows)]
++mod native_windows_process;
+ mod platform;
+ pub(crate) use platform::bundled_runtime;
+ 
+@@ -37,7 +49,7 @@
+ impl Default for XServerOptions {
+     fn default() -> Self {
+         Self {
+-            artifact_id: LINUX_XWAYLAND_ARTIFACT.into(),
++            artifact_id: platform::DEFAULT_ARTIFACT.into(),
+             display_mode: XDisplayMode::Windowed,
+             monitor: None,
+         }
+@@ -132,6 +144,10 @@
+     process: engine::OwnedProcess,
+     #[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
+     _reservation: platform::DisplayReservation,
++    #[cfg(any(windows, target_os = "macos"))]
++    _native_image: native_artifact::VerifiedSnapshot,
++    #[cfg(windows)]
++    _runtime_guard: std::fs::File,
+     // Stop the child before removing the files it needs.
+     _runtime: tempfile::TempDir,
+ }
+--- a/src/x11/platform.rs
++++ b/src/x11/platform.rs
+@@ -1,3 +1,13 @@
++#[cfg(target_os = "macos")]
++pub(super) use super::native_macos::start;
++#[cfg(windows)]
++pub(super) use super::native_windows::start;
++#[cfg(windows)]
++pub(super) const DEFAULT_ARTIFACT: &str = super::native_policy::WINDOWS_ARTIFACT;
++#[cfg(target_os = "macos")]
++pub(super) const DEFAULT_ARTIFACT: &str = super::native_policy::MACOS_ARTIFACT;
++#[cfg(not(any(windows, target_os = "macos")))]
++pub(super) const DEFAULT_ARTIFACT: &str = super::LINUX_XWAYLAND_ARTIFACT;
+ #[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
+ pub(super) use linux::{DisplayReservation, start};
+ 
+@@ -6,14 +16,26 @@
+ ) -> Result<(std::path::PathBuf, String), String> {
+     #[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
+     return linux::bundled_runtime(root);
+-    #[cfg(not(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu")))]
++    #[cfg(windows)]
++    return super::native_windows::bundled_runtime(root);
++    #[cfg(target_os = "macos")]
++    return super::native_macos::bundled_runtime(root);
++    #[cfg(not(any(
++        all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"),
++        windows,
++        target_os = "macos"
++    )))]
+     {
+         let _ = root;
+         Err("The packaged X server is unavailable on this platform".into())
+     }
+ }
+ 
+-#[cfg(not(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu")))]
++#[cfg(not(any(
++    all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"),
++    windows,
++    target_os = "macos"
++)))]
+ pub(super) fn start(
+     _: &std::path::Path,
+     _: super::XServerOptions,
+--- a/src/x11/engine.rs
++++ b/src/x11/engine.rs
+@@ -1,12 +1,21 @@
++#[cfg(windows)]
++pub(super) use super::native_windows_process::OwnedProcess;
++#[cfg(not(windows))]
+ use std::io;
++#[cfg(not(windows))]
+ use std::process::Child;
+ 
++#[cfg(not(windows))]
+ pub(super) struct OwnedProcess {
+     child: Option<Child>,
+ }
+ 
++#[cfg(not(windows))]
+ impl OwnedProcess {
+-    #[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
++    #[cfg(any(
++        all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"),
++        target_os = "macos"
++    ))]
+     pub(super) fn new(child: Child) -> Self {
+         Self { child: Some(child) }
+     }
+@@ -16,6 +25,33 @@
+     }
+ 
+     pub(super) fn is_running(&mut self) -> io::Result<bool> {
++        #[cfg(target_os = "macos")]
++        if let Some(child) = &mut self.child {
++            // Observe exit without reaping: retain the PID/group identity until
++            // every owned helper has received termination, then reap the leader.
++            let mut info: libc::siginfo_t = unsafe { std::mem::zeroed() };
++            if unsafe {
++                libc::waitid(
++                    libc::P_PID,
++                    child.id(),
++                    &mut info,
++                    libc::WEXITED | libc::WNOHANG | libc::WNOWAIT,
++                )
++            } < 0
++            {
++                return Err(io::Error::last_os_error());
++            }
++            if unsafe { info.si_pid() } == 0 {
++                return Ok(true);
++            }
++            unsafe {
++                libc::kill(-(child.id() as libc::pid_t), libc::SIGKILL);
++            }
++            child.wait()?;
++            self.child = None;
++            return Ok(false);
++        }
++        #[cfg(not(target_os = "macos"))]
+         if let Some(child) = &mut self.child {
+             if child.try_wait()?.is_none() {
+                 return Ok(true);
+@@ -45,6 +81,11 @@
+                 std::thread::sleep(Duration::from_millis(10));
+             }
+         }
++        #[cfg(target_os = "macos")]
++        unsafe {
++            libc::kill(-(child.id() as libc::pid_t), libc::SIGKILL);
++        }
++        #[cfg(not(target_os = "macos"))]
+         child.kill()?;
+         child.wait()?;
+         self.child = None;
+@@ -52,6 +93,7 @@
+     }
+ }
+ 
++#[cfg(not(windows))]
+ impl Drop for OwnedProcess {
+     fn drop(&mut self) {
+         let _ = self.stop();
+--- a/src/ssh/x11.rs
++++ b/src/ssh/x11.rs
+@@ -24,6 +24,27 @@
+     screen: u32,
+ }
+ impl DisplayTarget {
++    fn parse_owned(display: &str) -> Result<Self, String> {
++        #[cfg(unix)]
++        if Path::new(display).is_absolute() {
++            // A private XQuartz socket includes its fixed :0 suffix. Only the
++            // manager-created display generation can reach this path branch.
++            if !display.ends_with(":0")
++                || display.contains(['\0', '\n', '\r'])
++                || Path::new(display)
++                    .components()
++                    .any(|v| matches!(v, std::path::Component::ParentDir))
++            {
++                return Err("Invalid private X display socket".into());
++            }
++            return Ok(Self {
++                endpoint: Endpoint::Unix(display.into()),
++                number: 0,
++                screen: 0,
++            });
++        }
++        Self::parse(display)
++    }
+     fn parse(display: &str) -> Result<Self, String> {
+         let (host, tail) = display
+             .rsplit_once(':')
+@@ -159,7 +180,11 @@
+         path: &Path,
+         owned: Option<XClientDisplay>,
+     ) -> Result<Arc<Self>, String> {
+-        let target = DisplayTarget::parse(display)?;
++        let target = if owned.is_some() {
++            DisplayTarget::parse_owned(display)?
++        } else {
++            DisplayTarget::parse(display)?
++        };
+         let mut bytes = Zeroizing::new(Vec::new());
+         std::fs::File::open(path)
+             .map_err(
+@@ -382,6 +407,24 @@
+             std::io::ErrorKind::WouldBlock
+         );
+     }
++    #[cfg(unix)]
++    #[test]
++    fn owned_socket_display_does_not_enable_system_path_connections() {
++        let name = "/private/owned-runtime/display:0";
++        assert!(DisplayTarget::parse(name).is_err());
++        let target = DisplayTarget::parse_owned(name).unwrap();
++        assert_eq!(target.number, 0);
++        assert_eq!(target.screen, 0);
++        assert!(matches!(target.endpoint, Endpoint::Unix(path) if path == Path::new(name)));
++        for invalid in [
++            "/private/../other/display:0",
++            "/private/display:1",
++            "/private/display:0.5",
++            "/private/display:0\0",
++        ] {
++            assert!(DisplayTarget::parse_owned(invalid).is_err());
++        }
++    }
+     #[test]
+     fn display_parser_rejects_remote_targets_and_port_overflow() {
+         assert!(DisplayTarget::parse("evil.example:0").is_err());
+--- a/packaging/x11/manifest.json
++++ b/packaging/x11/manifest.json
+@@ -33,7 +33,8 @@
+       "source_url": "https://github.com/marchaesen/vcxsrv/tree/b1c7712a2584b263f44fa24e8c493f4f59c472ea",
+       "license": "GPL-3.0-or-later for the upstream packaging with component licenses and corresponding source review required",
+       "runtime_inputs": ["Win64 PE and MSVC runtime", "upstream software rendering DLLs", "xkbcomp.exe", "xkbdata", "bundled fonts"],
+-      "engine_name": "vcxsrv.exe"
++      "engine_name": "vcxsrv.exe",
++      "private_candidate": {"artifact_id": "vcxsrv-21.1.16.1-termcraft-private1-windows-x86_64", "source_contract": "packaging/x11/native/source-contract.json", "patch": "packaging/x11/native/vcxsrv-private-transport.patch", "approved_executable_sha256": null, "runtime_approved": false}
+     },
+     {
+       "id": "xquartz-2.8.6-macos-universal",
+@@ -44,7 +45,8 @@
+       "source_url": "https://github.com/XQuartz/XQuartz/tree/db446ed66b76f386b815e8b095beb56aa368424a",
+       "license": "X.Org and per-component licenses; XQuartz About and corresponding source review required",
+       "runtime_inputs": ["macOS x86_64 and arm64", "native XQuartz.app helper and frameworks", "opt/X11 dylibs, data and xkbcomp"],
+-      "engine_name": "Xquartz"
++      "engine_name": "Xquartz",
++      "private_candidate": {"artifact_id": "xquartz-2.8.6-termcraft-private1-macos-universal", "source_contract": "packaging/x11/native/source-contract.json", "patch": "packaging/x11/native/xquartz-private-entry.patch", "approved_executable_sha256": null, "runtime_approved": false}
+     }
+   ]
+ }

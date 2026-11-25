@@ -1,0 +1,54 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `set_broadcast_enabled` found for struct `ui::Workspace` in the current scope
+   --> src/ui/workspace_review_tests.rs:53:7
+    |
+ 53 |     w.set_broadcast_enabled(false);w.set_broadcast_enabled(true);
+    |       ^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/ui.rs:371:1
+    |
+371 | pub struct Workspace {
+    | -------------------- method `set_broadcast_enabled` not found for this struct
+    |
+help: there is a method `broadcast_toggle` with a similar name
+    |
+ 53 -     w.set_broadcast_enabled(false);w.set_broadcast_enabled(true);
+ 53 +     w.broadcast_toggle(false);w.set_broadcast_enabled(true);
+    |
+
+error[E0599]: no method named `set_broadcast_enabled` found for struct `ui::Workspace` in the current scope
+   --> src/ui/workspace_review_tests.rs:53:38
+    |
+ 53 |     w.set_broadcast_enabled(false);w.set_broadcast_enabled(true);
+    |                                      ^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/ui.rs:371:1
+    |
+371 | pub struct Workspace {
+    | -------------------- method `set_broadcast_enabled` not found for this struct
+    |
+help: there is a method `broadcast_toggle` with a similar name
+    |
+ 53 -     w.set_broadcast_enabled(false);w.set_broadcast_enabled(true);
+ 53 +     w.set_broadcast_enabled(false);w.broadcast_toggle(true);
+    |
+
+error[E0599]: no method named `acknowledge_broadcast_failures` found for struct `ui::Workspace` in the current scope
+   --> src/ui/workspace_review_tests.rs:66:7
+    |
+ 66 |     w.acknowledge_broadcast_failures();assert!(w.broadcast_report.failed.is_empty());
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/ui.rs:371:1
+    |
+371 | pub struct Workspace {
+    | -------------------- method `acknowledge_broadcast_failures` not found for this struct
+    |
+help: there is a method `enable_broadcast_all` with a similar name
+    |
+ 66 -     w.acknowledge_broadcast_failures();assert!(w.broadcast_report.failed.is_empty());
+ 66 +     w.enable_broadcast_all();assert!(w.broadcast_report.failed.is_empty());
+    |
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 3 previous errors

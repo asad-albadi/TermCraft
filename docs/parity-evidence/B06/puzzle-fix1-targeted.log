@@ -1,0 +1,62 @@
+
+running 1 test
+test filled_map_region_rejects_pencil_transactionally ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.00s
+
+
+running 1 test
+test puzzles::tests::recovered_filled_map_pencil_is_transactional ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.00s
+
+
+running 1 test
+test puzzles::tests::recovered_map_actual_default_dimensions ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.00s
+
+
+running 1 test
+test puzzles::tests::recovered_net_half_turn_atomic_jumble_and_source_ui ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.00s
+
+
+running 1 test
+test puzzles::tests::recovered_net_source_wrap_locked_jumble_and_invalid_half_turn ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.00s
+
+
+running 1 test
+Default: 25/30 randomized, 26 distinct layouts
+Portrait: 28/30 randomized, 29 distinct layouts
+test puzzles::map::tests::recovered_default_normal_deductions_and_connected_regions ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.92s
+
+
+running 1 test
+test puzzles::map::tests::exhaustion_exposes_certified_normal_fallback ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.00s
+
+
+running 1 test
+test puzzles::map::tests::portrait_reset_preserves_dimensions ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.05s
+
+
+running 1 test
+test puzzles::map::normal_source_fixtures::recovered_normal_adjacent_pair_elimination ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.00s
+
+
+running 1 test
+test puzzles::net::added_source_fixtures::recovered_half_turn_is_two_quarters_and_lock_protected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.00s
+

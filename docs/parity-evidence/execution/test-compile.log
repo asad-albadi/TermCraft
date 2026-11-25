@@ -1,0 +1,210 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: associated items `with_cursor`, `with_resize`, `with_shrink`, and `stop` are never used
+   --> tests/support/rdp_server.rs:68:12
+    |
+ 64 | impl Server {
+    | ----------- associated items in this implementation
+...
+ 68 |     pub fn with_cursor() -> Self {
+    |            ^^^^^^^^^^^
+...
+ 74 |     pub fn with_resize() -> Self {
+    |            ^^^^^^^^^^^
+...
+ 77 |     pub fn with_shrink() -> Self {
+    |            ^^^^^^^^^^^
+...
+137 |     pub fn stop(&mut self) {
+    |            ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `poll` is never used
+   --> src/ui.rs:163:8
+    |
+120 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+163 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (test "rdp_options") generated 1 warning
+warning: methods `to_remote` and `from_remote` are never used
+  --> tests/support/../../src/desktop/options.rs:12:12
+   |
+11 | impl ClipboardPolicy {
+   | -------------------- methods in this implementation
+12 |     pub fn to_remote(self) -> bool {
+   |            ^^^^^^^^^
+...
+15 |     pub fn from_remote(self) -> bool {
+   |            ^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `RdpCapabilities` is never constructed
+  --> tests/support/../../src/desktop/options.rs:54:12
+   |
+54 | pub struct RdpCapabilities {
+   |            ^^^^^^^^^^^^^^^
+
+warning: associated function `embedded` is never used
+  --> tests/support/../../src/desktop/options.rs:64:12
+   |
+63 | impl RdpCapabilities {
+   | -------------------- associated function in this implementation
+64 |     pub fn embedded() -> Self {
+   |            ^^^^^^^^
+
+warning: struct `NegotiatedRdpOptions` is never constructed
+  --> tests/support/../../src/desktop/options.rs:77:12
+   |
+77 | pub struct NegotiatedRdpOptions {
+   |            ^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `is_default`, `validate`, and `negotiate` are never used
+   --> tests/support/../../src/desktop/options.rs:83:12
+    |
+ 82 | impl RdpOptions {
+    | --------------- methods in this implementation
+ 83 |     pub fn is_default(&self) -> bool {
+    |            ^^^^^^^^^^
+...
+ 86 |     pub fn validate(&self) -> Result<(), String> {
+    |            ^^^^^^^^
+...
+115 |     pub fn negotiate(
+    |            ^^^^^^^^^
+
+warning: `harbor-workspace` (test "rdp_session") generated 5 warnings
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+warning: variants `PasswordThenMfa` and `ScpStartup` are never constructed
+  --> tests/support/auth_server.rs:18:5
+   |
+16 | pub enum Mode {
+   |          ---- variants in this enum
+17 |     Password,
+18 |     PasswordThenMfa,
+   |     ^^^^^^^^^^^^^^^
+...
+22 |     ScpStartup,
+   |     ^^^^^^^^^^
+   |
+   = note: `Mode` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `attempts` and `startup` are never read
+   --> tests/support/auth_server.rs:271:5
+    |
+270 | pub struct AuthServer {
+    |            ---------- fields in this struct
+271 |     attempts: Arc<Attempts>,
+    |     ^^^^^^^^
+272 |     startup: Arc<StartupState>,
+    |     ^^^^^^^
+
+warning: methods `startup_requests`, `active_startup_helpers`, `allow_startup_helpers`, and `attempts` are never used
+   --> tests/support/auth_server.rs:345:12
+    |
+281 | impl AuthServer {
+    | --------------- methods in this implementation
+...
+345 |     pub fn startup_requests(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^
+...
+348 |     pub fn active_startup_helpers(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+351 |     pub fn allow_startup_helpers(&self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+...
+370 |     pub fn attempts(&self) -> [usize; 4] {
+    |            ^^^^^^^^
+
+warning: method `restart_with_new_host_key` is never used
+   --> tests/support/ssh_server.rs:131:12
+    |
+ 14 | impl SshServer {
+    | -------------- method in this implementation
+...
+131 |     pub fn restart_with_new_host_key(&mut self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (test "ssh_browser") generated 1 warning
+warning: `harbor-workspace` (test "ssh_authentication") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 17s
+  Executable unittests src/lib.rs (app/target/debug/deps/harbor_workspace-0600196180dcb998)
+  Executable unittests src/main.rs (app/target/debug/deps/harbor_workspace-e32249531f077a68)
+  Executable tests/cli_dispatch.rs (app/target/debug/deps/cli_dispatch-cb75826c1f5494a5)
+  Executable tests/connection.rs (app/target/debug/deps/connection-68999c93664faacb)
+  Executable tests/credential_vault.rs (app/target/debug/deps/credential_vault-67a8cf074861e339)
+  Executable tests/desktop_fullscreen.rs (app/target/debug/deps/desktop_fullscreen-7835dd569b9244e8)
+  Executable tests/highlighting.rs (app/target/debug/deps/highlighting-b70019931059ec28)
+  Executable tests/model.rs (app/target/debug/deps/model-376485c31b57ab41)
+  Executable tests/multiexec.rs (app/target/debug/deps/multiexec-caf1e51631ed6d0f)
+  Executable tests/process_input.rs (app/target/debug/deps/process_input-0fbbf575c6d28811)
+  Executable tests/rdp_credentials.rs (app/target/debug/deps/rdp_credentials-77fcf3a560f24f4f)
+  Executable tests/rdp_options.rs (app/target/debug/deps/rdp_options-1f930a5dad69ac2b)
+  Executable tests/rdp_session.rs (app/target/debug/deps/rdp_session-c7a39bdd8dbd9a60)
+  Executable tests/remote_editor.rs (app/target/debug/deps/remote_editor-e92640431bfcae2a)
+  Executable tests/remote_paths.rs (app/target/debug/deps/remote_paths-861cf239c86c0e1d)
+  Executable tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-a8760ab78784be15)
+  Executable tests/scp_browser.rs (app/target/debug/deps/scp_browser-ea00f0f25e25119e)
+  Executable tests/serial_settings.rs (app/target/debug/deps/serial_settings-c11eb23e359938c4)
+  Executable tests/session_groups.rs (app/target/debug/deps/session_groups-409e1ef5ab64e566)
+  Executable tests/session_import.rs (app/target/debug/deps/session_import-bb916e893924124b)
+  Executable tests/shared_sessions.rs (app/target/debug/deps/shared_sessions-4dc7f5351b2306a5)
+  Executable tests/shared_source_ssh.rs (app/target/debug/deps/shared_source_ssh-872bba9f163d4de7)
+  Executable tests/shared_sources_network.rs (app/target/debug/deps/shared_sources_network-973d798d7ac146e4)
+  Executable tests/shell_directory.rs (app/target/debug/deps/shell_directory-d9dba25cd1609e21)
+  Executable tests/shortcuts.rs (app/target/debug/deps/shortcuts-801d89d26982fb60)
+  Executable tests/ssh_agent.rs (app/target/debug/deps/ssh_agent-8018ad8c14047f6e)
+  Executable tests/ssh_authentication.rs (app/target/debug/deps/ssh_authentication-b31cce0d3778a4e5)
+  Executable tests/ssh_browser.rs (app/target/debug/deps/ssh_browser-97712a2ccc059fcb)
+  Executable tests/ssh_lifecycle.rs (app/target/debug/deps/ssh_lifecycle-2e4901a30c68cd95)
+  Executable tests/ssh_options.rs (app/target/debug/deps/ssh_options-d2b02700efbfada7)
+  Executable tests/tab_activity.rs (app/target/debug/deps/tab_activity-05045a49522f6646)
+  Executable tests/terminal_conformance.rs (app/target/debug/deps/terminal_conformance-8b92e4607ff7af8c)
+  Executable tests/terminal_mouse.rs (app/target/debug/deps/terminal_mouse-dc4c0c08c27c6e65)
+  Executable tests/terminal_performance.rs (app/target/debug/deps/terminal_performance-6ebe18b59a660361)
+  Executable tests/terminal_programs.rs (app/target/debug/deps/terminal_programs-3e31c6b9b075c38f)
+  Executable tests/terminal_safety.rs (app/target/debug/deps/terminal_safety-4f7dc8cb9e63c128)
+  Executable tests/terminal_search.rs (app/target/debug/deps/terminal_search-7dd2a5d59a4ecf3b)
+  Executable tests/terminal_selection.rs (app/target/debug/deps/terminal_selection-59c289192e417351)
+  Executable tests/terminal_settings.rs (app/target/debug/deps/terminal_settings-b33959f165bcdd61)
+  Executable tests/workspace_layout.rs (app/target/debug/deps/workspace_layout-05dd6abf9b45140d)
+  Executable tests/workspace_windows.rs (app/target/debug/deps/workspace_windows-5aa63cca4da74ec3)

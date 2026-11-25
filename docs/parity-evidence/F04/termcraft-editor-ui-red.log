@@ -1,0 +1,62 @@
+warning: unused import: `TransferOperation`
+ --> src/remote_files/editor.rs:2:58
+  |
+2 | use super::{RemotePath, transfer::{Job, TransferManager, TransferOperation, TransferOutcome}};
+  |                                                          ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (lib) generated 1 warning (run `cargo fix --lib -p harbor-workspace` to apply 1 suggestion)
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `open_remote_editor` found for struct `ui::Workspace` in the current scope
+    --> src/ui.rs:1749:11
+     |
+ 293 | pub struct Workspace {
+     | -------------------- method `open_remote_editor` not found for this struct
+...
+1749 |         w.open_remote_editor(w.tabs[0].id, path);
+     |           ^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+
+error[E0609]: no field `remote_editors` on type `ui::Workspace`
+    --> src/ui.rs:1751:17
+     |
+1751 |         while w.remote_editors[0].document.snapshot().status != DocumentStatus::Ready {
+     |                 ^^^^^^^^^^^^^^ unknown field
+     |
+     = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 41 others
+
+error[E0609]: no field `remote_editors` on type `ui::Workspace`
+    --> src/ui.rs:1755:11
+     |
+1755 |         w.remote_editors[0].document.set_text("mine").unwrap();
+     |           ^^^^^^^^^^^^^^ unknown field
+     |
+     = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 41 others
+
+error[E0609]: no field `pending_remote_tab_close` on type `ui::Workspace`
+    --> src/ui.rs:1759:22
+     |
+1759 |         assert_eq!(w.pending_remote_tab_close, Some(connection));
+     |                      ^^^^^^^^^^^^^^^^^^^^^^^^ unknown field
+     |
+     = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 41 others
+
+error[E0609]: no field `pending_remote_tab_close` on type `ui::Workspace`
+    --> src/ui.rs:1760:11
+     |
+1760 |         w.pending_remote_tab_close = None; // Cancel the close prompt.
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^ unknown field
+     |
+     = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 41 others
+
+error[E0609]: no field `remote_editors` on type `ui::Workspace`
+    --> src/ui.rs:1763:22
+     |
+1763 |         assert_eq!(w.remote_editors[0].document.snapshot().text, "mine");
+     |                      ^^^^^^^^^^^^^^ unknown field
+     |
+     = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 41 others
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 6 previous errors

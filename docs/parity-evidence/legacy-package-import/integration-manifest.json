@@ -1,0 +1,208 @@
+{
+  "target_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app",
+  "private_stage": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/legacy-package-compat",
+  "qualification": "Local inspect/quarantine import only; no original execution, native qualification, universal compatibility or parity count increase",
+  "package_version_note": "Private work used 0.1.142 and unique bin. Proposed manifest/lock restore original 0.1.0 and implicit bin.",
+  "files": [
+    {
+      "path": "CREDITS.md",
+      "base_sha256": "3bc9bbff7a2d0a9fd9dc3ea199700d3db21633848e86d477ddd72b3f2c3813fd",
+      "proposed_sha256": "3127bc368d68be0d510cbcdf2c09b551d75f9f98767df0b61c2e5e33fa12a141",
+      "bytes": 7032,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "Cargo.lock",
+      "base_sha256": "6b0b552a3514d9158c6370c0c23dbcbbc394571dcccb7b3cd927a4d801f2ad3a",
+      "proposed_sha256": "505f6d86e9b4d71504fec28af55ca21fdcd7b745071f7052a01464eaa0f0f511",
+      "bytes": 145446,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "Cargo.toml",
+      "base_sha256": "13c2009b4e461aa97ead1d6b823dc658f7978dbf222c6b11e3bbe6d937b46263",
+      "proposed_sha256": "bc1b732f7bcb0cdecc5484aa2a8910413960c210770eb49fb968f240e3cb2abb",
+      "bytes": 3614,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/LEGACY_CYGUTILS64_ARCHIVE.json",
+      "base_sha256": null,
+      "proposed_sha256": "9a4e0769c3c46b10854965f965fc0e64f7a42fbf58fac60c98c7620afab1c66d",
+      "bytes": 109907,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/LEGACY_CYGUTILS_ARCHIVE.json",
+      "base_sha256": null,
+      "proposed_sha256": "41dbf68232acfd5e46c65fd065f644658df4abfdb6325b8bcb7b44d02ffd3eb1",
+      "bytes": 296871,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/LEGACY_SQLITE_ARCHIVE.json",
+      "base_sha256": null,
+      "proposed_sha256": "3ac06e0a564b33f19de351b3cb0a99ab65d214ed8086b9901cc6b67137b9f48e",
+      "bytes": 2513,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/README.md",
+      "base_sha256": null,
+      "proposed_sha256": "d33cb5bec099e2f9da54993384ce28ec773fa38d9237b7b93c9073d7d549411b",
+      "bytes": 9128,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/codec-provenance.json",
+      "base_sha256": null,
+      "proposed_sha256": "c6d12a8913180caa2e075044173f3dd8f0f01eb80b33b8272e276266cf27c968",
+      "bytes": 4136,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/constant_time_eq-0.6.1-LICENSE-APACHE",
+      "base_sha256": null,
+      "proposed_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "bytes": 9723,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/constant_time_eq-0.6.1-LICENSE-CC0",
+      "base_sha256": null,
+      "proposed_sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+      "bytes": 7048,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/constant_time_eq-0.6.1-LICENSE-MIT0",
+      "base_sha256": null,
+      "proposed_sha256": "9a3aeb3f63659c4c6302d315e1d98784d1e8559858a47ff9562e091bb922d28d",
+      "bytes": 858,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/crc-3.4.0-LICENSE-APACHE",
+      "base_sha256": null,
+      "proposed_sha256": "470355a7eed93fcc4281ec2e0f82ca3b94e7af1e4d83629f91de8cfac34d750e",
+      "bytes": 10846,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/crc-3.4.0-LICENSE-MIT",
+      "base_sha256": null,
+      "proposed_sha256": "3488679340a49ecc34d342c4009d2dabf76f4a21f12aec2ca99b15805d656544",
+      "bytes": 1074,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/lzma-rs-0.3.0-LICENSE",
+      "base_sha256": null,
+      "proposed_sha256": "ad9f07faa5f6f671df93523293cf8c1ce24f14886fa101013c21536c7890c59b",
+      "bytes": 1084,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/typed-path-0.13.0-LICENSE-APACHE",
+      "base_sha256": null,
+      "proposed_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "bytes": 9723,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/typed-path-0.13.0-LICENSE-MIT",
+      "base_sha256": null,
+      "proposed_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "bytes": 1023,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/zeroize_derive-1.5.0-LICENSE-APACHE",
+      "base_sha256": null,
+      "proposed_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/zeroize_derive-1.5.0-LICENSE-MIT",
+      "base_sha256": null,
+      "proposed_sha256": "b8c6939380a400f53e11923d50fcc4dd2fa1ba8339fd9d04cda38a0251b6c9b0",
+      "bytes": 1082,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "docs/parity-evidence/legacy-package-import/licenses/zip-9.8.2-LICENSE",
+      "base_sha256": null,
+      "proposed_sha256": "58545fed1565e42d687aecec6897d35c6d37ccb71479a137c0deb2203e125c79",
+      "bytes": 1085,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "src/packages/legacy.rs",
+      "base_sha256": null,
+      "proposed_sha256": "10ff87b431d7ecd55c8677cff5c64ec81a4e00b4499ee980583d701ee128833c",
+      "bytes": 41953,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "src/packages/mod.rs",
+      "base_sha256": "d4a28ae0077ea4d5c27ab0161db72ccf6a7152a476749b0e384758268ef95196",
+      "proposed_sha256": "c26629447f965aecefd8bef9aede18372c7607d34d0413bb9a4a8b14c4299493",
+      "bytes": 30597,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "src/ui/legacy_packages.rs",
+      "base_sha256": null,
+      "proposed_sha256": "a039efd88cd6c9d07ba95b4e0873c333ac299eccf177a19168151b5599c94d45",
+      "bytes": 9091,
+      "current_main_matches_base": true
+    },
+    {
+      "path": "src/ui/packages.rs",
+      "base_sha256": "60ab87de7478f1c63be40c2e5d61619248861b9ac2767bab5e5fb12b226ac580",
+      "proposed_sha256": "6d9665f14218e9347e30d926454060ad0566a68c95375e3852111d5b13ec2648",
+      "bytes": 19523,
+      "current_main_matches_base": true
+    }
+  ],
+  "patch_sha256": "82e33b70a767c8677b2604c867bfcbb3ed4dba4755db0f6c9c16e1de01d4dd86",
+  "logs": [
+    {
+      "path": "logs/red.log",
+      "sha256": "039e05e486c58a74f39db0212f8545305d90bc49fd59929b48e2536c1fe256de"
+    },
+    {
+      "path": "logs/red-strict-headers.log",
+      "sha256": "a9007e8fe6c38193350d45995c38a4987fe1523d32d969f505b2154c65d83dfc"
+    },
+    {
+      "path": "logs/security-final.log",
+      "sha256": "0eeea3d3f5536a2ba7995215f65a049ee6deab31c917051587616a72bf5d9203"
+    },
+    {
+      "path": "logs/packages-subsystem-final.log",
+      "sha256": "63cb91b81034b89e24f97b3ada73580f9e09aa11f664d11c1b74a8fea87b6cca"
+    },
+    {
+      "path": "logs/actual-final.log",
+      "sha256": "4c899e63bc418e4b674f9d29987db4f25bc998fa388b29635cac345d5096871c"
+    },
+    {
+      "path": "logs/ui-tests-final.log",
+      "sha256": "3d9a6c2b404f304816649592b074d2af3ba18d349aa0bb2763ae222dbc2bb3e6"
+    },
+    {
+      "path": "logs/check-x86_64-pc-windows-msvc.log",
+      "sha256": "591649627ba4b13ef3ad2febb081b7eb482e62212508a964afafa7eaddfc37e3"
+    },
+    {
+      "path": "logs/check-aarch64-apple-darwin.log",
+      "sha256": "42905a1e5087d9b91e17d5824622eb78c9b872d18956f9841c4a71939a4940da"
+    },
+    {
+      "path": "logs/patch-dry-run.log",
+      "sha256": "2c3952435adc42404bb51f2f061b68fcb8811d2ad4339dd5bee94163852e5d3d"
+    }
+  ]
+}

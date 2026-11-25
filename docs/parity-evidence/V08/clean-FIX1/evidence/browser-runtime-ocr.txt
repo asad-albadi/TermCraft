@@ -1,0 +1,107 @@
+v
+
+(B TermCratt — Personal edition
+
+System
+
+Sessions View Xserver Tools Games Settings Macros Help
+
+@ @ X ® O
+
+%
+
+& @
+
+=]
+
+53
+
+Session
+
+Servers
+
+Tools
+
+Games.
+
+Sessions
+
+spit
+
+MuitExee
+
+Tunneling
+
+Setings
+
+Help
+
+Xserver
+
+Bt
+
+Quick connect,
+
+Home
+
+ FIXL bundled browser
+
+x
+
++
+
+jau ]
+
+Host or IP address
+
+X
+
+FIX1 bundled browser Browser - Disconnecied - 65
+
+Toggle split
+
+Reconnect
+
+More
+
+SSH
+
+Connect
+
+Single terminal v
+
+Sessions
+
+Fix2 bundied browser
+
+>
+
+Search sessions
+
+Back
+
+Forward
+
+Reload
+
+hitp://127.0.0.1:25380/
+
+Go
+
+[The Chromium process exited. Check the installed browser and sandbox configuration.
+
+My sessions
+
+FIXL bundled browser
+
+Read-only shared sources
+
+Manage
+
+Double-click a session to connect
+
+® Workspace saved
+
+0 connecions +
+
+1 saved sessions

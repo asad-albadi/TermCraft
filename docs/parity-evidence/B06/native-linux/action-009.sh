@@ -1,0 +1,3 @@
+set -euo pipefail
+export DISPLAY=:77
+xdotool key Escape; sleep .25; xdotool mousemove --sync 570 470 click 1; sleep .3; xdotool mousemove --sync 252 58 click 1; sleep .2; xdotool mousemove --sync 263 285 click 1; sleep .4; import -window root /evidence/016-ninvaders.png; xdotool mousemove --sync 200 230 click 1; xdotool key space Right space; sleep .4; import -window root /evidence/017-ninvaders-move.png; xdotool key Escape; sleep .25; xdotool mousemove --sync 570 470 click 1; sleep .3; xdotool mousemove --sync 252 58 click 1; sleep .2; xdotool mousemove --sync 263 323 click 1; sleep .4; import -window root /evidence/018-greed.png; xdotool mousemove --sync 200 230 click 1; xdotool key Right; sleep .3; import -window root /evidence/019-greed-move.png

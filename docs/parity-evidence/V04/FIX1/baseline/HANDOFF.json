@@ -1,0 +1,216 @@
+{
+  "task": "V04",
+  "status": "partial",
+  "strict_native_original": 0,
+  "whole_v04_complete": false,
+  "main_product_source_changes": 0,
+  "handoff_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/V04",
+  "private_work_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v04",
+  "source_base_and_candidate": [
+    {
+      "path": "src/process_input.rs",
+      "base_sha256": "8848ef9cdc54813109d1d22cb4f8420d7f6f818ef2f9558af63080044de8dc33",
+      "candidate_sha256": "8848ef9cdc54813109d1d22cb4f8420d7f6f818ef2f9558af63080044de8dc33",
+      "action": "unchanged-source-input"
+    },
+    {
+      "path": "src/serial.rs",
+      "base_sha256": "9f95e681e75739e9dc0c3a9a8cfa6779b9e4e235bba2179a697a4a5421bd2567",
+      "candidate_sha256": "9f95e681e75739e9dc0c3a9a8cfa6779b9e4e235bba2179a697a4a5421bd2567",
+      "action": "unchanged-source-input"
+    },
+    {
+      "path": "src/serial/settings.rs",
+      "base_sha256": "2f18c5c62500ba8432c1f10f0db20fe0f0ef7c03852776ee04557a5a562f1ea2",
+      "candidate_sha256": "2f18c5c62500ba8432c1f10f0db20fe0f0ef7c03852776ee04557a5a562f1ea2",
+      "action": "unchanged-source-input"
+    },
+    {
+      "path": "tests/serial_settings.rs",
+      "base_sha256": "90fe7db1316ba58f0e46fac6c23d793de92080a7c43105dffa6b78643390a270",
+      "candidate_sha256": "90fe7db1316ba58f0e46fac6c23d793de92080a7c43105dffa6b78643390a270",
+      "action": "unchanged-source-input"
+    },
+    {
+      "path": "tests/support/serial.rs",
+      "base_sha256": "e6a86ee9f0ecf1c0b683cde4796a7d5481e775b3753b335caf6a6f6a676cfc78",
+      "candidate_sha256": "e6a86ee9f0ecf1c0b683cde4796a7d5481e775b3753b335caf6a6f6a676cfc78",
+      "action": "unchanged-source-input"
+    },
+    {
+      "path": "docs/parity-evidence/V04/README.md",
+      "base_sha256": null,
+      "candidate_sha256": "bb795d3f194b1ca5bb746b05a288aa7a8be91d9ad9fabc9f3971884a21c77671",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/mosh/private-interface-migration.journal.jsonl",
+      "base_sha256": null,
+      "candidate_sha256": "8a37bfb10987cdd1ae2d07a1bb2d1d7bb50f18826246164afcffd5307e383a7c",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/mosh/private-interface-migration.server.log",
+      "base_sha256": null,
+      "candidate_sha256": "eb87b0fcec0914f1bdf1ba3ca7e7b28545ed28a49b6d21093ffc6de46afa125c",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/mosh/private-interface-migration.terminal.bin",
+      "base_sha256": null,
+      "candidate_sha256": "f9e2af8aca4648cb0b3a08cd3acce8ef23a9d18a9d179d189fb8b415d3df01f7",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/mosh/provenance.json",
+      "base_sha256": null,
+      "candidate_sha256": "295d1028c8a8936b7d0055a041d244a2161ed4aa1c1a08efb2341330f2d105fa",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/mosh/results.json",
+      "base_sha256": null,
+      "candidate_sha256": "eb1ef6f92dfd74f137214789072a1d49c135a5db9337f3d528bd208dbe262304",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/mosh/udp-rebind-loss-reordering.journal.jsonl",
+      "base_sha256": null,
+      "candidate_sha256": "eb5fb9c9b14af3a06b50443c81f29a676b074a972891879787541bf6fa11f7be",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/mosh/udp-rebind-loss-reordering.server.log",
+      "base_sha256": null,
+      "candidate_sha256": "b57452c088f5cf77893877936cf4d97396a97efb572bebca061efa2d8a7efb70",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/mosh/udp-rebind-loss-reordering.terminal.bin",
+      "base_sha256": null,
+      "candidate_sha256": "f9e2af8aca4648cb0b3a08cd3acce8ef23a9d18a9d179d189fb8b415d3df01f7",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/mosh.log",
+      "base_sha256": null,
+      "candidate_sha256": "a374512ca005f25b42b846fb53ae45b5a2b7d6dcc2a4b7cbd02d74baa8fb9ae4",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/rustc.log",
+      "base_sha256": null,
+      "candidate_sha256": "b569b0c98ea3133c7252b4b8ea6b39b7b353813df0dd5f5c412c355691424112",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/serial-provenance.json",
+      "base_sha256": null,
+      "candidate_sha256": "f5e65714a6cbc1d8ddcfca8b6c47ee8afcb403c28d9450dfea3f52b46ff42dfe",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/serial-source/Cargo.lock",
+      "base_sha256": null,
+      "candidate_sha256": "9fcfb3f4b1809becb3413dbe01f5ea2c89250b7449b93388bdca49d78d420c95",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/serial-source/Cargo.toml",
+      "base_sha256": null,
+      "candidate_sha256": "207cb6b504bd88affb8e628b48f0a2b25179ad61f11b3a1cbb8b46f16352f693",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/serial-source/src/lib.rs",
+      "base_sha256": null,
+      "candidate_sha256": "547f444e8a97d5001ce2dce61b1c800d6f02c1c051aecf41ba01ed75542148e2",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/serial-source/src/process_input.rs",
+      "base_sha256": null,
+      "candidate_sha256": "8848ef9cdc54813109d1d22cb4f8420d7f6f818ef2f9558af63080044de8dc33",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/serial-source/src/serial/settings.rs",
+      "base_sha256": null,
+      "candidate_sha256": "2f18c5c62500ba8432c1f10f0db20fe0f0ef7c03852776ee04557a5a562f1ea2",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/serial-source/src/serial.rs",
+      "base_sha256": null,
+      "candidate_sha256": "9f95e681e75739e9dc0c3a9a8cfa6779b9e4e235bba2179a697a4a5421bd2567",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/serial-source/tests/serial_pty.rs",
+      "base_sha256": null,
+      "candidate_sha256": "f34b391b221b1fbad85446ba9d387e551d589afa2f667ec8665a73a26aa1f7e9",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/serial-source/tests/support/serial.rs",
+      "base_sha256": null,
+      "candidate_sha256": "e6a86ee9f0ecf1c0b683cde4796a7d5481e775b3753b335caf6a6f6a676cfc78",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/serial.log",
+      "base_sha256": null,
+      "candidate_sha256": "176907c7e88b0a4742c11e3e28ac4ba3603e6c46e6e766ced5246ea522c99acc",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/strict-run.exit",
+      "base_sha256": null,
+      "candidate_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/strict-run.log",
+      "base_sha256": null,
+      "candidate_sha256": "7d7793d6d679e88105eafb495f400346fbbb1c18e1e23477cbdb36f2787c951d",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/observed/summary.json",
+      "base_sha256": null,
+      "candidate_sha256": "c35d06299f211f0cf88753887eb68f56e279bb079424e830d9ba5aff8eb9fbf8",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/physical-fixture-request.json",
+      "base_sha256": null,
+      "candidate_sha256": "70817b6f220ad107a66f223b9165bfc6e74ca40ab206a8a338335d929f67151c",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/runner/check_v04.py",
+      "base_sha256": null,
+      "candidate_sha256": "b9dbf5f77d05205521b511b789120a40d98a46ab764a7e52abcd081bf24b0de4",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/runner/run_mosh_roaming.py",
+      "base_sha256": null,
+      "candidate_sha256": "f017e280cf50955dc4219351c145e311f6f9f1c5fa75743a3553bafbba3c3e54",
+      "action": "add-evidence"
+    },
+    {
+      "path": "docs/parity-evidence/V04/runner/serial-base.json",
+      "base_sha256": null,
+      "candidate_sha256": "8d2ca7b477586089bcb3855303ef437aa3e6a04fa52ddc235c4868e46e553d46",
+      "action": "add-evidence"
+    }
+  ],
+  "observed_strict_exit": 2,
+  "observed_passed": {
+    "actual_mosh": 2,
+    "selected_source_serial_pty": 3
+  },
+  "unavailable": 3,
+  "all_owned_jobs_reaped": true
+}

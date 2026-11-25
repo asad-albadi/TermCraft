@@ -1,0 +1,13 @@
+[package]
+name="termcraft-printer-native-rebased936"
+version="0.1.936"
+edition="2024"
+[dependencies]
+serde={version="1",features=["derive"]}
+tokio={version="1",features=["rt","net","sync","time","io-util","macros","process"]}
+tempfile="=3.27.0"
+[target.'cfg(unix)'.dependencies]
+libc="0.2"
+rustix={version="=1.1.6",features=["fs"]}
+[target.'cfg(windows)'.dependencies]
+windows-sys={version="0.61",features=["Win32_Foundation","Win32_Graphics_Printing","Win32_Graphics_Gdi","Win32_Security","Win32_System_JobObjects","Win32_System_Threading"]}

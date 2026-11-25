@@ -1,0 +1,10 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.63s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-e89bfe3840855a01)
+
+running 2 tests
+test remote_files::transfer::folder_archive::portable::windows_decoder_tests::portable_decoder_preserves_content_and_resolves_selected_tree_link_types ... ok
+test remote_files::transfer::folder_archive::portable::windows_decoder_tests::windows_decoder_rejects_device_names_streams_and_unknown_link_types ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 34 filtered out; finished in 0.00s
+

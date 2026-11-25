@@ -1,0 +1,10 @@
+{
+  "root_gui_image": "sha256:c326d40de0700f7086d34670a6d21b0af6d8a6da71bc442fceed67bcd0648fe5",
+  "input_image": "sha256:bf83b781e2d467fe7cbafb6c4235c3263260fd56cec7cfb9b22dafde0a914a12",
+  "runtime_image": "sha256:1ab61a2bb16febd0a86829a43c26849b06ca82aca31be8385880cc7a3570c79d",
+  "root_gui_layers_prefix_of_input": true,
+  "input_layers_prefix_of_runtime": true,
+  "input_dockerfile_sha256": "261c37407c283134ce541ad2e7736f19fe70d05cc2fda76bd827895dcadb27e0",
+  "runtime_dockerfile_sha256": "3237e9556ae5b428b92ab47c03309ff79e258f33048aee83a3b55e0c995b5a0c",
+  "runtime_dependency_names_origin": "Current immutable browser/linux-x86_64/SOURCE-PKGINFO dependency lines plus declared perl openssh; no chromium package installed"
+}

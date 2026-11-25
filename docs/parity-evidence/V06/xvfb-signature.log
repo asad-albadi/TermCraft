@@ -1,0 +1,7 @@
+gpg: WARNING: unsafe ownership on homedir '/etc/pacman.d/gnupg'
+gpg: Signature made Tue Nov 10 18:59:36 2026 +04
+gpg:                using RSA key ADC8A1FCC15E01D45310419E94657AB20F2A092B
+gpg: Note: trustdb not writable
+gpg: Good signature from "Andreas Radke <andyrtr@archlinux.org>" [full]
+gpg:                 aka "Andreas Radke <andreas.radke@mailbox.org>" [undefined]
+gpg:                 aka "Andreas Radke <andyrtr@mailbox.org>" [undefined]

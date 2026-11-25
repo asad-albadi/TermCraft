@@ -1,0 +1,19 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.23s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-317c3b688bab989e)
+
+running 1 test
+
+thread 'services::cron::tests::releasing_store_owner_unlocks_inherited_open_description' (12488) panicked at src/services/cron/tests.rs:339:41:
+retired owner must explicitly release its lock: "This cron file is already owned by an active scheduler or save; stop it before editing."
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test services::cron::tests::releasing_store_owner_unlocks_inherited_open_description ... FAILED
+
+failures:
+
+failures:
+    services::cron::tests::releasing_store_owner_unlocks_inherited_open_description
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 97 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

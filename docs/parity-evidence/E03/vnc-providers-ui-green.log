@@ -1,0 +1,11 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-vnc-providers-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-vnc-providers)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 46.77s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-8a8a9b61a7520178)
+
+running 2 tests
+test ui::managed_vnc::tests::servers_vnc_pointer_start_stop_owns_only_selected_display ... ignored, requires private bwrap/Cage display; never run on a host display
+test ui::managed_vnc::tests::vnc_service_password_field_leaves_no_undo_history ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 148 filtered out; finished in 0.13s
+

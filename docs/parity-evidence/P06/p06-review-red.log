@@ -1,0 +1,29 @@
+   Compiling harbor-workspace v0.1.6 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p06)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.82s
+     Running unittests src/lib.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-bcb84ae701577a55)
+
+running 2 tests
+test plugins::registry::lifecycle_regressions::paused_retirement_allows_registry_changes_and_cancels ... FAILED
+test plugins::registry::lifecycle_regressions::retirement_preserves_replacement_after_verification ... FAILED
+
+failures:
+
+---- plugins::registry::lifecycle_regressions::paused_retirement_allows_registry_changes_and_cancels stdout ----
+
+thread 'plugins::registry::lifecycle_regressions::paused_retirement_allows_registry_changes_and_cancels' (542433) panicked at src/plugins/registry.rs:504:9:
+registry blocked by retirement: Err(Busy)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- plugins::registry::lifecycle_regressions::retirement_preserves_replacement_after_verification stdout ----
+
+thread 'plugins::registry::lifecycle_regressions::retirement_preserves_replacement_after_verification' (542435) panicked at src/plugins/registry.rs:487:55:
+called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+
+
+failures:
+    plugins::registry::lifecycle_regressions::paused_retirement_allows_registry_changes_and_cancels
+    plugins::registry::lifecycle_regressions::retirement_preserves_replacement_after_verification
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 68 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`

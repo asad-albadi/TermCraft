@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'destination_failure_is_observable' (92025) panicked at tests/tunnel_interop.rs:155:35:
+called `Result::unwrap()` on an `Err` value: Error { kind: UnexpectedEof, message: "failed to fill whole buffer" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test destination_failure_is_observable ... FAILED
+
+failures:
+
+failures:
+    destination_failure_is_observable
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.46s
+

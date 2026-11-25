@@ -1,0 +1,14 @@
+
+running 9 tests
+test telnet_gateway_profile_cannot_fall_back_to_direct_tcp ... ok
+test unsupported_privileged_port_requirement_is_explicit ... ok
+test telnet_uses_carrier_without_resolving_configured_target ... ok
+test close_interrupts_unacknowledged_legacy_handshake ... ok
+test configured_legacy_port_and_user_reach_server ... ok
+test telnet_iac_is_not_displayed_as_text ... ok
+test close_interrupts_backpressured_terminal_input ... ok
+test closed_transport_drops_queued_output ... ok
+test rlogin_window_size_follows_server_urgent_request ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+

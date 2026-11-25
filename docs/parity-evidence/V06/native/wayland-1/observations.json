@@ -1,0 +1,542 @@
+{
+  "status": "PASS",
+  "backend": "wayland",
+  "app_executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v06/package-extracted/TermCraft-0.1.706-linux-x86_64-arch-xwayland/harbor-workspace",
+  "binaries": {
+    "termcraft-v06-native-matrix": "ea603394a68bebd30ff66472cb3b7aa9c1a9ce9589bc231c5ecae65bec7bcf6d",
+    "v06-clipboard-peer": "138ff97413a683e8531870f262891b5d6e914133aa95ad36fb8055761159737b",
+    "v06-appearance-portal": "9183143f959845696fc2b927a11450b8f452b41dbd7d9fc82a2e73114b8f614d"
+  },
+  "scale": 1.0,
+  "env": {
+    "DISPLAY": null,
+    "WAYLAND_DISPLAY": "wayland-1",
+    "SWAYSOCK": "/tmp/v06-runtime/sway-ipc.1000.5.sock",
+    "XDG_RUNTIME_DIR": "/tmp/v06-runtime",
+    "DBUS_SESSION_BUS_ADDRESS": "unix:path=/tmp/dbus-VXNrQHhC5w,guid=5d4a83b5d5ec4bdc5b64b5da6b061840",
+    "WINIT_X11_SCALE_FACTOR": null
+  },
+  "observations": [
+    {
+      "case": "system_theme_changes_while_idle",
+      "appearance": "System",
+      "portal": 2,
+      "expected": "Light",
+      "observed": {
+        "appearance": "System",
+        "detached": [],
+        "frame": 43,
+        "pixels_per_point": 1.0,
+        "tabs": 0,
+        "theme": "Light"
+      },
+      "before_frame": 15,
+      "capture": "theme-System-2.png"
+    },
+    {
+      "case": "system_theme_changes_while_idle",
+      "appearance": "System",
+      "portal": 1,
+      "expected": "Dark",
+      "observed": {
+        "appearance": "System",
+        "detached": [],
+        "frame": 76,
+        "pixels_per_point": 1.0,
+        "tabs": 0,
+        "theme": "Dark"
+      },
+      "before_frame": 46,
+      "capture": "theme-System-1.png"
+    },
+    {
+      "case": "system_theme_changes_while_idle",
+      "appearance": "Light",
+      "portal": 1,
+      "expected": "Light",
+      "observed": {
+        "appearance": "Light",
+        "detached": [],
+        "frame": 107,
+        "pixels_per_point": 1.0,
+        "tabs": 0,
+        "theme": "Light"
+      },
+      "before_frame": 80,
+      "capture": "theme-Light-1.png"
+    },
+    {
+      "case": "system_theme_changes_while_idle",
+      "appearance": "Light",
+      "portal": 2,
+      "expected": "Light",
+      "observed": {
+        "appearance": "Light",
+        "detached": [],
+        "frame": 139,
+        "pixels_per_point": 1.0,
+        "tabs": 0,
+        "theme": "Light"
+      },
+      "before_frame": 111,
+      "capture": "theme-Light-2.png"
+    },
+    {
+      "case": "system_theme_changes_while_idle",
+      "appearance": "Dark",
+      "portal": 2,
+      "expected": "Dark",
+      "observed": {
+        "appearance": "Dark",
+        "detached": [],
+        "frame": 170,
+        "pixels_per_point": 1.0,
+        "tabs": 0,
+        "theme": "Dark"
+      },
+      "before_frame": 143,
+      "capture": "theme-Dark-2.png"
+    },
+    {
+      "case": "system_theme_changes_while_idle",
+      "appearance": "Dark",
+      "portal": 1,
+      "expected": "Dark",
+      "observed": {
+        "appearance": "Dark",
+        "detached": [],
+        "frame": 203,
+        "pixels_per_point": 1.0,
+        "tabs": 0,
+        "theme": "Dark"
+      },
+      "before_frame": 174,
+      "capture": "theme-Dark-1.png"
+    },
+    {
+      "case": "visible_theme_pixels",
+      "differences": {
+        "theme-System-2 vs theme-System-1": 659.080864679784,
+        "theme-Light-1 vs theme-Light-2": 0.0,
+        "theme-Dark-1 vs theme-Dark-2": 0.0
+      }
+    },
+    {
+      "case": "scaled_root_input_coordinates",
+      "col": 8,
+      "row": 0,
+      "native_window": {
+        "id": 5,
+        "type": "con",
+        "orientation": "none",
+        "percent": 1.0,
+        "urgent": false,
+        "marks": [],
+        "focused": true,
+        "layout": "none",
+        "border": "none",
+        "current_border_width": 2,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "deco_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "window_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 1360,
+          "height": 880
+        },
+        "name": "TermCraft \u2014 Remote workspace",
+        "window": null,
+        "nodes": [],
+        "floating_nodes": [],
+        "focus": [],
+        "fullscreen_mode": 0,
+        "sticky": false,
+        "floating": "auto_off",
+        "scratchpad_state": "none",
+        "pid": 15,
+        "app_id": "termcraft",
+        "foreign_toplevel_identifier": "d07d21c92dfa9d52ca7f66285aa0ee2f",
+        "visible": true,
+        "max_render_time": 0,
+        "allow_tearing": false,
+        "shell": "xdg_shell",
+        "inhibit_idle": false,
+        "sandbox_engine": null,
+        "sandbox_app_id": null,
+        "sandbox_instance_id": null,
+        "tag": null,
+        "idle_inhibitors": {
+          "user": "none",
+          "application": "none"
+        }
+      },
+      "local": [
+        398.64404296875,
+        452.5
+      ],
+      "injected": [
+        398.64404296875,
+        452.5
+      ],
+      "pixels_per_point": 1.0,
+      "expected_hex": "1b5b3c303b393b314d",
+      "observed_hex": "1b5b3c303b393b314d1b5b3c303b393b316d"
+    },
+    {
+      "case": "scaled_detached_views_keep_correct_input_coordinates",
+      "col": 4,
+      "row": 2,
+      "native_window": {
+        "id": 6,
+        "type": "con",
+        "orientation": "none",
+        "percent": 0.5,
+        "urgent": false,
+        "marks": [],
+        "focused": true,
+        "layout": "none",
+        "border": "none",
+        "current_border_width": 2,
+        "rect": {
+          "x": 960,
+          "y": 0,
+          "width": 960,
+          "height": 1080
+        },
+        "deco_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "window_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 1080
+        },
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 640
+        },
+        "name": "V06 Native Terminal",
+        "window": null,
+        "nodes": [],
+        "floating_nodes": [],
+        "focus": [],
+        "fullscreen_mode": 0,
+        "sticky": false,
+        "floating": "auto_off",
+        "scratchpad_state": "none",
+        "pid": 15,
+        "app_id": null,
+        "foreign_toplevel_identifier": "888b772792996be34e48d207d2ea0e90",
+        "visible": true,
+        "max_render_time": 0,
+        "allow_tearing": false,
+        "shell": "xdg_shell",
+        "inhibit_idle": false,
+        "sandbox_engine": null,
+        "sandbox_app_id": null,
+        "sandbox_instance_id": null,
+        "tag": null,
+        "idle_inhibitors": {
+          "user": "none",
+          "application": "none"
+        }
+      },
+      "local": [
+        37.92919921875,
+        141.5
+      ],
+      "injected": [
+        997.92919921875,
+        141.5
+      ],
+      "pixels_per_point": 1.0,
+      "expected_hex": "1b5b3c303b353b334d",
+      "observed_hex": "1b5b3c303b393b314d1b5b3c303b393b316d1b5b3c303b353b334d1b5b3c303b353b336d"
+    },
+    {
+      "case": "scaled_detached_views_keep_correct_input_coordinates",
+      "col": 20,
+      "row": 5,
+      "native_window": {
+        "id": 6,
+        "type": "con",
+        "orientation": "none",
+        "percent": 0.5,
+        "urgent": false,
+        "marks": [],
+        "focused": true,
+        "layout": "none",
+        "border": "none",
+        "current_border_width": 2,
+        "rect": {
+          "x": 960,
+          "y": 0,
+          "width": 960,
+          "height": 1080
+        },
+        "deco_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "window_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 1080
+        },
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 640
+        },
+        "name": "V06 Native Terminal",
+        "window": null,
+        "nodes": [],
+        "floating_nodes": [],
+        "focus": [],
+        "fullscreen_mode": 0,
+        "sticky": false,
+        "floating": "auto_off",
+        "scratchpad_state": "none",
+        "pid": 15,
+        "app_id": null,
+        "foreign_toplevel_identifier": "888b772792996be34e48d207d2ea0e90",
+        "visible": true,
+        "max_render_time": 0,
+        "allow_tearing": false,
+        "shell": "xdg_shell",
+        "inhibit_idle": false,
+        "sandbox_engine": null,
+        "sandbox_app_id": null,
+        "sandbox_instance_id": null,
+        "tag": null,
+        "idle_inhibitors": {
+          "user": "none",
+          "application": "none"
+        }
+      },
+      "local": [
+        172.78857421875,
+        198.5
+      ],
+      "injected": [
+        1132.78857421875,
+        198.5
+      ],
+      "pixels_per_point": 1.0,
+      "expected_hex": "1b5b3c303b32313b364d",
+      "observed_hex": "1b5b3c303b393b314d1b5b3c303b393b316d1b5b3c303b353b334d1b5b3c303b353b336d1b5b3c303b32313b364d1b5b3c303b32313b366d"
+    },
+    {
+      "case": "clipboard_roundtrip_between_real_windows",
+      "direction": "native peer window -> production read_os_text -> detached PTY",
+      "expected_sha256": "25ee609bb08ce01756e215b886dc580b744a793ffcecaee6741422087deb47e0",
+      "pty_hex": "1b5b3c303b393b314d1b5b3c303b393b316d1b5b3c303b353b334d1b5b3c303b353b336d1b5b3c303b32313b364d1b5b3c303b32313b366d1b5b3230307e56303620556e69636f64653a20e697a5e69cace8aa9e20636166c3a920ce95cebbcebbceb7cebdceb9cebaceac20f09fa6800a7365636f6e64206c696e650a7468697264206c696e651b5b3230317e"
+    },
+    {
+      "case": "clipboard_roundtrip_between_real_windows",
+      "direction": "production egui copy -> native peer TextEdit",
+      "expected_sha256": "25ee609bb08ce01756e215b886dc580b744a793ffcecaee6741422087deb47e0",
+      "actual_sha256": "25ee609bb08ce01756e215b886dc580b744a793ffcecaee6741422087deb47e0"
+    },
+    {
+      "case": "scaled_detached_desktop_coordinates",
+      "canvas": {
+        "height": 480,
+        "id": 2,
+        "ppp": 1.0,
+        "rect": [
+          109.33332824707031,
+          114.0,
+          490.66668701171875,
+          400.0
+        ],
+        "viewport": "\"F062\"",
+        "width": 640
+      },
+      "expected": [
+        160,
+        120
+      ],
+      "observed": {
+        "type": "pointer",
+        "mask": 1,
+        "x": 160,
+        "y": 120
+      },
+      "native_window": {
+        "id": 8,
+        "type": "floating_con",
+        "orientation": "none",
+        "percent": 0.11574074074074073,
+        "urgent": false,
+        "marks": [],
+        "focused": true,
+        "layout": "none",
+        "border": "none",
+        "current_border_width": 2,
+        "rect": {
+          "x": 300,
+          "y": 50,
+          "width": 600,
+          "height": 400
+        },
+        "deco_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "window_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 600,
+          "height": 400
+        },
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 640
+        },
+        "name": "V06 Native Desktop",
+        "window": null,
+        "nodes": [],
+        "floating_nodes": [],
+        "focus": [],
+        "fullscreen_mode": 0,
+        "sticky": false,
+        "floating": "user_on",
+        "scratchpad_state": "none",
+        "pid": 15,
+        "app_id": null,
+        "foreign_toplevel_identifier": "3f55628a86e9fac9a175284b2c440635",
+        "visible": true,
+        "max_render_time": 0,
+        "allow_tearing": false,
+        "shell": "xdg_shell",
+        "inhibit_idle": false,
+        "sandbox_engine": null,
+        "sandbox_app_id": null,
+        "sandbox_instance_id": null,
+        "tag": null,
+        "idle_inhibitors": {
+          "user": "none",
+          "application": "none"
+        }
+      }
+    },
+    {
+      "case": "scaled_detached_desktop_coordinates",
+      "canvas": {
+        "height": 480,
+        "id": 2,
+        "ppp": 1.0,
+        "rect": [
+          109.33332824707031,
+          114.0,
+          490.66668701171875,
+          400.0
+        ],
+        "viewport": "\"F062\"",
+        "width": 640
+      },
+      "expected": [
+        480,
+        360
+      ],
+      "observed": {
+        "type": "pointer",
+        "mask": 1,
+        "x": 479,
+        "y": 359
+      },
+      "native_window": {
+        "id": 8,
+        "type": "floating_con",
+        "orientation": "none",
+        "percent": 0.11574074074074073,
+        "urgent": false,
+        "marks": [],
+        "focused": true,
+        "layout": "none",
+        "border": "none",
+        "current_border_width": 2,
+        "rect": {
+          "x": 300,
+          "y": 50,
+          "width": 600,
+          "height": 400
+        },
+        "deco_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "window_rect": {
+          "x": 0,
+          "y": 0,
+          "width": 600,
+          "height": 400
+        },
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 960,
+          "height": 640
+        },
+        "name": "V06 Native Desktop",
+        "window": null,
+        "nodes": [],
+        "floating_nodes": [],
+        "focus": [],
+        "fullscreen_mode": 0,
+        "sticky": false,
+        "floating": "user_on",
+        "scratchpad_state": "none",
+        "pid": 15,
+        "app_id": null,
+        "foreign_toplevel_identifier": "3f55628a86e9fac9a175284b2c440635",
+        "visible": true,
+        "max_render_time": 0,
+        "allow_tearing": false,
+        "shell": "xdg_shell",
+        "inhibit_idle": false,
+        "sandbox_engine": null,
+        "sandbox_app_id": null,
+        "sandbox_instance_id": null,
+        "tag": null,
+        "idle_inhibitors": {
+          "user": "none",
+          "application": "none"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "source_fixture": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/v03/inputs/xdmcp-fixture",
+  "candidate_fixture": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-games-v03/xdmcp-fixture-atomic",
+  "baseline_manifest": "docs/parity-evidence/V03/run-qualified/source-input-sha256.json",
+  "files": [
+    {
+      "file": "lib/libXpm.so.4",
+      "source_sha256": "e02df8ee6e0bff934a13563d9543e1a727620399ddf43d5c211d6846830768ac",
+      "candidate_sha256": "e02df8ee6e0bff934a13563d9543e1a727620399ddf43d5c211d6846830768ac",
+      "unchanged": true,
+      "source_matches_V03_qualified": true
+    },
+    {
+      "file": "libXdmGreet.so",
+      "source_sha256": "ab10ec35cf6045a27261ac4e6003127e23b5e9be0f054005cae69cf08f0a03ae",
+      "candidate_sha256": "ab10ec35cf6045a27261ac4e6003127e23b5e9be0f054005cae69cf08f0a03ae",
+      "unchanged": true,
+      "source_matches_V03_qualified": true
+    },
+    {
+      "file": "xdm",
+      "source_sha256": "d0f9df84fa1313b9e9155d2a5e5f790af7a760a8918239bd60b7b3dc3a27d946",
+      "candidate_sha256": "d0f9df84fa1313b9e9155d2a5e5f790af7a760a8918239bd60b7b3dc3a27d946",
+      "unchanged": true,
+      "source_matches_V03_qualified": true
+    },
+    {
+      "file": "xdmcp_output.py",
+      "source_sha256": "5376c6c050de55abb91eb5fb8fb798edf006c7f3c47d48e111d0876ac073ea2f",
+      "candidate_sha256": "5376c6c050de55abb91eb5fb8fb798edf006c7f3c47d48e111d0876ac073ea2f",
+      "unchanged": true,
+      "source_matches_V03_qualified": true
+    },
+    {
+      "file": "xdmcp_window.py",
+      "source_sha256": "78c78a4464775ab615e0a8ef3404e5e0d6cf4571dac7abf338080d0b1588b780",
+      "candidate_sha256": "7a9369ece740240662121f40750f665be337266d088def54eb5001717c62a283",
+      "unchanged": false,
+      "source_matches_V03_qualified": true
+    }
+  ],
+  "unchanged_consumer_sha256": "530c07cb6b7ee8a7c11fe9d66ecc47044c817555520d538bd2bf900b7d0ed986",
+  "frozen_lib_tests_sha256": "5c1a93e0bd59830ef5625f917e4ce23543c781bb26933107c36362c5c7ce9d0b",
+  "evidence_files": {
+    "fixture-marker-green.log": "d14abd54213c001d29b0bdbc646cb423536bd429384fd897f3ea1803718cbb54",
+    "fixture-marker-original.log": "bc46b72222b975c3e1fa3a0488f1086e35015fed0898edec4d774baf3b61642e",
+    "fixture-marker-patch.diff": "e57f42e8b49aa50162976d61a1b02d7cea219702f070bdfd3d8372df6cf7b8af",
+    "fixture-marker-red.log": "129ec29c31eabc65279893524b4b4f28fe294349606d189393781b6c01374a3c",
+    "fixture-marker-test-results.json": "2820393c9cef77d1ed15ecece493025c2d642b0b71a36e330e666e406647da82",
+    "fixture-marker-test.py": "ebf899cefe1bec9568d69c8c776b568cf994cd49da689dc70dda5066e703e1ab",
+    "fixture-marker-write-failure.log": "cbf66609a06e4eb74e7a84638302280bbaccc516f9775c2ae826a7ccf5c48679"
+  }
+}

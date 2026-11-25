@@ -1,0 +1,8 @@
+   Compiling ring v0.17.14
+   Compiling rustls v0.23.46
+   Compiling rustls-webpki v0.103.17
+   Compiling tokio-rustls v0.26.6
+   Compiling ironrdp-server v0.13.0
+   Compiling ironrdp v0.17.0
+   Compiling termcraft-rdp-engine-evaluation v0.0.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/rdp-prototype)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.44s

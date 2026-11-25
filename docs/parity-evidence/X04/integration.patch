@@ -1,0 +1,288 @@
+--- a/src/model.rs
++++ b/src/model.rs
+@@ -191,6 +191,8 @@
+     pub rdp_options: crate::desktop::rdp_options::RdpOptions,
+     #[serde(skip_serializing_if = "DesktopEngine::is_embedded")]
+     pub desktop_engine: DesktopEngine,
++    #[serde(skip_serializing_if = "crate::x11::xdmcp::XdmcpConfig::is_default")]
++    pub xdmcp_options: crate::x11::xdmcp::XdmcpConfig,
+     pub id: SessionId,
+     pub credential_ref: Option<String>,
+     pub gateway_credential_ref: Option<String>,
+@@ -261,6 +263,7 @@
+             key: String::new(),
+             jump: String::new(),
+             remote_environment: Default::default(),
++            xdmcp_options: Default::default(),
+             x11: false,
+             x11_source: Default::default(),
+             compression: true,
+--- a/src/connection.rs
++++ b/src/connection.rs
+@@ -245,25 +245,7 @@
+             }
+         }
+         "XDMCP" => {
+-            validate_host(&s.host)?;
+-            if cfg!(windows) {
+-                (
+-                    "vcxsrv.exe".into(),
+-                    vec!["-query".into(), s.host.clone(), "-once".into()],
+-                )
+-            } else {
+-                (
+-                    "Xephyr".into(),
+-                    vec![
+-                        ":2".into(),
+-                        "-query".into(),
+-                        s.host.clone(),
+-                        "-once".into(),
+-                        "-screen".into(),
+-                        format!("{}x{}", s.width, s.height),
+-                    ],
+-                )
+-            }
++            return Err("XDMCP uses its per-session owned engine. Connect through the workspace; installed-client fallback is not automatic.".into());
+         }
+         _ => return Err(format!("{} is not a supported session type.", s.protocol)),
+     };
+--- a/src/ui.rs
++++ b/src/ui.rs
+@@ -60,6 +60,7 @@
+ mod vnc_settings;
+ mod web_browser;
+ mod windows;
++mod xdmcp;
+ mod xserver;
+ fn accent(ui: &Ui) -> Color32 {
+     ui.visuals().hyperlink_color
+@@ -116,6 +117,7 @@
+     // Drop the process before releasing its installed-version lease.
+     portable_launch: Option<harbor_workspace::environment::Launch>,
+     pending_mosh: Option<mosh_startup::Pending>,
++    xdmcp: Option<harbor_workspace::x11::ManagedXdmcp>,
+     pending_portable: Option<packages::PendingLaunch>,
+     desktop: Option<desktop::State>,
+     web_browser: Option<web_browser::State>,
+@@ -223,6 +225,17 @@
+             usize,
+         ) -> Vec<harbor_workspace::ssh::ConnectionEvent>,
+     ) -> usize {
++        if let Some(session) = &self.xdmcp {
++            while let Some(status) = session.poll() {
++                match status {
++                    Ok(message) => self.connection_status = message,
++                    Err(error) => {
++                        self.connection_status = "XDMCP could not start".into();
++                        self.error = error;
++                    }
++                }
++            }
++        }
+         if let Some(startup) = &self.pending_portable {
+             let Some(result) = startup.poll() else {
+                 return 0;
+@@ -461,6 +474,9 @@
+         if self.terminal_starting() {
+             return true;
+         }
++        if let Some(session) = &self.xdmcp {
++            return !session.is_finished();
++        }
+         if let Some(browser) = &self.web_browser {
+             return !browser.handle.state().closed;
+         }
+@@ -617,6 +633,7 @@
+     http_timeout: u32,
+     http_started: Option<Instant>,
+     xserver: xserver::State,
++    xdmcp_discovery: xdmcp::State,
+     managed_servers: managed_servers::ManagedServers,
+     managed_cron: managed_cron::ManagedCron,
+     managed_ssh_iperf: managed_ssh_iperf::ManagedSshIperf,
+@@ -853,6 +870,7 @@
+             http_timeout: 3600,
+             http_started: None,
+             xserver: xserver::State::for_context(ctx),
++            xdmcp_discovery: Default::default(),
+             managed_servers: Default::default(),
+             managed_cron: Default::default(),
+             managed_ssh_iperf: Default::default(),
+@@ -974,6 +992,7 @@
+             process: None,
+             portable_launch: None,
+             pending_mosh: None,
++            xdmcp: None,
+             pending_portable: None,
+             desktop: None,
+             web_browser: None,
+@@ -1020,6 +1039,11 @@
+             } else {
+                 tab.waiting_for_x11 = true;
+                 tab.launch = launch;
++            }
++        } else if s.protocol == "XDMCP" && launch.is_none() {
++            match xdmcp::start(&s) {
++                Ok(session) => tab.xdmcp = Some(session),
++                Err(error) => tab.error = error,
+             }
+         } else if s.protocol == "Browser" && s.browser_options.embedded && launch.is_none() {
+             let config = harbor_workspace::browser::Config {
+--- a/src/ui/pages.rs
++++ b/src/ui/pages.rs
+@@ -169,7 +169,7 @@
+ 
+    if matches!(s.protocol.as_str(),"RDP"|"VNC"){ui.horizontal(|ui|{ui.checkbox(&mut s.fullscreen,"Full screen").on_hover_text("Enter fullscreen when the connected desktop is first displayed.");ui.checkbox(&mut s.view_only,"View only");});ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. The view fits server dimensions; server-driven resize is supported."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. The view fits the negotiated desktop."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));}
+    if s.protocol=="Browser"{super::web_browser::settings(ui,&mut s);}
+-   if s.protocol=="XDMCP"{ui.label(RichText::new("Uses the nested X display engine.").size(12.).color(muted(ui)));}
++   if s.protocol=="XDMCP"{super::xdmcp::settings(ui,&mut s,&mut self.xdmcp_discovery);}
+    if super::macro_events::supported_session(&s) {
+        ui.horizontal(|ui| {
+            ui.label("Startup macro");
+@@ -413,6 +413,24 @@
+                     Err(e) => self.message(e.to_string()),
+                 }
+             }
++        }
++        if self.tabs[self.active].session.protocol == "XDMCP" {
++            let tab = &mut self.tabs[self.active];
++            ui.label(&tab.connection_status);
++            if !tab.error.is_empty() {
++                ui.colored_label(Color32::RED, &tab.error);
++            }
++            if tab
++                .xdmcp
++                .as_ref()
++                .is_some_and(|session| !session.is_finished())
++                && ui.button("Cancel / disconnect XDMCP").clicked()
++            {
++                tab.xdmcp = None;
++                tab.connection_status = "XDMCP cancellation requested".into();
++            }
++            ui.small("The remote desktop opens in its own owned X display window. Closing this session stops only that display.");
++            return;
+         }
+         self.tabs[self.active].search_ui(ui);
+         if self.tabs[self.active].session.protocol == "SFTP" {
+--- a/src/x11/mod.rs
++++ b/src/x11/mod.rs
+@@ -190,3 +190,12 @@
+         lease.process.stop().map_err(|error| error.to_string())
+     }
+ }
++
++pub mod xdmcp;
++mod xdmcp_engine;
++#[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
++mod xdmcp_listener;
++pub use xdmcp_engine::{LINUX_XEPHYR_ARTIFACT, ManagedXdmcp, XdmcpSession};
++
++#[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
++mod xdmcp_payload;
+--- a/scripts/package-release.py
++++ b/scripts/package-release.py
+@@ -379,6 +379,22 @@
+     return info, dependencies
+ 
+ 
++def stage_xephyr(source, destination, archive):
++    relative = Path("packaging/x11/xdmcp")
++    info = json.loads(regular_source(source, relative / "manifest.json").read_text())
++    if archive.is_symlink() or not archive.is_file():
++        raise ValueError("Expected a regular pinned Arch Xephyr archive.")
++    if sha256(archive) != info["archive_sha256"]:
++        raise ValueError("Pinned Arch Xephyr archive checksum mismatch.")
++    stage = regular_source(source, relative / "prepare-linux.py")
++    subprocess.run([sys.executable, "-I", "-B", stage, destination,
++                    "--archive", archive.resolve(strict=True)], check=True)
++    executable = regular_source(destination, Path(info["entry_point"]))
++    if sha256(executable) != info["executable_sha256"]:
++        raise ValueError("Packaged Xephyr executable checksum mismatch.")
++    return info, native_libraries(executable, "linux")
++
++
+ def stage_mosh(source, destination, inputs):
+     manifest_path = regular_source(source, Path("packaging/runtime-manifest.json"))
+     stage = regular_source(source, Path("packaging/runtime/stage-mosh.py"))
+@@ -440,7 +456,7 @@
+ 
+ 
+ def package_release(target, output, app_binary, helper_binary, build_inputs=None, source=ROOT,
+-                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None):
++                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None, xephyr_archive=None):
+     packaging = source / "packaging"
+     binaries = [app_binary.resolve(strict=True), helper_binary.resolve(strict=True)]
+     if binaries[0].samefile(binaries[1]):
+@@ -456,6 +472,8 @@
+     version = app_info["version"]
+     if xwayland_archive is not None and (target, arch) != ("linux", "x86_64"):
+         raise ValueError("The pinned Xwayland payload targets the Linux x86_64 Arch runtime ABI.")
++    if xephyr_archive is not None and (target, arch) != ("linux", "x86_64"):
++        raise ValueError("The pinned Xephyr payload targets the Linux x86_64 Arch runtime ABI.")
+     if iperf_runtime is not None and (target, arch) != ("linux", "x86_64"):
+         raise ValueError("The qualified Iperf payload targets Linux x86_64 only.")
+     if mosh_inputs is not None and (target, arch) != ("linux", "x86_64"):
+@@ -467,6 +485,8 @@
+     basename = f"TermCraft-{version}-{target}-{arch}"
+     if xwayland_archive is not None:
+         basename += "-arch-xwayland"
++    if xephyr_archive is not None:
++        basename += "-xdmcp"
+     if mosh_inputs is not None:
+         basename += "-mosh" if xwayland_archive is not None else "-arch-mosh"
+     if unix_cache is not None:
+@@ -496,6 +516,10 @@
+         if xwayland_archive is not None:
+             xwayland, dependencies = stage_xwayland(source, resources, xwayland_archive)
+             linked[xwayland["entry_point"]] = dependencies
++        xephyr = None
++        if xephyr_archive is not None:
++            xephyr, dependencies = stage_xephyr(source, resources, xephyr_archive)
++            linked[xephyr["entry_point"]] = dependencies
+         runtime_manifest = regular_source(source, Path("packaging/runtime-manifest.json"))
+         shutil.copyfile(runtime_manifest, resources / "RUNTIME-MANIFEST.json")
+         mosh = None
+@@ -551,6 +575,8 @@
+             runtime["mosh"] = mosh["mosh_inputs"]
+         if xwayland is not None:
+             runtime["managed_xwayland"] = xwayland
++        if xephyr is not None:
++            runtime["managed_xdmcp"] = xephyr
+         if target != "linux":
+             del runtime["linux_display_libraries"]
+         notices = cargo_notices(resources, arch, target, source, cargo_settings)
+@@ -603,6 +629,7 @@
+     parser.add_argument("--helper-binary", type=Path)
+     parser.add_argument("--xwayland-archive", type=Path,
+                         help="Bundle the pinned Arch x86_64 Xwayland package (Linux only).")
++    parser.add_argument("--xephyr-archive", type=Path, help="Bundle the pinned owned Linux x86_64 Xephyr XDMCP engine (explicit session network policy still required).")
+     parser.add_argument("--iperf-runtime", type=Path, help="Root of the pinned Linux x86_64 Iperf runtime payload.")
+     parser.add_argument("--mosh-archive", type=Path, help="Pinned Arch Linux x86_64 Mosh binary package.")
+     parser.add_argument("--mosh-source", type=Path, help="Pinned corresponding upstream Mosh source archive.")
+@@ -621,6 +648,8 @@
+         parser.error("Run the packager on the target operating system.")
+     if args.xwayland_archive and args.platform != "linux":
+         parser.error("--xwayland-archive is available for Linux x86_64 only.")
++    if args.xephyr_archive and args.platform != "linux":
++        parser.error("--xephyr-archive is available for Linux x86_64 only.")
+     if args.unix_cache is not None and args.platform not in ("linux", "windows"):
+         parser.error("--unix-cache supports Linux and Windows x86_64 only.")
+     mosh_inputs = (args.mosh_archive, args.mosh_source, args.mosh_recipe)
+@@ -634,7 +663,7 @@
+     try:
+         if args.app_binary:
+             archive = package_release(args.platform, args.output.resolve(), args.app_binary, args.helper_binary,
+-                                      xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs)
++                                      xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive)
+         else:
+             build_root = args.build_root.resolve() if args.build_root else ROOT / "target"
+             source, inputs = freeze_sources(ROOT, build_root / "package-sources")
+@@ -643,7 +672,7 @@
+                 print(f"Building source snapshot {source.name}", flush=True)
+                 app, helper = release_build(source, build_root, settings)
+                 archive = package_release(args.platform, args.output.resolve(), app, helper, inputs, source, settings,
+-                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs)
++                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive)
+     except (OSError, ValueError, subprocess.CalledProcessError) as error:
+         parser.exit(1, f"Packaging failed: {error}\n")
+     print(f"{sha256(archive)}  {archive}")

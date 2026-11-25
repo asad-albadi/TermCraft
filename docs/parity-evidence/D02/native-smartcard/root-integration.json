@@ -1,0 +1,102 @@
+{
+  "files": {
+    "engines/rdp/Cargo.toml": {
+      "baseline": "79b2cafbe2a8da7a90773959e0d429e35a4ed8c3843263b647aa35e0b8d1b557",
+      "candidate": "34804531d6959c0c77de61596945ca296b99aaf0c7d980fb52939e52b6605bb1",
+      "payload": "30c910673c6f25c05c662c9a4be3f6e52dad89b56d7ff24d90f71ec8d900e588"
+    },
+    "engines/rdp/src/main.rs": {
+      "baseline": "ffe946a21d40404bf73c92d36410b60286d6e56df67cbc6d39bb41d421c8ff8e",
+      "candidate": "81c1e488cef257712a0060e4c727e45a1ab0adae0e94601a29bc157f47182a8c",
+      "payload": "81c1e488cef257712a0060e4c727e45a1ab0adae0e94601a29bc157f47182a8c"
+    },
+    "engines/rdp/src/smartcard.rs": {
+      "baseline": "5309a690b1ec3192842f3beee75a5c1c0104d5e1f3a88cddebe743377d7313a4",
+      "candidate": "3737f29a8875c8615378a864a7cb45c62a9c9d86890a659ced4df7eac1b4703f",
+      "payload": "3737f29a8875c8615378a864a7cb45c62a9c9d86890a659ced4df7eac1b4703f"
+    },
+    "engines/rdp/src/smartcard/framed.rs": {
+      "baseline": null,
+      "candidate": "2c98e1e65bb7f80c24498cc2551893865e2d04d15f67f1051090291ed8ff478a",
+      "payload": "2c98e1e65bb7f80c24498cc2551893865e2d04d15f67f1051090291ed8ff478a"
+    },
+    "engines/rdp/src/smartcard/library_macos.rs": {
+      "baseline": null,
+      "candidate": "8a852c7bcf55b55323f1c5a4febf7c85479d4ad82745422f387fad842f297e73",
+      "payload": "8a852c7bcf55b55323f1c5a4febf7c85479d4ad82745422f387fad842f297e73"
+    },
+    "engines/rdp/src/smartcard/library_windows.rs": {
+      "baseline": null,
+      "candidate": "f99a10bf6e86301b573aed5438959ed5e78e964636b566d0ecce8ffd233b3ea9",
+      "payload": "f99a10bf6e86301b573aed5438959ed5e78e964636b566d0ecce8ffd233b3ea9"
+    },
+    "engines/rdp/src/smartcard/native_pcsc.rs": {
+      "baseline": null,
+      "candidate": "9eb1f85f8a8ea521594e59581166f970a6e7580c8ffada7538f18e1446555bca",
+      "payload": "9eb1f85f8a8ea521594e59581166f970a6e7580c8ffada7538f18e1446555bca"
+    },
+    "engines/rdp/src/smartcard/native_worker.rs": {
+      "baseline": null,
+      "candidate": "2b7868fa65755ca497d47491b4ab86c706b95bac9d314e7fc13ee549536e5954",
+      "payload": "2b7868fa65755ca497d47491b4ab86c706b95bac9d314e7fc13ee549536e5954"
+    },
+    "engines/rdp/src/smartcard/process_command.rs": {
+      "baseline": null,
+      "candidate": "9a998cbcd39d875b54864cdc5c6f808e82c5cd69e579fce8e99b11340a8e5145",
+      "payload": "9a998cbcd39d875b54864cdc5c6f808e82c5cd69e579fce8e99b11340a8e5145"
+    },
+    "engines/rdp/src/smartcard/process_macos.rs": {
+      "baseline": null,
+      "candidate": "6cfbfd499756f719df9603e978d11723c8838a7d28b6678def99277d05560c25",
+      "payload": "6cfbfd499756f719df9603e978d11723c8838a7d28b6678def99277d05560c25"
+    },
+    "engines/rdp/src/smartcard/process_windows.rs": {
+      "baseline": null,
+      "candidate": "aa5be7677f32bce51178e6d8f7f7d71b665ca9b9ddbf9f60d8bc5eead77de6d4",
+      "payload": "aa5be7677f32bce51178e6d8f7f7d71b665ca9b9ddbf9f60d8bc5eead77de6d4"
+    },
+    "src/desktop/options.rs": {
+      "baseline": "6ee2ed2025a617b4565a0fabeaf44d3a8c34aed4e743cafc95e5422661542d4d",
+      "candidate": "f07cf5f5e366f1b3157b1fcd53f954c70e88a96a016239e0fddd383e18bd9f35",
+      "payload": "f07cf5f5e366f1b3157b1fcd53f954c70e88a96a016239e0fddd383e18bd9f35"
+    },
+    "src/ui/rdp_settings.rs": {
+      "baseline": "8313361949fdf8b2a9b66b27f2cf9c0d7172bd41921ad7b877d391ae09b3eee9",
+      "candidate": "ed85757d4d87d7ee02759cdce371900a69e0c6e6b5becf263be326eccf654d1e",
+      "payload": "ed85757d4d87d7ee02759cdce371900a69e0c6e6b5becf263be326eccf654d1e"
+    },
+    "tests/rdp-smartcard-native-component/Cargo.lock": {
+      "baseline": null,
+      "candidate": "5fff098f295d9449dd27e87759df0fa130f0bd202492e3d9c6f083b1ae102356",
+      "payload": "5fff098f295d9449dd27e87759df0fa130f0bd202492e3d9c6f083b1ae102356"
+    },
+    "tests/rdp-smartcard-native-component/Cargo.toml": {
+      "baseline": null,
+      "candidate": "7d006a6c07c66dfc3578949b3197c568ac8c573172c3fd2e4c34bea767506095",
+      "payload": "7d006a6c07c66dfc3578949b3197c568ac8c573172c3fd2e4c34bea767506095"
+    },
+    "tests/rdp-smartcard-native-component/src/fixture_main.rs": {
+      "baseline": null,
+      "candidate": "55985ee07a078911285c9733b3ac047f6ad74b9feaea4433a6da3d93c003a160",
+      "payload": "55985ee07a078911285c9733b3ac047f6ad74b9feaea4433a6da3d93c003a160"
+    },
+    "tests/rdp-smartcard-native-component/src/lib.rs": {
+      "baseline": null,
+      "candidate": "c84e6d64a4544d5cbae02b6a92ba1eb7c64f16bbe44304d67283cf55a7c07916",
+      "payload": "c84e6d64a4544d5cbae02b6a92ba1eb7c64f16bbe44304d67283cf55a7c07916"
+    },
+    "tests/rdp-smartcard-native-component/src/smartcard_fixture.rs": {
+      "baseline": null,
+      "candidate": "eba03b544f53953401228c2b8246d9f85dc5068bdebd97dbe2149cc2f4745cd5",
+      "payload": "eba03b544f53953401228c2b8246d9f85dc5068bdebd97dbe2149cc2f4745cd5"
+    },
+    "tests/rdp-smartcard-native-component/src/transport_tests.rs": {
+      "baseline": null,
+      "candidate": "5be00b8148a5afc5cf6703d581808eeb05e50c47eefd6daa9dc8f3781bb88c9c",
+      "payload": "5be00b8148a5afc5cf6703d581808eeb05e50c47eefd6daa9dc8f3781bb88c9c"
+    }
+  },
+  "exact_original_package_identity": true,
+  "review": "review.md",
+  "qualification": "source/types/controlled mocks; nativehardware/runtimepending"
+}

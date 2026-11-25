@@ -1,0 +1,21 @@
+   Compiling b06-advanced-fix918 v0.1.918 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/fix2/mutants/weaken-final-grade)
+    Finished `release` profile [optimized] target(s) in 4.77s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/fix2/mutation-target/release/deps/b06_advanced_fix918-220bb8297dc415ce)
+
+running 1 test
+
+thread 'map::fix2_generation_tests::actual_failing_ordinary_seeds_and_all_six_advanced_maps' (566138) panicked at src/games/puzzles/map.rs:1341:9:
+assertion `left == right` failed
+  left: Easy
+ right: Hard
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test map::fix2_generation_tests::actual_failing_ordinary_seeds_and_all_six_advanced_maps ... FAILED
+
+failures:
+
+failures:
+    map::fix2_generation_tests::actual_failing_ordinary_seeds_and_all_six_advanced_maps
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 68 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

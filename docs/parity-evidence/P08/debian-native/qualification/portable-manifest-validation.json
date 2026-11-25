@@ -1,0 +1,92 @@
+{
+  "archive_sha256": "08969e0223e0b74ec954a1440a8f70c1eab03c9ba7d53fe7c8129b29e08b12f4",
+  "manifest_files_checked": 1074,
+  "files_match": true,
+  "profile": "release",
+  "platform": "linux",
+  "architecture": "x86_64",
+  "runtime": {
+    "artifact_declarations": "RUNTIME-MANIFEST.json",
+    "linked_libraries": {
+      "harbor-workspace": {
+        "highest_required_glibc_symbol_version": "2.35",
+        "interpreter": "/lib64/ld-linux-x86-64.so.2",
+        "libraries": [
+          "ld-linux-x86-64.so.2",
+          "libc.so.6",
+          "libgcc_s.so.1",
+          "libm.so.6",
+          "linux-vdso.so.1"
+        ]
+      },
+      "termcraft-rdp-engine": {
+        "highest_required_glibc_symbol_version": "2.34",
+        "interpreter": "/lib64/ld-linux-x86-64.so.2",
+        "libraries": [
+          "ld-linux-x86-64.so.2",
+          "libc.so.6",
+          "libgcc_s.so.1",
+          "libm.so.6",
+          "linux-vdso.so.1"
+        ]
+      }
+    },
+    "linux_display_libraries": {
+      "Wayland with EGL": [
+        "libwayland-client.so.0",
+        "libwayland-egl.so.1",
+        "libwayland-cursor.so.0",
+        "libxkbcommon.so.0",
+        "libEGL.so.1"
+      ],
+      "X11 with GLX or EGL": [
+        "libX11.so.6",
+        "libX11-xcb.so.1",
+        "libxcb.so.1",
+        "libXcursor.so.1",
+        "libXi.so.6",
+        "libXrandr.so.2",
+        "libxkbcommon.so.0",
+        "libxkbcommon-x11.so.0",
+        "libGL.so.1 or libEGL.so.1"
+      ]
+    },
+    "managed_vnc_browser": {
+      "embedded_runtime": true,
+      "release": "v1.7.0",
+      "source_and_notices": "build-source/noVNC",
+      "source_archive_sha256": "b1003a11b6e6e8d8f7f5e5586daae7f8ca651d8aee0aa155ff9ac841c48f52c6",
+      "source_url": "https://codeload.github.com/novnc/noVNC/tar.gz/refs/tags/v1.7.0"
+    },
+    "optional_installed_clients": {
+      "ftp": "Compatibility FTP sessions",
+      "mosh": "Mosh client and corresponding server with UDP connectivity",
+      "mstsc.exe": "External Windows Remote Desktop client",
+      "rlogin": "Compatibility remote login sessions",
+      "rsh": "Compatibility remote shell sessions",
+      "sftp": "OpenSSH compatibility file sessions",
+      "ssh": "OpenSSH compatibility sessions and SSH-based X11 forwarding",
+      "telnet": "Compatibility Telnet sessions",
+      "vncviewer": "External VNC viewer",
+      "wl-paste": "Optional Wayland clipboard integration",
+      "xfreerdp": "External FreeRDP client on Linux/macOS",
+      "xfreerdp3": "Preferred external FreeRDP client when available"
+    },
+    "optional_native_providers": {
+      "libpcap": "Live capture is available only with the operating system's compatible libpcap and existing capture privileges."
+    },
+    "platform_requirements": [
+      "glibc and shared libraries listed under linked_libraries",
+      "X11 or Wayland display",
+      "OpenGL with the host driver, EGL or GLX and associated display client libraries",
+      "OS certificate store for network TLS",
+      "POSIX shell for local terminals",
+      "optional xdg-desktop-portal and xdg-open for file integration",
+      "optional Python 3 for menu registration"
+    ],
+    "remote_requirements": {
+      "SCP compatibility mode": "POSIX remote host with Python 3 and a supported atomic rename primitive",
+      "SSH X11 forwarding": "A local X server and SSH server support for X11 forwarding"
+    }
+  }
+}

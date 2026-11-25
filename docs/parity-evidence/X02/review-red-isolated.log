@@ -1,0 +1,25 @@
+00:00:00.000 [INFO] [backend/backend.c:342] Loading user-specified backends due to WLR_BACKENDS: headless
+00:00:00.000 [INFO] [backend/headless/backend.c:60] Creating headless backend
+00:00:00.000 [INFO] [util/env.c:25] Loading WLR_RENDERER option: pixman
+00:00:00.000 [INFO] [render/pixman/renderer.c:328] Creating pixman renderer
+00:00:00.000 [INFO] [../cage/cage.c:521] Failed to create wlr_drm_lease_manager_v1
+00:00:00.005 [INFO] [backend/headless/backend.c:17] Starting headless backend
+00:00:00.048 [INFO] [xwayland/server.c:108] Starting Xwayland on :0
+Xwayland glamor: GBM Wayland interfaces not available
+Failed to initialize glamor, falling back to sw
+
+running 1 test
+
+thread 'ui::xserver::tests::embedded_config_controls_owned_display_startup' (8) panicked at src/ui/xserver.rs:478:17:
+The TermCraft X server must be ready before connecting. Choose System display to use your desktop's X server.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ui::xserver::tests::embedded_config_controls_owned_display_startup ... FAILED
+
+failures:
+
+failures:
+    ui::xserver::tests::embedded_config_controls_owned_display_startup
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 134 filtered out; finished in 1.16s
+
+(EE) failed to read Wayland events: Broken pipe

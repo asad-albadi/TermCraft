@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.18s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-e34932d23f1e276b)
+
+running 1 test
+test repeated_tree_cancellation_releases_bounded_sftp_handles ... FAILED
+
+failures:
+
+---- repeated_tree_cancellation_releases_bounded_sftp_handles stdout ----
+
+thread 'repeated_tree_cancellation_releases_bounded_sftp_handles' (198515) panicked at tests/remote_transfers.rs:259:45:
+[TransferEvent { id: 5, bytes: 0, outcome: Some(Failed("Limit exceeded: Handle limit reached")), recovery: Some(Local("/tmp/termcraft-ssh-test-198514-1795430874644271811/.termcraft-1c7e33a001574499c60b267ad9c56d97.part")) }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    repeated_tree_cancellation_releases_bounded_sftp_handles
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.26s
+
+error: test failed, to rerun pass `--test remote_transfers`

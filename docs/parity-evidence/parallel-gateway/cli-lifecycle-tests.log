@@ -1,0 +1,13 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.38s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-4aa8822a5d2e7f03)
+
+running 5 tests
+test ui::cli_dispatch::tests::exit_when_done_retires_telnet_job_when_gateway_cannot_connect ... ok
+test ui::cli_dispatch::tests::exit_when_done_preserves_preexisting_user_terminals ... ok
+test ui::cli_dispatch::tests::forwarded_new_tab_opens_once_in_the_actual_workspace ... ok
+test ui::cli_dispatch::tests::command_dispatch_uses_its_own_process_and_exact_local_cwd ... ok
+test ui::cli_dispatch::tests::named_macro_targets_its_new_terminal_and_respects_paste_confirmation ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 102 filtered out; finished in 2.38s
+

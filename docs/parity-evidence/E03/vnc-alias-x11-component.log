@@ -1,0 +1,11 @@
+   Compiling e03-vnc-x11-component v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-vnc-x11-component)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.18s
+     Running unittests src/lib.rs (../e03-vnc-component-target/debug/deps/e03_vnc_x11_component-5addf7bd2755c28d)
+
+running 3 tests
+test keyboard::tests::character_aliases_share_identity_without_converting_function_keys ... ok
+test keyboard::tests::windows_case_and_shifted_punctuation_use_literal_unicode_without_shortcuts ... ok
+test keyboard::tests::windows_shortcut_mapping_retains_shift_and_altgr_requirements ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

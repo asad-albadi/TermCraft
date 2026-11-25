@@ -1,0 +1,4 @@
+2026-11-25 Asia/Muscat. Bounded stable-package discovery attempt:
+curl -fsSL --max-time 20 https://archive.archlinux.org/packages/w/wine/
+Result: curl (28) Operation timed out after 20001 milliseconds with 0 bytes received.
+No stable Wine package or signature was obtained. No stable-runtime claim is made.

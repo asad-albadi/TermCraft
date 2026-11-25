@@ -1,0 +1,10 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.26s
+     Running tests/terminal_programs.rs (app/target/debug/deps/terminal_programs-d3370fcdd17a1322)
+
+running 2 tests
+test less_search_and_exit_restore_the_primary_screen ... ok
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+

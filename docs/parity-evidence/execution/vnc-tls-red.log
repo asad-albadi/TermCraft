@@ -1,0 +1,34 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no variant, associated function, or constant named `TlsPassword` found for enum `vnc::Security` in the current scope
+   --> src/desktop/vnc_tests.rs:308:32
+    |
+308 |     for security in [Security::TlsPassword,Security::TlsNone] {
+    |                                ^^^^^^^^^^^ variant, associated function, or constant not found in `vnc::Security`
+    |
+   ::: src/desktop/vnc.rs:10:1
+    |
+ 10 | pub enum Security {
+    | ----------------- variant, associated function, or constant `TlsPassword` not found for this enum
+    |
+help: there is a variant with a similar name
+    |
+308 -     for security in [Security::TlsPassword,Security::TlsNone] {
+308 +     for security in [Security::Password,Security::TlsNone] {
+    |
+
+error[E0599]: no variant, associated function, or constant named `TlsNone` found for enum `vnc::Security` in the current scope
+   --> src/desktop/vnc_tests.rs:308:54
+    |
+308 |     for security in [Security::TlsPassword,Security::TlsNone] {
+    |                                                      ^^^^^^^ variant, associated function, or constant not found in `vnc::Security`
+    |
+   ::: src/desktop/vnc.rs:10:1
+    |
+ 10 | pub enum Security {
+    | ----------------- variant, associated function, or constant `TlsNone` not found for this enum
+    |
+help: there is a method `clone` with a similar name
+   --> /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/core/src/clone.rs:236:4
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (lib test) due to 2 previous errors

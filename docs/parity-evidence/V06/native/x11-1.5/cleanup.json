@@ -1,0 +1,33 @@
+{
+  "owned": [
+    {
+      "pid": 5,
+      "returncode": 0
+    },
+    {
+      "pid": 7,
+      "returncode": -15
+    },
+    {
+      "pid": 11,
+      "returncode": -15
+    },
+    {
+      "pid": 12,
+      "returncode": -15
+    },
+    {
+      "pid": 136,
+      "returncode": -15
+    }
+  ],
+  "descendants": [
+    5,
+    7,
+    11,
+    12,
+    136,
+    110
+  ],
+  "survivors_after_reap": []
+}

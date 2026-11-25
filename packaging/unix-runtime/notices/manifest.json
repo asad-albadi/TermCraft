@@ -1,0 +1,40 @@
+{
+  "musl_reference_notices": [
+    {
+      "version": "1.1.22",
+      "reference_source_url": "https://musl.libc.org/releases/musl-1.1.22.tar.gz",
+      "reference_source_sha256": "8b0941a48d2f980fd7036cfbd24aa1d414f03d9a0652ecbd5ec5c7ff1bee29e3",
+      "notice_file": "musl-1.1.22-source-notices.txt",
+      "notice_sha256": "96ebebadefa0a997fd0174387a1745a7134d33ea28d3f41e2cccbcf8d2f10af0",
+      "copyright_file": "musl-v1.1.22-COPYRIGHT",
+      "copyright_sha256": "a3ae1b9fc5d4938f5734734383b9813d27a5652df23010c6f9d4c5419b239a41"
+    },
+    {
+      "version": "1.2.2",
+      "reference_source_url": "https://musl.libc.org/releases/musl-1.2.2.tar.gz",
+      "reference_source_sha256": "9b969322012d796dc23dda27a35866034fa67d8fb67e0e2c45c913c3d43219dd",
+      "notice_file": "musl-1.2.2-source-notices.txt",
+      "notice_sha256": "ec21430ad457115d2f7f9f330b727f8dfad238d388d02043a707e239f62da3f1",
+      "copyright_file": "musl-v1.2.2-COPYRIGHT",
+      "copyright_sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+    }
+  ],
+  "upstream_materials": [
+    {
+      "platform": "linux",
+      "version": "1.31.0",
+      "file": "busybox-1.31.0-build-cross.sh",
+      "sha256": "dd8bb7240716e812796c06ce8aae315bbcf082fdcf2db9432b3d5efc9d61d2d8",
+      "source_url": "https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/build-cross.sh",
+      "description": "Published upstream build script"
+    },
+    {
+      "platform": "linux",
+      "version": "1.31.0",
+      "file": "busybox-1.31.0-busybox-x86_64.log",
+      "sha256": "6f3e5a7faea3e5790bfc05abff588a3cae9e13ae2a6b1185cdc3b8bbc7ac3b10",
+      "source_url": "https://busybox.net/downloads/binaries/1.31.0-defconfig-multiarch-musl/busybox-x86_64.log",
+      "description": "Published upstream build log including generated configuration"
+    }
+  ]
+}

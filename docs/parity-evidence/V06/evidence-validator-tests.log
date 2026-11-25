@@ -1,0 +1,8 @@
+
+running 3 tests
+test scaled_detached_views_keep_correct_input_coordinates ... ok
+test clipboard_roundtrip_between_real_windows ... ok
+test system_theme_changes_while_idle ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.14s
+

@@ -1,0 +1,506 @@
+[
+  {
+    "name": "bin/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0x0",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "bin/MobAgent.exe",
+    "bytes": 527872,
+    "declared_crc32": "0xc668ac33",
+    "method": 0,
+    "local_header_offset": "0x22",
+    "actual_crc32": "0x31961f31",
+    "actual_sha256": "bcebb50ed69d63b295e3a3781d0786b2530ec830b0738340f28f89901ac13364"
+  },
+  {
+    "name": "bin/MobaKeyGen.exe",
+    "bytes": 576512,
+    "declared_crc32": "0x49975be1",
+    "method": 0,
+    "local_header_offset": "0x80e50",
+    "actual_crc32": "0xe7c5edaf",
+    "actual_sha256": "2a2f0e66a0c76ac107b85bd8e0a578e4630ae407af96deddb1ef024d83fa74b5"
+  },
+  {
+    "name": "bin/MobaRTE.exe",
+    "bytes": 6429176,
+    "declared_crc32": "0xf8eed9fb",
+    "method": 0,
+    "local_header_offset": "0x10da80",
+    "actual_crc32": "0x76f7765e",
+    "actual_sha256": "e16b4097059464abfe1cc2ebf635b45f26ccd69c9d45929058009c74d8595033"
+  },
+  {
+    "name": "bin/MobaSCP.exe",
+    "bytes": 903160,
+    "declared_crc32": "0xf1c67e3f",
+    "method": 0,
+    "local_header_offset": "0x72f4a5",
+    "actual_crc32": "0xd1e41716",
+    "actual_sha256": "fb9b849c0b911128e9dae0ba290cead62422cfd9ce6b23c5de067a5a8ac746c4"
+  },
+  {
+    "name": "bin/MoTTY.exe",
+    "bytes": 3381752,
+    "declared_crc32": "0x6c01bf3e",
+    "method": 0,
+    "local_header_offset": "0x80bcca",
+    "actual_crc32": "0xc3c8dca4",
+    "actual_sha256": "005cf22fbe092d90f85635c6bf8cfcd2f30286dd55635bd3bae458762d66343d"
+  },
+  {
+    "name": "bin/stgames.exe",
+    "bytes": 292864,
+    "declared_crc32": "0x46c80442",
+    "method": 0,
+    "local_header_offset": "0xb456ed",
+    "actual_crc32": "0x2c5f575",
+    "actual_sha256": "8a3239672bb359934b42696f383e13bcf35859e646d89bd20a7d4bd319b000fe"
+  },
+  {
+    "name": "bin/wsltermd",
+    "bytes": 25320,
+    "declared_crc32": "0x82c6f09",
+    "method": 0,
+    "local_header_offset": "0xb8cf1a",
+    "actual_crc32": "0xed886fe5",
+    "actual_sha256": "a80bb879df6f77e07050e46013e9812199516f972e4023590de91280d349152f"
+  },
+  {
+    "name": "bin/_TCPCapture.sh",
+    "bytes": 2093,
+    "declared_crc32": "0x856abf3e",
+    "method": 0,
+    "local_header_offset": "0xb9322c",
+    "actual_crc32": "0x856abf3e",
+    "actual_sha256": "48f47c046ce9426706820549042270f3ac5bd835ddd1b18031f2469cee95bc13"
+  },
+  {
+    "name": "usr/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xb93a89",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xb93aab",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/doc/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xb93ad3",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/doc/info.gif",
+    "bytes": 1219,
+    "declared_crc32": "0x288e3070",
+    "method": 0,
+    "local_header_offset": "0xb93aff",
+    "actual_crc32": "0x288e3070",
+    "actual_sha256": "38aa1dbf1c05aa9840f7f2f25a9eece21d34a517a5e87f70b53d046aec5f120e"
+  },
+  {
+    "name": "usr/share/doc/term.gif",
+    "bytes": 1199,
+    "declared_crc32": "0x6f455d61",
+    "method": 0,
+    "local_header_offset": "0xb93ff6",
+    "actual_crc32": "0x6f455d61",
+    "actual_sha256": "0004a3843b444c96e6a74dc612170a90daa4b43e04b75ae83f1dfe1397f5db80"
+  },
+  {
+    "name": "usr/share/dtree.css",
+    "bytes": 795,
+    "declared_crc32": "0x502178ad",
+    "method": 0,
+    "local_header_offset": "0xb944d9",
+    "actual_crc32": "0x502178ad",
+    "actual_sha256": "1b89005e727ce5b6128e8f0e415cd8511d3cb871bfe8d2b16ee2a986e1b9c1c5"
+  },
+  {
+    "name": "usr/share/dtree.js",
+    "bytes": 12410,
+    "declared_crc32": "0xfea2f9ad",
+    "method": 0,
+    "local_header_offset": "0xb94825",
+    "actual_crc32": "0xfea2f9ad",
+    "actual_sha256": "9a9ef8af4100251e7682d7ba8cf1ed71753b3e6093865f3d4acf31e5e1bd1e5c"
+  },
+  {
+    "name": "usr/share/img/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xb978cf",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/img/base.gif",
+    "bytes": 1040,
+    "declared_crc32": "0x12e41b2c",
+    "method": 0,
+    "local_header_offset": "0xb978fb",
+    "actual_crc32": "0x8d0d49ef",
+    "actual_sha256": "aa3482b296ba5899546e993c08ae02a3d5e94ffce4beb165f90f44ec4bfd6bbe"
+  },
+  {
+    "name": "usr/share/img/empty.gif",
+    "bytes": 62,
+    "declared_crc32": "0x546fbe77",
+    "method": 0,
+    "local_header_offset": "0xb97d3f",
+    "actual_crc32": "0x546fbe77",
+    "actual_sha256": "152c84e46b3466b723a4cb9bacbbce881a1fd9af042dfa716eaf02df28d6ad7d"
+  },
+  {
+    "name": "usr/share/img/join.gif",
+    "bytes": 69,
+    "declared_crc32": "0xb61498a5",
+    "method": 0,
+    "local_header_offset": "0xb97db2",
+    "actual_crc32": "0xb61498a5",
+    "actual_sha256": "6def35062b5bf23ba38ef8cf3e11d6560fdda9e7fff7be6b84594eee8ca5369c"
+  },
+  {
+    "name": "usr/share/img/joinbottom.gif",
+    "bytes": 66,
+    "declared_crc32": "0xa516f9c8",
+    "method": 0,
+    "local_header_offset": "0xb97e2b",
+    "actual_crc32": "0xa516f9c8",
+    "actual_sha256": "e7da2318deae5ac66e1a08e890ce607be5d6497b6801afbf06aa54e6e412bcd2"
+  },
+  {
+    "name": "usr/share/img/line.gif",
+    "bytes": 66,
+    "declared_crc32": "0xe511e714",
+    "method": 0,
+    "local_header_offset": "0xb97ea7",
+    "actual_crc32": "0xe511e714",
+    "actual_sha256": "b53c9e4623e45d49fd5d602e9208e0694062d42f84ceda840c98ab57961d2a3f"
+  },
+  {
+    "name": "usr/share/img/minus.gif",
+    "bytes": 86,
+    "declared_crc32": "0x109df2f1",
+    "method": 0,
+    "local_header_offset": "0xb97f1d",
+    "actual_crc32": "0x109df2f1",
+    "actual_sha256": "0e0cb21b435d0884a76c4b9b6f10565223aaa8c586988905a9ca246dd98b0ff4"
+  },
+  {
+    "name": "usr/share/img/minusbottom.gif",
+    "bytes": 85,
+    "declared_crc32": "0x16c67fb5",
+    "method": 0,
+    "local_header_offset": "0xb97fa8",
+    "actual_crc32": "0x16c67fb5",
+    "actual_sha256": "e62b1e30111f763c9bdff72900afc9ecc9b456b939589f7f32859e4e84eddeaa"
+  },
+  {
+    "name": "usr/share/img/nolines_minus.gif",
+    "bytes": 861,
+    "declared_crc32": "0x2a56692b",
+    "method": 0,
+    "local_header_offset": "0xb98038",
+    "actual_crc32": "0x2a56692b",
+    "actual_sha256": "29f308b5dda5166af0077345fe65925212bb330624fff7b43107b2a8e559276c"
+  },
+  {
+    "name": "usr/share/img/nolines_plus.gif",
+    "bytes": 870,
+    "declared_crc32": "0x5f04efb5",
+    "method": 0,
+    "local_header_offset": "0xb983d2",
+    "actual_crc32": "0x5f04efb5",
+    "actual_sha256": "987a8de26058309b4cca5525cefdc07d21046b47054cd2049272b30aa79fd836"
+  },
+  {
+    "name": "usr/share/img/plus.gif",
+    "bytes": 89,
+    "declared_crc32": "0x51087609",
+    "method": 0,
+    "local_header_offset": "0xb98774",
+    "actual_crc32": "0x51087609",
+    "actual_sha256": "632cb2532c746978b117a9141019afff577fc2a614887090ab7c0b6121663be5"
+  },
+  {
+    "name": "usr/share/img/plusbottom.gif",
+    "bytes": 88,
+    "declared_crc32": "0x90e26b32",
+    "method": 0,
+    "local_header_offset": "0xb98801",
+    "actual_crc32": "0x90e26b32",
+    "actual_sha256": "69eab49ddc4379315f9ca973ec8838536a65e0dce530963a926333a137f1099d"
+  },
+  {
+    "name": "usr/share/locale/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xb98893",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/locale/locale.alias",
+    "bytes": 1311,
+    "declared_crc32": "0x3155707e",
+    "method": 0,
+    "local_header_offset": "0xb988c2",
+    "actual_crc32": "0x3155707e",
+    "actual_sha256": "dc4436b6bea7b682eef1934f4dad32cbe80babaa04ab002bde9993a5cf833e29"
+  },
+  {
+    "name": "usr/share/X11/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xb98e1c",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/X11/xkb/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xb98e48",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/X11/xkb/symbols/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xb98e78",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/X11/xkb/symbols/keypad",
+    "bytes": 21961,
+    "declared_crc32": "0x386ed23a",
+    "method": 0,
+    "local_header_offset": "0xb98eb0",
+    "actual_crc32": "0x386ed23a",
+    "actual_sha256": "a83e75838eda1383cbb50c6cb763e5f68cb6f46b5317b41584df46a791c244d4"
+  },
+  {
+    "name": "usr/share/X11/xkb/symbols/mokeypad",
+    "bytes": 21673,
+    "declared_crc32": "0xe7b7623c",
+    "method": 0,
+    "local_header_offset": "0xb9e4b7",
+    "actual_crc32": "0xe7b7623c",
+    "actual_sha256": "8816e6d43807235d9ba4ceec419f696886719bf8785737a5286a6cb3a7629b0c"
+  },
+  {
+    "name": "usr/share/X11/xkb/symbols/mopc",
+    "bytes": 3610,
+    "declared_crc32": "0xe3742b74",
+    "method": 0,
+    "local_header_offset": "0xba39a0",
+    "actual_crc32": "0xe3742b74",
+    "actual_sha256": "bd6ff9bcc42e7052dc9d88fb403622f90efbf7a0f4e0e7e51683265ead6222ba"
+  },
+  {
+    "name": "usr/share/X11/xkb/symbols/pc",
+    "bytes": 3765,
+    "declared_crc32": "0xb6f2c544",
+    "method": 0,
+    "local_header_offset": "0xba47f6",
+    "actual_crc32": "0xb6f2c544",
+    "actual_sha256": "cf2497c138aed70ea325904df240f808e2e4df6805fbf9a7e3e91e3320e05a4c"
+  },
+  {
+    "name": "usr/share/zoneinfo/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xba56e5",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/zoneinfo/posixrules",
+    "bytes": 3519,
+    "declared_crc32": "0x83bcf3f8",
+    "method": 0,
+    "local_header_offset": "0xba5716",
+    "actual_crc32": "0xe162b1ed",
+    "actual_sha256": "a2d552851d918e5aa6f4be6a5fc3b68411c6c88b5b760b301c098e88e21aa868"
+  },
+  {
+    "name": "bin/arm_wsltermd",
+    "bytes": 26544,
+    "declared_crc32": "0xb5946726",
+    "method": 0,
+    "local_header_offset": "0xba6510",
+    "actual_crc32": "0xfca44b01",
+    "actual_sha256": "8c0030593c10149f8b2c3d15e58c3dbcb3e59d0f967a8c930e93bb100d96a505"
+  },
+  {
+    "name": "bin/wslconnect",
+    "bytes": 175784,
+    "declared_crc32": "0xed2b40c",
+    "method": 0,
+    "local_header_offset": "0xbaccee",
+    "actual_crc32": "0x3006d313",
+    "actual_sha256": "6ba5a157546dd6d4b0b4f0dbd5655066429e982746a6b72c97c06d060362997d"
+  },
+  {
+    "name": "bin/wineconnect",
+    "bytes": 170444,
+    "declared_crc32": "0xd57a8447",
+    "method": 0,
+    "local_header_offset": "0xbd7bc2",
+    "actual_crc32": "0x9b5b9cfb",
+    "actual_sha256": "a66fc2329f3494bb0a4dd4d4f71849fe81877a03019d6ebc12f4bd4eae993a2c"
+  },
+  {
+    "name": "bin/mac_wineconnect",
+    "bytes": 158660,
+    "declared_crc32": "0x6eb47636",
+    "method": 0,
+    "local_header_offset": "0xc015bb",
+    "actual_crc32": "0xb950de5f",
+    "actual_sha256": "eb05b564102994a110dcf83554e9c9c1dc09350d3395a04911e8103b5919d42d"
+  },
+  {
+    "name": "bin/exttermd/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xc281b0",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "bin/exttermd/c32termd.exe",
+    "bytes": 23566,
+    "declared_crc32": "0x943c926",
+    "method": 0,
+    "local_header_offset": "0xc281db",
+    "actual_crc32": "0xca739eab",
+    "actual_sha256": "559130748d570cb2c0d6649bb557c6e7da7b26b19c7c0882045c0f1ac0e6ce65"
+  },
+  {
+    "name": "bin/exttermd/c64termd.exe",
+    "bytes": 31336,
+    "declared_crc32": "0x5277378f",
+    "method": 0,
+    "local_header_offset": "0xc2de20",
+    "actual_crc32": "0x78d5fcb8",
+    "actual_sha256": "dc8caa8a2331da491d3511ca1110666cb034501162a65b0233789fedf5bac726"
+  },
+  {
+    "name": "bin/exttermd/m32termd.exe",
+    "bytes": 31944,
+    "declared_crc32": "0xdac78230",
+    "method": 0,
+    "local_header_offset": "0xc358bf",
+    "actual_crc32": "0xb10de30f",
+    "actual_sha256": "d3c72c6b71e7d2b204661b7b2a36c272574195d1b409126a7a1f3545c91f6fd1"
+  },
+  {
+    "name": "bin/exttermd/m64termd.exe",
+    "bytes": 34488,
+    "declared_crc32": "0x945de06d",
+    "method": 0,
+    "local_header_offset": "0xc3d5be",
+    "actual_crc32": "0x9c507b7e",
+    "actual_sha256": "94e37c52061f932aa69a634e16100ccc3ae81b283e843f056b676dc6d4931daa"
+  },
+  {
+    "name": "usr/share/X11/xkb/symbols/notmopc",
+    "bytes": 3765,
+    "declared_crc32": "0xb6f2c544",
+    "method": 0,
+    "local_header_offset": "0xc45cad",
+    "actual_crc32": "0xb6f2c544",
+    "actual_sha256": "cf2497c138aed70ea325904df240f808e2e4df6805fbf9a7e3e91e3320e05a4c"
+  },
+  {
+    "name": "usr/share/X11/xkb/symbols/notmokeypad",
+    "bytes": 21961,
+    "declared_crc32": "0x386ed23a",
+    "method": 0,
+    "local_header_offset": "0xc46ba1",
+    "actual_crc32": "0x386ed23a",
+    "actual_sha256": "a83e75838eda1383cbb50c6cb763e5f68cb6f46b5317b41584df46a791c244d4"
+  },
+  {
+    "name": "usr/share/fonts/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xc4c1ad",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/fonts/mobafonts/",
+    "bytes": 0,
+    "declared_crc32": "0x0",
+    "method": 0,
+    "local_header_offset": "0xc4c1db",
+    "actual_crc32": "0x0",
+    "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "usr/share/fonts/mobafonts/MobaFanta.ttf",
+    "bytes": 690772,
+    "declared_crc32": "0x67b910a8",
+    "method": 0,
+    "local_header_offset": "0xc4c213",
+    "actual_crc32": "0x7d08001f",
+    "actual_sha256": "c935a11cb639ac4a5c333dd938a76ae69624faa4b6ec328e73dc171c69bd0187"
+  },
+  {
+    "name": "usr/share/fonts/mobafonts/MobaFira.ttf",
+    "bytes": 721388,
+    "declared_crc32": "0xcd4057da",
+    "method": 0,
+    "local_header_offset": "0xcf4cac",
+    "actual_crc32": "0xd59b200c",
+    "actual_sha256": "7297891251ae4662b3da6d7609691f044629377fb46b3b453ca00b18db37eb94"
+  },
+  {
+    "name": "usr/share/fonts/mobafonts/MobaFont.ttf",
+    "bytes": 701496,
+    "declared_crc32": "0xbaeeeef0",
+    "method": 0,
+    "local_header_offset": "0xda4edc",
+    "actual_crc32": "0xb3890dd1",
+    "actual_sha256": "ee8fa6dff7b2061059bf1b1c432951e2ac5180ae5cf3e8e936f598092494e589"
+  },
+  {
+    "name": "bin/MobaRDP64.exe",
+    "bytes": 209920,
+    "declared_crc32": "0x63ca5859",
+    "method": 0,
+    "local_header_offset": "0xe50358",
+    "actual_crc32": "0xb75610f4",
+    "actual_sha256": "063f218474e547210f1479ca32d82258a632b3748d81717d47ddbd15f3d1f4b5"
+  }
+]

@@ -1,0 +1,10 @@
+--- a/tests/packaging_wayland.py
++++ b/tests/packaging_wayland.py
+@@ -13,6 +13,7 @@
+ spec=importlib.util.spec_from_file_location('package_release',ROOT/'scripts/package-release.py')
+ package=importlib.util.module_from_spec(spec)
+ spec.loader.exec_module(package)
++@unittest.skipUnless("E03_HELPER" in os.environ, "Set E03_HELPER to explicitly qualify the optional native Wayland helper.")
+ class OptionalWayland(unittest.TestCase):
+     def test_optional_helper_stages_hash_source_lock_notices_and_native_requirements(self):
+         real=Path(os.environ['E03_HELPER']).resolve()

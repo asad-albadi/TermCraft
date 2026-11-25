@@ -1,0 +1,7 @@
+Authentic full Mosh stage from pinned cache
+Strict extraction succeeded, 20 packages, 1834 runtime files verified
+60 provenance references cover 56 unique shipped artifacts, no collisions or omissions
+Manifest and extractor byte-identical to baseline
+{
+  "zlib-1:1.4-1-x86_64.pkg.tar.zst.sig": "sources/zlib-1~3A1.4-1-x86_64.pkg.tar.zst.sig"
+}

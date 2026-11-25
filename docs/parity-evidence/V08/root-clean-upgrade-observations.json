@@ -1,0 +1,36 @@
+{
+  "qualification": "Bounded diagnostic observations, not V08 checkpoint or current-source qualification",
+  "image": "sha256:c326d40de0700f7086d34670a6d21b0af6d8a6da71bc442fceed67bcd0648fe5",
+  "observed": [
+    {
+      "case": "Old c6 then b0d1 native Wayland rendered folder/session and Dark preference in clean image",
+      "status": "passed"
+    },
+    {
+      "case": "No-edit startup preserves legacy workspace JSON byte content",
+      "status": "passed"
+    },
+    {
+      "case": "Automatic migrated ID persists on no-edit screenshot startup",
+      "status": "not demonstrated; original probe assertion failed because no user save action occurred; no product defect established"
+    }
+  ],
+  "runs": [
+    {
+      "label": "c6",
+      "store_preserved_exactly": true,
+      "store_json_sha256": "785a647ffa8f1c1b243d27db132ef2b2fdd234f97ca440f635c27702aa86972e",
+      "screenshot": "target/validation/v08/upgrade-fixture/c6.png",
+      "screenshot_sha256": "dc4f35f58ec42ff7971b1518510a229681a8b315e7a310bb04a763034c84975e",
+      "log": "docs/parity-evidence/V08/root-clean-upgrade-c6.log"
+    },
+    {
+      "label": "b0d1",
+      "store_preserved_exactly": true,
+      "store_json_sha256": "785a647ffa8f1c1b243d27db132ef2b2fdd234f97ca440f635c27702aa86972e",
+      "screenshot": "target/validation/v08/upgrade-fixture/b0d1.png",
+      "screenshot_sha256": "dc4f35f58ec42ff7971b1518510a229681a8b315e7a310bb04a763034c84975e",
+      "log": "docs/parity-evidence/V08/root-clean-upgrade-b0d1.log"
+    }
+  ]
+}

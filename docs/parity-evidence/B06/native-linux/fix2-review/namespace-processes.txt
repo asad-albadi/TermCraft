@@ -1,0 +1,7 @@
+UID          PID    PPID  C STIME TTY          TIME CMD
+1000           1       0  0 01:45 ?        00:00:00 bwrap --unshare-all --uid 1000 --gid 1000 --cap-drop ALL --die-with-parent --new-session --ro-bind /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation/v08-clean-namespace/rootfs / --proc /proc --dev /dev --tmpfs /tmp --tmpfs /home --dir /home/validation --ro-bind /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-native-games-fix2 /opt/termcraft --bind /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/B06/native-linux/fix2-review /evidence --clearenv --setenv HOME /home/validation --setenv PATH /usr/bin --setenv LANG C.UTF-8 --chdir /tmp /usr/bin/bash /evidence/session.sh
+1000           2       1  0 01:45 ?        00:00:00 /usr/bin/bash /evidence/session.sh
+1000           5       2  1 01:45 ?        00:00:02 Xvfb :77 -screen 0 1440x1000x24 -nolisten tcp
+1000           8       2 99 01:45 ?        00:02:19 /opt/termcraft/harbor-workspace --data-dir /tmp/store
+1000        1352       2  0 01:47 ?        00:00:00 bash /evidence/action-010.sh
+1000        1363    1352  0 01:47 ?        00:00:00 ps -ef

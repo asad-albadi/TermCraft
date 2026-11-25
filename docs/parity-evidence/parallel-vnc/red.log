@@ -1,0 +1,68 @@
+warning: method `poll` is never used
+   --> src/ui.rs:163:8
+    |
+120 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+163 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.25s
+     Running tests/vnc_session.rs (target/debug/deps/vnc_session-484eb4d38ed40f97)
+
+running 4 tests
+
+thread 'extended_clipboard_is_negotiated_before_transfer' (185283) panicked at tests/vnc_session.rs:164:5:
+assertion failed: fixture::encodings(&mut server).contains(&(0xc0a1e5ceu32 as i32))
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test extended_clipboard_is_negotiated_before_transfer ... FAILED
+
+thread 'vnc_known_frame_and_pointer_coordinates_match' (185285) panicked at tests/vnc_session.rs:29:5:
+Hextile is missing from the advertised encodings
+test vnc_known_frame_and_pointer_coordinates_match ... FAILED
+test vnc_resize_reinitializes_framebuffer ... ok
+test view_only_sends_no_keyboard_or_pointer ... ok
+
+failures:
+
+failures:
+    extended_clipboard_is_negotiated_before_transfer
+    vnc_known_frame_and_pointer_coordinates_match
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+error: test failed, to rerun pass `--test vnc_session`

@@ -1,0 +1,12 @@
+error[E0599]: no method named `start_xdmcp_cancellable` found for struct `XServerManager` in the current scope
+ --> evidence/engine-red.rs:3:62
+  |
+3 |     let _ = harbor_workspace::x11::XServerManager::default().start_xdmcp_cancellable(Default::default(), 800, 600, &std::sync::atomic...
+  |                                                              ^^^^^^^^^^^^^^^^^^^^^^^
+  |
+help: there is a method `start_cancellable` with a similar name, but with different arguments
+ --> src/x11/mod.rs:81:4
+
+error: aborting due to 1 previous error
+
+For more information about this error, try `rustc --explain E0599`.

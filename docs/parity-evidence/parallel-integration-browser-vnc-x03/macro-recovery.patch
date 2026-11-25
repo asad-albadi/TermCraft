@@ -1,0 +1,15 @@
+--- a/src/ui/macro_events.rs
++++ b/src/ui/macro_events.rs
+@@ -764,7 +764,11 @@
+                 .any(|event| matches!(event, Step::Wait { millis } if *millis >= 20))
+         );
+         assert_eq!(events.last(), Some(&text("B")));
+-        wait_for(&mut w, &ctx, |w| captured(&w.tabs[0]).ends_with(b"AB"));
++        // Acknowledging both original broadcasts keeps a delayed B echo out of
++        // the replay-isolation comparison below.
++        wait_for(&mut w, &ctx, |w| {
++            captured(&w.tabs[0]).ends_with(b"AB") && captured(&w.tabs[1]) == b"AB"
++        });
+         let second_at_start = captured(&w.tabs[1]);
+         w.queue_macro(first, &recorded).unwrap();
+         w.active = 1;

@@ -1,0 +1,10 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.85s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-127cf14f51e8fab8)
+
+running 2 tests
+test ui::session_import::tests::cancelled_or_failed_import_cannot_apply_a_late_result ... ok
+test ui::session_import::tests::background_import_previews_before_apply_and_persists_only_after_apply ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 78 filtered out; finished in 1.17s
+

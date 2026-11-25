@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-9a2e8410f611c3b2)
+
+running 2 tests
+test ui::terminal_mouse::tests::sidebar_history_clip_scroll_offsets_focus_and_shift_gate_mouse ... ok
+test ui::terminal_mouse::tests::wheel_work_is_bounded_per_frame_and_small_deltas_accumulate ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 30 filtered out; finished in 0.01s
+

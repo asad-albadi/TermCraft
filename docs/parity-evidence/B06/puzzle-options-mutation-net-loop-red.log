@@ -1,0 +1,30 @@
+
+running 1 test
+test net::additional_configuration_tests::default_fallback_is_unique_and_loops_do_not_win ... FAILED
+
+failures:
+
+failures:
+    net::additional_configuration_tests::default_fallback_is_unique_and_loops_do_not_win
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 47 filtered out; finished in 0.00s
+
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-puzzle-options)
+warning: unused variable: `tree`
+   --> src/games/puzzles/net.rs:320:13
+    |
+320 |         let tree = self
+    |             ^^^^ help: if this is intentional, prefix it with an underscore: `_tree`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `b06-puzzle-options-private` (lib test) generated 1 warning (run `cargo fix --lib -p b06-puzzle-options-private --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.32s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-puzzle-options/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+thread 'net::additional_configuration_tests::default_fallback_is_unique_and_loops_do_not_win' (359874) panicked at src/games/puzzles/net.rs:549:9:
+assertion `left == right` failed
+  left: Won
+ right: Playing
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `--lib`

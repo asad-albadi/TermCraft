@@ -1,0 +1,37 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0433]: cannot find type `RemoteCursor` in this scope
+    --> src/ui/desktop.rs:1480:17
+     |
+1480 |         assert!(RemoteCursor::new(2,2,(0,0),vec![0;15]).is_err());
+     |                 ^^^^^^^^^^^^ use of undeclared type `RemoteCursor`
+
+error[E0433]: cannot find type `RemoteCursor` in this scope
+    --> src/ui/desktop.rs:1481:17
+     |
+1481 |         assert!(RemoteCursor::new(513,1,(0,0),vec![0;513*4]).is_err());
+     |                 ^^^^^^^^^^^^ use of undeclared type `RemoteCursor`
+
+error[E0433]: cannot find type `RemoteCursor` in this scope
+    --> src/ui/desktop.rs:1482:17
+     |
+1482 |         assert!(RemoteCursor::new(2,2,(2,0),vec![0;16]).is_err());
+     |                 ^^^^^^^^^^^^ use of undeclared type `RemoteCursor`
+
+error[E0433]: cannot find type `RemoteCursor` in this scope
+    --> src/ui/desktop.rs:1483:17
+     |
+1483 |         assert!(RemoteCursor::new(0,0,(0,0),vec![]).unwrap().is_none());
+     |                 ^^^^^^^^^^^^ use of undeclared type `RemoteCursor`
+
+error[E0433]: cannot find type `RemoteCursor` in this scope
+    --> src/ui/desktop.rs:1484:20
+     |
+1484 |         let cursor=RemoteCursor::new(8,6,(3,2),vec![255;8*6*4]).unwrap().unwrap();
+     |                    ^^^^^^^^^^^^ use of undeclared type `RemoteCursor`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 5 previous errors

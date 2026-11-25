@@ -1,0 +1,76 @@
+{
+  "scope": "Only src/ui/games/play.rs changed from frozen CURRENT MAIN. Production edits are the confirmed-New attempt cursor and its start/configured-start/reset/load/close initialization. Other edits are three focused tests plus the two current-core Map fixture repairs. No MAIN, core/generator, grade/error policy, codec, overwrite, global close, plugin fixture or cosmetic changes.",
+  "base": "Current MAIN four-file UI snapshot at fix2/base, starting play8019865e... rather than pre-format review source. Exact complete game source dependency hashes recorded in game-dependency-hashes.json, including Mapd5b5a94c3f8d371b0d2b5d8271dd9eee1cfe3a51a4585de43f2da952c7a2d10e. Private complete compile snapshot at work/ with existing resources/tests/vendor and package/version0.1.917, normal bin termcraft-game-save-ui917.",
+  "behavior": "A New attempt takes the next cursor seed only after any discard confirmation is accepted. Cursor advances with wrapping arithmetic even when generation fails. On failure the active GameSession, full history/assistance, dirty/generation/revision/clean state, draft/settings/selection and queued input stay intact; the existing readable error remains. Successful explicit start, configured start, reset and load initialize the cursor from the actual session seed+1. Canceling discard does not consume a seed or perform New. No automatic retry, grade relaxation or failure replacement.",
+  "fixture_repairs": "Killer history/preservation test now independently finds a valid Map30 Unreasonable configuration seed with bounded generation failure within seeds0..16, keeping all prior scene/selection/assistance/configuration/error assertions. The15-preset render test independently discovers a successful seed for each requested Map configuration within seeds0..32 instead of obsolete success-seed tables; still creates and paints all15 actual samples, verifies all51 presets and adds achieved==requested grade assertions for Solo and Map.",
+  "tests": [
+    {
+      "command": "CARGO_TARGET_DIR=<app>/target cargo test --manifest-path <fix2>/work/Cargo.toml --offline --locked -j 2 --bin termcraft-game-save-ui917 fix2_actual_new_failure -- --nocapture",
+      "log": "new-red2.log",
+      "result": "RED0/1,217 filtered,10.07s. Actual New remained at active seed1 when independent next valid Advanced candidate was seed3."
+    },
+    {
+      "command": "same cargo flags; filter advanced_ui_killer_cages_sums_arithmetic_and_history -- --nocapture",
+      "log": "killer-fixture-red.log",
+      "result": "RED0/1,217 filtered,0.24s. Obsolete expectation that current MapHardseed0 must fail."
+    },
+    {
+      "command": "same cargo flags; filter advanced_ui_all_51_presets_available_and_15_samples_paint_exact_grade -- --nocapture",
+      "log": "presets-fixture-red.log",
+      "result": "RED0/1,217 filtered,6.02s. Obsolete fixed Map success seed."
+    },
+    {
+      "command": "same cargo flags; filter fix2_ -- --nocapture --test-threads=2",
+      "log": "new-green.log",
+      "result": "GREEN2/2,217 filtered,9.27s. Both actual SoloAdvanced and Map30Unreasonable independently found failedseed2 then validseed3, and actual New reached exact independently generated seed3 state. Wrapping/reset/load/all13 constructor cursor paths passed."
+    },
+    {
+      "command": "same cargo flags; filter ui::games -- --test-threads=2",
+      "log": "games-ui-verified.log",
+      "result": "Final exact payload GREEN64/64,156 filtered,45.88s. Includes all accepted Save/Load/overwrite/native-close/focus/PTY isolation/screensaver and advanced15 graded render cases plus3 FIX2 cases."
+    },
+    {
+      "command": "rustfmt --edition2024 --check work/src/ui/games/play.rs",
+      "result": "PASS; modified file formatted as a whole from normalized current baseline."
+    },
+    {
+      "command": "patch -p1 applied to copied four-file base followed by all candidate SHA256 assertions",
+      "log": "patch-check.log",
+      "result": "PASS; reconstructs all4 payload files exactly."
+    }
+  ],
+  "focused_cases": [
+    "Actual New buttons and explicit discard/Keep playing controls for both native-qualified failing configurations, exact old saved-state/history and dirty/revision/generation/settings/selection preservation, cancel-no-consume and eventual valid graded seed3 equality.",
+    "All13 constructor paths set next cursor correctly; wrap from MAX through0, failed attempts wrap without replacing current session; successful configured start/reset/adopt initialize from actual seed.",
+    "Confirmed invalid-New failure keeps exact queued events/key state/modifiers and exact active session/history/files/settings, advances only attempt cursor, reports the exact existing validation error."
+  ],
+  "notes": "The initial new-red.log ran0 tests from stale same917 path-cache artifacts and is not counted as evidence. Private source mtimes were refreshed to force current exact snapshot recompilation; new-red2.log confirms private fix2/work compilation and the actual failure. Intermediate games-ui.log passed63 before queued-input case was added; its first added-case run games-ui-final.log passed all preservation assertions but expected the budget-exhaustion phrase for a deliberately invalid config. Only that test assertion was corrected to the exact validation error; final64/64 verified source is unchanged since.",
+  "parent_native_evidence": "Parent confirmed native Linux only actionable finding in the remaining batch was failed-New seed trap. Fresh idle/wake/PTY resume and ROOT dirty discard->owned-session confirmation passed; no additional product fixes requested.",
+  "maps": {
+    "src/ui/games/play.rs": {
+      "base": "8019865e83ea1864e055fa9349356bd85511acc52d30693791b383a5c2954b18",
+      "candidate": "c449a915bf89c0aad71d1b8d4091c1252ad1c44a0ac7d476391b01da18d2d105"
+    },
+    "src/ui/games/save.rs": {
+      "base": "a319751542ea82a4993bece94fef92a676cb73abce477bc5d3f8e7b43a34d9af",
+      "candidate": "a319751542ea82a4993bece94fef92a676cb73abce477bc5d3f8e7b43a34d9af"
+    },
+    "src/ui/games.rs": {
+      "base": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac",
+      "candidate": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac"
+    },
+    "src/ui/session_confirmations.rs": {
+      "base": "7394c8213179d507700236564e50493a1ef7774c1dfb5cc50c0fd12c635918de",
+      "candidate": "7394c8213179d507700236564e50493a1ef7774c1dfb5cc50c0fd12c635918de"
+    }
+  },
+  "jobs": "Every Cargo invocation offline+locked+jobs2; same917 tests/build serialized, awaited/reaped. No parent all-target gate or extra unchanged broad source game sampler; root owns final independent review and integration gate.",
+  "normal_build": {
+    "command": "CARGO_TARGET_DIR=<app>/target cargo build --manifest-path <fix2>/work/Cargo.toml --offline --locked -j 2 --bin termcraft-game-save-ui917",
+    "log": "normal-build.log",
+    "result": "PASS10.81s;3 preexisting dead-code warnings",
+    "binary": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/termcraft-game-save-ui917",
+    "sha256": "3eb4ac105d6083b280fc05e8508d79bcea26772c54c60b41410106e635cd81a5",
+    "bytes": 611728632
+  }
+}

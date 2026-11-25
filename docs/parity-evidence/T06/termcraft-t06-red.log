@@ -1,0 +1,24 @@
+   Compiling encoding_rs v0.8.35
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0432]: unresolved import `harbor_workspace::terminal::settings`
+ --> tests/terminal_settings.rs:1:61
+  |
+1 | use harbor_workspace::{model::{Store,Preferences},terminal::settings::{TerminalSettings,TerminalOverrides,TerminalFont,TerminalCodec,...
+  |                                                             ^^^^^^^^ could not find `settings` in `terminal`
+
+error[E0599]: no method named `terminal_settings` found for struct `Preferences` in the current scope
+ --> tests/terminal_settings.rs:5:36
+  |
+5 |     let settings=store.preferences.terminal_settings();assert_eq!(settings.font_size,14.);assert_eq!(settings.encoding,CharacterEncod...
+  |                                    ^^^^^^^^^^^^^^^^^ method not found in `Preferences`
+
+error[E0599]: no method named `terminal_settings` found for struct `Preferences` in the current scope
+ --> tests/terminal_settings.rs:6:95
+  |
+6 |     let old:Preferences=serde_json::from_str(r#"{"font_size":19.0}"#).unwrap();assert_eq!(old.terminal_settings().font_size,19.);
+  |                                                                                               ^^^^^^^^^^^^^^^^^ method not found in `Preferences`
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `harbor-workspace` (test "terminal_settings") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...

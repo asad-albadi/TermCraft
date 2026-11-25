@@ -1,0 +1,8 @@
+{
+  "candidate_restored": true,
+  "main_registry_unchanged": true,
+  "private_candidate_source_inputs_match": true,
+  "all_jobs_reaped": true,
+  "base_sha256": "955c2b5340cea52dea9f69b984f5c149409f25950e0a28dee255e4845df07883",
+  "candidate_sha256": "6e0dbe8fe7511de237c9d90630817106a4bf4949fc31f3c024ada8614ec89144"
+}

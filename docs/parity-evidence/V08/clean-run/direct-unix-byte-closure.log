@@ -1,0 +1,3 @@
+Traceback (most recent call last):
+  File "<stdin>", line 9, in <module>
+AssertionError: ['bin/ash', 'bin/awk', 'bin/basename', 'bin/cat', 'bin/cp', 'bin/cut', 'bin/dirname', 'bin/env', 'bin/find', 'bin/grep', 'bin/head', 'bin/ls', 'bin/mkdir', 'bin/mv', 'bin/pwd', 'bin/rm', 'bin/sed', 'bin/sleep', 'bin/sort', 'bin/tail', 'bin/tee', 'bin/tr', 'bin/uniq', 'bin/wc', 'notices/LICENSE']

@@ -1,0 +1,18 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: unused import: `super::*`
+ --> src/ui/terminal_selection.rs:3:9
+  |
+3 |     use super::*;
+  |         ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0433]: cannot find type `Controller` in this scope
+ --> src/ui/terminal_selection.rs:9:61
+  |
+9 | ...   let ctx=egui::Context::default();let mut controller=Controller::default();let mut screen=Screen::new(8,3,100);screen.feed(b"abc...
+  |                                                           ^^^^^^^^^^ use of undeclared type `Controller`
+
+For more information about this error, try `rustc --explain E0433`.
+warning: `harbor-workspace` (bin "harbor-workspace" test) generated 1 warning
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 1 previous error; 1 warning emitted

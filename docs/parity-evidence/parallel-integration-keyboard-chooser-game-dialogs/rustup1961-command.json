@@ -1,0 +1,14 @@
+{
+  "command": [
+    "rustup",
+    "toolchain",
+    "install",
+    "1.96.1",
+    "--profile",
+    "minimal",
+    "--no-self-update"
+  ],
+  "RUSTUP_HOME": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961",
+  "reason": "Verified exact libc crate source; standalone one-job test passes installed1.95 and fails clean1.99.1; full app nfsembed declares minimum1.96. Isolate compatible older LLVM family without source/lock/global default changes.",
+  "official_release_index": "https://blog.rust-lang.org/releases/"
+}

@@ -1,0 +1,28 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: method `poll` is never used
+   --> src/ui.rs:147:8
+    |
+104 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+147 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.29s
+     Running tests/session_import.rs (target/debug/deps/session_import-a20dd9210fc1f46e)
+
+running 8 tests
+test declared_utf8_is_not_silently_reinterpreted_as_legacy_text ... ok
+test documented_csv_preserves_quotes_and_reports_ignored_commands ... ok
+test moba_import_preserves_host_port_key_and_folder ... ok
+test unsupported_putty_option_is_reported ... ok
+test duplicate_policies_preserve_or_regenerate_stable_ids ... ok
+test malformed_registry_unicode_and_late_invalid_candidate_are_safe ... ok
+test encoding_variants_and_legacy_ids_round_trip_without_aliasing ... ok
+test malformed_import_does_not_mutate_store ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

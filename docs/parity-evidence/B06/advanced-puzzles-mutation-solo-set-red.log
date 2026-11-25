@@ -1,0 +1,45 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/mutants/solo-set)
+warning: unreachable statement
+   --> src/games/puzzles/solo_advanced.rs:156:5
+    |
+154 |  return 0; // mutation: suppress this source deduction
+    |  -------- any code following this expression is unreachable
+155 |
+156 |     let cells: Vec<_> = unit.iter().copied().filter(|&i| p[i] != 0).collect();
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unreachable statement
+    |
+    = note: `#[warn(unreachable_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `p`
+   --> src/games/puzzles/solo_advanced.rs:153:18
+    |
+153 | fn set_eliminate(p: &mut [u32], unit: &[usize]) -> usize {
+    |                  ^ help: if this is intentional, prefix it with an underscore: `_p`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `unit`
+   --> src/games/puzzles/solo_advanced.rs:153:33
+    |
+153 | fn set_eliminate(p: &mut [u32], unit: &[usize]) -> usize {
+    |                                 ^^^^ help: if this is intentional, prefix it with an underscore: `_unit`
+
+warning: `b06-puzzle-options-private` (lib test) generated 3 warnings (run `cargo fix --lib -p b06-puzzle-options-private --tests` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 4.43s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/mutation-target/release/deps/b06_puzzle_options_private-beed19bb514c887b)
+
+running 1 test
+
+thread 'solo::advanced::rule_tests::full_set_rule_eliminates_naked_triple' (421779) panicked at src/games/puzzles/solo_advanced.rs:1041:9:
+assertion failed: set_eliminate(&mut p, &(0..9).collect::<Vec<_>>()) > 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test solo::advanced::rule_tests::full_set_rule_eliminates_naked_triple ... FAILED
+
+failures:
+
+failures:
+    solo::advanced::rule_tests::full_set_rule_eliminates_naked_triple
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 64 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

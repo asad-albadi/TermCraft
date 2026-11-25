@@ -1,0 +1,13 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.54s
+     Running tests/terminal_settings.rs (target/debug/deps/terminal_settings-b525404a750475e1)
+
+running 5 tests
+test encoding_change_flushes_pending_once_and_dimensions_are_bounded ... ok
+test palette_changes_recolor_indexes_but_preserve_explicit_truecolor ... ok
+test old_store_inherits_terminal_defaults ... ok
+test session_override_does_not_modify_global ... ok
+test split_legacy_encoding_decodes_once ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

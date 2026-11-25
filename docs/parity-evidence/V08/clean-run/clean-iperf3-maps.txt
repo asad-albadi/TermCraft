@@ -1,0 +1,32 @@
+55eb04c22000-55eb04c25000 r--p 00000000 00:23 7023750                    /opt/termcraft/runtime/linux-x86_64/iperf3
+55eb04c25000-55eb04c3f000 r-xp 00003000 00:23 7023750                    /opt/termcraft/runtime/linux-x86_64/iperf3
+55eb04c3f000-55eb04c4b000 r--p 0001d000 00:23 7023750                    /opt/termcraft/runtime/linux-x86_64/iperf3
+55eb04c4b000-55eb04c4c000 r--p 00028000 00:23 7023750                    /opt/termcraft/runtime/linux-x86_64/iperf3
+55eb04c4c000-55eb04c4d000 rw-p 00029000 00:23 7023750                    /opt/termcraft/runtime/linux-x86_64/iperf3
+55eb04c4d000-55eb04c4e000 rw-p 00000000 00:00 0 
+55eb2e4a1000-55eb2e4c2000 rw-p 00000000 00:00 0                          [heap]
+7fd648126000-7fd648129000 rw-p 00000000 00:00 0 
+7fd648129000-7fd64814d000 r--p 00000000 00:5b 1331479                    /usr/lib/libc.so.6
+7fd64814d000-7fd6482c8000 r-xp 00024000 00:5b 1331479                    /usr/lib/libc.so.6
+7fd6482c8000-7fd64833e000 r--p 0019f000 00:5b 1331479                    /usr/lib/libc.so.6
+7fd64833e000-7fd648342000 r--p 00214000 00:5b 1331479                    /usr/lib/libc.so.6
+7fd648342000-7fd648344000 rw-p 00218000 00:5b 1331479                    /usr/lib/libc.so.6
+7fd648344000-7fd64834c000 rw-p 00000000 00:00 0 
+7fd64834c000-7fd64835c000 r--p 00000000 00:5b 1331765                    /usr/lib/libm.so.6
+7fd64835c000-7fd6483f8000 r-xp 00010000 00:5b 1331765                    /usr/lib/libm.so.6
+7fd6483f8000-7fd648481000 r--p 000ac000 00:5b 1331765                    /usr/lib/libm.so.6
+7fd648481000-7fd648482000 r--p 00134000 00:5b 1331765                    /usr/lib/libm.so.6
+7fd648482000-7fd648483000 rw-p 00135000 00:5b 1331765                    /usr/lib/libm.so.6
+7fd648483000-7fd648485000 rw-p 00000000 00:00 0 
+7fd648485000-7fd64848f000 r--p 00000000 00:5b 1369278                    /etc/ld.so.cache
+7fd64848f000-7fd648493000 r--p 00000000 00:00 0                          [vvar]
+7fd648493000-7fd648495000 r--p 00000000 00:00 0                          [vvar_vclock]
+7fd648495000-7fd648497000 r-xp 00000000 00:00 0                          [vdso]
+7fd648497000-7fd648498000 r--p 00000000 00:5b 1331284                    /usr/lib/ld-linux-x86-64.so.2
+7fd648498000-7fd6484c5000 r-xp 00001000 00:5b 1331284                    /usr/lib/ld-linux-x86-64.so.2
+7fd6484c5000-7fd6484d4000 r--p 0002e000 00:5b 1331284                    /usr/lib/ld-linux-x86-64.so.2
+7fd6484d4000-7fd6484d6000 r--p 0003d000 00:5b 1331284                    /usr/lib/ld-linux-x86-64.so.2
+7fd6484d6000-7fd6484d7000 rw-p 0003f000 00:5b 1331284                    /usr/lib/ld-linux-x86-64.so.2
+7fd6484d7000-7fd6484d8000 rw-p 00000000 00:00 0 
+7fffabfa4000-7fffabfc5000 rw-p 00000000 00:00 0                          [stack]
+ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]

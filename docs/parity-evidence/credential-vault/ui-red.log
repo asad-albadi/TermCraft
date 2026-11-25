@@ -1,0 +1,141 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0433]: cannot find `Request` in `credentials`
+  --> src/ui/credential_tests.rs:16:218
+   |
+16 | ...nce.as_str()));let request=credentials::Request::use_terminal(w.tabs[1].id,auth.id,auth.credential.clone().unwrap());
+   |                                            ^^^^^^^ could not find `Request` in `credentials`
+
+warning: unused import: `super::*`
+ --> src/ui/credentials.rs:1:5
+  |
+1 | use super::*;
+  |     ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0599]: no method named `poll_vault` found for mutable reference `&mut ui::Workspace` in the current scope
+ --> src/ui/credential_tests.rs:8:100
+  |
+8 | ...::now()+Duration::from_secs(20);loop{w.poll_vault(ctx);if !w.vault_busy(){break}assert!(Instant::now()<end);std::thread::sleep(Dur...
+  |                                           ^^^^^^^^^^ method not found in `&mut ui::Workspace`
+
+error[E0599]: no method named `vault_busy` found for mutable reference `&mut ui::Workspace` in the current scope
+ --> src/ui/credential_tests.rs:8:122
+  |
+8 | ..._secs(20);loop{w.poll_vault(ctx);if !w.vault_busy(){break}assert!(Instant::now()<end);std::thread::sleep(Duration::from_millis(5));}}
+  |                                           ^^^^^^^^^^ method not found in `&mut ui::Workspace`
+
+error[E0599]: no method named `create_vault` found for struct `ui::Workspace` in the current scope
+   --> src/ui/credential_tests.rs:12:42
+    |
+ 12 |  let(ctx,root,mut w)=owned_workspace();w.create_vault(Secret::new("owned master password"),&ctx);wait_vault(&ctx,&mut w);assert!(w....
+    |                                          ^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:380:1
+    |
+380 | pub struct Workspace {
+    | -------------------- method `create_vault` not found for this struct
+
+error[E0599]: no method named `vault_unlocked` found for struct `ui::Workspace` in the current scope
+   --> src/ui/credential_tests.rs:12:132
+    |
+ 12 | ...ctx);wait_vault(&ctx,&mut w);assert!(w.vault_unlocked());
+    |                                           ^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:380:1
+    |
+380 | pub struct Workspace {
+    | -------------------- method `vault_unlocked` not found for this struct
+
+error[E0609]: no field `save_in_vault` on type `&mut AuthForm`
+  --> src/ui/credential_tests.rs:14:146
+   |
+14 | ...uth=w.tabs[0].auth.as_mut().unwrap();assert!(!auth.save_in_vault);assert!(auth.credential.is_some());auth.values[0]=zeroize::Zero...
+   |                                                       ^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `id`, `title`, `prompts`, `values`, `host_key`, `credential`
+
+error[E0609]: no field `save_in_vault` on type `&mut AuthForm`
+  --> src/ui/credential_tests.rs:14:267
+   |
+14 | ...ze::Zeroizing::new("fixture-password".into());auth.save_in_vault=true;w.tabs[0].answer_auth(None);
+   |                                                       ^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `id`, `title`, `prompts`, `values`, `host_key`, `credential`
+
+error[E0624]: method `answer_auth` is private
+   --> src/ui/credential_tests.rs:14:296
+    |
+ 14 | ...assword".into());auth.save_in_vault=true;w.tabs[0].answer_auth(None);
+    |                                                       ^^^^^^^^^^^ private method
+    |
+   ::: src/ui/remote_files.rs:701:5
+    |
+701 |     fn answer_auth(&mut self, trust: Option<TrustDecision>) {
+    |     ------------------------------------------------------- private method defined here
+
+error[E0599]: no method named `vault_path` found for struct `ui::Workspace` in the current scope
+   --> src/ui/credential_tests.rs:15:235
+    |
+ 15 | ..."fixture-password"));assert!(!fs::read(w.vault_path()).unwrap().windows(b"fixture-password".len()).any(|v|v==b"fixture-password"));
+    |                                             ^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:380:1
+    |
+380 | pub struct Workspace {
+    | -------------------- method `vault_path` not found for this struct
+
+error[E0599]: no method named `request_vault` found for struct `ui::Workspace` in the current scope
+   --> src/ui/credential_tests.rs:17:4
+    |
+ 17 |  w.request_vault(request,&ctx);w.poll_vault(&ctx);assert_eq!(w.tabs[1].auth.as_ref().unwrap().values[0].as_str(),"fixture-password"...
+    |    ^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:380:1
+    |
+380 | pub struct Workspace {
+    | -------------------- method `request_vault` not found for this struct
+
+error[E0599]: no method named `poll_vault` found for struct `ui::Workspace` in the current scope
+   --> src/ui/credential_tests.rs:17:34
+    |
+ 17 |  w.request_vault(request,&ctx);w.poll_vault(&ctx);assert_eq!(w.tabs[1].auth.as_ref().unwrap().values[0].as_str(),"fixture-password"...
+    |                                  ^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:380:1
+    |
+380 | pub struct Workspace {
+    | -------------------- method `poll_vault` not found for this struct
+
+error[E0599]: no method named `lock_vault` found for struct `ui::Workspace` in the current scope
+   --> src/ui/credential_tests.rs:18:4
+    |
+ 18 |  w.lock_vault();assert!(!w.vault_unlocked());assert!(w.tabs[1].auth.as_ref().unwrap().values[0].is_empty());
+    |    ^^^^^^^^^^
+    |
+   ::: src/ui.rs:380:1
+    |
+380 | pub struct Workspace {
+    | -------------------- method `lock_vault` not found for this struct
+    |
+help: there is a method `local` with a similar name
+    |
+ 18 -  w.lock_vault();assert!(!w.vault_unlocked());assert!(w.tabs[1].auth.as_ref().unwrap().values[0].is_empty());
+ 18 +  w.local();assert!(!w.vault_unlocked());assert!(w.tabs[1].auth.as_ref().unwrap().values[0].is_empty());
+    |
+
+error[E0599]: no method named `vault_unlocked` found for struct `ui::Workspace` in the current scope
+   --> src/ui/credential_tests.rs:18:28
+    |
+ 18 |  w.lock_vault();assert!(!w.vault_unlocked());assert!(w.tabs[1].auth.as_ref().unwrap().values[0].is_empty());
+    |                            ^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:380:1
+    |
+380 | pub struct Workspace {
+    | -------------------- method `vault_unlocked` not found for this struct
+
+Some errors have detailed explanations: E0433, E0599, E0609, E0624.
+For more information about an error, try `rustc --explain E0433`.
+warning: `harbor-workspace` (bin "harbor-workspace" test) generated 1 warning
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 13 previous errors; 1 warning emitted

@@ -1,0 +1,25 @@
+{
+  "library": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-e2c28291dd76bb7f",
+    "sha256": "86a4434f39823bcb6c792990cf376e6f3a75e00a70f7d1339539ba389aed9590",
+    "summary": "test result: ok. 40 passed; 0 failed; 7 ignored; 0 measured; 276 filtered out; finished in 2.00s"
+  },
+  "ui": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/termcraft_xdmcp_clipboard952-e574c918114cfba1",
+    "sha256": "22b061ff533296e0c1f165f3340cf7bb18af60a4a4ba75730ec8d3e256866ce2",
+    "summary": "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 217 filtered out; finished in 2.55s"
+  },
+  "normal": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/termcraft-xdmcp-clipboard952",
+    "sha256": "66e2dfaaaf2ae07e36a33ea6fbfcb5029c04049ec6df00edeb205d23c89b6c9c"
+  },
+  "isolated_cases": {
+    "actual_hostname_connect_resolves_fresh_and_manages_authenticated_window.log": "c4667e624e90072737e9637169606a5101bcbb267ed16d6865cade9cdfdabd7c",
+    "actual_owned_bidirectional_clipboard_and_independent_leases.log": "d49c6cfd7377576a0309aa4b2d3bf8c54d97b78ef7191526cdcf36935ceba387",
+    "actual_xdm_negotiated_clipboard_both_directions.log": "f01fbb68793d0b80bcd37f6979fe1fe836bcea7fbd8cac2eef603620e6d786b6",
+    "actual_xdm_nondefault_port_opens_selected_display_and_cleanup_preserves_host.log": "ba9ccdaa604806c30204092c04ba303934edafb9dffc5de0cba42d659c7dd05c",
+    "manager_wait_honors_cancellation_and_timeout_before_parent_access.log": "2ed157d84cb6176548a4038f556cded03ff075769693d44adaf7617c0b0d1d0b",
+    "owned_endpoint_reauthenticates_and_initializes_with_one_deadline_per_epoch.log": "28d06e0b839c749bc561cae55930927dc786746b0310f848b969361a4dbd04f2",
+    "recovery_clears_owned_parent_selection_after_previous_budget_expires.log": "64ba74a8ad6c34abdf3cb3493d95a38fa95b83b044d569025ef5a0ec1a101a4a"
+  }
+}

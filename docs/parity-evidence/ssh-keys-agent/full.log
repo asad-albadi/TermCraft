@@ -1,0 +1,689 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: method `poll` is never used
+   --> src/ui.rs:157:8
+    |
+114 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+157 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+641 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+warning: method `restart_with_new_host_key` is never used
+   --> tests/support/ssh_server.rs:129:12
+    |
+ 14 | impl SshServer {
+    | -------------- method in this implementation
+...
+129 |     pub fn restart_with_new_host_key(&mut self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (test "ssh_browser") generated 1 warning
+warning: variants `PasswordThenMfa` and `ScpStartup` are never constructed
+  --> tests/support/auth_server.rs:18:5
+   |
+16 | pub enum Mode {
+   |          ---- variants in this enum
+17 |     Password,
+18 |     PasswordThenMfa,
+   |     ^^^^^^^^^^^^^^^
+...
+22 |     ScpStartup,
+   |     ^^^^^^^^^^
+   |
+   = note: `Mode` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `attempts` and `startup` are never read
+   --> tests/support/auth_server.rs:271:5
+    |
+270 | pub struct AuthServer {
+    |            ---------- fields in this struct
+271 |     attempts: Arc<Attempts>,
+    |     ^^^^^^^^
+272 |     startup: Arc<StartupState>,
+    |     ^^^^^^^
+
+warning: methods `startup_requests`, `active_startup_helpers`, `allow_startup_helpers`, and `attempts` are never used
+   --> tests/support/auth_server.rs:345:12
+    |
+281 | impl AuthServer {
+    | --------------- methods in this implementation
+...
+345 |     pub fn startup_requests(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^
+...
+348 |     pub fn active_startup_helpers(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^^^
+...
+351 |     pub fn allow_startup_helpers(&self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^
+...
+370 |     pub fn attempts(&self) -> [usize; 4] {
+    |            ^^^^^^^^
+
+warning: `harbor-workspace` (test "ssh_authentication") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 46.52s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-94bde7e000a59e92)
+
+running 37 tests
+test http_server::tests::rejects_encoded_traversal ... ok
+test platform::atomic_rename::tests::atomic_commit_preserves_both_files_on_conflict ... ok
+test remote_files::editor::review_tests::earlier_job_completion_cannot_finish_a_new_save ... ok
+test remote_files::transfer::operations::tree::windows_name_tests::windows_download_names_reject_device_aliases_and_path_syntax ... ok
+test remote_files::transfer::operations::commit::tests::atomic_commit_preserves_both_files_on_conflict ... ok
+test remote_files::editor::review_tests::full_document_queue_is_retryable_and_keeps_local_recovery ... ok
+test remote_files::transfer::review_tests::bulk_cancellation_waits_for_an_authoritative_entry_and_stops_the_next ... ok
+test remote_files::transfer::review_tests::equal_sized_jobs_keep_distinct_immutable_operation_summaries ... ok
+test remote_files::transfer::folder_archive::unix::tests::cancelled_folder_preparation_stops_before_copying ... ok
+test remote_files::transfer::folder_archive::portable::tests::capability_folder_encoder_rejects_an_unselected_root_and_escaping_link ... ok
+test ssh::auth::tests::agent_factor_preserves_new_authentication_methods ... ok
+test remote_files::transfer::tests::queued_cancellation_is_observable_before_worker_start ... ok
+test remote_files::transfer::review_tests::submitted_commits_have_authoritative_or_indeterminate_outcomes ... ok
+test remote_files::transfer::local_stage::tests::replaced_folder_containers_and_archives_are_never_published_or_cleaned ... ok
+test remote_files::transfer::operations::source::tests::replaced_children_are_not_followed_after_enumeration ... ok
+test remote_files::transfer::operations::source::cap_backend::tests::capability_backend_moves_files_between_anchored_directories ... ok
+test remote_files::transfer::folder_archive::portable::windows_decoder_tests::portable_decoder_preserves_content_and_resolves_selected_tree_link_types ... ok
+test remote_files::transfer::folder_archive::unix::tests::hostile_folder_payloads_cannot_escape_or_follow_directory_links ... ok
+test ssh::x11::tests::authority_requires_matching_display_host_and_protocol ... ok
+test ssh::worker::budget_tests::directory_budget_bounds_retained_bytes_before_allocating_paths ... ok
+test ssh::x11::tests::display_parser_rejects_remote_targets_and_port_overflow ... ok
+test ssh::x11::tests::rejects_wrong_cookie_and_oversized_handshakes ... ok
+test ssh::host_keys::tests::remembering_a_conflicting_key_cannot_expand_the_pin_set ... ok
+test ssh::x11::tests::substitutes_only_verified_cookie_in_both_byte_orders ... ok
+test remote_files::transfer::operations::source::cap_backend::tests::capability_backend_rejects_swapped_sources_and_destination_links ... ok
+test terminal::tests::preserves_split_utf8 ... ok
+test tests::protocol_defaults_match_sessions ... ok
+test terminal::tests::cursor_edit_and_erase ... ok
+test terminal::tests::alternate_screen_restores_primary ... ok
+test tests::rejects_option_injection_and_bad_hosts ... ok
+test terminal::tests::scrolling_keeps_history ... ok
+test ssh::x11::tests::unauthorized_x11_never_connects_to_local_server ... ok
+test tests::ssh_preserves_key_paths_without_shell_interpolation ... ok
+test remote_files::transfer::folder_archive::portable::tests::capability_folder_encoder_preserves_bytes_links_names_and_ordinary_modes ... ok
+test remote_files::transfer::folder_archive::portable::windows_decoder_tests::windows_decoder_rejects_device_names_streams_and_unknown_link_types ... ok
+test process::backend::tests::real_shell_uses_pty_and_returns_output ... ok
+test process::backend::lifecycle_tests::dropping_tab_ends_foreground_and_background_jobs ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-29e3f133fb9121f7)
+
+running 92 tests
+test ui::appearance::tests::reads_live_desktop_appearance_portal ... ignored, requires a running desktop appearance portal
+test ui::appearance::tests::portal_values_follow_the_desktop_specification ... ok
+test ui::gui_tests::closing_an_earlier_tab_preserves_active_session ... ok
+test ui::gui_tests::broadcast_paste_cancel_and_stale_target_send_no_payload ... ok
+test ui::appearance::tests::system_theme_updates_do_not_override_explicit_appearance ... ok
+test ui::gui_tests::integrated_tab_close_does_not_select_the_tab ... ok
+test ui::cli_dispatch::tests::command_dispatch_uses_its_own_process_and_exact_local_cwd ... ok
+test ui::cli_dispatch::tests::forwarded_new_tab_opens_once_in_the_actual_workspace ... ok
+test ui::gui_tests::cancel_active_tab_close_preserves_real_process ... ok
+test ui::gui_tests::appearance_tracks_system_and_honors_overrides ... ok
+test ui::gui_tests::disconnected_serial_aborts_pending_broadcast_before_other_target_writes ... ok
+test ui::gui_tests::embedded_ssh_creates_browser_even_when_sidebar_collapsed ... ok
+test ui::cli_dispatch::tests::exit_when_done_preserves_preexisting_user_terminals ... ok
+test ui::cli_dispatch::tests::named_macro_targets_its_new_terminal_and_respects_paste_confirmation ... ok
+test ui::broadcast::tests::painted_keyboard_and_paste_use_only_the_selected_real_transports ... ok
+test ui::highlighting::tests::invalid_editor_draft_does_not_replace_saved_rules_or_enabled_state ... ok
+test ui::highlighting::tests::malformed_import_retains_cached_working_rules_until_valid_replacement ... ok
+test ui::highlighting::tests::rejected_saved_rules_are_not_cloned_into_render_caches ... ok
+test ui::activity::tests::real_background_output_is_unread_until_painted_and_detached_output_is_seen ... ok
+test ui::gui_tests::all_workspace_pages_and_dialogs_render ... ok
+test ui::pages::appearance_tests::benchmark_visible_terminal_rows_with_long_history ... ignored, CPU renderer benchmark; run explicitly to record frame timings
+test ui::gui_tests::reconnect_keeps_tool_program_and_arguments ... ok
+test ui::pages::appearance_tests::keyword_rendering_preserves_ansi_and_search_has_priority ... ok
+test ui::gui_tests::selected_legacy_transport_decodes_once_and_encodes_keyboard_input ... ok
+test ui::pages::appearance_tests::physical_selection_highlight_has_priority_and_covers_wide_cells ... ok
+test ui::gui_tests::unauthenticated_terminal_input_cannot_be_recorded_or_queued ... ok
+test ui::pages::appearance_tests::search_only_highlights_matching_text_and_inverse_stays_legible ... ok
+test ui::gui_tests::generated_sftp_filename_keeps_native_bytes_outside_keyboard_codec ... ok
+test ui::gui_tests::system_appearance_without_native_theme_defaults_to_light ... ok
+test ui::gui_tests::terminal_widget_writes_keyboard_input_into_real_shell ... ok
+test ui::pages::appearance_tests::wide_graphemes_reserve_exact_terminal_columns_in_the_galley ... ok
+test ui::remote_files::auth_tests::auth_field_leaves_no_secret_in_undo_history ... ok
+test ui::remote_files::transfer_tests::action_dialog_keeps_its_confirmed_target_and_rejects_traversal ... ok
+test ui::remote_files::transfer_tests::download_uses_selected_raw_path_and_requires_a_regular_file ... ok
+test ui::remote_files::transfer_tests::folder_download_and_dropped_upload_keep_explicit_roots ... ok
+test ui::layout::tests::dragging_real_divider_persists_the_ratio_and_small_views_fall_back ... ok
+test ui::remote_files::transfer_tests::recursive_deletion_requires_the_explicit_contents_choice ... ok
+test ui::remote_files::transfer_tests::remote_drop_cannot_cross_connection_or_escape_local_directory ... ok
+test ui::remote_files::transfer_tests::scp_remote_directory_drop_is_rejected_before_submission ... ok
+test ui::gui_tests::dirty_remote_editor_blocks_tab_close_and_reconnect ... ok
+test ui::layout::tests::four_painted_panes_route_input_once_to_the_clicked_owner ... ok
+test ui::gui_tests::new_remote_revision_blocks_stale_active_window_close_approval ... ok
+test ui::pages::appearance_tests::configured_terminal_profile_changes_actual_paint_and_dimensions ... ok
+test ui::gui_tests::ssh_directory_notices_follow_only_after_opt_in ... ok
+test ui::gui_tests::native_drop_on_local_zone_does_not_upload ... ok
+test ui::gui_tests::scp_pane_never_identifies_itself_as_sftp ... ok
+test ui::pages::appearance_tests::proportional_font_keeps_physical_terminal_columns ... ok
+test ui::pages::appearance_tests::terminal_view_copies_cell_rectangle_and_opens_shift_right_click_menu ... ok
+test ui::pages::appearance_tests::terminal_view_routes_mouse_without_broadcast_or_macro_recording ... ok
+test ui::gui_tests::sidebar_keyboard_toggle_persists_and_restores ... ok
+test ui::pages::appearance_tests::the_entire_live_screen_fits_the_terminal_viewport ... ok
+test ui::pages::appearance_tests::oversized_fixed_alternate_grid_can_reveal_its_far_controls ... ok
+test ui::session_groups::tests::mixed_group_launch_opens_real_valid_peers_and_reports_bad_program ... ok
+test ui::credential_tests::optional_saved_password_stays_encrypted_and_requires_a_matching_live_challenge ... ok
+test ui::terminal_mouse::tests::sidebar_history_clip_scroll_offsets_focus_and_shift_gate_mouse ... ok
+test ui::terminal_mouse::tests::wheel_work_is_bounded_per_frame_and_small_deltas_accumulate ... ok
+test ui::session_import::tests::cancelled_or_failed_import_cannot_apply_a_late_result ... ok
+test ui::remote_files::transfer_tests::old_listing_rows_cannot_be_selected_during_navigation ... ok
+test ui::session_import::tests::background_import_previews_before_apply_and_persists_only_after_apply ... ok
+test ui::shared_sessions::tests::cancelled_source_prompt_cannot_send_values_to_a_later_refresh ... ok
+test ui::shared_sessions::tests::source_definition_rows_are_painted_with_readonly_and_stale_text ... ok
+test ui::shortcuts::tests::closing_shortcut_targets_focused_pane_instead_of_stale_tab_index ... ok
+test ui::shortcuts::tests::edited_global_binding_respects_real_textedit_focus_and_store_reload ... ok
+test ui::shortcuts::tests::native_paste_payload_and_shortcut_do_not_request_another_clipboard_read ... ok
+test ui::terminal_selection::tests::cell_drag_copies_rectangle_and_mouse_mode_requires_shift ... ok
+test ui::terminal_settings::tests::profile_editor_migrates_legacy_font_and_rejects_invalid_draft ... ok
+test ui::ssh_key_tests::background_key_generation_records_the_real_created_paths ... ok
+test ui::shortcuts::tests::modifier_shortcut_text_event_is_consumed_before_terminal_encoding ... ok
+test ui::shortcuts::tests::shortcut_capture_keeps_typed_keys_out_of_the_focused_shell ... ok
+test ui::shortcuts::tests::real_history_pageup_changes_view_without_transport_bytes ... ok
+test ui::terminal_review_tests::cancelling_recorded_paste_records_logical_text_without_framing ... ok
+test ui::terminal_review_tests::cursor_report_waits_until_the_paste_transaction_ends ... ok
+test ui::terminal_review_tests::native_copy_event_interrupts_without_selection_but_shift_copy_does_not ... ok
+test ui::shared_sessions::tests::readonly_source_cache_survives_restart_and_never_overwrites_local_names ... ok
+test ui::terminal_review_tests::asynchronous_clipboard_keeps_original_targets_across_focus_and_broadcast_changes ... ok
+test ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source ... ok
+test ui::workspace_review_tests::tiny_output_on_four_large_screens_has_bounded_activity_overhead ... ok
+test ui::terminal_review_tests::output_bursts_share_one_work_budget_and_keep_close_cancel_responsive ... ok
+test ui::terminal_review_tests::paste_then_enter_in_one_frame_keeps_wire_order ... ok
+test ui::terminal_review_tests::refused_mouse_release_is_retried_after_transport_admission_recovers ... ok
+test ui::terminal_review_tests::zero_budget_cannot_finalize_a_decoder_with_unread_transport_tail ... ok
+test ui::windows::tests::real_transport_survives_detach_paint_rename_and_reattach_once ... ok
+test ui::workspace_review_tests::detached_find_query_is_edited_in_child_instead_of_sent_to_shell ... ok
+test ui::workspace_review_tests::detached_dispatcher_consumes_modifier_text_before_painting_terminal ... ok
+test ui::workspace_review_tests::embedded_child_cannot_close_a_different_focused_window ... ok
+test ui::workspace_review_tests::detach_reconciles_root_toolbar_and_reconnect_preserves_window_and_peers ... ok
+test ui::workspace_review_tests::multiexec_failure_survives_next_success_until_acknowledged ... ok
+test ui::workspace_review_tests::multiexec_toggle_preserves_explicit_membership ... ok
+test ui::workspace_review_tests::paste_and_close_confirmations_show_custom_titles_and_terminal_identity ... ok
+test ui::workspace_review_tests::opaque_client_password_keyboard_and_paste_stay_private ... ok
+test ui::workspace_review_tests::output_after_last_paint_stays_unread_when_switching_to_another_tab ... ok
+test ui::shared_sessions::tests::saved_source_credential_never_fills_a_canceled_refresh_generation ... ok
+
+test result: ok. 90 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 21.29s
+
+     Running tests/cli_dispatch.rs (target/debug/deps/cli_dispatch-58798fba9cca6e92)
+
+running 7 tests
+test cli_missing_value_returns_error_not_panic ... ok
+test instance_record_cannot_overwrite_a_hard_linked_file ... ok
+test instance_record_is_private_and_symlinks_are_rejected ... ok
+test different_data_dirs_do_not_share_commands ... ok
+test malformed_oversized_and_unauthenticated_ipc_are_rejected ... ok
+test same_workspace_dispatches_exactly_once ... ok
+test generated_shortcut_dispatches_through_the_real_binary_without_another_gui ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests/connection.rs (target/debug/deps/connection-cd4c75530d76964c)
+
+running 2 tests
+test sftp_escapes_quotes_and_rejects_newlines ... ok
+test missing_client_is_actionable ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/credential_vault.rs (target/debug/deps/credential_vault-c4e523920d4d91c9)
+
+running 6 tests
+test bound_credentials_reject_other_origins_and_unbound_entries ... ok
+test session_export_contains_reference_not_password ... ok
+test vault_replacements_keep_private_permissions ... ok
+test stale_vault_writer_preserves_committed_data ... ok
+test wrong_master_and_tamper_cannot_decrypt ... ok
+test failed_master_change_keeps_old_vault_usable ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 22.77s
+
+     Running tests/highlighting.rs (target/debug/deps/highlighting-c8039613347be3bc)
+
+running 4 tests
+test invalid_pattern_is_reported_before_save ... ok
+test old_settings_and_session_override_roundtrip ... ok
+test keyword_ranges_preserve_unicode_and_output ... ok
+test precedence_regex_case_and_resource_limits_are_deterministic ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/model.rs (target/debug/deps/model-f098ca0a4e1c9fde)
+
+running 8 tests
+test ipv6_tunnels_preserve_address_boundaries ... ok
+test ssh_file_transfer_keeps_connection_options ... ok
+test tunnel_does_not_interpolate_destination ... ok
+test unknown_tunnel_modes_are_rejected ... ok
+test old_ssh_sessions_keep_openssh_configuration_compatibility ... ok
+test file_copy_never_overwrites_a_destination ... ok
+test layout_preferences_roundtrip_and_old_stores_load ... ok
+test roundtrip_keeps_sessions_and_macros ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/multiexec.rs (target/debug/deps/multiexec-93d76714f34bc546)
+
+running 3 tests
+test auth_challenge_is_never_broadcast ... ok
+test broadcast_sends_once_only_to_selected_targets ... ok
+test removing_disconnected_targets_is_explicit_and_does_not_enroll_new_tabs ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/process_input.rs (target/debug/deps/process_input-f8efc342db99d933)
+
+running 3 tests
+test worker_failure_is_observable_without_another_submit ... ok
+test full_input_queue_applies_backpressure_and_drop_does_not_wait_for_reader ... ok
+test queued_partial_writes_preserve_bytes_and_order ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/remote_editor.rs (target/debug/deps/remote_editor-d50b5b30e5e7c4ed)
+
+running 7 tests
+test failed_save_keeps_recoverable_edits ... ok
+test unsupported_atomic_replace_cleans_up_owned_remote_staging ... ok
+test close_cancel_retains_dirty_document ... ok
+test queued_editor_operations_can_be_cancelled_without_closing_ssh ... ok
+test remote_save_conflict_preserves_both_versions ... ok
+test reconnect_import_requires_a_fresh_matching_endpoint_and_never_uploads_implicitly ... ok
+test a_permission_restriction_during_staging_cannot_be_reversed_by_save ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.66s
+
+     Running tests/remote_paths.rs (target/debug/deps/remote_paths-eb369f07fed7cea2)
+
+running 4 tests
+test displayed_paths_distinguish_raw_bytes_and_literal_escape_sequences ... ok
+test remote_paths_preserve_literal_bytes_and_use_posix_separators ... ok
+test stale_connection_or_request_cannot_replace_directory ... ok
+test transfer_refresh_cannot_supersede_pending_user_navigation ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/remote_transfers.rs (target/debug/deps/remote_transfers-31b1d82dd8d059a8)
+
+running 19 tests
+
+running 1 test
+test composed_symlinks_cannot_publish_an_escape_from_the_selected_tree ... ok
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.19s
+
+
+running 1 test
+test explicit_folder_overwrite_merges_files_and_preserves_unrelated_entries ... ok
+test cancellation_and_conflicts_preserve_existing_destination ... ok
+test disconnect_keeps_original_destination_and_recoverable_partial ... ok
+test cancelled_download_does_not_overwrite_destination ... ok
+test failed_local_and_remote_io_preserve_existing_data ... ok
+test folder_merge_never_follows_existing_destination_directory_symlinks ... ok
+test literal_binary_file_round_trip_uses_sftp ... ok
+test missing_sftp_rejects_file_jobs_without_stranding_the_queue ... ok
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.20s
+
+
+running 1 test
+test folder_merge_retains_modes_without_making_staging_read_only_too_early ... ok
+test remote_delete_requires_confirmed_target ... ok
+test recursive_delete_is_confirmed_bounded_and_never_follows_symlinks ... ok
+test recursive_transfer_preserves_bytes_and_names ... ok
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.21s
+
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+test symlink_cycle_is_not_followed ... ok
+test transfer_preserves_executable_modes_after_staging ... ok
+test overlapping_overwrite_jobs_commit_in_submission_order ... ok
+test repeated_tree_cancellation_releases_bounded_sftp_handles ... ok
+test oversized_recursive_delete_stops_before_removing_root_entries ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.98s
+
+     Running tests/scp_browser.rs (target/debug/deps/scp_browser-0810d4ac3af8bffe)
+
+running 24 tests
+test completed_scp_staging_does_not_authorize_remote_publication_on_eof ... ok
+test explicit_scp_reports_negotiated_endpoint_capabilities ... ok
+test cancelling_scp_exec_startup_does_not_exhaust_session_channels ... ok
+test moving_a_remote_upload_parent_cannot_publish_or_clean_up_unrelated_objects ... ok
+test moving_a_local_download_parent_cannot_publish_a_replaced_staging_name ... ok
+test scp_enumeration_failure_retains_the_remote_reason ... ok
+test scp_folder_merge_preserves_unrelated_entries_and_existing_modes ... ok
+test scp_folder_merges_never_follow_existing_destination_directory_links ... ok
+test scp_recursive_delete_does_not_follow_links_and_requires_exact_confirmation ... ok
+test silent_terminal_does_not_delay_initial_scp_listing ... ok
+test late_scp_conflicts_are_typed_and_keep_complete_remote_recovery ... ok
+test scp_bulk_cancel_finishes_the_current_entry_and_preserves_the_rest ... ok
+test unsupported_enumerator_reports_capability_error ... ok
+test lost_remote_commit_acknowledgement_is_indeterminate_after_real_publication ... ok
+test scp_folder_round_trip_preserves_binary_names_empty_directories_and_cycles ... ok
+test special_entry_download_is_rejected_before_local_staging ... ok
+test malformed_remote_editor_commit_reply_is_indeterminate ... ok
+test sftp_disabled_endpoint_supports_explicit_scp ... ok
+test scp_upload_preserves_ordinary_new_and_existing_modes ... ok
+test scp_folder_policies_raw_names_and_modes_survive_round_trip ... ok
+test scp_entry_management_keeps_confirmation_and_no_replace_semantics ... ok
+test scp_names_cannot_be_interpreted_as_commands ... ok
+test virtual_file_sizes_cannot_silently_publish_empty_content ... ok
+test scp_remote_editor_uses_versioned_conflicts_and_local_recovery ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.80s
+
+     Running tests/session_groups.rs (target/debug/deps/session_groups-defc4b3c5bf779fd)
+
+running 2 tests
+test group_launch_reports_per_session_outcomes ... ok
+test shortcut_preserves_space_and_quote_arguments ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/session_import.rs (target/debug/deps/session_import-e35dfc52f6de3677)
+
+running 8 tests
+test declared_utf8_is_not_silently_reinterpreted_as_legacy_text ... ok
+test documented_csv_preserves_quotes_and_reports_ignored_commands ... ok
+test moba_import_preserves_host_port_key_and_folder ... ok
+test duplicate_policies_preserve_or_regenerate_stable_ids ... ok
+test unsupported_putty_option_is_reported ... ok
+test encoding_variants_and_legacy_ids_round_trip_without_aliasing ... ok
+test malformed_registry_unicode_and_late_invalid_candidate_are_safe ... ok
+test malformed_import_does_not_mutate_store ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/shared_sessions.rs (target/debug/deps/shared_sessions-ce70d1743899f725)
+
+running 5 tests
+test unsupported_or_credential_bearing_source_urls_are_rejected ... ok
+test editing_source_metadata_preserves_identity_but_does_not_retarget_credentials ... ok
+test shared_definitions_cannot_reference_local_vault_credentials ... ok
+test offline_source_keeps_labeled_cached_snapshot ... ok
+test shared_refresh_never_overwrites_local_session ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/shared_source_ssh.rs (target/debug/deps/shared_source_ssh-c7efe339668cd08e)
+
+running 2 tests
+test bounded_source_sftp_read_does_not_start_a_terminal_or_execute_login_command ... ok
+test source_sftp_size_limit_never_returns_partial_definitions ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+     Running tests/shared_sources_network.rs (target/debug/deps/shared_sources_network-a8c46e956f374a26)
+
+running 3 tests
+test shared_sftp_source_uses_saved_embedded_identity_and_verified_host_without_a_shell ... ok
+test owned_https_source_checks_certificates_and_keeps_basic_credentials_out_of_cache ... ok
+test https_redirect_and_oversized_source_are_rejected_without_partial_snapshot ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+
+     Running tests/shell_directory.rs (target/debug/deps/shell_directory-177b40d35900df56)
+
+running 9 tests
+test bash_prompt_pipeline_cleanup_and_export_regressions ... ignored, requires local interactive Bash; run with --include-ignored
+test opt_in_shell_scripts_report_literal_paths_and_restore_existing_hooks ... ignored, requires local Bash, Zsh and Fish; run with --include-ignored
+test disabling_follow_before_initial_listing_does_not_fabricate_an_empty_directory ... ok
+test disabling_follow_invalidates_only_its_pending_listing ... ok
+test malformed_or_other_host_metadata_cannot_navigate ... ok
+test split_osc7_updates_only_matching_connection ... ok
+test unsupported_shell_keeps_manual_browser ... ok
+test manual_mode_ignores_shell_directory ... ok
+test notices_are_bounded_and_recover_after_a_terminated_oversized_message ... ok
+
+test result: ok. 7 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/shortcuts.rs (target/debug/deps/shortcuts-aec1ee19afb76b7d)
+
+running 5 tests
+test history_shortcut_scrolls_without_sending_input ... ok
+test key_aliases_are_canonical_and_bare_typing_is_rejected ... ok
+test shortcut_conflicts_are_explicit ... ok
+test text_editor_focus_does_not_trigger_terminal_action ... ok
+test shortcuts_round_trip_and_old_preferences_get_defaults ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/ssh_agent.rs (target/debug/deps/ssh_agent-96c5e464b593f117)
+
+running 8 tests
+test canceled_generation_publishes_no_key_bundle ... ok
+test default_agent_mode_preserves_existing_vault_profile_bindings ... ok
+test key_generation_never_overwrites_without_confirmation ... ok
+test stop_owned_never_kills_system_agent ... ok
+test removing_identity_updates_authentication ... ok
+test generated_ecdsa_and_rsa_keys_authenticate_with_openssh ... ok
+test protected_import_preserves_encryption_and_agent_lifetime_expires ... ok
+test ppk_import_preserves_identity_and_encryption_in_openssh_format ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.20s
+
+     Running tests/ssh_authentication.rs (target/debug/deps/ssh_authentication-0eb7aeb314677527)
+
+running 4 tests
+
+running 1 test
+test x11_cookie_forwarding_shares_the_authenticated_connection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.14s
+
+test x11_cookie_forwarding_shares_the_authenticated_connection ... ok
+test keyboard_interactive_preserves_prompt_echo_flags ... ok
+test password_auth_and_stalled_sftp_preserve_shell ... ok
+test public_key_then_mfa_uses_updated_methods ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests/ssh_browser.rs (target/debug/deps/ssh_browser-f6572ca2fdf02454)
+
+running 13 tests
+test cancelling_a_host_prompt_stops_the_connection ... ok
+test changed_key_prevents_authentication ... ok
+test embedded_shell_and_browser_share_one_authentication ... ok
+test missing_sftp_keeps_shell_usable ... ok
+test closed_sftp_channel_can_reopen_without_reauthenticating ... ok
+test unknown_host_can_be_rejected_before_authentication ... ok
+test tab_separated_wildcard_host_pin_is_enforced ... ok
+test revoked_host_key_overrides_a_matching_app_pin ... ok
+test bounded_output_poll_preserves_complete_ssh_tail_and_exit ... ok
+test single_jump_host_authenticates_each_hop_and_opens_files ... ok
+test full_output_queue_cannot_prevent_cancellation ... ok
+test exit_reason_survives_a_saturated_event_queue ... ok
+test stalled_shell_write_does_not_block_sftp_navigation ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.33s
+
+     Running tests/ssh_lifecycle.rs (target/debug/deps/ssh_lifecycle-c43ca3397be569fd)
+
+running 15 tests
+test credential_titles_identify_the_role_host_and_port ... ok
+test reconnect_discards_old_challenges_and_listings ... ok
+test browser_retry_does_not_reauthenticate ... ok
+test password_then_mfa_uses_the_new_methods_without_repeating_password ... ok
+test password_credential_binding_uses_verified_endpoint_and_typed_method ... ok
+test recovery_from_an_unsuccessful_open_cannot_replace_a_fresh_document ... ok
+test cancelling_encrypted_key_unlock_rejects_late_passphrases ... ok
+test server_disconnect_retires_a_visible_password_prompt_without_an_answer ... ok
+test gateway_credential_title_identifies_the_gateway_before_target_authentication ... ok
+test reconnect_rejects_real_old_directory_snapshots ... ok
+test prompted_username_identity_survives_fresh_editor_recovery_without_implicit_upload ... ok
+test recovery_import_preserves_unsaved_destination_edits ... ok
+test cancel_auth_stops_the_entire_attempt ... ok
+test recovery_never_crosses_a_changed_trust_once_server_key ... ok
+test recovery_never_crosses_a_changed_trust_once_gateway_key ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s
+
+     Running tests/tab_activity.rs (target/debug/deps/tab_activity-ce852dddc12b3998)
+
+running 3 tests
+test background_output_marks_unread_until_viewed ... ok
+test visible_detached_terminal_is_not_unread ... ok
+test screen_activity_ignores_protocol_queries_and_unfinished_sequences ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/terminal_conformance.rs (target/debug/deps/terminal_conformance-471cf5e79344708a)
+
+running 20 tests
+test alternate_visible_copy_and_search_exclude_primary_history ... ok
+test alternate_resize_restores_primary ... ok
+test dec_restore_reinstates_origin_mode_and_survives_widening ... ok
+test combining_and_wide_cells_survive_resize ... ok
+test dec_save_restore_preserves_wrap_and_rendition ... ok
+test editing_either_half_of_a_wide_cell_never_leaves_an_orphan ... ok
+test insert_mode_extends_graphemes_once_and_standalone_marks_own_their_cells ... ok
+test erasing_half_a_wide_glyph_uses_the_current_erase_rendition ... ok
+test nonprinting_reports_and_modes_preserve_pending_wrap ... ok
+test oversized_control_parameters_cannot_panic_or_escape_the_screen ... ok
+test origin_insert_and_dec_graphics_modes_follow_vt_commands ... ok
+test scroll_region_does_not_corrupt_history ... ok
+test shrinking_height_preserves_live_prompt_and_primary_history_even_after_alternate ... ok
+test shrinking_unused_bottom_padding_keeps_visible_rows_in_place ... ok
+test streamed_emoji_clusters_and_margin_wrapping_use_display_columns ... ok
+test widening_a_pending_wrap_cursor_never_overwrites_the_last_character ... ok
+test unsupported_control_strings_and_cancelled_sequences_never_become_visible_text ... ok
+test long_scrollback_search_reuses_unchanged_index ... ok
+test plain_scrollback_retains_ordinary_history_within_a_small_budget ... ok
+test scrollback_memory_and_grapheme_growth_are_bounded ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/terminal_mouse.rs (target/debug/deps/terminal_mouse-352436a328d6c0aa)
+
+running 6 tests
+test legacy_release_outside_coordinate_range_uses_last_representable_cell ... ok
+test motion_modes_modifiers_and_legacy_coordinates ... ok
+test sgr_mouse_coordinates_and_release_are_correct ... ok
+test movement_within_same_cell_is_not_reported_even_after_press ... ok
+test shift_override_releases_pressed_buttons_and_does_not_resume_drag ... ok
+test disabled_mouse_mode_sends_nothing ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/terminal_performance.rs (target/debug/deps/terminal_performance-63796884a8475453)
+
+running 1 test
+test benchmark_360000_lines_with_a_retained_memory_budget ... ignored, long-session benchmark; run explicitly to record machine and memory
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/terminal_programs.rs (target/debug/deps/terminal_programs-b019d5d27c5a72e8)
+
+running 3 tests
+test htop_owned_pid_redraw_resize_and_exit_restore_the_primary_screen ... ignored, requires TERMCRAFT_TEST_HTOP pointing to the htop fixture executable
+test less_search_and_exit_restore_the_primary_screen ... ok
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests/terminal_safety.rs (target/debug/deps/terminal_safety-09bba4fc2b8b98df)
+
+running 6 tests
+test cancel_close_retains_running_session ... ok
+test delayed_bracketed_paste_uses_one_delimiter_pair ... ok
+test cancelled_multiline_paste_sends_zero_bytes ... ok
+test existing_transport_backpressure_messages_retry_but_closed_connections_stop ... ok
+test refused_transport_chunk_is_retried_without_skipping_or_orphan_delimiters ... ok
+test paste_chunks_and_interrupts_are_bounded_and_injection_is_rejected ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/terminal_search.rs (target/debug/deps/terminal_search-9f4d16f01d8bda74)
+
+running 1 test
+test active_search_only_indexes_new_history_rows ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/terminal_selection.rs (target/debug/deps/terminal_selection-64c01b461074c1b3)
+
+running 5 tests
+test rectangle_selection_preserves_columns_and_unicode ... ok
+test linear_history_selection_survives_scroll_and_expires_without_retargeting ... ok
+test configured_delimiters_word_selection_and_alternate_epoch ... ok
+test right_click_mode_keeps_context_menu_reachable ... ok
+test selection_padding_uses_the_terminal_column_bound ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/terminal_settings.rs (target/debug/deps/terminal_settings-904b0f0e8a3377db)
+
+running 6 tests
+test encoding_change_flushes_pending_once_and_dimensions_are_bounded ... ok
+test palette_changes_recolor_indexes_but_preserve_explicit_truecolor ... ok
+test session_override_does_not_modify_global ... ok
+test palette_sources_survive_history_and_final_decoder_flush_is_once ... ok
+test split_legacy_encoding_decodes_once ... ok
+test old_store_inherits_terminal_defaults ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workspace_layout.rs (target/debug/deps/workspace_layout-0fadfe060151c67f)
+
+running 4 tests
+test four_panes_cover_bounds_without_overlap ... ok
+test closing_pane_preserves_other_terminal_ids ... ok
+test orientation_divider_resize_and_minimum_bounds_are_consistent ... ok
+test presets_only_use_distinct_available_terminal_ids ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workspace_windows.rs (target/debug/deps/workspace_windows-5393dd4956d9e122)
+
+running 4 tests
+test fullscreen_restore_keeps_bounds ... ok
+test detach_reattach_keeps_one_transport ... ok
+test moving_to_another_detached_window_compacts_the_old_window ... ok
+test renamed_title_survives_server_title_change ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests harbor_workspace
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

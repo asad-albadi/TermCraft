@@ -1,0 +1,11 @@
+     Locking 8 packages to highest Rust 1.99.0 compatible versions
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s
+     Running tests/serial_pty.rs (target/debug/deps/serial_pty-f9657e941b9c8b79)
+
+running 3 tests
+test close_releases_all_serial_handles_while_session_remains_alive_under_write_pressure ... ok
+test idle_serial_close_stops_reader_and_real_pty_carries_bytes ... ok
+test serial_full_output_queue_still_cancels_and_unplug_reports_an_error ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.30s
+

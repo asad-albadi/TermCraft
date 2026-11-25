@@ -1,0 +1,38 @@
+F
+======================================================================
+FAIL: test_previous_source_and_object_tree_cannot_execute_or_influence_build (__main__.FreshSignedStaging.test_previous_source_and_object_tree_cannot_execute_or_influence_build)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/scripts/test_dropbear_staging.py", line 33, in test_previous_source_and_object_tree_cannot_execute_or_influence_build
+    self.assertFalse(marker.exists(), 'preexisting unverified configure was executed')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false : preexisting unverified configure was executed
+
+----------------------------------------------------------------------
+Ran 1 test in 2.233s
+
+FAILED (failures=1)
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/target/interop-tools/staging-regression-qerqq2n4/dropbear-2026.94.tar.bz2': OK
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+  5  2.27M   5 124.8k   0      0 118.2k      0   00:19   00:01   00:18 124.1k
+100  2.27M 100  2.27M   0      0  1.32M      0   00:01   00:01         124.1k
+100  2.27M 100  2.27M   0      0  1.32M      0   00:01   00:01         124.1k
+100  2.27M 100  2.27M   0      0  1.32M      0   00:01   00:01         124.1k
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100    833 100    833   0      0   4115      0                              0
+100    833 100    833   0      0   4112      0                              0
+100    833 100    833   0      0   4111      0                              0
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+
+  0      0   0      0   0      0      0      0                              0
+100   2464 100   2464   0      0  12023      0                              0
+100   2464 100   2464   0      0  12021      0                              0
+100   2464 100   2464   0      0  12019      0                              0
+

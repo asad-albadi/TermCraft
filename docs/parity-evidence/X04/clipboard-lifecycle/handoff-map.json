@@ -1,0 +1,117 @@
+[
+  {
+    "path": "Cargo.toml",
+    "base_sha256": "bc1b732f7bcb0cdecc5484aa2a8910413960c210770eb49fb968f240e3cb2abb",
+    "payload_sha256": "363fe1b6d3a501f614b9fafeecf876cf2e1001f0cf2965c891e43f0464b05b4c"
+  },
+  {
+    "path": "docs/parity-evidence/X04/clipboard.md",
+    "base_sha256": null,
+    "payload_sha256": "32d9df2848f0692c151e7abc382cec739e22420085ca0ce5edc29f54800ee168"
+  },
+  {
+    "path": "packaging/x11/xdmcp/manifest.json",
+    "base_sha256": "af6b62e1fcf15d1b9b9f7f5b3eee3ecd8e4c85ad542cb0799a15eafc7ec2fe0f",
+    "payload_sha256": "c2fc702f204086de8f33e90df002e3d56f23570459f0b3ecf262577ceb7bbb21"
+  },
+  {
+    "path": "packaging/x11/xdmcp/prepare-linux.py",
+    "base_sha256": "0012d3f2ff2d0ba2d40500ea1494e8578c51c746a7eb6491fabfb4fbb68557bb",
+    "payload_sha256": "1383ba91080cd43f42a4a98a91f4e6bb89a3824c3a0eb08c8e5c674b9af65c8d"
+  },
+  {
+    "path": "packaging/x11/xdmcp/readiness/XTRANS_COPYING",
+    "base_sha256": null,
+    "payload_sha256": "af61583b470afb73de1bc704a34e593183c1e8ae76882991ea54a64b6d846c0d"
+  },
+  {
+    "path": "packaging/x11/xdmcp/readiness/Xephyr-session-ready.xz",
+    "base_sha256": null,
+    "payload_sha256": "1591b56085492f31c2e5f5c5ad7b4f914b3818f3b4d5444c7b20d827c9d78c6a"
+  },
+  {
+    "path": "packaging/x11/xdmcp/readiness/build-packages.txt",
+    "base_sha256": null,
+    "payload_sha256": "b12190d346b88b0bd85c8f954d3ae3bfc8ae1510aec105211c4147d3ad02a51d"
+  },
+  {
+    "path": "packaging/x11/xdmcp/readiness/executable.sha256.bin",
+    "base_sha256": null,
+    "payload_sha256": "154b51c6a371c3127dfd8e60ff0c1451d2d5595469e48b236a37a377e8c865e0"
+  },
+  {
+    "path": "packaging/x11/xdmcp/readiness/rebuild.sh",
+    "base_sha256": null,
+    "payload_sha256": "e26038d2dafdd2412ac522852494cc66d9eecc7d0c59b8188c8f51ca5dcc8b0b"
+  },
+  {
+    "path": "packaging/x11/xdmcp/readiness/xephyr.patch",
+    "base_sha256": null,
+    "payload_sha256": "6399192635349fc2cb090bb2d76fd0a6c1c1973676e5fae5245c3bad43cc6a85"
+  },
+  {
+    "path": "packaging/x11/xdmcp/readiness/xtrans-1.6.0-headers.tar.xz",
+    "base_sha256": null,
+    "payload_sha256": "f00c6c854e9f08bd40de10b0278d942d6d7e48bad08e93415487e199a286d6e6"
+  },
+  {
+    "path": "packaging/x11/xdmcp/readiness/xtrans.pc",
+    "base_sha256": null,
+    "payload_sha256": "60c532df069274ac0060e51d1dcf2420292e6dd4406ec2723117de12a27d3d56"
+  },
+  {
+    "path": "scripts/package-release.py",
+    "base_sha256": "c51b6fbd6e71364166d02b640e689d27ce1fb0efdbdc59bb3332ed79995e58e4",
+    "payload_sha256": "d1fa9d9267d0546d7e53a0dadbf5dd4c1d0861ecc7f96c07c379b74d767552c7"
+  },
+  {
+    "path": "src/ui/xdmcp.rs",
+    "base_sha256": "31870f5fc806cc58291dad0082f0b257d502b01e561d2d98f3073df418087b03",
+    "payload_sha256": "e27e634479d43bbf98bbae9332b8df205692198c2d62f23569b93d4395a3929b"
+  },
+  {
+    "path": "src/x11/mod.rs",
+    "base_sha256": "8a6de0b76e0ed06378b047ab5bf701a821f73c99576a11a75c895f86f0974316",
+    "payload_sha256": "1e744c66f63450479f9abc69d90132f3a01312353e496ae7c316036d744dd39b"
+  },
+  {
+    "path": "src/x11/xdmcp.rs",
+    "base_sha256": "858db28ff49e97379863a343938e551990a539c8e0b3dda49b8ed241362110a7",
+    "payload_sha256": "21f09c36f9453e66801d2bf843156a9a3797a17d6a9e1e40aa1f4779d869a1bb"
+  },
+  {
+    "path": "src/x11/xdmcp_clipboard.rs",
+    "base_sha256": null,
+    "payload_sha256": "7e43e8e8dd6e1cbdf624faa14a781e28ae4df8dbc4b744b000580d37f46c9c25"
+  },
+  {
+    "path": "src/x11/xdmcp_clipboard/deadline_tests.rs",
+    "base_sha256": null,
+    "payload_sha256": "4e83adfe9caebc88e13157107cb399e7203354a1588590c8b577cf8f96e05486"
+  },
+  {
+    "path": "src/x11/xdmcp_clipboard/fixture.rs",
+    "base_sha256": null,
+    "payload_sha256": "ee7f26b5483094ad8c71e892290d5cab6688598123134820a225937d27710398"
+  },
+  {
+    "path": "src/x11/xdmcp_clipboard/transport.rs",
+    "base_sha256": null,
+    "payload_sha256": "e5f6c67ca54979eec274e2e8a141a6c82cebf21fd33cd9356610a3922cd845d3"
+  },
+  {
+    "path": "src/x11/xdmcp_engine.rs",
+    "base_sha256": "47b1704a5807dbaf073589f538e980918b13a44ebff1624116fde134d69a7505",
+    "payload_sha256": "f3821c03aa61ff118581a5e05e41e42efa102828fd5742e0eebb41647c114e32"
+  },
+  {
+    "path": "src/x11/xdmcp_payload.rs",
+    "base_sha256": "9c16f3f744665d37b6028dba196fc38c8d60e66b81802f4835adc71a9aa0c7e3",
+    "payload_sha256": "6f6b571f193c1b0acacc248736a0ed38c36a003d8927d59c411cc8ff400b7cbb"
+  },
+  {
+    "path": "tests/support/xdmcp_window.py",
+    "base_sha256": "78c78a4464775ab615e0a8ef3404e5e0d6cf4571dac7abf338080d0b1588b780",
+    "payload_sha256": "c6f4b506dbc28f7194ea84b464864a1409b26227b24d7444d999c96849b50eea"
+  }
+]

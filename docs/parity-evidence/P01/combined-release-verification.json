@@ -1,0 +1,52 @@
+{
+  "archive_sha256": "e7315e1082bc354c4f002835b1ba138d7107bb89d91ed993b360ea525626429a",
+  "source_snapshot_sha256": "ba1685800410dbb5279e4f3b07a1ddbedabdbc27e871991412f9c32ba1e34105",
+  "files_verified": 980,
+  "package_root": "target/package-platforms-qualified/e7315e1082bc354c4f002835b1ba138d7107bb89d91ed993b360ea525626429a/TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh",
+  "qualification": "Arch-compatible Linux x86_64, system Perl/OpenSSH and display libraries; not clean/native cross-platform closure",
+  "startup": {
+    "wayland": {
+      "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh.tar.gz",
+      "archive_sha256": "e7315e1082bc354c4f002835b1ba138d7107bb89d91ed993b360ea525626429a",
+      "manifest_schema": 1,
+      "platform": "linux",
+      "display_backend": "Wayland",
+      "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+      "screen_size": [
+        938,
+        990
+      ],
+      "rdp_helper_wire_version": 1,
+      "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+      "rdp_helper_child_location_verified": true
+    },
+    "x11": {
+      "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh.tar.gz",
+      "archive_sha256": "e7315e1082bc354c4f002835b1ba138d7107bb89d91ed993b360ea525626429a",
+      "manifest_schema": 1,
+      "platform": "linux",
+      "display_backend": "X11",
+      "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+      "screen_size": [
+        938,
+        990
+      ],
+      "rdp_helper_wire_version": 1,
+      "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+      "rdp_helper_child_location_verified": true
+    }
+  },
+  "scope": "Frozen combined Xwayland and Mosh archive; predates package/plugin/server integration and test-only fixture reliability changes.",
+  "isolated_X11": {
+    "passed": 5,
+    "failed": 0,
+    "isolation": "Private mount/network/PID namespaces, private tmp and nested Cage; no host X server lifecycle operations",
+    "evidence": "docs/parity-evidence/P01/combined-release-x11.log"
+  },
+  "Mosh": {
+    "passed": 1,
+    "failed": 0,
+    "workflow": "Actual strict-host-key SSH bootstrap and real Mosh UDP terminal, empty local PATH, verified relocated archive payloads; altered payloads rejected",
+    "evidence": "docs/parity-evidence/P01/combined-release-mosh.log"
+  }
+}

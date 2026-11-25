@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.24s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-df2a632a0c6609e7)
+
+running 1 test
+test ui::pages::appearance_tests::oversized_fixed_alternate_grid_can_reveal_its_far_controls ... FAILED
+
+failures:
+
+---- ui::pages::appearance_tests::oversized_fixed_alternate_grid_can_reveal_its_far_controls stdout ----
+
+thread 'ui::pages::appearance_tests::oversized_fixed_alternate_grid_can_reveal_its_far_controls' (431211) panicked at src/ui/pages.rs:2111:9:
+local scrolling must reveal fixed alternate controls outside the initial viewport
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::pages::appearance_tests::oversized_fixed_alternate_grid_can_reveal_its_far_controls
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 50 filtered out; finished in 1.31s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

@@ -1,0 +1,10 @@
+{
+  "baseline_files_match_gate_manifest": {
+    "src/services/cron.rs": true,
+    "src/services/cron/tests.rs": true,
+    "src/ui.rs": true,
+    "src/ui/managed_servers.rs": true
+  },
+  "preexisting_changes_found": false,
+  "note": "Current inventory comparison before UI SCP edit found only the three changes already made by this recovery agent; the remaining UI base also matches gate."
+}

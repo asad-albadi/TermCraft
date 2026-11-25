@@ -1,0 +1,39 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: field `endpoint` is never read
+  --> src/remote_files/editor.rs:32:82
+   |
+32 | pub struct RemoteDocument { state: Arc<Mutex<State>>, sender: mpsc::Sender<Job>, endpoint: Option<Endpoint> }
+   |            -------------- field in this struct                                   ^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (lib) generated 1 warning
+error[E0609]: no field `id` on type `RemoteEditor`
+    --> src/ui.rs:1794:44
+     |
+1794 |         let first_id = w.remote_editors[0].id;
+     |                                            ^^ unknown field
+     |
+     = note: available field is: `document`
+
+error[E0609]: no field `id` on type `RemoteEditor`
+    --> src/ui.rs:1798:45
+     |
+1798 |         let second_id = w.remote_editors[1].id;
+     |                                             ^^ unknown field
+     |
+     = note: available field is: `document`
+
+error[E0609]: no field `id` on type `RemoteEditor`
+    --> src/ui.rs:1802:40
+     |
+1802 | ...   assert_eq!(w.remote_editors[0].id, second_id, "A surviving editor must keep its own undo identity when its vector index chan...
+     |                                      ^^ unknown field
+     |
+     = note: available field is: `document`
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 3 previous errors

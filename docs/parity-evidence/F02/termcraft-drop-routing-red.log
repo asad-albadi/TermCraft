@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.04s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-8a57c66b7dc86033)
+
+running 1 test
+test ui::gui_tests::native_drop_on_local_zone_does_not_upload ... FAILED
+
+failures:
+
+---- ui::gui_tests::native_drop_on_local_zone_does_not_upload stdout ----
+
+thread 'ui::gui_tests::native_drop_on_local_zone_does_not_upload' (211073) panicked at src/ui.rs:1777:9:
+Native drop on the LOCAL zone uploaded data to SSH
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::gui_tests::native_drop_on_local_zone_does_not_upload
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 19 filtered out; finished in 2.69s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

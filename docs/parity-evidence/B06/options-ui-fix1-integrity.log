@@ -1,0 +1,5 @@
+Original reviewed UI archive/manifest/payload preserved in reviewed-ui-baseline.
+Only src/ui/games/play.rs changes relative to reviewed UI candidate.
+MAIN base4 files and accepted FIX1 core50 files match exact hashes and sizes.
+FIX1 archive has exactly3 regular declared files, each with exact candidate bytes.
+All private Cargo/rustc/linker jobs finished and reaped.

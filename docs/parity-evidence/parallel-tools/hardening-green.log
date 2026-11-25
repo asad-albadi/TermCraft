@@ -1,0 +1,122 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: method `poll` is never used
+   --> src/ui.rs:172:8
+    |
+127 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+172 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.00s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-1555a4b1f4cd19ec)
+
+running 53 tests
+test desktop::vnc::tests::classic_vnc_challenge_matches_independent_openssl_vector ... ok
+test desktop::vnc::tests::old_sessions_keep_external_vnc_and_new_security_is_explicit ... ok
+test desktop::queue_tests::local_keyboard_and_view_only_are_enforced_before_queueing_input ... ok
+test desktop::vnc::tests::verified_tls_modes_do_not_require_classic_unencrypted_consent ... ok
+test http_server::tests::listing_writer_checks_cancellation_after_partial_progress ... ok
+test http_server::tests::rejects_encoded_traversal ... ok
+test desktop::vnc::tests::selected_security_never_falls_back_to_another_server_offer ... ok
+test desktop::vnc::tests::oversized_resize_and_disconnect_mid_rectangle_are_errors ... ok
+test platform::atomic_rename::tests::atomic_commit_preserves_both_files_on_conflict ... ok
+test remote_files::editor::review_tests::earlier_job_completion_cannot_finish_a_new_save ... ok
+test remote_files::transfer::folder_archive::portable::tests::capability_folder_encoder_rejects_an_unselected_root_and_escaping_link ... ok
+test remote_files::editor::review_tests::full_document_queue_is_retryable_and_keeps_local_recovery ... ok
+test remote_files::transfer::folder_archive::unix::tests::cancelled_folder_preparation_stops_before_copying ... ok
+test remote_files::transfer::operations::commit::tests::atomic_commit_preserves_both_files_on_conflict ... ok
+test remote_files::transfer::folder_archive::portable::windows_decoder_tests::portable_decoder_preserves_content_and_resolves_selected_tree_link_types ... ok
+test remote_files::transfer::local_stage::tests::replaced_folder_containers_and_archives_are_never_published_or_cleaned ... ok
+test remote_files::transfer::operations::tree::windows_name_tests::windows_download_names_reject_device_aliases_and_path_syntax ... ok
+test remote_files::transfer::review_tests::bulk_cancellation_waits_for_an_authoritative_entry_and_stops_the_next ... ok
+test remote_files::transfer::review_tests::equal_sized_jobs_keep_distinct_immutable_operation_summaries ... ok
+test remote_files::transfer::operations::source::cap_backend::tests::capability_backend_moves_files_between_anchored_directories ... ok
+test remote_files::transfer::review_tests::submitted_commits_have_authoritative_or_indeterminate_outcomes ... ok
+test remote_files::transfer::tests::queued_cancellation_is_observable_before_worker_start ... ok
+test remote_files::transfer::operations::source::tests::replaced_children_are_not_followed_after_enumeration ... ok
+test ssh::auth::tests::agent_factor_preserves_new_authentication_methods ... ok
+test ssh::worker::budget_tests::directory_budget_bounds_retained_bytes_before_allocating_paths ... ok
+test ssh::x11::tests::authority_requires_matching_display_host_and_protocol ... ok
+test ssh::x11::tests::display_parser_rejects_remote_targets_and_port_overflow ... ok
+test ssh::x11::tests::rejects_wrong_cookie_and_oversized_handshakes ... ok
+test ssh::x11::tests::substitutes_only_verified_cookie_in_both_byte_orders ... ok
+test ssh::host_keys::tests::remembering_a_conflicting_key_cannot_expand_the_pin_set ... ok
+test terminal::tests::alternate_screen_restores_primary ... ok
+test terminal::tests::cursor_edit_and_erase ... ok
+test ssh::x11::tests::unauthorized_x11_never_connects_to_local_server ... ok
+test terminal::tests::preserves_split_utf8 ... ok
+test remote_files::transfer::operations::source::cap_backend::tests::capability_backend_rejects_swapped_sources_and_destination_links ... ok
+test tests::protocol_defaults_match_sessions ... ok
+test terminal::tests::scrolling_keeps_history ... ok
+test tests::rejects_option_injection_and_bad_hosts ... ok
+test tests::ssh_preserves_key_paths_without_shell_interpolation ... ok
+test remote_files::transfer::folder_archive::portable::tests::capability_folder_encoder_preserves_bytes_links_names_and_ordinary_modes ... ok
+test tools::diff::tests::folder_diff_stays_on_open_root_after_path_replacement ... ok
+test tools::diff::tests::folder_diff_refuses_intermediate_symlink_replacement_after_listing ... ok
+test desktop::queue_tests::focus_release_is_encoded_even_with_full_input_queue ... ok
+test remote_files::transfer::folder_archive::unix::tests::hostile_folder_payloads_cannot_escape_or_follow_directory_links ... ok
+test remote_files::transfer::folder_archive::portable::windows_decoder_tests::windows_decoder_rejects_device_names_streams_and_unknown_link_types ... ok
+test http_server::tests::listing_writer_checks_deadline_after_partial_progress ... ok
+test desktop::vnc::tests::vnc_known_frame_pointer_copyrect_and_resize_are_real_protocol_operations ... ok
+test process::backend::tests::real_shell_uses_pty_and_returns_output ... ok
+test desktop::vnc::tests::view_only_sends_no_input_even_at_transport_boundary_and_clipboard_is_directional ... ok
+test process::backend::lifecycle_tests::dropping_tab_ends_foreground_and_background_jobs ... ok
+test desktop::vnc::tests::vencrypt_verified_none_and_password_deliver_pixels_over_real_tls ... ok
+test desktop::vnc::tests::vencrypt_bad_trust_hostname_and_rotated_certificate_prevent_authentication ... ok
+test desktop::vnc::tests::classic_password_wait_does_not_spend_network_timeout_or_leak_plaintext ... ok
+
+test result: ok. 53 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.11s
+
+     Running tests/tools.rs (target/debug/deps/tools-ecee33d486ed4b7b)
+
+running 13 tests
+test file_diff_rejects_oversized_input ... ok
+test folder_comparison_checks_cancellation ... ok
+test file_diff_reports_utf8_insertion_and_distinguishes_binary ... ok
+test folder_diff_rejects_symlinks_without_following_them ... ok
+test port_check_configuration_accepts_ipv4_and_ipv6_without_connecting ... ok
+test scan_rejects_wildcard_addresses_and_invalid_port_lists ... ok
+test scan_cancel_joins_worker ... ok
+test image_preview_decodes_known_pixels ... ok
+test oversized_image_is_rejected_before_allocation ... ok
+test folder_diff_reports_added_removed_changed ... ok
+test scan_reports_configured_loopback_ports ... ok
+test image_preview_decodes_jpeg_pixels ... ok
+test folder_diff_enforces_depth_limit ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

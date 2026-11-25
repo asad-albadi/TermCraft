@@ -1,0 +1,34 @@
+{
+  "fix1_manifest_sha256": "03e643f0b82bce97311dec176ba4452ce92fdc33537534981bbfedd93c4935f2",
+  "owned": {
+    "engines/rdp/src/devices.rs": {
+      "main": "829015928973781608d6c4664b66a90f8b476fe2b2f9372c9f56993db3d17c86",
+      "fix": "3dae2b28c714ff28fdc1b3f2f6c44d65a462a22283ea17ab1603daa0c66e5723"
+    },
+    "engines/rdp/src/devices_tests.rs": {
+      "main": "9cb7e9b54ebbb9c01a357295fb62e2efcc2e990792adec79c2c0ee8ad3c25b31",
+      "fix": "f9b8ec2849182a1b9bd00b0d347f48766b910d51e7d9723d5a7e1ac79d76685c"
+    },
+    "engines/rdp/src/serial.rs": {
+      "main": "2730a2be6382e93f2d0256a2390750e8605b0c92213a0064e92b8257e2d5f4de",
+      "fix": "709a83e09988d35ea0e4e2010167b1aeee5f8a9c201c63e82171bff1882f73b4"
+    }
+  },
+  "evidence": {
+    "REPORT.md": "a89e04809abc37ae6945a0de08dd938b7a627913717e564e0736b1721f261b57",
+    "COMMANDS.md": "33e8e52c3af3c649991dc9b029c7f557e841dae46082aee3ebbda3e759c8d07a",
+    "freeze.py": "e0aeb52287dacf69a4fd96233ec77a84b5c22334a775d1e775b8c60d3a3a6665",
+    "green.log": "6346e325965b6630bbd6844ff121e2aadc0e0820fcb1d0d6b3b8f8fad6a362bf",
+    "format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fix2.patch": "e1b7184ac10d2fd910434bc4dd4d93e34f7b022731e2801beebe4c6f51e13e2f",
+    "integration.patch": "ddee87116ba3a425718d839c0c5ff49710b67d94118a40cfb2dfcc027663062f",
+    "fix1-vs-fix2-maps.json": "d8d970a7d4125aaa02c1ec19659c8a7d6ef3161f046d6c689c64c1568d5646d7",
+    "main-vs-cumulative-maps.json": "d1a534e3d553d7a1945ab412c989c34b7113e4d9e2d66b883bd097b93ab29301"
+  },
+  "identity": {
+    "app": "termcraft-unix-control947",
+    "helper": "termcraft-rdp-unix-control947",
+    "component": "d02-unix-controls-component947",
+    "version": "0.1.947"
+  }
+}

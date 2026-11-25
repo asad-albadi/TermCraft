@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "sessions": 6,
+  "native_observations": 84,
+  "packaged_engine_cases": 1,
+  "ignored": 0,
+  "counts": {
+    "x11-1": 14,
+    "x11-1.5": 14,
+    "x11-2": 14,
+    "wayland-1": 14,
+    "wayland-1.5": 14,
+    "wayland-2": 14
+  },
+  "scope": "Linux x86_64 private headless native X11/Wayland with software rendering; instrumented production Workspace; original/native-all-platform parity remains unproven"
+}

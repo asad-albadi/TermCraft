@@ -1,0 +1,7 @@
+{
+  "source": "engines/wayland/target/release/termcraft-wayland-engine",
+  "copy": "target/qualification-vnc-composed/wayland-helper-release",
+  "sha256": "26c3495d140afc8e90f318783af7a2a8b9484d69aa6e3c5c3c5e3c684096236e",
+  "bytes": 683928,
+  "qualification": "Locked offline release build only; extracted release staging and execution pending"
+}

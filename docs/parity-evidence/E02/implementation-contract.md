@@ -1,0 +1,11 @@
+# Graphical/timed macro execution contract
+
+Implements the approved E02 extension in `2026-11-23-09-scope-evidence.md`, grounded in `../original-scope/README.md`. Existing text macros remain compatible. The owner is an explicit runtime tab identity plus connection generation; playback must never follow the active tab. Only terminal/desktop content input is recordable; authentication, trust dialogs and app controls are excluded.
+
+The first implementation slice adds a versioned, bounded script, event recorder and deterministic player. Text, key down/up, normalized desktop pointer, delay, output-pattern wait, focus wait and named calls are supported. Expand calls before execution with cycle/depth/event/byte limits. An injected monotonic clock controls delays and timeouts. Authentication, target replacement, cancellation and malformed scripts stop execution and release held input. Playback emits a bounded number of actions per UI poll; waits consume only the bound target's output. Startup/named invocation and the editor/recorder then integrate with this same player rather than adding a second execution path.
+
+No recurring calendar scheduler is inferred. Global OS input injection is not introduced: graphical actions target owned embedded desktop sessions. Native/original timing, focus and exact pointer semantics remain explicit comparison gaps. Tests first cover recorded timing at 0/100/250 ms, cancellation and release, waits, cycles, target-generation/auth rejection and bounded catch-up. UI tests must additionally prove actual transport delivery, startup duplication and no auth recording before E02 can reach a checkpoint.
+
+## Core slice verification
+
+`tests/macro_events.rs` exercises the production player/recorder using injected clock values. The baseline compiled production library rejected the missing macro API (`core-baseline-red.log`); the Cargo RED also reached the intended unresolved import (`core-red.log`). All eight engine tests pass (`core-green.log`). This is an engine slice, with no E02 checkpoint advancement. The required UI/editor, actual terminal and desktop transport delivery, recording hooks, startup/named invocation and native/original comparisons remain pending. In particular, callers must consume cleanup actions on every cancellation/error and bound import bytes before deserializing scripts.

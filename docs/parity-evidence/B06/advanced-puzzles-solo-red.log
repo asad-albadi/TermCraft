@@ -1,0 +1,31 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/work)
+warning: function `peers` is never used
+   --> src/games/puzzles/solo.rs:100:4
+    |
+100 | fn peers(i: usize, j: usize, c: SoloConfig) -> bool {
+    |    ^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `b06-puzzle-options-private` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.23s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/work/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 1 test
+test solo::advanced::tests::remaining_solo_presets_generate_real_certified_boards ... FAILED
+
+failures:
+
+---- solo::advanced::tests::remaining_solo_presets_generate_real_certified_boards stdout ----
+
+thread 'solo::advanced::tests::remaining_solo_presets_generate_real_certified_boards' (397835) panicked at src/games/puzzles/solo_advanced.rs:25:6:
+3x3 Intermediate had no generated boards
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    solo::advanced::tests::remaining_solo_presets_generate_real_certified_boards
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 52 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

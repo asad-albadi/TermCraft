@@ -1,0 +1,13 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-x04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3m 02s
+     Running unittests src/lib.rs (../../debug/deps/harbor_workspace-a4bd4fbc14f695ce)
+
+running 4 tests
+test x11::xdmcp::tests::malformed_and_oversized_replies_are_rejected ... ok
+test x11::xdmcp::tests::cancellation_prevents_any_packet ... ok
+test x11::xdmcp::tests::broadcast_requires_explicit_interface_choice ... ok
+test x11::xdmcp::tests::nondefault_port_is_used_and_only_correlated_willing_is_admitted ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 114 filtered out; finished in 0.62s
+

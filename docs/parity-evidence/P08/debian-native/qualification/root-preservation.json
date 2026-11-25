@@ -1,0 +1,6 @@
+{
+  "artifact": "dist/snapshots/2bad678090823cf3aeb990ddf785cd364fd81b52fa3eaf823c50120251a6e53f/termcraft_0.1.0_amd64.deb",
+  "sha256": "2bad678090823cf3aeb990ddf785cd364fd81b52fa3eaf823c50120251a6e53f",
+  "scope": "native Debian12 core/default13games source4726eebad; predates advanced presets and Save/Load",
+  "exact_copy": true
+}

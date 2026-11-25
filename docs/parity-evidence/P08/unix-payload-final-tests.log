@@ -1,0 +1,30 @@
+test_windows_zip_and_macos_bundle_keep_helper_beside_app (packaging_release.NativePackageLayout.test_windows_zip_and_macos_bundle_keep_helper_beside_app) ... ok
+test_architecture_mismatch_prevents_staging (packaging_release.PortablePackage.test_architecture_mismatch_prevents_staging) ... ok
+test_archive_relocates_with_empty_path_and_keeps_workspace_data (packaging_release.PortablePackage.test_archive_relocates_with_empty_path_and_keeps_workspace_data) ... Owned integration file was changed: /tmp/package path fcfplvwd/menu % data/applications/org.termcraft.TermCraft.desktop
+Owned integration file was changed: /tmp/package path fcfplvwd/menu % data/applications/org.termcraft.TermCraft.desktop
+ok
+test_source_tree_loader_and_runpath_are_rejected (packaging_release.PortablePackage.test_source_tree_loader_and_runpath_are_rejected) ... ok
+test_xwayland_archive_copies_verified_executable_and_notices (packaging_release.PortablePackage.test_xwayland_archive_copies_verified_executable_and_notices) ... skipped 'requires the pinned Arch archive and its runtime ABI'
+test_xwayland_archive_rejects_missing_wrong_hash_and_wrong_target (packaging_release.PortablePackage.test_xwayland_archive_rejects_missing_wrong_hash_and_wrong_target) ... ok
+test_asset_allowlist_excludes_private_files_and_rejects_symlinks (packaging_release.PublicationBoundary.test_asset_allowlist_excludes_private_files_and_rejects_symlinks) ... ok
+test_cargo_ignores_live_ancestor_configuration (packaging_release.PublicationBoundary.test_cargo_ignores_live_ancestor_configuration) ... ok
+test_release_build_reads_snapshot_while_live_sources_change (packaging_release.SourceSnapshot.test_release_build_reads_snapshot_while_live_sources_change) ... ok
+test_absent_option_has_no_payload (packaging_unix_release.UnixRelease.test_absent_option_has_no_payload) ... ok
+test_archive_digest_native_format_and_notice_tampering_rejected (packaging_unix_release.UnixRelease.test_archive_digest_native_format_and_notice_tampering_rejected) ... ok
+test_cli_exposes_offline_option (packaging_unix_release.UnixRelease.test_cli_exposes_offline_option) ... ok
+test_composes_with_xwayland_and_mosh (packaging_unix_release.UnixRelease.test_composes_with_xwayland_and_mosh) ... ok
+test_corrupt_binary_source_and_missing_cache_fail_closed (packaging_unix_release.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed) ... Unix payload staging failed: Unix payload checksum mismatch: 51fcb60efbdf3e579550e9ab893730df56b33d0cc928a2a6467bd846cdfef7d8
+Unix payload staging failed: Unix payload checksum mismatch: 0e4925392fd9f3743cc517e031b68b012b24a63b0cf6c1ff03cce7bb3846cc99
+Unix payload staging failed: Unix payload checksum mismatch: bc04f0222c39f0edf35eeb034fae3dc35a6e38a048c259d4c977ba915b9d57a6
+ok
+test_frozen_source_snapshot_remains_independent_and_unchanged (packaging_unix_release.UnixRelease.test_frozen_source_snapshot_remains_independent_and_unchanged) ... ok
+test_missing_or_symlink_input_never_downloads (packaging_unix_release.UnixRelease.test_missing_or_symlink_input_never_downloads) ... ok
+test_optional_payload_inventory_sources_notices_and_no_overwrite (packaging_unix_release.UnixRelease.test_optional_payload_inventory_sources_notices_and_no_overwrite) ... ok
+test_unsupported_target_and_architecture_rejected (packaging_unix_release.UnixRelease.test_unsupported_target_and_architecture_rejected) ... ok
+test_windows_payload_verified_without_execution (packaging_unix_release.UnixRelease.test_windows_payload_verified_without_execution) ... ok
+test_windows_zip_layout_contains_native_payload_and_source_inventory (packaging_unix_release.UnixRelease.test_windows_zip_layout_contains_native_payload_and_source_inventory) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 24.874s
+
+OK (skipped=1)

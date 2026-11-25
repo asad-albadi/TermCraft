@@ -1,0 +1,24 @@
+# V03 independent specification and quality review — 2026-11-25
+
+**Disposition: accept the bounded controlled Linux endpoint checkpoint and candidate integration. No Important findings.** This is a partial V03 implementation/evidence checkpoint, not completion of the approved V03 validation plan or original-product parity. Native/original verified remains 0.
+
+Reviewed candidate patch SHA-256 `8996a4275a2426e85d295c44f36ea290676f9f8a0056affd2b076d6d0c86faff`, its five candidate files, frozen private source, approved V03 plan, durable matrix and retained evidence. No production/source changes or whole-application builds were made by this review.
+
+## Provenance and evidence
+
+- Independently recomputed the patch, archive (`e07c5c8ad9e73588e391dd33c0c5e5920c7177b4cab510cb757a9185118ce471`) and qualified evidence (`e79f116a476f9fcee2c582a9abc880a400823cb1b2c00689846e212c68528886`) hashes; all match handoff. All entries in evidence-files-sha256.json match current retained files.
+- Verified all five candidate hashes and the existing MAIN RDP support base hash against owned-file-hashes.json. Verified every pre-build source input against both the frozen private workspace and the archive. Verified every declared private fixture hash. The build-artifact, pre-build-input and captured inventory hashes match the qualified result.
+- All 30 result records match the durable matrix. Recomputed every case log and current executed-binary hash; no mismatch. Independently reapplied the candidate acceptance predicate to all 30 retained logs: all require exit 0, the selected exact test success, one summary, 1 passed and 0 ignored. No unavailable/skipped output was promoted to pass. The explicitly ignored XDMCP test was actually selected with --ignored and reports 1 passed/0 ignored.
+- The qualified runner and relocatable candidate intentionally differ in path/inventory handling only; the original 30-case evidence remains bound to the preserved qualified runner. The private Cargo identity is not included in the candidate patch.
+
+## Focused verification and quality
+
+Ran the candidate runner contract suite independently: 2 tests passed, including negative acceptance cases and timeout kill/reap. Reviewed executable-negative and relocation evidence: absent executable, zero-test success and unavailable fixture are rejected; explicit missing fixtures are unavailable/nonzero; copied runner plus explicit source/fixture root and durable default matrix passed the real RDP frame/input case without claiming a complete checkpoint. The candidate also supports explicit --matrix, rejects unknown/empty selections and verifies exact test discovery before execution. Timeout paths kill the owned process group and wait for the direct child. Each private namespace wrapper removes host display/agent access and uses a private network; no host capabilities or configuration are changed.
+
+Independently reran only the two frozen real-TCP VNC TLS test cases with host display/SSH-agent variables stripped and a 30-second outer bound. Both returned exit 0 with exactly 1 passed/0 ignored (0.28s positive, 0.19s negative). The positive fixture selects VeNCrypt X509Vnc 261, trusts its explicit ephemeral localhost certificate, checks the exact password response, green pixel, pointer bytes and carrier EOF. The negative fixture uses a different CA, requires certificate rejection and fails on any password prompt. Neither fixture bypasses trust checks or accesses host input/clipboard. Both test-owned server threads joined and runner processes were reaped. The review contract timeout subprocess was also killed and reaped; no review jobs remain.
+
+## Accepted limits and integration notes
+
+This evidence supports the named owned endpoint cases: actual FTP/FTPS sockets, terminal protocol bytes/reserved-port namespace cases, prebuilt owned RDP endpoint/helper, VNC sockets including TLS, genuine isolated xdm/Xephyr desktop and owned SSH carriers. The RDP gateway row correctly claims retry-carrier behavior rather than a full RDP session through an independent gateway. XDMCP clipboard stays Disabled. RDP helper/prototype provenance explicitly qualifies exact binary bytes rather than claiming correspondence with current helper source.
+
+Independent deployed daemons/version combinations, end-to-end RDP clipboard/device redirection, physical devices, native platforms, clean-machine packaging and original Personal 26.6 comparisons remain open. Therefore leave full V03/parity completion open even after integrating these files. Preserve executable permission on tests/support/run_protocol_reserved_isolated.sh when applying the plain unified patch (which does not encode mode), stage the frozen runtime fixtures explicitly, and supply --fixture-root for MAIN execution. These are integration requirements, not defects in the reviewed checkpoint.

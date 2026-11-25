@@ -1,0 +1,11 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.39s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-35a5b814e387799d)
+
+running 3 tests
+test ui::xserver::tests::xserver_ui_starts_and_stops_packaged_engine ... ignored, requires the isolated Wayland fixture and a qualified Xwayland bundle
+test ui::xserver::tests::xserver_ui_cancels_in_background ... ok
+test ui::xserver::tests::xserver_ui_reports_missing_bundle ... ok
+
+test result: ok. 2 passed; 0 failed; 1 ignored; 0 measured; 124 filtered out; finished in 0.01s
+

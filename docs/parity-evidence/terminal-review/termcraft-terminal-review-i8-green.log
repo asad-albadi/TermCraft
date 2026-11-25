@@ -1,0 +1,10 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.13s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-c814a3629b30588a)
+
+running 1 test
+I8 owned output-flood check: four GUI ticks plus close/cancel 206.358248ms, largest shared input budget 8192 bytes (debug; no timing-only assertion)
+test ui::terminal_review_tests::output_bursts_share_one_work_budget_and_keep_close_cancel_responsive ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 51 filtered out; finished in 1.41s
+

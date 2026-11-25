@@ -1,0 +1,38 @@
+{
+  "review": "SPEC/QUALITY ACCEPT after cancellation FIX1",
+  "files": [
+    {
+      "path": "src/ui/games/play.rs",
+      "base_sha256": "c449a915bf89c0aad71d1b8d4091c1252ad1c44a0ac7d476391b01da18d2d105",
+      "sha256": "c95a2454dcf3b46d015b62c4855a22dd1f9fbb25769f09427d7d6e083eeaa3e6"
+    },
+    {
+      "path": "src/ui/games/save.rs",
+      "base_sha256": "a319751542ea82a4993bece94fef92a676cb73abce477bc5d3f8e7b43a34d9af",
+      "sha256": "0bf107badfccbce662000e050b935445f5be3ef714dbd3cb6396c282c3491c1b"
+    }
+  ],
+  "unchanged_game_core_sources": {
+    "src/games/mod.rs": "4dd43fa71ef16d02df645233369b6fc50458bcc96bf6c468b684ba24ba6dd4dd",
+    "src/games/screensaver.rs": "bd02411d5d01f0661b0ef20859fcebf8032ed57729266588ff86d051ee397d94",
+    "src/games/library.rs": "310bc21c795e6081876eb22e68d663ca8e5fd9080f6aeec87df95fd56967c16c",
+    "src/games/persistence.rs": "56b61c2c334a5976869da7fa7319950d4bfaec41d01fc598bb07cbca547540d8",
+    "src/games/puzzles/guess.rs": "97b4e824a1cbb1a087cfd03b74ab8703e22b10cdc6883559b2c97a474984de95",
+    "src/games/puzzles/map.rs": "d5b5a94c3f8d371b0d2b5d8271dd9eee1cfe3a51a4585de43f2da952c7a2d10e",
+    "src/games/puzzles/mines.rs": "47ceafff40fd4730eb411927c254fa3592b33a614cd9aa1f64e22bfcc20e5315",
+    "src/games/puzzles/mod.rs": "e673ad201af8806ef56c9906007fc935affe194e12243f8784d33260f1929696",
+    "src/games/puzzles/net.rs": "74aed8b3a2b70b6b8ccd1d7c52aa2fa899ffcc67bfc62dc73ce319df6ed2c1fa",
+    "src/games/puzzles/solo.rs": "d6feaa52a36766526084a924bb0013b3dbbd1eac9d76757e41887e1464fcce58",
+    "src/games/puzzles/tests.rs": "0704f130e468e2b9a747a06dd159739042109a1728af4707ac3e7283fafe06be",
+    "src/games/puzzles/untangle.rs": "cdf9cd40fa22ab4242fe516a84cd195f5e75400d0b9a8b889419b09e557a7bd4",
+    "src/games/puzzles/config.rs": "460c62b15b85653f6b723887a0e244e2c96a15f264e99d9ea453f96e19c97b4f",
+    "src/games/puzzles/solo_advanced.rs": "7a5918dcf06c090124ec3db73b3429eae44bb434d2732b6efd9ec02f785ed69f",
+    "src/games/terminal/blocks.rs": "d5cb8488b6af4fd1fc3a4b616fffa11c05553950c79533ad88c856a8ffc0401d",
+    "src/games/terminal/cards.rs": "eec79b73222f95a8613ef717ec26a4a62deb2ed7e7361397bb6841ee48a0b855",
+    "src/games/terminal/grids.rs": "9542675e8dfedd976161c334ffddca5a2121b181bc219e0ec97e9462ea0d057c",
+    "src/games/terminal/invaders.rs": "40bd4817919dee05ef7602321b50b7e7f05307ca042da3d78dacb42fab323ed8",
+    "src/games/terminal/mod.rs": "640c9c76974c34b2cdf8c4f24993e7be40470db7e4a9400989239e5021f0713c",
+    "src/games/terminal/tests.rs": "a1ed8ab284807242360a2b83237051e8e96609372f35057e0cf143bfa884ee7e"
+  },
+  "scope": "App-owned confirmation; no Zenity; original held-target consent/identity and dirty/history safeguards retained. Cancellation before publication claim prevents commit; after claim atomic operation may finish after close. Native GTK overwrite on final combined release pending."
+}

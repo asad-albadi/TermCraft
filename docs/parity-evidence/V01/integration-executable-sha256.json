@@ -1,0 +1,42 @@
+{
+  "ssh_lifecycle": {
+    "original": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_lifecycle-abaa568787857db5",
+    "copy": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/handoff/binaries/ssh_lifecycle-abaa568787857db5",
+    "sha256": "87c55396cbc8a7eea2e016304a27d5105d63afbb55a71f3c0ca2389cae3dff42"
+  },
+  "ssh_options": {
+    "original": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_options-3a83901b4c8feaa9",
+    "copy": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/handoff/binaries/ssh_options-3a83901b4c8feaa9",
+    "sha256": "120c72e67fb6db24a9b7ca6263e0fe35bf5729c69c70985d18e5a496342be937"
+  },
+  "remote_transfers": {
+    "original": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/remote_transfers-5b12b9e73ea589cb",
+    "copy": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/handoff/binaries/remote_transfers-5b12b9e73ea589cb",
+    "sha256": "642721015042e29f7be78050c08081571314b7c1ab1be9c747ef6f029fd77c61"
+  },
+  "ssh_agent": {
+    "original": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_agent-2d144c00deeb961c",
+    "copy": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/handoff/binaries/ssh_agent-2d144c00deeb961c",
+    "sha256": "127988c54287740d6c5ce7ffbd01879e99a87c88cbb8e6440e6b5ec919ac56ce"
+  },
+  "ssh_authentication": {
+    "original": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_authentication-05d6262f32c90e79",
+    "copy": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/handoff/binaries/ssh_authentication-05d6262f32c90e79",
+    "sha256": "c69f3f81b04b55683d5617d70d2f3d858e4207d3a2ad5484c13827bce1eef68b"
+  },
+  "ssh_browser": {
+    "original": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_browser-6a8ad83dd46fcc62",
+    "copy": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/handoff/binaries/ssh_browser-6a8ad83dd46fcc62",
+    "sha256": "00aa0799bfd5bfd23a0537964f5fd51f9e9d2ac669386d07f903f320e0897d46"
+  },
+  "ssh_interop": {
+    "original": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_interop-402819b4a2c8008c",
+    "copy": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/handoff/binaries/ssh_interop-402819b4a2c8008c",
+    "sha256": "b0a1bd3777a60c56a3e7b4dcbb678df706a8bfece6b0dfb5161ef69fc1aa594b"
+  },
+  "tunnel_interop": {
+    "original": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74",
+    "copy": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/handoff/binaries/tunnel_interop-b4213a0a852eff74",
+    "sha256": "0fa9fd1dcc9cc5e1ccd57f333145ee69b433d68fa65fda1abd5428d3790804fa"
+  }
+}

@@ -1,0 +1,408 @@
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/ui/session_confirmations.rs:1:
+ use super::*;
+-use std::collections::VecDeque;
+ use harbor_workspace::terminal::paste::{
+     CloseController, CloseDecision, PasteController, PasteDecision,
+ };
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/ui/session_confirmations.rs:6:
++use std::collections::VecDeque;
+ pub(super) enum CloseTarget {
+     Tab(u64),
+     Reconnect(u64),
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:22:
+         let mut ftp = FtpBackend::connect(options).await.unwrap();
+         let file = path(b"/a file");
+         let binary_upload = b"\0\xffone\rtwo\nthree\r\n\0";
+-        ftp.write(&file, FtpTransferType::Binary, binary_upload).await.unwrap();
+-        let binary_download = ftp.read(&file, FtpTransferType::Binary, 1024).await.unwrap();
++        ftp.write(&file, FtpTransferType::Binary, binary_upload)
++            .await
++            .unwrap();
++        let binary_download = ftp
++            .read(&file, FtpTransferType::Binary, 1024)
++            .await
++            .unwrap();
+         assert_eq!(binary_download, binary_upload);
+         let entries = ftp.list(&path(b"/")).await.unwrap();
+         assert_eq!(entries.len(), 1);
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:39:
+         let evidence = server.evidence();
+         assert_eq!(evidence.uploads, [binary_upload.to_vec()]);
+         assert_eq!(evidence.data_connections, 3);
+-        assert_eq!(evidence.active_connections, if data_mode == FtpDataMode::Active { 3 } else { 0 });
++        assert_eq!(
++            evidence.active_connections,
++            if data_mode == FtpDataMode::Active {
++                3
++            } else {
++                0
++            }
++        );
+     }
+ }
+ 
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:48:
+     let server = Endpoint::start(ServerOptions::default()).await;
+     let mut ftp = FtpBackend::connect(server.options()).await.unwrap();
+     let text = path(b"/text");
+-    ftp.write(&text, FtpTransferType::Ascii, b"one\ntwo\r\n").await.unwrap();
++    ftp.write(&text, FtpTransferType::Ascii, b"one\ntwo\r\n")
++        .await
++        .unwrap();
+     let converted_text = &server.evidence().uploads[0];
+     assert_eq!(converted_text, b"one\r\ntwo\r\n");
+-    assert_eq!(ftp.read(&text, FtpTransferType::Ascii, 1024).await.unwrap(), b"one\ntwo\n");
+-    assert_eq!(ftp.read(&text, FtpTransferType::Binary, 1024).await.unwrap(), b"one\r\ntwo\r\n");
++    assert_eq!(
++        ftp.read(&text, FtpTransferType::Ascii, 1024).await.unwrap(),
++        b"one\ntwo\n"
++    );
++    assert_eq!(
++        ftp.read(&text, FtpTransferType::Binary, 1024)
++            .await
++            .unwrap(),
++        b"one\r\ntwo\r\n"
++    );
+ }
+ 
+ #[tokio::test]
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:59:
+ async fn ftps_validates_certificate_and_encrypts_selected_channels() {
+     for tls in [FtpTlsMode::Explicit, FtpTlsMode::Implicit] {
+         for data_mode in [FtpDataMode::Passive, FtpDataMode::Active] {
+-            let server = Endpoint::start(ServerOptions { tls, ..Default::default() }).await;
++            let server = Endpoint::start(ServerOptions {
++                tls,
++                ..Default::default()
++            })
++            .await;
+             let mut options = server.options();
+             options.data_mode = data_mode;
+             let mut ftp = FtpBackend::connect(options).await.unwrap();
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:66:
+             let file = path(b"/tls");
+-            ftp.write(&file, FtpTransferType::Binary, b"protected\0").await.unwrap();
+-            assert_eq!(ftp.read(&file, FtpTransferType::Binary, 256).await.unwrap(), b"protected\0");
++            ftp.write(&file, FtpTransferType::Binary, b"protected\0")
++                .await
++                .unwrap();
++            assert_eq!(
++                ftp.read(&file, FtpTransferType::Binary, 256).await.unwrap(),
++                b"protected\0"
++            );
+             let evidence = server.evidence();
+             assert_eq!(evidence.encrypted_control_logins, 1);
+             assert_eq!(evidence.encrypted_data_connections, 2);
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:72:
+         }
+         for wrong_name in [true, false] {
+-            let server = Endpoint::start(ServerOptions { tls, ..Default::default() }).await;
++            let server = Endpoint::start(ServerOptions {
++                tls,
++                ..Default::default()
++            })
++            .await;
+             let mut options = server.options();
+-            if wrong_name { options.host = "127.0.0.1".into(); } else { options.certificate_authority = None; }
++            if wrong_name {
++                options.host = "127.0.0.1".into();
++            } else {
++                options.certificate_authority = None;
++            }
+             let invalid_certificate_connected = FtpBackend::connect(options).await.is_ok();
+             assert!(!invalid_certificate_connected);
+             assert_eq!(server.evidence().login_attempts, 0);
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:84:
+ #[tokio::test]
+ async fn rejected_protection_and_plain_data_do_not_downgrade() {
+     let tls = FtpTlsMode::Explicit;
+-    let server = Endpoint::start(ServerOptions { tls, reject_protection: true, ..Default::default() }).await;
++    let server = Endpoint::start(ServerOptions {
++        tls,
++        reject_protection: true,
++        ..Default::default()
++    })
++    .await;
+     let failure = FtpBackend::connect(server.options()).await.err().unwrap();
+     assert!(failure.contains("PROT P"), "{failure}");
+     assert_eq!(server.evidence().clear_protection_requests, 0);
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:91:
+-    let server = Endpoint::start(ServerOptions { tls, force_clear_data: true, ..Default::default() }).await;
++    let server = Endpoint::start(ServerOptions {
++        tls,
++        force_clear_data: true,
++        ..Default::default()
++    })
++    .await;
+     let mut ftp = FtpBackend::connect(server.options()).await.unwrap();
+-    assert!(ftp.read(&path(b"/seed"), FtpTransferType::Binary, 128).await.is_err());
++    assert!(
++        ftp.read(&path(b"/seed"), FtpTransferType::Binary, 128)
++            .await
++            .is_err()
++    );
+     assert_eq!(server.evidence().data_connections, 1);
+     assert_eq!(server.evidence().clear_protection_requests, 0);
+ }
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:97:
+ 
+ #[tokio::test]
+ async fn verifies_active_peer_and_ignores_pasv_address() {
+-    let server = Endpoint::start(ServerOptions { force_pasv: true, ..Default::default() }).await;
++    let server = Endpoint::start(ServerOptions {
++        force_pasv: true,
++        ..Default::default()
++    })
++    .await;
+     let mut ftp = FtpBackend::connect(server.options()).await.unwrap();
+-    assert_eq!(ftp.read(&path(b"/seed"), FtpTransferType::Binary, 128).await.unwrap(), b"seed bytes");
+-    let server = Endpoint::start(ServerOptions { force_port: true, foreign_active_peer: true, ..Default::default() }).await;
++    assert_eq!(
++        ftp.read(&path(b"/seed"), FtpTransferType::Binary, 128)
++            .await
++            .unwrap(),
++        b"seed bytes"
++    );
++    let server = Endpoint::start(ServerOptions {
++        force_port: true,
++        foreign_active_peer: true,
++        ..Default::default()
++    })
++    .await;
+     let mut options = server.options();
+     options.data_mode = FtpDataMode::Active;
+     let mut ftp = FtpBackend::connect(options).await.unwrap();
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:107:
+-    assert_eq!(ftp.read(&path(b"/seed"), FtpTransferType::Binary, 128).await.unwrap(), b"seed bytes");
++    assert_eq!(
++        ftp.read(&path(b"/seed"), FtpTransferType::Binary, 128)
++            .await
++            .unwrap(),
++        b"seed bytes"
++    );
+     assert_eq!(server.evidence().foreign_active_connections, 1);
+ }
+ 
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:111:
+ #[tokio::test]
+ async fn cancel_interrupts_stalled_transfer_and_paths_cannot_inject_commands() {
+-    let server = Endpoint::start(ServerOptions { stall_transfer: true, ..Default::default() }).await;
++    let server = Endpoint::start(ServerOptions {
++        stall_transfer: true,
++        ..Default::default()
++    })
++    .await;
+     let mut options = server.options();
+     options.timeout = Duration::from_secs(10);
+     let mut ftp = FtpBackend::connect(options).await.unwrap();
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:117:
+     assert!(ftp.mkdir(&path(b"a\r\nDELE /seed")).await.is_err());
+-    assert!(!server.evidence().commands.iter().any(|command| command == "MKD" || command == "DELE"));
++    assert!(
++        !server
++            .evidence()
++            .commands
++            .iter()
++            .any(|command| command == "MKD" || command == "DELE")
++    );
+     let cancel = ftp.cancel_handle();
+     let result = tokio::time::timeout(Duration::from_secs(2), async {
+         let signal = async {
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/ftp_ftps.rs:124:
+             }
+             cancel.cancel();
+         };
+-        tokio::join!(ftp.read(&path(b"/seed"), FtpTransferType::Binary, 128), signal).0
+-    }).await.unwrap();
++        tokio::join!(
++            ftp.read(&path(b"/seed"), FtpTransferType::Binary, 128),
++            signal
++        )
++        .0
++    })
++    .await
++    .unwrap();
+     assert!(result.unwrap_err().contains("cancel"));
+ }
+ 
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:58:
+             let (control, _) = listener.accept().await.unwrap();
+             let _ = serve(control, options, state).await;
+         });
+-        Self { address, tls, evidence, task }
++        Self {
++            address,
++            tls,
++            evidence,
++            task,
++        }
+     }
+ 
+     pub fn options(&self) -> FtpOptions {
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:65:
+         let tls = self.tls != FtpTlsMode::Plain;
+         FtpOptions {
+-            host: if tls { "localhost".into() } else { self.address.ip().to_string() },
++            host: if tls {
++                "localhost".into()
++            } else {
++                self.address.ip().to_string()
++            },
+             port: self.address.port(),
+             username: "test-user".into(),
+             password: Some(Secret::new("test-password")),
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:71:
+             tls: self.tls,
+             protect_data: tls,
+             data_mode: FtpDataMode::Passive,
+-            certificate_authority: tls.then(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/support/ftp_tls/ca.pem")),
++            certificate_authority: tls.then(|| {
++                PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/support/ftp_tls/ca.pem")
++            }),
+             timeout: Duration::from_secs(4),
+         }
+     }
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:93:
+ 
+ fn tls_acceptor() -> tokio_rustls::TlsAcceptor {
+     let certificate = CertificateDer::from(include_bytes!("ftp_tls/server.der").to_vec());
+-    let key = PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(include_bytes!("ftp_tls/server.key.der").to_vec()));
+-    let config = rustls::ServerConfig::builder_with_provider(Arc::new(rustls::crypto::ring::default_provider()))
+-        .with_safe_default_protocol_versions().unwrap()
+-        .with_no_client_auth().with_single_cert(vec![certificate], key).unwrap();
++    let key = PrivateKeyDer::Pkcs8(PrivatePkcs8KeyDer::from(
++        include_bytes!("ftp_tls/server.key.der").to_vec(),
++    ));
++    let config = rustls::ServerConfig::builder_with_provider(Arc::new(
++        rustls::crypto::ring::default_provider(),
++    ))
++    .with_safe_default_protocol_versions()
++    .unwrap()
++    .with_no_client_auth()
++    .with_single_cert(vec![certificate], key)
++    .unwrap();
+     tokio_rustls::TlsAcceptor::from(Arc::new(config))
+ }
+ 
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:104:
+     control.get_mut().write_all(line.as_bytes()).await
+ }
+ 
+-async fn serve(mut socket: TcpStream, options: ServerOptions, evidence: Arc<Mutex<Evidence>>) -> std::io::Result<()> {
++async fn serve(
++    mut socket: TcpStream,
++    options: ServerOptions,
++    evidence: Arc<Mutex<Evidence>>,
++) -> std::io::Result<()> {
+     let acceptor = tls_acceptor();
+     let channel: Stream = match options.tls {
+         FtpTlsMode::Plain => Box::new(socket),
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:111:
+         FtpTlsMode::Explicit => {
+             // Read exactly one clear command before changing the wire protocol.
+-            socket.write_all(b"220-Welcome to the fixture\r\n220 Ready\r\n").await?;
++            socket
++                .write_all(b"220-Welcome to the fixture\r\n220 Ready\r\n")
++                .await?;
+             let mut command = Vec::new();
+             loop {
+                 let byte = socket.read_u8().await?;
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:117:
+                 command.push(byte);
+-                if byte == b'\n' { break; }
++                if byte == b'\n' {
++                    break;
++                }
+             }
+-            if command != b"AUTH TLS\r\n" { return Ok(()); }
++            if command != b"AUTH TLS\r\n" {
++                return Ok(());
++            }
+             socket.write_all(b"234 Ready for TLS\r\n").await?;
+             Box::new(acceptor.accept(socket).await?)
+         }
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:134:
+     let mut rename_from = String::new();
+     loop {
+         let mut line = String::new();
+-        if control.read_line(&mut line).await? == 0 { return Ok(()); }
++        if control.read_line(&mut line).await? == 0 {
++            return Ok(());
++        }
+         let line = line.trim_end_matches(['\r', '\n']);
+         let (command, argument) = line.split_once(' ').unwrap_or((line, ""));
+         evidence.lock().unwrap().commands.push(command.to_owned());
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:164:
+                 let response = if command == "EPSV" {
+                     format!("229 Passive data (|||{port}|)\r\n")
+                 } else {
+-                    format!("227 Passive data (127,0,0,2,{},{})\r\n", port / 256, port % 256)
++                    format!(
++                        "227 Passive data (127,0,0,2,{},{})\r\n",
++                        port / 256,
++                        port % 256
++                    )
+                 };
+                 passive = Some(listener);
+                 reply(&mut control, &response).await?;
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:171:
+             }
+             "EPRT" if !options.force_port => {
+                 let fields = argument.split('|').collect::<Vec<_>>();
+-                active = Some(SocketAddr::new(fields[2].parse().unwrap(), fields[3].parse().unwrap()));
++                active = Some(SocketAddr::new(
++                    fields[2].parse().unwrap(),
++                    fields[3].parse().unwrap(),
++                ));
+                 reply(&mut control, "200 Active connection\r\n").await?;
+             }
+             "PORT" => {
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:178:
+-                let fields = argument.split(',').map(|part| part.parse::<u8>().unwrap()).collect::<Vec<_>>();
+-                active = Some(SocketAddr::new(IpAddr::V4(Ipv4Addr::new(fields[0], fields[1], fields[2], fields[3])), u16::from_be_bytes([fields[4], fields[5]])));
++                let fields = argument
++                    .split(',')
++                    .map(|part| part.parse::<u8>().unwrap())
++                    .collect::<Vec<_>>();
++                active = Some(SocketAddr::new(
++                    IpAddr::V4(Ipv4Addr::new(fields[0], fields[1], fields[2], fields[3])),
++                    u16::from_be_bytes([fields[4], fields[5]]),
++                ));
+                 reply(&mut control, "200 Active connection\r\n").await?;
+             }
+             "TYPE" => reply(&mut control, "200 Type set\r\n").await?,
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:217:
+                         evidence.lock().unwrap().uploads.push(bytes.clone());
+                         files.insert(argument.to_owned(), bytes);
+                     }
+-                    "RETR" => data.write_all(files.get(argument).map_or(&b"seed bytes"[..], Vec::as_slice)).await?,
++                    "RETR" => {
++                        data.write_all(
++                            files
++                                .get(argument)
++                                .map_or(&b"seed bytes"[..], Vec::as_slice),
++                        )
++                        .await?
++                    }
+                     "MLSD" => {
+                         for (name, bytes) in &files {
+-                            let facts = format!("type=file;size={}; {}\r\n", bytes.len(), name.trim_start_matches('/'));
++                            let facts = format!(
++                                "type=file;size={}; {}\r\n",
++                                bytes.len(),
++                                name.trim_start_matches('/')
++                            );
+                             data.write_all(facts.as_bytes()).await?;
+                         }
+                     }
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/support/ftp_endpoint.rs:242:
+                 reply(&mut control, "350 Send destination\r\n").await?;
+             }
+             "RNTO" => {
+-                if let Some(bytes) = files.remove(&rename_from) { files.insert(argument.to_owned(), bytes); }
++                if let Some(bytes) = files.remove(&rename_from) {
++                    files.insert(argument.to_owned(), bytes);
++                }
+                 reply(&mut control, "250 Renamed\r\n").await?;
+             }
+             "MKD" => reply(&mut control, "257 Directory created\r\n").await?,

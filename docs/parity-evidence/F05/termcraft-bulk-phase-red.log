@@ -1,0 +1,30 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `begin_step` found for struct `transfer::Job` in the current scope
+   --> src/remote_files/transfer.rs:387:21
+    |
+103 | pub(crate) struct Job {
+    | --------------------- method `begin_step` not found for this struct
+...
+387 |         assert!(job.begin_step()); manager.cancel(id);
+    |                     ^^^^^^^^^^ method not found in `transfer::Job`
+
+error[E0599]: no method named `end_step` found for struct `transfer::Job` in the current scope
+   --> src/remote_files/transfer.rs:389:22
+    |
+103 | pub(crate) struct Job {
+    | --------------------- method `end_step` not found for this struct
+...
+389 |         assert!(!job.end_step(false)); assert!(!job.begin_step());
+    |                      ^^^^^^^^ method not found in `transfer::Job`
+
+error[E0599]: no method named `begin_step` found for struct `transfer::Job` in the current scope
+   --> src/remote_files/transfer.rs:389:53
+    |
+103 | pub(crate) struct Job {
+    | --------------------- method `begin_step` not found for this struct
+...
+389 |         assert!(!job.end_step(false)); assert!(!job.begin_step());
+    |                                                     ^^^^^^^^^^ method not found in `transfer::Job`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (lib test) due to 3 previous errors

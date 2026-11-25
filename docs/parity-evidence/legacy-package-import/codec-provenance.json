@@ -1,0 +1,115 @@
+[
+  {
+    "crate": "constant_time_eq",
+    "version": "0.6.1",
+    "license": "CC0-1.0 OR MIT-0 OR Apache-2.0",
+    "repository": "https://codeberg.org/cesarb/constant_time_eq",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "registry_checksum": "9eb6feb175df65d0a3ccd3e73484e940d0ac664e8034f0519fd49a93db3071d9",
+    "licenses": [
+      {
+        "path": "licenses/constant_time_eq-0.6.1-LICENSE-APACHE",
+        "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+      },
+      {
+        "path": "licenses/constant_time_eq-0.6.1-LICENSE-CC0",
+        "sha256": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+      },
+      {
+        "path": "licenses/constant_time_eq-0.6.1-LICENSE-MIT0",
+        "sha256": "9a3aeb3f63659c4c6302d315e1d98784d1e8559858a47ff9562e091bb922d28d"
+      }
+    ]
+  },
+  {
+    "crate": "crc",
+    "version": "3.4.0",
+    "license": "MIT OR Apache-2.0",
+    "repository": "https://github.com/mrhooray/crc-rs.git",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "registry_checksum": "5eb8a2a1cd12ab0d987a5d5e825195d372001a4094a0376319d5a0ad71c1ba0d",
+    "licenses": [
+      {
+        "path": "licenses/crc-3.4.0-LICENSE-APACHE",
+        "sha256": "470355a7eed93fcc4281ec2e0f82ca3b94e7af1e4d83629f91de8cfac34d750e"
+      },
+      {
+        "path": "licenses/crc-3.4.0-LICENSE-MIT",
+        "sha256": "3488679340a49ecc34d342c4009d2dabf76f4a21f12aec2ca99b15805d656544"
+      }
+    ]
+  },
+  {
+    "crate": "crc-catalog",
+    "version": "2.5.0",
+    "license": "MIT OR Apache-2.0",
+    "repository": "https://github.com/akhilles/crc-catalog.git",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "registry_checksum": "217698eaf96b4a3f0bc4f3662aaa55bdf913cd54d7204591faa790070c6d0853",
+    "licenses": []
+  },
+  {
+    "crate": "lzma-rs",
+    "version": "0.3.0",
+    "license": "MIT",
+    "repository": "https://github.com/gendx/lzma-rs",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "registry_checksum": "297e814c836ae64db86b36cf2a557ba54368d03f6afcd7d947c266692f71115e",
+    "licenses": [
+      {
+        "path": "licenses/lzma-rs-0.3.0-LICENSE",
+        "sha256": "ad9f07faa5f6f671df93523293cf8c1ce24f14886fa101013c21536c7890c59b"
+      }
+    ]
+  },
+  {
+    "crate": "typed-path",
+    "version": "0.13.0",
+    "license": "MIT OR Apache-2.0",
+    "repository": "https://github.com/chipsenkbeil/typed-path",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "registry_checksum": "9ce898823d8cd0f028662d2f349694b1af0a5cc9be83f1d213a00d3147445e1e",
+    "licenses": [
+      {
+        "path": "licenses/typed-path-0.13.0-LICENSE-APACHE",
+        "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+      },
+      {
+        "path": "licenses/typed-path-0.13.0-LICENSE-MIT",
+        "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      }
+    ]
+  },
+  {
+    "crate": "zeroize_derive",
+    "version": "1.5.0",
+    "license": "Apache-2.0 OR MIT",
+    "repository": "https://github.com/RustCrypto/utils",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "registry_checksum": "3c50655cbb0fe3fc43170059e702f1ce5e19b84cec58dc87b037a09935c2f328",
+    "licenses": [
+      {
+        "path": "licenses/zeroize_derive-1.5.0-LICENSE-APACHE",
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "path": "licenses/zeroize_derive-1.5.0-LICENSE-MIT",
+        "sha256": "b8c6939380a400f53e11923d50fcc4dd2fa1ba8339fd9d04cda38a0251b6c9b0"
+      }
+    ]
+  },
+  {
+    "crate": "zip",
+    "version": "9.8.2",
+    "license": "MIT",
+    "repository": "https://github.com/zip-rs/zip2",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "registry_checksum": "2d8dbe089cf6b0448b78f5fc50139ab5aaa40d08ac07cdc1baf2c13add35fcce",
+    "licenses": [
+      {
+        "path": "licenses/zip-9.8.2-LICENSE",
+        "sha256": "58545fed1565e42d687aecec6897d35c6d37ccb71479a137c0deb2203e125c79"
+      }
+    ]
+  }
+]

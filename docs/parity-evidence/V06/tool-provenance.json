@@ -1,0 +1,17 @@
+[
+  {
+    "archive": "sway-1:1.12-4-x86_64.pkg.tar.zst",
+    "sha256": "5704cfc9eba9804116c665cb4450352bf5a240c1a8300b36aca3218116648443",
+    "signature_sha256": "f5e7c027c76db34dee0b853501a62a2ade163d671044ae1d2ead40dadbdbe45b"
+  },
+  {
+    "archive": "wtype-0.4-2-x86_64.pkg.tar.zst",
+    "sha256": "36ce49003b9e741b85463574d3ab35316bd27d0ef950db0e1f8540d75d68409d",
+    "signature_sha256": "ee3a7304ecc952e002b17ec61a0891ee7b922f293385e3ef058ad56137a22cea"
+  },
+  {
+    "archive": "xdotool-4.20260303.1-1-x86_64.pkg.tar.zst",
+    "sha256": "e215cac06133496d8ecd3ac7e456cacffed69fc52d28485891d346f7a15edcba",
+    "signature_sha256": "8f186cdf426fef941dcf50ba1ff7ea1b6bf79a554e916da78868dc3137c0051b"
+  }
+]

@@ -1,0 +1,3 @@
+   Compiling harbor-workspace v0.1.0-p01-browser-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p01-browser)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.91s
+  Executable unittests src/main.rs (app/target/debug/deps/harbor_workspace-f0ede213b553dcb7)

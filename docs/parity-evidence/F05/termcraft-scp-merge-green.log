@@ -1,0 +1,47 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: type `SourceEntry` is more private than the item `SourceDir::entries`
+  --> src/remote_files/transfer/operations/source.rs:45:5
+   |
+45 |     pub async fn entries(&self) -> Result<Vec<SourceEntry>, String> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `SourceDir::entries` is reachable at visibility `pub(in crate::remote_files::transfer)`
+   |
+note: but type `SourceEntry` is only usable at visibility `pub(in crate::remote_files::transfer::operations)`
+  --> src/remote_files/transfer/operations/source.rs:9:1
+   |
+ 9 | pub(super) struct SourceEntry {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `SourceEntry` is more private than the item `SourceDir::open_child`
+  --> src/remote_files/transfer/operations/source.rs:75:5
+   |
+75 |     pub async fn open_child(&self, entry: SourceEntry) -> Result<SourceNode, String> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `SourceDir::open_child` is reachable at visibility `pub(in crate::remote_files::transfer)`
+   |
+note: but type `SourceEntry` is only usable at visibility `pub(in crate::remote_files::transfer::operations)`
+  --> src/remote_files/transfer/operations/source.rs:9:1
+   |
+ 9 | pub(super) struct SourceEntry {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `SourceNode` is more private than the item `SourceDir::open_child`
+  --> src/remote_files/transfer/operations/source.rs:75:5
+   |
+75 |     pub async fn open_child(&self, entry: SourceEntry) -> Result<SourceNode, String> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `SourceDir::open_child` is reachable at visibility `pub(in crate::remote_files::transfer)`
+   |
+note: but type `SourceNode` is only usable at visibility `pub(in crate::remote_files::transfer::operations)`
+  --> src/remote_files/transfer/operations/source.rs:22:1
+   |
+22 | pub(super) enum SourceNode {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (lib) generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.89s
+     Running tests/scp_browser.rs (app/target/debug/deps/scp_browser-c29d0c75c0879a2f)
+
+running 1 test
+test scp_folder_merge_preserves_unrelated_entries_and_existing_modes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.49s
+

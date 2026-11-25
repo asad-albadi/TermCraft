@@ -1,0 +1,12 @@
+{
+  "owned_files": 19,
+  "patch_applied_cleanly": true,
+  "patched_hashes_match_payload": true,
+  "linux_provider_session_ndr_byte_identical": true,
+  "linux_owned_worker_module_byte_identical": true,
+  "source_snapshot_excludes": [
+    "target",
+    "dist"
+  ],
+  "full_app_gate": "root-owned, not run by this worker"
+}

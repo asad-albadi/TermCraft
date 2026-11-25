@@ -1,0 +1,24 @@
+python -m http.server 25380 --bind 127.0.0.1 --directory /tmp > /evidence/clean-runtime-browser-http.log 2>&1 & hp=$!
+trap 'kill "$hp" 2>/dev/null || true; wait "$hp" 2>/dev/null || true; cleanup' EXIT
+launch browser
+/opt/termcraft/harbor-workspace --data-dir /evidence/browser --session 0123456789abcdef0123456789abcdef
+sleep 8
+shot clean-runtime-bundled-browser
+set +e
+LD_LIBRARY_PATH=/opt/termcraft/browser/linux-x86_64/libraries /opt/termcraft/browser/linux-x86_64/chromium --version > /evidence/clean-runtime-browser-version.log 2>&1
+version_rc=$?
+printf 'browser --version exit=%s\n' "$version_rc"
+
+cat /opt/termcraft-validation-runtime-packages.txt > /evidence/clean-runtime-image-packages.txt
+python - <<'PYS'
+import subprocess,os,json
+from pathlib import Path
+env=dict(os.environ,LD_LIBRARY_PATH='/opt/termcraft/browser/linux-x86_64/libraries')
+try:
+ p=subprocess.run(['/opt/termcraft/browser/linux-x86_64/chromium','--headless','--disable-gpu','--dump-dom','http://127.0.0.1:25380'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env=env,timeout=12)
+ Path('/evidence/clean-runtime-browser-native.log').write_bytes(p.stdout)
+ print('native sandbox browser exit',p.returncode)
+except subprocess.TimeoutExpired as e:
+ Path('/evidence/clean-runtime-browser-native.log').write_bytes(e.stdout or b'')
+ print('native sandbox browser timeout')
+PYS

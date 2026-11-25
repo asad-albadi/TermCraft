@@ -1,0 +1,80 @@
+[
+  {
+    "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Hard }",
+    "ordinary": {
+      "successes": 5,
+      "count": 8,
+      "max_us": 8320
+    },
+    "held_out": {
+      "successes": 2,
+      "count": 8,
+      "max_us": 12700
+    }
+  },
+  {
+    "configuration": "MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }",
+    "ordinary": {
+      "successes": 6,
+      "count": 8,
+      "max_us": 5272
+    },
+    "held_out": {
+      "successes": 5,
+      "count": 8,
+      "max_us": 5287
+    }
+  },
+  {
+    "configuration": "MapConfig { preset: Default, regions: 75, difficulty: Hard }",
+    "ordinary": {
+      "successes": 8,
+      "count": 8,
+      "max_us": 58221
+    },
+    "held_out": {
+      "successes": 8,
+      "count": 8,
+      "max_us": 31368
+    }
+  },
+  {
+    "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Hard }",
+    "ordinary": {
+      "successes": 5,
+      "count": 8,
+      "max_us": 5355
+    },
+    "held_out": {
+      "successes": 4,
+      "count": 8,
+      "max_us": 4846
+    }
+  },
+  {
+    "configuration": "MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }",
+    "ordinary": {
+      "successes": 8,
+      "count": 8,
+      "max_us": 4626
+    },
+    "held_out": {
+      "successes": 4,
+      "count": 8,
+      "max_us": 5796
+    }
+  },
+  {
+    "configuration": "MapConfig { preset: Portrait, regions: 75, difficulty: Hard }",
+    "ordinary": {
+      "successes": 7,
+      "count": 8,
+      "max_us": 66731
+    },
+    "held_out": {
+      "successes": 8,
+      "count": 8,
+      "max_us": 30593
+    }
+  }
+]

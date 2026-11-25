@@ -1,0 +1,5 @@
+Request f299f6f5e9950d02c6b0903c9143d087a0882b85c951c08f35dd69a7b43c1146 accepted by the existing workspace; results appear in its terminal tabs.
+Estimating resolution as 128
+Request 84f9c12c24013e281393140246e941b7dd912639e24a11a06063e85295ecdd36 accepted by the existing workspace; results appear in its terminal tabs.
+Estimating resolution as 129
+[{"provider": "system", "status": "EXPECTED_ERROR_OBSERVED", "required_error": "The selected installed Mosh provider is unavailable. Install the required system program.", "ocr_file": "mosh-system-ocr.txt", "screenshot": "mosh-system.png", "installed_mosh_absent": true, "perl_absent": true}, {"provider": "bundled", "status": "EXPECTED_ERROR_OBSERVED", "required_error": "Bundled Mosh requires system Perl at /usr/bin/perl", "ocr_file": "mosh-bundled-ocr.txt", "screenshot": "mosh-bundled.png", "installed_mosh_absent": true, "perl_absent": true}]

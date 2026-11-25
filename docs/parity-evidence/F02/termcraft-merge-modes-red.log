@@ -1,0 +1,24 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.23s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-a3e649926aaf12fc)
+
+running 1 test
+test folder_merge_retains_modes_without_making_staging_read_only_too_early ... FAILED
+
+failures:
+
+---- folder_merge_retains_modes_without_making_staging_read_only_too_early stdout ----
+
+thread 'folder_merge_retains_modes_without_making_staging_read_only_too_early' (221518) panicked at tests/remote_transfers.rs:686:163:
+assertion `left == right` failed: TransferEvent { summary: "Upload \"/tmp/termcraft-ssh-test-221517-1795435845883012125/readonly-merge-source\" → /tmp/termcraft-ssh-test-221517-1795435845883012125/readonly-merge-remote", id: 1, bytes: 15, merged_files: 0, outcome: Some(Failed("Merge commit not acknowledged; refresh destination to confirm: Permission denied: Permission denied")), recovery: Some(Remote(RemotePath([47, 116, 109, 112, 47, 116, 101, 114, 109, 99, 114, 97, 102, 116, 45, 115, 115, 104, 45, 116, 101, 115, 116, 45, 50, 50, 49, 53, 49, 55, 45, 49, 55, 57, 53, 52, 51, 53, 56, 52, 53, 56, 56, 51, 48, 49, 50, 49, 50, 53, 47, 46, 116, 101, 114, 109, 99, 114, 97, 102, 116, 45, 97, 49, 102, 53, 49, 99, 54, 57, 48, 50, 48, 48, 57, 102, 98, 99, 54, 56, 99, 48, 48, 49, 99, 56, 52, 49, 52, 100, 56, 55, 101, 55, 46, 112, 97, 114, 116]))) }
+  left: Some(Failed("Merge commit not acknowledged; refresh destination to confirm: Permission denied: Permission denied"))
+ right: Some(Completed)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    folder_merge_retains_modes_without_making_staging_read_only_too_early
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.26s
+
+error: test failed, to rerun pass `--test remote_transfers`

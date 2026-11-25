@@ -1,0 +1,13 @@
+Regular temporary-file write: OK
+AF_INET: socket/bind/listen OK: ('127.0.0.1', 46805)
+AF_UNIX: socket/bind/listen OK: /tmp/termcraft-listener-86tohvnw/owned.sock
+Current process policy:
+Uid:	1000	1000	1000	1000
+Gid:	1000	1000	1000	1000
+CapEff:	0000000000000000
+NoNewPrivs:	0
+Seccomp:	0
+Seccomp_filters:	0
+LSM identification unavailable: errno=22: [Errno 22] Invalid argument
+Runner executable: /usr/lib/systemd/systemd
+Runner applies seccomp: False

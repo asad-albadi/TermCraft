@@ -1,0 +1,15 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/work)
+    Finished `release` profile [optimized] target(s) in 3.85s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/work/target/release/deps/b06_puzzle_options_private-beed19bb514c887b)
+
+running 1 test
+Map MapConfig { preset: Default, regions: 30, difficulty: Hard }: seed 10, forcing 6, recursive 0
+Map MapConfig { preset: Default, regions: 30, difficulty: Unreasonable }: seed 10, forcing 0, recursive 22
+Map MapConfig { preset: Default, regions: 75, difficulty: Hard }: seed 1, forcing 7, recursive 0
+Map MapConfig { preset: Portrait, regions: 30, difficulty: Hard }: seed 1, forcing 3, recursive 0
+Map MapConfig { preset: Portrait, regions: 30, difficulty: Unreasonable }: seed 0, forcing 0, recursive 21
+Map MapConfig { preset: Portrait, regions: 75, difficulty: Hard }: seed 2, forcing 8, recursive 0
+test map::advanced_stock_matrix::all_six_remaining_map_presets_have_exact_grade_samples ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 59 filtered out; finished in 0.34s
+

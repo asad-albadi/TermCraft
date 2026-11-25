@@ -1,0 +1,12 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.79s
+     Running tests/remote_paths.rs (app/target/debug/deps/remote_paths-9e4bceac2be8a9c9)
+
+running 3 tests
+test displayed_paths_distinguish_raw_bytes_and_literal_escape_sequences ... ok
+test remote_paths_preserve_literal_bytes_and_use_posix_separators ... ok
+test stale_connection_or_request_cannot_replace_directory ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,23 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-x03-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x03)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 14.26s
+     Running unittests src/main.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-7b63fee2fda1b36b)
+
+running 8 tests
+test ui::xserver::tests::crashed_probe_discards_fresh_display_before_releasing_clients ... ignored, requires the isolated Wayland fixture and a qualified Xwayland bundle
+test ui::xserver::tests::embedded_config_controls_owned_display_startup ... ignored, requires the isolated Wayland fixture and a qualified Xwayland bundle
+test ui::xserver::tests::local_tab_starts_owned_server_and_only_its_shell_gets_client_environment ... ignored, requires the isolated Wayland fixture and a qualified Xwayland bundle
+test ui::xserver::tests::xserver_ui_starts_and_stops_packaged_engine ... ignored, requires the isolated Wayland fixture and a qualified Xwayland bundle
+
+running 1 test
+test ui::xserver::tests::xserver_ui_reports_missing_bundle ... ok
+test ui::xserver::tests::xserver_ui_cancels_in_background ... ok
+test ui::xserver::tests::requested_display_failure_blocks_local_shell ... ok
+test ui::xserver::tests::openssh_without_display_blocks_only_requested_forwarding ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 146 filtered out; finished in 1.61s
+
+test ui::xserver::tests::openssh_without_display_blocks_only_requested_forwarding ... ok
+
+test result: ok. 4 passed; 0 failed; 4 ignored; 0 measured; 139 filtered out; finished in 1.62s
+

@@ -1,0 +1,14 @@
+F
+======================================================================
+FAIL: test_simultaneous_installer_waits_for_failed_transaction_before_upgrading (__main__.InstallFailureTests.test_simultaneous_installer_waits_for_failed_transaction_before_upgrading)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b05/scripts/test-desktop-integration.py", line 122, in test_simultaneous_installer_waits_for_failed_transaction_before_upgrading
+    with self.assertRaises(subprocess.TimeoutExpired,msg='second installer did not wait for the first transaction'):second.wait(timeout=.3)
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: TimeoutExpired not raised : second installer did not wait for the first transaction
+
+----------------------------------------------------------------------
+Ran 1 test in 0.142s
+
+FAILED (failures=1)

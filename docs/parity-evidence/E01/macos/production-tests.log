@@ -1,0 +1,11 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.13s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-c95ec83546c98485)
+
+running 3 tests
+test browser::native_macos::tests::accepts_intel_and_arm_thin_images_but_rejects_wrong_cpu_and_libraries ... ok
+test browser::native_macos::tests::rejects_truncated_huge_or_out_of_file_universal_tables ... ok
+test browser::native_macos::tests::selects_and_checks_the_actual_native_slice_in_a_universal_application ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 60 filtered out; finished in 0.00s
+

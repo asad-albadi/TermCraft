@@ -1,0 +1,28 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.82s
+     Running tests/scp_browser.rs (target/debug/deps/scp_browser-8ade13c5a5dbd886)
+
+running 2 tests
+
+thread 'moving_a_remote_upload_parent_cannot_publish_or_clean_up_unrelated_objects' (266037) panicked at tests/scp_browser.rs:223:5:
+assertion `left != right` failed
+  left: Completed
+ right: Completed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test moving_a_remote_upload_parent_cannot_publish_or_clean_up_unrelated_objects ... FAILED
+
+thread 'moving_a_local_download_parent_cannot_publish_a_replaced_staging_name' (266036) panicked at tests/scp_browser.rs:252:5:
+assertion `left != right` failed
+  left: Completed
+ right: Completed
+test moving_a_local_download_parent_cannot_publish_a_replaced_staging_name ... FAILED
+
+failures:
+
+failures:
+    moving_a_local_download_parent_cannot_publish_a_replaced_staging_name
+    moving_a_remote_upload_parent_cannot_publish_or_clean_up_unrelated_objects
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.54s
+
+error: test failed, to rerun pass `--test scp_browser`

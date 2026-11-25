@@ -1,0 +1,9 @@
+   Compiling harbor-workspace v0.1.929 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/plugin-registry-fixture/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 26.59s
+     Running unittests src/lib.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-3516e47b50d7b203)
+
+running 1 test
+test plugins::registry::lifecycle_regressions::registry_executes_granted_elf_when_installed_inode_changes_after_verification ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 291 filtered out; finished in 0.10s
+

@@ -1,0 +1,9 @@
+
+running 4 tests
+test plugins::registry::lifecycle_regressions::retirement_preserves_replacement_after_verification ... ok
+test plugins::registry::lifecycle_regressions::paused_retirement_allows_registry_changes_and_cancels ... ok
+test plugins::host::unix::verified_image_regressions::mutation_after_verification_executes_original_elf ... ok
+test plugins::registry::lifecycle_regressions::registry_executes_granted_elf_when_installed_inode_changes_after_verification ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 288 filtered out; finished in 0.10s
+

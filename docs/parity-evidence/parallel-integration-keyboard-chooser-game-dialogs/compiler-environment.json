@@ -1,0 +1,44 @@
+{
+  "LD_PRELOAD": {
+    "present": false
+  },
+  "LD_AUDIT": {
+    "present": false
+  },
+  "LD_LIBRARY_PATH": {
+    "present": false
+  },
+  "MALLOC_PERTURB_": {
+    "present": false
+  },
+  "GLIBC_TUNABLES": {
+    "present": false
+  },
+  "RUSTC": {
+    "present": false
+  },
+  "RUSTC_WRAPPER": {
+    "present": false
+  },
+  "RUSTC_WORKSPACE_WRAPPER": {
+    "present": false
+  },
+  "RUSTC_BOOTSTRAP": {
+    "present": false
+  },
+  "RUSTFLAGS": {
+    "present": false
+  },
+  "CARGO_ENCODED_RUSTFLAGS": {
+    "present": false
+  },
+  "RUST_MIN_STACK": {
+    "present": false
+  },
+  "RUSTUP_TOOLCHAIN": {
+    "present": false
+  },
+  "RUSTUP_HOME": {
+    "present": false
+  }
+}

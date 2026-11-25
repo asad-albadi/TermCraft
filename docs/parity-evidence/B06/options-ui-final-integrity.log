@@ -1,0 +1,4 @@
+All 4 captured MAIN UI base files match exact SHA-256.
+All 50 accepted FIX1 dependency files match exact SHA-256 and size.
+UI archive has exactly 3 declared regular source/test files and exact bytes.
+No active private Cargo/rustc/linker jobs remain.

@@ -1,0 +1,11 @@
+--- proposed/src/plugins/host/unix.rs
++++ counterexample/src/plugins/host/unix.rs
+@@ -189,7 +189,7 @@
+             Some(libc::EPERM)
+         );
+         fs::write(&executable, fs::read(bin.join("replacement")).unwrap()).unwrap();
+-        let (mut child, mut stdin) = PluginChild::spawn(root.path(), "fixture", &verified).unwrap();
++        let (mut child, mut stdin) = PluginChild::spawn(root.path(), "fixture", &File::open(&executable).unwrap()).unwrap();
+         stdin.write_all(b"{}\n").unwrap();
+         drop(stdin);
+         let until = std::time::Instant::now() + std::time::Duration::from_secs(2);

@@ -1,0 +1,12 @@
+{
+  "all.log": "49d64ba905b129f598d5692c42f75f33c2cbf30adf7bd2e06246fa51be4d759e",
+  "green-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "green.log": "1e615e35e29000aaf414d976baf2a080f46cbd517de9cdba9330c9b96cede2b9",
+  "mutation-drop-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "mutation-drop.log": "a4ee2b8ddb1c3224c6ea4ab775ba941bfc2fdc5a140b481e901535ccd533b674",
+  "mutation-release-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "mutation-release.log": "1810cd466311f2a9aeec62326141e5897f39f723bdb1ea7665e044587362809a",
+  "patch-dry-run.log": "e7ee20fb3f107c5be6ec7ffc5fe1c0aa9e050b38422c0541080ef5ff4980b022",
+  "red.log": "5df2f8887594f134fa63f5eeaa37de1a45560607a2089f82c009c252fe09b43a",
+  "superseded-build.log": "20899d440a15e8da43ecfbf39958b9f600da02e5d7057ffff250413bc9ef31b5"
+}

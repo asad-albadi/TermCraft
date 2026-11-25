@@ -1,0 +1,11 @@
+{
+  "Cargo.toml": "db4894cfc44706ae6e7de51fbf154f61e7f4f4fe8dcc7ca557246d6178f97ed2",
+  "src/services/vnc.rs": "eab0590d5a3f46a8c37747e317ff52eee1b67e8ae1760b55bdf4fdd0c13dd797",
+  "src/services/vnc/x11.rs": "f8eb57b8c4dcc630373f5f49bb1de05e191002a94504a4f089d8547d6bca49fd",
+  "src/services/vnc/windows.rs": "b5a6b6861f9592db900db810c1188382578b1a565c74f2191c79f1647fb941a1",
+  "src/services/vnc_service_tests.rs": "924d3412473f465d9bfcf564ef1755e6d131888b486fadec60b09349278fe684",
+  "src/ui/managed_vnc.rs": "ed969ecb22578f574a444da77ced14edbacbb86a770491e9a32748152cafa223",
+  "src/services/vnc/clipboard.rs": "8544bd6cf72c1096b474fd7f3e49f7ea7db8fc70ec7b348bad0c416cb84da79e",
+  "src/services/vnc/x11/clipboard.rs": "50fc8e7ce2963228d23c126a50a47953f1c472c7e753862597e900e623b9ddba",
+  "src/services/vnc/windows_clipboard.rs": "1f6d88efb6d1fd22b85a11825d1bacd27bc78d6a9f434e855ebb003624e696d4"
+}

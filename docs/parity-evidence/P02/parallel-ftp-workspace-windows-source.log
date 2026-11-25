@@ -1,0 +1,7 @@
+     Locking 4 packages to highest Rust 1.99.0 compatible versions
+    Checking pin-project-lite v0.2.18
+    Checking windows-link v0.2.1
+    Checking windows-sys v0.61.2
+    Checking tokio v1.54.1
+    Checking termcraft-ftp-upload-win-probe v0.0.0 (/tmp/termcraft-ftp-upload-win.v5W9qJt6)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.14s

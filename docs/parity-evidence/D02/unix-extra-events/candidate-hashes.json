@@ -1,0 +1,13 @@
+{
+  "source/engines/rdp/src/serial.rs": "15d258935e8678b5dad71f757dd05e65efe31e037a9041003483dffb958c1132",
+  "source/engines/rdp/src/devices.rs": "454b0d6121e5004875d77a6af5b8584bf53f8ba090deef9716b1e4b0a85705c8",
+  "source/engines/rdp/src/devices_tests.rs": "f9b8ec2849182a1b9bd00b0d347f48766b910d51e7d9723d5a7e1ac79d76685c",
+  "source/engines/rdp/Cargo.toml": "d0d90e475c4ad3a3d6c1ed42c5f43a669eca4bb834f251939418c2605a33a167",
+  "source/engines/rdp/Cargo.lock": "a8d9cd7c752c58e5657156d7f642919502c8dded648c067d719d52a2c6e5e531",
+  "source/engines/rdp/tests/pcsc_worker.rs": "ebf5dae6c5e0e5fe0d055757f9cb87ddaf992331d9971aabc2da9fa786ef0c61",
+  "source/src/desktop/options.rs": "44ef5d2dc9a68b44e5853326e0e4e62b2cabf3338aade123adf7b9affbcca75e",
+  "source/src/desktop/wire.rs": "25fc322a05aabbfa41bb569d168fb0294685e488899e61a1838d6976024c9718",
+  "../build/debug/deps/termcraft_rdp_unix_events983-1468ce34fb3e6abb": "eb10a7cfc1d77169dc07a93d00a84b059c0edfeb59c4166b3508858eae6f6227",
+  "../build/debug/deps/termcraft_rdp_unix_events983-bb5382c9af07ebca": "a1d86338538e2441416b63d48d87c7d66d2ad7b9b77f9b22c580da2f291ee059",
+  "../build/debug/termcraft-rdp-unix-events983": "eb10a7cfc1d77169dc07a93d00a84b059c0edfeb59c4166b3508858eae6f6227"
+}

@@ -1,0 +1,65 @@
+{
+  "finding": "P1 overwrite consent was bound only to path existence and could overwrite a replacement created while consent was visible.",
+  "scope": "Only src/ui/games/save.rs production helper and appended tests in src/ui/games/play.rs changed. games.rs/session_confirmations.rs remain exact previously reviewed hashes. No MAIN, backend, game-rule or application identity changes.",
+  "identity": "Private package0.1.917 / normal bin termcraft-game-save-ui917; original four reviewed candidate files preserved at fix1/base.",
+  "fix": "Before consent, open the existing regular file without following links and keep its handle alive. Capture device/inode identity (Windows volume/file-index via cap_fs_ext::MetadataExt), length, modification timestamp and <=262144 original content bytes. Revalidate current path/held original identity and bounded contents after consent and again after staging+sync immediately before publication. Changed/replaced/missing/linked targets fail with a readable message, leaving the destination and active game/history/dirty state intact.",
+  "bounded_io": "Snapshot and each revalidation use MAX_BYTES+1 bounded reads, reject metadata or observed lengths beyond MAX_BYTES, and reject nonregular files. Oversized existing targets fail clearly and require a different save destination. New-target atomic no-clobber hard-link path and anchored same-directory staging/rename remain.",
+  "portable_limit": "A residual interval remains between the final identity/content checks and portable rename. This implementation does not claim atomic compare-and-swap. Consent-window mutations completed before validation are rejected; the reviewed deterministic replacement and restored-timestamp in-place edit cases pass.",
+  "verification": [
+    {
+      "command": "CARGO_TARGET_DIR=<app>/target cargo test --manifest-path <private>/work/Cargo.toml --offline --locked -j 2 --bin termcraft-game-save-ui917 review_save_ui_replacement_during_visible_overwrite_consent_is_preserved -- --nocapture",
+      "log": "red.log",
+      "result": "Independently reproduced before fix: RED0/1,214 filtered,1.15s; review actual Save callback replacement was overwritten."
+    },
+    {
+      "command": "CARGO_TARGET_DIR=<app>/target cargo test --manifest-path <private>/work/Cargo.toml --offline --locked -j 2 --bin termcraft-game-save-ui917 save_ui -- --test-threads=2",
+      "log": "focused.log",
+      "result": "GREEN13/13,204 filtered,8.11s; all10 previously accepted Save/Load controls/lifecycle tests plus3 focused regressions."
+    },
+    {
+      "command": "Exact rustc --target x86_64-pc-windows-msvc --emit=metadata invocation recorded in log, using bundled cap_std/cap_fs_ext metadata artifacts.",
+      "log": "windows-metadata-api.log",
+      "result": "PASS exact unchanged() metadata comparison function and file.metadata() type check. API compatibility evidence only; no Windows runtime claim."
+    },
+    {
+      "command": "CARGO_TARGET_DIR=<app>/target cargo build --manifest-path <private>/work/Cargo.toml --offline --locked -j 2 --bin termcraft-game-save-ui917",
+      "log": "normal-build.log",
+      "result": "PASS4.43s;3 preexisting dead_code warnings."
+    },
+    {
+      "command": "patch -p1 against copied fix1/base followed by full payload SHA256 equality assertions",
+      "log": "patch-check.log",
+      "result": "PASS; reconstructed all4 final file bytes exactly."
+    }
+  ],
+  "regressions": [
+    "Exact reviewer actual Save replacement-during-consent repro RED->GREEN, preserving replacement bytes, renamed original bytes and exact active save/history bytes plus dirty state.",
+    "Actual Save same-inode/same-size edit with original mtime restored before consent returns; content snapshot catches it and leaves readable target-changed error and dirty board/history intact.",
+    "Helper accepts unchanged snapshot, then rejects a mutation after initial validation at the final publication check; oversized original snapshot rejected within256KiB budget.",
+    "Existing actual unchanged-file acceptance and consent-decline paths pass; all previous10 save_ui tests pass."
+  ],
+  "maps": {
+    "src/ui/games.rs": {
+      "review_base": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac",
+      "fix": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac"
+    },
+    "src/ui/games/play.rs": {
+      "review_base": "10568dc869262e703df24884de8585c2301601c0c61cc63a6a2a0dce1ed7167e",
+      "fix": "20d6dc46ecde31810f4b1fd81f7d5aaa9ff807463cef9e47eb57df5e041add24"
+    },
+    "src/ui/games/save.rs": {
+      "review_base": "36083d6f5a5527fe8d2500539c05dc118f18097e5ad084c9efc3c61aec0754ec",
+      "fix": "a319751542ea82a4993bece94fef92a676cb73abce477bc5d3f8e7b43a34d9af"
+    },
+    "src/ui/session_confirmations.rs": {
+      "review_base": "68f97410c75bd813b953391c69e649a25c2ae94dd70b7ee009b6ad2ea1e1e067",
+      "fix": "68f97410c75bd813b953391c69e649a25c2ae94dd70b7ee009b6ad2ea1e1e067"
+    }
+  },
+  "normal_binary": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/termcraft-game-save-ui917",
+    "bytes": 611536176,
+    "sha256": "2c773968abb79ecafeb947c853061d024da38d260db9288ac6d88fb9a78738f9"
+  },
+  "jobs": "Every own cargo session awaited/reaped sequentially; no same917 test/build overlap. No all-target gate, unchanged broad game sampler, or own review subagent."
+}

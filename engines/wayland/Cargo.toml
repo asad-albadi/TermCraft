@@ -1,0 +1,11 @@
+[package]
+name = "termcraft-wayland-engine"
+version = "0.1.0"
+edition = "2024"
+publish = false
+[dependencies]
+pipewire = { version = "=0.10.1", features = ["v0_3_65"] }
+libc = "0.2"
+[[bin]]
+name = "termcraft-wayland-engine"
+path = "src/main.rs"

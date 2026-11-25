@@ -1,0 +1,20 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.07s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-29e3f133fb9121f7)
+
+running 1 test
+Error: Operation not permitted (os error 1)
+
+thread 'ui::desktop::tests::real_rdp_vault_save_use_delete_and_session_fullscreen' (326) panicked at src/ui/../../tests/support/rdp_server.rs:111:14:
+Fixture readiness
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ui::desktop::tests::real_rdp_vault_save_use_delete_and_session_fullscreen ... FAILED
+
+failures:
+
+failures:
+    ui::desktop::tests::real_rdp_vault_save_use_delete_and_session_fullscreen
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 97 filtered out; finished in 0.37s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

@@ -1,0 +1,13 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.6 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p06)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.82s
+     Running unittests src/lib.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-bcb84ae701577a55)
+
+running 4 tests
+test plugins::host::unix::verified_image_regressions::mutation_after_verification_executes_original_elf ... ok
+test plugins::registry::lifecycle_regressions::paused_retirement_allows_registry_changes_and_cancels ... ok
+test plugins::registry::lifecycle_regressions::registry_executes_granted_elf_when_installed_inode_changes_after_verification ... ok
+test plugins::registry::lifecycle_regressions::retirement_preserves_replacement_after_verification ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 71 filtered out; finished in 0.34s
+

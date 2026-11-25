@@ -1,0 +1,23 @@
+# E02 independent implementation review
+
+Progress at review was 53.3% (32/60 checkpoints). Four Important findings remain. No Critical finding identified. Findings below are source traces against the graphical/timed macro contract.
+
+| Severity | Location | Failure and regression case |
+| --- | --- | --- |
+| Important | src/ui/macro_events.rs lines 379–386, src/ui/activity.rs lines 119–139 | A focused detached terminal can time out on WaitFocus. The player queries the root viewport's focused widget and native focus and requires the root to display the Terminal page. A detached session remains usable when the root displays another page. Read the target widget and window focus from its owning viewport. Cover focus moving between child and root and a root page change while the target remains detached. |
+| Important | src/macros.rs lines 243–274 | Two successive output waits for “ready” then “prompt” time out if the PTY delivers “ready prompt” in one read. The first match clears the entire buffer and prevents the second wait reading the remainder. The identical byte stream split across two polls succeeds. Consume through the end of each match and preserve the trailing bytes for consecutive output waits. Include a split UTF-8 pattern case. |
+| Important | src/ui/macro_events.rs lines 190–193 and 342–355, src/ui.rs lines 209–237 and 353–355 | A startup macro waiting for the first SSH prompt misses it when the SSH poll returns Connected and the initial prompt together. The tab decodes the prompt while the startup player is pending, and capture discards it. The next macro poll starts waiting after the prompt has passed. Test a queued startup wait with same-poll connection and output, and retain eligible output from that authenticated generation. |
+| Important | src/ui/macro_events.rs lines 378–405 and 425–450, src/macros.rs lines 203–205 and 270–274 | Output preceding actual command delivery can incorrectly satisfy a wait. Queue nine terminal inputs followed by a wait and a follow-up action. The engine returns the inputs in one batch, but the UI sends eight. A matching marker received before input nine remains in the tab buffer while input nine is dispatched. The next tick consumes that old marker and sends the follow-up. A pending paste can similarly retain output produced before approval. Establish the wait boundary at transport delivery and exercise both delayed delivery and paste confirmation. |
+
+Existing evidence includes eight engine tests, eight model tests, nine GUI/PTY/VNC tests, and one loopback RDP test in core-final.log, ui-macro.log and ui-rdp-final.log. The cases cover authentication/trust forms, target replacement, startup duplication, named CLI invocation, declined multiline paste and desktop release ordering. The review examined the accepted content-input recording hooks, bounded import/call expansion, versioned editor persistence, shared paste confirmation path, cancellation, and incremental terminal decoding. The four sequences above are outside the supplied tests. This review did not rerun the earlier 522-test batch or perform a native Windows/original-product comparison. The shared full-suite result for the reviewed snapshot remains pending.
+
+## Scoped re-review
+
+| Original Important finding | Verdict | Verification |
+| --- | --- | --- |
+| Detached terminal focus | ADDRESSED | The widget records focus in its owning viewport. Playback checks the current window association and native viewport focus. The detached PTY test alternates root and child focus with Macros open in the root. |
+| Consecutive output-pattern waits | ADDRESSED | Matching consumes bytes through the match and leaves the tail for the following wait. The core regression covers coalesced prompts and a Unicode pattern spanning chunks. |
+| First authenticated SSH prompt at startup | ADDRESSED | A pending player collects decoded output when its bound tab is ready. The loopback SSH regression observes the reply to the initial prompt delivered alongside Connected. |
+| Output buffered before terminal submission | ADDRESSED | Accepted terminal input and completion of the macro paste clear old output in both the tab and player. Separate PTY regressions exercise the ninth input across the eight-action UI limit and output received before paste confirmation. The boundary is acceptance by the local transport. |
+
+Verified the changed source and the saved RED/GREEN evidence. The follow-up logs report nine passing core cases, thirteen GUI/transport cases and one real RDP case. All four original Important findings are closed. Checkpoint progress at re-review is 53.3% (32/60). Native Windows/original-product comparisons and the shared full-suite gate are tracked separately.

@@ -1,0 +1,16 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "engines/rdp/Cargo.toml",
+    "--all-targets",
+    "--no-fail-fast"
+  ],
+  "CARGO_BUILD_JOBS": "2",
+  "RUSTUP_TOOLCHAIN": "1.96.1",
+  "RUST_MIN_STACK": "134217728",
+  "CARGO_TARGET_DIR": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/validation-rust1961"
+}

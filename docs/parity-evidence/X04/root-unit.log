@@ -1,0 +1,25 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 24.52s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-f954e9579d7534fe)
+
+running 17 tests
+test x11::xdmcp_engine::tests::actual_xdm_nondefault_port_opens_selected_display_and_cleanup_preserves_host ... ignored, must run inside tests/support/run_xserver_isolated.sh with the private xdm package
+test x11::xdmcp::tests::cancellation_prevents_any_packet ... ok
+test x11::xdmcp::tests::broadcast_requires_explicit_interface_choice ... ok
+test x11::xdmcp_engine::tests::cancellation_before_start_never_spawns_engine ... ok
+test x11::xdmcp::tests::malformed_and_oversized_replies_are_rejected ... ok
+test x11::xdmcp::tests::listener_consent_and_selected_endpoint_are_required ... ok
+test x11::xdmcp::tests::old_profiles_default_to_no_listener_and_round_trip_custom_options ... ok
+test x11::xdmcp_payload::tests::cancellation_and_expired_deadline_prevent_payload_open ... ok
+test x11::xdmcp_engine::tests::legacy_session_json_preserves_disabled_xdmcp_defaults ... ok
+test x11::xdmcp_payload::tests::fifo_directory_symlink_and_oversize_finish_without_an_x_display ... ok
+test x11::xdmcp_payload::tests::cancellation_during_a_real_file_read_finishes_worker_before_copy ... ok
+test x11::xdmcp_listener::tests::owned_listener_is_required_and_another_pid_cannot_claim_it ... ok
+test x11::xdmcp_payload::tests::regular_file_chunks_are_hashed_and_copied_without_relaxing_the_pin ... ok
+test x11::xdmcp_payload::tests::elapsed_deadline_stops_a_loading_worker_between_read_and_copy ... ok
+test x11::xdmcp_engine::tests::saturated_socket_readiness_stays_bounded_and_cancellable ... ok
+test x11::xdmcp::tests::cancellation_during_discovery_finishes_promptly ... ok
+test x11::xdmcp::tests::nondefault_port_is_used_and_only_correlated_willing_is_admitted ... ok
+
+test result: ok. 16 passed; 0 failed; 1 ignored; 0 measured; 126 filtered out; finished in 0.63s
+

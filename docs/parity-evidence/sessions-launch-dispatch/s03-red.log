@@ -1,0 +1,41 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0433]: cannot find `platform` in `harbor_workspace`
+ --> tests/session_groups.rs:1:81
+  |
+1 | use harbor_workspace::{model::{Session, Store}, sessions::groups::SessionGroup, platform::shortcuts::ShortcutSpec};
+  |                                                                                 ^^^^^^^^ could not find `platform` in `harbor_workspace`
+
+error[E0432]: unresolved import `harbor_workspace::sessions::groups`
+ --> tests/session_groups.rs:1:59
+  |
+1 | use harbor_workspace::{model::{Session, Store}, sessions::groups::SessionGroup, platform::shortcuts::ShortcutSpec};
+  |                                                           ^^^^^^ could not find `groups` in `sessions`
+
+Some errors have detailed explanations: E0432, E0433.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `harbor-workspace` (test "session_groups") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+warning: method `poll` is never used
+   --> src/ui.rs:148:8
+    |
+105 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+148 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:519:19
+    |
+481 | impl Workspace {
+    | -------------- methods in this implementation
+...
+519 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+832 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 2 warnings

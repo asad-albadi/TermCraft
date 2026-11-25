@@ -1,0 +1,19 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.63s
+     Running tests/terminal_performance.rs (app/target/debug/deps/terminal_performance-c7f4f93941d0cba5)
+
+running 1 test
+
+thread 'benchmark_360000_lines_with_a_retained_memory_budget' (344188) panicked at tests/terminal_performance.rs:13:64:
+Retained history exceeded its storage budget plus allocator allowance: baseline=3719168, after=240541696, budget=134217728
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test benchmark_360000_lines_with_a_retained_memory_budget ... FAILED
+
+failures:
+
+failures:
+    benchmark_360000_lines_with_a_retained_memory_budget
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 15.14s
+
+error: test failed, to rerun pass `--test terminal_performance`

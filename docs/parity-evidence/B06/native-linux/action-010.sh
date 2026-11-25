@@ -1,0 +1,3 @@
+set -euo pipefail
+export DISPLAY=:77
+xdotool key Escape; sleep .25; xdotool mousemove --sync 570 470 click 1; sleep .3; xdotool mousemove --sync 252 58 click 1; sleep .2; xdotool mousemove --sync 263 361 click 1; sleep .4; import -window root /evidence/020-netwalk.png; xdotool mousemove --sync 35 260 click 1; xdotool key d; sleep .3; import -window root /evidence/021-netwalk-move.png; xdotool key Escape; sleep .25; xdotool mousemove --sync 570 470 click 1; sleep .3; xdotool mousemove --sync 252 58 click 1; sleep .2; xdotool mousemove --sync 263 399 click 1; sleep .4; import -window root /evidence/022-mines.png; xdotool mousemove --sync 35 260 click 1; xdotool key f; sleep .3; import -window root /evidence/023-mines-move.png

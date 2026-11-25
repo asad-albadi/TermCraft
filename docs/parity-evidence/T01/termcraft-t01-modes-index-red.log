@@ -1,0 +1,19 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0609]: no field `indexed_history_lines` on type `ScreenStats`
+  --> tests/terminal_conformance.rs:58:32
+   |
+58 |     let indexed=screen.stats().indexed_history_lines;
+   |                                ^^^^^^^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `history_bytes`, `history_budget`, `discarded_lines`, `index_builds`
+
+error[E0609]: no field `indexed_history_lines` on type `ScreenStats`
+  --> tests/terminal_conformance.rs:59:108
+   |
+59 | ...count("needle"),501);assert_eq!(screen.stats().indexed_history_lines-indexed,1,"Unchanged history must not be rescanned while out...
+   |                                                   ^^^^^^^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `history_bytes`, `history_budget`, `discarded_lines`, `index_builds`
+
+For more information about this error, try `rustc --explain E0609`.
+error: could not compile `harbor-workspace` (test "terminal_conformance") due to 2 previous errors

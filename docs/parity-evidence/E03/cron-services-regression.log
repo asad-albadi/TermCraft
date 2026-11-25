@@ -1,0 +1,20 @@
+   Compiling harbor-workspace v0.1.0-e03-cron-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-cron)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.77s
+     Running unittests src/lib.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-4ec8bd47c21a683f)
+
+running 12 tests
+test services::cron::tests::numeric_calendar_and_rejected_extensions ... ok
+test services::cron::tests::utc_day_rules_leap_and_dst_dates ... ok
+test services::cron::tests::local_dst_gaps_and_repeated_instants ... ok
+test services::cron::tests::same_store_has_one_owner_and_rejects_live_edits ... ok
+test services::cron::tests::durable_commit_barrier_precedes_launch_and_failure_prevents_execution ... ok
+test services::cron::tests::nonzero_exit_is_visible_without_output_or_command_logging ... ok
+test services::sshd::ownership_tests::parent_ssh_disconnect_cancels_retained_sftp_upload_workers ... ok
+test services::sshd::ownership_tests::live_sftp_subsystems_retain_four_channel_admission_slots ... ok
+test services::sshd::ownership_tests::real_spawned_sftp_loop_obeys_stream_deadline_and_cancellation ... ok
+test services::cron::tests::real_due_process_once_disable_restart_and_corrupt_preserve ... ok
+test services::cron::tests::concurrency_cap_and_service_lifetime_are_real_process_bounds ... ok
+test services::cron::tests::stop_and_deadline_kill_owned_descendants_leave_unrelated ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 75 filtered out; finished in 1.16s
+

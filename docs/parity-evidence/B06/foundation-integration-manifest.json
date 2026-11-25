@@ -1,0 +1,66 @@
+[
+  {
+    "path": "src/lib.rs",
+    "base_sha256": "1045e2ca857ae79fcfe91f9123988b807f5bfc4045dcb43cd30e3e23f0769d71",
+    "source_sha256": "11a3e15a3a75bb56df494f28459dbae84265e1d88de9d1bc49728453d091f4b5",
+    "frozen_sha256": "11a3e15a3a75bb56df494f28459dbae84265e1d88de9d1bc49728453d091f4b5",
+    "live_equals_base": true,
+    "rebase_equals_frozen": true
+  },
+  {
+    "path": "src/ui.rs",
+    "base_sha256": "011a4276303375a00f9f23fb2307dbee4d7d0172397248366301e2d6e3d68304",
+    "source_sha256": "710ea401d58b44183b90811095af4958627063fd6e5bd8d1e2a0ce21b951b22c",
+    "frozen_sha256": "710ea401d58b44183b90811095af4958627063fd6e5bd8d1e2a0ce21b951b22c",
+    "live_equals_base": true,
+    "rebase_equals_frozen": true
+  },
+  {
+    "path": "src/ui/windows.rs",
+    "base_sha256": "6c5bc570f4e4a9fb1faca17c9e1cde547c8c98e3074856968143159920931da1",
+    "source_sha256": "d67917e5d92dc10077116b561b25ef9af1a45554f773025886a15de85c73d701",
+    "frozen_sha256": "d67917e5d92dc10077116b561b25ef9af1a45554f773025886a15de85c73d701",
+    "live_equals_base": true,
+    "rebase_equals_frozen": true
+  },
+  {
+    "path": "src/ui/games.rs",
+    "base_sha256": null,
+    "source_sha256": "f9498e6444dc483c3719991c71105c2b5b1fae710435b41a415844f5379e25d6",
+    "frozen_sha256": "f9498e6444dc483c3719991c71105c2b5b1fae710435b41a415844f5379e25d6",
+    "live_equals_base": true,
+    "rebase_equals_frozen": true
+  },
+  {
+    "path": "src/games/mod.rs",
+    "base_sha256": null,
+    "source_sha256": "ef55b5884e0a2ca3fc13dc856bd96ef0aba7000a3af7c99d0565ae70fd7d71e0",
+    "frozen_sha256": "ef55b5884e0a2ca3fc13dc856bd96ef0aba7000a3af7c99d0565ae70fd7d71e0",
+    "live_equals_base": true,
+    "rebase_equals_frozen": true
+  },
+  {
+    "path": "src/games/screensaver.rs",
+    "base_sha256": null,
+    "source_sha256": "bd02411d5d01f0661b0ef20859fcebf8032ed57729266588ff86d051ee397d94",
+    "frozen_sha256": "bd02411d5d01f0661b0ef20859fcebf8032ed57729266588ff86d051ee397d94",
+    "live_equals_base": true,
+    "rebase_equals_frozen": true
+  },
+  {
+    "path": "tests/games.rs",
+    "base_sha256": null,
+    "source_sha256": "fe668766f79d947109d8edff8d7934a9e61e312f7692a39698552a8d155d7eb5",
+    "frozen_sha256": "fe668766f79d947109d8edff8d7934a9e61e312f7692a39698552a8d155d7eb5",
+    "live_equals_base": true,
+    "rebase_equals_frozen": true
+  },
+  {
+    "path": "docs/parity-evidence/B06/README.md",
+    "base_sha256": null,
+    "source_sha256": "99587c3049443ae542f22c91c53fa914df420f0d2f979a9b9fa28a13d8dbe9fa",
+    "frozen_sha256": "99587c3049443ae542f22c91c53fa914df420f0d2f979a9b9fa28a13d8dbe9fa",
+    "live_equals_base": true,
+    "rebase_equals_frozen": true
+  }
+]

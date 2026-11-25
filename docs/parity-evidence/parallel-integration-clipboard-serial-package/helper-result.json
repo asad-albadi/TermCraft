@@ -1,0 +1,15 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--locked",
+    "--manifest-path",
+    "engines/rdp/Cargo.toml",
+    "--all-targets",
+    "--no-fail-fast"
+  ],
+  "exit_code": 0,
+  "seconds": 22.72,
+  "CARGO_BUILD_JOBS": "2"
+}

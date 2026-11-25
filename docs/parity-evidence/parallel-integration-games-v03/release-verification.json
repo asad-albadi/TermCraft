@@ -1,0 +1,75 @@
+{
+  "archive": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-games-v03-reviewed/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing.tar.gz",
+  "archive_sha256": "68f356f63c92a9a6aced6abe3d845ab9d064e5da0d37b52ff0c4c99f0fc4b117",
+  "package_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-games-v03-qualified/68f356f63c92a9a6aced6abe3d845ab9d064e5da0d37b52ff0c4c99f0fc4b117/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing",
+  "source_sha256": "4726eebadb56a15c2e9ed9f4018a63ffe9a55e9834ad927fea5472f2f2c29b53",
+  "files_verified": 1415,
+  "wayland_helper_sha256": "26c3495d140afc8e90f318783af7a2a8b9484d69aa6e3c5c3c5e3c684096236e",
+  "qualification": "Unsigned Arch-compatible Linux x86_64; exact frozen source and declared native libraries. Not universal clean/native-all-platform/original parity.",
+  "app_gate": {
+    "passed": 843,
+    "failed": 0,
+    "ignored": 54,
+    "outer_targets": 70,
+    "captured_source_files": 677,
+    "source_changes": []
+  },
+  "startup": {
+    "wayland": {
+      "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing.tar.gz",
+      "archive_sha256": "68f356f63c92a9a6aced6abe3d845ab9d064e5da0d37b52ff0c4c99f0fc4b117",
+      "manifest_schema": 1,
+      "platform": "linux",
+      "display_backend": "Wayland",
+      "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+      "screen_size": [
+        938,
+        486
+      ],
+      "rdp_helper_wire_version": 1,
+      "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+      "rdp_helper_child_location_verified": true
+    },
+    "x11": {
+      "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing.tar.gz",
+      "archive_sha256": "68f356f63c92a9a6aced6abe3d845ab9d064e5da0d37b52ff0c4c99f0fc4b117",
+      "manifest_schema": 1,
+      "platform": "linux",
+      "display_backend": "X11",
+      "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+      "screen_size": [
+        938,
+        990
+      ],
+      "rdp_helper_wire_version": 1,
+      "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+      "rdp_helper_child_location_verified": true
+    }
+  },
+  "extracted_checks": {
+    "x11_extensions_and_probes": {
+      "passed": 7,
+      "failed": 0,
+      "includes": "GLX actual scene/Composite/RandR and cancellation/auth negatives plus report contract"
+    },
+    "xdmcp": {
+      "passed": 1,
+      "failed": 0,
+      "log": "extracted-xdmcp-final.log",
+      "fixture_producer_sha256": "7a9369ece740240662121f40750f665be337266d088def54eb5001717c62a283",
+      "fixture_review": "../X04/fixture-marker-review.md",
+      "prior_attempt": "extracted-xdmcp.log retained: non-atomic result marker read before complete publication; product code unchanged"
+    },
+    "optional_wayland_helper": {
+      "passed": 1,
+      "failed": 0,
+      "producer_exit": 143,
+      "pipewire_daemon_exit": 0,
+      "scope": "Actual extracted helper with private mock portal and synthetic native PipeWire source; no real desktop consent/input/clipboard claim"
+    }
+  },
+  "ordinary_app_links_pipewire": false,
+  "helper_links_pipewire": true,
+  "clean_linux_evidence": "../V08/clean-HANDOFF.md (bounded partial, separate review)",
+  "remaining": "New puzzle options/advanced variants not in this source; active-game native, physical devices/GPU, Windows/macOS, clean distro/runtime closure, browser container sandbox and original comparison remain open."
+}

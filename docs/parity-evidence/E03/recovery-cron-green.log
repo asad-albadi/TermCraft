@@ -1,0 +1,18 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.47s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-317c3b688bab989e)
+
+running 10 tests
+test services::cron::tests::releasing_store_owner_unlocks_inherited_open_description ... ok
+test services::cron::tests::numeric_calendar_and_rejected_extensions ... ok
+test services::cron::tests::utc_day_rules_leap_and_dst_dates ... ok
+test services::cron::tests::local_dst_gaps_and_repeated_instants ... ok
+test services::cron::tests::same_store_has_one_owner_and_rejects_live_edits ... ok
+test services::cron::tests::durable_commit_barrier_precedes_launch_and_failure_prevents_execution ... ok
+test services::cron::tests::nonzero_exit_is_visible_without_output_or_command_logging ... ok
+test services::cron::tests::real_due_process_once_disable_restart_and_corrupt_preserve ... ok
+test services::cron::tests::concurrency_cap_and_service_lifetime_are_real_process_bounds ... ok
+test services::cron::tests::stop_and_deadline_kill_owned_descendants_leave_unrelated ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 88 filtered out; finished in 1.16s
+

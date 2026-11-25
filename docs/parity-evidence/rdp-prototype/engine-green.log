@@ -1,0 +1,5 @@
+   Compiling termcraft-rdp-engine-evaluation v0.0.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/rdp-prototype)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.12s
+     Running `docs/parity-evidence/rdp-prototype/target/debug/termcraft-rdp-engine-evaluation`
+actual_frame_rgba=[255,0,0,255]; actual_pointer=(45,27); actual_key=30; TLS_chain_and_name_checked=true
+owned_server_connection_closed=true

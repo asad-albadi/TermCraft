@@ -1,0 +1,239 @@
+{
+  "before": {
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-baseline-diagnostic-red.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-baseline-timing-red.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-clippy.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-debug-focused-green.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-degree-ascending-experiment.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-degree-descending-experiment.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-fmt-check.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-focused-green.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-holdout-experiment.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-macos-check.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-map-regression-green.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-mutation-deterministic-colouring-red.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-mutation-results.json": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-mutation-unbounded-colouring-red.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-mutation-weaken-final-grade-red.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-mutations.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-random-colouring-experiment.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-report.md": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-seed-distribution-summary.json": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-source-verification.log": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-timing-and-work.json": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-unchanged-solver-and-sampler.json": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-verify-mutations.py": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-verify-source.py": null,
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-windows-check.log": null,
+    "src/games/puzzles/PROVENANCE.md": "bd41c14ecc846eb2d2d183981ebe7d261a5dc037f97e01e349eb46fb9b61cfcf",
+    "src/games/puzzles/config.rs": "460c62b15b85653f6b723887a0e244e2c96a15f264e99d9ea453f96e19c97b4f",
+    "src/games/puzzles/guess.rs": "97b4e824a1cbb1a087cfd03b74ab8703e22b10cdc6883559b2c97a474984de95",
+    "src/games/puzzles/map.rs": "48021e0fb77ad2e797e305242dd167751752a5559a39097f253571be240aea5c",
+    "src/games/puzzles/mines.rs": "47ceafff40fd4730eb411927c254fa3592b33a614cd9aa1f64e22bfcc20e5315",
+    "src/games/puzzles/mod.rs": "e673ad201af8806ef56c9906007fc935affe194e12243f8784d33260f1929696",
+    "src/games/puzzles/net.rs": "74aed8b3a2b70b6b8ccd1d7c52aa2fa899ffcc67bfc62dc73ce319df6ed2c1fa",
+    "src/games/puzzles/provenance/UPSTREAM-LICENCE": "324cba4984cf02666dec301689f11806c75cee0bdef56bc81a5bdc75667dd68b",
+    "src/games/puzzles/provenance/advanced-source-excerpts.txt": "7dbbe42eb5991983bbfa7c55d1bddb9e67c7f41d6acd90495ed7e16a9d6d9538",
+    "src/games/puzzles/provenance/advanced-source-manifest.json": "2d9c4b897b61c9dd98a10616f0a42070b78dec9c5656ce8b833aeef7673f21c0",
+    "src/games/puzzles/provenance/map-generation-fix2-source.json": null,
+    "src/games/puzzles/provenance/map-generation-fix2-source.txt": null,
+    "src/games/puzzles/provenance/options-source-excerpts.txt": "55eac037125eba9b11d80ed3b8967a7262cca55a446f78af176fc3649e824a4d",
+    "src/games/puzzles/provenance/options-source-manifest.json": "aea46ce2cfed9aeb874ac1a0857e49b4448fba7eb003489fb94573b89d75cb19",
+    "src/games/puzzles/provenance/recovered-manual-sections.but": "ef6c371b62dc4ca074f8808f84d4dd657f50f2c8a22f96b439716915bb052abe",
+    "src/games/puzzles/provenance/recovered-source-excerpts.txt": "8274950155663828b00dfd319c81a765974eaf18331122f3a0af3aeda65f2e90",
+    "src/games/puzzles/provenance/source-manifest.json": "2def57c10f6675907ad7bdd7815f7fc44bdde3c54115bc586f2c576cf8f93dda",
+    "src/games/puzzles/solo.rs": "d6feaa52a36766526084a924bb0013b3dbbd1eac9d76757e41887e1464fcce58",
+    "src/games/puzzles/solo_advanced.rs": "7a5918dcf06c090124ec3db73b3429eae44bb434d2732b6efd9ec02f785ed69f",
+    "src/games/puzzles/tests.rs": "0704f130e468e2b9a747a06dd159739042109a1728af4707ac3e7283fafe06be",
+    "src/games/puzzles/untangle.rs": "cdf9cd40fa22ab4242fe516a84cd195f5e75400d0b9a8b889419b09e557a7bd4"
+  },
+  "after": {
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-baseline-diagnostic-red.log": {
+      "sha256": "3578a1a61ca586366d8e773f6925ecbe8e491424e09e1d5b31e61abf6debc3bd",
+      "size": 89293
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-baseline-timing-red.log": {
+      "sha256": "0724aa3bfe30f882496bd2ca42e98adf422b64227d8c12d25bc0db95fae839c9",
+      "size": 6108
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-clippy.log": {
+      "sha256": "666f738cad6bacf8e79d691669de3c8b17799145912b022f75c8fdc2b0701f16",
+      "size": 221
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-debug-focused-green.log": {
+      "sha256": "a7596d91659d36000a95cb22b10d2b6510f88398e8811dd69f5e215b20d0e0c5",
+      "size": 20216
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-degree-ascending-experiment.log": {
+      "sha256": "a48b39fec87d84ade807dc96a2ba04c6b512eb4f80a85bf1dd246290a9f262b0",
+      "size": 86108
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-degree-descending-experiment.log": {
+      "sha256": "f66840bf9a9b22ffad485035c745cbebdf70396c786d2cea1060e39d30751179",
+      "size": 53591
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-fmt-check.log": {
+      "sha256": "3189cbd81fd40ddca772af00ae5da660991dceeb9bae7cd34a3ca55f3bd8e461",
+      "size": 58
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-focused-green.log": {
+      "sha256": "7500632d52d5e58a11d7196bdf341b3bd74c3fba665dfd460fb33cd7b3c87311",
+      "size": 20110
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-holdout-experiment.log": {
+      "sha256": "4e985e3879a4a2cd1342d324d5528026340f2302f47bd07993871cc7d4966426",
+      "size": 5529
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-macos-check.log": {
+      "sha256": "5f82a8e8c7946b1496e391411d2784df39d6485daf936f6edb3128a07946233f",
+      "size": 221
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-map-regression-green.log": {
+      "sha256": "5b439b756cc795b69b973d4d9b0fec11ed32d5636e69bb605a8cac55529d60e2",
+      "size": 21466
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-mutation-deterministic-colouring-red.log": {
+      "sha256": "295492fd2de1f04c2264a65b4c65ef48c761349505fa0e30ba2076cc9a78a3c2",
+      "size": 1099
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-mutation-results.json": {
+      "sha256": "c00dc4dbc9bc8e7ccb9649b5a89b5ac7ea7e476d2824b0920d031509497d7f14",
+      "size": 536
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-mutation-unbounded-colouring-red.log": {
+      "sha256": "010cdfdbca99e6fcb0345e133610b903a31a894f863af1982ec6ceddd9022aef",
+      "size": 1097
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-mutation-weaken-final-grade-red.log": {
+      "sha256": "54b96eeb5cffba561d460e89e43e16549a371d134e26638359c93a40b69e353d",
+      "size": 1043
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-mutations.log": {
+      "sha256": "548d8234d7d011a52b46fe0672ef4dda1747de1bf368049d4536f70a5f86b211",
+      "size": 78
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-random-colouring-experiment.log": {
+      "sha256": "f6fcccd32e9f0ee505d495644fc9bcf77a28a1ff245132f880d905990bcdd7dc",
+      "size": 77944
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-report.md": {
+      "sha256": "6cf8cbb9d54636f7b8fb28dfeb27c24706d5fe2c45e1bf280dc9d0ec7293f544",
+      "size": 8707
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-seed-distribution-summary.json": {
+      "sha256": "d0825777116ce05d5c4388030c7eba909916ae5cb8583cee4a6daf2331101c62",
+      "size": 1617
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-source-verification.log": {
+      "sha256": "3337a9cdd28b3c4d21ebf6abdabb387ac41fe9bee69136a32649d6cba4956f4c",
+      "size": 114
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-timing-and-work.json": {
+      "sha256": "29a4f23c38dc23d906cf53af0699219766f6f01b5ae16b2bb91eb778332d53e2",
+      "size": 71661
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-unchanged-solver-and-sampler.json": {
+      "sha256": "8d3e702988132231f61b8c18a7ad7bd34361f3933b618d9b36f97c35ea4c9b29",
+      "size": 906
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-verify-mutations.py": {
+      "sha256": "d2f6bd72284b725f29b003ffa3845d3c1ded1f5be9d70d8809288e659e775b27",
+      "size": 1988
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-verify-source.py": {
+      "sha256": "c36a4209b0e8bcf6976234469a57a58c2e9691253ac10d46bbccf640ee901ab4",
+      "size": 1281
+    },
+    "docs/parity-evidence/B06/advanced-map-generation-fix2-windows-check.log": {
+      "sha256": "89989990269ef1986011687e4ffae8493a8f290369a3c7fece54f81e60f715e2",
+      "size": 221
+    },
+    "src/games/puzzles/PROVENANCE.md": {
+      "sha256": "778644762b42584338bdac67c7c6d6624e45270d0da9b26369b9284e7a1dcf21",
+      "size": 19404
+    },
+    "src/games/puzzles/config.rs": {
+      "sha256": "460c62b15b85653f6b723887a0e244e2c96a15f264e99d9ea453f96e19c97b4f",
+      "size": 15902
+    },
+    "src/games/puzzles/guess.rs": {
+      "sha256": "97b4e824a1cbb1a087cfd03b74ab8703e22b10cdc6883559b2c97a474984de95",
+      "size": 8415
+    },
+    "src/games/puzzles/map.rs": {
+      "sha256": "d5b5a94c3f8d371b0d2b5d8271dd9eee1cfe3a51a4585de43f2da952c7a2d10e",
+      "size": 54155
+    },
+    "src/games/puzzles/mines.rs": {
+      "sha256": "47ceafff40fd4730eb411927c254fa3592b33a614cd9aa1f64e22bfcc20e5315",
+      "size": 16564
+    },
+    "src/games/puzzles/mod.rs": {
+      "sha256": "e673ad201af8806ef56c9906007fc935affe194e12243f8784d33260f1929696",
+      "size": 13564
+    },
+    "src/games/puzzles/net.rs": {
+      "sha256": "74aed8b3a2b70b6b8ccd1d7c52aa2fa899ffcc67bfc62dc73ce319df6ed2c1fa",
+      "size": 18859
+    },
+    "src/games/puzzles/provenance/UPSTREAM-LICENCE": {
+      "sha256": "324cba4984cf02666dec301689f11806c75cee0bdef56bc81a5bdc75667dd68b",
+      "size": 1275
+    },
+    "src/games/puzzles/provenance/advanced-source-excerpts.txt": {
+      "sha256": "7dbbe42eb5991983bbfa7c55d1bddb9e67c7f41d6acd90495ed7e16a9d6d9538",
+      "size": 85948
+    },
+    "src/games/puzzles/provenance/advanced-source-manifest.json": {
+      "sha256": "2d9c4b897b61c9dd98a10616f0a42070b78dec9c5656ce8b833aeef7673f21c0",
+      "size": 3143
+    },
+    "src/games/puzzles/provenance/map-generation-fix2-source.json": {
+      "sha256": "efff2759a2b62b92fdd1cfabf3c266407c4158b7a01c02823107b84d29c5b092",
+      "size": 833
+    },
+    "src/games/puzzles/provenance/map-generation-fix2-source.txt": {
+      "sha256": "1109eb8011a96c7c392420b74cb5bf479ad09ef30c0f3c508f612007923e4c82",
+      "size": 7668
+    },
+    "src/games/puzzles/provenance/options-source-excerpts.txt": {
+      "sha256": "55eac037125eba9b11d80ed3b8967a7262cca55a446f78af176fc3649e824a4d",
+      "size": 31655
+    },
+    "src/games/puzzles/provenance/options-source-manifest.json": {
+      "sha256": "aea46ce2cfed9aeb874ac1a0857e49b4448fba7eb003489fb94573b89d75cb19",
+      "size": 5558
+    },
+    "src/games/puzzles/provenance/recovered-manual-sections.but": {
+      "sha256": "ef6c371b62dc4ca074f8808f84d4dd657f50f2c8a22f96b439716915bb052abe",
+      "size": 22466
+    },
+    "src/games/puzzles/provenance/recovered-source-excerpts.txt": {
+      "sha256": "8274950155663828b00dfd319c81a765974eaf18331122f3a0af3aeda65f2e90",
+      "size": 64309
+    },
+    "src/games/puzzles/provenance/source-manifest.json": {
+      "sha256": "2def57c10f6675907ad7bdd7815f7fc44bdde3c54115bc586f2c576cf8f93dda",
+      "size": 5862
+    },
+    "src/games/puzzles/solo.rs": {
+      "sha256": "d6feaa52a36766526084a924bb0013b3dbbd1eac9d76757e41887e1464fcce58",
+      "size": 25658
+    },
+    "src/games/puzzles/solo_advanced.rs": {
+      "sha256": "7a5918dcf06c090124ec3db73b3429eae44bb434d2732b6efd9ec02f785ed69f",
+      "size": 41160
+    },
+    "src/games/puzzles/tests.rs": {
+      "sha256": "0704f130e468e2b9a747a06dd159739042109a1728af4707ac3e7283fafe06be",
+      "size": 23277
+    },
+    "src/games/puzzles/untangle.rs": {
+      "sha256": "cdf9cd40fa22ab4242fe516a84cd195f5e75400d0b9a8b889419b09e557a7bd4",
+      "size": 7585
+    }
+  },
+  "review": "advanced-map-fix2-review.md",
+  "private_baseline_diagnostic_files_absent_in_MAIN": [],
+  "exact": true
+}

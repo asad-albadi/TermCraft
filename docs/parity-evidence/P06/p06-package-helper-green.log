@@ -1,0 +1,14 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.6 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p06)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 01s
+     Running unittests src/lib.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-bcb84ae701577a55)
+
+running 5 tests
+test packages::install::tests::executable_header_must_match_architecture ... ok
+test packages::install::tests::rejects_paths_links_special_entries_and_oversized_records ... ok
+test packages::retirement_tests::closed_ninth_release_is_collected_behind_eight_live_leases ... ok
+test packages::retirement_tests::concurrent_editor_save_is_preserved_by_retirement_quarantine ... ok
+test packages::retirement_tests::paused_collection_leaves_launch_and_install_available_and_can_cancel ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 69 filtered out; finished in 79.71s
+

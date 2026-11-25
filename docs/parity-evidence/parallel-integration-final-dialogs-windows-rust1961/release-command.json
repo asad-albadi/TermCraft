@@ -1,0 +1,43 @@
+{
+  "command": [
+    "python3",
+    "scripts/package-release.py",
+    "--platform",
+    "linux",
+    "--output",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-45-final-rust1961-reviewed",
+    "--xwayland-archive",
+    "/var/cache/pacman/pkg/xorg-xwayland-24.1.15-1-x86_64.pkg.tar.zst",
+    "--xephyr-archive",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04/source-packages/xephyr.pkg.tar.zst",
+    "--mosh-archive",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/mosh-1.4.0-35-x86_64.pkg.tar.zst",
+    "--mosh-source",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/mosh-1.4.0.tar.gz",
+    "--mosh-recipe",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/PKGBUILD",
+    "--mosh-dependencies",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/mosh-input-recovery/newcache",
+    "--iperf-runtime",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b03",
+    "--unix-cache",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/p05-cache",
+    "--browser-inputs",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p01-browser/browser-inputs",
+    "--wayland-helper-binary",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-vnc-composed/wayland-helper-release",
+    "--build-root",
+    "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1961"
+  ],
+  "environment": {
+    "TERMCRAFT_OFFLINE": "1",
+    "CARGO_BUILD_JOBS": "2",
+    "RUST_MIN_STACK": "134217728",
+    "RUSTUP_HOME": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961",
+    "RUSTUP_TOOLCHAIN": "1.96.1",
+    "PATH_PREFIX": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/rustup-validation-1961/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin"
+  },
+  "state": "same locked app dependencies, accepted overwrite/XDMCP/Windows admission source, project-local Rust1.96.1 satisfies all MSRVs; minimal dependency probe passed unlike1.99.1; genuine default release profile",
+  "actual_compiler": "rustc 1.96.1 (31fca3adb 2026-06-26)\nbinary: rustc\ncommit-hash: 31fca3adb283cc9dfd56b49cdee9a96eb9c96ffd\ncommit-date: 2026-06-26\nhost: x86_64-unknown-linux-gnu\nrelease: 1.96.1\nLLVM version: 22.1.2\n",
+  "actual_cargo": "cargo 1.96.1 (356927216 2026-06-26)\n"
+}

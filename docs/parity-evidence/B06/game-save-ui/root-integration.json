@@ -1,0 +1,46 @@
+{
+  "original_base": {
+    "src/ui/games.rs": {
+      "base": "52f57bffea9ed82867533b100a96ee4586cfd2492b992a3446fd9cfe5c2e4c3f",
+      "candidate": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac"
+    },
+    "src/ui/games/play.rs": {
+      "base": "9ed8b5ca22798480c98514b50881944e0b60243c997e4bc37eca9f78f0d5f18e",
+      "candidate": "10568dc869262e703df24884de8585c2301601c0c61cc63a6a2a0dce1ed7167e"
+    },
+    "src/ui/games/save.rs": {
+      "base": null,
+      "candidate": "36083d6f5a5527fe8d2500539c05dc118f18097e5ad084c9efc3c61aec0754ec"
+    },
+    "src/ui/session_confirmations.rs": {
+      "base": "5ffa70053f46c4c21e0f146398ec7a9150b482683314a416210f380b232ed67e",
+      "candidate": "68f97410c75bd813b953391c69e649a25c2ae94dd70b7ee009b6ad2ea1e1e067"
+    }
+  },
+  "accepted_fix": {
+    "src/ui/games.rs": {
+      "review_base": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac",
+      "fix": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac"
+    },
+    "src/ui/games/play.rs": {
+      "review_base": "10568dc869262e703df24884de8585c2301601c0c61cc63a6a2a0dce1ed7167e",
+      "fix": "20d6dc46ecde31810f4b1fd81f7d5aaa9ff807463cef9e47eb57df5e041add24"
+    },
+    "src/ui/games/save.rs": {
+      "review_base": "36083d6f5a5527fe8d2500539c05dc118f18097e5ad084c9efc3c61aec0754ec",
+      "fix": "a319751542ea82a4993bece94fef92a676cb73abce477bc5d3f8e7b43a34d9af"
+    },
+    "src/ui/session_confirmations.rs": {
+      "review_base": "68f97410c75bd813b953391c69e649a25c2ae94dd70b7ee009b6ad2ea1e1e067",
+      "fix": "68f97410c75bd813b953391c69e649a25c2ae94dd70b7ee009b6ad2ea1e1e067"
+    }
+  },
+  "separately_reviewed_core_delta": {
+    "src/games/puzzles/map.rs": {
+      "tested_base": "48021e0fb77ad2e797e305242dd167751752a5559a39097f253571be240aea5c",
+      "reviewed_new": "d5b5a94c3f8d371b0d2b5d8271dd9eee1cfe3a51a4585de43f2da952c7a2d10e"
+    }
+  },
+  "exact": true,
+  "review": "fix1-review.md"
+}

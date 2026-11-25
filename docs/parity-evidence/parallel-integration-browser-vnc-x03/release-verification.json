@@ -1,0 +1,86 @@
+{
+  "archive_sha256": "74443392c4e5eec78ac3f11beb3d7ce5699f8fc25780727d94f36994512ff850",
+  "source_snapshot_sha256": "afccc98c4b08d7df56e37b18898acad6660d4857aa3db15998893ffa8d0a5069",
+  "files_verified": 1265,
+  "package_root": "target/package-browser-vnc-x03-qualified/74443392c4e5eec78ac3f11beb3d7ce5699f8fc25780727d94f36994512ff850/TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix-chromium",
+  "qualification": "1265-file manifest; native Wayland/X11 empty-PATH startup and sealed RDP helper; integrated Browser/X03/VNC checks passed; one unrelated macro fixture failure in whole gate",
+  "startup_wayland": {
+    "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix-chromium.tar.gz",
+    "archive_sha256": "74443392c4e5eec78ac3f11beb3d7ce5699f8fc25780727d94f36994512ff850",
+    "manifest_schema": 1,
+    "platform": "linux",
+    "display_backend": "Wayland",
+    "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+    "screen_size": [
+      1262,
+      1005
+    ],
+    "rdp_helper_wire_version": 1,
+    "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+    "rdp_helper_child_location_verified": true
+  },
+  "startup_x11": {
+    "archive": "TermCraft-0.1.0-linux-x86_64-arch-xwayland-mosh-unix-chromium.tar.gz",
+    "archive_sha256": "74443392c4e5eec78ac3f11beb3d7ce5699f8fc25780727d94f36994512ff850",
+    "manifest_schema": 1,
+    "platform": "linux",
+    "display_backend": "X11",
+    "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+    "screen_size": [
+      1262,
+      1005
+    ],
+    "rdp_helper_wire_version": 1,
+    "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+    "rdp_helper_child_location_verified": true
+  },
+  "integrated_qualification": {
+    "x03-live": {
+      "log": "x03-live.log",
+      "sha256": "1641f938d2b3ec21f784ae976780823f28e142e031676bd411bdd9dd9f871c5a",
+      "status": "passed"
+    },
+    "x03-ui-live": {
+      "log": "x03-ui-live.log",
+      "sha256": "7ff97e719fe2157b132910368d0cf860aaf22fe8ae8abbab6698dc0706f7cd6d",
+      "status": "passed"
+    },
+    "vnc-live": {
+      "log": "vnc-live.log",
+      "sha256": "ed38baab43c98ede0dca6c18e80a002438b7fbf9e85532a55704d9f80712d94f",
+      "status": "passed"
+    },
+    "vnc-ui-live": {
+      "log": "vnc-ui-live.log",
+      "sha256": "d54a111a00eea2401ff6ff2812a90949a6164909aa4db313fb9362c18a368d08",
+      "status": "passed"
+    },
+    "browser-live": {
+      "log": "browser-live.log",
+      "sha256": "b195e70480fd2801f43b7187f3a43d30e974ad6d617acbeaf42223cc3a7b3e9b",
+      "status": "passed"
+    },
+    "browser-ui-qualified": {
+      "log": "browser-ui-qualified.log",
+      "sha256": "92b0155d9afdf1ddb960f8ee61a2ebd709b3cf67d290e1aacda6bab69ef15dbe",
+      "status": "passed"
+    },
+    "browser-sandbox-qualified": {
+      "log": "browser-sandbox-qualified.log",
+      "sha256": "2265a1fbb399189850802f99e480363c672abf4665b885bebd000ef62862ca45",
+      "status": "passed"
+    },
+    "browser-packaging": {
+      "log": "browser-packaging.log",
+      "sha256": "44dde6224a8655636e459087f2401da0fb4bb481e6aeaec038c18466ec97bee6",
+      "status": "passed"
+    }
+  },
+  "extracted_package_graphics": {
+    "log": "package-x03-live.log",
+    "passed": 7,
+    "probe": "actual extracted release executable",
+    "engine": "actual extracted release Xwayland",
+    "isolation": "private bwrap network/PID/tmp plus Cage"
+  }
+}

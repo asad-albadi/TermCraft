@@ -1,0 +1,7 @@
+{
+  "reason": "Foundation integration copy2 retained older source mtime than existing root rlib, so Cargo reused pre-foundation library missing games export. Refreshed crate root mtimes only, source bytes unchanged.",
+  "source_sha256": {
+    "src/lib.rs": "11a3e15a3a75bb56df494f28459dbae84265e1d88de9d1bc49728453d091f4b5",
+    "src/main.rs": "75a9e9e464866cfaa4440be8fa232c1f21ccb68f6e879be38119d8a8cd1f5369"
+  }
+}

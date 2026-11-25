@@ -1,0 +1,59 @@
+   Compiling harbor-workspace v0.1.609 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-options-ui)
+warning: unused variable: `i`
+    --> src/ui/games/play.rs:1330:24
+     |
+1330 |                 .map(|(i, &d)| if d != 0 { d.to_string() } else { String::new() })
+     |                        ^ help: if this is intentional, prefix it with an underscore: `_i`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (bin "termcraft-games-options609" test) generated 1 warning (run `cargo fix --bin "termcraft-games-options609" -p harbor-workspace --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.91s
+     Running unittests src/main.rs (app/target/debug/deps/termcraft_games_options609-6171176519abc315)
+
+running 42 tests
+test ui::games::play::options_ui_tests::options_dynamic_guess_last_slot_and_atomic_failure ... ok
+test ui::games::play::options_ui_tests::options_custom_guess_blanks_distinct_and_failed_submission_keeps_row ... ok
+test ui::games::lifecycle_tests::held_wakeup_guard_waits_with_bounded_repaint ... ok
+test ui::games::lifecycle_tests::unrelated_viewport_cannot_release_guard_but_missing_owner_recovers ... ok
+test ui::games::lifecycle_tests::preidle_held_modifier_without_repeat_prevents_activation ... ok
+test ui::games::play::options_ui_tests::options_guess_tenth_colour_keyboard_reaches_last_custom_slot ... ok
+test ui::games::lifecycle_tests::ordinary_input_at_idle_threshold_is_preserved_before_activation ... ok
+test ui::games::play::options_ui_tests::options_actual_wrapping_net_last_cell_and_solve_undo_redo ... ok
+test ui::games::play::options_ui_tests::options_actual_super_guess_fifth_peg_click_and_hold ... ok
+test ui::games::play::options_ui_tests::options_actual_solve_confirmation_and_redo_buttons ... ok
+test ui::games::play::options_ui_tests::options_actual_preset_menu_selects_super_without_replacing_board ... ok
+test ui::games::play::tests::cards_keyboard_source_and_destination_apply_a_real_transfer ... ok
+test ui::games::play::options_ui_tests::options_actual_new_game_applies_draft_then_rejects_bad_settings ... ok
+test ui::games::play::options_ui_tests::options_focused_numeric_edit_owns_digits_shortcuts_and_enter ... ok
+test ui::games::play::options_ui_tests::options_focused_shortcut_preserves_assisted_game ... ok
+test ui::games::play::options_ui_tests::options_solo_16_keyboard_pencil ... ok
+test ui::games::play::options_ui_tests::options_net_barriers_and_solo_bit16_are_painted_from_scene ... ok
+test ui::games::play::tests::library_retains_session_and_new_variants_reset_to_selected_rules ... ok
+test ui::games::play::options_ui_tests::options_changed_sizes_render_inside_scrolling_surface ... ok
+test ui::games::play::tests::untangle_keyboard_move_uses_selected_vertex_and_bounded_integer_coordinates ... ok
+test ui::games::lifecycle_tests::preidle_blur_frame_is_preserved_and_stale_removed_or_blurred_pointer_does_not_inhibit ... ok
+test ui::games::lifecycle_tests::canceled_touch_and_focus_loss_recover_stale_pointer_without_replaying_input ... ok
+test ui::games::play::options_ui_tests::options_leaving_editor_by_board_click_restores_game_keys ... ok
+test ui::games::play::tests::canceled_pointer_keeps_other_held_close_keys_owned_until_their_release ... ok
+test ui::games::play::tests::close_consumes_escape_repeats_release_and_recovers_canceled_pointer ... ok
+test ui::games::play::tests::closing_main_game_consumes_a_held_game_key_and_release_in_another_viewport ... ok
+test ui::games::play::tests::invader_render_player_marker_uses_core_player_row ... ok
+test ui::games::play::tests::detached_native_close_is_canceled_while_game_retains_owned_terminal ... ok
+test ui::games::play::options_ui_tests::options_widget_buttons_and_combo_receive_keyboard_without_board_moves ... ok
+test ui::games::lifecycle_tests::immediate_detached_close_is_canceled_and_queued_while_idle_with_owned_pty ... ok
+test ui::games::play::options_ui_tests::options_large_mines_and_map_pointer_coordinates ... ok
+test ui::games::play::tests::all_thirteen_real_boards_render_and_game_keys_cannot_reach_owned_broadcast_sessions ... ok
+test ui::games::play::tests::keyboard_pointer_moves_reset_and_undo_reach_actual_core ... ok
+test ui::games::play::untangle_fix1_regression::untangle_batched_press_motion_drag ... ok
+test ui::games::play::tests::native_close_suspends_game_without_destroying_it_and_shows_owned_session_confirmation ... ok
+test ui::games::tests::disabled_screensaver_preserves_ordinary_input_frame ... ok
+test ui::games::tests::wakeup_key_repeats_are_consumed_until_release ... ok
+test ui::games::tests::screensaver_dismisses_without_losing_terminal_input ... ok
+test ui::games::tests::screensaver_dismissal_in_detached_viewport_preserves_terminal ... ok
+test ui::games::play::untangle_fix1_regression::untangle_separate_press_drag ... ok
+test ui::games::tests::ime_and_raw_mouse_input_dismiss_the_idle_screen ... ok
+test ui::games::lifecycle_tests::preidle_root_and_detached_held_inputs_without_repeat_prevent_activation ... ok
+
+test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 156 filtered out; finished in 8.77s
+

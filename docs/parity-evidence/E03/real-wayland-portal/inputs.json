@@ -1,0 +1,18 @@
+{
+  "sha256": {
+    "package/real-wayland-portal-provider-private": "45657d56eac8a8024455c76209df2ee7c65dcde2af8e39a57549ce1690ed8f6c",
+    "package/termcraft-wayland-engine": "26c3495d140afc8e90f318783af7a2a8b9484d69aa6e3c5c3c5e3c684096236e",
+    "package/PACKAGE-MANIFEST.json": "c28ed3fae4904b19dd1e923d9ce9f114a5473c6fde8a2bdf08e5eafed2ec6edf",
+    "source/Cargo.toml": "8decef7f25beca09a9945354b1128d512c8367d4c86e17ca44cab26fb43a7200",
+    "source/Cargo.lock": "8269d0c8b484914080d76909d07ceafbc2691f686e8827d6c7afcb98b933c7b2",
+    "matrix.py": "5e66dfeb755da34b892fb71ca9811c45343033b27d759d7f893bdd1d123e9a2c",
+    "run-private.sh": "193da1145aff66971ef20b933a1fd98d42dacbd3b8d8d7815a005c33d63e14c5",
+    "verify.py": "8d428d40b40731a6d9d566e01bc2f902d7aac229f51dadc26e86306ac4e26534"
+  },
+  "native_packages": "xdg-desktop-portal 1.22.1-2.1\npipewire 1:1.6.11-1\nwireplumber 0.5.19-1.1\ngrim 1.5.0-2.1\nzenity 4.2.2-1.2\ndbus 1.16.4-1.1\n",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\n",
+  "build": "CARGO_BUILD_JOBS=2 CARGO_TARGET_DIR=<app>/target cargo build --offline --manifest-path target/agent-work/real-wayland-portal/source/Cargo.toml --bin real-wayland-portal-provider-private",
+  "build_result": "exit 0; scoped existing component dependency cache; 2.71s",
+  "wlr_signed_inputs": "../../wayland-real-portal-inputs/inputs.json and signature-binary-keyring.log",
+  "sway_staged_pins": "../v06/pins.json"
+}

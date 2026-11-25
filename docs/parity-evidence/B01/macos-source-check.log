@@ -1,0 +1,17 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Checking b01-native-source-check v0.0.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b01/native-check)
+warning: method `cancel` is never used
+  --> src/../../src/process_input.rs:74:19
+   |
+19 | impl InputQueue {
+   | --------------- method in this implementation
+...
+74 |     pub(crate) fn cancel(&self) {
+   |                   ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `b01-native-source-check` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.33s

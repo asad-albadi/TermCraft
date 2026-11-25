@@ -1,0 +1,61 @@
+{
+  "shared_base_sha256": {
+    "src/browser/mod.rs": "2b11b8ceddd80327e52c0e098912cd0f7faec56db039c89c5f7cc0be80edee8f",
+    "src/browser/pipe.rs": "3a80364a2bd8c1802219133bb0d2b015ecf9cd350d7cb901ec65dcaf61014db4",
+    "src/browser/engine.rs": "3433c7ca10d47751ae9e89e78c40b60d0062c84e04f5f715033c26efabf3100b",
+    "src/browser/windows_pipe.rs": "97996e5e57a57da9cb246d76837e39868f8e13c551d3b9e950f0a2beb1ba16fa",
+    "src/runtime/mod.rs": "e87b448d9305db9fa4ec58addb9d4a9957b48be5c83e5dd136ca1a1da2972f40",
+    "src/ui.rs": "f591f0709e2900e4f47a845e4c6d3f70a6bebbe768015885f6a9d9d60d64a9c0",
+    "src/ui/pages.rs": "8fe9d4b4906eb7f7eaacfedee06111b191ed0072e0db2b91be90ea7882673a96",
+    "src/ui/web_browser.rs": "3c0ac9fcb4bd74c90ad7832832cd9160f276b12c8dca4846706e8dc268a84e36",
+    "src/ui/web_browser_tests.rs": "bc59bbd5985970c89edfc0a41da16ba885b04031ff48d7672affdf7f05c6a77c",
+    "scripts/package-release.py": "3cb37d33d5373a12b4e7dd960e87df75d65cf0357c29ab6e7dbac45018014b7a",
+    "packaging/browser/README.md": "fb6a2916d83035630589f11f0e546fded93b129ccf8591d21238a9e222ea922b",
+    "tests/browser_session.rs": "e79955b0c42d706d763e79496440461e6ca98f9df39ce72789ae5608bf3a307f"
+  },
+  "owned_sha256": {
+    "src/runtime/browser_bundle.rs": "c131ec623a8b81d84edb1ceb39cc8bc151f028ac8bdfff339d3ed90d4c935cf8",
+    "tests/packaging_browser.py": "13303097012be66b1af30ed160004820fcd576a697ae0d60a668577724aaf3b7",
+    "packaging/browser/test_stage.py": "ec7b7476e77d4abb590d7e3a29cb8ed79eca23ddd9de09e235ffecb8f1b689df",
+    "packaging/browser/stage-runtime.py": "f2faa522483791182ab0498e9342f005c318de88b0f00c9db2baaa0145973afb",
+    "packaging/browser/runtime-manifest.json": "8446b1cbcdc255e3ef69a78b4f7c6d3683791f04d2e4b5bab5d18fa18d201c5f",
+    "packaging/browser/THIRD-PARTY-NOTICES.html": "8a48726cb3854c9cbab99badf31bb7b089bf12cbcbd05932e4a1167e735d86f7"
+  },
+  "shared": [
+    "src/browser/mod.rs",
+    "src/browser/pipe.rs",
+    "src/browser/engine.rs",
+    "src/browser/windows_pipe.rs",
+    "src/runtime/mod.rs",
+    "src/ui.rs",
+    "src/ui/pages.rs",
+    "src/ui/web_browser.rs",
+    "src/ui/web_browser_tests.rs",
+    "scripts/package-release.py",
+    "packaging/browser/README.md",
+    "tests/browser_session.rs"
+  ],
+  "owned": [
+    "src/runtime/browser_bundle.rs",
+    "tests/packaging_browser.py",
+    "packaging/browser/test_stage.py",
+    "packaging/browser/stage-runtime.py",
+    "packaging/browser/runtime-manifest.json",
+    "packaging/browser/THIRD-PARTY-NOTICES.html"
+  ],
+  "patch_sha256": "2576a7a4057b67e68a8d1c65d6e3999df83290ce0b26e479e1b23e2de42f4a28",
+  "shared_candidate_sha256": {
+    "src/browser/mod.rs": "ad9911a16e48f0fa5734e0dcb2dbf95ab54f5fbe0d12669fa61ef56c2cb83c69",
+    "src/browser/pipe.rs": "2f713c32f26b34eb6b551269300dd361eecbfe58b8e3ceb0e293f8c203fbb15b",
+    "src/browser/engine.rs": "33e1c534011991f3c2d6918603c67fa5c17c9243431394fbf5290edb7b1b290d",
+    "src/browser/windows_pipe.rs": "535a7bd7a26a9f36b1646a40b9cff5b848a1cdae6e238337316c0fc7d0401b71",
+    "src/runtime/mod.rs": "3229dacf5b2a98a1a03cb82c1c3a5746fcc3e8a5a97a906c785e280a911f5304",
+    "src/ui.rs": "2f0b38a4daacc545c7c3d74759de344bf2923301075a1264f6b85b56836be871",
+    "src/ui/pages.rs": "27cdad5c115c410080c18a61b93da4092446a77c36d70635f5cb814cf0ed90ab",
+    "src/ui/web_browser.rs": "20bb5a5165ecb9a2c9020e0e5e081bbbecbf0f94c42ba04658f152a149c9a71b",
+    "src/ui/web_browser_tests.rs": "74cc15bec7ca8f46eb93292d54bf5fd48a3fc5bdd6f51bb683772464e103733e",
+    "scripts/package-release.py": "461ad84bb5af69ad0e99ed1cba7e10271c1a6039a1099686bab1d120d3c3bc55",
+    "packaging/browser/README.md": "ae59c368dc9d00ca4f52fc3f3c4dbfe77653f0e68b9000de2e4c3325a1a69b05",
+    "tests/browser_session.rs": "0639cddb862a00f1ac9472683d05c03659e173c76765d10546cb96a23bad5c7c"
+  }
+}

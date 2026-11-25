@@ -1,0 +1,24 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.65s
+     Running tests/terminal_conformance.rs (app/target/debug/deps/terminal_conformance-f1f1293098e096af)
+
+running 1 test
+test unsupported_control_strings_and_cancelled_sequences_never_become_visible_text ... FAILED
+
+failures:
+
+---- unsupported_control_strings_and_cancelled_sequences_never_become_visible_text stdout ----
+
+thread 'unsupported_control_strings_and_cancelled_sequences_never_become_visible_text' (347614) panicked at tests/terminal_conformance.rs:57:139:
+assertion `left == right` failed
+  left: "Aprivate-payloadBignored-apcCD"
+ right: "ABCD"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    unsupported_control_strings_and_cancelled_sequences_never_become_visible_text
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test terminal_conformance`

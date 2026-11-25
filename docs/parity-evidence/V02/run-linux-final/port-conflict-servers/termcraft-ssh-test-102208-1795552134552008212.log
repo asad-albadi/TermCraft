@@ -1,0 +1,30 @@
+Server listening on 127.0.0.1 port 44605.
+Connection from 127.0.0.1 port 40918 on 127.0.0.1 port 44605 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 40918 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Connection from 127.0.0.1 port 40932 on 127.0.0.1 port 44605 rdomain ""
+Accepted key ED25519 SHA256:82rNOtaj3hmMh5RhgpcTjfq6cfOqF3J5gm4qgff3Fc8 found at /tmp/termcraft-ssh-test-102208-1795552134552008212/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 40932 ssh2 [preauth]
+Accepted key ED25519 SHA256:82rNOtaj3hmMh5RhgpcTjfq6cfOqF3J5gm4qgff3Fc8 found at /tmp/termcraft-ssh-test-102208-1795552134552008212/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 40932 ssh2: ED25519 SHA256:82rNOtaj3hmMh5RhgpcTjfq6cfOqF3J5gm4qgff3Fc8
+User child is on pid 102221
+send DEBUG: Connection from user asad 127.0.0.1 port 40932: Broken pipe
+Connection from 127.0.0.1 port 40942 on 127.0.0.1 port 44605 rdomain ""
+Accepted key ED25519 SHA256:82rNOtaj3hmMh5RhgpcTjfq6cfOqF3J5gm4qgff3Fc8 found at /tmp/termcraft-ssh-test-102208-1795552134552008212/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 40942 ssh2 [preauth]
+Accepted key ED25519 SHA256:82rNOtaj3hmMh5RhgpcTjfq6cfOqF3J5gm4qgff3Fc8 found at /tmp/termcraft-ssh-test-102208-1795552134552008212/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 40942 ssh2: ED25519 SHA256:82rNOtaj3hmMh5RhgpcTjfq6cfOqF3J5gm4qgff3Fc8
+User child is on pid 102227
+bind [127.0.0.1]:38107: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 38107
+Connection closed by 127.0.0.1 port 40942
+Transferred: sent 3488, received 3596 bytes
+Closing connection to 127.0.0.1 port 40942
+Connection from 127.0.0.1 port 40956 on 127.0.0.1 port 44605 rdomain ""
+Accepted key ED25519 SHA256:82rNOtaj3hmMh5RhgpcTjfq6cfOqF3J5gm4qgff3Fc8 found at /tmp/termcraft-ssh-test-102208-1795552134552008212/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 40956 ssh2 [preauth]
+Accepted key ED25519 SHA256:82rNOtaj3hmMh5RhgpcTjfq6cfOqF3J5gm4qgff3Fc8 found at /tmp/termcraft-ssh-test-102208-1795552134552008212/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 40956 ssh2: ED25519 SHA256:82rNOtaj3hmMh5RhgpcTjfq6cfOqF3J5gm4qgff3Fc8
+User child is on pid 102233
+send DEBUG: Connection from user asad 127.0.0.1 port 40956: Broken pipe

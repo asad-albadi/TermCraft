@@ -1,0 +1,44 @@
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/ui/rdp_settings.rs:206:
+             if ui.button("Remove smartcard reader").clicked() {
+                 options.smartcard_reader = None;
+             }
+-        } else if embedded && cfg!(target_os = "linux") && ui.button("Add smartcard reader").clicked() {
++        } else if embedded
++            && cfg!(target_os = "linux")
++            && ui.button("Add smartcard reader").clicked()
++        {
+             options.smartcard_reader = Some(String::new());
+         }
+     }
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/rdp_options.rs:323:
+ fn explicit_pcsc_reader_is_required_and_platform_bounded() {
+     use harbor_workspace::desktop::rdp_options::{RdpCapabilities, RdpOptions};
+     let capability = RdpCapabilities::embedded();
+-    let mut options: RdpOptions = serde_json::from_str(r#"{"smartcard_reader":"Fixture Reader 00 00"}"#).unwrap();
+-    assert_eq!(options.negotiate(&capability).is_ok(), cfg!(target_os = "linux"));
++    let mut options: RdpOptions =
++        serde_json::from_str(r#"{"smartcard_reader":"Fixture Reader 00 00"}"#).unwrap();
++    assert_eq!(
++        options.negotiate(&capability).is_ok(),
++        cfg!(target_os = "linux")
++    );
+     options.smartcard = true;
+     assert!(options.negotiate(&capability).is_err());
+-    let invalid: RdpOptions = serde_json::from_str(r#"{"smartcard_reader":"invalid\u0000reader"}"#).unwrap();
++    let invalid: RdpOptions =
++        serde_json::from_str(r#"{"smartcard_reader":"invalid\u0000reader"}"#).unwrap();
+     assert!(invalid.validate().is_err());
+ }
+ 
+Diff in /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/tests/runtime_manifest.rs:259:
+     std::fs::rename(&missing_client, &saved_client).unwrap();
+     let result = catalog.resolve(ToolId::Mosh);
+     std::fs::rename(&saved_client, &missing_client).unwrap();
+-    assert!(result.is_err(), "incomplete Mosh payload was reported available");
++    assert!(
++        result.is_err(),
++        "incomplete Mosh payload was reported available"
++    );
+ 
+     // Package bytes replaced after launch resolution must be blocked by the
+     // process entry point, before either of the new executables could run.

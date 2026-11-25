@@ -1,0 +1,42 @@
+[
+  {
+    "case": "empty Iperf list",
+    "old_exit": 0,
+    "incorrectly_accepted": true
+  },
+  {
+    "case": "empty Unix list",
+    "old_exit": 0,
+    "incorrectly_accepted": true
+  },
+  {
+    "case": "wrong Unix version",
+    "old_exit": 0,
+    "incorrectly_accepted": true
+  },
+  {
+    "case": "garbage browser version",
+    "old_exit": 0,
+    "incorrectly_accepted": true
+  },
+  {
+    "case": "missing minimal browser record",
+    "old_exit": 0,
+    "incorrectly_accepted": true
+  },
+  {
+    "case": "unsupported minimal browser exit",
+    "old_exit": 0,
+    "incorrectly_accepted": true
+  },
+  {
+    "case": "unsupported omitted inventory exit",
+    "old_exit": 0,
+    "incorrectly_accepted": true
+  },
+  {
+    "case": "truncated Iperf receiver",
+    "old_exit": 0,
+    "incorrectly_accepted": true
+  }
+]

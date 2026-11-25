@@ -1,0 +1,65 @@
+{
+  "baseline_tar_sha256": "7a5f17d6f6003f4a55f25cf9b921669bb5ff0ef8609754ebcc6c86026b04c4d8",
+  "baseline_preserved": true,
+  "patch_sha256": "79257d2559792f36d009e0fbe116702f5d05f06c1161e05a83cd6c099bb49acc",
+  "files": [
+    {
+      "path": "src/games/terminal/API.md",
+      "baseline_sha256": "826ce9aa9751a5d35a050db80e46c70f6548cb65f702f3522cf92c1c0fa39ed8",
+      "amended_sha256": "c9cb5428d994a756fec69cb181defecaff9ef4ae21d14b8564406e8550460962",
+      "changed": true,
+      "bytes": 2885
+    },
+    {
+      "path": "src/games/terminal/PROVENANCE.md",
+      "baseline_sha256": "239d2ed241c5117b472cbe5a1fafc2563e5cb4fd9bd0fe5cb5e493a83fa4ed41",
+      "amended_sha256": "f55604ca641ced8e93f6ee7d29a9343981ece8406fdafadb3542698af2d857d7",
+      "changed": true,
+      "bytes": 6705
+    },
+    {
+      "path": "src/games/terminal/blocks.rs",
+      "baseline_sha256": "80638fa5c6f096cd2552eb02382f59916d6b83940b5def3e77f985a86c8bb31b",
+      "amended_sha256": "196dbf81c213f25250c9c57d52c6addbfaa698cb4dfea90158802253c5cd2f52",
+      "changed": true,
+      "bytes": 8633
+    },
+    {
+      "path": "src/games/terminal/cards.rs",
+      "baseline_sha256": "f68b2d3b8bfdf0f6a8e4f083f034f386d48b2f531896189e0111e5dc45404ea8",
+      "amended_sha256": "f68b2d3b8bfdf0f6a8e4f083f034f386d48b2f531896189e0111e5dc45404ea8",
+      "changed": false,
+      "bytes": 13817
+    },
+    {
+      "path": "src/games/terminal/grids.rs",
+      "baseline_sha256": "c40a6bf0f0ce1b274abfd83233e9fe510f6b56925160850ddcfc4c345be5496e",
+      "amended_sha256": "c40a6bf0f0ce1b274abfd83233e9fe510f6b56925160850ddcfc4c345be5496e",
+      "changed": false,
+      "bytes": 24201
+    },
+    {
+      "path": "src/games/terminal/invaders.rs",
+      "baseline_sha256": "ea9a19eb9f1d1ccc1c37100a8f8dca862204026a2088c52cfc15e48f25ec72c7",
+      "amended_sha256": "40bd4817919dee05ef7602321b50b7e7f05307ca042da3d78dacb42fab323ed8",
+      "changed": true,
+      "bytes": 7201
+    },
+    {
+      "path": "src/games/terminal/mod.rs",
+      "baseline_sha256": "e6b2d32fadb24c6bd8144e0fd6dee3345989739cc884fdccde4139e0f968cf1f",
+      "amended_sha256": "e6b2d32fadb24c6bd8144e0fd6dee3345989739cc884fdccde4139e0f968cf1f",
+      "changed": false,
+      "bytes": 9491
+    },
+    {
+      "path": "src/games/terminal/tests.rs",
+      "baseline_sha256": "41e98c860dd20b68684ce1be4aaa14ca29a847327860273308c87c2712fe4be3",
+      "amended_sha256": "bcc74410c8d4421b028df99dd39cc2c130a18573d32f5a4380a33a51a0f919c0",
+      "changed": true,
+      "bytes": 5988
+    }
+  ],
+  "tests": 33,
+  "scope": "Public Piece arithmetic, explicit shooter row contract, paused-input documentation, corrected solver evidence wording. No main product source edits."
+}

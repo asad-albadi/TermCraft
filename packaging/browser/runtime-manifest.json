@@ -1,0 +1,1980 @@
+{
+  "schema_version": 1,
+  "platform": "linux",
+  "architecture": "x86_64",
+  "version": "158.0.8127.88",
+  "root": "browser/linux-x86_64",
+  "executable": "chromium",
+  "archive_name": "chromium-158.0.8127.88-1-x86_64.pkg.tar.zst",
+  "archive_url": "https://archive.archlinux.org/packages/c/chromium/chromium-158.0.8127.88-1-x86_64.pkg.tar.zst",
+  "archive_sha256": "f66354afc7b74c28de2eae2adf90939c054eedb0c0819fc6c96378fd694d5535",
+  "archive_signature_sha256": "55d524f5736173daf6b3cf51417cc399cab9f9c444a998401f8d7f9611ba367e",
+  "source_url": "https://chromium.googlesource.com/chromium/src/+/refs/tags/158.0.8127.88",
+  "recipe_repository_url": "https://gitlab.archlinux.org/archlinux/packaging/packages/chromium",
+  "recipe_sha256": "efaf2c41589168501fc864678c33db6373e4f71886691dddd45e8e8ade3930db",
+  "signer_fingerprint": "1DF226B6A2E7FB85B2E6C8F1F8BB3DD85903D982",
+  "notices_sha256": "8a48726cb3854c9cbab99badf31bb7b089bf12cbcbd05932e4a1167e735d86f7",
+  "license": "BSD-3-Clause for Chromium with component-specific notices",
+  "sandbox": "Unprivileged user namespaces and Chromium seccomp. No setuid installation is performed. Host must permit the standard namespace sandbox.",
+  "abi_baseline": "Arch Linux x86_64 shared-library ABI with private simdutf 9.3.1; not a universal static runtime. See SOURCE-PKGINFO and package linked_libraries.",
+  "qualification": "Native Linux x86_64 fixture candidate; clean OS matrix pending",
+  "dependencies": [
+    {
+      "id": "simdutf",
+      "version": "9.3.1-1",
+      "archive_name": "simdutf-9.3.1-1-x86_64.pkg.tar.zst",
+      "archive_url": "https://archive.archlinux.org/packages/s/simdutf/simdutf-9.3.1-1-x86_64.pkg.tar.zst",
+      "archive_sha256": "ce6ae8d758d4cdbfd2bbdfa9f7a8df80df1eb5ce0dd3e1af0485523d15e3a5ae",
+      "archive_signature_sha256": "714d230244f9ba5d2cb73c5e0cdec0c4b1f9836fb5c861605ffec09c60847492",
+      "source_url": "https://github.com/simdutf/simdutf/tree/v9.3.1",
+      "license": "MIT",
+      "signer_fingerprint": "C5D2A6E0ED2D11C66B9FA2A306313911057DD5A8"
+    }
+  ],
+  "files": [
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/chrome-sandbox",
+      "path": "chrome-sandbox",
+      "size": 14544,
+      "sha256": "650117cb4113fcd57762f7ccd8bfdf5f4e618952ecbc36b6642f49e8c561d1b3",
+      "executable": true
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/chrome_100_percent.pak",
+      "path": "chrome_100_percent.pak",
+      "size": 577211,
+      "sha256": "c306aff15b566edcf7aa79f07332ca4b0ebb81381fe3fe35592927fa4a1b488e",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/chrome_200_percent.pak",
+      "path": "chrome_200_percent.pak",
+      "size": 934826,
+      "sha256": "4d9c7700bc0f7c5f72d9a4fb31c4352ff57ba12d926cb216fbfcdb1a0657832f",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/chrome_crashpad_handler",
+      "path": "chrome_crashpad_handler",
+      "size": 2760400,
+      "sha256": "5fc24752dd6834229b150e5c643b424e63212cfe9f21212795cd8138f4f55715",
+      "executable": true
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/chromium",
+      "path": "chromium",
+      "size": 342117464,
+      "sha256": "35d59a09075378c3c7ec9b60ebd46bb327563b87f6feb1365417fea4349db126",
+      "executable": true
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/icudtl.dat",
+      "path": "icudtl.dat",
+      "size": 10824576,
+      "sha256": "e1ed8f674bb8449731b79cae956042da59f9ecbd37c8d3f86586a22b4836e5b2",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/libEGL.so",
+      "path": "libEGL.so",
+      "size": 248512,
+      "sha256": "b8903fe22005784e0ad69d628bcecdaaccea4c44349e606305db1e368582c332",
+      "executable": true
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/libGLESv2.so",
+      "path": "libGLESv2.so",
+      "size": 248520,
+      "sha256": "85528875da46620fa2ed196fb86c67539937518ab63fe919c2d70683998fcfae",
+      "executable": true
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/libqt6_shim.so",
+      "path": "libqt6_shim.so",
+      "size": 28736,
+      "sha256": "f18426d71a5dff2dc20fdbd4d491ce6a62d391688cedbfc75227d59fa113e0fd",
+      "executable": true
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/libvk_swiftshader.so",
+      "path": "libvk_swiftshader.so",
+      "size": 5108672,
+      "sha256": "abdc0ab3e50157eb9be5930dd3a0705d20b2a351f3335d66619a333ced7d194e",
+      "executable": true
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/libvulkan.so.1",
+      "path": "libvulkan.so.1",
+      "size": 741960,
+      "sha256": "b2246b120f3cb0f63584962c50148474815a08f9ba508445c5974f7ff23d95b9",
+      "executable": true
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/af.pak",
+      "path": "locales/af.pak",
+      "size": 650762,
+      "sha256": "b0d9f1aaf67c6b21c69dc57305e50e819d8c48a27ab076ada9236499ea386e6b",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/af_FEMININE.pak",
+      "path": "locales/af_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/af_MASCULINE.pak",
+      "path": "locales/af_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/af_NEUTER.pak",
+      "path": "locales/af_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/am.pak",
+      "path": "locales/am.pak",
+      "size": 1053301,
+      "sha256": "79845155a5777ed21b0b9f74edaea34d3544b36716016b6bfac39ce030490c80",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/am_FEMININE.pak",
+      "path": "locales/am_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/am_MASCULINE.pak",
+      "path": "locales/am_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/am_NEUTER.pak",
+      "path": "locales/am_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ar.pak",
+      "path": "locales/ar.pak",
+      "size": 1175269,
+      "sha256": "eb7fffaf92544b510f47cebf902464b602eb81b48437195cba1392ceafc172d2",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ar_FEMININE.pak",
+      "path": "locales/ar_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ar_MASCULINE.pak",
+      "path": "locales/ar_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ar_NEUTER.pak",
+      "path": "locales/ar_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/bg.pak",
+      "path": "locales/bg.pak",
+      "size": 1206542,
+      "sha256": "5b1311a58b2d2182ff294d7d4ce2419f3a2ebc5117cc5ea9bc56bd3fcb7ad44e",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/bg_FEMININE.pak",
+      "path": "locales/bg_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/bg_MASCULINE.pak",
+      "path": "locales/bg_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/bg_NEUTER.pak",
+      "path": "locales/bg_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/bn.pak",
+      "path": "locales/bn.pak",
+      "size": 1543647,
+      "sha256": "0ac171eba709073c20f2f30321bc799887847ee687ca9666e7e26e1bc526dbb1",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/bn_FEMININE.pak",
+      "path": "locales/bn_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/bn_MASCULINE.pak",
+      "path": "locales/bn_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/bn_NEUTER.pak",
+      "path": "locales/bn_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ca.pak",
+      "path": "locales/ca.pak",
+      "size": 742608,
+      "sha256": "9764839d21869de9c04185125237d52a394b18e010920d8ac8a31ac22024e220",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ca_FEMININE.pak",
+      "path": "locales/ca_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ca_MASCULINE.pak",
+      "path": "locales/ca_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ca_NEUTER.pak",
+      "path": "locales/ca_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/cs.pak",
+      "path": "locales/cs.pak",
+      "size": 768306,
+      "sha256": "6bb5707cced05c9898d8040ed77d9729447c5c7ede293394c1da8165889f53c1",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/cs_FEMININE.pak",
+      "path": "locales/cs_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/cs_MASCULINE.pak",
+      "path": "locales/cs_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/cs_NEUTER.pak",
+      "path": "locales/cs_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/da.pak",
+      "path": "locales/da.pak",
+      "size": 689566,
+      "sha256": "94c9d7d6de2182f4190d4d46fa02910fd6affb8ca2eaa4e6a860bac525fa70c8",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/da_FEMININE.pak",
+      "path": "locales/da_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/da_MASCULINE.pak",
+      "path": "locales/da_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/da_NEUTER.pak",
+      "path": "locales/da_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/de.pak",
+      "path": "locales/de.pak",
+      "size": 746784,
+      "sha256": "6d1cad9595fe6c70fa939360e4bc2b0ed90e72478b92fcb4a34073c6e7633502",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/de_FEMININE.pak",
+      "path": "locales/de_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/de_MASCULINE.pak",
+      "path": "locales/de_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/de_NEUTER.pak",
+      "path": "locales/de_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/el.pak",
+      "path": "locales/el.pak",
+      "size": 1324291,
+      "sha256": "c960181d2a0f0158d2c1d444131c70ef0759d58a304726a0892c564228b6a5b6",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/el_FEMININE.pak",
+      "path": "locales/el_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/el_MASCULINE.pak",
+      "path": "locales/el_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/el_NEUTER.pak",
+      "path": "locales/el_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/en-GB.pak",
+      "path": "locales/en-GB.pak",
+      "size": 594035,
+      "sha256": "4987c35b96b487fe1b2c3fb450bf606a3d8b3d4dbc53d95814f73c623f6b7dd8",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/en-GB_FEMININE.pak",
+      "path": "locales/en-GB_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/en-GB_MASCULINE.pak",
+      "path": "locales/en-GB_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/en-GB_NEUTER.pak",
+      "path": "locales/en-GB_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/en-US.pak",
+      "path": "locales/en-US.pak",
+      "size": 601668,
+      "sha256": "07c678573470219a398d1b48cc8212dd0bfd687d4d88e36b6abdb8c73758b76d",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/en-US_FEMININE.pak",
+      "path": "locales/en-US_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/en-US_MASCULINE.pak",
+      "path": "locales/en-US_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/en-US_NEUTER.pak",
+      "path": "locales/en-US_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/es-419.pak",
+      "path": "locales/es-419.pak",
+      "size": 728069,
+      "sha256": "080b23247352341851b83c2927f2ea1eaad5618e76380672511e8a37058fc86e",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/es-419_FEMININE.pak",
+      "path": "locales/es-419_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/es-419_MASCULINE.pak",
+      "path": "locales/es-419_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/es-419_NEUTER.pak",
+      "path": "locales/es-419_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/es.pak",
+      "path": "locales/es.pak",
+      "size": 722529,
+      "sha256": "2aee3e3324dd02888dcaf8755c193f2bf40f32d3ffdf7647d39930a27d9d9977",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/es_FEMININE.pak",
+      "path": "locales/es_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/es_MASCULINE.pak",
+      "path": "locales/es_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/es_NEUTER.pak",
+      "path": "locales/es_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/et.pak",
+      "path": "locales/et.pak",
+      "size": 662666,
+      "sha256": "80ba5be054577285a9b77937237c04c21725f5a535cb7969f5c82f5ab442ad10",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/et_FEMININE.pak",
+      "path": "locales/et_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/et_MASCULINE.pak",
+      "path": "locales/et_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/et_NEUTER.pak",
+      "path": "locales/et_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fa.pak",
+      "path": "locales/fa.pak",
+      "size": 1092930,
+      "sha256": "25c0574aa1ea72ac582508f05bbab13a68b841b0ec86515e344e04242c084693",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fa_FEMININE.pak",
+      "path": "locales/fa_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fa_MASCULINE.pak",
+      "path": "locales/fa_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fa_NEUTER.pak",
+      "path": "locales/fa_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fi.pak",
+      "path": "locales/fi.pak",
+      "size": 673900,
+      "sha256": "2e7ef36889a49ab6ba3d0084eded22d09047a2a9fed19ce9a64d6137bbc09944",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fi_FEMININE.pak",
+      "path": "locales/fi_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fi_MASCULINE.pak",
+      "path": "locales/fi_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fi_NEUTER.pak",
+      "path": "locales/fi_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fil.pak",
+      "path": "locales/fil.pak",
+      "size": 761069,
+      "sha256": "98848cca7807a0d5bceea22c123b90f8ff728fe4f96dad97fc5bfaf48a40f099",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fil_FEMININE.pak",
+      "path": "locales/fil_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fil_MASCULINE.pak",
+      "path": "locales/fil_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fil_NEUTER.pak",
+      "path": "locales/fil_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fr.pak",
+      "path": "locales/fr.pak",
+      "size": 792504,
+      "sha256": "7744fa5990a5c32d99d05ab222415142429f8a23ac474c4d5bf71e960243a6f1",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fr_FEMININE.pak",
+      "path": "locales/fr_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fr_MASCULINE.pak",
+      "path": "locales/fr_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/fr_NEUTER.pak",
+      "path": "locales/fr_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/gu.pak",
+      "path": "locales/gu.pak",
+      "size": 1530845,
+      "sha256": "5e5c02ccfe615655ecb6ca2d6ef451df96ea8d1f80cac5209244b67bb5cd0002",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/gu_FEMININE.pak",
+      "path": "locales/gu_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/gu_MASCULINE.pak",
+      "path": "locales/gu_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/gu_NEUTER.pak",
+      "path": "locales/gu_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/he.pak",
+      "path": "locales/he.pak",
+      "size": 962510,
+      "sha256": "b7d576f0e1008223694fef1aa4063ad6e9866bc57dbf52b1a8bb88650f914580",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/he_FEMININE.pak",
+      "path": "locales/he_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/he_MASCULINE.pak",
+      "path": "locales/he_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/he_NEUTER.pak",
+      "path": "locales/he_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hi.pak",
+      "path": "locales/hi.pak",
+      "size": 1631658,
+      "sha256": "162910fb8c30a260d1643005c0079c8d76de09554d890c3d9f72d2e104ab64df",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hi_FEMININE.pak",
+      "path": "locales/hi_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hi_MASCULINE.pak",
+      "path": "locales/hi_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hi_NEUTER.pak",
+      "path": "locales/hi_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hr.pak",
+      "path": "locales/hr.pak",
+      "size": 738808,
+      "sha256": "9e3aa674be25e150e439bf3d354528d102fd2c65fb79ca85f9500e61a91cfb74",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hr_FEMININE.pak",
+      "path": "locales/hr_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hr_MASCULINE.pak",
+      "path": "locales/hr_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hr_NEUTER.pak",
+      "path": "locales/hr_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hu.pak",
+      "path": "locales/hu.pak",
+      "size": 785769,
+      "sha256": "df7ee5a382e04476761b9adf3e236f8553d6f8906c20c8bafd4a54055db8777f",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hu_FEMININE.pak",
+      "path": "locales/hu_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hu_MASCULINE.pak",
+      "path": "locales/hu_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/hu_NEUTER.pak",
+      "path": "locales/hu_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/id.pak",
+      "path": "locales/id.pak",
+      "size": 653944,
+      "sha256": "29a9804e714d397580bc6b84a7a86af5d23acae99bb5b6fec0c347f4f8e4ea85",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/id_FEMININE.pak",
+      "path": "locales/id_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/id_MASCULINE.pak",
+      "path": "locales/id_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/id_NEUTER.pak",
+      "path": "locales/id_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/it.pak",
+      "path": "locales/it.pak",
+      "size": 718365,
+      "sha256": "c31018d3bd1762e48ee4b65f2c3c1112a69d77f80936d74478839c3aefafb74d",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/it_FEMININE.pak",
+      "path": "locales/it_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/it_MASCULINE.pak",
+      "path": "locales/it_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/it_NEUTER.pak",
+      "path": "locales/it_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ja.pak",
+      "path": "locales/ja.pak",
+      "size": 870530,
+      "sha256": "7e04ff23d0f3bce98a3e67b8b0765c159278cdd7de6b48d6522fb0753d145065",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ja_FEMININE.pak",
+      "path": "locales/ja_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ja_MASCULINE.pak",
+      "path": "locales/ja_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ja_NEUTER.pak",
+      "path": "locales/ja_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/kn.pak",
+      "path": "locales/kn.pak",
+      "size": 1758389,
+      "sha256": "e4a763db22430e7168ea7190b522d13f9019512aef9a2952d1e0923b91776e3a",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/kn_FEMININE.pak",
+      "path": "locales/kn_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/kn_MASCULINE.pak",
+      "path": "locales/kn_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/kn_NEUTER.pak",
+      "path": "locales/kn_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ko.pak",
+      "path": "locales/ko.pak",
+      "size": 743054,
+      "sha256": "5d02fe5b6fb40acaea660e8a64311bf10bda9bc61a58ef9505e2d23da9dfd6d5",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ko_FEMININE.pak",
+      "path": "locales/ko_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ko_MASCULINE.pak",
+      "path": "locales/ko_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ko_NEUTER.pak",
+      "path": "locales/ko_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/lt.pak",
+      "path": "locales/lt.pak",
+      "size": 805078,
+      "sha256": "c7cd4996376b6edecc1af995a164542a88f21f33d1197ad49f94f05bcacb79c5",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/lt_FEMININE.pak",
+      "path": "locales/lt_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/lt_MASCULINE.pak",
+      "path": "locales/lt_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/lt_NEUTER.pak",
+      "path": "locales/lt_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/lv.pak",
+      "path": "locales/lv.pak",
+      "size": 799678,
+      "sha256": "e3be73e7a4787968390056674eb74f18eb77ca8c79ebc93150a6244948aa4710",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/lv_FEMININE.pak",
+      "path": "locales/lv_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/lv_MASCULINE.pak",
+      "path": "locales/lv_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/lv_NEUTER.pak",
+      "path": "locales/lv_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ml.pak",
+      "path": "locales/ml.pak",
+      "size": 1799518,
+      "sha256": "f1093240be932cc2027d0df36d7f775d767c7b54c22201e8fd0d783d0ce8fb6f",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ml_FEMININE.pak",
+      "path": "locales/ml_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ml_MASCULINE.pak",
+      "path": "locales/ml_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ml_NEUTER.pak",
+      "path": "locales/ml_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/mr.pak",
+      "path": "locales/mr.pak",
+      "size": 1495814,
+      "sha256": "74960e8b83eaf2ab72dcb05f4004e6ead5a60e6144e0b2c9dd0ddce4259f24ad",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/mr_FEMININE.pak",
+      "path": "locales/mr_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/mr_MASCULINE.pak",
+      "path": "locales/mr_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/mr_NEUTER.pak",
+      "path": "locales/mr_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ms.pak",
+      "path": "locales/ms.pak",
+      "size": 688659,
+      "sha256": "352afe72f30fc5bfba6a74eee598d546d747f5c3d97825ff1ea6ea778bb0cc90",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ms_FEMININE.pak",
+      "path": "locales/ms_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ms_MASCULINE.pak",
+      "path": "locales/ms_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ms_NEUTER.pak",
+      "path": "locales/ms_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/nb.pak",
+      "path": "locales/nb.pak",
+      "size": 654143,
+      "sha256": "127df743e4bc2320ae25badb44a5b858cf73f0d403b3d36ce1f2bac71c459c9d",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/nb_FEMININE.pak",
+      "path": "locales/nb_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/nb_MASCULINE.pak",
+      "path": "locales/nb_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/nb_NEUTER.pak",
+      "path": "locales/nb_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/nl.pak",
+      "path": "locales/nl.pak",
+      "size": 682970,
+      "sha256": "db4079cab6e0944495dd05fedc2fdbb26e3611df639e96064d62ffb43690f4e4",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/nl_FEMININE.pak",
+      "path": "locales/nl_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/nl_MASCULINE.pak",
+      "path": "locales/nl_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/nl_NEUTER.pak",
+      "path": "locales/nl_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pl.pak",
+      "path": "locales/pl.pak",
+      "size": 769054,
+      "sha256": "3f39737020dce2b04bed72d4cdcea2682e4eb7294b7beeec22b287e5de62c99b",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pl_FEMININE.pak",
+      "path": "locales/pl_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pl_MASCULINE.pak",
+      "path": "locales/pl_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pl_NEUTER.pak",
+      "path": "locales/pl_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pt-BR.pak",
+      "path": "locales/pt-BR.pak",
+      "size": 717803,
+      "sha256": "b67d47c1e2b4c0c4216e16370925b5679d7089c0c8b00c9b632c2e06fa7dca70",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pt-BR_FEMININE.pak",
+      "path": "locales/pt-BR_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pt-BR_MASCULINE.pak",
+      "path": "locales/pt-BR_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pt-BR_NEUTER.pak",
+      "path": "locales/pt-BR_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pt-PT.pak",
+      "path": "locales/pt-PT.pak",
+      "size": 719951,
+      "sha256": "207d56e3b981220229f5fd4e752b1f255bb417ed13c5ba4e9459c611071ae060",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pt-PT_FEMININE.pak",
+      "path": "locales/pt-PT_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pt-PT_MASCULINE.pak",
+      "path": "locales/pt-PT_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/pt-PT_NEUTER.pak",
+      "path": "locales/pt-PT_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ro.pak",
+      "path": "locales/ro.pak",
+      "size": 745894,
+      "sha256": "fa48287e1c3eb48ca79181524ea1ebb292aa42209d6f59c1067bdf62200d50a1",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ro_FEMININE.pak",
+      "path": "locales/ro_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ro_MASCULINE.pak",
+      "path": "locales/ro_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ro_NEUTER.pak",
+      "path": "locales/ro_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ru.pak",
+      "path": "locales/ru.pak",
+      "size": 1238175,
+      "sha256": "7d3503c72ea87722acb2da7e6cd06eec44f34edf99f390ab5376929e3c5d04af",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ru_FEMININE.pak",
+      "path": "locales/ru_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ru_MASCULINE.pak",
+      "path": "locales/ru_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ru_NEUTER.pak",
+      "path": "locales/ru_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sk.pak",
+      "path": "locales/sk.pak",
+      "size": 780215,
+      "sha256": "f19456c597f7d19bdcbe7be8e399b22d118b7574f9226a1e2c7f75831e177712",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sk_FEMININE.pak",
+      "path": "locales/sk_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sk_MASCULINE.pak",
+      "path": "locales/sk_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sk_NEUTER.pak",
+      "path": "locales/sk_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sl.pak",
+      "path": "locales/sl.pak",
+      "size": 745197,
+      "sha256": "24a0f4b3cbc4cc952e0a19046bc0076bb4d9124f0a06449f1a3543cd1e791c1f",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sl_FEMININE.pak",
+      "path": "locales/sl_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sl_MASCULINE.pak",
+      "path": "locales/sl_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sl_NEUTER.pak",
+      "path": "locales/sl_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sr.pak",
+      "path": "locales/sr.pak",
+      "size": 1144695,
+      "sha256": "a6b20cfb3aa9318e971ecc0bb974cb67c88a945daad6826546a09c464cd0f4f1",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sr_FEMININE.pak",
+      "path": "locales/sr_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sr_MASCULINE.pak",
+      "path": "locales/sr_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sr_NEUTER.pak",
+      "path": "locales/sr_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sv.pak",
+      "path": "locales/sv.pak",
+      "size": 665332,
+      "sha256": "10b2c87602588b7d7e0dc055ec437cab17c3dc596c90ca12bd4360ddcf894cac",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sv_FEMININE.pak",
+      "path": "locales/sv_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sv_MASCULINE.pak",
+      "path": "locales/sv_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sv_NEUTER.pak",
+      "path": "locales/sv_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sw.pak",
+      "path": "locales/sw.pak",
+      "size": 703647,
+      "sha256": "31fd1d0922198c2adcb1ab5ce4a39fe337ed955bfb92a3b4c1f5a81e849f0bb9",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sw_FEMININE.pak",
+      "path": "locales/sw_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sw_MASCULINE.pak",
+      "path": "locales/sw_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/sw_NEUTER.pak",
+      "path": "locales/sw_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ta.pak",
+      "path": "locales/ta.pak",
+      "size": 1793424,
+      "sha256": "6c93a26c047f955f1b856c4c0a13d85756bc9100063250be887528c170764f7c",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ta_FEMININE.pak",
+      "path": "locales/ta_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ta_MASCULINE.pak",
+      "path": "locales/ta_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ta_NEUTER.pak",
+      "path": "locales/ta_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/te.pak",
+      "path": "locales/te.pak",
+      "size": 1661058,
+      "sha256": "9043cdc818d19081c995fb69d276f3c936abebcb09be457e07e355777d243fac",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/te_FEMININE.pak",
+      "path": "locales/te_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/te_MASCULINE.pak",
+      "path": "locales/te_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/te_NEUTER.pak",
+      "path": "locales/te_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/th.pak",
+      "path": "locales/th.pak",
+      "size": 1392444,
+      "sha256": "11140b8b1136be5207d478c2f04eeaffb19ad6e1f659cb31f9146fce249333f5",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/th_FEMININE.pak",
+      "path": "locales/th_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/th_MASCULINE.pak",
+      "path": "locales/th_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/th_NEUTER.pak",
+      "path": "locales/th_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/tr.pak",
+      "path": "locales/tr.pak",
+      "size": 717311,
+      "sha256": "a9297ee40f68047c1065c1b68d841035466a90dce12e12ebf585efbb73bbf6f3",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/tr_FEMININE.pak",
+      "path": "locales/tr_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/tr_MASCULINE.pak",
+      "path": "locales/tr_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/tr_NEUTER.pak",
+      "path": "locales/tr_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/uk.pak",
+      "path": "locales/uk.pak",
+      "size": 1247678,
+      "sha256": "18eec18f78da8514b4243dea00f25a89b6827500541c58b9505b70c2277065c6",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/uk_FEMININE.pak",
+      "path": "locales/uk_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/uk_MASCULINE.pak",
+      "path": "locales/uk_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/uk_NEUTER.pak",
+      "path": "locales/uk_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ur.pak",
+      "path": "locales/ur.pak",
+      "size": 1070442,
+      "sha256": "4343fddcb0042a0ff717eda48aece07a2cf78ab86e556c3b173563739321e288",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ur_FEMININE.pak",
+      "path": "locales/ur_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ur_MASCULINE.pak",
+      "path": "locales/ur_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/ur_NEUTER.pak",
+      "path": "locales/ur_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/vi.pak",
+      "path": "locales/vi.pak",
+      "size": 852427,
+      "sha256": "dd0d9d86f9c0350d9c9d1b1364250f646f36bcce78b03dae94f731a81b39ff8b",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/vi_FEMININE.pak",
+      "path": "locales/vi_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/vi_MASCULINE.pak",
+      "path": "locales/vi_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/vi_NEUTER.pak",
+      "path": "locales/vi_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/zh-CN.pak",
+      "path": "locales/zh-CN.pak",
+      "size": 611169,
+      "sha256": "da76e1a99129d8d8531c6b83bc56a2d0f5656ee66723defb43bc05cfd7f12056",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/zh-CN_FEMININE.pak",
+      "path": "locales/zh-CN_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/zh-CN_MASCULINE.pak",
+      "path": "locales/zh-CN_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/zh-CN_NEUTER.pak",
+      "path": "locales/zh-CN_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/zh-TW.pak",
+      "path": "locales/zh-TW.pak",
+      "size": 604496,
+      "sha256": "a8adba1647cdde6c5716df14c3e50e8f7ce8a6eeee6c9999701dda80891ef50e",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/zh-TW_FEMININE.pak",
+      "path": "locales/zh-TW_FEMININE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/zh-TW_MASCULINE.pak",
+      "path": "locales/zh-TW_MASCULINE.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/locales/zh-TW_NEUTER.pak",
+      "path": "locales/zh-TW_NEUTER.pak",
+      "size": 18,
+      "sha256": "ca73097bd968b363b7145e86b64f3c595e533808b0763dc8863a27fc363cfa51",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/resources.pak",
+      "path": "resources.pak",
+      "size": 26321324,
+      "sha256": "e0bbd3c8e27ec82933589d4813b66ae2765e693b30104298788a8d240cd37c6f",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/v8_context_snapshot.bin",
+      "path": "v8_context_snapshot.bin",
+      "size": 709560,
+      "sha256": "d88cd8c924f3c3a7a51f65a64febc8053a8ee5d3033f6fa9008cf7230c6abdf2",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/lib/chromium/vk_swiftshader_icd.json",
+      "path": "vk_swiftshader_icd.json",
+      "size": 107,
+      "sha256": "c9eef28b6b984fec220ef0abfecc40b502d46946706e47bfe97707027cb818bd",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": "usr/share/licenses/chromium/LICENSE",
+      "path": "LICENSE",
+      "size": 1536,
+      "sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": ".PKGINFO",
+      "path": "SOURCE-PKGINFO",
+      "size": 2072,
+      "sha256": "05c08dfd706591486ce6af396fd0412d02294f60e8149f26f148bcc37da0496b",
+      "executable": false
+    },
+    {
+      "archive": "chromium",
+      "archive_path": ".BUILDINFO",
+      "path": "SOURCE-BUILDINFO",
+      "size": 12646,
+      "sha256": "1e777765902ef7c005cb996dc1cd071bca210e0a8ca2448e9ac738cc09d352c0",
+      "executable": false
+    },
+    {
+      "archive": "simdutf",
+      "archive_path": "usr/lib/libsimdutf.so.37.0.0",
+      "path": "libraries/libsimdutf.so.37",
+      "size": 604232,
+      "sha256": "b446b0f4122555ccec556d731810ea62f6f0192ea9a363b9299e83fc10fcc67e",
+      "executable": true
+    },
+    {
+      "archive": "simdutf",
+      "archive_path": "usr/share/licenses/simdutf/LICENSE-MIT",
+      "path": "libraries/SIMDUTF-LICENSE",
+      "size": 1059,
+      "sha256": "fc8dbc04e03ad4efc08a647ffe7f995b811a95bc04c0e85a56d5277c6593fa5f",
+      "executable": false
+    },
+    {
+      "archive": "simdutf",
+      "archive_path": ".PKGINFO",
+      "path": "libraries/SIMDUTF-PKGINFO",
+      "size": 477,
+      "sha256": "b67adde2a84f922508f61f97972bb7bfffe2a6da027b2acfdc3060939605526d",
+      "executable": false
+    },
+    {
+      "archive": "simdutf",
+      "archive_path": ".BUILDINFO",
+      "path": "libraries/SIMDUTF-BUILDINFO",
+      "size": 6714,
+      "sha256": "d1907a07053f30f6f2db0529dcbbe10adef1a52f401288f916586ae3b20215d3",
+      "executable": false
+    },
+    {
+      "path": "THIRD-PARTY-NOTICES.html",
+      "size": 5373662,
+      "sha256": "8a48726cb3854c9cbab99badf31bb7b089bf12cbcbd05932e4a1167e735d86f7",
+      "executable": false
+    },
+    {
+      "input_path": "CHROMIUM-SOURCE-RECIPE.tar.gz",
+      "path": "SOURCE-RECIPE.tar.gz",
+      "size": 20313,
+      "sha256": "a8cbcd515e35089976d41857221dab33e8939b3558c8fa9008abd54398321df2",
+      "executable": false
+    }
+  ],
+  "recipe_archive_url": "https://gitlab.archlinux.org/archlinux/packaging/packages/chromium/-/archive/158.0.8127.88-1/chromium-158.0.8127.88-1.tar.gz",
+  "source_archive_url": "https://commondatastorage.googleapis.com/chromium-browser-official/chromium-158.0.8127.88-lite.tar.xz",
+  "source_archive_sha256": "76f5aa94996e31a59b9aa01944c5bdc181043ff58553aff572f9d5750acd326d"
+}

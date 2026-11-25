@@ -1,0 +1,5 @@
+linux x86_64 unverified
+Verified all 975 package SHA-256 entries.
+Mosh client loader: /lib64/ld-linux-x86-64.so.2
+Mosh client declared linked names: 68
+Highest glibc symbol required by Mosh client: 2.38

@@ -1,0 +1,30 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.20s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-127cf14f51e8fab8)
+
+running 1 test
+test ui::workspace_review_tests::paste_and_close_confirmations_show_custom_titles_and_terminal_identity ... FAILED
+
+failures:
+
+---- ui::workspace_review_tests::paste_and_close_confirmations_show_custom_titles_and_terminal_identity stdout ----
+
+thread 'ui::workspace_review_tests::paste_and_close_confirmations_show_custom_titles_and_terminal_identity' (499523) panicked at src/ui/workspace_review_tests.rs:293:46:
+Confirm multiline paste
+Send this text to 2 original terminal target(s)? Newlines can execute commands.
+same session
+same session
+one
+two
+Paste to these targets
+Cancel paste
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::workspace_review_tests::paste_and_close_confirmations_show_custom_titles_and_terminal_identity
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 77 filtered out; finished in 1.20s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

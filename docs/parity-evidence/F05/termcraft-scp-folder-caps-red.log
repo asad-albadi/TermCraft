@@ -1,0 +1,60 @@
+warning: type `SourceEntry` is more private than the item `SourceDir::entries`
+  --> src/remote_files/transfer/operations/source.rs:45:5
+   |
+45 |     pub async fn entries(&self) -> Result<Vec<SourceEntry>, String> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `SourceDir::entries` is reachable at visibility `pub(in crate::remote_files::transfer)`
+   |
+note: but type `SourceEntry` is only usable at visibility `pub(in crate::remote_files::transfer::operations)`
+  --> src/remote_files/transfer/operations/source.rs:9:1
+   |
+ 9 | pub(super) struct SourceEntry {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `SourceEntry` is more private than the item `SourceDir::open_child`
+  --> src/remote_files/transfer/operations/source.rs:75:5
+   |
+75 |     pub async fn open_child(&self, entry: SourceEntry) -> Result<SourceNode, String> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `SourceDir::open_child` is reachable at visibility `pub(in crate::remote_files::transfer)`
+   |
+note: but type `SourceEntry` is only usable at visibility `pub(in crate::remote_files::transfer::operations)`
+  --> src/remote_files/transfer/operations/source.rs:9:1
+   |
+ 9 | pub(super) struct SourceEntry {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `SourceNode` is more private than the item `SourceDir::open_child`
+  --> src/remote_files/transfer/operations/source.rs:75:5
+   |
+75 |     pub async fn open_child(&self, entry: SourceEntry) -> Result<SourceNode, String> {
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ method `SourceDir::open_child` is reachable at visibility `pub(in crate::remote_files::transfer)`
+   |
+note: but type `SourceNode` is only usable at visibility `pub(in crate::remote_files::transfer::operations)`
+  --> src/remote_files/transfer/operations/source.rs:22:1
+   |
+22 | pub(super) enum SourceNode {
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (lib) generated 3 warnings
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.91s
+     Running tests/scp_browser.rs (app/target/debug/deps/scp_browser-c29d0c75c0879a2f)
+
+running 1 test
+test explicit_scp_reports_negotiated_endpoint_capabilities ... FAILED
+
+failures:
+
+---- explicit_scp_reports_negotiated_endpoint_capabilities stdout ----
+
+thread 'explicit_scp_reports_negotiated_endpoint_capabilities' (301920) panicked at tests/scp_browser.rs:180:5:
+assertion failed: capabilities.folders
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    explicit_scp_reports_negotiated_endpoint_capabilities
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.28s
+
+error: test failed, to rerun pass `--test scp_browser`

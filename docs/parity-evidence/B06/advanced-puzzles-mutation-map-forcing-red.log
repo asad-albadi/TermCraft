@@ -1,0 +1,51 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/mutants/map-forcing)
+warning: unreachable statement
+   --> src/games/puzzles/map.rs:122:5
+    |
+120 |  return 0; // mutation: suppress this source deduction
+    |  -------- any code following this expression is unreachable
+121 |
+122 |     let n = colours.len();
+    |     ^^^^^^^^^^^^^^^^^^^^^^ unreachable statement
+    |
+    = note: `#[warn(unreachable_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `colours`
+   --> src/games/puzzles/map.rs:119:19
+    |
+119 | fn forcing_chains(colours: &[u8], possible: &mut [u8], edges: &[(usize, usize)]) -> usize {
+    |                   ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_colours`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `possible`
+   --> src/games/puzzles/map.rs:119:35
+    |
+119 | fn forcing_chains(colours: &[u8], possible: &mut [u8], edges: &[(usize, usize)]) -> usize {
+    |                                   ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_possible`
+
+warning: unused variable: `edges`
+   --> src/games/puzzles/map.rs:119:56
+    |
+119 | fn forcing_chains(colours: &[u8], possible: &mut [u8], edges: &[(usize, usize)]) -> usize {
+    |                                                        ^^^^^ help: if this is intentional, prefix it with an underscore: `_edges`
+
+warning: `b06-puzzle-options-private` (lib test) generated 4 warnings (run `cargo fix --lib -p b06-puzzle-options-private --tests` to apply 3 suggestions)
+    Finished `release` profile [optimized] target(s) in 5.32s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/mutation-target/release/deps/b06_puzzle_options_private-beed19bb514c887b)
+
+running 1 test
+
+thread 'map::advanced_tests::forcing_chain_deduction_is_real' (422499) panicked at src/games/puzzles/map.rs:933:9:
+assertion failed: forcing_chains(&colours, &mut p, &edges) > 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test map::advanced_tests::forcing_chain_deduction_is_real ... FAILED
+
+failures:
+
+failures:
+    map::advanced_tests::forcing_chain_deduction_is_real
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 64 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

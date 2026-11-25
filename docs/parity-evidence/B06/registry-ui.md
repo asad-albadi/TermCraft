@@ -1,0 +1,27 @@
+# B06 common registry and foreground game UI
+
+2026-11-25. Independent implementation candidate; no B06 completion/native/original-runtime claim.
+
+The catalog follows all thirteen unhidden game declarations, in order, in recovered `original-static-recovery/catalog.json`. Exact visible labels and lowercase dispatch selectors are preserved. Typespeed is absent because the actual serialized declaration explicitly hides it; Tux consolesaver remains the existing independently branded idle screen, with explicit opt-in timing rather than guessed original timers. No original executable, companion executable, extracted artwork or native game engine is packaged or launched.
+
+`games::library` exposes `GameRegistry::catalog/start`, typed `GameSession` constructors, `id/spec/seed/help/scene/outcome/input/undo/can_undo/reset`, and a common outcome/scene/input wrapper. Wrong-family input fails without changing the scene. Per-core state/history/randomness remain in their pure modules. Configurable core constructors are exposed: Freecell/Klondike plus passes, four Nimesweeper presets, Termwalk odd 3–15 grids, Map default/portrait. New applies the selected options and an incremented explicit seed; Reset repeats the exact current initial rules/seed. Library preserves the current game for Resume. Closing the foreground game ends it; native Close suspends it so existing session/remote-edit confirmation paths can run, retaining game state for Library/Resume.
+
+Games menu entries and the Games toolbar open a foreground game/library. A second gate immediately after the menu catches the launch frame before terminal panels. While active, the root draws the game; detached windows display that a game is open in the main window and swallow game input. Session polling precedes the game gate, and a bounded delayed repaint maintains that polling. Existing native detached Close interception still precedes every idle/game gate. A native Close suspends the game and permits existing confirmation rendering. Escape and the Close button consume their whole frame, held repeats, modifiers and pointer releases, scoped to the owning viewport; missing/unfocused owner and canceled pointer recover without replaying swallowed input. Screensaver idle is reset while a foreground game/library is open. Existing reviewed idle guards are retained.
+
+## Implemented interaction
+
+- Netwalk/Termwalk: drawn connection masks, connectivity/source indication, click rotation, secondary inverse rotation (Netwalk left anticlockwise/right clockwise), Netwalk middle lock; explicit rotation, lock, half-turn and jumble buttons. Arrows select; Ctrl+arrows moves Netwalk source; A/D, S, F and J perform core actions.
+- Mines/Nimesweeper: visible covered/open/flag/mine cells, pointer reveal/flag/chord, selection cursor and explicit buttons. Arrows select; Mines Enter reveals/Space flags; Nimesweeper Space reveals/F flags/Enter chords; P pauses Nimesweeper.
+- Solo/Sudoku: selectable grid, fixed digits and editable fields, numeric palette/keyboard, erase, Solo pencil marks/conflict indication.
+- Guess: previous rows and exact/misplaced counts, editable peg row, six-colour palette and keyboard, pointer cycle/secondary hold, submit/hold buttons and terminal answer/outcome.
+- Map: actual region geometry with inter-region borders, fixed clues, colour palette, normal/pencil input, conflicts, numeric keyboard; default/portrait constructor selection for New.
+- Untangle: drawn edges and crossing indication, live point drag preview with one integer-coordinate core move on release. Tab selects a point and arrows move it (Shift fine step).
+- Soliterm: displayed tableau cards, reserves, foundations, stock/waste, selected source/destination and move count; mouse pile selection and draw, keyboard arrows select pile/Space or Enter chooses source/destination/D draws. New selects Freecell/Klondike and passes.
+- Ctris/Ninvaders: actual board/active block/enemies/shots/player scene rendering, movement/action/pause buttons and keyboard, bounded one-step elapsed-time ticks (500ms blocks, 100ms invaders), no catch-up burst. Ninvaders player is drawn from the explicit core `player_y`, the same contract used for collisions and firing.
+- Greed: visible digits/erased squares/player, eight direction buttons, arrows/vim/keypad digits and pointer direction moves.
+
+All games share Help, New, Reset, Undo and visible outcome/error feedback. Views are independently drawn with existing penguin/emerald branding and no copied assets. GUI fixtures use the real pinned egui context and owned raw PTYs, not a substitute renderer or process stub.
+
+## Evidence limits retained
+
+Static recovery does not establish original runtime defaults, random sequences or controls. The pure-core provenance and reviews remain authoritative about implemented restrictions: historical puzzle variants/common save-ID actions, Solo symmetry/DIFF_BLOCK generation, exact terminal difficulty/controls, timed-game historical behavior and screensaver animation remain gaps. The UI exposes available core variants; it cannot invent unavailable historical rules. Existing named Sudoku fix/save/solve/hint operations are not implemented by the current core and are not claimed here. No native OS input/window comparison, original Windows runtime observation, complete native accessibility/IME qualification, release build, whole-application regression gate or B06 checklist-count advance is supplied by this narrow handoff.

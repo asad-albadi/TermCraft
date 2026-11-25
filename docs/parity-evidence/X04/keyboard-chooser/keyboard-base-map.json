@@ -1,0 +1,11 @@
+{
+  "packaging/x11/xdmcp/manifest.json": "c2fc702f204086de8f33e90df002e3d56f23570459f0b3ecf262577ceb7bbb21",
+  "packaging/x11/xdmcp/readiness/Xephyr-session-ready.xz": "1591b56085492f31c2e5f5c5ad7b4f914b3818f3b4d5444c7b20d827c9d78c6a",
+  "packaging/x11/xdmcp/readiness/executable.sha256.bin": "154b51c6a371c3127dfd8e60ff0c1451d2d5595469e48b236a37a377e8c865e0",
+  "packaging/x11/xdmcp/readiness/xephyr.patch": "6399192635349fc2cb090bb2d76fd0a6c1c1973676e5fae5245c3bad43cc6a85",
+  "src/ui/xdmcp.rs": "e27e634479d43bbf98bbae9332b8df205692198c2d62f23569b93d4395a3929b",
+  "src/x11/xdmcp.rs": "21f09c36f9453e66801d2bf843156a9a3797a17d6a9e1e40aa1f4779d869a1bb",
+  "src/x11/xdmcp_engine.rs": "f3821c03aa61ff118581a5e05e41e42efa102828fd5742e0eebb41647c114e32",
+  "tests/support/run_xdmcp_isolated.sh": "8469fc84e2565e0cce38b73d3003d6cc9009d27b47eba0583fc07806074c51fa",
+  "tests/support/xdmcp_window.py": "c6f4b506dbc28f7194ea84b464864a1409b26227b24d7444d999c96849b50eea"
+}

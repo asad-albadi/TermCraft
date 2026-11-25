@@ -1,0 +1,28 @@
+
+running 5 tests
+test ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full ... FAILED
+test ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs ... ok
+test ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source ... FAILED
+test ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text ... ok
+test ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted ... ok
+
+failures:
+
+---- ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full stdout ----
+
+thread 'ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full' (519175) panicked at src/ui/web_browser_tests.rs:282:9:
+The pointer fixture never rendered: page_requested=true, expected_title=false, loading=false, closed=true, authenticated_dialog=false, viewport=[721, 464], viewport_revision=1, texture_revision=None, error=Some("Chromium could not complete Page.getNavigationHistory."), notice=None
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source stdout ----
+
+thread 'ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source' (519172) panicked at src/ui/../../tests/support/ssh_server.rs:78:13:
+sshd fixture failed: 
+
+
+failures:
+    ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source
+    ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 measured; 132 filtered out; finished in 11.78s
+

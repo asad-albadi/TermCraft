@@ -1,0 +1,42 @@
+[
+  {
+    "path": "docs/parity-evidence/parallel-legacy/review-reserved-ports.log",
+    "sha256": "c24b7575d2dbdcf4bca4df89f928cd3df1d44efe2028ed336bb827682ede8b06",
+    "scope": "historical real reserved-port protocol fixtures"
+  },
+  {
+    "path": "docs/parity-evidence/parallel-vnc/green.log",
+    "sha256": "e3000c398f7693f8d49313088cab73b08f25ed189cda35a689d588c35f72f252",
+    "scope": "historical real TCP VNC scenarios"
+  },
+  {
+    "path": "docs/parity-evidence/parallel-vnc/unit-green.log",
+    "sha256": "4d523865f1e4a15887293009d2d31637017d0296d2622579bac97ca72cc693ff",
+    "scope": "historical TLS in-memory test streams; not real TCP endpoint evidence"
+  },
+  {
+    "path": "docs/parity-evidence/parallel-gateway/transport-tests.log",
+    "sha256": "b8c6aed8c5afb7ada08c7c896b2d04b7d0bbc8b607af73bce0966ad85371b17f",
+    "scope": "historical owned SSH gateway transport"
+  },
+  {
+    "path": "docs/parity-evidence/parallel-rdp-serial/helper-final.log",
+    "sha256": "b884adaa68d8e2b22c00b9294e6960656dc948282b3b4945e06ce421322126e2",
+    "scope": "historical helper regressions, not a current endpoint run"
+  },
+  {
+    "path": "docs/parity-evidence/D02/providers/review-green.log",
+    "sha256": "1f724c8637ca702113857b9a398bc6f1078123c2253c1b473968624a44f0da3b",
+    "scope": "historical drive/admin provider PDU/component tests, not end-to-end endpoint redirection"
+  },
+  {
+    "path": "docs/parity-evidence/D02/engine.log",
+    "sha256": "6e971b5dd2cea3d391bd13ac7f1b9d4250b05d3a737ac2842880fd7b6c922bd9",
+    "scope": "historical RDP clipboard component tests; not current endpoint clipboard interoperability"
+  },
+  {
+    "path": "target/agent-work/x04/evidence/final-review-fix-real-xdm.log",
+    "sha256": "119afa1e7aaaeaff946530288f416ca7823e592e2bd23d9d184f6554f7ff5406",
+    "scope": "historical actual xdm endpoint and desktop lifecycle"
+  }
+]

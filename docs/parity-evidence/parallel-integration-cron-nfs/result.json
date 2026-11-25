@@ -1,0 +1,13 @@
+{
+  "exit_code": 101,
+  "outer_targets": 65,
+  "passed": 655,
+  "failed": 3,
+  "ignored": 35,
+  "failures": [
+    "services::cron::tests::real_due_process_once_disable_restart_and_corrupt_preserve",
+    "ui::gui_tests::scp_pane_never_identifies_itself_as_sftp",
+    "ui::managed_servers::tests::servers_page_buttons_own_real_listeners_and_restart"
+  ],
+  "scope": "Cron/NFS merged integration failed; preserve last639-pass source boundary, no new checkpoint."
+}

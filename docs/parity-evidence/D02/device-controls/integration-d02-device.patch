@@ -1,0 +1,3073 @@
+--- a/engines/rdp/Cargo.toml
++++ b/engines/rdp/Cargo.toml
+@@ -33,3 +33,6 @@
+ 
+ [dev-dependencies]
+ tempfile = "=3.27.0"
++
++[target.'cfg(windows)'.dependencies]
++windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_Devices_Communication", "Win32_System_IO", "Win32_System_Threading", "Win32_Security"] }
+--- a/engines/rdp/Cargo.lock
++++ b/engines/rdp/Cargo.lock
+@@ -2679,6 +2679,7 @@
+  "tempfile",
+  "tokio",
+  "tokio-rustls",
++ "windows-sys 0.61.2",
+  "x509-cert 0.2.5",
+  "zeroize",
+ ]
+--- a/engines/rdp/src/devices.rs
++++ b/engines/rdp/src/devices.rs
+@@ -1,12 +1,24 @@
+ //! RDP device redirection. Disk operations run on a bounded worker,
+ //! confined to capability directory handles. No ambient path from the peer is opened.
+ use crate::rdp_options::{DriveMapping, PrinterMapping, RdpOptions, SerialMapping};
++#[cfg(target_os = "macos")]
++#[path = "native_file_macos.rs"]
++mod native_file_macos;
++#[cfg(windows)]
++#[path = "native_file_windows.rs"]
++mod native_file_windows;
+ #[cfg(target_os = "linux")]
+ #[path = "printer.rs"]
+ mod printer;
+ #[cfg(unix)]
+ #[path = "serial.rs"]
+ mod serial;
++#[cfg(windows)]
++#[path = "serial_windows.rs"]
++mod serial;
++#[cfg(any(windows, test))]
++#[path = "serial_completion.rs"]
++mod serial_completion;
+ use crate::smartcard;
+ use cap_std::fs::{Dir, File, OpenOptions};
+ use ironrdp_core::AsAny;
+@@ -98,7 +110,7 @@
+     dir: Option<Dir>,
+     access: u32,
+     share: u32,
+-    identity: (u64, u64),
++    identity: (u64, u128),
+     entries: Option<cap_std::fs::ReadDir>,
+     pattern: String,
+     reservation: Option<std::sync::Arc<Reservation>>,
+@@ -243,6 +255,23 @@
+                     use cap_std::fs::OpenOptionsExt;
+                     opt.custom_flags(libc::O_NONBLOCK | libc::O_NOFOLLOW);
+                 }
++                #[cfg(windows)]
++                {
++                    use cap_std::fs::OpenOptionsExt;
++                    // Request DELETE only when the remote handle owns that right.
++                    // FILE_GENERIC_READ/WRITE include SYNCHRONIZE for synchronous files.
++                    let native_access = if access & (0x80000000 | 0x10000000 | 1) != 0 || !writing {
++                        0x120089
++                    } else {
++                        0
++                    } | if writing { 0x120116 } else { 0 }
++                        | if access & (0x10000 | 0x10000000) != 0 {
++                            0x10000
++                        } else {
++                            0
++                        };
++                    opt.access_mode(native_access).share_mode(share);
++                }
+                 match disposition {
+                     0 | 3 | 5 => {
+                         opt.create(true);
+@@ -259,7 +288,15 @@
+                 }
+                 (Some(file), None, metadata)
+             };
++            #[cfg(not(windows))]
+             let identity = identity(&metadata)?;
++            #[cfg(windows)]
++            let identity = if let Some(file) = &file {
++                native_file_windows::identity(file)
++            } else {
++                native_file_windows::identity(dir.as_ref().ok_or(INVALID)?)
++            }
++            .map_err(status)?;
+             let requested = access_categories(access);
+             for handle in self.handles.values().filter(|h| h.identity == identity) {
+                 if requested & !handle.share != 0 || access_categories(handle.access) & !share != 0
+@@ -362,6 +399,20 @@
+                 }
+                 .map_err(status)?;
+                 let data = file_info(&meta, class)?;
++                #[cfg(windows)]
++                let data = if class == 5 {
++                    let mut data = data;
++                    if let Some(file) = &h.file {
++                        data[..8].copy_from_slice(
++                            &native_file_windows::allocation_size(file)
++                                .map_err(status)?
++                                .to_le_bytes(),
++                        );
++                    }
++                    data
++                } else {
++                    data
++                };
+                 Ok(length_data(data))
+             }
+             6 => {
+@@ -408,6 +459,42 @@
+                             }
+                         }
+                     }
++                    #[cfg(windows)]
++                    10 | 13 => {
++                        if h.access & (0x10000 | 0x10000000) == 0 {
++                            return Err(DENIED);
++                        }
++                        let file = h.file.as_ref().ok_or(UNSUPPORTED)?;
++                        if class == 13 {
++                            if !data.is_empty() {
++                                return Err(INVALID);
++                            }
++                            native_file_windows::disposition(file, true).map_err(status)?;
++                        } else {
++                            // MS-RDPEFS encodes RootDirectory as one reserved zero byte.
++                            if data.len() < 6 || data[0] > 1 || data[1] != 0 {
++                                return Err(INVALID);
++                            }
++                            let name_length = u32_at(data, 2)? as usize;
++                            if data.len() != 6 + name_length {
++                                return Err(INVALID);
++                            }
++                            let destination = relative(&text(&data[6..])?)?;
++                            let name = destination.file_name().ok_or(INVALID)?;
++                            let parent = destination
++                                .parent()
++                                .filter(|path| !path.as_os_str().is_empty())
++                                .unwrap_or(std::path::Path::new("."));
++                            let parent = root.dir.open_dir(parent).map_err(status)?;
++                            native_file_windows::rename(
++                                file,
++                                &parent,
++                                std::path::Path::new(name),
++                                data[0] != 0,
++                            )
++                            .map_err(status)?;
++                        }
++                    }
+                     _ => return Err(UNSUPPORTED),
+                 }
+                 let mut out = Vec::new();
+@@ -472,7 +559,15 @@
+         }
+         Ok(())
+     }
+-    #[cfg(not(target_os = "linux"))]
++    #[cfg(windows)]
++    {
++        native_file_windows::allocate(file, size).map_err(status)
++    }
++    #[cfg(target_os = "macos")]
++    {
++        native_file_macos::allocate(file, size).map_err(status)
++    }
++    #[cfg(not(any(target_os = "linux", target_os = "macos", windows)))]
+     {
+         let _ = (file, size);
+         Err(UNSUPPORTED)
+@@ -677,18 +772,18 @@
+ 
+ /// Serial devices selected for one connection, shared by its certificate attempts.
+ pub struct BoundSerialMappings {
+-    #[cfg(unix)]
++    #[cfg(any(unix, windows))]
+     ports: Vec<serial::Binding>,
+ }
+ 
+ impl BoundSerialMappings {
+     pub fn new(mappings: &[SerialMapping]) -> Result<Self, String> {
+-        #[cfg(not(unix))]
++        #[cfg(not(any(unix, windows)))]
+         if !mappings.is_empty() {
+             return Err("Embedded RDP serial redirection is unsupported on this platform".into());
+         }
+         Ok(Self {
+-            #[cfg(unix)]
++            #[cfg(any(unix, windows))]
+             ports: serial::bind(mappings)?,
+         })
+     }
+@@ -812,9 +907,9 @@
+         printer: &BoundPrinterMapping,
+         smartcard: Option<smartcard::Worker>,
+     ) -> Result<Self, String> {
+-        #[cfg(unix)]
++        #[cfg(any(unix, windows))]
+         let names: Vec<&str> = serial.ports.iter().map(|port| port.name.as_str()).collect();
+-        #[cfg(not(unix))]
++        #[cfg(not(any(unix, windows)))]
+         let names = {
+             let _ = serial;
+             Vec::new()
+@@ -837,7 +932,7 @@
+             .zip(printer_id)
+             .map(|(binding, id)| printer::Printer::new(binding, id));
+         let drives = drives.to_vec();
+-        #[cfg(unix)]
++        #[cfg(any(unix, windows))]
+         let ports = serial.ports.clone();
+         // Reserve one extra position for a close even if serial reads fill the queue.
+         let (tx, jobs) = mpsc::sync_channel::<Vec<u8>>(17);
+@@ -854,10 +949,10 @@
+                         return;
+                     }
+                 };
+-                #[cfg(unix)]
++                #[cfg(any(unix, windows))]
+                 let mut serial = serial::Serial::new(drives.roots.len() as u32 + 1, ports);
+                 loop {
+-                    #[cfg(unix)]
++                    #[cfg(any(unix, windows))]
+                     let request = if serial.has_pending() {
+                         match jobs.recv_timeout(std::time::Duration::from_millis(5)) {
+                             Ok(request) => Some(request),
+@@ -868,7 +963,7 @@
+                         let Ok(request) = jobs.recv() else { break };
+                         Some(request)
+                     };
+-                    #[cfg(not(unix))]
++                    #[cfg(not(any(unix, windows)))]
+                     let request = match jobs.recv() {
+                         Ok(request) => Some(request),
+                         Err(_) => break,
+@@ -891,13 +986,13 @@
+                             }
+                             continue;
+                         }
+-                        #[cfg(unix)]
++                        #[cfg(any(unix, windows))]
+                         let response = if serial.contains(u32_at(&request, 4).unwrap()) {
+                             serial.process(request).map(Ok)
+                         } else {
+                             Some(drives.process(&request))
+                         };
+-                        #[cfg(not(unix))]
++                        #[cfg(not(any(unix, windows)))]
+                         let response = Some(drives.process(&request));
+                         if let Some(response) = response
+                             && results.send(response.map(|packet| (packet, None))).is_err()
+@@ -908,7 +1003,7 @@
+                     if cancelled.load(Ordering::Acquire) {
+                         break;
+                     }
+-                    #[cfg(unix)]
++                    #[cfg(any(unix, windows))]
+                     for response in serial.ready() {
+                         if results.send(Ok((response, None))).is_err() {
+                             return;
+@@ -1241,21 +1336,16 @@
+     }
+     categories
+ }
+-fn identity(metadata: &cap_std::fs::Metadata) -> Result<(u64, u64), u32> {
+-    use cap_std::fs::MetadataExt;
++#[cfg(not(windows))]
++fn identity(metadata: &cap_std::fs::Metadata) -> Result<(u64, u128), u32> {
+     #[cfg(unix)]
+     {
+-        Ok((metadata.dev(), metadata.ino()))
+-    }
+-    #[cfg(windows)]
++        use cap_std::fs::MetadataExt;
++        Ok((metadata.dev(), metadata.ino() as u128))
++    }
++    #[cfg(not(unix))]
+     {
+-        Ok((
+-            metadata.volume_serial_number().ok_or(UNSUPPORTED)? as u64,
+-            metadata.file_index().ok_or(UNSUPPORTED)?,
+-        ))
+-    }
+-    #[cfg(not(any(unix, windows)))]
+-    {
++        let _ = metadata;
+         Err(UNSUPPORTED)
+     }
+ }
+--- a/engines/rdp/src/serial.rs
++++ b/engines/rdp/src/serial.rs
+@@ -20,6 +20,7 @@
+ const BUFFER_TOO_SMALL: u32 = 0xc0000023;
+ const IO_TIMEOUT: u32 = 0xc00000b5;
+ const DISCONNECTED: u32 = 0xc000009d;
++#[cfg(test)]
+ const IO_LIMIT: Duration = Duration::from_secs(1);
+ 
+ const SET_BAUD: u32 = 0x001b0004;
+@@ -51,13 +52,43 @@
+     reads: bool,
+     writes: bool,
+     original: Option<libc::termios>,
++    original_modem: Option<libc::c_int>,
++    modem_changed: bool,
++    flow_changed: bool,
++    break_changed: bool,
++    timeouts: [u32; 5],
+ }
+ 
+ impl Drop for Handle {
+     fn drop(&mut self) {
++        if self.break_changed {
++            unsafe {
++                libc::ioctl(self.file.as_raw_fd(), libc::TIOCCBRK as _);
++            }
++        }
++        if self.flow_changed {
++            unsafe {
++                libc::tcflow(self.file.as_raw_fd(), libc::TCOON);
++            }
++        }
+         if let Some(original) = &self.original {
+             // TCSANOW avoids waiting for potentially stalled serial output on shutdown.
+             let _ = set_attributes(&self.file, original);
++        }
++        if self.modem_changed {
++            if let Some(bits) = self.original_modem {
++                let mask = libc::TIOCM_DTR
++                    | if self
++                        .original
++                        .as_ref()
++                        .is_some_and(|t| t.c_cflag & libc::CRTSCTS != 0)
++                    {
++                        0
++                    } else {
++                        libc::TIOCM_RTS
++                    };
++                let _ = change_modem(&self.file, bits, mask);
++            }
+         }
+     }
+ }
+@@ -105,12 +136,18 @@
+         } else {
+             None
+         };
++        let original_modem = if writes { modem(&file).ok() } else { None };
+         Ok(Handle {
+             id,
+             file,
+             reads,
+             writes,
+             original,
++            original_modem,
++            modem_changed: false,
++            flow_changed: false,
++            break_changed: false,
++            timeouts: [u32::MAX, u32::MAX, 1000, 0, 1000],
+         })
+     }
+ }
+@@ -125,34 +162,82 @@
+     device: u32,
+     handle: u32,
+     transfer: Transfer,
+-    deadline: Instant,
++    deadline: Option<Instant>,
++    started: bool,
++    received: usize,
++    last_byte: Option<Instant>,
++    timeouts: [u32; 5],
+ }
+ 
+ impl Pending {
++    fn immediate(&self) -> bool {
++        self.timeouts[..3] == [u32::MAX, 0, 0]
++    }
++    fn first_byte_mode(&self) -> bool {
++        self.timeouts[0] == u32::MAX && self.timeouts[1] == u32::MAX
++    }
++
+     fn try_io(&mut self, handle: &mut Handle) -> Option<Result<Vec<u8>, u32>> {
+-        if Instant::now() >= self.deadline {
+-            return Some(match &self.transfer {
+-                Transfer::Read(_) => Ok(length_data(Vec::new())),
++        let now = Instant::now();
++        if !self.started {
++            self.started = true;
++            let (len, multiplier, constant) = match &self.transfer {
++                Transfer::Read(buffer) => (buffer.len(), self.timeouts[1], self.timeouts[2]),
++                Transfer::Write { data, .. } => (data.len(), self.timeouts[3], self.timeouts[4]),
++            };
++            let multiplier = if matches!(self.transfer, Transfer::Read(_)) && self.first_byte_mode()
++            {
++                0
++            } else {
++                multiplier
++            };
++            let milliseconds = (len as u64)
++                .saturating_mul(multiplier as u64)
++                .saturating_add(constant as u64);
++            self.deadline = (milliseconds != 0).then(|| now + Duration::from_millis(milliseconds));
++        }
++        let interval_expired = self.last_byte.is_some_and(|last| {
++            self.timeouts[0] != 0
++                && self.timeouts[0] != u32::MAX
++                && now.duration_since(last) >= Duration::from_millis(self.timeouts[0] as u64)
++        });
++        if self.deadline.is_some_and(|deadline| now >= deadline) || interval_expired {
++            return Some(match &mut self.transfer {
++                Transfer::Read(buffer) => {
++                    buffer.truncate(self.received);
++                    Ok(length_data(std::mem::take(buffer)))
++                }
+                 Transfer::Write { written, .. } if *written != 0 => Ok(write_count(*written)),
+                 Transfer::Write { .. } => Err(IO_TIMEOUT),
+             });
+         }
++        let immediate = self.immediate();
++        let first_byte = self.first_byte_mode();
+         let result = match &mut self.transfer {
+             Transfer::Read(buffer) if buffer.is_empty() => {
+                 return Some(Ok(length_data(Vec::new())));
+             }
+-            Transfer::Read(buffer) => handle.file.read(buffer).and_then(|n| {
+-                if n == 0 {
+-                    // A locally configured VMIN of zero can also produce a zero-byte read.
+-                    return if has_hung_up(&handle.file)? {
+-                        Err(io::Error::from_raw_os_error(libc::EIO))
++            Transfer::Read(buffer) => match handle.file.read(&mut buffer[self.received..]) {
++                Ok(0) => match has_hung_up(&handle.file) {
++                    Ok(true) => Err(io::Error::from_raw_os_error(libc::EIO)),
++                    Ok(false) => Ok(immediate.then(|| length_data(Vec::new()))),
++                    Err(error) => Err(error),
++                },
++                Ok(n) => {
++                    self.received += n;
++                    self.last_byte = Some(now);
++                    if immediate || first_byte || self.received == buffer.len() {
++                        buffer.truncate(self.received);
++                        Ok(Some(length_data(std::mem::take(buffer))))
+                     } else {
+                         Ok(None)
+-                    };
++                    }
+                 }
+-                buffer.truncate(n);
+-                Ok(Some(length_data(std::mem::take(buffer))))
+-            }),
++                Err(error) if immediate && error.kind() == io::ErrorKind::WouldBlock => {
++                    Ok(Some(length_data(Vec::new())))
++                }
++                Err(error) => Err(error),
++            },
+             Transfer::Write { data, written } => handle.file.write(&data[*written..]).map(|n| {
+                 *written += n;
+                 (*written == data.len()).then(|| write_count(*written))
+@@ -251,7 +336,11 @@
+                             device,
+                             handle: id,
+                             transfer,
+-                            deadline: Instant::now() + IO_LIMIT,
++                            deadline: None,
++                            started: false,
++                            received: 0,
++                            last_byte: None,
++                            timeouts: handle.timeouts,
+                         });
+                         return None;
+                     }
+@@ -387,7 +476,7 @@
+     Ok(())
+ }
+ 
+-fn control(handle: &Handle, body: &[u8]) -> Result<Vec<u8>, u32> {
++fn control(handle: &mut Handle, body: &[u8]) -> Result<Vec<u8>, u32> {
+     let output = u32_at(body, 0)? as usize;
+     let len = u32_at(body, 4)? as usize;
+     let code = u32_at(body, 8)?;
+@@ -400,6 +489,15 @@
+         GET_BAUD => (0, 4),
+         SET_LINE => (3, 0),
+         GET_LINE => (0, 3),
++        0x001b001c => (20, 0),             // SET_TIMEOUTS
++        0x001b0020 => (0, 20),             // GET_TIMEOUTS
++        0x001b0058 => (6, 0),              // SET_CHARS
++        0x001b005c => (0, 6),              // GET_CHARS
++        0x001b0064 => (16, 0),             // SET_HANDFLOW
++        0x001b0060 => (0, 16),             // GET_HANDFLOW
++        0x001b0068 | 0x001b0078 => (0, 4), // MODEMSTATUS / DTRRTS
++        0x001b0024 | 0x001b0028 | 0x001b0030 | 0x001b0034 | 0x001b0038 | 0x001b003c
++        | 0x001b0010 | 0x001b0014 => (0, 0),
+         _ => return Err(UNSUPPORTED),
+     };
+     if len != input_size {
+@@ -408,8 +506,39 @@
+     if output < output_size {
+         return Err(BUFFER_TOO_SMALL);
+     }
+-    if matches!(code, SET_BAUD | SET_LINE) && !handle.writes {
++    let query = matches!(
++        code,
++        GET_BAUD | GET_LINE | 0x001b0020 | 0x001b005c | 0x001b0060 | 0x001b0068 | 0x001b0078
++    );
++    if !query && !handle.writes {
+         return Err(DENIED);
++    }
++    if code == 0x001b001c {
++        let mut values = [0; 5];
++        for (index, value) in values.iter_mut().enumerate() {
++            *value = u32_at(input, index * 4)?;
++        }
++        if values[0] == u32::MAX && values[2] == u32::MAX {
++            return Err(INVALID);
++        }
++        handle.timeouts = values;
++        return Ok(length_data(Vec::new()));
++    }
++    if code == 0x001b0020 {
++        return Ok(length_data(
++            handle
++                .timeouts
++                .into_iter()
++                .flat_map(u32::to_le_bytes)
++                .collect(),
++        ));
++    }
++    let modem_mutation = matches!(
++        code,
++        0x001b0064 | 0x001b0024 | 0x001b0028 | 0x001b0030 | 0x001b0034
++    );
++    if modem_mutation && handle.original_modem.is_none() {
++        handle.original_modem = Some(modem(&handle.file)?);
+     }
+     let file = &handle.file;
+     let mut attributes = get_attributes(file)?;
+@@ -500,9 +629,183 @@
+             });
+             data.push(bits);
+         }
++        0x001b0058 => {
++            // Unix termios cannot implement arbitrary EOF/error/break substitution.
++            if input[..4] != [0; 4] || input[4] == input[5] {
++                return Err(UNSUPPORTED);
++            }
++            attributes.c_cc[libc::VSTART] = input[4];
++            attributes.c_cc[libc::VSTOP] = input[5];
++            set_attributes(file, &attributes)?;
++        }
++        0x001b005c => {
++            data.extend([
++                0,
++                0,
++                0,
++                0,
++                attributes.c_cc[libc::VSTART],
++                attributes.c_cc[libc::VSTOP],
++            ]);
++        }
++        0x001b0064 => {
++            let handshake = u32_at(input, 0)?;
++            let flow = u32_at(input, 4)?;
++            // POSIX provides coupled RTS/CTS and software XON/XOFF, but no
++            // independent DSR/DCD handshake or programmable queue thresholds.
++            if ![0, 1, 9].contains(&handshake)
++                || flow & !0xc3 != 0
++                || ![0, 0x40, 0x80].contains(&(flow & 0xc0))
++                || (handshake & 8 != 0) != (flow & 0xc0 == 0x80)
++                || input[8..] != [0; 8]
++            {
++                return Err(UNSUPPORTED);
++            }
++            let old_modem = modem(file)?; // Prove support before any termios mutation.
++            let old = attributes;
++            attributes.c_iflag &= !(libc::IXON | libc::IXOFF | libc::IXANY);
++            attributes.c_cflag &= !libc::CRTSCTS;
++            if flow & 1 != 0 {
++                attributes.c_iflag |= libc::IXON;
++            }
++            if flow & 2 != 0 {
++                attributes.c_iflag |= libc::IXOFF;
++            }
++            if handshake & 8 != 0 {
++                attributes.c_cflag |= libc::CRTSCTS;
++            }
++            let mut next_modem = old_modem & !(libc::TIOCM_DTR | libc::TIOCM_RTS);
++            if handshake & 1 != 0 {
++                next_modem |= libc::TIOCM_DTR;
++            }
++            if flow & 0xc0 == 0x40 {
++                next_modem |= libc::TIOCM_RTS;
++            }
++            set_attributes(file, &attributes)?;
++            let actual = get_attributes(file)?;
++            let mask = libc::IXON | libc::IXOFF | libc::IXANY;
++            if actual.c_iflag & mask != attributes.c_iflag & mask
++                || actual.c_cflag & libc::CRTSCTS != attributes.c_cflag & libc::CRTSCTS
++            {
++                let _ = set_attributes(file, &old);
++                return Err(UNSUPPORTED);
++            }
++            handle.modem_changed = true;
++            // Let the kernel own RTS when hardware handshaking is selected.
++            let mask = libc::TIOCM_DTR
++                | if handshake & 8 == 0 {
++                    libc::TIOCM_RTS
++                } else {
++                    0
++                };
++            if let Err(error) = change_modem(file, next_modem, mask) {
++                let _ = set_attributes(file, &old);
++                let _ = change_modem(file, old_modem, mask);
++                return Err(error);
++            }
++        }
++        0x001b0060 => {
++            let modem = modem(file)?;
++            let hardware = attributes.c_cflag & libc::CRTSCTS != 0;
++            word(
++                &mut data,
++                u32::from(modem & libc::TIOCM_DTR != 0) | if hardware { 8 } else { 0 },
++            );
++            word(
++                &mut data,
++                u32::from(attributes.c_iflag & libc::IXON != 0)
++                    | (u32::from(attributes.c_iflag & libc::IXOFF != 0) << 1)
++                    | if hardware {
++                        0x80
++                    } else if modem & libc::TIOCM_RTS != 0 {
++                        0x40
++                    } else {
++                        0
++                    },
++            );
++            data.extend([0; 8]);
++        }
++        0x001b0068 => {
++            let modem = modem(file)?;
++            word(
++                &mut data,
++                if modem & libc::TIOCM_CTS != 0 {
++                    0x10
++                } else {
++                    0
++                } | if modem & libc::TIOCM_DSR != 0 {
++                    0x20
++                } else {
++                    0
++                } | if modem & libc::TIOCM_RI != 0 { 0x40 } else { 0 }
++                    | if modem & libc::TIOCM_CD != 0 { 0x80 } else { 0 },
++            );
++        }
++        0x001b0078 => {
++            let modem = modem(file)?;
++            word(
++                &mut data,
++                u32::from(modem & libc::TIOCM_DTR != 0)
++                    | (u32::from(modem & libc::TIOCM_RTS != 0) << 1),
++            );
++        }
++        0x001b0024 | 0x001b0028 | 0x001b0030 | 0x001b0034 => {
++            let (mask, enabled) = match code {
++                0x001b0024 => (libc::TIOCM_DTR, true),
++                0x001b0028 => (libc::TIOCM_DTR, false),
++                0x001b0030 => (libc::TIOCM_RTS, true),
++                _ => (libc::TIOCM_RTS, false),
++            };
++            if mask == libc::TIOCM_RTS && attributes.c_cflag & libc::CRTSCTS != 0 {
++                return Err(INVALID);
++            }
++            handle.modem_changed = true;
++            change_modem(file, if enabled { mask } else { 0 }, mask)?;
++        }
++        0x001b0038 | 0x001b003c => {
++            handle.flow_changed = true;
++            let action = if code == 0x001b0038 {
++                libc::TCOOFF
++            } else {
++                libc::TCOON
++            };
++            if unsafe { libc::tcflow(file.as_raw_fd(), action) } != 0 {
++                return Err(tty_status(io::Error::last_os_error()));
++            }
++        }
++        0x001b0010 | 0x001b0014 => {
++            handle.break_changed = true;
++            let operation = if code == 0x001b0010 {
++                libc::TIOCSBRK
++            } else {
++                libc::TIOCCBRK
++            };
++            if unsafe { libc::ioctl(file.as_raw_fd(), operation as _) } != 0 {
++                return Err(tty_status(io::Error::last_os_error()));
++            }
++        }
+         _ => unreachable!(),
+     }
+     Ok(length_data(data))
++}
++
++fn modem(file: &File) -> Result<libc::c_int, u32> {
++    let mut bits = 0;
++    if unsafe { libc::ioctl(file.as_raw_fd(), libc::TIOCMGET, &mut bits) } != 0 {
++        return Err(tty_status(io::Error::last_os_error()));
++    }
++    Ok(bits)
++}
++fn change_modem(file: &File, bits: libc::c_int, mask: libc::c_int) -> Result<(), u32> {
++    for (operation, value) in [
++        (libc::TIOCMBIS, bits & mask),
++        (libc::TIOCMBIC, !bits & mask),
++    ] {
++        if value != 0 && unsafe { libc::ioctl(file.as_raw_fd(), operation, &value) } != 0 {
++            return Err(tty_status(io::Error::last_os_error()));
++        }
++    }
++    Ok(())
+ }
+ 
+ const SPEEDS: &[(u32, libc::speed_t)] = &[
+@@ -543,6 +846,11 @@
+             reads: true,
+             writes: true,
+             original: None,
++            original_modem: None,
++            modem_changed: false,
++            flow_changed: false,
++            break_changed: false,
++            timeouts: [u32::MAX, u32::MAX, 1000, 0, 1000],
+         };
+         let mut pending = Pending {
+             request: Vec::new(),
+@@ -552,7 +860,11 @@
+                 data: b"lost".to_vec(),
+                 written: 1,
+             },
+-            deadline: Instant::now() - Duration::from_secs(1),
++            deadline: Some(Instant::now() - Duration::from_secs(1)),
++            started: true,
++            received: 0,
++            last_byte: None,
++            timeouts: [u32::MAX, u32::MAX, 1000, 0, 1000],
+         };
+         assert_eq!(pending.try_io(&mut handle), Some(Ok(vec![1, 0, 0, 0, 0])));
+         let mut bytes = [0; 4];
+@@ -576,6 +888,11 @@
+             reads: true,
+             writes: false,
+             original: None,
++            original_modem: None,
++            modem_changed: false,
++            flow_changed: false,
++            break_changed: false,
++            timeouts: [u32::MAX, u32::MAX, 1000, 0, 1000],
+         };
+         drop(master);
+         let mut pending = Pending {
+@@ -583,7 +900,11 @@
+             device: 1,
+             handle: 1,
+             transfer: Transfer::Read(vec![0; 1]),
+-            deadline: Instant::now() + IO_LIMIT,
++            deadline: Some(Instant::now() + IO_LIMIT),
++            started: true,
++            received: 0,
++            last_byte: None,
++            timeouts: [u32::MAX, u32::MAX, 1000, 0, 1000],
+         };
+         assert_eq!(pending.try_io(&mut handle), Some(Err(DISCONNECTED)));
+         pending.transfer = Transfer::Read(Vec::new());
+--- /dev/null
++++ b/engines/rdp/src/serial_windows.rs
+@@ -0,0 +1,486 @@
++//! Explicit Windows COM mappings pinned to one opened device for the connection.
++//! Native overlapped operations run only on the bounded device worker.
++use super::{DENIED, INVALID, MAX_IO, UNSUPPORTED, complete, length_data, status, u32_at};
++use crate::rdp_options::SerialMapping;
++use std::{
++    collections::{BTreeMap, BTreeSet, VecDeque},
++    fs::File,
++    io,
++    os::windows::io::{AsRawHandle, FromRawHandle, OwnedHandle},
++    sync::Arc,
++};
++use windows_sys::Win32::{
++    Devices::Communication::{
++        COMMTIMEOUTS, ClearCommBreak, DCB, EscapeCommFunction, GetCommState, GetCommTimeouts,
++        SETXON, SetCommState, SetCommTimeouts,
++    },
++    Foundation::{
++        ERROR_DEVICE_NOT_CONNECTED, ERROR_INVALID_FUNCTION, ERROR_IO_INCOMPLETE, ERROR_IO_PENDING,
++        ERROR_NOT_SUPPORTED, ERROR_OPERATION_ABORTED, INVALID_HANDLE_VALUE,
++    },
++    Storage::FileSystem::{CreateFileW, FILE_FLAG_OVERLAPPED, OPEN_EXISTING, ReadFile, WriteFile},
++    System::{
++        IO::{CancelIoEx, DeviceIoControl, GetOverlappedResult, OVERLAPPED},
++        Threading::CreateEventW,
++    },
++};
++const CANCELLED: u32 = 0xc0000120;
++const INVALID_HANDLE: u32 = 0xc0000008;
++const DEVICE_BUSY: u32 = 0x80000011;
++
++#[derive(Clone)]
++pub(super) struct Binding {
++    pub(super) name: String,
++    endpoint: Result<Arc<File>, u32>,
++    read_only: bool,
++}
++struct Port {
++    binding: Binding,
++    handle: Option<Handle>,
++}
++struct Handle {
++    id: u32,
++    file: Arc<File>,
++    reads: bool,
++    writes: bool,
++    original: Option<(DCB, COMMTIMEOUTS)>,
++}
++impl Drop for Handle {
++    fn drop(&mut self) {
++        if let Some((state, timeouts)) = &self.original {
++            unsafe {
++                ClearCommBreak(self.file.as_raw_handle());
++                EscapeCommFunction(self.file.as_raw_handle(), SETXON);
++                SetCommState(self.file.as_raw_handle(), state);
++                SetCommTimeouts(self.file.as_raw_handle(), timeouts);
++            }
++        }
++    }
++}
++fn failure(error: io::Error) -> u32 {
++    match error.raw_os_error().map(|value| value as u32) {
++        Some(ERROR_OPERATION_ABORTED) => CANCELLED,
++        Some(ERROR_DEVICE_NOT_CONNECTED) => 0xc000009d,
++        Some(ERROR_INVALID_FUNCTION | ERROR_NOT_SUPPORTED) => UNSUPPORTED,
++        _ => status(error),
++    }
++}
++fn last_error() -> u32 {
++    failure(io::Error::last_os_error())
++}
++fn com_name(name: &str) -> Option<String> {
++    let name = name.to_ascii_uppercase();
++    let n = name.strip_prefix("COM")?.parse::<u16>().ok()?;
++    ((1..=256).contains(&n) && name == format!("COM{n}")).then_some(name)
++}
++pub(super) fn bind(mappings: &[SerialMapping]) -> Result<Vec<Binding>, String> {
++    let mut names = BTreeSet::new();
++    let mut devices = BTreeSet::new();
++    mappings
++        .iter()
++        .map(|mapping| {
++            let name = com_name(&mapping.name).ok_or("Invalid RDP serial port name")?;
++            let local = mapping
++                .path
++                .to_str()
++                .and_then(|name| name.strip_prefix("\\\\.\\"))
++                .and_then(com_name)
++                .ok_or("Select an explicit Windows serial device such as \\\\.\\COM3")?;
++            if !names.insert(name.clone()) || !devices.insert(local.clone()) {
++                return Err("Duplicate RDP serial mapping".into());
++            }
++            let path: Vec<u16> = format!("\\\\.\\{local}\0").encode_utf16().collect();
++            let raw = unsafe {
++                CreateFileW(
++                    path.as_ptr(),
++                    0x80000000 | if mapping.read_only { 0 } else { 0x40000000 },
++                    0,
++                    std::ptr::null(),
++                    OPEN_EXISTING,
++                    FILE_FLAG_OVERLAPPED,
++                    std::ptr::null_mut(),
++                )
++            };
++            let endpoint = if raw == INVALID_HANDLE_VALUE {
++                Err(last_error())
++            } else {
++                // The binding keeps this device open across certificate retries and
++                // remote close/reopen. A removed/reassigned COM name is never reopened.
++                let file = unsafe { File::from_raw_handle(raw) };
++                let mut state = DCB {
++                    DCBlength: size_of::<DCB>() as u32,
++                    ..Default::default()
++                };
++                if unsafe { GetCommState(raw, &mut state) } == 0 {
++                    Err(last_error())
++                } else {
++                    Ok(Arc::new(file))
++                }
++            };
++            Ok(Binding {
++                name,
++                endpoint,
++                read_only: mapping.read_only,
++            })
++        })
++        .collect()
++}
++impl Port {
++    fn open(&self, id: u32, body: &[u8]) -> Result<Handle, u32> {
++        let access = u32_at(body, 0)?;
++        let len = u32_at(body, 28)? as usize;
++        if body.len() != 32 + len {
++            return Err(INVALID);
++        }
++        if len != 0 {
++            return Err(DENIED);
++        }
++        if u32_at(body, 20)? != 1 || u32_at(body, 24)? & (1 | 0x1000) != 0 {
++            return Err(UNSUPPORTED);
++        }
++        let reads = access & (0x80000000 | 0x10000000 | 1) != 0;
++        let writes = access & (0x40000000 | 0x10000000 | 2 | 4) != 0;
++        if self.binding.read_only && (writes || access & (0x10000 | 0x10 | 0x100) != 0) {
++            return Err(DENIED);
++        }
++        if self.handle.is_some() {
++            return Err(DEVICE_BUSY);
++        }
++        let file = self
++            .binding
++            .endpoint
++            .as_ref()
++            .map_err(|error| *error)?
++            .clone();
++        let mut state = DCB {
++            DCBlength: size_of::<DCB>() as u32,
++            ..Default::default()
++        };
++        let mut timeouts = COMMTIMEOUTS::default();
++        if unsafe { GetCommState(file.as_raw_handle(), &mut state) } == 0
++            || unsafe { GetCommTimeouts(file.as_raw_handle(), &mut timeouts) } == 0
++        {
++            return Err(last_error());
++        }
++        Ok(Handle {
++            id,
++            file,
++            reads,
++            writes,
++            original: writes.then_some((state, timeouts)),
++        })
++    }
++}
++// Buffer, OVERLAPPED and event retain stable addresses until native completion.
++// Cancellation requests alone do not end the kernel's ownership of those buffers.
++struct Pending {
++    request: Vec<u8>,
++    device: u32,
++    file: Arc<File>,
++    operation: Box<OVERLAPPED>,
++    _event: OwnedHandle,
++    input: Vec<u8>,
++    output: Vec<u8>,
++    major: u32,
++    finished: bool,
++}
++impl Pending {
++    fn new(request: Vec<u8>, device: u32, handle: &Handle, major: u32) -> Result<Self, u32> {
++        let body = &request[24..];
++        let mut input = Vec::new();
++        let mut output = Vec::new();
++        let mut code = 0;
++        match major {
++            3 | 4 => {
++                let len = u32_at(body, 0)? as usize;
++                if len > MAX_IO || body.len() != 32 + if major == 4 { len } else { 0 } {
++                    return Err(INVALID);
++                }
++                if major == 3 {
++                    if !handle.reads {
++                        return Err(DENIED);
++                    }
++                    output.resize(len, 0);
++                } else {
++                    if !handle.writes {
++                        return Err(DENIED);
++                    }
++                    input.extend_from_slice(&body[32..]);
++                }
++            }
++            14 => {
++                let capacity = u32_at(body, 0)? as usize;
++                let len = u32_at(body, 4)? as usize;
++                code = u32_at(body, 8)?;
++                if capacity > MAX_IO || len > MAX_IO || body.len() != 32 + len {
++                    return Err(INVALID);
++                }
++                let (required_input, required_output, query) = match code {
++                    0x001b0004 => (4, 0, false),
++                    0x001b0050 => (0, 4, true),
++                    0x001b000c => (3, 0, false),
++                    0x001b0054 => (0, 3, true),
++                    0x001b001c => (20, 0, false),
++                    0x001b0020 => (0, 20, true),
++                    0x001b0058 => (6, 0, false),
++                    0x001b005c => (0, 6, true),
++                    0x001b0064 => (16, 0, false),
++                    0x001b0060 => (0, 16, true),
++                    0x001b0068 | 0x001b0078 => (0, 4, true),
++                    0x001b0024 | 0x001b0028 | 0x001b0030 | 0x001b0034 | 0x001b0038 | 0x001b003c
++                    | 0x001b0010 | 0x001b0014 => (0, 0, false),
++                    _ => return Err(UNSUPPORTED),
++                };
++                if len != required_input {
++                    return Err(INVALID);
++                }
++                if capacity < required_output {
++                    return Err(0xc0000023);
++                }
++                if !query && !handle.writes {
++                    return Err(DENIED);
++                }
++                input.extend_from_slice(&body[32..]);
++                output.resize(required_output, 0);
++            }
++            _ => return Err(UNSUPPORTED),
++        }
++        let event = unsafe { CreateEventW(std::ptr::null(), 1, 0, std::ptr::null()) };
++        if event.is_null() {
++            return Err(last_error());
++        }
++        let event = unsafe { OwnedHandle::from_raw_handle(event) };
++        let mut operation = Box::new(OVERLAPPED::default());
++        operation.hEvent = event.as_raw_handle();
++        let mut pending = Self {
++            request,
++            device,
++            file: handle.file.clone(),
++            operation,
++            _event: event,
++            input,
++            output,
++            major,
++            finished: false,
++        };
++        let ok = unsafe {
++            match major {
++                3 => ReadFile(
++                    pending.file.as_raw_handle(),
++                    pending.output.as_mut_ptr(),
++                    pending.output.len() as u32,
++                    std::ptr::null_mut(),
++                    &mut *pending.operation,
++                ),
++                4 => WriteFile(
++                    pending.file.as_raw_handle(),
++                    pending.input.as_ptr(),
++                    pending.input.len() as u32,
++                    std::ptr::null_mut(),
++                    &mut *pending.operation,
++                ),
++                _ => DeviceIoControl(
++                    pending.file.as_raw_handle(),
++                    code,
++                    pending.input.as_ptr().cast(),
++                    pending.input.len() as u32,
++                    pending.output.as_mut_ptr().cast(),
++                    pending.output.len() as u32,
++                    std::ptr::null_mut(),
++                    &mut *pending.operation,
++                ),
++            }
++        };
++        if ok == 0 && io::Error::last_os_error().raw_os_error() != Some(ERROR_IO_PENDING as i32) {
++            pending.finished = true;
++            return Err(last_error());
++        }
++        Ok(pending)
++    }
++    fn ready(&mut self) -> Option<Vec<u8>> {
++        let mut transferred = 0;
++        let ok = unsafe {
++            GetOverlappedResult(
++                self.file.as_raw_handle(),
++                &*self.operation,
++                &mut transferred,
++                0,
++            )
++        };
++        if ok == 0 && io::Error::last_os_error().raw_os_error() == Some(ERROR_IO_INCOMPLETE as i32)
++        {
++            return None;
++        }
++        self.finished = true;
++        let result = super::serial_completion::terminal_data(
++            self.major,
++            &mut self.output,
++            if ok == 0 {
++                Err(last_error())
++            } else {
++                Ok(transferred)
++            },
++        );
++        Some(complete(&self.request, result))
++    }
++    fn cancel_and_retire(&mut self) -> Vec<u8> {
++        let handle = self.file.as_raw_handle();
++        let operation = &*self.operation as *const OVERLAPPED;
++        let response = super::serial_completion::cancel_and_collect(
++            &self.request,
++            self.major,
++            &mut self.output,
++            || unsafe {
++                CancelIoEx(handle, operation);
++            },
++            || {
++                // This wait retains self's buffers/event/handle until native
++                // completion; CancelIoEx alone does not decide the outcome.
++                let mut transferred = 0;
++                let ok = unsafe { GetOverlappedResult(handle, operation, &mut transferred, 1) };
++                if ok == 0 {
++                    Err(last_error())
++                } else {
++                    Ok(transferred)
++                }
++            },
++        );
++        self.finished = true;
++        response
++    }
++}
++impl Drop for Pending {
++    fn drop(&mut self) {
++        if !self.finished {
++            let mut transferred = 0;
++            unsafe {
++                CancelIoEx(self.file.as_raw_handle(), &*self.operation);
++                // Only this filesystem/device worker can wait for a driver; the
++                // protocol and UI threads never join it or own the native buffers.
++                GetOverlappedResult(
++                    self.file.as_raw_handle(),
++                    &*self.operation,
++                    &mut transferred,
++                    1,
++                );
++            }
++        }
++    }
++}
++pub(super) struct Serial {
++    ports: BTreeMap<u32, Port>,
++    pending: VecDeque<Pending>,
++    completed: Vec<Vec<u8>>,
++    next_handle: u32,
++}
++impl Serial {
++    pub(super) fn new(start: u32, bindings: Vec<Binding>) -> Self {
++        Self {
++            ports: bindings
++                .into_iter()
++                .enumerate()
++                .map(|(i, binding)| {
++                    (
++                        start + i as u32,
++                        Port {
++                            binding,
++                            handle: None,
++                        },
++                    )
++                })
++                .collect(),
++            pending: VecDeque::new(),
++            completed: Vec::new(),
++            next_handle: 1,
++        }
++    }
++    pub(super) fn contains(&self, device: u32) -> bool {
++        self.ports.contains_key(&device)
++    }
++    pub(super) fn has_pending(&self) -> bool {
++        !self.pending.is_empty() || !self.completed.is_empty()
++    }
++    pub(super) fn process(&mut self, request: Vec<u8>) -> Option<Vec<u8>> {
++        let device = u32_at(&request, 4).unwrap();
++        let id = u32_at(&request, 8).unwrap();
++        let major = u32_at(&request, 16).unwrap();
++        if u32_at(&request, 20).unwrap() != 0 {
++            return Some(complete(&request, Err(UNSUPPORTED)));
++        }
++        let port = self.ports.get_mut(&device).unwrap();
++        let result = if major == 0 {
++            port.open(self.next_handle, &request[24..])
++                .and_then(|handle| {
++                    let next = self.next_handle.checked_add(1).ok_or(0xc000009au32)?;
++                    let mut body = handle.id.to_le_bytes().to_vec();
++                    body.push(0);
++                    self.next_handle = next;
++                    port.handle = Some(handle);
++                    Ok(body)
++                })
++        } else if port.handle.as_ref().is_some_and(|handle| handle.id == id) {
++            if major == 2 {
++                if request.len() != 56 {
++                    Err(INVALID)
++                } else {
++                    let mut active = VecDeque::new();
++                    for mut pending in self.pending.drain(..) {
++                        if pending.device == device {
++                            self.completed.push(pending.cancel_and_retire());
++                            // Retire native buffers before restoring the port state.
++                            drop(pending);
++                        } else {
++                            active.push_back(pending);
++                        }
++                    }
++                    self.pending = active;
++                    port.handle = None;
++                    Ok(vec![0; 4])
++                }
++            } else {
++                match Pending::new(
++                    request.clone(),
++                    device,
++                    port.handle.as_ref().unwrap(),
++                    major,
++                ) {
++                    Ok(pending) => {
++                        self.pending.push_back(pending);
++                        return None;
++                    }
++                    Err(error) => Err(error),
++                }
++            }
++        } else {
++            Err(INVALID_HANDLE)
++        };
++        Some(complete(&request, result))
++    }
++    pub(super) fn ready(&mut self) -> Vec<Vec<u8>> {
++        let mut responses = std::mem::take(&mut self.completed);
++        self.pending.retain_mut(|pending| match pending.ready() {
++            Some(response) => {
++                responses.push(response);
++                false
++            }
++            None => true,
++        });
++        responses
++    }
++}
++impl Drop for Serial {
++    fn drop(&mut self) {
++        self.pending.clear(); /* retire native buffers before handle state restoration */
++    }
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn explicit_com_names_exclude_ambient_files_and_device_namespaces() {
++        for value in ["COM0", "COM01", "COM257", "COM1\\other", "NUL", "C:\\data"] {
++            assert!(com_name(value).is_none());
++        }
++        assert_eq!(com_name("com256").as_deref(), Some("COM256"));
++    }
++}
+--- /dev/null
++++ b/engines/rdp/src/native_file_windows.rs
+@@ -0,0 +1,182 @@
++//! Mutations use the already opened source and a pinned destination directory.
++//! No operation reconstructs an ambient source or destination pathname.
++use cap_std::fs::{Dir, File};
++use std::{
++    io,
++    os::windows::{ffi::OsStrExt, io::AsRawHandle},
++    path::Path,
++};
++use windows_sys::Win32::Storage::FileSystem::{
++    FILE_ALLOCATION_INFO, FILE_DISPOSITION_INFO, FILE_ID_INFO, FILE_RENAME_INFO,
++    FILE_STANDARD_INFO, FileAllocationInfo, FileDispositionInfo, FileIdInfo, FileRenameInfo,
++    FileStandardInfo, GetFileInformationByHandleEx, SetFileInformationByHandle,
++};
++
++pub(super) fn allocate(file: &File, size: u64) -> io::Result<()> {
++    let allocation = FILE_ALLOCATION_INFO {
++        AllocationSize: i64::try_from(size)
++            .map_err(|_| io::Error::from(io::ErrorKind::InvalidInput))?,
++    };
++    let ok = unsafe {
++        SetFileInformationByHandle(
++            file.as_raw_handle(),
++            FileAllocationInfo,
++            (&allocation as *const FILE_ALLOCATION_INFO).cast(),
++            size_of::<FILE_ALLOCATION_INFO>() as u32,
++        )
++    };
++    if ok == 0 {
++        Err(io::Error::last_os_error())
++    } else {
++        Ok(())
++    }
++}
++
++pub(super) fn disposition(file: &File, deleting: bool) -> io::Result<()> {
++    let disposition = FILE_DISPOSITION_INFO {
++        DeleteFile: deleting,
++    };
++    let ok = unsafe {
++        SetFileInformationByHandle(
++            file.as_raw_handle(),
++            FileDispositionInfo,
++            (&disposition as *const FILE_DISPOSITION_INFO).cast(),
++            size_of::<FILE_DISPOSITION_INFO>() as u32,
++        )
++    };
++    if ok == 0 {
++        Err(io::Error::last_os_error())
++    } else {
++        Ok(())
++    }
++}
++
++pub(super) fn rename(file: &File, parent: &Dir, name: &Path, replace: bool) -> io::Result<()> {
++    // A single validated component makes resolution relative to parent atomic;
++    // an intervening symlink or local parent rename cannot escape this handle.
++    let name: Vec<u16> = name.as_os_str().encode_wide().collect();
++    if name.is_empty()
++        || name.len() > 255
++        || name
++            .last()
++            .is_some_and(|unit| [b' ' as u16, b'.' as u16].contains(unit))
++        || name
++            .iter()
++            .any(|unit| [0, b'/' as u16, b'\\' as u16, b':' as u16].contains(unit))
++        || name == [b'.' as u16]
++        || name == [b'.' as u16, b'.' as u16]
++    {
++        return Err(io::ErrorKind::InvalidInput.into());
++    }
++    let bytes = std::mem::offset_of!(FILE_RENAME_INFO, FileName) + (name.len() + 1) * 2;
++    // Vec<usize> supplies native alignment for the variable length Windows struct.
++    let mut storage = vec![0usize; bytes.div_ceil(size_of::<usize>())];
++    let info = storage.as_mut_ptr().cast::<FILE_RENAME_INFO>();
++    unsafe {
++        (*info).Anonymous.ReplaceIfExists = replace;
++        (*info).RootDirectory = parent.as_raw_handle();
++        (*info).FileNameLength = (name.len() * 2) as u32;
++        std::ptr::copy_nonoverlapping(
++            name.as_ptr(),
++            std::ptr::addr_of_mut!((*info).FileName).cast(),
++            name.len(),
++        );
++    }
++    let ok = unsafe {
++        SetFileInformationByHandle(
++            file.as_raw_handle(),
++            FileRenameInfo,
++            info.cast(),
++            bytes as u32,
++        )
++    };
++    if ok == 0 {
++        Err(io::Error::last_os_error())
++    } else {
++        Ok(())
++    }
++}
++
++pub(super) fn allocation_size(file: &File) -> io::Result<u64> {
++    let mut standard = FILE_STANDARD_INFO::default();
++    let ok = unsafe {
++        GetFileInformationByHandleEx(
++            file.as_raw_handle(),
++            FileStandardInfo,
++            (&mut standard as *mut FILE_STANDARD_INFO).cast(),
++            size_of::<FILE_STANDARD_INFO>() as u32,
++        )
++    };
++    if ok == 0 {
++        return Err(io::Error::last_os_error());
++    }
++    u64::try_from(standard.AllocationSize).map_err(|_| io::ErrorKind::InvalidData.into())
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use cap_std::fs::{OpenOptions, OpenOptionsExt};
++    fn opened(root: &Dir) -> File {
++        let mut options = OpenOptions::new();
++        options
++            .read(true)
++            .write(true)
++            .create_new(true)
++            .access_mode(0xc0010000)
++            .share_mode(7);
++        root.open_with("selected", &options).unwrap()
++    }
++    #[test]
++    fn native_allocation_rename_and_delete_keep_opened_source_identity() {
++        use std::io::Write;
++        let temp = tempfile::tempdir().unwrap();
++        let root = Dir::open_ambient_dir(temp.path(), cap_std::ambient_authority()).unwrap();
++        let mut source = opened(&root);
++        source.write_all(b"original").unwrap();
++        allocate(&source, 65536).unwrap();
++        assert_eq!(source.metadata().unwrap().len(), 8);
++        assert!(allocation_size(&source).unwrap() >= 65536);
++        std::fs::rename(
++            temp.path().join("selected"),
++            temp.path().join("moved-locally"),
++        )
++        .unwrap();
++        std::fs::write(temp.path().join("selected"), b"replacement").unwrap();
++        rename(&source, &root, Path::new("remote-name"), false).unwrap();
++        assert_eq!(
++            std::fs::read(temp.path().join("remote-name")).unwrap(),
++            b"original"
++        );
++        assert_eq!(
++            std::fs::read(temp.path().join("selected")).unwrap(),
++            b"replacement"
++        );
++        disposition(&source, true).unwrap();
++        drop(source);
++        assert!(!temp.path().join("remote-name").exists());
++        assert_eq!(
++            std::fs::read(temp.path().join("selected")).unwrap(),
++            b"replacement"
++        );
++    }
++}
++
++pub(super) fn identity(handle: &impl AsRawHandle) -> io::Result<(u64, u128)> {
++    let mut identity = FILE_ID_INFO::default();
++    let ok = unsafe {
++        GetFileInformationByHandleEx(
++            handle.as_raw_handle(),
++            FileIdInfo,
++            (&mut identity as *mut FILE_ID_INFO).cast(),
++            size_of::<FILE_ID_INFO>() as u32,
++        )
++    };
++    if ok == 0 {
++        return Err(io::Error::last_os_error());
++    }
++    Ok((
++        identity.VolumeSerialNumber,
++        u128::from_le_bytes(identity.FileId.Identifier),
++    ))
++}
+--- /dev/null
++++ b/engines/rdp/src/native_file_macos.rs
+@@ -0,0 +1,65 @@
++//! Darwin preallocation keeps logical EOF unchanged and uses the opened file.
++use cap_std::fs::{File, MetadataExt};
++use std::{io, os::fd::AsRawFd};
++pub(super) fn allocate(file: &File, size: u64) -> io::Result<()> {
++    let metadata = file.metadata()?;
++    if size < metadata.len() {
++        return file.set_len(size);
++    }
++    let allocated = metadata.blocks().saturating_mul(512);
++    if size <= allocated {
++        return Ok(());
++    }
++    // F_PEOFPOSMODE adds space beyond physical EOF; request only the deficit.
++    // F_ALLOCATEALL refuses partial allocation, and deliberately omitting
++    // F_ALLOCATEPERSIST lets Darwin release unused preallocation on close.
++    let mut store = libc::fstore_t {
++        fst_flags: libc::F_ALLOCATEALL,
++        fst_posmode: libc::F_PEOFPOSMODE,
++        fst_offset: 0,
++        fst_length: i64::try_from(size - allocated)
++            .map_err(|_| io::Error::from(io::ErrorKind::InvalidInput))?,
++        fst_bytesalloc: 0,
++    };
++    if unsafe { libc::fcntl(file.as_raw_fd(), libc::F_PREALLOCATE, &mut store) } == -1 {
++        return Err(io::Error::last_os_error());
++    }
++    Ok(())
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn native_preallocation_keeps_eof_and_retires_on_close() {
++        let temp = tempfile::tempdir().unwrap();
++        let root =
++            cap_std::fs::Dir::open_ambient_dir(temp.path(), cap_std::ambient_authority()).unwrap();
++        std::fs::write(temp.path().join("selected"), b"original").unwrap();
++        let file = root
++            .open_with(
++                "selected",
++                cap_std::fs::OpenOptions::new().read(true).write(true),
++            )
++            .unwrap();
++        allocate(&file, 65536).unwrap();
++        assert_eq!(file.metadata().unwrap().len(), 8);
++        assert!(file.metadata().unwrap().blocks() * 512 >= 65536);
++        let first = file.metadata().unwrap().blocks();
++        allocate(&file, 65536).unwrap();
++        assert_eq!(file.metadata().unwrap().blocks(), first);
++        drop(file);
++        assert_eq!(
++            std::fs::read(temp.path().join("selected")).unwrap(),
++            b"original"
++        );
++        use std::os::unix::fs::MetadataExt;
++        assert!(
++            std::fs::metadata(temp.path().join("selected"))
++                .unwrap()
++                .blocks()
++                * 512
++                < 65536
++        );
++    }
++}
+--- a/engines/rdp/src/devices_tests.rs
++++ b/engines/rdp/src/devices_tests.rs
+@@ -249,6 +249,7 @@
+         "a matching late directory entry was lost"
+     );
+ }
++#[cfg(not(windows))]
+ #[test]
+ fn redirected_file_resize_preserves_unsupported_rename_and_delete() {
+     let root = tempfile::tempdir().unwrap();
+@@ -282,6 +283,48 @@
+     );
+     assert_eq!(std::fs::read(root.path().join("source")).unwrap(), b"ori");
+ }
++#[cfg(windows)]
++#[test]
++fn redirected_windows_file_mutations_use_protocol_layout_and_keep_handle_identity() {
++    let root = tempfile::tempdir().unwrap();
++    std::fs::write(root.path().join("source"), b"original").unwrap();
++    let mut b = backend(root.path(), false);
++    let opened = open(&mut b, "source", 0xc0010000, 1);
++    assert_eq!(value(&opened, 12), 0);
++    let id = value(&opened, 16);
++    std::fs::rename(root.path().join("source"), root.path().join("local-name")).unwrap();
++    std::fs::write(root.path().join("source"), b"replacement").unwrap();
++    let name: Vec<_> = "remote-name"
++        .encode_utf16()
++        .flat_map(u16::to_le_bytes)
++        .collect();
++    let mut data = vec![0, 0];
++    word(&mut data, name.len() as u32);
++    data.extend(name);
++    let mut invalid = data.clone();
++    invalid[1] = 1;
++    assert_eq!(value(&set_info(&mut b, id, 10, &invalid), 12), 0xc000000d);
++    assert_eq!(value(&set_info(&mut b, id, 10, &data), 12), 0);
++    assert_eq!(
++        std::fs::read(root.path().join("remote-name")).unwrap(),
++        b"original"
++    );
++    assert_eq!(
++        std::fs::read(root.path().join("source")).unwrap(),
++        b"replacement"
++    );
++    assert_eq!(value(&set_info(&mut b, id, 13, &[]), 12), 0);
++    assert_eq!(
++        value(&b.process(&request(1, id, 99, 2, 0, &[0; 32])).unwrap(), 12),
++        0
++    );
++    assert!(!root.path().join("remote-name").exists());
++    assert_eq!(
++        std::fs::read(root.path().join("source")).unwrap(),
++        b"replacement"
++    );
++}
++
+ #[cfg(unix)]
+ #[test]
+ fn redirected_volume_reports_actual_capacity() {
+@@ -777,6 +820,143 @@
+         let handle = value(&packets[0], 16);
+         send(&mut channel, handle, 2, 3, &[0; 32]);
+         assert_eq!(value(&completions(&mut channel, 1)[0], 12), 0xc0000022);
++    }
++
++    #[test]
++    fn serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads() {
++        let (mut master, _slave, path) = pty();
++        let mut channel = start(path, false);
++        send(&mut channel, 0, 1, 0, &create("", 0xc0000000, 1, 0));
++        let handle = value(&completions(&mut channel, 1)[0], 16);
++        let settings: Vec<u8> = [25u32, 0, 250, 0, 250]
++            .into_iter()
++            .flat_map(u32::to_le_bytes)
++            .collect();
++        send(
++            &mut channel,
++            handle,
++            2,
++            14,
++            &ioctl(0x001b001c, &settings, 0),
++        );
++        assert_eq!(value(&completions(&mut channel, 1)[0], 12), 0);
++        send(&mut channel, handle, 3, 14, &ioctl(0x001b0020, &[], 20));
++        assert_eq!(&completions(&mut channel, 1)[0][20..], settings);
++        let mut transfer = vec![0; 32];
++        transfer[..4].copy_from_slice(&4u32.to_le_bytes());
++        send(&mut channel, handle, 4, 3, &transfer);
++        master.write_all(b"ab").unwrap();
++        std::thread::sleep(Duration::from_millis(10));
++        assert!(
++            channel.poll().unwrap().is_empty(),
++            "partial read must wait for the configured interval"
++        );
++        let partial = completions(&mut channel, 1).pop().unwrap();
++        assert_eq!(&partial[20..], b"ab");
++        let immediate: Vec<u8> = [u32::MAX, 0, 0, 0, 0]
++            .into_iter()
++            .flat_map(u32::to_le_bytes)
++            .collect();
++        send(
++            &mut channel,
++            handle,
++            5,
++            14,
++            &ioctl(0x001b001c, &immediate, 0),
++        );
++        assert_eq!(value(&completions(&mut channel, 1)[0], 12), 0);
++        send(&mut channel, handle, 6, 3, &transfer);
++        assert_eq!(&completions(&mut channel, 1)[0][16..], &[0; 4]);
++        master.write_all(b"xy").unwrap();
++        send(&mut channel, handle, 7, 3, &transfer);
++        assert_eq!(&completions(&mut channel, 1)[0][20..], b"xy");
++    }
++
++    #[test]
++    fn serial_xoff_stalls_pty_output_until_xon_and_read_only_rejects_new_controls() {
++        let (mut master, _slave, path) = pty();
++        let mut channel = start(path, false);
++        send(&mut channel, 0, 1, 0, &create("", 0xc0000000, 1, 0));
++        let handle = value(&completions(&mut channel, 1)[0], 16);
++        send(&mut channel, handle, 2, 14, &ioctl(0x001b0038, &[], 0));
++        assert_eq!(value(&completions(&mut channel, 1)[0], 12), 0);
++        let mut transfer = vec![0; 32];
++        transfer[..4].copy_from_slice(&4u32.to_le_bytes());
++        transfer.extend(b"flow");
++        send(&mut channel, handle, 3, 4, &transfer);
++        std::thread::sleep(Duration::from_millis(10));
++        assert!(channel.poll().unwrap().is_empty());
++        assert_eq!(
++            master.read(&mut [0; 4]).unwrap_err().kind(),
++            std::io::ErrorKind::WouldBlock
++        );
++        send(&mut channel, handle, 4, 14, &ioctl(0x001b003c, &[], 0));
++        let mut packets = completions(&mut channel, 2);
++        packets.sort_by_key(|p| value(p, 8));
++        assert!(packets.iter().all(|p| value(p, 12) == 0));
++        let mut data = [0; 4];
++        master.read_exact(&mut data).unwrap();
++        assert_eq!(&data, b"flow");
++        drop(channel);
++        let (_master, _slave, path) = pty();
++        let mut channel = start(path, true);
++        send(&mut channel, 0, 1, 0, &create("", 0x80000000, 1, 0));
++        let handle = value(&completions(&mut channel, 1)[0], 16);
++        for (code, bytes) in [
++            (0x001b001c, vec![0; 20]),
++            (0x001b0058, vec![0; 6]),
++            (0x001b0064, vec![0; 16]),
++            (0x001b0024, vec![]),
++            (0x001b0030, vec![]),
++            (0x001b0010, vec![]),
++            (0x001b0038, vec![]),
++        ] {
++            send(&mut channel, handle, 2, 14, &ioctl(code, &bytes, 0));
++            assert_eq!(value(&completions(&mut channel, 1)[0], 12), 0xc0000022);
++        }
++    }
++
++    #[test]
++    fn serial_flow_characters_apply_to_pty_and_modem_failures_are_explicit() {
++        let (_master, slave, path) = pty();
++        let mut channel = start(path, false);
++        send(&mut channel, 0, 1, 0, &create("", 0xc0000000, 1, 0));
++        let handle = value(&completions(&mut channel, 1)[0], 16);
++        send(
++            &mut channel,
++            handle,
++            2,
++            14,
++            &ioctl(0x001b0058, &[0, 0, 0, 0, 17, 19], 0),
++        );
++        assert_eq!(value(&completions(&mut channel, 1)[0], 12), 0);
++        send(&mut channel, handle, 3, 14, &ioctl(0x001b005c, &[], 6));
++        assert_eq!(
++            &completions(&mut channel, 1)[0][20..],
++            &[0, 0, 0, 0, 17, 19]
++        );
++        let mut attributes = std::mem::MaybeUninit::uninit();
++        assert_eq!(
++            unsafe { libc::tcgetattr(slave.as_raw_fd(), attributes.as_mut_ptr()) },
++            0
++        );
++        let before = unsafe { attributes.assume_init() };
++        // PTYs have no modem lines: do not report a fabricated CTS/DTR state.
++        send(&mut channel, handle, 4, 14, &ioctl(0x001b0068, &[], 4));
++        assert_eq!(value(&completions(&mut channel, 1)[0], 12), 0xc00000bb);
++        let flow: Vec<u8> = [1u32, 0x43, 0, 0]
++            .into_iter()
++            .flat_map(u32::to_le_bytes)
++            .collect();
++        send(&mut channel, handle, 5, 14, &ioctl(0x001b0064, &flow, 0));
++        assert_eq!(value(&completions(&mut channel, 1)[0], 12), 0xc00000bb);
++        assert_eq!(
++            unsafe { libc::tcgetattr(slave.as_raw_fd(), attributes.as_mut_ptr()) },
++            0
++        );
++        assert_eq!(unsafe { attributes.assume_init() }.c_iflag, before.c_iflag);
++        send(&mut channel, handle, 6, 14, &ioctl(0x001b001c, &[0; 19], 0));
++        assert_eq!(value(&completions(&mut channel, 1)[0], 12), 0xc000000d);
+     }
+ 
+     #[test]
+--- a/src/desktop/options.rs
++++ b/src/desktop/options.rs
+@@ -83,7 +83,7 @@
+         Self {
+             clipboard: true,
+             drives: true,
+-            serial_ports: cfg!(unix),
++            serial_ports: cfg!(any(unix, windows)),
+             printers: cfg!(target_os = "linux"),
+             smartcard: cfg!(target_os = "linux"),
+             administrative: true,
+--- a/src/ui/rdp_settings.rs
++++ b/src/ui/rdp_settings.rs
+@@ -117,7 +117,7 @@
+         }
+     }
+     ui.label(RichText::new("Explicit serial mappings").strong());
+-    ui.small("Share only named local TTY devices. Read-only mappings refuse remote writes. Embedded support is currently available on Unix; native device compatibility still requires validation.");
++    ui.small("Share only explicitly named local serial devices. Read-only mappings refuse remote writes. Native device compatibility still requires validation.");
+     let mut remove_serial = None;
+     for (index, mapping) in options.serial_mappings.iter_mut().enumerate() {
+         ui.push_id(("rdp-serial-mapping", index), |ui| {
+@@ -131,10 +131,11 @@
+             });
+             let mut path = mapping.path.display().to_string();
+             if ui
+-                .add(
+-                    TextEdit::singleline(&mut path)
+-                        .hint_text("Absolute local device path, for example /dev/ttyUSB0"),
+-                )
++                .add(TextEdit::singleline(&mut path).hint_text(if cfg!(windows) {
++                    r"Windows device path, for example \\.\COM3"
++                } else {
++                    "Absolute local device path, for example /dev/ttyUSB0"
++                }))
+                 .changed()
+             {
+                 mapping.path = path.into();
+--- /dev/null
++++ b/tests/rdp-native-component/Cargo.toml
+@@ -0,0 +1,16 @@
++[package]
++name = "d02-device-native-component"
++version = "0.1.0-d02-device-20261125"
++edition = "2024"
++[dependencies]
++cap-std = "=4.0.3"
++libc = "0.2"
++serde = { version = "1", features = ["derive"] }
++[target.'cfg(windows)'.dependencies]
++windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_Devices_Communication", "Win32_System_IO", "Win32_System_Threading", "Win32_Security"] }
++
++[dev-dependencies]
++tempfile = "=3.27.0"
++
++[target.'cfg(unix)'.dependencies]
++rustix = { version = "=1.1.6", features = ["fs"] }
+--- /dev/null
++++ b/tests/rdp-native-component/Cargo.lock
+@@ -0,0 +1,432 @@
++# This file is automatically @generated by Cargo.
++# It is not intended for manual editing.
++version = 4
++
++[[package]]
++name = "ambient-authority"
++version = "0.0.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e9d4ee0d472d1cd2e28c97dfa124b3d8d992e10eb0a035f33f5d12e3a177ba3b"
++
++[[package]]
++name = "bitflags"
++version = "2.13.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06"
++
++[[package]]
++name = "cap-primitives"
++version = "4.0.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "8b5f74729fd2f44701d1a8eb47e906cdb3ccd9ec0f02baad85a744b791940b18"
++dependencies = [
++ "ambient-authority",
++ "fs-set-times",
++ "io-extras",
++ "io-lifetimes 3.0.1",
++ "ipnet",
++ "maybe-owned",
++ "rustix",
++ "rustix-linux-procfs",
++ "windows-sys 0.61.2",
++ "winx",
++]
++
++[[package]]
++name = "cap-std"
++version = "4.0.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "c1ec78e242cfa2cfe276807ac2ecc00315a6c97786977414bcd1c3963b6c91b8"
++dependencies = [
++ "cap-primitives",
++ "io-extras",
++ "io-lifetimes 3.0.1",
++ "rustix",
++]
++
++[[package]]
++name = "cfg-if"
++version = "1.0.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
++
++[[package]]
++name = "d02-device-native-component"
++version = "0.1.0-d02-device-20261125"
++dependencies = [
++ "cap-std",
++ "libc",
++ "rustix",
++ "serde",
++ "tempfile",
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "errno"
++version = "0.3.15"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e35d6e78f4cebb90e51d543db8fe41528851d6deeef6ef21ebd4bfdc1e784776"
++dependencies = [
++ "libc",
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "fastrand"
++version = "2.5.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "da7c62ceae207dd37ea5b845da6a0696c799f85e97da1ab5b7910be3c1c80223"
++
++[[package]]
++name = "fs-set-times"
++version = "0.20.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "94e7099f6313ecacbe1256e8ff9d617b75d1bcb16a6fddef94866d225a01a14a"
++dependencies = [
++ "io-lifetimes 2.0.4",
++ "rustix",
++ "windows-sys 0.59.0",
++]
++
++[[package]]
++name = "getrandom"
++version = "0.4.3"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "300e883d756b2e4ec94e02791f39b04b522276138852cfc41d9fb7e904106099"
++dependencies = [
++ "cfg-if",
++ "libc",
++ "r-efi",
++]
++
++[[package]]
++name = "io-extras"
++version = "0.19.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "20fd6de4ccfcc187e38bc21cfa543cb5a302cb86a8b114eb7f0bf0dc9f8ac00f"
++dependencies = [
++ "io-lifetimes 3.0.1",
++ "windows-sys 0.60.2",
++]
++
++[[package]]
++name = "io-lifetimes"
++version = "2.0.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "06432fb54d3be7964ecd3649233cddf80db2832f47fec34c01f65b3d9d774983"
++
++[[package]]
++name = "io-lifetimes"
++version = "3.0.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "2f0fb0570afe1fed943c5c3d4102d5358592d8625fda6a0007fdbe65a92fba96"
++
++[[package]]
++name = "ipnet"
++version = "2.12.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "791930b43c0d5973160d90a8f3894509f2b273430f5c5c73b668636d0287c5c0"
++
++[[package]]
++name = "libc"
++version = "0.2.191"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "65cd87c9a6d60536580b316ad985726104730a5151c99845f2490428ef91240a"
++
++[[package]]
++name = "linux-raw-sys"
++version = "0.12.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "32a66949e030da00e8c7d4434b251670a91556f4144941d37452769c25d58a53"
++
++[[package]]
++name = "maybe-owned"
++version = "0.3.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4facc753ae494aeb6e3c22f839b158aebd4f9270f55cd3c79906c45476c47ab4"
++
++[[package]]
++name = "once_cell"
++version = "1.21.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50"
++
++[[package]]
++name = "proc-macro2"
++version = "1.0.107"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9"
++dependencies = [
++ "unicode-ident",
++]
++
++[[package]]
++name = "quote"
++version = "1.0.47"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001"
++dependencies = [
++ "proc-macro2",
++]
++
++[[package]]
++name = "r-efi"
++version = "6.0.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf"
++
++[[package]]
++name = "rustix"
++version = "1.1.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e5e76742e5294153d4dde1207dbec5bdd81eef6fabdc0d2118babadabfd858aa"
++dependencies = [
++ "bitflags",
++ "errno",
++ "libc",
++ "linux-raw-sys",
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "rustix-linux-procfs"
++version = "0.1.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "2fc84bf7e9aa16c4f2c758f27412dc9841341e16aa682d9c7ac308fe3ee12056"
++dependencies = [
++ "once_cell",
++ "rustix",
++]
++
++[[package]]
++name = "serde"
++version = "1.0.229"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba"
++dependencies = [
++ "serde_core",
++ "serde_derive",
++]
++
++[[package]]
++name = "serde_core"
++version = "1.0.229"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "67dca2c9c51e58a4791a4b1ed58308b39c64224d349a935ab5039aa360942a48"
++dependencies = [
++ "serde_derive",
++]
++
++[[package]]
++name = "serde_derive"
++version = "1.0.229"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "syn",
++]
++
++[[package]]
++name = "syn"
++version = "3.0.10"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4ae9ccbea3a7b0b09443036490c8f34a8b1b760fd345e5c0dae0aac718faea79"
++dependencies = [
++ "proc-macro2",
++ "quote",
++ "unicode-ident",
++]
++
++[[package]]
++name = "tempfile"
++version = "3.27.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
++dependencies = [
++ "fastrand",
++ "getrandom",
++ "once_cell",
++ "rustix",
++ "windows-sys 0.61.2",
++]
++
++[[package]]
++name = "unicode-ident"
++version = "1.0.27"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a2c754d6c33795a1c324727428e5a7dedb5b06195f9890bdbcba760d3e246563"
++
++[[package]]
++name = "windows-link"
++version = "0.2.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5"
++
++[[package]]
++name = "windows-sys"
++version = "0.59.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b"
++dependencies = [
++ "windows-targets 0.52.6",
++]
++
++[[package]]
++name = "windows-sys"
++version = "0.60.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "f2f500e4d28234f72040990ec9d39e3a6b950f9f22d3dba18416c35882612bcb"
++dependencies = [
++ "windows-targets 0.53.5",
++]
++
++[[package]]
++name = "windows-sys"
++version = "0.61.2"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
++dependencies = [
++ "windows-link",
++]
++
++[[package]]
++name = "windows-targets"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9b724f72796e036ab90c1021d4780d4d3d648aca59e491e6b98e725b84e99973"
++dependencies = [
++ "windows_aarch64_gnullvm 0.52.6",
++ "windows_aarch64_msvc 0.52.6",
++ "windows_i686_gnu 0.52.6",
++ "windows_i686_gnullvm 0.52.6",
++ "windows_i686_msvc 0.52.6",
++ "windows_x86_64_gnu 0.52.6",
++ "windows_x86_64_gnullvm 0.52.6",
++ "windows_x86_64_msvc 0.52.6",
++]
++
++[[package]]
++name = "windows-targets"
++version = "0.53.5"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "4945f9f551b88e0d65f3db0bc25c33b8acea4d9e41163edf90dcd0b19f9069f3"
++dependencies = [
++ "windows-link",
++ "windows_aarch64_gnullvm 0.53.1",
++ "windows_aarch64_msvc 0.53.1",
++ "windows_i686_gnu 0.53.1",
++ "windows_i686_gnullvm 0.53.1",
++ "windows_i686_msvc 0.53.1",
++ "windows_x86_64_gnu 0.53.1",
++ "windows_x86_64_gnullvm 0.53.1",
++ "windows_x86_64_msvc 0.53.1",
++]
++
++[[package]]
++name = "windows_aarch64_gnullvm"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "32a4622180e7a0ec044bb555404c800bc9fd9ec262ec147edd5989ccd0c02cd3"
++
++[[package]]
++name = "windows_aarch64_gnullvm"
++version = "0.53.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "a9d8416fa8b42f5c947f8482c43e7d89e73a173cead56d044f6a56104a6d1b53"
++
++[[package]]
++name = "windows_aarch64_msvc"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "09ec2a7bb152e2252b53fa7803150007879548bc709c039df7627cabbd05d469"
++
++[[package]]
++name = "windows_aarch64_msvc"
++version = "0.53.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "b9d782e804c2f632e395708e99a94275910eb9100b2114651e04744e9b125006"
++
++[[package]]
++name = "windows_i686_gnu"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "8e9b5ad5ab802e97eb8e295ac6720e509ee4c243f69d781394014ebfe8bbfa0b"
++
++[[package]]
++name = "windows_i686_gnu"
++version = "0.53.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "960e6da069d81e09becb0ca57a65220ddff016ff2d6af6a223cf372a506593a3"
++
++[[package]]
++name = "windows_i686_gnullvm"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "0eee52d38c090b3caa76c563b86c3a4bd71ef1a819287c19d586d7334ae8ed66"
++
++[[package]]
++name = "windows_i686_gnullvm"
++version = "0.53.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "fa7359d10048f68ab8b09fa71c3daccfb0e9b559aed648a8f95469c27057180c"
++
++[[package]]
++name = "windows_i686_msvc"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66"
++
++[[package]]
++name = "windows_i686_msvc"
++version = "0.53.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "1e7ac75179f18232fe9c285163565a57ef8d3c89254a30685b57d83a38d326c2"
++
++[[package]]
++name = "windows_x86_64_gnu"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "147a5c80aabfbf0c7d901cb5895d1de30ef2907eb21fbbab29ca94c5b08b1a78"
++
++[[package]]
++name = "windows_x86_64_gnu"
++version = "0.53.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "9c3842cdd74a865a8066ab39c8a7a473c0778a3f29370b5fd6b4b9aa7df4a499"
++
++[[package]]
++name = "windows_x86_64_gnullvm"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "24d5b23dc417412679681396f2b49f3de8c1473deb516bd34410872eff51ed0d"
++
++[[package]]
++name = "windows_x86_64_gnullvm"
++version = "0.53.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "0ffa179e2d07eee8ad8f57493436566c7cc30ac536a3379fdf008f47f6bb7ae1"
++
++[[package]]
++name = "windows_x86_64_msvc"
++version = "0.52.6"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec"
++
++[[package]]
++name = "windows_x86_64_msvc"
++version = "0.53.1"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "d6bbff5f0aada427a1e5a6da5f1f98158182f26556f345ac9e04d36d0ebed650"
++
++[[package]]
++name = "winx"
++version = "0.36.4"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "3f3fd376f71958b862e7afb20cfe5a22830e1963462f3a17f49d82a6c1d1f42d"
++dependencies = [
++ "bitflags",
++ "windows-sys 0.59.0",
++]
+--- /dev/null
++++ b/tests/rdp-native-component/generate.py
+@@ -0,0 +1,16 @@
++from pathlib import Path
++import re, hashlib, json
++root=Path(__file__).resolve().parents[2]
++source=root/'engines/rdp/src/devices.rs'
++text=source.read_text()
++prefix=text[:text.index('type DeviceCompletion')]
++helpers=text[text.index('fn access_categories'):text.index('#[cfg(test)]',text.index('fn access_categories'))]
++# Extract unchanged production Drives and helpers, excluding only SVC imports.
++for line in ['use crate::smartcard;\n','use ironrdp_core::AsAny;\n','use ironrdp_pdu::{PduResult, gcc::ChannelName};\n','use ironrdp_svc::{SvcClientProcessor, SvcMessage, SvcProcessor};\n']:
++ prefix=prefix.replace(line,'')
++prefix=re.sub(r'#\[path = "([^"]+)"\]',lambda m: '#[path = '+json.dumps(str(source.parent/m[1]))+']',prefix)
++out=Path(__file__).parent/'src/drives.rs';out.write_text(prefix+helpers)
++inputs = [source, root/'src/desktop/options.rs'] + [source.parent/name for name in ['serial.rs','serial_windows.rs','serial_completion.rs','native_file_windows.rs','native_file_macos.rs']]
++proof = {str(path.relative_to(root)):hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}
++proof['generated-drives.rs'] = hashlib.sha256(out.read_bytes()).hexdigest()
++(Path(__file__).parent/'production-input-sha256.json').write_text(json.dumps(proof,indent=2)+'\n')
+--- /dev/null
++++ b/tests/rdp-native-component/src/lib.rs
+@@ -0,0 +1,4 @@
++#![allow(dead_code, unused_imports)]
++#[path = "../../../src/desktop/options.rs"]
++mod rdp_options;
++mod drives;
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-red-behavior.log
+@@ -0,0 +1,63 @@
++    Blocking waiting for file lock on build directory
++   Compiling termcraft-rdp-engine v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/engines/rdp)
++warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
++  --> src/../../../src/desktop/options.rs:96:9
++   |
++95 | pub struct NegotiatedRdpOptions {
++   |            -------------------- fields in this struct
++96 |     pub clipboard: ClipboardPolicy,
++   |         ^^^^^^^^^
++97 |     pub keyboard: KeyboardRouting,
++   |         ^^^^^^^^
++98 |     pub keyboard_layout: u32,
++   |         ^^^^^^^^^^^^^^^
++   |
++   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
++   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
++
++warning: method `is_default` is never used
++   --> src/../../../src/desktop/options.rs:101:12
++    |
++100 | impl RdpOptions {
++    | --------------- method in this implementation
++101 |     pub fn is_default(&self) -> bool {
++    |            ^^^^^^^^^^
++
++warning: `termcraft-rdp-engine` (bin "d02-device-private-rdp" test) generated 2 warnings
++    Finished `test` profile [unoptimized + debuginfo] target(s) in 20.93s
++     Running unittests src/main.rs (app/target/debug/deps/d02_device_private_rdp-34a4dfff972ff5e3)
++
++running 12 tests
++test devices::serial::tests::serial_peer_hangup_is_not_a_successful_empty_read ... ok
++test devices::serial::tests::expired_serial_operations_leave_pty_data_untouched ... ok
++test devices_tests::serial::embedded_drive_and_serial_use_distinct_device_ids_on_the_same_channel ... ok
++test devices_tests::serial::embedded_serial_rejects_non_tty_character_devices ... ok
++test devices_tests::serial::embedded_serial_opens_the_specification_metadata_probe ... ok
++
++thread 'devices_tests::serial::serial_flow_characters_apply_to_pty_and_modem_failures_are_explicit' (100085) panicked at src/devices_tests.rs:818:9:
++assertion `left == right` failed
++  left: 3221225659
++ right: 0
++note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
++test devices_tests::serial::serial_flow_characters_apply_to_pty_and_modem_failures_are_explicit ... FAILED
++test devices_tests::serial::embedded_serial_certificate_retry_keeps_the_original_tty_binding ... ok
++
++thread 'devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads' (100084) panicked at src/devices_tests.rs:790:9:
++assertion `left == right` failed
++  left: 3221225659
++ right: 0
++test devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads ... FAILED
++test devices_tests::serial::embedded_serial_close_cancels_all_waiting_reads_even_at_capacity ... ok
++test devices_tests::serial::embedded_serial_read_only_denies_writes_and_mutating_controls ... ok
++test devices_tests::serial::embedded_serial_does_not_reopen_a_recycled_pty ... ok
++test devices_tests::serial::embedded_serial_redirects_an_owned_pty_with_concurrent_read_and_write ... ok
++
++failures:
++
++failures:
++    devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads
++    devices_tests::serial::serial_flow_characters_apply_to_pty_and_modem_failures_are_explicit
++
++test result: FAILED. 10 passed; 2 failed; 0 ignored; 0 measured; 31 filtered out; finished in 0.03s
++
++error: test failed, to rerun pass `--bin d02-device-private-rdp`
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-final-helper-identity.log
+@@ -0,0 +1,91 @@
++   Compiling termcraft-rdp-engine v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/engines/rdp)
++warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
++  --> src/../../../src/desktop/options.rs:96:9
++   |
++95 | pub struct NegotiatedRdpOptions {
++   |            -------------------- fields in this struct
++96 |     pub clipboard: ClipboardPolicy,
++   |         ^^^^^^^^^
++97 |     pub keyboard: KeyboardRouting,
++   |         ^^^^^^^^
++98 |     pub keyboard_layout: u32,
++   |         ^^^^^^^^^^^^^^^
++   |
++   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
++   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
++
++warning: method `is_default` is never used
++   --> src/../../../src/desktop/options.rs:101:12
++    |
++100 | impl RdpOptions {
++    | --------------- method in this implementation
++101 |     pub fn is_default(&self) -> bool {
++    |            ^^^^^^^^^^
++
++warning: `termcraft-rdp-engine` (bin "d02-device-private-rdp" test) generated 2 warnings (2 duplicates)
++warning: `termcraft-rdp-engine` (bin "d02-device-private-rdp") generated 2 warnings
++    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.60s
++     Running unittests src/main.rs (app/target/debug/deps/d02_device_private_rdp-34a4dfff972ff5e3)
++
++running 44 tests
++test config::tests::administrative_session_requests_console_without_advertising_redirects ... ok
++test clipboard::tests::empty_local_clipboard_still_initializes_the_channel ... ok
++test devices::smartcard_tests::smartcard_capability_and_announcement_require_a_matching_peer_capability ... ok
++test devices::serial::tests::serial_peer_hangup_is_not_a_successful_empty_read ... ok
++test devices::serial::tests::expired_serial_operations_leave_pty_data_untouched ... ok
++test devices::smartcard_tests::default_does_not_attach_the_smartcard_or_device_channel ... ok
++test devices_tests::allocation_reserves_space_without_extending_eof_and_validates_signed_lengths ... ok
++test devices_tests::opened_drive_handles_keep_the_original_object_after_a_local_rename ... ok
++test devices_tests::drive_announcements_use_unicode_v2_names_and_saturated_io_replies_without_disconnect ... ok
++test devices_tests::drive_handles_enforce_requested_access_and_exclusive_sharing ... ok
++test devices_tests::drive_channel_handshake_advertises_only_after_logon_and_processes_io ... ok
++test devices_tests::printer_tests::stale_owned_socket_is_refused_before_announcement ... ok
++test devices_tests::drive_allocation_is_released_on_last_remote_close_and_disconnect ... ok
++test devices_tests::printer_tests::default_session_requests_no_device_channel ... ok
++test clipboard::tests::text_channel_enforces_both_directions_and_rejects_invalid_data ... ok
++test devices_tests::redirected_read_only_drive_blocks_mutations_and_escape ... ok
++test devices_tests::redirected_volume_reports_actual_capacity ... ok
++test devices_tests::printer_tests::missing_wrong_stopped_or_incompatible_queue_is_refused_before_announcement ... ok
++test devices_tests::serial::embedded_drive_and_serial_use_distinct_device_ids_on_the_same_channel ... ok
++test devices_tests::redirected_drives_reject_fifos_without_opening_a_blocking_stream ... ok
++test devices_tests::redirected_drive_reads_writes_and_retires_real_handles ... ok
++test devices_tests::redirected_file_resize_preserves_unsupported_rename_and_delete ... ok
++test devices_tests::serial::embedded_serial_certificate_retry_keeps_the_original_tty_binding ... ok
++test devices_tests::serial::embedded_serial_close_cancels_all_waiting_reads_even_at_capacity ... ok
++test devices_tests::serial::embedded_serial_opens_the_specification_metadata_probe ... ok
++test devices_tests::serial::embedded_serial_rejects_non_tty_character_devices ... ok
++test devices_tests::redirected_folder_listing_uses_rdpefs_layout_and_never_loses_late_matches ... ok
++test devices_tests::serial::embedded_serial_read_only_denies_writes_and_mutating_controls ... ok
++test devices_tests::unsupported_drive_mutations_never_change_files ... ok
++test devices_tests::printer_tests::truncated_write_retires_job_without_submitting_a_partial_document ... ok
++test devices_tests::printer_tests::cups_ipp_rejection_is_reported_even_when_http_succeeds ... ok
++test devices_tests::redirected_drives_reject_malformed_pdus_and_bound_handles ... ok
++test devices_tests::printer_tests::abandoned_job_and_certificate_retry_keep_the_original_queue_binding ... ok
++test devices_tests::serial::embedded_serial_does_not_reopen_a_recycled_pty ... ok
++test devices_tests::printer_tests::selected_printer_announces_and_submits_complete_ordered_job_to_ipp ... ok
++test devices_tests::serial::serial_flow_characters_apply_to_pty_and_modem_failures_are_explicit ... ok
++test devices_tests::serial::embedded_serial_redirects_an_owned_pty_with_concurrent_read_and_write ... ok
++test devices_tests::printer_tests::disconnect_cancels_an_in_flight_cups_upload_without_finishing_it ... ok
++test devices_tests::printer_tests::delayed_close_for_failed_job_cannot_submit_a_new_open_job ... ok
++test devices_tests::serial::serial_xoff_stalls_pty_output_until_xon_and_read_only_rejects_new_controls ... ok
++test devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads ... ok
++test devices_tests::printer_tests::malformed_ipp_success_is_an_unconfirmed_submission ... ok
++test devices_tests::printer_tests::stalled_cups_response_times_out_and_retires_the_document ... ok
++test devices_tests::printer_tests::malformed_pdu_and_job_limits_preserve_the_channel ... ok
++
++test result: ok. 44 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.13s
++
++     Running tests/pcsc_worker.rs (app/target/debug/deps/pcsc_worker-a6912cfcaa38d4ff)
++
++running 8 tests
++test fixture_worker_entry ... ok
++test provider_requires_its_private_socket ... ok
++test unassigned_controls_drop_without_consuming_the_worker_queue ... ok
++test cancelling_a_watch_retires_only_that_owned_context ... ok
++test inconsistent_transmit_capacity_has_no_native_side_effect ... ok
++test selected_reader_probes_and_exchanges_card_bytes_over_real_worker_transport ... ok
++test failed_native_cancel_or_release_keeps_live_watch ... ok
++test closing_worker_reaps_stalled_native_transmit ... ok
++
++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.09s
++
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-final-windows-component-real-dispatch.log
+@@ -0,0 +1,19 @@
++     Locking 7 packages to highest Rust 1.99.0 compatible versions
++      Adding proc-macro2 v1.0.107
++      Adding quote v1.0.47
++      Adding serde v1.0.229
++      Adding serde_core v1.0.229
++      Adding serde_derive v1.0.229
++      Adding syn v3.0.10
++      Adding unicode-ident v1.0.27
++    Checking d02-device-native-component v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/tests/rdp-native-component)
++warning: unused variable: `metadata`
++   --> src/drives.rs:230:29
++    |
++230 |             let (file, dir, metadata) = if directory {
++    |                             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_metadata`
++    |
++    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
++
++warning: `d02-device-native-component` (lib test) generated 1 warning (run `cargo fix --lib -p d02-device-native-component --tests` to apply 1 suggestion)
++    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.32s
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-final-macos-component-real-dispatch.log
+@@ -0,0 +1,2 @@
++    Checking d02-device-native-component v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/tests/rdp-native-component)
++    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.32s
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-windows-helper.log
+@@ -0,0 +1,208 @@
++   Compiling syn v2.0.119
++    Checking subtle v2.6.1
++   Compiling getrandom v0.4.3
++   Compiling syn v3.0.10
++   Compiling zeroize_derive v1.5.0
++    Checking ctutils v0.4.8
++    Checking zeroize v1.9.2
++    Checking hybrid-array v0.4.15
++    Checking const-oid v0.10.3
++    Checking crypto-common v0.2.2
++    Checking block-buffer v0.12.1
++    Checking flagset v0.4.7
++   Compiling der_derive v0.8.0
++    Checking digest v0.11.3
++    Checking der v0.8.3
++   Compiling displaydoc v0.2.7
++   Compiling generic-array v0.14.7
++    Checking spki v0.8.1
++   Compiling synstructure v0.14.0
++    Checking crypto-bigint v0.7.11
++   Compiling thiserror-impl v2.0.21
++    Checking thiserror v2.0.21
++   Compiling zerofrom-derive v0.1.8
++   Compiling find-msvc-tools v0.1.15
++   Compiling cc v1.11.3
++    Checking zerofrom v0.1.8
++   Compiling yoke-derive v0.8.4
++    Checking block-padding v0.4.2
++    Checking inout v0.2.6
++    Checking yoke v0.8.4
++    Checking sha1 v0.11.0
++    Checking hmac v0.13.0
++   Compiling der_derive v0.7.3
++    Checking const-oid v0.9.6
++    Checking minimal-lexical v0.2.1
++    Checking der v0.7.10
++    Checking nom v7.1.3
++    Checking crypto-common v0.1.7
++    Checking block-buffer v0.10.4
++   Compiling zerovec-derive v0.11.7
++   Compiling synstructure v0.13.2
++    Checking ff v0.14.0
++   Compiling asn1-rs-derive v0.6.0
++    Checking zerovec v0.11.9
++    Checking rusticata-macros v4.1.0
++    Checking digest v0.10.7
++    Checking spki v0.7.3
++    Checking cipher v0.5.2
++   Compiling num-derive v0.5.1
++   Compiling asn1-rs-impl v0.2.0
++    Checking log v0.4.35
++    Checking tap v1.0.1
++    Checking pin-project-lite v0.2.18
++    Checking asn1-rs v0.7.2
++    Checking group v0.14.0
++    Checking pkcs8 v0.11.0
++    Checking signature v3.0.0
++    Checking num-integer v0.1.47
++    Checking ironrdp-error v0.2.1
++    Checking ironrdp-core v0.3.0
++    Checking sec1 v0.8.1
++    Checking der-parser v10.0.0
++    Checking num-bigint v0.4.8
++    Checking md-5 v0.10.6
++    Checking hmac v0.12.1
++    Checking pkcs1 v0.7.5
++    Checking hkdf v0.13.0
++    Checking tracing-core v0.1.36
++    Checking x509-cert v0.3.1
++   Compiling serde_derive v1.0.229
++   Compiling tracing-attributes v0.1.31
++    Checking bit_field v0.10.4
++    Checking ironrdp-pdu v0.11.0
++    Checking serde v1.0.229
++    Checking tracing v0.1.44
++    Checking elliptic-curve v0.14.3
++    Checking tinystr v0.8.5
++    Checking primefield v0.14.0
++    Checking num-conv v0.2.2
++    Checking deranged v0.5.9
++    Checking powerfmt v0.2.1
++    Checking time-core v0.1.9
++    Checking time v0.3.55
++    Checking icu_locale_core v2.4.0
++    Checking utf8_iter v1.1.0
++    Checking wnaf v0.14.1
++    Checking oid v0.2.1
++    Checking potential_utf v0.1.6
++   Compiling curve25519-dalek v5.0.0
++    Checking rfc6979 v0.6.0
++    Checking zerotrie v0.2.5
++    Checking windows-strings v0.5.1
++    Checking sha2 v0.11.1
++   Compiling icu_normalizer_data v2.4.0
++   Compiling icu_properties_data v2.4.0
++    Checking icu_provider v2.4.0
++    Checking ecdsa v0.17.0
++    Checking icu_collections v2.4.0
++    Checking picky-asn1 v0.10.2
++    Checking primeorder v0.14.0
++    Checking ironrdp-svc v0.10.0
++    Checking aes v0.9.4
++    Checking windows-sys v0.61.2
++    Checking universal-hash v0.6.1
++   Compiling curve25519-dalek-derive v0.1.1
++   Compiling windows-interface v0.59.3
++   Compiling windows-implement v0.60.2
++   Compiling pkg-config v0.3.34
++    Checking bytemuck v1.25.2
++   Compiling getrandom v0.3.4
++    Checking bytes v1.12.2
++   Compiling vcpkg v0.2.15
++    Checking windows-core v0.62.2
++   Compiling libz-sys v1.1.33
++    Checking polyval v0.7.3
++    Checking picky-asn1-der v0.5.7
++   Compiling heapless v0.7.17
++    Checking chacha20 v0.10.2
++   Compiling crc32fast v1.5.5
++    Checking base64 v0.23.1
++    Checking smallvec v1.16.6
++    Checking icu_normalizer v2.4.0
++    Checking picky-asn1-x509 v0.15.6
++    Checking rand v0.10.4
++    Checking icu_properties v2.4.0
++    Checking ghash v0.6.0
++    Checking spin v0.9.9
++    Checking ed25519 v3.0.0
++    Checking ctr v0.10.1
++    Checking cbc v0.2.1
++    Checking des v0.9.0
++    Checking pbkdf2 v0.13.0
++    Checking aead v0.6.1
++   Compiling ring v0.17.14
++warning: libz-sys@1.1.33: GNU compiler is not supported for this target
++warning: libz-sys@1.1.33: src/zlib/gzlib.c: In function 'gz_open':
++warning: libz-sys@1.1.33: src/zlib/gzlib.c:15:17: error: implicit declaration of function 'lseek'; did you mean 'fseek'? [-Wimplicit-function-declaration]
++warning: libz-sys@1.1.33:    15 | #  define LSEEK lseek
++warning: libz-sys@1.1.33:       |                 ^~~~~
++warning: libz-sys@1.1.33: src/zlib/gzlib.c:275:9: note: in expansion of macro 'LSEEK'
++warning: libz-sys@1.1.33:   275 |         LSEEK(state->fd, 0, SEEK_END);  /* so gzoffset() is correct */
++warning: libz-sys@1.1.33:       |         ^~~~~
++error: failed to run custom build command for `libz-sys v1.1.33`
++
++Caused by:
++  process didn't exit successfully: `/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/build/libz-sys-a0f8fd8e1848d47a/build-script-build` (exit status: 1)
++  --- stdout
++  cargo:rerun-if-env-changed=LIBZ_SYS_STATIC
++  cargo:rerun-if-changed=build.rs
++  cargo:rerun-if-changed=zng/cmake.rs
++  cargo:rerun-if-changed=zng/cc.rs
++  note, vcpkg did not find zlib: Could not find Vcpkg tree: No vcpkg installation found. Set the VCPKG_ROOT environment variable or run 'vcpkg integrate install'
++  cargo:rerun-if-env-changed=CC_FORCE_DISABLE
++  CC_FORCE_DISABLE = None
++  cargo:rerun-if-env-changed=CC_PREFER_CLANG_CL_OVER_MSVC
++  CC_PREFER_CLANG_CL_OVER_MSVC = None
++  cargo:rerun-if-env-changed=VCINSTALLDIR
++  VCINSTALLDIR = None
++  cargo:rerun-if-env-changed=CC_x86_64-pc-windows-msvc
++  CC_x86_64-pc-windows-msvc = None
++  cargo:rerun-if-env-changed=CC_x86_64_pc_windows_msvc
++  CC_x86_64_pc_windows_msvc = None
++  cargo:rerun-if-env-changed=TARGET_CC
++  TARGET_CC = None
++  cargo:rerun-if-env-changed=CC
++  CC = None
++  cargo:rerun-if-env-changed=CROSS_COMPILE
++  CROSS_COMPILE = None
++  cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
++  cargo:warning=GNU compiler is not supported for this target
++  cargo:rerun-if-env-changed=CPATH
++  cargo:rerun-if-env-changed=C_INCLUDE_PATH
++  cargo:rerun-if-env-changed=CPLUS_INCLUDE_PATH
++  cargo:rerun-if-env-changed=OBJC_INCLUDE_PATH
++  cargo:rerun-if-env-changed=OBJCPLUS_INCLUDE_PATH
++  cargo:rerun-if-env-changed=COMPILER_PATH
++  cargo:rerun-if-env-changed=SOURCE_DATE_EPOCH
++  cargo:rerun-if-env-changed=GCC_EXEC_PREFIX
++  cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
++  CRATE_CC_NO_DEFAULTS = None
++  CRATE_CC_NO_DEFAULTS = None
++  cargo:rerun-if-env-changed=CFLAGS
++  CFLAGS = None
++  cargo:rerun-if-env-changed=TARGET_CFLAGS
++  TARGET_CFLAGS = None
++  cargo:rerun-if-env-changed=CFLAGS_x86_64_pc_windows_msvc
++  CFLAGS_x86_64_pc_windows_msvc = None
++  cargo:rerun-if-env-changed=CFLAGS_x86_64-pc-windows-msvc
++  CFLAGS_x86_64-pc-windows-msvc = None
++  CFLAGS = None
++  TARGET_CFLAGS = None
++  CFLAGS_x86_64_pc_windows_msvc = None
++  CFLAGS_x86_64-pc-windows-msvc = None
++  cargo:warning=src/zlib/gzlib.c: In function 'gz_open':
++  cargo:warning=src/zlib/gzlib.c:15:17: error: implicit declaration of function 'lseek'; did you mean 'fseek'? [-Wimplicit-function-declaration]
++  cargo:warning=   15 | #  define LSEEK lseek
++  cargo:warning=      |                 ^~~~~
++  cargo:warning=src/zlib/gzlib.c:275:9: note: in expansion of macro 'LSEEK'
++  cargo:warning=  275 |         LSEEK(state->fd, 0, SEEK_END);  /* so gzoffset() is correct */
++  cargo:warning=      |         ^~~~~
++
++  --- stderr
++
++
++  error occurred in cc-rs: command did not execute successfully (status code exit status: 1): "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-g" "-fno-omit-frame-pointer" "-mno-omit-leaf-frame-pointer" "-m64" "-I" "src/zlib" "-w" "-DSTDC" "-o" "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/x86_64-pc-windows-msvc/debug/build/libz-sys-36fe731c31b69013/out/lib/b9b191b8e1a44c35-gzlib.o" "-c" "src/zlib/gzlib.c"
++
++
++warning: build failed, waiting for other jobs to finish...
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-windows-dispatch-component.log
+@@ -0,0 +1,67 @@
++    Checking d02-device-native-component v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/tests/rdp-native-component)
++warning: unused imports: `PrinterMapping`, `RdpOptions`, and `SerialMapping`
++ --> src/drives.rs:3:40
++  |
++3 | use crate::rdp_options::{DriveMapping, PrinterMapping, RdpOptions, SerialMapping};
++  |                                        ^^^^^^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^^^^
++  |
++  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
++
++warning: unused import: `crate::smartcard`
++  --> src/drives.rs:19:5
++   |
++19 | use crate::smartcard;
++   |     ^^^^^^^^^^^^^^^^
++
++warning: unused imports: `Arc`, `AtomicBool`, `Ordering`, and `mpsc`
++  --> src/drives.rs:26:9
++   |
++26 |         Arc,
++   |         ^^^
++27 |         atomic::{AtomicBool, Ordering},
++   |                  ^^^^^^^^^^  ^^^^^^^^
++28 |         mpsc,
++   |         ^^^^
++
++warning: unused import: `cap_std::fs::MetadataExt`
++   --> src/drives.rs:735:9
++    |
++735 |     use cap_std::fs::MetadataExt;
++    |         ^^^^^^^^^^^^^^^^^^^^^^^^
++
++error[E0308]: mismatched types
++   --> src/drives.rs:595:50
++    |
++595 | fn allocation_size(m: &cap_std::fs::Metadata) -> u64 {
++    |    ---------------                               ^^^ expected `u64`, found `()`
++    |    |
++    |    implicitly returns `()` as its body has no tail or `return` expression
++
++error[E0599]: no method named `volume_serial_number` found for reference `&cap_std::fs::Metadata` in the current scope
++   --> src/drives.rs:743:22
++    |
++743 |             metadata.volume_serial_number().ok_or(UNSUPPORTED)? as u64,
++    |                      ^^^^^^^^^^^^^^^^^^^^ method not found in `&cap_std::fs::Metadata`
++    |
++    = help: items from traits can only be used if the trait is in scope
++help: trait `_WindowsByHandle` which provides `volume_serial_number` is implemented but not in scope; perhaps you want to import it
++    |
++  3 + use cap_primitives::fs::metadata::_WindowsByHandle;
++    |
++
++error[E0599]: no method named `file_index` found for reference `&cap_std::fs::Metadata` in the current scope
++   --> src/drives.rs:744:22
++    |
++744 |             metadata.file_index().ok_or(UNSUPPORTED)?,
++    |                      ^^^^^^^^^^ method not found in `&cap_std::fs::Metadata`
++    |
++    = help: items from traits can only be used if the trait is in scope
++help: trait `_WindowsByHandle` which provides `file_index` is implemented but not in scope; perhaps you want to import it
++    |
++  3 + use cap_primitives::fs::metadata::_WindowsByHandle;
++    |
++
++Some errors have detailed explanations: E0308, E0599.
++For more information about an error, try `rustc --explain E0308`.
++warning: `d02-device-native-component` (lib test) generated 4 warnings
++error: could not compile `d02-device-native-component` (lib test) due to 3 previous errors; 4 warnings emitted
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-macos-component-type-red.log
+@@ -0,0 +1,40 @@
++    Checking tempfile v3.27.0
++    Checking d02-device-native-component v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/tests/rdp-native-component)
++error[E0308]: mismatched types
++   --> src/../../../engines/rdp/src/serial.rs:64:77
++    |
++ 64 |         if self.break_changed { unsafe { libc::ioctl(self.file.as_raw_fd(), libc::TIOCCBRK); } }
++    |                                          -----------                        ^^^^^^^^^^^^^^ expected `u64`, found `i32`
++    |                                          |
++    |                                          arguments to this function are incorrect
++    |
++note: function defined here
++   --> /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.191/src/unix/bsd/mod.rs:611:12
++    |
++611 |     pub fn ioctl(fd: c_int, request: c_ulong, ...) -> c_int;
++    |            ^^^^^
++help: you can convert an `i32` to a `u64` and panic if the converted value doesn't fit
++    |
++ 64 |         if self.break_changed { unsafe { libc::ioctl(self.file.as_raw_fd(), libc::TIOCCBRK.try_into().unwrap()); } }
++    |                                                                                           ++++++++++++++++++++
++
++error[E0308]: mismatched types
++   --> src/../../../engines/rdp/src/serial.rs:663:55
++    |
++663 |             if unsafe { libc::ioctl(file.as_raw_fd(), operation) } != 0 { return Err(tty_status(io::Error::last_os_error())); }
++    |                         -----------                   ^^^^^^^^^ expected `u64`, found `i32`
++    |                         |
++    |                         arguments to this function are incorrect
++    |
++note: function defined here
++   --> /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.191/src/unix/bsd/mod.rs:611:12
++    |
++611 |     pub fn ioctl(fd: c_int, request: c_ulong, ...) -> c_int;
++    |            ^^^^^
++help: you can convert an `i32` to a `u64` and panic if the converted value doesn't fit
++    |
++663 |             if unsafe { libc::ioctl(file.as_raw_fd(), operation.try_into().unwrap()) } != 0 { return Err(tty_status(io::Error::last_os_error())); }
++    |                                                                ++++++++++++++++++++
++
++For more information about this error, try `rustc --explain E0308`.
++error: could not compile `d02-device-native-component` (lib test) due to 2 previous errors
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/README.md
+@@ -0,0 +1,54 @@
++# D02 serial controls and native device-source increment — 2026-11-25
++
++This is a source increment for review, not D02 completion or native-device validation. The root coordinator owns checklist counts and the whole-application gate. No host serial device, printer, or smartcard was opened. Linux tests use owned pseudo-terminals, temporary files, and the existing private PC/SC fixture child.
++
++## Changed source behavior
++
++- Unix serial requests now support configurable read/write timeouts, accumulated reads and interval expiry, immediate and first-byte read modes, XON/XOFF characters, software pause/resume, break controls, DTR/RTS controls and modem queries. The POSIX handflow subset supports software flow and coupled RTS/CTS when the selected device supports its modem ioctls. Unsupported independent DSR/DCD/DTR handshaking, queue thresholds and character substitutions return explicit errors. PTYs reject modem queries and handflow instead of fabricating modem state; failed handflow probes leave termios unchanged. Mutating controls require a writable remote handle. Changed line/modem/flow/break state is restored or cleared on close, and queued operations retain their request-time timeout settings with timers starting when I/O can begin.
++- The Windows serial provider uses an explicitly selected `\\.\COMn` endpoint, opened once with `CreateFileW(FILE_FLAG_OVERLAPPED)`. The opened handle survives certificate retries and remote close/reopen; unplug/reassignment does not reopen the visible COM name. `ReadFile`, `WriteFile`, `DeviceIoControl`, `CancelIoEx` and `GetOverlappedResult` operate on retained native buffers/events. Only explicitly implemented serial control codes and bounded input/output sizes are forwarded. Read-only authority, remote access checks, bounded queues and close cancellation remain enforced. Driver completion is awaited before native buffers are freed. A driver that never completes cancellation can retain its bounded worker/resources; the UI/protocol tasks never join that wait. Arbitrary device namespaces, automatic port discovery and event-wait controls remain unavailable.
++- Windows regular-file allocation, rename and delete disposition use `SetFileInformationByHandle` on the opened source. Rename resolves one validated leaf relative to a capability-opened parent directory. The wire rename layout includes the one-byte reserved RootDirectory; disposition requires the protocol's empty buffer. DELETE access is requested only when authorized, and root read-only policy still refuses changes. Full 128-bit `FileIdInfo` plus the volume identity identifies opened objects, including ReFS-sized IDs. Open-file allocation queries use `FileStandardInfo` rather than estimating reserved space from logical EOF. Directory rename/delete and delete-on-close remain unsupported.
++- Darwin allocation uses `F_PREALLOCATE`/`F_ALLOCATEALL`, requesting only the deficit from physical allocation and keeping logical EOF unchanged. `F_ALLOCATEPERSIST` is deliberately omitted so unused preallocation can retire on native close. Shrinking below EOF uses the opened file, consistent with existing allocation behavior. Native filesystem behavior remains unobserved.
++- The embedded serial capability and device-path hint now include the Windows provider. Saved JSON fields/defaults are unchanged. Existing reviewed Linux CUPS/PCSC implementations are unchanged.
++
++Linux/POSIX rename, disposition and delete-on-close still return unsupported. No path-check-then-unlink/rename is presented as an identity-safe operation. Windows destination resolution and native cancellation/allocation semantics require real endpoint validation before being counted as parity.
++
++## Exact evidence
++
++- `d02-red-behavior.log`: the two new timeout/character assertions were run with the unchanged original Unix serial implementation. **10 passed, 2 failed** with STATUS_NOT_SUPPORTED at the intended assertions. The earlier private harness setup failure (renamed helper binary environment variable) is not counted as behavioral RED.
++- `d02-final-helper-identity.log`: pre-review helper **44 unit tests plus 8 private PC/SC integration tests passed**, zero failed. Thirteen serial tests include byte accumulation/interval timeout, immediate reads, actual PTY pause/resume, read-only mutation refusal, state restoration, cancellation at capacity, pinned retry/recycled-name identity, and unplug error handling. Existing Linux drive/printer/smartcard cases remain passing.
++- `d02-final-windows-component-real-dispatch.log` and `d02-final-macos-component-real-dispatch.log`: actual native modules, the production Drives implementation/dispatch/helpers and actual options source **typecheck for x86_64-pc-windows-msvc and aarch64-apple-darwin**, including cfg-gated native test source. No native tests were executed. The component generator copies the exact production Drives/helper sections, omitting unrelated SVC/channel imports only; no native API stub or replacement is used. The generated input hashes record what was checked.
++- `d02-windows-dispatch-component.log`: the exact-source component caught a Windows-only allocation fallback cfg error and a pre-existing unavailable cap-std Windows metadata trait. These were fixed using the native FileIdInfo API. `d02-macos-component-type-red.log` caught Darwin ioctl argument types, which were corrected.
++- `d02-windows-helper.log`: the full Windows helper check **did not pass**. Its existing libz-sys build attempts host `cc` for Windows and fails at gzlib.c/lseek before checking/linking the full helper. The native component successes do not replace full packaging/linking evidence.
++- `d02-final-format.log`: scoped formatting check passed.
++
++Reproduce the component checks from app/: first run `python3 tests/rdp-native-component/generate.py`, then `CARGO_BUILD_JOBS=2 cargo check --offline --manifest-path tests/rdp-native-component/Cargo.toml --target x86_64-pc-windows-msvc --tests` and the same command with `--target aarch64-apple-darwin`. The generated `src/drives.rs` is a transient check artifact and contains absolute paths to the checked production files.
++
++## Scoped review follow-up
++
++The independent review recorded two Important Windows serial findings. Both are corrected in the refreshed candidate, pending independent rereview:
++
++1. `ReadFile`, `WriteFile` and `DeviceIoControl` now receive null count pointers for overlapped dispatch. Counts are collected through synchronous `GetOverlappedResult` calls while their local count variables remain alive. The three arguments were inspected directly; no native runtime or memory-corruption claim is made. [ReadFile asynchronous contract](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-readfile)
++2. Explicit close requests cancellation, waits for each Pending's terminal native outcome, then encodes that actual outcome. A write that completed normally retains its real successful byte count; successful reads/controls retain their real output; `ERROR_OPERATION_ABORTED` alone maps to cancellation through the native error mapper, and other native failures retain their mapped status. The boxed OVERLAPPED, buffers, event and handle stay alive until the wait returns. Drop retires outstanding operations without a response only when no protocol response can be delivered. The dedicated worker owns these waits, and no timeout permits early freeing of kernel-owned buffers. [CancelIoEx outcomes](https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-cancelioex), [GetOverlappedResult wait contract](https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-getoverlappedresult)
++
++`serial_completion.rs` provides the actual production completion encoder and cancel/wait sequencing seam. The existing forced-cancellation behavior was first extracted unchanged, with the terminal outcome deliberately discarded as in the reviewed close path. `d02-review-red-completion.log` records **three behavioral assertion failures**: successful write count, exact read/control output, and forwarding of non-abort failure. Correcting the seam to encode the terminal result made all three pass in `d02-review-green-completion.log`; the abort case also retains cancellation status. The native wait/cancel calls are injected at that boundary for these bounded, device-free tests; Windows API calls and timing were not executed on Linux.
++
++`d02-review-green-serial.log` records the fresh scoped run: **16 serial/completion tests passed**, zero failed. `d02-review-windows-component.log` and `d02-review-macos-component.log` record fresh locked actual-source component checks with test source compiled, both passing. The Windows check retains the already documented unused metadata variable warning. `d02-review-format.log` is a passing changed-source formatting check. The earlier 44-unit/8-integration result predates these review fixes; this round did not rerun unrelated GUI/application or printer/PCSC suites. Component input proof now lists all production device modules and options, plus the generated Drives hash. Native close/cancel timing and hardware tests remain unrun.
++
++## Remaining D02 work
++
++Native Windows/macOS printer and smartcard providers are still absent. Serial wait/event masks, properties/status/statistics, queue sizing/purge and several less common control families are not implemented; unsupported calls remain explicit. Unix queue-threshold and independent modem handshakes are gaps. Windows regular-file native fixtures and Darwin allocation/close fixtures are compiled only. Full Windows helper linking/packaging, physical serial devices/modem/flow/unplug behavior, native RDP drive/admin/device/security/clipboard interoperability and comparison with original workflows remain unverified. Windows directory listing allocation sizes retain the older metadata-based estimate; native volume capacity queries remain unavailable. D02 stays open and no checklist count is advanced.
++
++## Primary API references consulted
++
++- [MS-RDPESP serial controls](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpesp/824cc217-febd-4a2e-a95f-5b5bdc32848f)
++- [Serial timeouts](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddser/ns-ntddser-_serial_timeouts)
++- [Serial handflow](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddser/ns-ntddser-_serial_handflow)
++- [RDP rename wire layout](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpefs/ae902739-950b-4549-8a11-ce0f487b3c14)
++- [RDP set-information disposition buffer](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-rdpefs/b5d3104b-0e42-4cf8-9059-e9fe86615e5c)
++- [Windows handle-based file mutation](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-setfileinformationbyhandle)
++- [Windows rename RootDirectory semantics](https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_rename_info)
++- [Windows allocation EOF behavior](https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_allocation_info)
++- [Darwin preallocation API](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html)
++- [Darwin F_ALLOCATEPERSIST native header](https://github.com/apple-oss-distributions/xnu/blob/main/bsd/sys/fcntl.h)
++
++No upstream implementation was copied; these references established protocol/API semantics.
+--- /dev/null
++++ b/engines/rdp/src/serial_completion.rs
+@@ -0,0 +1,72 @@
++//! Native serial completion encoding, shared with bounded non-device tests.
++use super::{INVALID, complete, length_data};
++
++pub(super) fn terminal_data(
++    major: u32,
++    output: &mut Vec<u8>,
++    outcome: Result<u32, u32>,
++) -> Result<Vec<u8>, u32> {
++    let transferred = outcome?;
++    if major == 4 {
++        let mut count = transferred.to_le_bytes().to_vec();
++        count.push(0);
++        Ok(count)
++    } else if transferred as usize > output.len() {
++        Err(INVALID)
++    } else {
++        output.truncate(transferred as usize);
++        Ok(length_data(std::mem::take(output)))
++    }
++}
++
++pub(super) fn cancel_and_collect(
++    request: &[u8],
++    major: u32,
++    output: &mut Vec<u8>,
++    request_cancel: impl FnOnce(),
++    wait_terminal: impl FnOnce() -> Result<u32, u32>,
++) -> Vec<u8> {
++    request_cancel();
++    let outcome = wait_terminal();
++    complete(request, terminal_data(major, output, outcome))
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    fn request(major: u32) -> Vec<u8> {
++        let mut request = vec![114, 68, 82, 73];
++        for word in [7u32, 9, 42, major, 0] {
++            request.extend(word.to_le_bytes());
++        }
++        request
++    }
++    #[test]
++    fn close_reports_write_success_when_normal_completion_wins_cancellation() {
++        let response = cancel_and_collect(&request(4), 4, &mut Vec::new(), || {}, || Ok(3));
++        assert_eq!(
++            response,
++            [
++                114, 68, 67, 73, 7, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0
++            ]
++        );
++    }
++    #[test]
++    fn close_preserves_terminal_abort_and_other_native_failure() {
++        for code in [0xc0000120u32, 0xc000009d] {
++            let response = cancel_and_collect(&request(4), 4, &mut Vec::new(), || {}, || Err(code));
++            assert_eq!(
++                u32::from_le_bytes(response[12..16].try_into().unwrap()),
++                code
++            );
++            assert_eq!(&response[16..], &[0; 5]);
++        }
++    }
++    #[test]
++    fn close_forwards_exact_terminal_read_and_control_output() {
++        let read = cancel_and_collect(&request(3), 3, &mut vec![b'a', b'b', b'c'], || {}, || Ok(2));
++        assert_eq!(&read[12..], &[0, 0, 0, 0, 2, 0, 0, 0, b'a', b'b']);
++        let control = cancel_and_collect(&request(14), 14, &mut Vec::new(), || {}, || Ok(0));
++        assert_eq!(&control[12..], &[0; 8]);
++    }
++}
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-review-red-completion.log
+@@ -0,0 +1,66 @@
++   Compiling termcraft-rdp-engine v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/engines/rdp)
++warning: function `terminal_data` is never used
++ --> src/serial_completion.rs:4:15
++  |
++4 | pub(super) fn terminal_data(
++  |               ^^^^^^^^^^^^^
++  |
++  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
++
++warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
++  --> src/../../../src/desktop/options.rs:96:9
++   |
++95 | pub struct NegotiatedRdpOptions {
++   |            -------------------- fields in this struct
++96 |     pub clipboard: ClipboardPolicy,
++   |         ^^^^^^^^^
++97 |     pub keyboard: KeyboardRouting,
++   |         ^^^^^^^^
++98 |     pub keyboard_layout: u32,
++   |         ^^^^^^^^^^^^^^^
++   |
++   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
++
++warning: method `is_default` is never used
++   --> src/../../../src/desktop/options.rs:101:12
++    |
++100 | impl RdpOptions {
++    | --------------- method in this implementation
++101 |     pub fn is_default(&self) -> bool {
++    |            ^^^^^^^^^^
++
++warning: `termcraft-rdp-engine` (bin "d02-device-private-rdp" test) generated 3 warnings
++    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.82s
++     Running unittests src/main.rs (app/target/debug/deps/d02_device_private_rdp-34a4dfff972ff5e3)
++
++running 3 tests
++
++thread 'devices::serial_completion::tests::close_forwards_exact_terminal_read_and_control_output' (148585) panicked at src/serial_completion.rs:58:9:
++assertion `left == right` failed
++  left: [32, 1, 0, 192, 0, 0, 0, 0]
++ right: [0, 0, 0, 0, 2, 0, 0, 0, 97, 98]
++note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
++
++thread 'devices::serial_completion::tests::close_preserves_terminal_abort_and_other_native_failure' (148586) panicked at src/serial_completion.rs:51:13:
++assertion `left == right` failed
++  left: 3221225760
++ right: 3221225629
++
++thread 'devices::serial_completion::tests::close_reports_write_success_when_normal_completion_wins_cancellation' (148587) panicked at src/serial_completion.rs:45:9:
++assertion `left == right` failed
++  left: [114, 68, 67, 73, 7, 0, 0, 0, 42, 0, 0, 0, 32, 1, 0, 192, 0, 0, 0, 0, 0]
++ right: [114, 68, 67, 73, 7, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0]
++test devices::serial_completion::tests::close_preserves_terminal_abort_and_other_native_failure ... FAILED
++test devices::serial_completion::tests::close_reports_write_success_when_normal_completion_wins_cancellation ... FAILED
++test devices::serial_completion::tests::close_forwards_exact_terminal_read_and_control_output ... FAILED
++
++failures:
++
++failures:
++    devices::serial_completion::tests::close_forwards_exact_terminal_read_and_control_output
++    devices::serial_completion::tests::close_preserves_terminal_abort_and_other_native_failure
++    devices::serial_completion::tests::close_reports_write_success_when_normal_completion_wins_cancellation
++
++test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 44 filtered out; finished in 0.00s
++
++error: test failed, to rerun pass `--bin d02-device-private-rdp`
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-review-green-completion.log
+@@ -0,0 +1,35 @@
++   Compiling termcraft-rdp-engine v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/engines/rdp)
++warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
++  --> src/../../../src/desktop/options.rs:96:9
++   |
++95 | pub struct NegotiatedRdpOptions {
++   |            -------------------- fields in this struct
++96 |     pub clipboard: ClipboardPolicy,
++   |         ^^^^^^^^^
++97 |     pub keyboard: KeyboardRouting,
++   |         ^^^^^^^^
++98 |     pub keyboard_layout: u32,
++   |         ^^^^^^^^^^^^^^^
++   |
++   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
++   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
++
++warning: method `is_default` is never used
++   --> src/../../../src/desktop/options.rs:101:12
++    |
++100 | impl RdpOptions {
++    | --------------- method in this implementation
++101 |     pub fn is_default(&self) -> bool {
++    |            ^^^^^^^^^^
++
++warning: `termcraft-rdp-engine` (bin "d02-device-private-rdp" test) generated 2 warnings
++    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.17s
++     Running unittests src/main.rs (app/target/debug/deps/d02_device_private_rdp-34a4dfff972ff5e3)
++
++running 3 tests
++test devices::serial_completion::tests::close_preserves_terminal_abort_and_other_native_failure ... ok
++test devices::serial_completion::tests::close_forwards_exact_terminal_read_and_control_output ... ok
++test devices::serial_completion::tests::close_reports_write_success_when_normal_completion_wins_cancellation ... ok
++
++test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 44 filtered out; finished in 0.00s
++
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-review-green-serial.log
+@@ -0,0 +1,48 @@
++    Blocking waiting for file lock on build directory
++warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
++  --> src/../../../src/desktop/options.rs:96:9
++   |
++95 | pub struct NegotiatedRdpOptions {
++   |            -------------------- fields in this struct
++96 |     pub clipboard: ClipboardPolicy,
++   |         ^^^^^^^^^
++97 |     pub keyboard: KeyboardRouting,
++   |         ^^^^^^^^
++98 |     pub keyboard_layout: u32,
++   |         ^^^^^^^^^^^^^^^
++   |
++   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
++   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
++
++warning: method `is_default` is never used
++   --> src/../../../src/desktop/options.rs:101:12
++    |
++100 | impl RdpOptions {
++    | --------------- method in this implementation
++101 |     pub fn is_default(&self) -> bool {
++    |            ^^^^^^^^^^
++
++warning: `termcraft-rdp-engine` (bin "d02-device-private-rdp" test) generated 2 warnings
++    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.05s
++     Running unittests src/main.rs (app/target/debug/deps/d02_device_private_rdp-34a4dfff972ff5e3)
++
++running 16 tests
++test devices::serial_completion::tests::close_reports_write_success_when_normal_completion_wins_cancellation ... ok
++test devices::serial_completion::tests::close_forwards_exact_terminal_read_and_control_output ... ok
++test devices::serial::tests::serial_peer_hangup_is_not_a_successful_empty_read ... ok
++test devices::serial_completion::tests::close_preserves_terminal_abort_and_other_native_failure ... ok
++test devices::serial::tests::expired_serial_operations_leave_pty_data_untouched ... ok
++test devices_tests::serial::embedded_drive_and_serial_use_distinct_device_ids_on_the_same_channel ... ok
++test devices_tests::serial::embedded_serial_rejects_non_tty_character_devices ... ok
++test devices_tests::serial::embedded_serial_close_cancels_all_waiting_reads_even_at_capacity ... ok
++test devices_tests::serial::embedded_serial_opens_the_specification_metadata_probe ... ok
++test devices_tests::serial::embedded_serial_certificate_retry_keeps_the_original_tty_binding ... ok
++test devices_tests::serial::embedded_serial_read_only_denies_writes_and_mutating_controls ... ok
++test devices_tests::serial::serial_flow_characters_apply_to_pty_and_modem_failures_are_explicit ... ok
++test devices_tests::serial::embedded_serial_does_not_reopen_a_recycled_pty ... ok
++test devices_tests::serial::embedded_serial_redirects_an_owned_pty_with_concurrent_read_and_write ... ok
++test devices_tests::serial::serial_xoff_stalls_pty_output_until_xon_and_read_only_rejects_new_controls ... ok
++test devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads ... ok
++
++test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 31 filtered out; finished in 0.04s
++
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-review-windows-component.log
+@@ -0,0 +1,11 @@
++    Checking d02-device-native-component v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/tests/rdp-native-component)
++warning: unused variable: `metadata`
++   --> src/drives.rs:233:29
++    |
++233 |             let (file, dir, metadata) = if directory {
++    |                             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_metadata`
++    |
++    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
++
++warning: `d02-device-native-component` (lib test) generated 1 warning (run `cargo fix --lib -p d02-device-native-component --tests` to apply 1 suggestion)
++    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.24s
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/d02-review-macos-component.log
+@@ -0,0 +1,2 @@
++    Checking d02-device-native-component v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/tests/rdp-native-component)
++    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.23s
+--- /dev/null
++++ b/docs/parity-evidence/D02/device-controls/component-production-input-sha256.json
+@@ -0,0 +1,10 @@
++{
++  "engines/rdp/src/devices.rs": "0c0bbf826239b2883afed7cf100c9e83f39658a5eb0e58aa3a92d550f8faca56",
++  "src/desktop/options.rs": "6ee2ed2025a617b4565a0fabeaf44d3a8c34aed4e743cafc95e5422661542d4d",
++  "engines/rdp/src/serial.rs": "87b0c5ca792b2703d3d190ffe8d7ecdba25290ba32dad80978487d35fd254efb",
++  "engines/rdp/src/serial_windows.rs": "69252c515c77dbf37865f2177f2f92169a95910985241c9af7f6d1a0bcf58f22",
++  "engines/rdp/src/serial_completion.rs": "1c3fe86501b75d796a397a0b25345dc33e36d96d76962fb9f7424b9070c92fbd",
++  "engines/rdp/src/native_file_windows.rs": "08b06604cfd79b0a5692f651c0048991fb1c3e09eb6b9e0da890d78ee33d6835",
++  "engines/rdp/src/native_file_macos.rs": "4002f76168b7482b34afa3a611f6274dfdf8b4cf3443aee3a263ee8e68a2ee93",
++  "generated-drives.rs": "74920da79c7eba784bc3c8e3328d1b6f0a3e6886a4bcbea331f618449cc31f50"
++}

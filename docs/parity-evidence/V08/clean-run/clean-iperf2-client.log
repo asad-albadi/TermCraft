@@ -1,0 +1,7 @@
+------------------------------------------------------------
+Client connecting to 127.0.0.1, TCP port 25322
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 127.0.0.1 port 42850 connected with 127.0.0.1 port 25322
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-0.02 sec   256 KBytes   127 Mbits/sec

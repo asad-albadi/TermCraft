@@ -1,0 +1,46 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+   Compiling termcraft-rdp-engine v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/engines/rdp)
+error[E0432]: unresolved import `crate::rdp_options::SerialMapping`
+ --> src/devices.rs:3:40
+  |
+3 | use crate::rdp_options::{DriveMapping, SerialMapping};
+  |                                        ^^^^^^^^^^^^^ no `SerialMapping` in `rdp_options`
+  |
+help: a similar name exists in the module
+  |
+3 - use crate::rdp_options::{DriveMapping, SerialMapping};
+3 + use crate::rdp_options::{DriveMapping, DriveMapping};
+  |
+
+error[E0432]: unresolved import `crate::rdp_options::SerialMapping`
+ --> src/serial.rs:5:5
+  |
+5 | use crate::rdp_options::SerialMapping;
+  |     ^^^^^^^^^^^^^^^^^^^^-------------
+  |                         |
+  |                         no `SerialMapping` in `rdp_options`
+  |
+help: a similar name exists in the module
+  |
+5 - use crate::rdp_options::SerialMapping;
+5 + use crate::rdp_options::DriveMapping;
+  |
+
+error[E0432]: unresolved import `crate::rdp_options::SerialMapping`
+   --> src/devices_tests.rs:557:35
+    |
+557 |     use crate::{devices::Channel, rdp_options::SerialMapping};
+    |                                   ^^^^^^^^^^^^^-------------
+    |                                                |
+    |                                                no `SerialMapping` in `rdp_options`
+    |
+help: a similar name exists in the module
+    |
+557 -     use crate::{devices::Channel, rdp_options::SerialMapping};
+557 +     use crate::{devices::Channel, rdp_options::DriveMapping};
+    |
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `termcraft-rdp-engine` (bin "termcraft-rdp-engine" test) due to 3 previous errors

@@ -1,0 +1,74 @@
+{
+  "schema": "termcraft.local-legacy-import.v1",
+  "provenance": "Local inspection of a user-selected archive; publisher and dependencies are not authenticated",
+  "source_name": "Sqlite3.mxt3",
+  "source_sha256": "3bd4979a8b7241b8a27b7020bb2eb08ab950ad15b2dde854c840da465f311c77",
+  "container": "ZIP",
+  "execution_enabled": false,
+  "runtime_status": "Commands are disabled. A supported Windows/Cygwin runtime and verified dependencies are required; this import does not provide them.",
+  "files": [
+    {
+      "path": "bin/cygsqlite3-0.dll",
+      "encoded_bytes": 822301,
+      "decoded_bytes": 822301,
+      "sha256": "819e9f782ea56b72c4db7cd861340a3bfdde51944134e859383fbe9a26809803",
+      "encoding": "ZIP member",
+      "format": "Windows PE",
+      "architecture": "x86"
+    },
+    {
+      "path": "bin/cygsqlite3vfslog-0.dll",
+      "encoded_bytes": 19485,
+      "decoded_bytes": 19485,
+      "sha256": "b736dc9ef5faba95456c235ef0c3f29e7c6ac9e6f47fbc63188022dbe60734c1",
+      "encoding": "ZIP member",
+      "format": "Windows PE",
+      "architecture": "x86"
+    },
+    {
+      "path": "bin/sqldiff.exe",
+      "encoded_bytes": 28701,
+      "decoded_bytes": 28701,
+      "sha256": "1814d64e03f8ee5ea2c62a1b074dbed6b60ac2c75e78104ee9e9599c91782243",
+      "encoding": "ZIP member",
+      "format": "Windows PE",
+      "architecture": "x86"
+    },
+    {
+      "path": "bin/sqlite3.exe",
+      "encoded_bytes": 73757,
+      "decoded_bytes": 73757,
+      "sha256": "2c49f68dc4775cffb5e9db6e9f34214abbde3cdae03d2fb6380da66d7b4592a4",
+      "encoding": "ZIP member",
+      "format": "Windows PE",
+      "architecture": "x86"
+    },
+    {
+      "path": "usr/share/doc/Cygwin/sqlite3.README",
+      "encoded_bytes": 8299,
+      "decoded_bytes": 8299,
+      "sha256": "19eb70ec8a39f2709a60dbe53cba3b2384c1ac6ddaa5a615fab03b94333f2e85",
+      "encoding": "ZIP member",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/doc/sqlite3/README",
+      "encoded_bytes": 1144,
+      "decoded_bytes": 1144,
+      "sha256": "b0f255c4d2f1827c09ae2f7b9b2addd1d75f85e2705470541ab94e4e21941c8a",
+      "encoding": "ZIP member",
+      "format": "text",
+      "architecture": null
+    },
+    {
+      "path": "usr/share/man/man1/sqlite3.1.gz",
+      "encoded_bytes": 3771,
+      "decoded_bytes": 3771,
+      "sha256": "9a014c55046cfbdf8b6dd6ec82fe28cabe7de1774deaec6dea02aca788888010",
+      "encoding": "ZIP member",
+      "format": "gzip data",
+      "architecture": null
+    }
+  ]
+}

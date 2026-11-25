@@ -1,0 +1,33 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: unused variable: `end`
+   --> src/ui/desktop.rs:894:13
+    |
+894 |         let end = Instant::now() + Duration::from_secs(3);
+    |             ^^^ help: if this is intentional, prefix it with an underscore: `_end`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (bin "harbor-workspace" test) generated 1 warning (run `cargo fix --bin "harbor-workspace" -p harbor-workspace --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.83s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-29e3f133fb9121f7)
+
+running 1 test
+test ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input ... FAILED
+
+failures:
+
+---- ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input stdout ----
+
+thread 'ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input' (672382) panicked at src/ui/desktop.rs:979:13:
+assertion `left == right` failed: A button in a covering window clicked the remote desktop underneath it
+  left: 2
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::desktop::tests::real_rdp_surface_paints_inside_workspace_and_routes_focused_input
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 94 filtered out; finished in 2.05s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

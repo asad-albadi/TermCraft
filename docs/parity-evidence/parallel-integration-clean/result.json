@@ -1,0 +1,16 @@
+{
+  "exit_code": 0,
+  "outer_targets": 58,
+  "passed": 565,
+  "failed": 0,
+  "ignored": 20,
+  "helper_passed": 49,
+  "source_unchanged_during_gate": true,
+  "scope": "Main workspace after package-only cache clean; includes P01 runtime review fixes, X02, smartcard provider, browser viewport/macOS/Windows source and test fixture reliability. Private P05/P06/B01 candidates are excluded.",
+  "separate_release_live_checks": {
+    "X11": 5,
+    "Mosh": 1,
+    "Wayland_startup": true,
+    "X11_startup": true
+  }
+}

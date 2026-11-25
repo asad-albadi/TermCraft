@@ -1,0 +1,92 @@
+    Checking termcraft-native-commit-check v0.0.0 (/tmp/termcraft-native-commit-check)
+warning: function `open_file` is never used
+   --> src/source.rs:272:21
+    |
+272 | pub(super) async fn open_file(path: PathBuf) -> Result<(tokio::fs::File, u32), String> {
+    |                     ^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `directory_child`, `file_mode`, `rename_from`, `remove_directory`, `set_mode`, and `validate_link` are never used
+   --> src/source.rs:360:18
+    |
+341 | impl SourceDir {
+    | -------------- methods in this implementation
+...
+360 |     pub async fn directory_child(&self, name: std::ffi::OsString) -> Result<(Self, bool), String> {
+    |                  ^^^^^^^^^^^^^^^
+...
+364 |     pub async fn file_mode(&self, name: std::ffi::OsString) -> Result<Option<u32>, String> {
+    |                  ^^^^^^^^^
+...
+367 |     pub async fn rename_from(&self, source: &Self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^
+...
+370 |     pub async fn remove_directory(&self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^^^
+...
+373 |     pub async fn set_mode(&self, mode: u32) -> Result<(), String> {
+    |                  ^^^^^^^^
+...
+376 |     pub async fn validate_link(&self, target: Vec<u8>) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^
+
+warning: methods `directory_child`, `file_mode`, `rename_from`, `remove_directory`, `set_mode`, and `validate_link` are never used
+   --> src/source/cap_backend.rs:151:18
+    |
+ 67 | impl CapDir {
+    | ----------- methods in this implementation
+...
+151 |     pub async fn directory_child(&self, name: std::ffi::OsString) -> Result<(Self, bool), String> {
+    |                  ^^^^^^^^^^^^^^^
+...
+170 |     pub async fn file_mode(&self, name: std::ffi::OsString) -> Result<Option<u32>, String> {
+    |                  ^^^^^^^^^
+...
+180 |     pub async fn rename_from(&self, source: &Self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^
+...
+187 |     pub async fn remove_directory(&self, name: std::ffi::OsString) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^^^
+...
+193 |     pub async fn set_mode(&self, mode: u32) -> Result<(), String> {
+    |                  ^^^^^^^^
+...
+217 |     pub async fn validate_link(&self, target: Vec<u8>) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^
+
+warning: struct `LocalStage` is never constructed
+ --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/local_stage.rs:8:19
+  |
+8 | pub(super) struct LocalStage {
+  |                   ^^^^^^^^^^
+
+warning: enum `CommitError` is never used
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/local_stage.rs:31:17
+   |
+31 | pub(super) enum CommitError {
+   |                 ^^^^^^^^^^^
+
+warning: associated items `create`, `validate_merge_root`, `recovery_path`, `initial_path`, and `commit` are never used
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/local_stage.rs:216:18
+    |
+ 35 | impl LocalStage {
+    | --------------- associated items in this implementation
+...
+216 |     pub async fn create(target: PathBuf) -> Result<(Self, tokio::fs::File), String> {
+    |                  ^^^^^^
+...
+284 |     pub async fn validate_merge_root(&self) -> Result<(), String> {
+    |                  ^^^^^^^^^^^^^^^^^^^
+...
+299 |     pub fn recovery_path(&self) -> Result<PathBuf, String> {
+    |            ^^^^^^^^^^^^^
+...
+338 |     pub fn initial_path(&self) -> &Path {
+    |            ^^^^^^^^^^^^
+...
+412 |     pub async fn commit(&self, overwrite: bool) -> Result<bool, CommitError> {
+    |                  ^^^^^^
+
+warning: `termcraft-native-commit-check` (lib test) generated 6 warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s

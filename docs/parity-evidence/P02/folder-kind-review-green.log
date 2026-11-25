@@ -1,0 +1,37 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+   Compiling termcraft-ftp-regression v0.0.0 (/tmp/termcraft-ftp-regression.nNKJKj7F)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 27.80s
+     Running tests/ftp_ftps.rs (target/debug/deps/ftp_ftps-aa56c8b992517a94)
+
+running 12 tests
+test invalid_credentials_never_open_control_channel ... ok
+test pwd_preserves_raw_telnet_escaped_path_round_trip ... ok
+test cancel_interrupts_stalled_transfer_and_paths_cannot_inject_commands ... ok
+test unexpected_preliminary_reply_cannot_supply_next_command_result ... ok
+test verifies_active_peer_and_ignores_pasv_address ... ok
+test ascii_mode_converts_only_selected_text ... ok
+test bounded_downloads_require_final_success_and_idle_transfers_time_out ... ok
+test protected_download_acknowledges_data_close_before_control_completion ... ok
+test machine_listing_retains_byte_names_and_rejects_unusable_snapshots ... ok
+test binary_transfer_is_byte_exact ... ok
+test rejected_protection_and_plain_data_do_not_downgrade ... ok
+test ftps_validates_certificate_and_encrypts_selected_channels ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.40s
+
+     Running tests/ftp_workspace.rs (target/debug/deps/ftp_workspace-33dba508ddf75c2c)
+
+running 10 tests
+test ftp_workspace_cancels_a_queued_operation_before_it_reaches_the_server ... ok
+test ftp_workspace_retains_short_binary_download_without_replacing_local_file ... ok
+test ftp_confirmed_upload_does_not_recurse_into_a_file_replaced_by_a_directory ... ok
+test ftp_folder_upload_rejects_symlink_children_instead_of_reading_outside ... ok
+test ftp_confirmed_download_does_not_recurse_into_a_file_replaced_by_a_directory ... ok
+test ftp_folder_rejects_an_ambiguous_server_child_before_recursive_delete ... ok
+test ftp_folder_download_cancellation_preserves_the_existing_destination_and_staging ... ok
+test ftp_workspace_browses_stages_transfers_and_checks_conflicts ... ok
+test ftp_document_conflicts_preserve_edits_and_require_an_observed_replacement ... ok
+test ftp_folder_round_trip_merges_entries_and_requires_exact_delete_confirmation ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.25s
+

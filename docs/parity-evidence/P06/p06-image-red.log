@@ -1,0 +1,41 @@
+   Compiling harbor-workspace v0.1.6 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p06)
+warning: variable does not need to be mutable
+   --> src/plugins/host/unix.rs:167:13
+    |
+167 |         let mut verified=File::options().read(true).write(true).open(&executable).unwrap();
+    |             ----^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `verification_target` is never used
+   --> src/plugins/host/unix.rs:188:27
+    |
+188 | pub(in crate::plugins) fn verification_target() -> io::Result<File> { tempfile::tempfile() }
+    |                           ^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (lib test) generated 2 warnings (run `cargo fix --lib -p harbor-workspace --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.34s
+     Running unittests src/lib.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-bcb84ae701577a55)
+
+running 1 test
+test plugins::host::unix::verified_image_regressions::mutation_after_verification_executes_original_elf ... FAILED
+
+failures:
+
+---- plugins::host::unix::verified_image_regressions::mutation_after_verification_executes_original_elf stdout ----
+
+thread 'plugins::host::unix::verified_image_regressions::mutation_after_verification_executes_original_elf' (543371) panicked at src/plugins/host/unix.rs:183:9:
+assertion failed: String::from_utf8(output).unwrap().contains("\"ok\":true")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    plugins::host::unix::verified_image_regressions::mutation_after_verification_executes_original_elf
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 70 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `--lib`

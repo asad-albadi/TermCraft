@@ -1,0 +1,55 @@
+   Compiling harbor-workspace v0.1.609 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-options-ui)
+error[E0599]: no associated function or constant named `new_puzzle` found for struct `GameSession` in the current scope
+   --> tests/games.rs:174:28
+    |
+174 |     let mut s=GameSession::new_puzzle(77,c).unwrap();
+    |                            ^^^^^^^^^^ associated function or constant not found in `GameSession`
+    |
+note: if you're trying to build a new `GameSession` consider using one of the following associated functions:
+      GameSession::new
+      GameSession::new_solitaire
+      GameSession::new_mines
+      GameSession::new_termwalk
+      GameSession::new_map
+   --> src/games/library.rs:127:5
+    |
+127 |     pub fn new(id: GameId, seed: u64) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+148 |     pub fn new_solitaire(seed: u64, variant: t::SolitaireVariant, passes: u8) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+154 |     pub fn new_mines(seed: u64, preset: t::MinePreset) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+160 |     pub fn new_termwalk(seed: u64, size: usize) -> Result<Self, &'static str> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+166 |     pub fn new_map(seed: u64, preset: p::MapPreset) -> Self {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (test "games") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error[E0507]: cannot move out of `row.pegs` which is behind a shared reference
+    --> src/ui/games/play.rs:1031:30
+     |
+1031 |                     for c in row.pegs {
+     |                              ^^^^^^^^
+     |                              |
+     |                              `row.pegs` moved due to this implicit call to `.into_iter()`
+     |                              move occurs because `row.pegs` has type `std::vec::Vec<u8>`, which does not implement the `Copy` trait
+     |
+note: the `for` loop is desugared into a call to `std::iter::IntoIterator::into_iter`, which takes ownership of the receiver `self`, which moves `row.pegs`
+    --> /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/core/src/iter/traits/collect.rs:312:17
+help: consider iterating over a slice of the `std::vec::Vec<u8>`'s content to avoid moving into the `for` loop
+     |
+1031 |                     for c in &row.pegs {
+     |                              +
+help: consider cloning the value if the performance cost is acceptable
+     |
+1031 |                     for c in row.pegs.clone() {
+     |                                      ++++++++
+
+For more information about this error, try `rustc --explain E0507`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace") due to 1 previous error

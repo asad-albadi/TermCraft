@@ -1,0 +1,56 @@
+{
+  "Id": "sha256:1e7cd41f77c63d2093907d8a33cc65562eafd5cfbed60c829b9faedf652f24a0",
+  "RepoTags": [
+    "termcraft-validation-p08:debian-builder"
+  ],
+  "RepoDigests": [
+    "termcraft-validation-p08@sha256:1e7cd41f77c63d2093907d8a33cc65562eafd5cfbed60c829b9faedf652f24a0"
+  ],
+  "Comment": "buildkit.dockerfile.v0",
+  "Created": "2026-11-25T03:47:28.999210726+04:00",
+  "Config": {
+    "Env": [
+      "PATH=/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "RUSTUP_HOME=/usr/local/rustup",
+      "CARGO_HOME=/usr/local/cargo",
+      "RUST_VERSION=1.99.1",
+      "CARGO_BUILD_JOBS=2"
+    ],
+    "Cmd": [
+      "bash"
+    ],
+    "Labels": {
+      "org.opencontainers.image.source": "https://github.com/rust-lang/docker-rust"
+    }
+  },
+  "Architecture": "amd64",
+  "Os": "linux",
+  "Size": 2261203354,
+  "RootFS": {
+    "Type": "layers",
+    "Layers": [
+      "sha256:05f9043663c0a4a3f7a75f1fe7cf08b5a69419f2e31425412598b5443e1887bc",
+      "sha256:74a1cce49db916676932c971e576f97b650bfdb55e355ee56d3b022d4c01ad1f",
+      "sha256:131853779658ab455b50696ca52922ea83febf8922703598ea672657331befbc",
+      "sha256:425acb6907fb99cde300a0ee88d416fd72a6a60315a9b777aaf84d842d88a288",
+      "sha256:ecdcfd4101f5240b98c80083bd6510a2acfd877cd35a4a6250dec83d0ae309bf",
+      "sha256:2092bb16101b2c6512f7079ebbdadac1b1b66d02ebcc0c7d159a06cd61aeee75"
+    ]
+  },
+  "Metadata": {
+    "LastTagTime": "2026-11-24T23:47:30.821781083Z"
+  },
+  "Descriptor": {
+    "mediaType": "application/vnd.oci.image.index.v1+json",
+    "digest": "sha256:1e7cd41f77c63d2093907d8a33cc65562eafd5cfbed60c829b9faedf652f24a0",
+    "size": 856
+  },
+  "Identity": {
+    "Build": [
+      {
+        "Ref": "5c6i8yoapfl5iqz3tromdyx1k",
+        "CreatedAt": "2026-11-25T03:47:31.123221093+04:00"
+      }
+    ]
+  }
+}

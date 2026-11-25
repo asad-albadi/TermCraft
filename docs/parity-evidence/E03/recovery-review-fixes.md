@@ -1,0 +1,11 @@
+# Scoped recovery follow-up review
+
+Verdict: **approved**. The original P2 is resolved; no new actionable findings in the deadline helper change.
+
+Reviewed patch SHA-256: `6a5cf4fb85be058045f94ed82d444df78959f804c44d57ec33740ba2d22dbd1b`. Current `src/ui/managed_servers.rs` SHA-256 is `64a1715be840ea2778e274457fad96d8adbd61c00d11a95f7e191d73ba3edb61`, matching the supplied review cut. Cron and SCP source hashes remain the previously accepted values. This follow-up covers the original P2 and possible breakage introduced by its correction; separately merged X03 work is outside scope.
+
+The Telnet Stop path now passes the absolute deadline created before the pointer action to both state and socket waits. The state helper checks time before accepting the expected state, so late Stopped cannot bypass the budget. The refusal helper rejects an exhausted budget before a probe, caps the real `connect_timeout` at the lesser of remaining time and 50 milliseconds, and checks time after the probe before accepting refusal. Only `ConnectionRefused` proves socket shutdown. Timeout, WouldBlock and Interrupted retry within the same deadline; other errors fail. Poll sleeps also use remaining time. This closes both the late-success bypass and the unbounded blocking-connect issue without adding a second lifecycle budget.
+
+The ordinary state-wait wrapper retains its four-second allowance and now rejects observations after that allowance, including an immediately available expected state after a scheduling delay. No production code changed in this follow-up. Existing live-listener, pointer, restart, sibling and password assertions remain intact.
+
+Reviewed the saved focused RED/GREEN logs: the old refusal semantics accepted late refusal and failed the regression; the corrected helper rejects it and requires a timeout to be followed by actual refusal. Reviewed final saved results: helper 1/0, original managed-server GUI 4/0, and the same ten constrained GUI fixtures 10/0 with 16 threads on one CPU in 37.55 seconds. Formatting success is recorded in the refreshed evidence. No new execution, build, broad rerun or production edit was performed by this reviewer, and no full-gate or native-platform qualification is claimed.

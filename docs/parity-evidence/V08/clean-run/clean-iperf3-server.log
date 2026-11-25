@@ -1,0 +1,14 @@
+-----------------------------------------------------------
+Server listening on 25323 (test #1)
+-----------------------------------------------------------
+Accepted connection from 127.0.0.1, port 34776
+[  5] local 127.0.0.1 port 25323 connected to 127.0.0.1 port 34778
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-1.00   sec   256 KBytes  2.09 Mbits/sec                  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-1.00   sec   256 KBytes  2.09 Mbits/sec                  receiver
+iperf3: interrupt - the server has terminated by signal Terminated(15)
+-----------------------------------------------------------
+Server listening on 25323 (test #2)
+-----------------------------------------------------------

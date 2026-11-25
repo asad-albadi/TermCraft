@@ -1,0 +1,10 @@
+{
+  "exit_code": 101,
+  "outer_targets": 57,
+  "passed": 544,
+  "failed": 1,
+  "ignored": 14,
+  "failed_test": "ui::macro_events::tests::timed_macro_startup_sees_the_first_authenticated_ssh_output",
+  "status": "RED retained; fixed sleep replaced by real SSH fixture signal, targeted repeats green, shared full rerun pending",
+  "later_evidence": "docs/parity-evidence/E02/ssh-startup-fixture-report.md"
+}

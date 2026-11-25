@@ -1,0 +1,22 @@
+{
+  "base-map.json": "d31a2798c6dee560cd1aca72152f295b46ab175e080590c1f40b5088d3550b28",
+  "changes.patch": "07da7e5ad0e0f973e6fd93f304493a550a01756b2347e0717d894f83132e99a1",
+  "evidence/fmt.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "evidence/green-build.log": "c83198ca6c28ab524d11ada7e03309177ff0e85436bfcd0e4ff4fade79965169",
+  "evidence/green.log": "87358c194547302f6ccfbeb278e04901dc4a5d9817ed447c1c244413c4256195",
+  "evidence/red-build.log": "3b91c979ccf2f9d6dac9d1d546f8c1aa7b9a529a8c35e6652756b589a5a59f4f",
+  "evidence/red.log": "b3be15612f003aeeb47a4a8d9a520e74644f9df6684eafd94fae255476d3f92a",
+  "evidence/shared-target-pilot.txt": "4d4b7dce2b651018a7d48bd837ca24312ba2bed94e947f0dbb878d3794b475d7",
+  "finalize.py": "88c105b73aea1838ba25ebba9dc6eca2f027c4c3a9b5aef425c7e035ab10deac",
+  "fix-seal.py": "ebf3bf7423da95c4f87237eb78a3b233146b417e46a2454519860785fdbaab6b",
+  "fix1.patch": "5b18732f9b95f9e2e4dcbb1b6f3773ec946688b49dde2b831cde22773f1845b5",
+  "handoff-map.json": "54e689dc4f7b8067e96b75fee2edecac5cc2bbf57cc901a96fd75f5ffbe61ce8",
+  "payload.tar.gz": "0f1d078fb4aff7ac4f70e32d7f4e781320e7a27b7f34d4910a8b2c6b42a69989",
+  "report.md": "0419c0aab1c4e0fab77af30d6ece28995cf91e2583a0af5178d45e9689729793",
+  "resources.sha256.json": "b9728be9d8ee07df50fe285d9d301c956e240c181753679282da6b75c7c1d264",
+  "seal.py": "76750b67807e08c94d60cd800e088457a9fbfd6a04799a5c98fd8ab31a94ec59",
+  "source-inputs.sha256.json": "38edbb6ba0df86e2baf84462a79048cebfc29f21edc2a182a62e04cb0e159c71",
+  "source-inputs.tar.gz": "bfdbf39adec7f83741962ec53ac8663f3c455ba6ee8e4acfbbb26fd8902ce8d5",
+  "test-results.json": "e89b82e0841fecc8a8c46e7b21d61dda77621e53896b843ec6246c9a1599b53b",
+  "verify.sh": "e2e0216898506b8d413e5c043380fe80feef18ec8cf1a7dd7e6434810b9adea0"
+}

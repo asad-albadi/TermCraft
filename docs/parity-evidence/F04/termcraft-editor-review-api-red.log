@@ -1,0 +1,15 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `cancel_operation` found for struct `RemoteDocument` in the current scope
+   --> tests/remote_editor.rs:194:9
+    |
+194 |     doc.cancel_operation();
+    |         ^^^^^^^^^^^^^^^^ method not found in `RemoteDocument`
+
+error[E0599]: no variant, associated function, or constant named `Cancelled` found for enum `DocumentStatus` in the current scope
+   --> tests/remote_editor.rs:195:32
+    |
+195 |     wait(&doc, DocumentStatus::Cancelled);
+    |                                ^^^^^^^^^ variant, associated function, or constant not found in `DocumentStatus`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (test "remote_editor") due to 2 previous errors

@@ -1,0 +1,13 @@
+Server listening on 127.0.0.1 port 41541.
+Connection from 127.0.0.1 port 57082 on 127.0.0.1 port 41541 rdomain ""
+Connection from 127.0.0.1 port 57084 on 127.0.0.1 port 41541 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 57082 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Accepted key ED25519 SHA256:Ko8GRIrliA5dFrKsxMhBkia08QDv8C6O0ySRunySGb0 found at /tmp/termcraft-ssh-test-101954-1795552133303191021/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 57084 ssh2 [preauth]
+Accepted key ED25519 SHA256:Ko8GRIrliA5dFrKsxMhBkia08QDv8C6O0ySRunySGb0 found at /tmp/termcraft-ssh-test-101954-1795552133303191021/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 57084 ssh2: ED25519 SHA256:Ko8GRIrliA5dFrKsxMhBkia08QDv8C6O0ySRunySGb0
+User child is on pid 101991
+Received disconnect from 127.0.0.1 port 57084:11: disconnected by user
+Disconnected from user asad 127.0.0.1 port 57084

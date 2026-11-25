@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.94s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-b53413bc11b7dcf9)
+
+running 1 test
+test ui::pages::appearance_tests::terminal_view_copies_cell_rectangle_and_opens_shift_right_click_menu ... FAILED
+
+failures:
+
+---- ui::pages::appearance_tests::terminal_view_copies_cell_rectangle_and_opens_shift_right_click_menu stdout ----
+
+thread 'ui::pages::appearance_tests::terminal_view_copies_cell_rectangle_and_opens_shift_right_click_menu' (389803) panicked at src/ui/pages.rs:2000:9:
+Shift-right-click must reach the menu in paste mode
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::pages::appearance_tests::terminal_view_copies_cell_rectangle_and_opens_shift_right_click_menu
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 37 filtered out; finished in 1.12s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

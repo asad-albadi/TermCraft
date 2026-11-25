@@ -1,0 +1,23 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.66s
+     Running tests/remote_editor.rs (target/debug/deps/remote_editor-92bf7fb3d77cd0a0)
+
+running 1 test
+
+thread 'remote_save_conflict_preserves_both_versions' (248390) panicked at tests/remote_editor.rs:42:9:
+expected Conflict, got Saved
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test remote_save_conflict_preserves_both_versions ... FAILED
+
+failures:
+
+failures:
+    remote_save_conflict_preserves_both_versions
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 2 filtered out; finished in 8.22s
+
+error: test failed, to rerun pass `--test remote_editor`

@@ -1,0 +1,15 @@
+{
+  "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
+  "archive_sha256": "542a6d87a3c8258e329ca1f0d4cd1ae164fbf84b14845b94b74b46961125c290",
+  "manifest_schema": 1,
+  "platform": "linux",
+  "display_backend": "X11",
+  "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+  "screen_size": [
+    938,
+    990
+  ],
+  "rdp_helper_wire_version": 1,
+  "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+  "rdp_helper_child_location_verified": true
+}

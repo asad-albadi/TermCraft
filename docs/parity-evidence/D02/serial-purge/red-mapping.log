@@ -1,0 +1,46 @@
+   Compiling termcraft-rdp-engine v0.1.916 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-serial-events/candidate/engines/rdp)
+warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
+  --> src/../../../src/desktop/options.rs:96:9
+   |
+95 | pub struct NegotiatedRdpOptions {
+   |            -------------------- fields in this struct
+96 |     pub clipboard: ClipboardPolicy,
+   |         ^^^^^^^^^
+97 |     pub keyboard: KeyboardRouting,
+   |         ^^^^^^^^
+98 |     pub keyboard_layout: u32,
+   |         ^^^^^^^^^^^^^^^
+   |
+   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `is_default` is never used
+   --> src/../../../src/desktop/options.rs:101:12
+    |
+100 | impl RdpOptions {
+    | --------------- method in this implementation
+101 |     pub fn is_default(&self) -> bool {
+    |            ^^^^^^^^^^
+
+warning: `termcraft-rdp-engine` (bin "termcraft-rdp-events916" test) generated 2 warnings (2 duplicates)
+warning: `termcraft-rdp-engine` (bin "termcraft-rdp-events916") generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.01s
+     Running unittests src/main.rs (app/target/agent-work/d02-serial-events/candidate/engines/rdp/target/debug/deps/termcraft_rdp_events916-e26b11d6ccd9ab51)
+
+running 1 test
+
+thread 'devices::serial::tests::serial_purge_maps_all_valid_queue_and_abort_flag_combinations' (540674) panicked at src/serial.rs:1197:13:
+assertion `left == right` failed: flags 0x1
+  left: Err(3221225659)
+ right: Ok(None)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test devices::serial::tests::serial_purge_maps_all_valid_queue_and_abort_flag_combinations ... FAILED
+
+failures:
+
+failures:
+    devices::serial::tests::serial_purge_maps_all_valid_queue_and_abort_flag_combinations
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 54 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin termcraft-rdp-events916`

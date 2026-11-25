@@ -1,0 +1,19 @@
+   Compiling b06-advanced-fix918 v0.1.918 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/fix2/mutants/deterministic-colouring)
+    Finished `release` profile [optimized] target(s) in 4.79s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/fix2/mutation-target/release/deps/b06_advanced_fix918-220bb8297dc415ce)
+
+running 1 test
+
+thread 'map::fix2_generation_tests::generation_colouring_is_bounded_randomized_and_preserves_constraints' (565954) panicked at src/games/puzzles/map.rs:1417:9:
+generator must change colour partitions, not just permute colour names
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test map::fix2_generation_tests::generation_colouring_is_bounded_randomized_and_preserves_constraints ... FAILED
+
+failures:
+
+failures:
+    map::fix2_generation_tests::generation_colouring_is_bounded_randomized_and_preserves_constraints
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 68 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

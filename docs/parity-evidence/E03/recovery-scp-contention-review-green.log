@@ -1,0 +1,15 @@
+
+running 10 tests
+test ui::managed_servers::tests::telnet_service_password_field_leaves_no_undo_history ... ok
+test ui::managed_servers::tests::ftp_service_password_field_leaves_no_undo_history ... ok
+test ui::managed_servers::tests::nfs_servers_page_pointer_start_stop ... ok
+test ui::managed_servers::tests::servers_page_buttons_own_real_listeners_and_restart ... ok
+test ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source ... ok
+test ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs ... ok
+test ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted ... ok
+test ui::gui_tests::scp_pane_never_identifies_itself_as_sftp ... ok
+test ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text ... ok
+test ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 138 filtered out; finished in 37.55s
+

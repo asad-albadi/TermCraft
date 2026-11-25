@@ -1,0 +1,9 @@
+blocked: target_exists=True; target_bytes=b''
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/X04/fixture-marker-test.py", line 106, in <module>
+    probe(args.fixture, args.expect_atomic, args.fail_write)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/X04/fixture-marker-test.py", line 93, in probe
+    assert not visible, f'publication exposed incomplete marker: {observed!r}'
+           ^^^^^^^^^^^
+AssertionError: publication exposed incomplete marker: b''

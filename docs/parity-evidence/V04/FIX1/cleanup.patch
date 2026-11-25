@@ -1,0 +1,298 @@
+--- a/docs/parity-evidence/V04/runner/run_mosh_roaming.py
++++ b/docs/parity-evidence/V04/runner/run_mosh_roaming.py
+@@ -4,16 +4,22 @@
+ """
+ import ctypes,hashlib,io,json,os,pty,re,select,signal,socket,struct,subprocess,sys,tarfile,tempfile,termios,time,traceback
+ from pathlib import Path
++from owned_process import OwnedChildren, run_owned, install_interrupt_cleanup
++install_interrupt_cleanup()
+ APP=Path(sys.argv[1]).resolve(); OUT=Path(sys.argv[2]).resolve(); OUT.mkdir(parents=True,exist_ok=True)
+ assert os.readlink('/proc/self/ns/net') != os.environ['V04_HOST_NETNS'], 'requires private network namespace'
+ ctypes.CDLL(None).prctl(36,1,0,0,0) # subreaper owns detached mosh-server and descendants
+ 
+ def digest(b): return hashlib.sha256(b).hexdigest()
+-def cmd(*args): return subprocess.run(args,check=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=10).stdout
++def cmd(*args):
++    result=run_owned(args,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=10)
++    result.check_returncode()
++    return result.stdout
+ cmd('ip','link','set','lo','up')
+ manifest=json.loads((APP/'packaging/runtime-manifest.json').read_text()); archive=APP/'target/runtime-inputs/mosh-1.4.0-35-x86_64.pkg.tar.zst'
+ raw=archive.read_bytes(); expected=next(a['archive_sha256'] for a in manifest['artifacts'] if a['path'].endswith('/mosh-client')); assert digest(raw)==expected
+-payload=subprocess.run(['zstd','-dc'],input=raw,stdout=subprocess.PIPE,check=True,timeout=10).stdout
++unpacked=run_owned(['zstd','-dc'],input=raw,stdout=subprocess.PIPE,timeout=10)
++unpacked.check_returncode(); payload=unpacked.stdout
+ private=tempfile.TemporaryDirectory(prefix='v04-',dir=OUT); work=Path(private.name)
+ with tarfile.open(fileobj=io.BytesIO(payload)) as tar:
+     for name in ['mosh-server','mosh-client']:
+@@ -44,6 +50,7 @@
+     s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); s.bind((address,0)); s.setblocking(False); return s
+ 
+ def run_case(name,virtual=False):
++    owned = OwnedChildren()
+     journal=work/(name+'.jsonl'); log=work/(name+'.server'); output=bytearray(); events=[]; counters={'forward':0,'return':0,'drop':0,'reordered':0}; owner=None; client=None; master=None; sockets=[]; held=None
+     if virtual:
+         cmd('ip','link','add','v04old','type','dummy'); cmd('ip','addr','add','10.203.0.1/32','dev','v04old'); cmd('ip','link','set','v04old','up')
+@@ -111,27 +118,9 @@
+         assert [(ip,int(port)) for ip,port in authenticated_peers]==observed_addresses, ('server did not authenticate both peer addresses',authenticated_peers,observed_addresses)
+         return {'case':name,'status':'passed','scope':'private Linux dummy-interface source-address migration through owned UDP relay' if virtual else 'owned UDP relay source-IP/port rebinding on loopback','network_before':json.loads(network_before),'network_after':json.loads(network_after),'outage_seconds':1.2,'events':events,'counters':counters,'relay_upstream_addresses':observed_addresses,'authenticated_server_peers':authenticated_peers,'journal':rows,'cancel_seconds':cancel_seconds,'server_pid':owner,'client_pid':client.pid}
+     finally:
+-        if client is not None and client.poll() is None: client.kill(); client.wait(timeout=3)
+-        if owner is not None:
+-            # server is our adopted child, so no unrelated PID signalling permitted.
+-            stat=Path('/proc',str(owner),'stat')
+-            if stat.exists() and int(stat.read_text().split()[3])==os.getpid(): os.kill(owner,signal.SIGTERM)
+-            end=time.monotonic()+3
+-            while stat.exists() and time.monotonic()<end:
+-                try: os.waitpid(owner,os.WNOHANG)
+-                except ChildProcessError: break
+-                time.sleep(.02)
+-            if stat.exists(): os.kill(owner,signal.SIGKILL); os.waitpid(owner,0)
++        owned.cleanup()
+         for s in sockets: s.close()
+         if master is not None: os.close(master)
+-        # mosh terminal command is also owned and may outlive termination briefly.
+-        end=time.monotonic()+3
+-        while time.monotonic()<end:
+-            try:
+-                pid,status=os.waitpid(-1,os.WNOHANG)
+-                if pid==0: time.sleep(.02); continue
+-            except ChildProcessError: break
+-        else: raise AssertionError('owned descendants not fully reaped')
+         (OUT/(name+'.terminal.bin')).write_bytes(output)
+         if journal.exists(): (OUT/(name+'.journal.jsonl')).write_bytes(journal.read_bytes())
+         if log.exists(): (OUT/(name+'.server.log')).write_text(re.sub(r'MOSH CONNECT (\d+) \S+',r'MOSH CONNECT \1 [REDACTED]',log.read_text()))
+--- a/docs/parity-evidence/V04/runner/check_v04.py
++++ b/docs/parity-evidence/V04/runner/check_v04.py
+@@ -2,6 +2,7 @@
+ """Reproduce scoped V04 fixtures; --require-complete rejects remaining unavailable cells."""
+ import argparse,hashlib,json,os,re,shutil,subprocess,sys
+ from pathlib import Path
++from owned_process import run_owned, install_interrupt_cleanup
+ 
+ def validate_mosh(report):
+     required={'udp-rebind-loss-reordering','private-interface-migration'}
+@@ -21,10 +22,11 @@
+     assert matches==[('3','0','0','0','0')], 'requires exactly three executed tests and zero ignored/filtered cases'
+ 
+ if __name__=='__main__':
++    install_interrupt_cleanup()
+     p=argparse.ArgumentParser(description=__doc__); p.add_argument('app',type=Path);p.add_argument('output',type=Path);p.add_argument('--require-complete',action='store_true');a=p.parse_args()
+     app=a.app.resolve();out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);here=Path(__file__).resolve().parent
+     def run(args,log,env=None):
+-        result=subprocess.run(args,cwd=app,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,env=env,timeout=180)
++        result=run_owned(args,cwd=app,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,env=env,timeout=180)
+         (out/log).write_text(result.stdout);assert result.returncode==0, (args,result.returncode,result.stdout[-2000:]); return result.stdout
+     expected=json.loads((here/'serial-base.json').read_text())
+     for name,h in expected.items(): assert hashlib.sha256((app/name).read_bytes()).hexdigest()==h, f'source drift: {name}'
+--- /dev/null
++++ b/docs/parity-evidence/V04/runner/owned_process.py
+@@ -0,0 +1,114 @@
++"""Linux-only bounded ownership scopes for this sequential fixture runner.
++
++Only descendants newly created by the current process during a scope are owned.
++Existing children are excluded. Signal delivery uses pidfds, which pin the exact
++process generation even if a PID is subsequently recycled. Callers must not
++start concurrent unrelated child work inside a scope.
++"""
++import ctypes
++import os
++from pathlib import Path
++import signal
++import subprocess
++import time
++
++
++def _children(pid):
++    try:
++        return [int(n) for n in Path(f'/proc/{pid}/task/{pid}/children').read_text().split()]
++    except FileNotFoundError:
++        return []
++
++
++def _identity(pid):
++    try:
++        # comm can contain spaces or closing parentheses; fields after final ')'.
++        fields = Path(f'/proc/{pid}/stat').read_text().rsplit(')', 1)[1].split()
++        return int(fields[19])  # Linux starttime (field 22)
++    except FileNotFoundError:
++        return None
++
++
++class OwnedChildren:
++    def __init__(self):
++        if ctypes.CDLL(None, use_errno=True).prctl(36, 1, 0, 0, 0) != 0:
++            raise OSError(ctypes.get_errno(), 'could not become child subreaper')
++        self.parent = os.getpid()
++        self.existing = {pid: _identity(pid) for pid in _children(self.parent)}
++
++    def _direct(self):
++        return [pid for pid in _children(self.parent)
++                if self.existing.get(pid) != _identity(pid)]
++
++    def cleanup(self, timeout=3):
++        deadline = time.monotonic() + timeout
++        kill_at = time.monotonic() + min(.2, timeout / 4)
++        while True:
++            direct = self._direct()
++            if not direct:
++                return
++            # Walk only descendants of our new direct children. A detached session
++            # remains in this ancestry or is adopted by this scope's subreaper.
++            pending = list(direct)
++            seen = set()
++            while pending:
++                pid = pending.pop()
++                if pid in seen:
++                    continue
++                seen.add(pid)
++                generation = _identity(pid)
++                if generation is None:
++                    continue
++                try:
++                    fd = os.pidfd_open(pid)
++                except ProcessLookupError:
++                    continue
++                try:
++                    if _identity(pid) != generation:
++                        continue
++                    pending.extend(_children(pid))
++                    try:
++                        signal.pidfd_send_signal(fd, signal.SIGKILL if time.monotonic() >= kill_at else signal.SIGTERM)
++                    except ProcessLookupError:
++                        pass
++                finally:
++                    os.close(fd)
++            for pid in direct:
++                try:
++                    os.waitpid(pid, os.WNOHANG)
++                except ChildProcessError:
++                    pass
++            if time.monotonic() >= deadline:
++                # The deadline branch must not claim cleanup. Return failure with
++                # pinned ownership still explicit, never signal an unrelated PID.
++                if self._direct():
++                    raise RuntimeError(f'owned descendants exceeded cleanup bound: {self._direct()}')
++                return
++            time.sleep(.01)
++
++
++def run_owned(args, *, timeout, input=None, **kwargs):
++    """Reap the entire owned tree on success, startup error, timeout or interrupt."""
++    scope = OwnedChildren()
++    process = None
++    try:
++        if input is not None:
++            kwargs["stdin"] = subprocess.PIPE
++        process = subprocess.Popen(args, start_new_session=True, **kwargs)
++        stdout, stderr = process.communicate(input=input, timeout=timeout)
++        return subprocess.CompletedProcess(args, process.returncode, stdout, stderr)
++    finally:
++        try:
++            scope.cleanup()
++        finally:
++            if process is not None:
++                for stream in (process.stdin, process.stdout, process.stderr):
++                    if stream is not None:
++                        stream.close()
++
++
++def install_interrupt_cleanup():
++    # Convert ordinary termination into stack unwinding through ownership scopes.
++    def terminate(signum, frame):
++        raise SystemExit(128 + signum)
++    signal.signal(signal.SIGTERM, terminate)
+--- /dev/null
++++ b/docs/parity-evidence/V04/runner/test_cleanup.py
+@@ -0,0 +1,91 @@
++#!/usr/bin/env python3
++"""Focused FIX1 fault probes: no Mosh session, hardware, Cargo or host network changes."""
++import ast
++import ctypes
++import importlib.util
++import json
++import os
++from pathlib import Path
++import re
++import signal
++import subprocess
++import sys
++import tempfile
++import time
++import types
++from owned_process import OwnedChildren, run_owned
++
++HERE=Path(__file__).resolve().parent
++ctypes.CDLL(None).prctl(36,1,0,0,0)
++records=[]
++probe_ownership=OwnedChildren()
++try:
++    # A pre-existing unrelated owned child must remain outside every scope.
++    sentinel=subprocess.Popen([sys.executable,'-c','import time;time.sleep(60)'],start_new_session=True)
++
++
++    def absent(pids):
++        assert all(not Path('/proc',str(pid)).exists() for pid in pids), pids
++        for pid in pids:
++            try: os.waitpid(pid,os.WNOHANG)
++            except ChildProcessError: continue
++            raise AssertionError(('child was not reaped',pid))
++        assert sentinel.poll() is None, 'cleanup touched a pre-existing child'
++
++
++    with tempfile.TemporaryDirectory(prefix='v04-fix1-') as tmp:
++        work=Path(tmp)
++        tree=ast.parse((HERE/'run_mosh_roaming.py').read_text()); function=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='run_case')
++        for mode in ['launcher-timeout-before-owner','launcher-exits-before-owner-parse','popen-startup-failure']:
++            launched=[]; pidfile=work/(mode+'.pid')
++            def popen(*args,**kwargs):
++                if mode=='popen-startup-failure': raise OSError('injected Popen failure')
++                if mode=='launcher-timeout-before-owner':
++                    p=subprocess.Popen([sys.executable,'-c','import signal,time;signal.signal(signal.SIGTERM,signal.SIG_IGN);time.sleep(60)'],start_new_session=True);launched.append(p.pid)
++                    def wait(timeout=None): raise subprocess.TimeoutExpired('injected launcher wait',.02)
++                    p.wait=wait;return p
++                script='import subprocess,sys; p=subprocess.Popen([sys.executable,"-c","import signal,time;signal.signal(signal.SIGTERM,signal.SIG_IGN);time.sleep(60)"],start_new_session=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);open(sys.argv[1],"w").write(str(p.pid))'
++                p=subprocess.Popen([sys.executable,'-c',script,str(pidfile)],start_new_session=True);launched.append(p.pid);return p
++            class Sock:
++                def close(self): pass
++            ns=dict(work=work,OUT=work,child=work/'dummy',cmd=lambda *args:'[]',sock=lambda *args:Sock(),subprocess=types.SimpleNamespace(Popen=popen),sys=sys,os=os,time=time,re=re,signal=signal,Path=Path,OwnedChildren=OwnedChildren)
++            exec(compile(ast.Module(body=[function],type_ignores=[]),'exact-candidate-run_case','exec'),ns)
++            start=time.monotonic()
++            try: ns['run_case'](mode)
++            except (subprocess.TimeoutExpired,AssertionError,OSError) as e: error=type(e).__name__
++            else: raise AssertionError('fault falsely returned success')
++            if pidfile.exists():launched.append(int(pidfile.read_text()))
++            absent(launched);elapsed=time.monotonic()-start;assert elapsed<4
++            records.append({'case':mode,'status':'passed','original_failure_preserved':error,'elapsed_seconds':elapsed,'pids_absent_and_reaped':launched})
++
++        for mode in ['outer-timeout-namespace-detached-descendant','outer-nonzero-detached-descendant']:
++            pidfile=work/(mode+'.pid'); rootfile=work/(mode+'.root')
++            script='import subprocess,sys,time,os;open(sys.argv[2],"w").write(str(os.getpid()));p=subprocess.Popen([sys.executable,"-c","import signal,time;signal.signal(signal.SIGTERM,signal.SIG_IGN);time.sleep(60)"],start_new_session=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);open(sys.argv[1],"w").write(str(p.pid));'+('time.sleep(60)' if 'timeout' in mode else 'sys.exit(7)')
++            args=[sys.executable,'-c',script,str(pidfile),str(rootfile)]
++            if 'namespace' in mode: args=['unshare','--user','--map-root-user','--net']+args
++            start=time.monotonic()
++            try:
++                result=run_owned(args,timeout=.3,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
++                assert mode=='outer-nonzero-detached-descendant' and result.returncode==7
++                error='exit 7'
++            except subprocess.TimeoutExpired:
++                assert 'timeout' in mode;error='TimeoutExpired'
++            pids=[int(rootfile.read_text()),int(pidfile.read_text())];absent(pids);elapsed=time.monotonic()-start;assert elapsed<4
++            records.append({'case':mode,'status':'passed','original_failure_preserved':error,'elapsed_seconds':elapsed,'pids_absent_and_reaped':pids})
++
++        # Interrupt the actual outer ownership helper while a namespace child tree runs.
++        pidfile=work/'interrupt.pid';rootfile=work/'interrupt.root'
++        worker=work/'interrupt.py';worker.write_text('import sys,threading,os,signal,subprocess\nsys.path.insert(0,sys.argv[1])\nfrom owned_process import run_owned,install_interrupt_cleanup\ninstall_interrupt_cleanup()\nthreading.Timer(.4,lambda:os.kill(os.getpid(),signal.SIGTERM)).start()\nrun_owned(sys.argv[2:],timeout=60,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)\n')
++        script='import subprocess,sys,time,os;open(sys.argv[2],"w").write(str(os.getpid()));p=subprocess.Popen([sys.executable,"-c","import time;time.sleep(60)"],start_new_session=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);open(sys.argv[1],"w").write(str(p.pid));time.sleep(60)'
++        result=run_owned([sys.executable,str(worker),str(HERE),'unshare','--user','--map-root-user','--net',sys.executable,'-c',script,str(pidfile),str(rootfile)],timeout=5,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
++        assert result.returncode==143,(result.returncode,result.stdout);pids=[int(rootfile.read_text()),int(pidfile.read_text())];absent(pids)
++        records.append({'case':'outer-SIGTERM-stack-unwind','status':'passed','preserved_exit':143,'pids_absent_and_reaped':pids})
++
++    result=run_owned([sys.executable,'-c','import sys;sys.stdout.buffer.write(sys.stdin.buffer.read())'],input=b'v04-input-roundtrip',timeout=2,stdout=subprocess.PIPE)
++    assert result.returncode==0 and result.stdout==b'v04-input-roundtrip'
++    records.append({'case':'owned-helper-stdin-success','status':'passed','payload_exact':True})
++    os.kill(sentinel.pid,signal.SIGTERM);sentinel.wait(timeout=2)
++    assert len(records)==7
++    print(json.dumps({'status':'GREEN','cases':records,'preexisting_unrelated_child_preserved':True,'probe_processes_reaped':True,'scope':'FIX1 cleanup-only fault injection; original Mosh/serial observation records unchanged'},indent=2))
++finally:
++    probe_ownership.cleanup()

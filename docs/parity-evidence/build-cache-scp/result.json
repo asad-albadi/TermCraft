@@ -1,0 +1,8 @@
+{
+  "original_error": "symbol '' is already defined in scp_browser test compile",
+  "isolated_same_source_compile_exit": 0,
+  "source_changes": [],
+  "resolution": "not reproduced on isolated target rebuild; no source change or manual cache purge",
+  "compiler": "rustc1.99.0 LLVM23.1.1",
+  "claim": "transient compile failure, exact cause unproven"
+}

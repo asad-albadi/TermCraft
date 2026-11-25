@@ -1,0 +1,40 @@
+
+running 5 tests
+test ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs ... FAILED
+test ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full ... FAILED
+test ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text ... FAILED
+test ui::web_browser::tests::embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_painted ... ok
+test ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source ... FAILED
+
+failures:
+
+---- ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs stdout ----
+
+thread 'ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs' (513132) panicked at src/ui/web_browser_tests.rs:236:50:
+called `Result::unwrap()` on an `Err` value: Timeout
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full stdout ----
+
+thread 'ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full' (513136) panicked at src/ui/web_browser_tests.rs:282:9:
+The pointer fixture never rendered: page_requested=false, expected_title=false, loading=false, closed=true, authenticated_dialog=false, viewport=[721, 464], viewport_revision=1, texture_revision=None, error=Some("Chromium timed out while completing Target.getTargets."), notice=None
+
+---- ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text stdout ----
+
+thread 'ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text' (513137) panicked at src/ui/web_browser_tests.rs:71:9:
+Some("Chromium could not complete Page.getNavigationHistory.")
+
+---- ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source stdout ----
+
+thread 'ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source' (513131) panicked at src/ui/ssh_key_tests.rs:47:9:
+
+
+
+failures:
+    ui::ssh_key_tests::owned_agent_selected_in_the_gui_authenticates_terminal_and_shared_source
+    ui::web_browser::tests::embedded_browser_address_reconciles_redirect_after_editing_blurs
+    ui::web_browser::tests::embedded_browser_delivers_outside_release_when_input_queue_is_full
+    ui::web_browser::tests::embedded_browser_tab_paints_chromium_and_routes_egui_pointer_and_text
+
+test result: FAILED. 1 passed; 4 failed; 0 ignored; 0 measured; 132 filtered out; finished in 21.55s
+

@@ -1,0 +1,103 @@
+{
+  "package": "b06-terminal-component",
+  "version": "0.6.27",
+  "source_files": [
+    {
+      "path": "src/games/terminal/API.md",
+      "bytes": 2371,
+      "sha256": "826ce9aa9751a5d35a050db80e46c70f6548cb65f702f3522cf92c1c0fa39ed8"
+    },
+    {
+      "path": "src/games/terminal/PROVENANCE.md",
+      "bytes": 6159,
+      "sha256": "239d2ed241c5117b472cbe5a1fafc2563e5cb4fd9bd0fe5cb5e493a83fa4ed41"
+    },
+    {
+      "path": "src/games/terminal/blocks.rs",
+      "bytes": 7483,
+      "sha256": "80638fa5c6f096cd2552eb02382f59916d6b83940b5def3e77f985a86c8bb31b"
+    },
+    {
+      "path": "src/games/terminal/cards.rs",
+      "bytes": 13817,
+      "sha256": "f68b2d3b8bfdf0f6a8e4f083f034f386d48b2f531896189e0111e5dc45404ea8"
+    },
+    {
+      "path": "src/games/terminal/grids.rs",
+      "bytes": 24201,
+      "sha256": "c40a6bf0f0ce1b274abfd83233e9fe510f6b56925160850ddcfc4c345be5496e"
+    },
+    {
+      "path": "src/games/terminal/invaders.rs",
+      "bytes": 6077,
+      "sha256": "ea9a19eb9f1d1ccc1c37100a8f8dca862204026a2088c52cfc15e48f25ec72c7"
+    },
+    {
+      "path": "src/games/terminal/mod.rs",
+      "bytes": 9491,
+      "sha256": "e6b2d32fadb24c6bd8144e0fd6dee3345989739cc884fdccde4139e0f968cf1f"
+    },
+    {
+      "path": "src/games/terminal/tests.rs",
+      "bytes": 4855,
+      "sha256": "41e98c860dd20b68684ce1be4aaa14ca29a847327860273308c87c2712fe4be3"
+    }
+  ],
+  "base_absence": [
+    {
+      "path": "src/games/terminal/API.md",
+      "absent": true
+    },
+    {
+      "path": "src/games/terminal/PROVENANCE.md",
+      "absent": true
+    },
+    {
+      "path": "src/games/terminal/blocks.rs",
+      "absent": true
+    },
+    {
+      "path": "src/games/terminal/cards.rs",
+      "absent": true
+    },
+    {
+      "path": "src/games/terminal/grids.rs",
+      "absent": true
+    },
+    {
+      "path": "src/games/terminal/invaders.rs",
+      "absent": true
+    },
+    {
+      "path": "src/games/terminal/mod.rs",
+      "absent": true
+    },
+    {
+      "path": "src/games/terminal/tests.rs",
+      "absent": true
+    }
+  ],
+  "evidence_inputs": [
+    {
+      "path": "docs/parity-evidence/original-static-recovery/README.md",
+      "sha256": "f106350272cdfaf5b205d091d9fd4277c3781a7cf36ab459e362cdf00466d05a"
+    },
+    {
+      "path": "docs/parity-evidence/original-static-recovery/catalog.json",
+      "sha256": "3369646917b72c72d265c7a1aaf353b42cc339d50575805573fccb7ea586491f"
+    },
+    {
+      "path": "docs/parity-evidence/original-static-recovery/controls.json",
+      "sha256": "657919d8dd5de35a0aebce8047e86d53b880909c89c27393d724bec39ccbe339"
+    },
+    {
+      "path": "docs/parity-evidence/original-static-recovery/sources.json",
+      "sha256": "ccda19a72b9de0b736307ab4c32dfe80e35a9b9e4fabbfb83356ef937feca2b5"
+    },
+    {
+      "path": "docs/parity-evidence/original-static-recovery/review.md",
+      "sha256": "edde7098288928e47c8061c9ed32c9404f9acf9338715dab351277d9df9dfff7"
+    }
+  ],
+  "scope": "Independent terminal cores only; no UI/foundation mutation; no measured parity or B06 completion claim."
+}

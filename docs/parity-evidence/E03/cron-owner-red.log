@@ -1,0 +1,19 @@
+   Compiling harbor-workspace v0.1.0-e03-cron-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-cron)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.70s
+     Running unittests src/lib.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-4ec8bd47c21a683f)
+
+running 1 test
+
+thread 'services::cron::tests::same_store_has_one_owner_and_rejects_live_edits' (643661) panicked at src/services/cron/tests.rs:197:5:
+same store must have one active scheduler
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test services::cron::tests::same_store_has_one_owner_and_rejects_live_edits ... FAILED
+
+failures:
+
+failures:
+    services::cron::tests::same_store_has_one_owner_and_rejects_live_edits
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 83 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `--lib`

@@ -1,0 +1,31 @@
+# B06 partial foundation — original game equivalence pending
+
+This change implements only the independent, optional idle-screen foundation. **B06 remains incomplete.** It does not implement a game catalog, `GameRegistry`, `GameSession`, or game-specific rules/controls/outcome fixtures. Exact Personal 26.6 exposed game inventory (E04/V07) must be measured before those implementations are written. Archive entries alone are not an exposed catalog.
+
+## Implemented behavior
+
+- `ScreensaverState` defaults off; explicit nonzero idle timeout enables it. Configuration and input reset idle time. `Duration` accumulation saturates.
+- Games menu retains “Games are not available in this build.” A session-only idle-screen checkbox and 30–3600 second timeout are available. Restarting the app disables this optional screen again; no original preference format is inferred.
+- The idle screen uses the existing independently created product penguin mark and “Press a key or click to return.” No original binaries, art, or game assets are copied.
+- Root and detached egui viewport rendering gates run before shortcut handling, terminal widgets, and broadcast dispatch. Background polling remains active.
+- Root-authorized provisional wake policy consumes the dismissal frame and the held wake-key/button sequence through release. Existing queued terminal input, output, sessions, and running processes remain untouched. A wakeup keystroke is not forwarded and may need retyping.
+
+## Validation and limitations
+
+`tests/games.rs` covers default off, exact idle threshold, reconfiguration, disabling, zero timeouts, and overflow. Scoped UI regressions cover ordinary input when disabled, wake input consumption, held-key repeat/release, IME/raw motion, and actual owned PTY session preservation in the root renderer and detached viewport callback. The named `screensaver_dismisses_without_losing_terminal_input` asserts that bytes submitted before idle are received unchanged, the process identity survives, and subsequent communication works; it does not claim the wake text is forwarded.
+
+The original detached callback test uses egui's embedded headless fallback. The lifecycle regression additionally runs the nonembedded `ViewportClass::Immediate` callback using a deterministic backend with real viewport IDs and `ViewportEvent::Close`, observing `CancelClose` in outermost output and the existing confirmation after wake. Both use real owned PTYs. Neither is a native OS-window integration run. Native Windows original behavior remains unmeasured. Exact original wake semantics must be reconciled against this provisional safe policy when available.
+
+No `game_rules_match_recorded_cases` fixture is supplied: the original game inventory/rules/controls/outcomes remain unavailable. The separate isolated original-runtime probe uses signed Wine 11.22 and private Xvfb; Wine observations are emulated, not native Windows evidence. Startup/menu observation limitations are recorded by that probe under `target/agent-work/original-runtime/reports/`.
+
+No whole application GUI sweep or full Rust suite was run by this worker; the root owns the integration/batch gate. Scoped RED/GREEN logs, formatting result, patch, and base/source hashes are supplied in `target/agent-work/b06/reports/`.
+
+## Foundation review round 1
+
+The wake guard now recovers on native touch cancellation, pointer loss, focus loss, or removal of the owning viewport. Cancellation resets only the current owner's retained pointer state; focus loss also clears that owner's stale keys/modifiers. A missing/unfocused owner's recovery consumes the current recovery frame. An unrelated live viewport's empty pointer state cannot release an active owner's guard. The full live viewport inventory comes from eframe's raw-input map. Waiting/idle repaint requests are bounded to 100 ms instead of an immediate loop. No swallowed input is queued or replayed.
+
+Detached lifecycle interception now precedes content/input gating: native Close always emits CancelClose and queues the existing close/reattach confirmation, including during idle or a held wake gesture. Native Close itself counts as activity: it dismisses idle, and the pending confirmation appears on the next frame without extra wake input. An existing unrelated held wake gesture still completes its release before content is shown. Existing active-session close confirmation remains required; declining it leaves the same session and process alive.
+
+Round-1 regressions reproduce the pinned dependency behavior (Touch Cancel + PointerGone, and WindowFocused(false), both retaining pointer-down), verify recovery without forwarding input, preserve unrelated viewport ownership, remove vanished owners, and check bounded repaint. The nonembedded close case verifies both idle and an unrelated viewport's held wake guard using real owned PTYs. Scoped final validation is 13 UI tests and 2 idle-policy tests; source/dependency hashes, actual RED/GREEN logs, and a patch relative to the previous handoff are supplied in `target/agent-work/b06/round1/`. This fixes only the generic foundation; game equivalence and original screensaver behavior remain pending.
+
+Parent additional FIX1 coverage prevents the idle screen from starting while any focused live viewport has held keys, modifiers, or pointer buttons, including without auto-repeat. The gate reads each live viewport's pinned `Context::input_for` state before ticking inactive idle time. Ordinary input at the timeout threshold and focus/cancellation lifecycle frames remain available to existing handlers, so pre-idle releases are never swallowed by starting midway through a native gesture. Removed viewports are pruned, and blurred viewports stop retaining a stale idle inhibitor only after that owner's actual inactive focus-loss callback is allowed through. A parent map reporting blur before the owner callback cannot bypass its held input. Pre-idle input state is not cleared by the saver. Deterministic root/deferred-child tests keep actual child input states registered across root passes and cover both held key and pointer threshold/release, held Ctrl, threshold text, blur-frame delivery and missing/blurred cleanup. These are input-routing regressions, not a claim of native remote desktop key-release qualification.

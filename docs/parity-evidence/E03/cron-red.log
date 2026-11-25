@@ -1,0 +1,211 @@
+   Compiling harbor-workspace v0.1.0-e03-cron-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-cron)
+error[E0405]: cannot find trait `CronClock` in this scope
+  --> src/services/cron/tests.rs:12:6
+   |
+12 | impl CronClock for Clock { fn unix_seconds(&self) -> u64 { self.0.load(Ordering::Acquire) } }
+   |      ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find type `CronJob` in this scope
+  --> src/services/cron/tests.rs:14:49
+   |
+14 | fn job(root: &std::path::Path, script: &str) -> CronJob {
+   |                                                 ^^^^^^^ not found in this scope
+
+error[E0422]: cannot find struct, variant or union type `CronJob` in this scope
+  --> src/services/cron/tests.rs:15:5
+   |
+15 |     CronJob { id: "fixture".into(), schedule: "* * * * *".into(), enabled: true,
+   |     ^^^^^^^ not found in this scope
+
+error[E0433]: cannot find type `Duration` in this scope
+  --> src/services/cron/tests.rs:18:80
+   |
+18 | fn wait(mut condition: impl FnMut()->bool) { let end=std::time::Instant::now()+Duration::from_secs(6); while !condition() { assert!(...
+   |                                                                                ^^^^^^^^ use of undeclared type `Duration`
+   |
+help: consider importing one of these structs
+   |
+ 1 + use crate::services::Duration;
+   |
+ 1 + use std::time::Duration;
+   |
+
+error[E0433]: cannot find type `Duration` in this scope
+  --> src/services/cron/tests.rs:18:196
+   |
+18 | ...now()<end,"timed out"); std::thread::sleep(Duration::from_millis(20)); } }
+   |                                               ^^^^^^^^ use of undeclared type `Duration`
+   |
+help: consider importing one of these structs
+   |
+ 1 + use crate::services::Duration;
+   |
+ 1 + use std::time::Duration;
+   |
+
+error[E0433]: cannot find type `Arc` in this scope
+  --> src/services/cron/tests.rs:26:15
+   |
+26 |     let clock=Arc::new(Clock(AtomicU64::new(1_704_099_600)));
+   |               ^^^ use of undeclared type `Arc`
+   |
+   = note: struct `crate::packages::retirement_tests::Arc` exists but is inaccessible
+help: consider importing this struct
+   |
+ 1 + use std::sync::Arc;
+   |
+
+error[E0433]: cannot find type `Duration` in this scope
+  --> src/services/cron/tests.rs:30:24
+   |
+30 |     std::thread::sleep(Duration::from_millis(150));assert_eq!(std::fs::read(dir.path().join("ran")).unwrap(),b"x");
+   |                        ^^^^^^^^ use of undeclared type `Duration`
+   |
+help: consider importing one of these structs
+   |
+ 1 + use crate::services::Duration;
+   |
+ 1 + use std::time::Duration;
+   |
+
+error[E0433]: cannot find type `Duration` in this scope
+  --> src/services/cron/tests.rs:32:78
+   |
+32 |     let id=supervisor.start_cron(config.clone()).unwrap();std::thread::sleep(Duration::from_millis(150));assert_eq!(std::fs::read(di...
+   |                                                                              ^^^^^^^^ use of undeclared type `Duration`
+   |
+help: consider importing one of these structs
+   |
+ 1 + use crate::services::Duration;
+   |
+ 1 + use std::time::Duration;
+   |
+
+error[E0433]: cannot find type `Duration` in this scope
+  --> src/services/cron/tests.rs:35:65
+   |
+35 |     clock.0.fetch_sub(120,Ordering::Release);std::thread::sleep(Duration::from_millis(150));assert_eq!(std::fs::read(dir.path().join...
+   |                                                                 ^^^^^^^^ use of undeclared type `Duration`
+   |
+help: consider importing one of these structs
+   |
+ 1 + use crate::services::Duration;
+   |
+ 1 + use std::time::Duration;
+   |
+
+error[E0433]: cannot find type `Duration` in this scope
+  --> src/services/cron/tests.rs:38:78
+   |
+38 |     let id=supervisor.start_cron(config.clone()).unwrap();std::thread::sleep(Duration::from_millis(150));assert_eq!(std::fs::read(di...
+   |                                                                              ^^^^^^^^ use of undeclared type `Duration`
+   |
+help: consider importing one of these structs
+   |
+ 1 + use crate::services::Duration;
+   |
+ 1 + use std::time::Duration;
+   |
+
+warning: unused import: `super::*`
+ --> src/services/cron/tests.rs:1:5
+  |
+1 | use super::*;
+  |     ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0433]: cannot find type `Schedule` in this scope
+ --> src/services/cron/tests.rs:4:16
+  |
+4 |     let cron = Schedule::parse("*/15 9-17 * * 1-5").unwrap();
+  |                ^^^^^^^^ use of undeclared type `Schedule`
+
+error[E0433]: cannot find type `Schedule` in this scope
+ --> src/services/cron/tests.rs:7:17
+  |
+7 |         assert!(Schedule::parse(bad).is_err(), "{bad}");
+  |                 ^^^^^^^^ use of undeclared type `Schedule`
+
+error[E0433]: cannot find type `CronServiceConfig` in this scope
+  --> src/services/cron/tests.rs:28:20
+   |
+28 |     let mut config=CronServiceConfig::new(path.clone()); config.clock=clock.clone();
+   |                    ^^^^^^^^^^^^^^^^^ use of undeclared type `CronServiceConfig`
+
+error[E0433]: cannot find type `CronServiceConfig` in this scope
+  --> src/services/cron/tests.rs:47:95
+   |
+47 | ...lt();let id=supervisor.start_cron(CronServiceConfig::new(path.clone())).unwrap();
+   |                                      ^^^^^^^^^^^^^^^^^ use of undeclared type `CronServiceConfig`
+
+error[E0433]: cannot find type `CronServiceConfig` in this scope
+  --> src/services/cron/tests.rs:52:144
+   |
+52 | ...ap();let id=supervisor.start_cron(CronServiceConfig::new(path)).unwrap();
+   |                                      ^^^^^^^^^^^^^^^^^ use of undeclared type `CronServiceConfig`
+
+error[E0433]: cannot find type `Schedule` in this scope
+  --> src/services/cron/tests.rs:58:15
+   |
+58 |     let every=Schedule::parse("30 1 * * *").unwrap();assert_eq!(every.next_after(1_730_593_800),Some(1_730_680_200));
+   |               ^^^^^^^^ use of undeclared type `Schedule`
+
+error[E0433]: cannot find type `Schedule` in this scope
+  --> src/services/cron/tests.rs:59:13
+   |
+59 |     assert!(Schedule::parse("0 0 29 2 *").unwrap().next_after(1_704_067_200).is_some());
+   |             ^^^^^^^^ use of undeclared type `Schedule`
+
+error[E0433]: cannot find type `Schedule` in this scope
+  --> src/services/cron/tests.rs:60:13
+   |
+60 |     assert!(Schedule::parse("0 0 30 2 *").unwrap().next_after(1_704_067_200).is_none());
+   |             ^^^^^^^^ use of undeclared type `Schedule`
+
+error[E0425]: cannot find function `save_jobs` in this scope
+  --> src/services/cron/tests.rs:24:5
+   |
+24 |     save_jobs(&path, vec![j.clone()]).unwrap(); let before=std::fs::read(&path).unwrap();
+   |     ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `save_jobs` in this scope
+  --> src/services/cron/tests.rs:25:65
+   |
+25 |     let mut bad=j.clone();bad.schedule="@hourly".into();assert!(save_jobs(&path,vec![bad]).is_err());assert_eq!(std::fs::read(&path)...
+   |                                                                 ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `save_jobs` in this scope
+  --> src/services/cron/tests.rs:37:47
+   |
+37 |     let mut disabled=j;disabled.enabled=false;save_jobs(&path,vec![disabled]).unwrap(); clock.0.fetch_add(600,Ordering::Release);
+   |                                               ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `load_jobs` in this scope
+  --> src/services/cron/tests.rs:39:94
+   |
+39 |     let last=std::fs::read(&path).unwrap();std::fs::write(&path,b"{broken").unwrap();assert!(load_jobs(&path).is_err());assert!(supe...
+   |                                                                                              ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `load_jobs` in this scope
+  --> src/services/cron/tests.rs:39:214
+   |
+39 | ...));std::fs::write(&path,last).unwrap();assert!(!load_jobs(&path).unwrap()[0].enabled);
+   |                                                    ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `save_jobs` in this scope
+  --> src/services/cron/tests.rs:46:5
+   |
+46 |     save_jobs(&path,vec![job(dir.path(),"sleep 30 & echo $! > child; wait")]).unwrap();
+   |     ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `save_jobs` in this scope
+  --> src/services/cron/tests.rs:52:81
+   |
+52 |     let mut j=job(dir.path(),"sleep 30");j.id="deadline".into();j.max_seconds=1;save_jobs(&path,vec![j]).unwrap();let id=supervisor....
+   |                                                                                 ^^^^^^^^^ not found in this scope
+
+Some errors have detailed explanations: E0405, E0422, E0425, E0433.
+For more information about an error, try `rustc --explain E0405`.
+warning: `harbor-workspace` (lib test) generated 1 warning
+error: could not compile `harbor-workspace` (lib test) due to 25 previous errors; 1 warning emitted

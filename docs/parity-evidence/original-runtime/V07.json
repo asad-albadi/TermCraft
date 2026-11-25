@@ -1,0 +1,26 @@
+{
+  "point_id": "V07",
+  "target": {
+    "product": "MobaXterm",
+    "version": "26.6.0.5560",
+    "edition": "Personal"
+  },
+  "sources": [
+    "docs/parity-evidence/original-runtime/README.md",
+    "docs/parity-evidence/original-runtime/original-inputs.sha256"
+  ],
+  "capture_date": "2026-11-25",
+  "observation_kind": "emulated-runtime-and-container-inspection",
+  "observed_behavior": "Verified private Wine bootstrap executes the exact original and can map its main UI; a partial original CRLF INI and ZIP companion/plugin containers are measured. Detailed Personal controls and exports remain unresolved after Wine loader-section wait timeouts.",
+  "termcraft_behavior": "No product code changed; no native qualification or scope exclusions inferred.",
+  "test_command": "target/agent-work/original-runtime/run-cage.sh and run.sh; helpers and exact package/signature records retained in this evidence directory.",
+  "platform": "Linux, isolated Wine11.22 original Windows application (emulated; not native Windows)",
+  "result": "partial",
+  "remaining_limitations": [
+    "No native Windows comparison or strict original qualification.",
+    "Archive game names do not establish exposed Games catalog; no game lifecycle/rules measured.",
+    "No measured complete preferences, session/macro export schema, effective limits, or MobApt install resolution.",
+    "No terms/license/system permission accepted; no host integration or network access to original."
+  ],
+  "artifact_sha256": "e9a66144b3a1c4d32f8062b1eb34e26e9ed5298106abf1982b4654ab107f13a5"
+}

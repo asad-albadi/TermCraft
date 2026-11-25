@@ -1,0 +1,11 @@
+{
+  "x03_final_seven_files_unchanged": {
+    "src/main.rs": "75a9e9e464866cfaa4440be8fa232c1f21ccb68f6e879be38119d8a8cd1f5369",
+    "src/x11/mod.rs": "4aac3d7b07085575cf7defa26bcf2ee76e0a099c1f53a847a6edb900de2d64dd",
+    "src/ui/xserver.rs": "214da69b6b13a46035f61fe849e136e7980c10fc5f7bfd5578600dd544724ce8",
+    "packaging/x11/manifest.json": "48201ffed3127429a70a693dee8110e15f2653e3358b2f3cf038c5d8c77a4957",
+    "src/x11/capabilities.rs": "6374348478856ba0021de5fa1dc23fe7e7b6f2644031824a4ddd8d3f03533cd1",
+    "src/x11/native_capabilities.rs": "c01efafb06b73adbbfdf7b82d74a1d13dea5a1da16132fa0176a8b03a2045cba",
+    "tests/x11_extensions.rs": "4adb8f11968fb0c587612f99bdd75dcca3698c185437b616e04fc245ad030811"
+  }
+}

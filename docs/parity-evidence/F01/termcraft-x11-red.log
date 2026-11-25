@@ -1,0 +1,85 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: unused import: `super::*`
+ --> src/ssh/x11.rs:3:9
+  |
+3 |     use super::*;
+  |         ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `AsyncReadExt`
+ --> src/ssh/x11.rs:4:21
+  |
+4 |     use tokio::io::{AsyncReadExt, AsyncWriteExt};
+  |                     ^^^^^^^^^^^^
+
+error[E0425]: cannot find function `read_setup` in this scope
+  --> src/ssh/x11.rs:23:28
+   |
+23 |             let replaced = read_setup(&mut remote, &fake, &real).await.unwrap();
+   |                            ^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `read_setup` in this scope
+  --> src/ssh/x11.rs:32:21
+   |
+32 |             assert!(read_setup(&mut remote, &[1;16], &[2;16]).await.is_err());
+   |                     ^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `authority_cookie` in this scope
+  --> src/ssh/x11.rs:43:22
+   |
+43 |         assert_eq!(&*authority_cookie(&bytes,7,b"test-host",true).unwrap(), &[42;16]);
+   |                      ^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `authority_cookie` in this scope
+  --> src/ssh/x11.rs:44:17
+   |
+44 |         assert!(authority_cookie(&bytes,8,b"test-host",true).is_err());
+   |                 ^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `authority_cookie` in this scope
+  --> src/ssh/x11.rs:45:17
+   |
+45 |         assert!(authority_cookie(&bytes,7,b"other-host",true).is_err());
+   |                 ^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `authority_cookie` in this scope
+  --> src/ssh/x11.rs:46:17
+   |
+46 |         assert!(authority_cookie(&bytes[..bytes.len()-1],7,b"test-host",true).is_err());
+   |                 ^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0433]: cannot find type `DisplayTarget` in this scope
+  --> src/ssh/x11.rs:50:17
+   |
+50 |         assert!(DisplayTarget::parse("evil.example:0").is_err());
+   |                 ^^^^^^^^^^^^^ use of undeclared type `DisplayTarget`
+
+error[E0433]: cannot find type `DisplayTarget` in this scope
+  --> src/ssh/x11.rs:51:17
+   |
+51 |         assert!(DisplayTarget::parse("localhost:65535").is_err());
+   |                 ^^^^^^^^^^^^^ use of undeclared type `DisplayTarget`
+
+error[E0433]: cannot find type `DisplayTarget` in this scope
+  --> src/ssh/x11.rs:52:20
+   |
+52 |         assert_eq!(DisplayTarget::parse("localhost:7.2").unwrap().screen, 2);
+   |                    ^^^^^^^^^^^^^ use of undeclared type `DisplayTarget`
+
+error[E0433]: cannot find type `DisplayTarget` in this scope
+  --> src/ssh/x11.rs:54:26
+   |
+54 |         assert!(matches!(DisplayTarget::parse(":7").unwrap().endpoint, Endpoint::Unix(_)));
+   |                          ^^^^^^^^^^^^^ use of undeclared type `DisplayTarget`
+
+error[E0433]: cannot find type `Endpoint` in this scope
+  --> src/ssh/x11.rs:54:72
+   |
+54 |         assert!(matches!(DisplayTarget::parse(":7").unwrap().endpoint, Endpoint::Unix(_)));
+   |                                                                        ^^^^^^^^ use of undeclared type `Endpoint`
+
+Some errors have detailed explanations: E0425, E0433.
+For more information about an error, try `rustc --explain E0425`.
+warning: `harbor-workspace` (lib test) generated 2 warnings
+error: could not compile `harbor-workspace` (lib test) due to 11 previous errors; 2 warnings emitted

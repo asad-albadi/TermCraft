@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "point": "V03",
+  "capture_utc": "2026-11-24T22:36:12.558776+00:00",
+  "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+  "matrix_sha256": "a85bcf6ffc10b4709f56fe0cefcc575da9e8de5a0e1bd8ae1fd3e86c5c546b57",
+  "build_artifacts_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "build_inputs_sha256": "6ef4856f9b3600d9967a27711ae9dab9f7111395ac4c32d8bdec43fcbad7546c",
+  "source_inputs_stable": true,
+  "source_input_inventory_sha256": "b950de59dfe2e81a218055375aebae789048a2b311939d27899d257e202fa4e4",
+  "complete_matrix": false,
+  "native_original_validated": 0,
+  "records": [
+    {
+      "case": {
+        "id": "ftp-ascii",
+        "protocol": "FTP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "fixture user/password; plaintext",
+        "encoding_options": "ASCII and binary",
+        "steps": "upload/download text in selected transfer type",
+        "expected": "ASCII CRLF conversion and binary preservation",
+        "target": "ftp_ftps",
+        "test": "ascii_mode_converts_only_selected_text",
+        "inputs": []
+      },
+      "command": [],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/nonexistent-v03-executable",
+      "executable_sha256": null,
+      "exit_code": null,
+      "result": "unavailable",
+      "log": "ftp-ascii.log",
+      "log_sha256": "d279778b7e66ba7b563e3641adf5614ff39a23f63271fbd138e8a6e42a63a937",
+      "source_input_inventory": "source-input-sha256.json"
+    }
+  ],
+  "controlled_endpoint_checkpoint": false
+}

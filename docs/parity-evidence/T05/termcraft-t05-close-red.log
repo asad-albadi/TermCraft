@@ -1,0 +1,18 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `resolve_session_close` found for struct `ui::Workspace` in the current scope
+    --> src/ui.rs:2366:11
+     |
+ 312 | pub struct Workspace {
+     | -------------------- method `resolve_session_close` not found for this struct
+...
+2366 |         w.resolve_session_close(false,&ctx);assert_eq!(w.tabs[0].id,id);assert!(w.tabs[0].running());
+     |           ^^^^^^^^^^^^^^^^^^^^^
+     |
+help: there is a method `new_session` with a similar name, but with different arguments
+    --> src/ui.rs:570:5
+     |
+ 570 |     fn new_session(&mut self, protocol: &str) {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 1 previous error

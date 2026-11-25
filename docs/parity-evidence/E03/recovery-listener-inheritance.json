@@ -1,0 +1,6 @@
+{
+  "parent_listener_dropped": true,
+  "connection_accepted_while_fork_child_holds_description": true,
+  "connection_refused_after_child_exit": true,
+  "child_reaped": true
+}

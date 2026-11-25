@@ -1,0 +1,288 @@
+[
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "local-ipv4.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=local-ipv4; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=ed25519 key; trust=known; jump=direct; operation=local exact TUNNEL_OK via ipv4; expected=exact TUNNEL_OK; one observed echo; listener released",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact local_ipv4 --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "d200a188da523a6e1570579efe4b5bab8cc9eec0ad598f44975f33a4a0ae01fd"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "local-ipv6.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=local-ipv6; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=ed25519 key; trust=known; jump=direct; operation=local exact TUNNEL_OK via ipv6; expected=exact TUNNEL_OK; one observed echo; listener released",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact local_ipv6 --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "eedd90981fe21b0cf0a880a991a0aadd4826740cf2c6e2c376ac7ea600c93b42"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "remote-ipv4.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=remote-ipv4; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=ed25519 key; trust=known; jump=direct; operation=remote exact TUNNEL_OK via ipv4; expected=exact TUNNEL_OK; one observed echo; listener released",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact remote_ipv4 --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "3232d0961676d36aa18332aa579faf45da2e3f6fa5d0af5658ee193c5d4e5d12"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "remote-ipv6.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=remote-ipv6; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=ed25519 key; trust=known; jump=direct; operation=remote exact TUNNEL_OK via ipv6; expected=exact TUNNEL_OK; one observed echo; listener released",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact remote_ipv6 --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "9335b7d7f4c894b9c559d1233708011328cf6067537ca521a663557f8105da71"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "dynamic-ipv4.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=dynamic-ipv4; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=ed25519 key; trust=known; jump=direct; operation=dynamic exact TUNNEL_OK via ipv4; expected=exact TUNNEL_OK; one observed echo; listener released",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact dynamic_ipv4 --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "ead837549435a81ea6bf956350b0658843a8cd2ddf2977c79ea338afb97a3d85"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "dynamic-ipv6.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=dynamic-ipv6; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=ed25519 key; trust=known; jump=direct; operation=dynamic exact TUNNEL_OK via ipv6; expected=exact TUNNEL_OK; one observed echo; listener released",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact dynamic_ipv6 --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "bac9c0ae7123dcab04ab906b0ed10654a433757c3f37c4b9c9a55101830835d0"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "named-payload.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=named-payload; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=all three IPv4 modes; expected=TUNNEL_OK exact",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact local_remote_dynamic_tunnels_carry_exact_payload --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "bcc6e36304f808ebfb32b603ea012346d903030da379046abdf0109366624788"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "nondefault-bind.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=nondefault-bind; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=all modes explicit 127.0.0.2; expected=exact TUNNEL_OK without LAN exposure",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact explicit_nondefault_loopback_bind --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "f571d9fbe735caa5aa36951f2444ecc4e18617010482150abc69e53084a2c4ed"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "port-conflict.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=port-conflict; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=all modes existing listener; expected=process exits; forwarding diagnostic in terminal bytes",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact tunnel_port_conflict_is_visible --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "5eee56996c31f079284cbf1382d7397b192b29be7240a4727a56adaaa4a65479"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "cancel-reconnect.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=cancel-reconnect; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=all modes close during live channel; reconnect twice; expected=forwarded socket closes; listener rebind; payload after reconnect",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact closing_tunnel_releases_listener --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "9d266da1e00224d375ad055920657d437e37c49a2d8befc786d72c2386a5c01e"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "destination-failure.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=destination-failure; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=all modes refused destination; expected=channel/SOCKS failure; reusable SSH process alive",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact destination_failure_is_observable --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "9a5e197be1525d1eb05ea8ba9b0afd370d5d2b69f8d67b46dead79b40c7ac5d9"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "native-windows.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=native-windows; endpoint=OpenSSH; version=unavailable; auth=key; trust=private known host pin; jump=direct; operation=local/remote/dynamic IPv4/IPv6 and cancellation; expected=native runtime assertions",
+    "termcraft_behavior": "unavailable: named test asserts the declared observation; see complete log",
+    "test_command": "not executed: endpoint unavailable",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "unavailable",
+    "remaining_limitations": [
+      "Native Windows runner unavailable; Linux process cleanup does not prove native lifetime semantics."
+    ],
+    "artifact_sha256": "cb5900ef7c60ef22df2a6dd8c214b7a6de0039582c8dc97563202407a4f84924"
+  },
+  {
+    "point_id": "V02",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "native-macos.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=native-macos; endpoint=OpenSSH; version=unavailable; auth=key; trust=private known host pin; jump=direct; operation=local/remote/dynamic IPv4/IPv6 and cancellation; expected=native runtime assertions",
+    "termcraft_behavior": "unavailable: named test asserts the declared observation; see complete log",
+    "test_command": "not executed: endpoint unavailable",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "unavailable",
+    "remaining_limitations": [
+      "Native macOS runner unavailable; Linux process cleanup does not prove native lifetime semantics."
+    ],
+    "artifact_sha256": "db3bfe45fabcc408813471774fb882aa8bc7867829aac4e6710bcd78bf524851"
+  }
+]

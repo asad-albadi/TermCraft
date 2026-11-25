@@ -1,0 +1,20 @@
+00:00:00.000 [INFO] [backend/backend.c:342] Loading user-specified backends due to WLR_BACKENDS: headless
+00:00:00.000 [INFO] [backend/headless/backend.c:60] Creating headless backend
+00:00:00.000 [INFO] [util/env.c:25] Loading WLR_RENDERER option: pixman
+00:00:00.000 [INFO] [render/pixman/renderer.c:328] Creating pixman renderer
+00:00:00.000 [INFO] [../cage/cage.c:521] Failed to create wlr_drm_lease_manager_v1
+00:00:00.005 [INFO] [backend/headless/backend.c:17] Starting headless backend
+00:00:00.045 [INFO] [xwayland/server.c:108] Starting Xwayland on :0
+Xwayland glamor: GBM Wayland interfaces not available
+Failed to initialize glamor, falling back to sw
+
+running 5 tests
+test ui::xserver::tests::local_tab_starts_owned_server_and_only_its_shell_gets_client_environment ... ok
+test ui::xserver::tests::requested_display_failure_blocks_local_shell ... ok
+test ui::xserver::tests::xserver_ui_cancels_in_background ... ok
+test ui::xserver::tests::xserver_ui_reports_missing_bundle ... ok
+test ui::xserver::tests::xserver_ui_starts_and_stops_packaged_engine ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 127 filtered out; finished in 2.93s
+
+(EE) failed to read Wayland events: Broken pipe

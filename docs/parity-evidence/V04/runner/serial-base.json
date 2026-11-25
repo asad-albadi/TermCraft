@@ -1,0 +1,7 @@
+{
+  "src/serial.rs": "9f95e681e75739e9dc0c3a9a8cfa6779b9e4e235bba2179a697a4a5421bd2567",
+  "src/serial/settings.rs": "2f18c5c62500ba8432c1f10f0db20fe0f0ef7c03852776ee04557a5a562f1ea2",
+  "src/process_input.rs": "8848ef9cdc54813109d1d22cb4f8420d7f6f818ef2f9558af63080044de8dc33",
+  "tests/support/serial.rs": "e6a86ee9f0ecf1c0b683cde4796a7d5481e775b3753b335caf6a6f6a676cfc78",
+  "tests/serial_settings.rs": "90fe7db1316ba58f0e46fac6c23d793de92080a7c43105dffa6b78643390a270"
+}

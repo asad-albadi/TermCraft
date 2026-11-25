@@ -1,0 +1,16 @@
+checking file Cargo.toml
+checking file Cargo.lock
+checking file src/services/mod.rs
+checking file src/services/supervisor.rs
+checking file src/model.rs
+checking file src/ui.rs
+checking file src/ui/managed_servers.rs
+checking file src/ui/servers.rs
+checking file src/services/vnc.rs
+checking file src/services/vnc/x11.rs
+checking file src/services/vnc/windows.rs
+checking file src/services/vnc/keyboard.rs
+checking file src/services/vnc/x11/keyboard.rs
+checking file src/services/vnc_fixture_keyboard.rs
+checking file src/services/vnc_service_tests.rs
+checking file src/ui/managed_vnc.rs

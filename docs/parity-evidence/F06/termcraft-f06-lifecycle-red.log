@@ -1,0 +1,39 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.12s
+     Running tests/ssh_lifecycle.rs (app/target/debug/deps/ssh_lifecycle-7068c92c1740f5cf)
+
+running 4 tests
+test cancel_auth_stops_the_entire_attempt ... FAILED
+test reconnect_discards_old_challenges_and_listings ... FAILED
+test browser_retry_does_not_reauthenticate ... ok
+test prompted_username_identity_survives_fresh_editor_recovery_without_implicit_upload ... FAILED
+
+failures:
+
+---- cancel_auth_stops_the_entire_attempt stdout ----
+
+thread 'cancel_auth_stops_the_entire_attempt' (324739) panicked at tests/ssh_lifecycle.rs:40:9:
+Cancelled authentication still accepted credentials
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- reconnect_discards_old_challenges_and_listings stdout ----
+
+thread 'reconnect_discards_old_challenges_and_listings' (324741) panicked at tests/ssh_lifecycle.rs:29:5:
+assertion `left != right` failed: Challenge identities must survive connection-generation changes
+  left: 1
+ right: 1
+
+---- prompted_username_identity_survives_fresh_editor_recovery_without_implicit_upload stdout ----
+
+thread 'prompted_username_identity_survives_fresh_editor_recovery_without_implicit_upload' (324740) panicked at tests/ssh_lifecycle.rs:61:5:
+An authenticated prompted username was lost from endpoint identity
+
+
+failures:
+    cancel_auth_stops_the_entire_attempt
+    prompted_username_identity_survives_fresh_editor_recovery_without_implicit_upload
+    reconnect_discards_old_challenges_and_listings
+
+test result: FAILED. 1 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+
+error: test failed, to rerun pass `--test ssh_lifecycle`

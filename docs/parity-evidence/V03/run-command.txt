@@ -1,0 +1,2 @@
+CARGO_BUILD_JOBS=2 CARGO_TARGET_DIR="$MAIN/target" cargo test --offline --no-run --lib --test ftp_ftps --test legacy_protocols --test rdp_session --test vnc_session --test protocol_interop --test desktop_gateway --message-format=json > evidence/build-final-matrix.jsonl 2> evidence/build-final-matrix.log
+python3 scripts/check-protocols.py --output evidence/run-linux-final --build-artifacts evidence/build-final-matrix.jsonl --build-inputs evidence/pre-build-final-sha256.json

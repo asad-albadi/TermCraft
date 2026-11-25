@@ -1,0 +1,989 @@
+{
+  "schema": 1,
+  "point": "V03",
+  "capture_utc": "2026-11-24T22:38:26.581167+00:00",
+  "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+  "matrix_sha256": "a85bcf6ffc10b4709f56fe0cefcc575da9e8de5a0e1bd8ae1fd3e86c5c546b57",
+  "build_artifacts_sha256": "68bc5492714bef953abd5a04ed601aa03e34177a76f6ed463e3a10708abf3358",
+  "build_inputs_sha256": "7f277dd699a4d54783f82ba85c723f36711d76e984887a99e74cefde512ffd72",
+  "source_inputs_stable": true,
+  "source_input_inventory_sha256": "01592e533363b3326fbf5dfeaba20b0cc034ea7afbe881da85e922ba15d43bc4",
+  "complete_matrix": true,
+  "native_original_validated": 0,
+  "records": [
+    {
+      "case": {
+        "id": "ftp-binary-active-passive",
+        "protocol": "FTP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "fixture user/password; plaintext",
+        "encoding_options": "binary; active and passive",
+        "steps": "upload, download, MLSD, SIZE, rename, remove file and directory",
+        "expected": "exact binary bytes and three data connections in each mode",
+        "target": "ftp_ftps",
+        "test": "binary_transfer_is_byte_exact",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+        "--exact",
+        "binary_transfer_is_byte_exact",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+      "executable_sha256": "3ea6e209ece7fb0c89ea0dfa0c5f8f4e94feccb01b720b27af31724ae58be5b5",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "ftp-binary-active-passive.log",
+      "log_sha256": "504c66ae1d61ce0f0f70b52336adbc78564a6d7302ce39e98af0e27923c113dd",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "ftp-ascii",
+        "protocol": "FTP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "fixture user/password; plaintext",
+        "encoding_options": "ASCII and binary",
+        "steps": "upload/download text in selected transfer type",
+        "expected": "ASCII CRLF conversion and binary preservation",
+        "target": "ftp_ftps",
+        "test": "ascii_mode_converts_only_selected_text",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+        "--exact",
+        "ascii_mode_converts_only_selected_text",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+      "executable_sha256": "3ea6e209ece7fb0c89ea0dfa0c5f8f4e94feccb01b720b27af31724ae58be5b5",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "ftp-ascii.log",
+      "log_sha256": "2552ac5a3ca2a95cf15692cec9a6e1caf601fe8524125ab2b022c377aada0e0c",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "ftps-tls-policy",
+        "protocol": "FTP/FTPS",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned CA, wrong CA, wrong hostname; TLS",
+        "encoding_options": "explicit and implicit TLS; private and clear data policies",
+        "steps": "connect valid and invalid cert targets; transfer TLS data",
+        "expected": "valid trust succeeds; invalid CA/name rejected; selected channel encryption asserted",
+        "target": "ftp_ftps",
+        "test": "ftps_validates_certificate_and_encrypts_selected_channels",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+        "--exact",
+        "ftps_validates_certificate_and_encrypts_selected_channels",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+      "executable_sha256": "3ea6e209ece7fb0c89ea0dfa0c5f8f4e94feccb01b720b27af31724ae58be5b5",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "ftps-tls-policy.log",
+      "log_sha256": "3e4da00ec28717f9a304f17b6cb64064aafda2f3fbc992acde601d434e1e1a46",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "ftps-no-downgrade",
+        "protocol": "FTP/FTPS",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned TLS certificate",
+        "encoding_options": "PROT P; server rejection and plaintext data sabotage",
+        "steps": "connect rejecting PROT and non-TLS data peers",
+        "expected": "no silent plaintext downgrade",
+        "target": "ftp_ftps",
+        "test": "rejected_protection_and_plain_data_do_not_downgrade",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+        "--exact",
+        "rejected_protection_and_plain_data_do_not_downgrade",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+      "executable_sha256": "3ea6e209ece7fb0c89ea0dfa0c5f8f4e94feccb01b720b27af31724ae58be5b5",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "ftps-no-downgrade.log",
+      "log_sha256": "264144dc4c2bd4f30a3242697b4bdc7593cd5bf3caa9486b8722f19d3a133436",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "ftp-data-peer",
+        "protocol": "FTP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "fixture password",
+        "encoding_options": "active and passive peer identity",
+        "steps": "hostile advertised PASV address and alternate active peer",
+        "expected": "active alien rejected, PASV host ignored",
+        "target": "ftp_ftps",
+        "test": "verifies_active_peer_and_ignores_pasv_address",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+        "--exact",
+        "verifies_active_peer_and_ignores_pasv_address",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+      "executable_sha256": "3ea6e209ece7fb0c89ea0dfa0c5f8f4e94feccb01b720b27af31724ae58be5b5",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "ftp-data-peer.log",
+      "log_sha256": "12c3e7293201e70bb19cf3440d9b138bac20e0f47f1d33cd82474b22b4a9546b",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "ftp-cancel-injection",
+        "protocol": "FTP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "fixture password",
+        "encoding_options": "stalled data; raw paths",
+        "steps": "cancel stalled transfer, attempt CRLF path injection",
+        "expected": "bounded cancellation and path rejection",
+        "target": "ftp_ftps",
+        "test": "cancel_interrupts_stalled_transfer_and_paths_cannot_inject_commands",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+        "--exact",
+        "cancel_interrupts_stalled_transfer_and_paths_cannot_inject_commands",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+      "executable_sha256": "3ea6e209ece7fb0c89ea0dfa0c5f8f4e94feccb01b720b27af31724ae58be5b5",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "ftp-cancel-injection.log",
+      "log_sha256": "8230be7770da4bbba1a6410d90cd63a7542bcd10b10b4061e958f33344236811",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "ftp-transfer-failure",
+        "protocol": "FTP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "fixture password",
+        "encoding_options": "bounded bytes, final reply and timeout",
+        "steps": "download excessive bytes, failing final reply and stalled peer",
+        "expected": "failures surfaced and connection retired as asserted",
+        "target": "ftp_ftps",
+        "test": "bounded_downloads_require_final_success_and_idle_transfers_time_out",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+        "--exact",
+        "bounded_downloads_require_final_success_and_idle_transfers_time_out",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+      "executable_sha256": "3ea6e209ece7fb0c89ea0dfa0c5f8f4e94feccb01b720b27af31724ae58be5b5",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "ftp-transfer-failure.log",
+      "log_sha256": "292d0d8616e2952cbdcb182f193b2db8c8ecdbf42ed2664b2edb19462e099067",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "ftp-raw-listing",
+        "protocol": "FTP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "fixture password",
+        "encoding_options": "MLSD raw names",
+        "steps": "list byte paths and invalid snapshots",
+        "expected": "raw names preserved; unusable listing rejected",
+        "target": "ftp_ftps",
+        "test": "machine_listing_retains_byte_names_and_rejects_unusable_snapshots",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+        "--exact",
+        "machine_listing_retains_byte_names_and_rejects_unusable_snapshots",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ftp_ftps-ccb4f84cbe7dc3de",
+      "executable_sha256": "3ea6e209ece7fb0c89ea0dfa0c5f8f4e94feccb01b720b27af31724ae58be5b5",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "ftp-raw-listing.log",
+      "log_sha256": "840459c1dabccf37d3b842d6e47337bb51027cd97135c6d996d882d1c9712e67",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "telnet-iac",
+        "protocol": "Telnet",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+        "encoding_options": "IAC/BINARY/NAWS/NVT",
+        "steps": "negotiate options and terminal size over loopback TCP",
+        "expected": "only text displayed; exact negotiation and NAWS bytes",
+        "target": "legacy_protocols",
+        "test": "telnet_iac_is_not_displayed_as_text",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+        "--exact",
+        "telnet_iac_is_not_displayed_as_text",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+      "executable_sha256": "873de2d52ea6152227a6a6c524dec6d0373b86ed457ab43c9b563a2701ca9e1f",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "telnet-iac.log",
+      "log_sha256": "5d1b9f60c99176e61c2c578b4a7d3d1eca040ea869eb6968447e6d112cb7cfe2",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "telnet-echo-enter",
+        "protocol": "Telnet",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+        "encoding_options": "echo, CR/LF enter",
+        "steps": "negotiate peer echo and send terminal line",
+        "expected": "echo state and ordered line bytes asserted",
+        "target": "legacy_protocols",
+        "test": "telnet_enter_completes_line_and_echo_tracks_peer_negotiation",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+        "--exact",
+        "telnet_enter_completes_line_and_echo_tracks_peer_negotiation",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+      "executable_sha256": "873de2d52ea6152227a6a6c524dec6d0373b86ed457ab43c9b563a2701ca9e1f",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "telnet-echo-enter.log",
+      "log_sha256": "6adcfd58376f766a4691fa26b19ad8601fd1cfe51b88c68b2a39a14539ed7c31",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "rlogin-rsh-handshake",
+        "protocol": "Rlogin/Rsh",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+        "encoding_options": "reserved source ports; configured endpoint/user",
+        "steps": "perform both protocols handshakes; exchange output/input; close",
+        "expected": "reserved source peer, alice, terminal/command fields, exact stdin and EOF",
+        "target": "legacy_protocols",
+        "test": "configured_legacy_port_and_user_reach_server",
+        "inputs": [
+          "tests/support/run_protocol_reserved_isolated.sh"
+        ],
+        "reserved_namespace": true,
+        "requires": [
+          "bwrap",
+          "ip",
+          "bash"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03/tests/support/run_protocol_reserved_isolated.sh",
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+        "--exact",
+        "configured_legacy_port_and_user_reach_server",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+      "executable_sha256": "873de2d52ea6152227a6a6c524dec6d0373b86ed457ab43c9b563a2701ca9e1f",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "rlogin-rsh-handshake.log",
+      "log_sha256": "75208505dd326f51cc75229356de81073f912e3d85fe440196ddf572f95c17af",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "rlogin-window",
+        "protocol": "Rlogin",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+        "encoding_options": "urgent TCP window negotiation",
+        "steps": "peer requests window size through OOB",
+        "expected": "expected protocol window update bytes",
+        "target": "legacy_protocols",
+        "test": "rlogin_window_size_follows_server_urgent_request",
+        "inputs": [
+          "tests/support/run_protocol_reserved_isolated.sh"
+        ],
+        "reserved_namespace": true,
+        "requires": [
+          "bwrap",
+          "ip",
+          "bash"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03/tests/support/run_protocol_reserved_isolated.sh",
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+        "--exact",
+        "rlogin_window_size_follows_server_urgent_request",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+      "executable_sha256": "873de2d52ea6152227a6a6c524dec6d0373b86ed457ab43c9b563a2701ca9e1f",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "rlogin-window.log",
+      "log_sha256": "7bcdf333cf1f1f8152796a6d01b22b9087b254c429c6997a28621cd66800c966",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "rlogin-flush",
+        "protocol": "Rlogin",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+        "encoding_options": "urgent output flush",
+        "steps": "send queued and unread pre-mark data then urgent flush",
+        "expected": "pre-mark data discarded; post-mark data retained",
+        "target": "legacy_protocols",
+        "test": "rlogin_urgent_flush_discards_queued_and_unread_pre_mark_data",
+        "inputs": [
+          "tests/support/run_protocol_reserved_isolated.sh"
+        ],
+        "reserved_namespace": true,
+        "requires": [
+          "bwrap",
+          "ip",
+          "bash"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03/tests/support/run_protocol_reserved_isolated.sh",
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+        "--exact",
+        "rlogin_urgent_flush_discards_queued_and_unread_pre_mark_data",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+      "executable_sha256": "873de2d52ea6152227a6a6c524dec6d0373b86ed457ab43c9b563a2701ca9e1f",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "rlogin-flush.log",
+      "log_sha256": "264362474c14cbc407704a75eff9e4fcb475d43967abf842f22ee532a7566e9c",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "rsh-cancel-handshake",
+        "protocol": "Rsh",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+        "encoding_options": "reserved source; unfinished handshake",
+        "steps": "withhold ack then close transport",
+        "expected": "exact rsh greeting and prompt cancellation",
+        "target": "legacy_protocols",
+        "test": "close_interrupts_unacknowledged_legacy_handshake",
+        "inputs": [
+          "tests/support/run_protocol_reserved_isolated.sh"
+        ],
+        "reserved_namespace": true,
+        "requires": [
+          "bwrap",
+          "ip",
+          "bash"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03/tests/support/run_protocol_reserved_isolated.sh",
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+        "--exact",
+        "close_interrupts_unacknowledged_legacy_handshake",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e",
+      "executable_sha256": "873de2d52ea6152227a6a6c524dec6d0373b86ed457ab43c9b563a2701ca9e1f",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "rsh-cancel-handshake.log",
+      "log_sha256": "b8736df5e20340f1783f8f8c361bbe0a63f25a1603f887d874ba7650162dbf8f",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "rdp-frame-input",
+        "protocol": "RDP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+        "encoding_options": "TLS/NLA; BGRA frame/input",
+        "steps": "authenticate and receive fixture frame; send input",
+        "expected": "known frame color and server input observations",
+        "target": "rdp_session",
+        "test": "rdp_frame_updates_render_inside_workspace",
+        "inputs": [
+          "inputs/termcraft-rdp-engine",
+          "inputs/termcraft-rdp-engine-evaluation"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+        "--exact",
+        "rdp_frame_updates_render_inside_workspace",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+      "executable_sha256": "7451e9832b33e8ef7bca6425be93d98dbcf8b7a96f29606fe51c1273e6d3206a",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "rdp-frame-input.log",
+      "log_sha256": "a64360a2cef9b0845b3b799c2fa90a6609a5a51e3ed0434d9d1d42e6e3a5b2f3",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "rdp-certificate-change",
+        "protocol": "RDP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+        "encoding_options": "TLS certificate pin",
+        "steps": "reconnect changed owned certificate",
+        "expected": "resolution required; no key sent to untrusted replacement",
+        "target": "rdp_session",
+        "test": "rdp_certificate_change_requires_resolution",
+        "inputs": [
+          "inputs/termcraft-rdp-engine",
+          "inputs/termcraft-rdp-engine-evaluation"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+        "--exact",
+        "rdp_certificate_change_requires_resolution",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+      "executable_sha256": "7451e9832b33e8ef7bca6425be93d98dbcf8b7a96f29606fe51c1273e6d3206a",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "rdp-certificate-change.log",
+      "log_sha256": "8cd9aa267bd692185c58c11930a5d632743647f01acd5ffe6030440cbc949a3e",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "rdp-resize",
+        "protocol": "RDP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+        "encoding_options": "server display update",
+        "steps": "receive initial and resized framebuffer",
+        "expected": "initial and renegotiated dimensions",
+        "target": "rdp_session",
+        "test": "server_display_resize_renegotiates_the_framebuffer",
+        "inputs": [
+          "inputs/termcraft-rdp-engine",
+          "inputs/termcraft-rdp-engine-evaluation"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+        "--exact",
+        "server_display_resize_renegotiates_the_framebuffer",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+      "executable_sha256": "7451e9832b33e8ef7bca6425be93d98dbcf8b7a96f29606fe51c1273e6d3206a",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "rdp-resize.log",
+      "log_sha256": "f68f079bf7fa5114b9a58a6091f60cff7e4fee4c905415be3c47c8a1fe77ebd9",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "rdp-close",
+        "protocol": "RDP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+        "encoding_options": "owned helper lifecycle",
+        "steps": "connect then close",
+        "expected": "owned helper reaped, server sees close, events empty",
+        "target": "rdp_session",
+        "test": "closing_rdp_releases_transport",
+        "inputs": [
+          "inputs/termcraft-rdp-engine",
+          "inputs/termcraft-rdp-engine-evaluation"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+        "--exact",
+        "closing_rdp_releases_transport",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+      "executable_sha256": "7451e9832b33e8ef7bca6425be93d98dbcf8b7a96f29606fe51c1273e6d3206a",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "rdp-close.log",
+      "log_sha256": "b9cb823d6a5e0f0f8757a87eade124ae0a71ef7caf6a0df21e32abeeed577f44",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "rdp-focus-input",
+        "protocol": "RDP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+        "encoding_options": "cursor and focus input",
+        "steps": "receive cursor and release pressed input on focus change",
+        "expected": "cursor event plus exact server key/button releases",
+        "target": "rdp_session",
+        "test": "remote_cursor_and_focus_release_reach_real_connection",
+        "inputs": [
+          "inputs/termcraft-rdp-engine",
+          "inputs/termcraft-rdp-engine-evaluation"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+        "--exact",
+        "remote_cursor_and_focus_release_reach_real_connection",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/rdp_session-3c94e8b26ffd3282",
+      "executable_sha256": "7451e9832b33e8ef7bca6425be93d98dbcf8b7a96f29606fe51c1273e6d3206a",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "rdp-focus-input.log",
+      "log_sha256": "cad58c62664cab514ffe5829ae356490f267285edfdf1355d6a1216f248d9357",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "vnc-pixels-input",
+        "protocol": "VNC",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned loopback RFB endpoint; fixture None security",
+        "encoding_options": "RFB 3.8 Raw/CopyRect/Hextile; key/pointer",
+        "steps": "negotiate endpoint; receive pixels and send canvas input",
+        "expected": "exact known pixels, keys and pointer coordinates",
+        "target": "vnc_session",
+        "test": "vnc_known_frame_and_pointer_coordinates_match",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/vnc_session-af827a6ecfc2ebb5",
+        "--exact",
+        "vnc_known_frame_and_pointer_coordinates_match",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/vnc_session-af827a6ecfc2ebb5",
+      "executable_sha256": "f82b0757b0858ad7c82a7bec757e9eb6fa82d4bcbf14fbd3a52eeb69142890de",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "vnc-pixels-input.log",
+      "log_sha256": "083d148ae8f1f98b457e89df3b57a9d0ba0900287244f6f506bdf6e3e8eb9cde",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "vnc-view-only",
+        "protocol": "VNC",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned loopback RFB endpoint; fixture None security",
+        "encoding_options": "view-only",
+        "steps": "send keyboard/pointer in view-only mode",
+        "expected": "no server input bytes",
+        "target": "vnc_session",
+        "test": "view_only_sends_no_keyboard_or_pointer",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/vnc_session-af827a6ecfc2ebb5",
+        "--exact",
+        "view_only_sends_no_keyboard_or_pointer",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/vnc_session-af827a6ecfc2ebb5",
+      "executable_sha256": "f82b0757b0858ad7c82a7bec757e9eb6fa82d4bcbf14fbd3a52eeb69142890de",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "vnc-view-only.log",
+      "log_sha256": "6c8b373eac63fccdef18fef217717304e53e48b0471d6d6e334de44be1804ba3",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "vnc-resize",
+        "protocol": "VNC",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned loopback RFB endpoint; fixture None security",
+        "encoding_options": "DesktopSize",
+        "steps": "receive resize rectangle",
+        "expected": "new dimensions and framebuffer",
+        "target": "vnc_session",
+        "test": "vnc_resize_reinitializes_framebuffer",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/vnc_session-af827a6ecfc2ebb5",
+        "--exact",
+        "vnc_resize_reinitializes_framebuffer",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/vnc_session-af827a6ecfc2ebb5",
+      "executable_sha256": "f82b0757b0858ad7c82a7bec757e9eb6fa82d4bcbf14fbd3a52eeb69142890de",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "vnc-resize.log",
+      "log_sha256": "0f3501323f44b22c07f38391f6189bf7bb863dacbd168793982480ecb0b4d08d",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "vnc-unicode-clipboard",
+        "protocol": "VNC",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned loopback RFB endpoint; fixture None security",
+        "encoding_options": "ExtendedClipboard; UTF-8",
+        "steps": "exchange clipboard via session API only",
+        "expected": "exact Unicode on both wire directions; host clipboard untouched",
+        "target": "vnc_session",
+        "test": "unicode_clipboard_round_trips_over_negotiated_tcp_session",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/vnc_session-af827a6ecfc2ebb5",
+        "--exact",
+        "unicode_clipboard_round_trips_over_negotiated_tcp_session",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/vnc_session-af827a6ecfc2ebb5",
+      "executable_sha256": "f82b0757b0858ad7c82a7bec757e9eb6fa82d4bcbf14fbd3a52eeb69142890de",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "vnc-unicode-clipboard.log",
+      "log_sha256": "f523ff43e5fc9887a59d9cc933e9e8763f2e211077a9254aaeda8433004b0316",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "vnc-cancel-incomplete",
+        "protocol": "VNC",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned loopback RFB endpoint; fixture None security",
+        "encoding_options": "incomplete frame",
+        "steps": "close session while peer stalls rectangle",
+        "expected": "carrier closes and worker finishes",
+        "target": "vnc_session",
+        "test": "vnc_cancel_closes_supplied_tcp_carrier_during_incomplete_rectangle",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/vnc_session-af827a6ecfc2ebb5",
+        "--exact",
+        "vnc_cancel_closes_supplied_tcp_carrier_during_incomplete_rectangle",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/vnc_session-af827a6ecfc2ebb5",
+      "executable_sha256": "f82b0757b0858ad7c82a7bec757e9eb6fa82d4bcbf14fbd3a52eeb69142890de",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "vnc-cancel-incomplete.log",
+      "log_sha256": "37530d9f7563ca12a451b3ad623613640f6ff9afe86c9499d9e2455dc4548599",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "xdmcp-real-desktop",
+        "protocol": "XDMCP",
+        "version": "owned fixture version pinned by source/input inventory",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned xdm 1.1.17; MIT-MAGIC-COOKIE; no login credentials",
+        "encoding_options": "UDP 1177; display 177; private veth; pinned Xephyr 21.1.26; clipboard Disabled",
+        "steps": "discover manager; MANAGE; map window; verify pixels/monitor; wrong cookie; concurrent close/cleanup",
+        "expected": "real managed authenticated desktop, green pixels, selected monitor, wrong-cookie rejection and owned cleanup preserving private Cage",
+        "target": "lib",
+        "test": "x11::xdmcp_engine::tests::actual_xdm_nondefault_port_opens_selected_display_and_cleanup_preserves_host",
+        "inputs": [
+          "inputs/xdmcp-engine/x11/linux-x86_64/Xephyr",
+          "inputs/xdmcp-fixture/xdm",
+          "inputs/compositor/x11/linux-x86_64/Xwayland"
+        ],
+        "ignored": true,
+        "isolated_xdmcp": true,
+        "requires": [
+          "bwrap",
+          "ip",
+          "cage",
+          "python3",
+          "bash"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03/tests/support/run_xdmcp_isolated.sh",
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03/inputs/compositor",
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-0d781c812ca506c3",
+        "--exact",
+        "x11::xdmcp_engine::tests::actual_xdm_nondefault_port_opens_selected_display_and_cleanup_preserves_host",
+        "--nocapture",
+        "--test-threads=1",
+        "--ignored"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-0d781c812ca506c3",
+      "executable_sha256": "6735c992fcf7bf9413028ca3019476655a7cc36b93153e749ba54cd832b68a5f",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "xdmcp-real-desktop.log",
+      "log_sha256": "4bf00bfbc24150001fc90168f1e127f2b36f8671292d9bd9e9a0c491cf83d603",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "vnc-tls-password-tcp",
+        "protocol": "VNC",
+        "version": "RFB 3.8 VeNCrypt 0.2 X509Vnc 261; source-pinned owned endpoint",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned ephemeral self-signed TLS, explicit CA; password challenge",
+        "encoding_options": "TLS; raw frame; supplied real TCP carrier",
+        "steps": "connect private loopback endpoint, negotiate VeNCrypt and certificate trust, assert frame/input or reject",
+        "expected": "verified TLS password response, green pixel, pointer wire bytes and closed carrier",
+        "target": "protocol_interop",
+        "test": "vnc_tls_password_real_tcp_pixels_input_and_cleanup",
+        "inputs": [],
+        "requires": [
+          "openssl"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/protocol_interop-6a48da232a7a3d68",
+        "--exact",
+        "vnc_tls_password_real_tcp_pixels_input_and_cleanup",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/protocol_interop-6a48da232a7a3d68",
+      "executable_sha256": "5c9584d93c5b204a767c4d520e7f027d4285fbf12e684eb40a5877e5f7648880",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "vnc-tls-password-tcp.log",
+      "log_sha256": "835dc238bfb5043544375e2d8edc39f6eff842872063b6793222be8c80c26d4e",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "vnc-tls-reject-tcp",
+        "protocol": "VNC",
+        "version": "RFB 3.8 VeNCrypt 0.2 X509Vnc 261; source-pinned owned endpoint",
+        "target_os": "Linux x86_64",
+        "auth_security": "owned ephemeral self-signed TLS, explicit CA; password challenge",
+        "encoding_options": "TLS; raw frame; supplied real TCP carrier",
+        "steps": "connect private loopback endpoint, negotiate VeNCrypt and certificate trust, assert frame/input or reject",
+        "expected": "wrong CA rejected before authentication prompt or response",
+        "target": "protocol_interop",
+        "test": "vnc_untrusted_tls_real_tcp_never_prompts_for_password",
+        "inputs": [],
+        "requires": [
+          "openssl"
+        ]
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/protocol_interop-6a48da232a7a3d68",
+        "--exact",
+        "vnc_untrusted_tls_real_tcp_never_prompts_for_password",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/protocol_interop-6a48da232a7a3d68",
+      "executable_sha256": "5c9584d93c5b204a767c4d520e7f027d4285fbf12e684eb40a5877e5f7648880",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "vnc-tls-reject-tcp.log",
+      "log_sha256": "8ec1c88ad0040088f8a1a48813270189b38a8766e14ba7ec4d4741e6be7755e3",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "vnc-gateway",
+        "protocol": "VNC/SSH",
+        "version": "source-pinned russh owned gateway fixture; RDP row validates carrier, not complete RDP endpoint",
+        "target_os": "Linux x86_64",
+        "auth_security": "ephemeral owned SSH keys; no host authorized_keys",
+        "encoding_options": "private TCP gateway channels",
+        "steps": "connect gateway; exercise exact bytes or changed-key block; close",
+        "expected": "exact VNC frame and pointer through authenticated owned SSH gateway; channel cleanup",
+        "target": "desktop_gateway",
+        "test": "vnc_frame_and_pointer_travel_through_the_gateway",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/desktop_gateway-59742f3ccab061fd",
+        "--exact",
+        "vnc_frame_and_pointer_travel_through_the_gateway",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/desktop_gateway-59742f3ccab061fd",
+      "executable_sha256": "a4a8e84e214cc96b1f94d6787b3de34fc4d0e4ecddb56c131fbba1ae9c51cb10",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "vnc-gateway.log",
+      "log_sha256": "94390439b3d8d7e2d9faed3800a7927c3ad99759f4ee216c2d34e53b78b111e3",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "rdp-gateway-retry",
+        "protocol": "RDP carrier/SSH",
+        "version": "source-pinned russh owned gateway fixture; RDP row validates carrier, not complete RDP endpoint",
+        "target_os": "Linux x86_64",
+        "auth_security": "ephemeral owned SSH keys; no host authorized_keys",
+        "encoding_options": "private TCP gateway channels",
+        "steps": "connect gateway; exercise exact bytes or changed-key block; close",
+        "expected": "relay retry reconnects exactly one channel on same SSH auth; wrong token rejected; cleanup",
+        "target": "desktop_gateway",
+        "test": "rdp_retry_relay_reopens_the_channel_on_one_ssh_authentication",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/desktop_gateway-59742f3ccab061fd",
+        "--exact",
+        "rdp_retry_relay_reopens_the_channel_on_one_ssh_authentication",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/desktop_gateway-59742f3ccab061fd",
+      "executable_sha256": "a4a8e84e214cc96b1f94d6787b3de34fc4d0e4ecddb56c131fbba1ae9c51cb10",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "rdp-gateway-retry.log",
+      "log_sha256": "85589aa9afd281fc5051bb4cabe464a4862c1709448c2e16992a2eb751758270",
+      "source_input_inventory": "source-input-sha256.json"
+    },
+    {
+      "case": {
+        "id": "gateway-trust",
+        "protocol": "RDP/VNC carrier/SSH",
+        "version": "source-pinned russh owned gateway fixture; RDP row validates carrier, not complete RDP endpoint",
+        "target_os": "Linux x86_64",
+        "auth_security": "ephemeral owned SSH keys; no host authorized_keys",
+        "encoding_options": "private TCP gateway channels",
+        "steps": "connect gateway; exercise exact bytes or changed-key block; close",
+        "expected": "changed gateway key prevents desktop target connection",
+        "target": "desktop_gateway",
+        "test": "changed_gateway_host_key_blocks_desktop",
+        "inputs": []
+      },
+      "command": [
+        "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/desktop_gateway-59742f3ccab061fd",
+        "--exact",
+        "changed_gateway_host_key_blocks_desktop",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "cwd": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v03",
+      "executable": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/desktop_gateway-59742f3ccab061fd",
+      "executable_sha256": "a4a8e84e214cc96b1f94d6787b3de34fc4d0e4ecddb56c131fbba1ae9c51cb10",
+      "exit_code": 0,
+      "result": "passed",
+      "log": "gateway-trust.log",
+      "log_sha256": "43c03b3eada76f266f80c7a1065b0e392d37f1972628069250ab51fafaa4173a",
+      "source_input_inventory": "source-input-sha256.json"
+    }
+  ],
+  "controlled_endpoint_checkpoint": true
+}

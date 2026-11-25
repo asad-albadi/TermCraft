@@ -1,0 +1,13 @@
+Server listening on 127.0.0.1 port 34049.
+Connection from 127.0.0.1 port 33546 on 127.0.0.1 port 34049 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 33546 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Connection from 127.0.0.1 port 33548 on 127.0.0.1 port 34049 rdomain ""
+Accepted key ED25519 SHA256:O4wi3RaMtJN/0MCogQwDoxcQ4sZ/DmbtaE+LfnjhXds found at /tmp/termcraft-ssh-test-101866-1795552130374922801/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 33548 ssh2 [preauth]
+Accepted key ED25519 SHA256:O4wi3RaMtJN/0MCogQwDoxcQ4sZ/DmbtaE+LfnjhXds found at /tmp/termcraft-ssh-test-101866-1795552130374922801/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 33548 ssh2: ED25519 SHA256:O4wi3RaMtJN/0MCogQwDoxcQ4sZ/DmbtaE+LfnjhXds
+User child is on pid 101881
+Received disconnect from 127.0.0.1 port 33548:11: disconnected by user
+Disconnected from user asad 127.0.0.1 port 33548

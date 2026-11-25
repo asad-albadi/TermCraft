@@ -1,0 +1,48 @@
+    Blocking waiting for file lock on build directory
+warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
+  --> src/../../../src/desktop/options.rs:96:9
+   |
+95 | pub struct NegotiatedRdpOptions {
+   |            -------------------- fields in this struct
+96 |     pub clipboard: ClipboardPolicy,
+   |         ^^^^^^^^^
+97 |     pub keyboard: KeyboardRouting,
+   |         ^^^^^^^^
+98 |     pub keyboard_layout: u32,
+   |         ^^^^^^^^^^^^^^^
+   |
+   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `is_default` is never used
+   --> src/../../../src/desktop/options.rs:101:12
+    |
+100 | impl RdpOptions {
+    | --------------- method in this implementation
+101 |     pub fn is_default(&self) -> bool {
+    |            ^^^^^^^^^^
+
+warning: `termcraft-rdp-engine` (bin "d02-device-private-rdp" test) generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.05s
+     Running unittests src/main.rs (app/target/debug/deps/d02_device_private_rdp-34a4dfff972ff5e3)
+
+running 16 tests
+test devices::serial_completion::tests::close_reports_write_success_when_normal_completion_wins_cancellation ... ok
+test devices::serial_completion::tests::close_forwards_exact_terminal_read_and_control_output ... ok
+test devices::serial::tests::serial_peer_hangup_is_not_a_successful_empty_read ... ok
+test devices::serial_completion::tests::close_preserves_terminal_abort_and_other_native_failure ... ok
+test devices::serial::tests::expired_serial_operations_leave_pty_data_untouched ... ok
+test devices_tests::serial::embedded_drive_and_serial_use_distinct_device_ids_on_the_same_channel ... ok
+test devices_tests::serial::embedded_serial_rejects_non_tty_character_devices ... ok
+test devices_tests::serial::embedded_serial_close_cancels_all_waiting_reads_even_at_capacity ... ok
+test devices_tests::serial::embedded_serial_opens_the_specification_metadata_probe ... ok
+test devices_tests::serial::embedded_serial_certificate_retry_keeps_the_original_tty_binding ... ok
+test devices_tests::serial::embedded_serial_read_only_denies_writes_and_mutating_controls ... ok
+test devices_tests::serial::serial_flow_characters_apply_to_pty_and_modem_failures_are_explicit ... ok
+test devices_tests::serial::embedded_serial_does_not_reopen_a_recycled_pty ... ok
+test devices_tests::serial::embedded_serial_redirects_an_owned_pty_with_concurrent_read_and_write ... ok
+test devices_tests::serial::serial_xoff_stalls_pty_output_until_xon_and_read_only_rejects_new_controls ... ok
+test devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 31 filtered out; finished in 0.04s
+

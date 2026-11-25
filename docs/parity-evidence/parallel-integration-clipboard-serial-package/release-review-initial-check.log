@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/parallel-integration-clipboard-serial-package/release-review-check.py", line 21, in <module>
+    assert package['source_inputs'](root) == package['source_inputs'](snapshot) == captured
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

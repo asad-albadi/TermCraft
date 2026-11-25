@@ -1,0 +1,44 @@
+usage: package-release.py [-h] [--platform {linux,windows,macos}]
+                          [--output OUTPUT] [--build-root BUILD_ROOT]
+                          [--app-binary APP_BINARY]
+                          [--helper-binary HELPER_BINARY]
+                          [--xwayland-archive XWAYLAND_ARCHIVE]
+                          [--xephyr-archive XEPHYR_ARCHIVE]
+                          [--iperf-runtime IPERF_RUNTIME]
+                          [--mosh-archive MOSH_ARCHIVE]
+                          [--mosh-source MOSH_SOURCE]
+                          [--mosh-recipe MOSH_RECIPE]
+                          [--unix-cache UNIX_CACHE]
+                          [--browser-inputs BROWSER_INPUTS]
+
+Build a native TermCraft release archive with a file and dependency manifest.
+
+options:
+  -h, --help            show this help message and exit
+  --platform {linux,windows,macos}
+  --output OUTPUT
+  --build-root BUILD_ROOT
+                        Place independent Cargo target directories here.
+  --app-binary APP_BINARY
+  --helper-binary HELPER_BINARY
+  --xwayland-archive XWAYLAND_ARCHIVE
+                        Bundle the pinned Arch x86_64 Xwayland package (Linux
+                        only).
+  --xephyr-archive XEPHYR_ARCHIVE
+                        Bundle the pinned owned Linux x86_64 Xephyr XDMCP
+                        engine (explicit session network policy still
+                        required).
+  --iperf-runtime IPERF_RUNTIME
+                        Root of the pinned Linux x86_64 Iperf runtime payload.
+  --mosh-archive MOSH_ARCHIVE
+                        Pinned Arch Linux x86_64 Mosh binary package.
+  --mosh-source MOSH_SOURCE
+                        Pinned corresponding upstream Mosh source archive.
+  --mosh-recipe MOSH_RECIPE
+                        Pinned corresponding Arch Mosh PKGBUILD.
+  --unix-cache UNIX_CACHE
+                        Bundle target-matching pinned Unix archives from an
+                        offline upstream hash cache (Linux/Windows x86_64).
+  --browser-inputs BROWSER_INPUTS
+                        Offline pinned Chromium archive, signature and third-
+                        party notices directory (Linux x86_64).

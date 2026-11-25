@@ -1,0 +1,106 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-v01v02 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02)
+warning: methods `send` and `poll` are never used
+   --> src/ui.rs:165:8
+    |
+147 | impl TerminalTab {
+    | ---------------- methods in this implementation
+...
+165 |     fn send(&mut self, data: &[u8]) {
+    |        ^^^^
+...
+209 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+    --> src/ui/shared_sessions.rs:691:19
+     |
+ 640 | impl Workspace {
+     | -------------- methods in this implementation
+...
+ 691 |     pub(super) fn shared_sources_busy(&self) -> bool {
+     |                   ^^^^^^^^^^^^^^^^^^^
+...
+1006 |     pub(super) fn refresh_shared_source_with(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "termcraft-v01v02-private") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.23s
+     Running tests/ssh_interop.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_interop-402819b4a2c8008c)
+
+running 3 tests
+test independent_dropbear_key_shell_and_sftp_roundtrip ... 
+thread 'independent_dropbear_key_shell_and_sftp_roundtrip' (111841) panicked at tests/support/dropbear_server.rs:93:13:
+Dropbear exited: Invalid option -E
+Dropbear server v2026.94 https://matt.ucc.asn.au/dropbear/dropbear.html
+Usage: /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/private-tools/dropbear/dropbear-2026.94/dropbear [options]
+-b bannerfile	Display the contents of bannerfile before user login
+		(default: none)
+-r keyfile      Specify hostkeys (repeatable)
+		defaults: 
+		- rsa /etc/dropbear/dropbear_rsa_host_key
+		- ecdsa /etc/dropbear/dropbear_ecdsa_host_key
+		- ed25519 /etc/dropbear/dropbear_ed25519_host_key
+-D		Directory containing authorized_keys file
+-R		Create hostkeys as required
+-F		Don't fork into background
+-e		Pass on server process environment to child process
+(Syslog support not compiled in, using stderr)
+-m		Don't display the motd on login
+-w		Disallow root logins
+-G		Restrict logins to members of specified group
+-T		Maximum authentication tries (default 10)
+-j		Disable local port/stream forwarding
+-k		Disable remote port/stream forwarding
+-a		Allow connections to forwarded ports from any host
+-c command	Force executed command
+-p [address:]port
+		Listen on specified tcp port (and optionally address),
+		up to 10 can be specified
+		(default port is 22 if none specified)
+-P PidFile	Create pid file PidFile
+		(default /var/run/dropbear.pid)
+-l <interface>
+		interface to bind on
+-i		Start for inetd
+-W <receive_window_buffer> (default 24576, larger may be faster, max 10MB)
+-K <keepalive>  (0 is never, default 0, in seconds)
+-I <idle_timeout>  (0 is never, default 0, in seconds)
+-M <max_duration>  (0 is off, default 0, in seconds)
+-z    disable QoS
+-Q    <algo>   Print supported algorithms, or -Q help
+-V    Version
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test sftp_interop_failure_and_reconnect ... ok
+test ssh_interop_auth_and_host_keys ... ok
+
+failures:
+
+failures:
+    independent_dropbear_key_shell_and_sftp_roundtrip
+
+test result: FAILED. 2 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `--test ssh_interop`

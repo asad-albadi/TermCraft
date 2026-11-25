@@ -1,0 +1,187 @@
+warning: unused import: `TransferOperation`
+ --> src/remote_files/editor.rs:2:58
+  |
+2 | use super::{RemotePath, transfer::{Job, TransferManager, TransferOperation, TransferOutcome}};
+  |                                                          ^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (lib) generated 1 warning (run `cargo fix --lib -p harbor-workspace` to apply 1 suggestion)
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s
+     Running tests/shell_directory.rs (target/debug/deps/shell_directory-eb58b94ddc62a2d6)
+
+running 9 tests
+
+thread 'disabling_follow_before_initial_listing_does_not_fabricate_an_empty_directory' (242660) panicked at tests/shell_directory.rs:100:5:
+An uninitialized browser must wait for an actual manual listing
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test disabling_follow_invalidates_only_its_pending_listing ... ok
+test malformed_or_other_host_metadata_cannot_navigate ... ok
+test manual_mode_ignores_shell_directory ... ok
+test disabling_follow_before_initial_listing_does_not_fabricate_an_empty_directory ... FAILED
+test split_osc7_updates_only_matching_connection ... ok
+test unsupported_shell_keeps_manual_browser ... ok
+test notices_are_bounded_and_recover_after_a_terminated_oversized_message ... ok
+test opt_in_shell_scripts_report_literal_paths_and_restore_existing_hooks ... ok
+
+thread 'bash_prompt_pipeline_cleanup_and_export_regressions' (242659) panicked at tests/shell_directory.rs:126:5:
+pipeline: PIPE:0
+PIPE:0
+]7;file://host/home/asad/Documents/Craft%20Anything/mobaxterm-personal-26-6/appPIPE:0
+]7;file://host/home/asad/Documents/Craft%20Anything/mobaxterm-personal-26-6/appPIPE:0
+]7;file://host/home/asad/Documents/Craft%20Anything/mobaxterm-personal-26-6/appPIPE:0
+]7;file://host/home/asad/Documents/Craft%20Anything/mobaxterm-personal-26-6/appPIPE:0
+
+cleanup: bash: cannot set terminal process group (242570): Inappropriate ioctl for device
+bash: no job control in this shell
+PROMPT_COMMAND=true
+__termcraft_osc7_install() {
+    local __tc_decl __tc_flags __tc_hook __tc_found=0
+    __tc_decl=$(declare -p PROMPT_COMMAND 2>/dev/null) || __tc_decl=''
+    __tc_flags=${__tc_decl#declare }; __tc_flags=${__tc_flags%% *}
+    if [[ $__tc_flags == *r* || $__tc_flags == *A* ]]; then
+<not writable/supported; use manual navigation.' >&2
+        return 1
+    fi
+<_VERSINFO[0] == 5 && BASH_VERSINFO[1] < 1) )); then
+<need Bash 5.1 or newer; use manual navigation.' >&2
+        return 1
+    fi
+    __termcraft_osc7() {
+        local __tc_status=$? __tc_url='' __tc_c __tc_hex __tc_i
+        local LC_ALL=C
+        for ((__tc_i=0; __tc_i<${#PWD}; __tc_i++)); do
+            __tc_c=${PWD:__tc_i:1}
+            case $__tc_c in
+                [a-zA-Z0-9/._~-]) __tc_url+=$__tc_c ;;
+<_tc_hex '%%%02X' "'$__tc_c"; __tc_url+=$__tc_hex ;;
+            esac
+        done
+        printf '\033]7;file://%s%s\007' 'host' "$__tc_url"
+        return "$__tc_status"
+    }
+    __termcraft_osc7_remove() {
+        local __tc_decl __tc_flags __tc_i
+        __tc_decl=$(declare -p PROMPT_COMMAND 2>/dev/null) || __tc_decl=''
+        __tc_flags=${__tc_decl#declare }; __tc_flags=${__tc_flags%% *}
+        if [[ $__tc_flags == *r* || $__tc_flags == *A* ]]; then
+<d; close this shell to remove its integration.' >&2
+            return 1
+        fi
+        if [[ $__tc_flags == *a* ]]; then
+            for __tc_i in "${!PROMPT_COMMAND[@]}"; do
+<ft_osc7 ]]; then unset 'PROMPT_COMMAND[__tc_i]'; fi
+            done
+        else
+            PROMPT_COMMAND=${PROMPT_COMMAND#'__termcraft_osc7; '}
+<z $PROMPT_COMMAND ]]; then unset PROMPT_COMMAND; fi
+        fi
+        unset __termcraft_osc7_installed __termcraft_osc7_was_unset
+        unset -f __termcraft_osc7 __termcraft_osc7_remove
+    }
+    if [[ ${__termcraft_osc7_installed-} != 1 ]]; then
+<_was_unset=0; else __termcraft_osc7_was_unset=1; fi
+        if [[ $__tc_flags == *a* ]]; then
+<c_hook == __termcraft_osc7 ]] && __tc_found=1; done
+            if (( !__tc_found )); then PROMPT_COMMAND+=(__termcraft_osc7); fi
+bash: !__tc_found: event not found
+        else
+            PROMPT_COMMAND="__termcraft_osc7; ${PROMPT_COMMAND-}"
+        fi
+        __termcraft_osc7_installed=1
+    fi
+}
+__termcraft_osc7_install
+unset -f __termcraft_osc7_install
+
+PROMPT_COMMAND="true; $PROMPT_COMMAND"
+__termcraft_osc7_remove
+bash: __termcraft_osc7: command not found
+printf CLEAN\n
+bash: __termcraft_osc7: command not found
+exit
+exit
+
+export: bash: cannot set terminal process group (242570): Inappropriate ioctl for device
+bash: no job control in this shell
+export PROMPT_COMMAND='printf CHILD\n'
+__termcraft_osc7_install() {
+    local __tc_decl __tc_flags __tc_hook __tc_found=0
+    __tc_decl=$(declare -p PROMPT_COMMAND 2>/dev/null) || __tc_decl=''
+    __tc_flags=${__tc_decl#declare }; __tc_flags=${__tc_flags%% *}
+    if [[ $__tc_flags == *r* || $__tc_flags == *A* ]]; then
+<not writable/supported; use manual navigation.' >&2
+        return 1
+    fi
+<_VERSINFO[0] == 5 && BASH_VERSINFO[1] < 1) )); then
+<need Bash 5.1 or newer; use manual navigation.' >&2
+        return 1
+    fi
+    __termcraft_osc7() {
+        local __tc_status=$? __tc_url='' __tc_c __tc_hex __tc_i
+        local LC_ALL=C
+        for ((__tc_i=0; __tc_i<${#PWD}; __tc_i++)); do
+            __tc_c=${PWD:__tc_i:1}
+            case $__tc_c in
+                [a-zA-Z0-9/._~-]) __tc_url+=$__tc_c ;;
+<_tc_hex '%%%02X' "'$__tc_c"; __tc_url+=$__tc_hex ;;
+            esac
+        done
+        printf '\033]7;file://%s%s\007' 'host' "$__tc_url"
+        return "$__tc_status"
+    }
+    __termcraft_osc7_remove() {
+        local __tc_decl __tc_flags __tc_i
+        __tc_decl=$(declare -p PROMPT_COMMAND 2>/dev/null) || __tc_decl=''
+        __tc_flags=${__tc_decl#declare }; __tc_flags=${__tc_flags%% *}
+        if [[ $__tc_flags == *r* || $__tc_flags == *A* ]]; then
+<d; close this shell to remove its integration.' >&2
+            return 1
+        fi
+        if [[ $__tc_flags == *a* ]]; then
+            for __tc_i in "${!PROMPT_COMMAND[@]}"; do
+<ft_osc7 ]]; then unset 'PROMPT_COMMAND[__tc_i]'; fi
+            done
+        else
+            PROMPT_COMMAND=${PROMPT_COMMAND#'__termcraft_osc7; '}
+<z $PROMPT_COMMAND ]]; then unset PROMPT_COMMAND; fi
+        fi
+        unset __termcraft_osc7_installed __termcraft_osc7_was_unset
+        unset -f __termcraft_osc7 __termcraft_osc7_remove
+    }
+    if [[ ${__termcraft_osc7_installed-} != 1 ]]; then
+<_was_unset=0; else __termcraft_osc7_was_unset=1; fi
+        if [[ $__tc_flags == *a* ]]; then
+<c_hook == __termcraft_osc7 ]] && __tc_found=1; done
+            if (( !__tc_found )); then PROMPT_COMMAND+=(__termcraft_osc7); fi
+bash: !__tc_found: event not found
+        else
+            PROMPT_COMMAND="__termcraft_osc7; ${PROMPT_COMMAND-}"
+        fi
+        __termcraft_osc7_installed=1
+    fi
+}
+__termcraft_osc7_install
+unset -f __termcraft_osc7_install
+
+bash --noprofile --norc -i <<<'exit'
+bash: cannot set terminal process group (242570): Inappropriate ioctl for device
+bash: no job control in this shell
+bash: __termcraft_osc7: command not found
+exit
+exit
+exit
+exit
+
+test bash_prompt_pipeline_cleanup_and_export_regressions ... FAILED
+
+failures:
+
+failures:
+    bash_prompt_pipeline_cleanup_and_export_regressions
+    disabling_follow_before_initial_listing_does_not_fabricate_an_empty_directory
+
+test result: FAILED. 7 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `--test shell_directory`

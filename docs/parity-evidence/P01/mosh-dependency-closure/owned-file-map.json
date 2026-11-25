@@ -1,0 +1,57 @@
+{
+  "src/runtime/mod.rs": {
+    "baseline": "1e43bcb6180412caee87bca75f0d7b82c5e12e8535578c2fcaa94ddda3040299",
+    "main_now": "1e43bcb6180412caee87bca75f0d7b82c5e12e8535578c2fcaa94ddda3040299",
+    "candidate": "c0eba56a5841f0047f4830a18e8a3bf35c1f2fb78c903ec1965d9d6cc55cbb8c"
+  },
+  "src/runtime/mosh.rs": {
+    "baseline": "19c434f772f6297485b62411f100ac2ad91f450ff6ace9740793660f16970b06",
+    "main_now": "19c434f772f6297485b62411f100ac2ad91f450ff6ace9740793660f16970b06",
+    "candidate": "ea74d2550577d4e30d3896e52f1eb33006e0ac117a895a9ffe4627eb69b64923"
+  },
+  "src/runtime/mosh_dependencies.rs": {
+    "baseline": null,
+    "main_now": null,
+    "candidate": "d7838519f806abc7c90f391fd04e7262ae1a1ada235c6b27f4a6e5f634bc8e68"
+  },
+  "src/process_unix.rs": {
+    "baseline": "8f9676f7de37eda8eba45502035a52f72a741c190b58dbf7f783c289f6d2c404",
+    "main_now": "8f9676f7de37eda8eba45502035a52f72a741c190b58dbf7f783c289f6d2c404",
+    "candidate": "91ef9e41b0eb641c9a745be6a0baec7cbe0465cf417e83f9e6074a7fce603d53"
+  },
+  "packaging/runtime-manifest.json": {
+    "baseline": "90bee453681f5a597f8cea51b10f38cbc2d53a55111c5b88e035feaa2829951a",
+    "main_now": "90bee453681f5a597f8cea51b10f38cbc2d53a55111c5b88e035feaa2829951a",
+    "candidate": "bf196135bb3ff79891d0ad09167a4c2dbb46766780734ea9d5fa8701c9839e09"
+  },
+  "packaging/runtime/mosh-dependencies.json": {
+    "baseline": null,
+    "main_now": null,
+    "candidate": "e615650cccd848dfbf457ef3b7df62fc4e691921daaf9156711139e2d3238506"
+  },
+  "packaging/runtime/stage-mosh.py": {
+    "baseline": "3d5ac96b380b2204f436a53addb7250d48be8178fd4199368c56c79970b6b3d7",
+    "main_now": "3d5ac96b380b2204f436a53addb7250d48be8178fd4199368c56c79970b6b3d7",
+    "candidate": "2e3a88534e9a02cc40a139da68ed42108ae38d7a36df3324ec7d34f98a3a625a"
+  },
+  "packaging/runtime/stage-mosh-dependencies.py": {
+    "baseline": null,
+    "main_now": null,
+    "candidate": "40d58cefa2f619b07dc3f363051b73143f5c3f3695b2fb11c642eb83d880ea14"
+  },
+  "scripts/package-release.py": {
+    "baseline": "73578f4b8a15fdd7e29b5ad1a49f6d7998d55b63d970ff0092fed0cb1b2876ce",
+    "main_now": "73578f4b8a15fdd7e29b5ad1a49f6d7998d55b63d970ff0092fed0cb1b2876ce",
+    "candidate": "c51b6fbd6e71364166d02b640e689d27ce1fb0efdbdc59bb3332ed79995e58e4"
+  },
+  "tests/runtime_manifest.rs": {
+    "baseline": "b28fa85e6b6652d647601c2685c0062c2e20f8a40c8cacd6841bf8841c1c974e",
+    "main_now": "b28fa85e6b6652d647601c2685c0062c2e20f8a40c8cacd6841bf8841c1c974e",
+    "candidate": "96c4c06b2f3259d10e13a96cf6115b7fe1bda9f955f545a43bb1b95222247096"
+  },
+  "tests/mosh_dependency_staging.py": {
+    "baseline": null,
+    "main_now": null,
+    "candidate": "780c820b73347ed217ac0df5052b577668d34498a6da6b38667f1cd6dfbe0694"
+  }
+}

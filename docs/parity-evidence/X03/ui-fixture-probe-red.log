@@ -1,0 +1,28 @@
+00:00:00.000 [INFO] [backend/backend.c:342] Loading user-specified backends due to WLR_BACKENDS: headless
+00:00:00.000 [INFO] [backend/headless/backend.c:60] Creating headless backend
+00:00:00.000 [INFO] [util/env.c:25] Loading WLR_RENDERER option: pixman
+00:00:00.000 [INFO] [render/pixman/renderer.c:328] Creating pixman renderer
+00:00:00.000 [INFO] [../cage/cage.c:521] Failed to create wlr_drm_lease_manager_v1
+00:00:00.005 [INFO] [backend/headless/backend.c:17] Starting headless backend
+00:00:00.038 [INFO] [xwayland/server.c:108] Starting Xwayland on :0
+Xwayland glamor: GBM Wayland interfaces not available
+Failed to initialize glamor, falling back to sw
+
+running 4 tests
+test ui::xserver::tests::crashed_probe_discards_fresh_display_before_releasing_clients ... ok
+test ui::xserver::tests::embedded_config_controls_owned_display_startup ... 
+thread 'ui::xserver::tests::embedded_config_controls_owned_display_startup' (14) panicked at src/ui/xserver.rs:588:17:
+X11 startup failed: X capability probe failed (exit status: 101); native graphics libraries or context may be unavailable Choose System display in the session settings to use your desktop's X server.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test ui::xserver::tests::local_tab_starts_owned_server_and_only_its_shell_gets_client_environment ... ok
+test ui::xserver::tests::xserver_ui_starts_and_stops_packaged_engine ... ok
+
+failures:
+
+failures:
+    ui::xserver::tests::embedded_config_controls_owned_display_startup
+
+test result: FAILED. 3 passed; 1 failed; 0 ignored; 0 measured; 143 filtered out; finished in 3.54s
+
+(EE) failed to read Wayland events: Broken pipe

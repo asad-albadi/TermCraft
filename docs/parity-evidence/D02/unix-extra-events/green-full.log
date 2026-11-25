@@ -1,0 +1,176 @@
+   Compiling termcraft-rdp-unix-events983 v0.1.983 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-unix-extra-events/FIX1/source/engines/rdp)
+warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
+  --> src/../../../src/desktop/options.rs:96:9
+   |
+95 | pub struct NegotiatedRdpOptions {
+   |            -------------------- fields in this struct
+96 |     pub clipboard: ClipboardPolicy,
+   |         ^^^^^^^^^
+97 |     pub keyboard: KeyboardRouting,
+   |         ^^^^^^^^
+98 |     pub keyboard_layout: u32,
+   |         ^^^^^^^^^^^^^^^
+   |
+   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `is_default` is never used
+   --> src/../../../src/desktop/options.rs:101:12
+    |
+100 | impl RdpOptions {
+    | --------------- method in this implementation
+101 |     pub fn is_default(&self) -> bool {
+    |            ^^^^^^^^^^
+
+warning: struct `Binding` is never constructed
+   --> src/printer_native.rs:127:19
+    |
+127 | pub(crate) struct Binding {
+    |                   ^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: associated items `new`, `announcement`, `check_ready`, and `submit` are never used
+   --> src/printer_native.rs:132:19
+    |
+131 | impl Binding {
+    | ------------ associated items in this implementation
+132 |     pub(crate) fn new(mapping: &PrinterMapping) -> Result<Self, String> {
+    |                   ^^^
+...
+144 |     pub(crate) fn announcement(&self) -> Vec<u8> {
+    |                   ^^^^^^^^^^^^
+...
+155 |     pub(crate) async fn check_ready(&self) -> Result<(), String> {
+    |                         ^^^^^^^^^^^
+...
+159 |     pub(super) fn submit(&self, mut job: Job, closed: &AtomicBool) -> Result<(), u32> {
+    |                   ^^^^^^
+
+warning: function `watch` is never used
+  --> src/printer_owner.rs:19:15
+   |
+19 | pub(super) fn watch(expected: libc::pid_t) -> Result<(), String> {
+   |               ^^^^^
+
+warning: fields `clipboard`, `keyboard`, and `keyboard_layout` are never read
+  --> src/../../../src/desktop/options.rs:96:9
+   |
+95 | pub struct NegotiatedRdpOptions {
+   |            -------------------- fields in this struct
+96 |     pub clipboard: ClipboardPolicy,
+   |         ^^^^^^^^^
+97 |     pub keyboard: KeyboardRouting,
+   |         ^^^^^^^^
+98 |     pub keyboard_layout: u32,
+   |         ^^^^^^^^^^^^^^^
+   |
+   = note: `NegotiatedRdpOptions` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: `termcraft-rdp-unix-events983` (bin "termcraft-rdp-unix-events983") generated 2 warnings
+warning: `termcraft-rdp-unix-events983` (bin "termcraft-rdp-unix-events983" test) generated 5 warnings (1 duplicate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.77s
+     Running unittests src/main.rs (target/agent-work/d02-unix-extra-events/build/debug/deps/termcraft_rdp_unix_events983-bb5382c9af07ebca)
+
+running 82 tests
+test clipboard::tests::empty_local_clipboard_still_initializes_the_channel ... ok
+test config::tests::administrative_session_requests_console_without_advertising_redirects ... ok
+test devices::printer::ipp::retained_tests::missing_or_malformed_queue_uuid_fails_closed ... ok
+test devices::printer::ipp::retained_tests::persistent_stream_keeps_queue_uuid_and_reply_boundaries ... ok
+test devices::printer::native::owner::tests::an_adopted_parent_is_not_the_known_owner ... ok
+test devices::printer::native::owner::tests::owner_identity_must_be_explicit_and_positive ... ok
+test clipboard::tests::text_channel_enforces_both_directions_and_rejects_invalid_data ... ok
+test devices::printer::native::tests::explicit_queue_raw_chunks_and_owned_completion ... ok
+test devices::printer::native::tests::initialization_permission_status_survives_real_pipe_transport ... ok
+test devices::printer::native::tests::malformed_and_oversized_frames_are_bounded ... ok
+test devices::printer::native::tests::native_permission_failure_is_not_success ... ok
+test devices::printer::native::tests::no_default_or_server_queue_names ... ok
+test devices::printer::native::tests::truncated_document_cannot_finish_and_is_aborted ... ok
+test devices::printer::native::tests::wait_errors_and_timeouts_never_prove_reaping ... ok
+test devices::serial::tests::expired_serial_operations_leave_pty_data_untouched ... ok
+test devices::serial::tests::serial_peer_hangup_is_not_a_successful_empty_read ... ok
+test devices::serial::tests::serial_purge_abort_cancels_only_selected_direction_and_existing_requests ... ok
+test devices::serial::tests::serial_purge_abort_preserves_completed_write_result_and_unread_input ... ok
+test devices::serial::tests::serial_purge_clear_does_not_abort_admitted_requests_or_partial_read ... ok
+test devices::serial::tests::serial_purge_denies_readonly_and_stale_handle_without_cancelling_reads ... ok
+test devices::serial::tests::serial_purge_does_not_touch_another_opened_pty_or_its_pending_read ... ok
+test devices::serial::tests::serial_purge_flag_validation_precedes_any_queue_side_effect ... ok
+test devices::serial::tests::serial_purge_maps_all_valid_queue_and_abort_flag_combinations ... ok
+test devices::serial::tests::serial_purge_rxclear_discards_actual_unread_pty_bytes ... ok
+test devices::serial::tests::unix_counter_event_mask_admission_tracks_supported_family_shape ... ok
+test devices::serial::tests::unix_counter_events_coexist_with_real_pty_reads_and_close_cleanup ... ok
+test devices::serial::tests::unix_counter_events_filter_fields_wrap_and_preserve_wait_on_failed_set ... ok
+test devices::serial::tests::unix_counter_events_map_individual_kernel_fields_and_keep_between_waits ... ok
+test devices::serial::tests::unix_counter_events_require_create_capability_and_fresh_mask_origin ... ok
+test devices::serial::tests::unix_event_close_and_hangup_retire_only_the_admitted_wait ... ok
+test devices::serial::tests::unix_event_controls_validate_wire_access_and_stale_id ... ok
+test devices::serial::tests::unix_event_driver_stats_start_at_each_logical_create ... ok
+test devices::serial::tests::unix_event_remembers_input_consumed_by_a_protocol_read_before_wait ... ok
+test devices::serial::tests::unix_event_stats_use_kernel_uapi_field_order_and_bit_patterns ... ok
+test devices::serial::tests::unix_event_wait_tracks_new_pty_input_once_without_consuming_it ... ok
+test devices::serial::tests::unix_modem_snapshot_does_not_establish_active_interrupt_capture ... ok
+test devices::serial_completion::tests::close_forwards_exact_terminal_read_and_control_output ... ok
+test devices::serial_completion::tests::close_preserves_terminal_abort_and_other_native_failure ... ok
+test devices::serial_completion::tests::close_reports_write_success_when_normal_completion_wins_cancellation ... ok
+test devices::smartcard_tests::default_does_not_attach_the_smartcard_or_device_channel ... ok
+test devices::smartcard_tests::smartcard_capability_and_announcement_require_a_matching_peer_capability ... ok
+test devices_tests::allocation_reserves_space_without_extending_eof_and_validates_signed_lengths ... ok
+test devices_tests::drive_allocation_is_released_on_last_remote_close_and_disconnect ... ok
+test devices_tests::drive_announcements_use_unicode_v2_names_and_saturated_io_replies_without_disconnect ... ok
+test devices_tests::drive_channel_handshake_advertises_only_after_logon_and_processes_io ... ok
+test devices_tests::drive_handles_enforce_requested_access_and_exclusive_sharing ... ok
+test devices_tests::opened_drive_handles_keep_the_original_object_after_a_local_rename ... ok
+test devices_tests::printer_tests::abandoned_job_and_certificate_retry_keep_the_original_queue_binding ... ok
+test devices_tests::printer_tests::cups_ipp_rejection_is_reported_even_when_http_succeeds ... ok
+test devices_tests::printer_tests::default_session_requests_no_device_channel ... ok
+test devices_tests::printer_tests::delayed_close_for_failed_job_cannot_submit_a_new_open_job ... ok
+test devices_tests::printer_tests::disconnect_cancels_an_in_flight_cups_upload_without_finishing_it ... ok
+test devices_tests::printer_tests::malformed_ipp_success_is_an_unconfirmed_submission ... ok
+test devices::printer::native::tests::cancellation_poisoning_kills_and_reaps_hung_owned_process ... ok
+test devices_tests::printer_tests::missing_wrong_stopped_or_incompatible_queue_is_refused_before_announcement ... ok
+test devices_tests::printer_tests::selected_printer_announces_and_submits_complete_ordered_job_to_ipp ... ok
+test devices_tests::printer_tests::stale_owned_socket_is_refused_before_announcement ... ok
+test devices_tests::printer_tests::stalled_cups_response_times_out_and_retires_the_document ... ok
+test devices_tests::printer_tests::truncated_write_retires_job_without_submitting_a_partial_document ... ok
+test devices_tests::redirected_drive_reads_writes_and_retires_real_handles ... ok
+test devices_tests::redirected_drives_reject_fifos_without_opening_a_blocking_stream ... ok
+test devices_tests::redirected_drives_reject_malformed_pdus_and_bound_handles ... ok
+test devices_tests::redirected_file_resize_preserves_unsupported_rename_and_delete ... ok
+test devices_tests::redirected_folder_listing_uses_rdpefs_layout_and_never_loses_late_matches ... ok
+test devices_tests::redirected_read_only_drive_blocks_mutations_and_escape ... ok
+test devices_tests::redirected_volume_reports_actual_capacity ... ok
+test devices_tests::serial::embedded_drive_and_serial_use_distinct_device_ids_on_the_same_channel ... ok
+test devices_tests::serial::embedded_serial_certificate_retry_keeps_the_original_tty_binding ... ok
+test devices_tests::serial::embedded_serial_close_cancels_all_waiting_reads_even_at_capacity ... ok
+test devices_tests::serial::embedded_serial_does_not_reopen_a_recycled_pty ... ok
+test devices_tests::serial::embedded_serial_opens_the_specification_metadata_probe ... ok
+test devices_tests::serial::embedded_serial_read_only_denies_writes_and_mutating_controls ... ok
+test devices_tests::serial::embedded_serial_redirects_an_owned_pty_with_concurrent_read_and_write ... ok
+test devices_tests::serial::embedded_serial_rejects_non_tty_character_devices ... ok
+test devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads ... ok
+test devices_tests::serial::serial_flow_characters_apply_to_pty_and_modem_failures_are_explicit ... ok
+test devices_tests::serial::serial_xoff_stalls_pty_output_until_xon_and_read_only_rejects_new_controls ... ok
+test devices_tests::serial::unix_event_saturated_channel_allows_mask_reset_and_close ... ok
+test devices_tests::unsupported_drive_mutations_never_change_files ... ok
+test smartcard::framed::tests::full_contract_and_fragmentation ... ok
+test smartcard::framed::tests::rejects_before_payload_and_truncated_frames ... ok
+test devices_tests::printer_tests::malformed_pdu_and_job_limits_preserve_the_channel ... ok
+
+test result: ok. 82 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.34s
+
+     Running tests/pcsc_worker.rs (target/agent-work/d02-unix-extra-events/build/debug/deps/pcsc_worker-8329f4dedf8b026b)
+
+running 10 tests
+test cancelling_a_watch_retires_only_that_owned_context ... ok
+test failed_native_cancel_or_release_keeps_live_watch ... ok
+test fixture_worker_entry ... ok
+test inconsistent_transmit_capacity_has_no_native_side_effect ... ok
+test provider_requires_its_private_socket ... ok
+test selected_reader_probes_and_exchanges_card_bytes_over_real_worker_transport ... ok
+test smartcard::framed::tests::full_contract_and_fragmentation ... ok
+test smartcard::framed::tests::rejects_before_payload_and_truncated_frames ... ok
+test unassigned_controls_drop_without_consuming_the_worker_queue ... ok
+test closing_worker_reaps_stalled_native_transmit ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.09s
+

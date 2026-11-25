@@ -1,0 +1,18 @@
+{
+  "src/ui/games/play.rs": {
+    "base": "8019865e83ea1864e055fa9349356bd85511acc52d30693791b383a5c2954b18",
+    "candidate": "c449a915bf89c0aad71d1b8d4091c1252ad1c44a0ac7d476391b01da18d2d105"
+  },
+  "src/ui/games/save.rs": {
+    "base": "a319751542ea82a4993bece94fef92a676cb73abce477bc5d3f8e7b43a34d9af",
+    "candidate": "a319751542ea82a4993bece94fef92a676cb73abce477bc5d3f8e7b43a34d9af"
+  },
+  "src/ui/games.rs": {
+    "base": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac",
+    "candidate": "cc1d84d3bdad894cbe347d3ee725d4241122a4ec38f2cbee68033e6351a51bac"
+  },
+  "src/ui/session_confirmations.rs": {
+    "base": "7394c8213179d507700236564e50493a1ef7774c1dfb5cc50c0fd12c635918de",
+    "candidate": "7394c8213179d507700236564e50493a1ef7774c1dfb5cc50c0fd12c635918de"
+  }
+}

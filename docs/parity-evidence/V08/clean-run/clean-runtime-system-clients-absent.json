@@ -1,0 +1,6 @@
+{
+  "system_chromium_absent": true,
+  "system_mosh_absent": true,
+  "perl": true,
+  "openssh": true
+}

@@ -1,0 +1,11 @@
+--- a/src/plugins/registry.rs
++++ b/src/plugins/registry.rs
+@@ -546,7 +546,7 @@
+         let (manager, mut record, path) = fixture(root.path());
+         for (name, value) in [("fixture", "true"), ("replacement", "false")] {
+             let source = root.path().join(format!("{name}.c"));
+-            fs::write(&source, format!("#include <stdio.h>\nint main(void) {{ puts(\"{{\\\"protocol\\\":1,\\\"ok\\\":{value}}}\"); return 0; }}")).unwrap();
++            fs::write(&source, format!("#include <stdio.h>\nint main(void) {{ char request[256]; if (!fgets(request, sizeof(request), stdin)) return 1; puts(\"{{\\\"protocol\\\":1,\\\"ok\\\":{value}}}\"); return 0; }}")).unwrap();
+             assert!(
+                 std::process::Command::new("cc")
+                     .arg("-o")

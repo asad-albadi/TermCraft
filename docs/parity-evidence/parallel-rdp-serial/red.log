@@ -1,0 +1,40 @@
+   Compiling ring v0.17.14
+   Compiling rustls v0.23.46
+   Compiling rustls-webpki v0.103.17
+   Compiling rustls-platform-verifier v0.7.1
+   Compiling tokio-rustls v0.26.6
+   Compiling termcraft-rdp-engine v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/engines/rdp)
+error[E0432]: unresolved import `crate::rdp_options::SerialMapping`
+   --> src/devices_tests.rs:557:35
+    |
+557 |     use crate::{devices::Channel, rdp_options::SerialMapping};
+    |                                   ^^^^^^^^^^^^^-------------
+    |                                                |
+    |                                                no `SerialMapping` in `rdp_options`
+    |
+help: a similar name exists in the module
+    |
+557 -     use crate::{devices::Channel, rdp_options::SerialMapping};
+557 +     use crate::{devices::Channel, rdp_options::DriveMapping};
+    |
+
+error[E0599]: no associated function or constant named `with_serial` found for struct `Channel` in the current scope
+   --> src/devices_tests.rs:593:36
+    |
+593 |         let mut channel = Channel::with_serial(
+    |                                    ^^^^^^^^^^^ associated function or constant not found in `Channel`
+    |
+   ::: src/devices.rs:645:1
+    |
+645 | pub struct Channel {
+    | ------------------ associated function or constant `with_serial` not found for this struct
+    |
+note: if you're trying to build a new `Channel`, consider using `Channel::new` which returns `Result<Channel, std::string::String>`
+   --> src/devices.rs:667:5
+    |
+667 |     pub fn new(mappings: &[DriveMapping]) -> Result<Self, String> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `termcraft-rdp-engine` (bin "termcraft-rdp-engine" test) due to 2 previous errors

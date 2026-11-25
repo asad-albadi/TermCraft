@@ -1,0 +1,16 @@
+
+running 1 test
+independent binder occupies released address 127.0.0.1:46581
+
+thread 'fixture_port_claim_survives_socket_handoff_and_releases_on_drop' (65419) panicked at red.rs:65:48:
+called `Result::unwrap()` on an `Err` value: Os { code: 98, kind: AddrInUse, message: "Address already in use" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test fixture_port_claim_survives_socket_handoff_and_releases_on_drop ... FAILED
+
+failures:
+
+failures:
+    fixture_port_claim_survives_socket_handoff_and_releases_on_drop
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

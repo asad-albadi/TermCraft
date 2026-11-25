@@ -1,0 +1,11 @@
+--- a/src/plugins/host/unix.rs
++++ b/src/plugins/host/unix.rs
+@@ -161,7 +161,7 @@
+         let executable = bin.join("fixture");
+         for (name, value) in [("fixture", "true"), ("replacement", "false")] {
+             let source = root.path().join(format!("{name}.c"));
+-            fs::write(&source, format!("#include <stdio.h>\nint main(void) {{ puts(\"{{\\\"protocol\\\":1,\\\"ok\\\":{value}}}\"); return 0; }}")).unwrap();
++            fs::write(&source, format!("#include <stdio.h>\nint main(void) {{ char request[256]; if (!fgets(request, sizeof(request), stdin)) return 1; puts(\"{{\\\"protocol\\\":1,\\\"ok\\\":{value}}}\"); return 0; }}")).unwrap();
+             assert!(
+                 Command::new("cc")
+                     .arg("-o")

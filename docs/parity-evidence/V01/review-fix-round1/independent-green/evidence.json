@@ -1,0 +1,24 @@
+[
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "independent-dropbear.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=independent-dropbear; endpoint=Dropbear with external OpenSSH SFTP subsystem; version=2026.94; auth=Ed25519 key; trust=known private Ed25519 host pin; jump=direct; operation=shell and literal binary SFTP roundtrip; expected=DROPBEAR_SHELL_OK, exact 90000 binary bytes, literal filename, one authentication",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_interop-402819b4a2c8008c' --exact independent_dropbear_key_shell_and_sftp_roundtrip --nocapture --test-threads=1 --ignored",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "a15ded12d258fa3f93c1d0bb41a6381aaee5106030160e3baa1f67ce5e865d54"
+  }
+]

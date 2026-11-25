@@ -1,0 +1,14 @@
+457 288 0:35 /@home/asad/Documents/Craft\040Anything/mobaxterm-personal-26-6/app/target/validation/v08-clean-namespace/rootfs / ro,nosuid,nodev,noatime master:199 - btrfs /dev/nvme0n1p2 rw,compress=zstd:1,ssd,discard=async,space_cache=v2,subvolid=257,subvol=/@home
+458 457 0:150 / /proc rw,nosuid,nodev,noexec,relatime - proc proc rw
+459 457 0:151 / /dev rw,nosuid,nodev,relatime - tmpfs tmpfs rw,mode=755,uid=1000,gid=1000,inode64,huge=advise
+460 459 0:9 /null /dev/null rw,nosuid master:2 - devtmpfs devtmpfs rw,size=4096k,nr_inodes=3992219,mode=755,inode64,huge=advise
+461 459 0:9 /zero /dev/zero rw,nosuid master:2 - devtmpfs devtmpfs rw,size=4096k,nr_inodes=3992219,mode=755,inode64,huge=advise
+462 459 0:9 /full /dev/full rw,nosuid master:2 - devtmpfs devtmpfs rw,size=4096k,nr_inodes=3992219,mode=755,inode64,huge=advise
+463 459 0:9 /random /dev/random rw,nosuid master:2 - devtmpfs devtmpfs rw,size=4096k,nr_inodes=3992219,mode=755,inode64,huge=advise
+509 459 0:9 /urandom /dev/urandom rw,nosuid master:2 - devtmpfs devtmpfs rw,size=4096k,nr_inodes=3992219,mode=755,inode64,huge=advise
+510 459 0:9 /tty /dev/tty rw,nosuid master:2 - devtmpfs devtmpfs rw,size=4096k,nr_inodes=3992219,mode=755,inode64,huge=advise
+524 459 0:152 / /dev/pts rw,nosuid,noexec,relatime - devpts devpts rw,mode=620,ptmxmode=666
+542 457 0:153 / /tmp rw,nosuid,nodev,relatime - tmpfs tmpfs rw,mode=755,uid=1000,gid=1000,inode64,huge=advise
+543 457 0:154 / /home rw,nosuid,nodev,relatime - tmpfs tmpfs rw,mode=755,uid=1000,gid=1000,inode64,huge=advise
+583 457 0:35 /@home/asad/Documents/Craft\040Anything/mobaxterm-personal-26-6/app/target/package-games-v03-qualified/68f356f63c92a9a6aced6abe3d845ab9d064e5da0d37b52ff0c4c99f0fc4b117/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing /opt/termcraft ro,nosuid,nodev,noatime master:199 - btrfs /dev/nvme0n1p2 rw,compress=zstd:1,ssd,discard=async,space_cache=v2,subvolid=257,subvol=/@home
+584 457 0:35 /@home/asad/Documents/Craft\040Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/V08/clean-namespace /evidence rw,nosuid,nodev,noatime master:199 - btrfs /dev/nvme0n1p2 rw,compress=zstd:1,ssd,discard=async,space_cache=v2,subvolid=257,subvol=/@home

@@ -1,0 +1,78 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/work)
+    Finished `release` profile [optimized] target(s) in 4.35s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/work/target/release/deps/b06_puzzle_options_private-beed19bb514c887b)
+
+running 64 tests
+test guess::configuration_tests::super_and_blank_distinct_rules ... ok
+test guess::recovered_fixtures::recovered_duplicate_feedback_and_hold_transfer ... ok
+test guess::tests::duplicates_not_double_counted ... ok
+test guess::tests::wins_and_loses ... ok
+test map::advanced_tests::forcing_chain_deduction_is_real ... ok
+test map::normal_source_fixtures::recovered_normal_adjacent_pair_elimination ... ok
+test map::recovered_fixtures::recovered_border_and_colour_transitions ... ok
+test mines::recovered_fixtures::recovered_mark_reveal_and_chord_transitions ... ok
+test map::tests::exhaustion_exposes_certified_normal_fallback ... ok
+test net::added_source_fixtures::recovered_half_turn_is_two_quarters_and_lock_protected ... ok
+test mines::configuration_tests::source_stock_dimensions_counts_and_first_click_safety ... ok
+test net::additional_configuration_tests::default_fallback_is_unique_and_loops_do_not_win ... ok
+test net::barrier_rate_tests::source_barrier_fraction_is_exact_and_rates_are_nested_on_same_candidate ... ok
+test net::configuration_tests::wrapped_seam_connects_but_barrier_stops_it ... ok
+test mines::tests::flags_chords_loss_and_hidden_mines ... ok
+test net::recovered_fixtures::recovered_rotation_and_lock_transitions ... ok
+test solo::advanced::rule_tests::extreme_fish_eliminates_common_columns ... ok
+test solo::advanced::rule_tests::full_set_rule_eliminates_naked_triple ... ok
+test solo::advanced::rule_tests::extreme_forcing_traverses_bivalue_peer_chain ... ok
+test solo::advanced::rule_tests::intersections_remove_only_candidates_outside_overlap ... ok
+test net::configuration_tests::source_stock_sizes_wrap_and_barriers_are_real_rules ... ok
+test solo::advanced::rule_tests::killer_distinct_sum_table_matches_independent_enumeration ... ok
+test solo::advanced::rule_tests::search_exhaustion_never_certifies_uniqueness ... ok
+test solo::advanced::topology_tests::cage_minmax_and_sum_sets_really_prune_candidates ... ok
+test solo::advanced::topology_tests::unsupported_advanced_size_is_rejected_before_allocation ... ok
+test map::configuration_tests::easy_presets_use_only_source_easy_singles ... ok
+test map::tests::portrait_reset_preserves_dimensions ... ok
+test solo::advanced::topology_tests::killer_stock_requires_source_intersection_grade ... ok
+test net::tests::tree_solution_and_locks ... ok
+test solo::tests::duplicate_is_visible_not_win ... ok
+test solo::advanced::topology_tests::killer_wrong_sum_blocks_win_even_when_all_sudoku_units_are_valid ... ok
+test solo::advanced::topology_tests::jigsaw_peer_conflicts_follow_irregular_regions_instead_of_boxes ... ok
+test tests::bounded_undo_and_finished_board_recovery ... ok
+test tests::mine_fatal_move_undo_retains_death_count ... ok
+test tests::mines_explicit_solve_after_death_reveals_corrections_and_undo_hides_them ... ok
+test tests::net_solve_locks_every_configured_tile_atomically_through_history ... ok
+test tests::net_solve_locks_every_default_tile_atomically_through_history ... ok
+test solo::recovered_fixtures::recovered_three_units_and_erase ... ok
+test tests::recovered_map_actual_default_dimensions ... ok
+test tests::recovered_net_half_turn_atomic_jumble_and_source_ui ... ok
+test tests::recovered_net_source_wrap_locked_jumble_and_invalid_half_turn ... ok
+test tests::recovered_filled_map_pencil_is_transactional ... ok
+test tests::redo_restores_moves_and_only_changed_branch_clears_it ... ok
+test tests::rejects_wrong_inputs_without_history ... ok
+test tests::explicit_solve_is_atomic_assisted_undoable_and_guess_gives_up ... ok
+test tests::typed_configuration_reset_and_source_metadata_are_honest ... ok
+test untangle::recovered_fixtures::recovered_crossing_and_shared_endpoint_rules ... ok
+test untangle::configuration_tests::stock_point_counts_have_valid_solved_embeddings ... ok
+test untangle::tests::edge_touch_and_overlap ... ok
+test untangle::tests::full_playthrough_and_degeneracy ... ok
+test solo::extended_configuration_tests::every_source_symmetry_is_atomic_and_diagonal_conflicts_enforced ... ok
+test mines::tests::first_reveal_safe_and_deducible_all_corners ... ok
+test tests::invalid_every_game_bounds_and_givens_are_transactional ... ok
+test map::configuration_tests::large_normal_presets_have_seventy_five_connected_regions ... ok
+test solo::tests::generated_unique_and_solvable ... ok
+test tests::all_kinds_seed_replay_and_reset ... ok
+test solo::options_tests::default_is_solved_using_only_block_position_elimination ... ok
+test map::advanced_tests::advanced_map_stock_grades_are_exact_or_explicitly_exhausted ... ok
+test solo::options_tests::default_clues_have_half_turn_symmetry ... ok
+test solo::extended_configuration_tests::stock_basic_and_small_sizes_are_logically_graded ... ok
+test map::tests::recovered_default_normal_deductions_and_connected_regions ... ok
+test map::advanced_stock_matrix::all_six_remaining_map_presets_have_exact_grade_samples ... ok
+test tests::selectable_stock_presets_smoke_and_disclose_generation_failure ... ok
+test solo::advanced::tests::remaining_solo_presets_generate_real_certified_boards ... ok
+
+test result: ok. 64 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 1.72s
+
+   Doc-tests b06_puzzle_options_private
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

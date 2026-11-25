@@ -1,0 +1,1667 @@
+--- a/src/services/vnc.rs
++++ b/src/services/vnc.rs
+@@ -13,6 +13,7 @@
+ };
+ use subtle::ConstantTimeEq;
+ use zeroize::Zeroizing;
++mod clipboard;
+ #[cfg(any(windows, target_os = "linux", test))]
+ mod keyboard;
+ #[cfg(windows)]
+@@ -71,9 +72,6 @@
+         {
+             return Err("Classic VNC requires 1–8 printable ASCII password bytes; passwords are never silently truncated.".into());
+         }
+-        if self.allow_clipboard {
+-            return Err("VNC server clipboard transfer is not implemented for this source; leave it disabled.".into());
+-        }
+         if let VncSource::X11 { display } = &self.source {
+             let number = display
+                 .strip_prefix(':')
+@@ -111,13 +109,25 @@
+         Ok(())
+     }
+ }
+-#[derive(Clone, Debug)]
++#[derive(Clone)]
+ enum Input {
+     Key { down: bool, keysym: u32 },
+     Pointer { buttons: u8, x: u16, y: u16 },
+     Release,
++    Clipboard(Zeroizing<String>),
+ }
+ trait Source: Send {
++    fn enable_clipboard(&mut self) -> io::Result<()> {
++        Err(io::Error::other(
++            "Clipboard unavailable for selected source",
++        ))
++    }
++    fn clipboard(&mut self) -> io::Result<Option<Zeroizing<String>>> {
++        Ok(None)
++    }
++    fn set_clipboard(&mut self, _text: Zeroizing<String>) -> io::Result<()> {
++        Err(io::Error::other("Clipboard disabled"))
++    }
+     fn capture(&mut self) -> io::Result<Frame>;
+     fn input(&mut self, event: Input) -> io::Result<()>;
+ }
+@@ -138,6 +148,7 @@
+ }
+ struct Shared {
+     frame: Mutex<Arc<Frame>>,
++    clipboard: Mutex<(u64, Option<Zeroizing<String>>)>,
+     input: std::sync::mpsc::SyncSender<Input>,
+     failure: Mutex<Option<String>>,
+     control_active: AtomicBool,
+@@ -157,6 +168,11 @@
+             config.allow_control,
+             config.x11_authority.as_deref(),
+         )?;
++        if config.allow_clipboard {
++            source
++                .enable_clipboard()
++                .map_err(|_| "Clipboard unavailable for selected source".to_string())?;
++        }
+         let frame = source
+             .capture()
+             .map_err(|_| "Could not capture the explicitly selected display.")?;
+@@ -178,6 +194,7 @@
+         let (tx, rx) = std::sync::mpsc::sync_channel(64);
+         let shared = Arc::new(Shared {
+             frame: Mutex::new(Arc::new(self.frame)),
++            clipboard: Mutex::new((0, None)),
+             input: tx,
+             failure: Mutex::new(None),
+             control_active: AtomicBool::new(false),
+@@ -199,6 +216,19 @@
+                             break;
+                         }
+                         match rx.try_recv() {
++                            Ok(Input::Clipboard(text)) => {
++                                {
++                                    let mut v = state.clipboard.lock().unwrap();
++                                    v.0 = v.0.wrapping_add(1);
++                                    v.1 = None;
++                                }
++                                if self.source.set_clipboard(text).is_err() {
++                                    *state.failure.lock().unwrap() =
++                                        Some("Selected display clipboard failed.".into());
++                                    cancelled.request_stop();
++                                    return;
++                                }
++                            }
+                             Ok(event) => {
+                                 if self.source.input(event).is_err() {
+                                     *state.failure.lock().unwrap() =
+@@ -221,6 +251,22 @@
+                             return;
+                         }
+                         state.control_active.store(false, Ordering::Release);
++                    }
++                    if self.config.allow_clipboard {
++                        match self.source.clipboard() {
++                            Ok(Some(text)) => {
++                                let mut v = state.clipboard.lock().unwrap();
++                                v.0 = v.0.wrapping_add(1);
++                                v.1 = Some(text);
++                            }
++                            Ok(None) => {}
++                            Err(_) => {
++                                *state.failure.lock().unwrap() =
++                                    Some("Selected display clipboard stopped.".into());
++                                cancelled.request_stop();
++                                return;
++                            }
++                        }
+                     }
+                     if Instant::now() >= next {
+                         match self.source.capture().and_then(|f| {
+@@ -249,9 +295,10 @@
+             })?;
+         let password = self.config.password;
+         let control = self.config.allow_control;
++        let clipboard = self.config.allow_clipboard;
+         let state = shared.clone();
+         let result = supervisor::serve_tcp(self.listener, context, move |mut stream, ctx| {
+-            serve_client(&mut stream, ctx, &state, &password, control)
++            serve_client(&mut stream, ctx, &state, &password, control, clipboard)
+         });
+         // Capture failures request cancellation; join both network and display ownership on stop.
+         context.request_stop();
+@@ -376,6 +423,7 @@
+     state: &Shared,
+     password: &Secret,
+     control: bool,
++    share_clipboard: bool,
+ ) -> io::Result<()> {
+     let mut control_lease = false;
+     let result = (|| {
+@@ -433,6 +481,10 @@
+         init.extend_from_slice(name);
+         send(s, &init, c)?;
+         drop(frame);
++        let mut clipboard = clipboard::Clipboard::default();
++        let mut clipboard_revision = 0;
++        let mut extended_clipboard = false;
++        let mut idle = Instant::now() + IDLE_LIMIT;
+         let mut pixel = Pixel::DEFAULT;
+         let mut next = Instant::now();
+         loop {
+@@ -440,7 +492,41 @@
+                 return Err(io::Error::other("Selected display unavailable"));
+             }
+             let mut ty = [0];
+-            exact(s, &mut ty, c, Instant::now() + IDLE_LIMIT)?;
++            if share_clipboard {
++                let local = {
++                    let v = state.clipboard.lock().unwrap();
++                    if v.0 != clipboard_revision {
++                        clipboard_revision = v.0;
++                        v.1.clone()
++                    } else {
++                        None
++                    }
++                };
++                if let Some(text) = local {
++                    if let Ok(packet) = clipboard.upload(&text) {
++                        send(s, &packet, c)?;
++                    }
++                }
++            }
++            use std::io::Read;
++            c.check(idle)?;
++            match s.read(&mut ty) {
++                Ok(0) => return Err(io::ErrorKind::UnexpectedEof.into()),
++                Ok(_) => {
++                    idle = Instant::now() + IDLE_LIMIT;
++                }
++                Err(e)
++                    if matches!(
++                        e.kind(),
++                        io::ErrorKind::WouldBlock
++                            | io::ErrorKind::TimedOut
++                            | io::ErrorKind::Interrupted
++                    ) =>
++                {
++                    continue;
++                }
++                Err(e) => return Err(e),
++            }
+             match ty[0] {
+                 0 => {
+                     let mut b = [0; 19];
+@@ -455,7 +541,17 @@
+                         return Err(io::Error::other("Too many VNC encodings"));
+                     }
+                     let mut b = vec![0; n * 4];
+-                    exact(s, &mut b, c, Instant::now() + IO_LIMIT)?; /* Raw is mandatory even when absent from list, RFC6143 7.5.2. */
++                    exact(s, &mut b, c, Instant::now() + IO_LIMIT)?;
++                    if share_clipboard
++                        && !extended_clipboard
++                        && b.chunks_exact(4).any(|v| {
++                            i32::from_be_bytes(v.try_into().unwrap()) == clipboard::ENCODING
++                        })
++                    {
++                        extended_clipboard = true;
++                        send(s, &clipboard::Clipboard::capabilities(), c)?;
++                    }
++                    /* Raw is mandatory even when absent from list, RFC6143 7.5.2. */
+                 }
+                 3 => {
+                     let mut b = [0; 9];
+@@ -526,12 +622,60 @@
+                 6 => {
+                     let mut h = [0; 7];
+                     exact(s, &mut h, c, Instant::now() + IO_LIMIT)?;
+-                    let n = u32::from_be_bytes(h[3..7].try_into().unwrap()) as usize;
+-                    if n > 65536 {
++                    let length = i32::from_be_bytes(h[3..7].try_into().unwrap());
++                    let n = length.unsigned_abs() as usize;
++                    if n > clipboard::WIRE_LIMIT {
+                         return Err(io::Error::other("VNC clipboard message exceeds limit"));
+                     }
+-                    let mut discard = Zeroizing::new(vec![0; n]);
+-                    exact(s, &mut discard, c, Instant::now() + IO_LIMIT)?;
++                    let mut data = Zeroizing::new(vec![0; n]);
++                    exact(s, &mut data, c, Instant::now() + IO_LIMIT)?;
++                    if !share_clipboard {
++                        continue;
++                    }
++                    let text = if length < 0 {
++                        if !extended_clipboard {
++                            return Err(io::Error::other("Clipboard extension not negotiated"));
++                        }
++                        let reply = clipboard
++                            .incoming(
++                                &data,
++                                clipboard::ClipboardPolicy { receive: control },
++                                false,
++                            )
++                            .map_err(io::Error::other)?;
++                        if data.len() >= 4
++                            && u32::from_be_bytes(data[..4].try_into().unwrap()) & (1 << 24) != 0
++                        {
++                            clipboard_revision = 0;
++                        }
++                        if data.len() >= 4
++                            && u32::from_be_bytes(data[..4].try_into().unwrap()) & (1 << 24) == 0
++                        {
++                            if let Some(packet) = reply.packet {
++                                send(s, &packet, c)?;
++                            }
++                        }
++                        reply.text.map(Zeroizing::new)
++                    } else {
++                        if n > 8192 {
++                            return Err(io::Error::other("Clipboard text exceeds limit"));
++                        }
++                        clipboard.classic_remote();
++                        Some(Zeroizing::new(
++                            data.iter().map(|b| char::from(*b)).collect::<String>(),
++                        ))
++                    };
++                    if control {
++                        if let Some(text) = text {
++                            if text.len() > 8192 || text.contains('\0') {
++                                return Err(io::Error::other("Invalid clipboard text"));
++                            }
++                            state
++                                .input
++                                .try_send(Input::Clipboard(text))
++                                .map_err(|_| io::Error::other("VNC clipboard queue full"))?;
++                        }
++                    }
+                 }
+                 _ => return Err(io::Error::other("Unsupported VNC client message")),
+             }
+@@ -546,6 +690,18 @@
+ #[cfg(test)]
+ mod tests {
+     use super::*;
++    #[test]
++    fn vnc_clipboard_optin_validates_without_opening_display() {
++        let mut c = VncServiceConfig::local(
++            VncSource::X11 {
++                display: ":991".into(),
++            },
++            Secret::new("fixture"),
++        );
++        c.allow_unencrypted = true;
++        c.allow_clipboard = true;
++        assert!(c.validate().is_ok());
++    }
+     #[test]
+     fn vnc_server_truecolor_formats_encode_channels_and_reject_overlap() {
+         let mut out = Vec::new();
+--- a/src/services/vnc/x11.rs
++++ b/src/services/vnc/x11.rs
+@@ -13,6 +13,8 @@
+     rust_connection::{DefaultStream, PollMode, RustConnection, Stream},
+     utils::RawFdContainer,
+ };
++use zeroize::Zeroizing;
++mod clipboard;
+ #[path = "x11/keyboard.rs"]
+ mod keyboard;
+ struct Timed {
+@@ -76,6 +78,7 @@
+     temporary: Vec<u8>,
+     buttons: u8,
+     control: bool,
++    clipboard: Option<clipboard::Clipboard>,
+ }
+ fn error(e: impl std::fmt::Display) -> io::Error {
+     io::Error::other(e.to_string())
+@@ -201,6 +204,7 @@
+             temporary: Vec::new(),
+             buttons: 0,
+             control,
++            clipboard: None,
+         })
+     }
+     fn deadline(&self) {
+@@ -234,6 +238,26 @@
+     }
+ }
+ impl Source for X11 {
++    fn enable_clipboard(&mut self) -> io::Result<()> {
++        self.deadline();
++        self.clipboard = Some(clipboard::Clipboard::open(&self.conn, self.root)?);
++        Ok(())
++    }
++    fn clipboard(&mut self) -> io::Result<Option<Zeroizing<String>>> {
++        self.deadline();
++        match self.clipboard.as_mut() {
++            Some(c) => c.poll(&self.conn),
++            None => Ok(None),
++        }
++    }
++    fn set_clipboard(&mut self, text: Zeroizing<String>) -> io::Result<()> {
++        self.deadline();
++        self.clipboard
++            .as_mut()
++            .ok_or_else(|| error("Clipboard disabled"))?
++            .set(&self.conn, text)
++    }
++
+     fn capture(&mut self) -> io::Result<Frame> {
+         self.deadline();
+         let geometry = self
+@@ -301,6 +325,7 @@
+         }
+         self.deadline();
+         match event {
++            Input::Clipboard(_) => {}
+             Input::Key { down, keysym } => self.keyboard_event(keysym, down)?,
+             Input::Pointer { buttons, x, y } => {
+                 self.fake(
+--- a/src/services/vnc/windows.rs
++++ b/src/services/vnc/windows.rs
+@@ -1,5 +1,7 @@
+ //! Windows primary display provider. Native runtime qualification is required.
+ //! GDI objects are created/released on the calling thread; no handles cross workers.
++#[path = "windows_clipboard.rs"]
++mod clipboard;
+ use super::{Frame, Input, MAX_PIXELS, Source};
+ use std::{
+     io,
+@@ -11,6 +13,7 @@
+     System::StationsAndDesktops::*,
+     UI::{Input::KeyboardAndMouse::*, WindowsAndMessaging::*},
+ };
++use zeroize::Zeroizing;
+ pub(super) struct Desktop {
+     width: u16,
+     height: u16,
+@@ -18,6 +21,8 @@
+     buttons: u8,
+     held: Vec<Held>,
+     temporary: Vec<u16>,
++    clipboard_enabled: bool,
++    clipboard: Option<clipboard::Clipboard>,
+ }
+ struct Held {
+     sym: u32,
+@@ -93,6 +98,8 @@
+             buttons: 0,
+             held: Vec::new(),
+             temporary: Vec::new(),
++            clipboard_enabled: false,
++            clipboard: None,
+         })
+     }
+     fn key(code: u16, flags: u32) -> io::Result<()> {
+@@ -199,6 +206,31 @@
+     })
+ }
+ impl Source for Desktop {
++    fn enable_clipboard(&mut self) -> io::Result<()> {
++        self.clipboard_enabled = true;
++        Ok(())
++    }
++    fn clipboard(&mut self) -> io::Result<Option<Zeroizing<String>>> {
++        if !self.clipboard_enabled {
++            return Ok(None);
++        }
++        active_desktop()?;
++        if self.clipboard.is_none() {
++            self.clipboard = Some(clipboard::Clipboard::new()?);
++        }
++        self.clipboard.as_mut().unwrap().poll()
++    }
++    fn set_clipboard(&mut self, text: Zeroizing<String>) -> io::Result<()> {
++        if !self.clipboard_enabled {
++            return Err(io::Error::other("Clipboard disabled"));
++        }
++        active_desktop()?;
++        if self.clipboard.is_none() {
++            self.clipboard = Some(clipboard::Clipboard::new()?);
++        }
++        self.clipboard.as_mut().unwrap().set(text)
++    }
++
+     fn capture(&mut self) -> io::Result<Frame> {
+         active_desktop()?;
+         if metrics()? != (self.width, self.height) {
+@@ -292,6 +324,7 @@
+         }
+         active_desktop()?;
+         match event {
++            Input::Clipboard(_) => {}
+             Input::Key { down, keysym } => self.keyboard_event(keysym, down)?,
+             Input::Pointer { buttons, x, y } => {
+                 Self::mouse(
+--- a/src/services/vnc_service_tests.rs
++++ b/src/services/vnc_service_tests.rs
+@@ -49,13 +49,13 @@
+     }
+     let mut c = VncServiceConfig::local(
+         VncSource::X11 {
+-            display: ":1".into(),
++            display: ":65535".into(),
+         },
+         Secret::new("fixture"),
+     );
+     c.allow_unencrypted = true;
+     c.allow_clipboard = true;
+-    assert!(s.start_vnc(c).unwrap_err().contains("clipboard"));
++    assert!(s.start_vnc(c).is_err());
+ }
+ 
+ #[cfg(target_os = "linux")]
+@@ -521,4 +521,443 @@
+         );
+         assert!(lease.is_running().unwrap());
+     }
++    #[test]
++    #[ignore = "requires private bwrap/Cage display; never host clipboard"]
++    fn owned_x11_vnc_clipboard_selection_roundtrip() {
++        assert_eq!(
++            std::env::var("TERMCRAFT_TEST_XSERVER_ISOLATED").as_deref(),
++            Ok("1")
++        );
++        assert_eq!(std::env::var("DISPLAY").as_deref(), Ok(":0"));
++        let root =
++            std::path::PathBuf::from(std::env::var_os("TERMCRAFT_TEST_XSERVER_PACKAGE").unwrap());
++        let manager = XServerManager::for_installation(root);
++        let lease = manager.start(XServerOptions::default()).unwrap();
++        let display = lease.display().to_string();
++        let authority = lease.authority_path().to_path_buf();
++        // Authenticate to only the owned fixture display, without mutating process environment.
++        let record = std::fs::read(&authority).unwrap();
++        let cookie = record[record.len() - 16..].to_vec();
++        let socket = std::os::unix::net::UnixStream::connect(format!(
++            "/tmp/.X11-unix/X{}",
++            display.trim_start_matches(':')
++        ))
++        .unwrap();
++        let (stream, _) = x11rb::rust_connection::DefaultStream::from_unix_stream(socket).unwrap();
++        let x = x11rb::rust_connection::RustConnection::connect_to_stream_with_auth_info(
++            stream,
++            0,
++            b"MIT-MAGIC-COOKIE-1".to_vec(),
++            cookie,
++        )
++        .unwrap();
++        let screen = &x.setup().roots[0];
++        let window = x.generate_id().unwrap();
++        x.create_window(
++            x11rb::COPY_DEPTH_FROM_PARENT,
++            window,
++            screen.root,
++            24,
++            24,
++            120,
++            100,
++            0,
++            WindowClass::INPUT_OUTPUT,
++            screen.root_visual,
++            &CreateWindowAux::new()
++                .background_pixel(0xff0000)
++                .event_mask(
++                    EventMask::KEY_PRESS
++                        | EventMask::KEY_RELEASE
++                        | EventMask::BUTTON_PRESS
++                        | EventMask::BUTTON_RELEASE,
++                ),
++        )
++        .unwrap()
++        .check()
++        .unwrap();
++        x.map_window(window).unwrap().check().unwrap();
++        x.set_input_focus(InputFocus::PARENT, window, 0u32)
++            .unwrap()
++            .check()
++            .unwrap();
++        x.flush().unwrap();
++
++        use x11rb::{protocol::Event, wrapper::ConnectionExt as _};
++        let atom = |name: &[u8]| x.intern_atom(false, name).unwrap().reply().unwrap().atom;
++        let selection = atom(b"CLIPBOARD");
++        let utf8 = atom(b"UTF8_STRING");
++        let property = atom(b"_OWNED_TEST_CLIPBOARD");
++        x.set_selection_owner(window, selection, 0u32)
++            .unwrap()
++            .check()
++            .unwrap();
++        let supervisor = ServiceSupervisor::default();
++        let mut config =
++            VncServiceConfig::local(VncSource::X11 { display }, Secret::new("fixture"));
++        config.x11_authority = Some(authority);
++        config.allow_unencrypted = true;
++        config.allow_clipboard = true;
++        config.allow_control = true;
++        let id = supervisor.start_vnc(config).unwrap();
++        let address = supervisor.status(id).unwrap().address.unwrap();
++        let mut viewer = wire(address, "fixture").unwrap();
++        viewer
++            .set_read_timeout(Some(Duration::from_millis(100)))
++            .unwrap();
++        let deadline = Instant::now() + Duration::from_secs(5);
++        // The owned window is a real CLIPBOARD selection owner, responding to ConvertSelection.
++        loop {
++            while let Some(event) = x.poll_for_event().unwrap() {
++                if let Event::SelectionRequest(e) = event {
++                    x.change_property8(
++                        PropMode::REPLACE,
++                        e.requestor,
++                        e.property,
++                        utf8,
++                        b"owned local text",
++                    )
++                    .unwrap()
++                    .check()
++                    .unwrap();
++                    x.send_event(
++                        false,
++                        e.requestor,
++                        EventMask::NO_EVENT,
++                        SelectionNotifyEvent {
++                            response_type: SELECTION_NOTIFY_EVENT,
++                            sequence: 0,
++                            time: e.time,
++                            requestor: e.requestor,
++                            selection: e.selection,
++                            target: e.target,
++                            property: e.property,
++                        },
++                    )
++                    .unwrap()
++                    .check()
++                    .unwrap();
++                    x.flush().unwrap();
++                }
++            }
++            let mut ty = [0];
++            match viewer.read(&mut ty) {
++                Ok(1) => {
++                    assert_eq!(ty, [3]);
++                    break;
++                }
++                Err(e)
++                    if matches!(
++                        e.kind(),
++                        std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut
++                    ) => {}
++                other => panic!("clipboard message: {other:?}"),
++            }
++            assert!(
++                Instant::now() < deadline,
++                "selected clipboard never reached remote viewer"
++            );
++        }
++        viewer
++            .set_read_timeout(Some(Duration::from_secs(5)))
++            .unwrap();
++        let h = read(&mut viewer, 7);
++        let n = u32::from_be_bytes(h[3..].try_into().unwrap()) as usize;
++        assert_eq!(read(&mut viewer, n), b"owned local text");
++        let remote = b"remote Latin-1: \xe9";
++        let mut packet = vec![6, 0, 0, 0];
++        packet.extend((remote.len() as u32).to_be_bytes());
++        packet.extend(remote);
++        viewer.write_all(&packet).unwrap();
++        let deadline = Instant::now() + Duration::from_secs(3);
++        while x
++            .get_selection_owner(selection)
++            .unwrap()
++            .reply()
++            .unwrap()
++            .owner
++            == window
++        {
++            assert!(Instant::now() < deadline);
++            thread::sleep(Duration::from_millis(20));
++        }
++        x.convert_selection(window, selection, utf8, property, 0u32)
++            .unwrap()
++            .check()
++            .unwrap();
++        x.flush().unwrap();
++        let deadline = Instant::now() + Duration::from_secs(3);
++        loop {
++            if let Some(Event::SelectionNotify(e)) = x.poll_for_event().unwrap() {
++                if e.property == property {
++                    break;
++                }
++            }
++            assert!(Instant::now() < deadline);
++            thread::sleep(Duration::from_millis(10));
++        }
++        let value = x
++            .get_property(true, window, property, utf8, 0, 4096)
++            .unwrap()
++            .reply()
++            .unwrap();
++        assert_eq!(
++            std::str::from_utf8(&value.value).unwrap(),
++            "remote Latin-1: é"
++        );
++        viewer
++            .set_read_timeout(Some(Duration::from_millis(250)))
++            .unwrap();
++        assert!(
++            viewer.read(&mut [0]).is_err(),
++            "remote clipboard echoed back"
++        );
++        drop(viewer);
++        thread::sleep(Duration::from_millis(200));
++        x.set_selection_owner(window, selection, 0u32)
++            .unwrap()
++            .check()
++            .unwrap();
++        let session = Session {
++            protocol: "VNC".into(),
++            host: "127.0.0.1".into(),
++            port: address.port(),
++            vnc_options: VncOptions {
++                embedded: true,
++                allow_unencrypted: true,
++                security: Security::Password,
++                clipboard: ClipboardPolicy::Bidirectional,
++                ..Default::default()
++            },
++            ..Default::default()
++        };
++        let mut client =
++            DesktopSession::connect(DesktopConfig::new(919, session, Default::default())).unwrap();
++        let deadline = Instant::now() + Duration::from_secs(6);
++        let mut received = false;
++        while !received {
++            while let Some(event) = x.poll_for_event().unwrap() {
++                if let Event::SelectionRequest(e) = event {
++                    x.change_property8(
++                        PropMode::REPLACE,
++                        e.requestor,
++                        e.property,
++                        utf8,
++                        "owned α UTF-8".as_bytes(),
++                    )
++                    .unwrap()
++                    .check()
++                    .unwrap();
++                    x.send_event(
++                        false,
++                        e.requestor,
++                        EventMask::NO_EVENT,
++                        SelectionNotifyEvent {
++                            response_type: SELECTION_NOTIFY_EVENT,
++                            sequence: 0,
++                            time: e.time,
++                            requestor: e.requestor,
++                            selection: e.selection,
++                            target: e.target,
++                            property: e.property,
++                        },
++                    )
++                    .unwrap()
++                    .check()
++                    .unwrap();
++                    x.flush().unwrap();
++                }
++            }
++            for event in client.poll() {
++                match event {
++                    DesktopEvent::Authentication { id, .. } => client
++                        .send(DesktopInput::Authenticate {
++                            id,
++                            user: "vnc".into(),
++                            password: Secret::new("fixture"),
++                            domain: String::new(),
++                        })
++                        .unwrap(),
++                    DesktopEvent::Clipboard { text } => {
++                        assert_eq!(text, "owned α UTF-8");
++                        received = true;
++                    }
++                    DesktopEvent::Disconnected { message } => panic!("{message}"),
++                    _ => {}
++                }
++            }
++            assert!(
++                Instant::now() < deadline,
++                "Unicode selected clipboard did not reach actual embedded client"
++            );
++            thread::sleep(Duration::from_millis(10));
++        }
++        client
++            .send(DesktopInput::Clipboard {
++                text: "remote α UTF-8\nline".into(),
++            })
++            .unwrap();
++        let deadline = Instant::now() + Duration::from_secs(3);
++        while x
++            .get_selection_owner(selection)
++            .unwrap()
++            .reply()
++            .unwrap()
++            .owner
++            == window
++        {
++            for event in client.poll() {
++                if let DesktopEvent::Disconnected { message } = event {
++                    panic!("{message}");
++                }
++            }
++            assert!(Instant::now() < deadline);
++            thread::sleep(Duration::from_millis(10));
++        }
++        x.convert_selection(window, selection, utf8, property, 0u32)
++            .unwrap()
++            .check()
++            .unwrap();
++        x.flush().unwrap();
++        let deadline = Instant::now() + Duration::from_secs(3);
++        loop {
++            if let Some(Event::SelectionNotify(e)) = x.poll_for_event().unwrap() {
++                if e.property == property {
++                    break;
++                }
++            }
++            assert!(Instant::now() < deadline);
++            thread::sleep(Duration::from_millis(10));
++        }
++        let value = x
++            .get_property(true, window, property, utf8, 0, 4096)
++            .unwrap()
++            .reply()
++            .unwrap();
++        assert_eq!(
++            std::str::from_utf8(&value.value).unwrap(),
++            "remote α UTF-8\nline"
++        );
++        client.close();
++        supervisor.stop(id).unwrap();
++        wait_state(&supervisor, id, crate::services::ServiceState::Stopped);
++        assert_eq!(
++            x.get_selection_owner(selection)
++                .unwrap()
++                .reply()
++                .unwrap()
++                .owner,
++            0,
++            "Stop must release only owned selection"
++        );
++        // A read-only server may export selected text but must ignore clipboard writes.
++        x.set_selection_owner(window, selection, 0u32)
++            .unwrap()
++            .check()
++            .unwrap();
++        let mut config = VncServiceConfig::local(
++            VncSource::X11 {
++                display: lease.display().to_string(),
++            },
++            Secret::new("fixture"),
++        );
++        config.x11_authority = Some(lease.authority_path().to_path_buf());
++        config.allow_unencrypted = true;
++        config.allow_clipboard = true;
++        let readonly = supervisor.start_vnc(config).unwrap();
++        let mut viewer = wire(
++            supervisor.status(readonly).unwrap().address.unwrap(),
++            "fixture",
++        )
++        .unwrap();
++        viewer.write_all(&packet).unwrap();
++        thread::sleep(Duration::from_millis(300));
++        assert_eq!(
++            x.get_selection_owner(selection)
++                .unwrap()
++                .reply()
++                .unwrap()
++                .owner,
++            window
++        );
++        viewer
++            .set_read_timeout(Some(Duration::from_millis(100)))
++            .unwrap();
++        let deadline = Instant::now() + Duration::from_secs(4);
++        loop {
++            while let Some(event) = x.poll_for_event().unwrap() {
++                if let Event::SelectionRequest(e) = event {
++                    let accepted = if e.target == u32::from(AtomEnum::STRING) {
++                        x.change_property8(
++                            PropMode::REPLACE,
++                            e.requestor,
++                            e.property,
++                            AtomEnum::STRING,
++                            b"fallback \xe9",
++                        )
++                        .unwrap()
++                        .check()
++                        .unwrap();
++                        e.property
++                    } else {
++                        0
++                    };
++                    x.send_event(
++                        false,
++                        e.requestor,
++                        EventMask::NO_EVENT,
++                        SelectionNotifyEvent {
++                            response_type: SELECTION_NOTIFY_EVENT,
++                            sequence: 0,
++                            time: e.time,
++                            requestor: e.requestor,
++                            selection: e.selection,
++                            target: e.target,
++                            property: accepted,
++                        },
++                    )
++                    .unwrap()
++                    .check()
++                    .unwrap();
++                    x.flush().unwrap();
++                }
++            }
++            match viewer.read(&mut [0]) {
++                Ok(1) => break,
++                Err(e)
++                    if matches!(
++                        e.kind(),
++                        std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut
++                    ) => {}
++                v => panic!("readonly selection export {v:?}"),
++            }
++            assert!(
++                Instant::now() < deadline,
++                "readonly source failed STRING fallback"
++            );
++        }
++        viewer
++            .set_read_timeout(Some(Duration::from_secs(3)))
++            .unwrap();
++        let h = read(&mut viewer, 7);
++        let n = u32::from_be_bytes(h[3..].try_into().unwrap()) as usize;
++        assert_eq!(read(&mut viewer, n), b"fallback \xe9");
++        supervisor.stop(readonly).unwrap();
++        wait_state(
++            &supervisor,
++            readonly,
++            crate::services::ServiceState::Stopped,
++        );
++        assert_eq!(
++            x.get_selection_owner(selection)
++                .unwrap()
++                .reply()
++                .unwrap()
++                .owner,
++            window,
++            "Stop preserved another app's selection"
++        );
++        assert!(x.get_geometry(window).unwrap().reply().is_ok());
++        drop(lease);
++    }
+ }
+--- a/src/ui/managed_vnc.rs
++++ b/src/ui/managed_vnc.rs
+@@ -12,6 +12,7 @@
+     bind: String,
+     password: Zeroizing<String>,
+     control: bool,
++    clipboard: bool,
+     network: bool,
+     consent: bool,
+     lifetime: u32,
+@@ -27,6 +28,7 @@
+             bind: "127.0.0.1:5900".into(),
+             password: Zeroizing::new(String::new()),
+             control: false,
++            clipboard: false,
+             network: false,
+             consent: false,
+             lifetime: 3600,
+@@ -50,11 +52,12 @@
+                     ui.label("Listen address");ui.text_edit_singleline(&mut self.bind);ui.end_row();
+                     ui.label("VNC password");super::managed_servers::service_password_field(ui,&mut self.password,210.);ui.end_row();
+                     ui.label("Access");ui.checkbox(&mut self.control,"Allow remote keyboard and pointer (view-only by default)");ui.end_row();
++                    ui.label("Clipboard");ui.checkbox(&mut self.clipboard,"Share selected display clipboard (read-only viewers can receive only)");ui.end_row();
+                     ui.label("Network access");ui.checkbox(&mut self.network,"Allow non-loopback listening");ui.end_row();
+                     ui.label("Transport");ui.checkbox(&mut self.consent,"I accept unencrypted classic VNC for this listener");ui.end_row();
+                     ui.label("Stop after");ui.add(DragValue::new(&mut self.lifetime).range(0..=86400).suffix(" seconds (0 = until stopped)"));ui.end_row();
+                 });
+-                ui.small("Password: 1–8 printable ASCII bytes. Clipboard transfer and browser HTTP viewer are not implemented. Wayland requires a user-approved portal backend, which is not implemented. One controlling client at a time; view-only servers allow multiple viewers.");
++                ui.small("Password: 1–8 printable ASCII bytes. Clipboard is limited to 8 KiB text and disabled by default. Browser HTTP viewer is not implemented. Wayland requires a user-approved portal backend, which is not implemented. One controlling client at a time; view-only servers allow multiple viewers.");
+             });
+             if let Some(s)=status {
+                 ui.label(format!("{:?}",s.state));
+@@ -69,7 +72,7 @@
+                     #[cfg(not(any(target_os="linux",windows)))]let source=VncSource::MacOsDisplay{display_id:0};
+                     let mut config=VncServiceConfig::local(source,Secret::new(self.password.as_str()));
+                     config.bind=self.bind.parse().map_err(|_|"Enter a listen IP address and port.".to_string())?;
+-                    config.x11_authority=(!self.authority.is_empty()).then(||self.authority.clone().into());config.allow_non_loopback=self.network;config.allow_unencrypted=self.consent;config.allow_control=self.control;config.lifetime=(self.lifetime!=0).then(||Duration::from_secs(u64::from(self.lifetime)));
++                    config.x11_authority=(!self.authority.is_empty()).then(||self.authority.clone().into());config.allow_non_loopback=self.network;config.allow_unencrypted=self.consent;config.allow_control=self.control;config.allow_clipboard=self.clipboard;config.lifetime=(self.lifetime!=0).then(||Duration::from_secs(u64::from(self.lifetime)));
+                     self.supervisor.begin_vnc(config)
+                 })();self.password.zeroize();match result{Ok(id)=>{self.id=Some(id);self.error=None},Err(e)=>self.error=Some(e)}
+             }
+@@ -83,6 +86,8 @@
+     #[test]
+     fn vnc_service_password_field_leaves_no_undo_history() {
+         let mut form = ManagedVnc::default();
++        assert!(!form.clipboard);
++        assert!(!form.control);
+         super::super::managed_servers::tests::password_history(
+             &mut form,
+             |form, ui| form.card(ui),
+--- /dev/null
++++ b/src/services/vnc/clipboard.rs
+@@ -0,0 +1,292 @@
++pub(super) struct ClipboardPolicy {
++    pub receive: bool,
++}
++impl ClipboardPolicy {
++    fn from_remote(&self) -> bool {
++        self.receive
++    }
++    fn to_remote(&self) -> bool {
++        true
++    }
++}
++use flate2::{Compression, Decompress, FlushDecompress, Status, write::ZlibEncoder};
++use std::io::Write;
++use zeroize::Zeroizing;
++
++pub(super) const ENCODING: i32 = 0xc0a1e5ce_u32 as i32;
++pub(super) const TEXT_LIMIT: usize = 8192;
++pub(super) const WIRE_LIMIT: usize = 32 * 1024;
++const UTF8_WIRE_LIMIT: usize = TEXT_LIMIT * 2 + 1;
++const FORMATS: u32 = 0xffff;
++const TEXT: u32 = 1;
++const CAPS: u32 = 1 << 24;
++const REQUEST: u32 = 1 << 25;
++const PEEK: u32 = 1 << 26;
++const NOTIFY: u32 = 1 << 27;
++const PROVIDE: u32 = 1 << 28;
++
++#[derive(Default)]
++pub(super) struct Clipboard {
++    peer_flags: u32,
++    unsolicited_limit: usize,
++    local: Option<Zeroizing<String>>,
++    requested: bool,
++}
++
++#[derive(Default)]
++pub(super) struct Reply {
++    pub packet: Option<Zeroizing<Vec<u8>>>,
++    pub text: Option<String>,
++}
++
++fn extended(flags: u32, data: &[u8]) -> Zeroizing<Vec<u8>> {
++    let mut packet = Zeroizing::new(vec![3, 0, 0, 0]);
++    packet.extend((-(4 + data.len() as i32)).to_be_bytes());
++    packet.extend(flags.to_be_bytes());
++    packet.extend(data);
++    packet
++}
++
++fn provide(text: &str) -> Result<Zeroizing<Vec<u8>>, String> {
++    let mut encoder = ZlibEncoder::new(Vec::new(), Compression::fast());
++    let normalized = Zeroizing::new(text.replace("\r\n", "\n"));
++    let text = Zeroizing::new(normalized.replace('\n', "\r\n"));
++    encoder
++        .write_all(&((text.len() + 1) as u32).to_be_bytes())
++        .and_then(|()| encoder.write_all(text.as_bytes()))
++        .and_then(|()| encoder.write_all(&[0]))
++        .map_err(|_| "Could not encode VNC Unicode clipboard")?;
++    let compressed = Zeroizing::new(
++        encoder
++            .finish()
++            .map_err(|_| "Could not encode VNC Unicode clipboard")?,
++    );
++    Ok(extended(PROVIDE | TEXT, &compressed))
++}
++
++fn decode(data: &[u8], formats: u32) -> Result<String, String> {
++    let mut bytes = Zeroizing::new(vec![0; 4 + UTF8_WIRE_LIMIT + 1]);
++    let mut decoder = Decompress::new(true);
++    if decoder
++        .decompress(data, &mut bytes, FlushDecompress::Finish)
++        .map_err(|_| "Invalid VNC clipboard compression")?
++        != Status::StreamEnd
++        || decoder.total_in() as usize != data.len()
++    {
++        return Err("Invalid or oversized VNC clipboard compression".into());
++    }
++    let data = &bytes[..decoder.total_out() as usize];
++    let length = data.get(..4).ok_or("Missing VNC clipboard text length")?;
++    let length = u32::from_be_bytes(length.try_into().unwrap()) as usize;
++    if length > UTF8_WIRE_LIMIT {
++        return Err("VNC clipboard text exceeds its wire limit".into());
++    }
++    let text = data
++        .get(4..4 + length)
++        .ok_or("Truncated VNC clipboard text")?;
++    // UTF-8 text is format bit 0, so it precedes other formats if offered.
++    // Reject surplus bytes for text-only responses.
++    if formats == TEXT && data.len() != 4 + length {
++        return Err("Unexpected VNC clipboard text size".into());
++    }
++    let text = std::str::from_utf8(
++        text.strip_suffix(&[0])
++            .ok_or("Unterminated VNC clipboard text")?,
++    )
++    .map_err(|_| "Invalid VNC clipboard UTF-8")?;
++    let text = text.replace("\r\n", "\n");
++    if text.len() > TEXT_LIMIT || text.contains('\0') {
++        return Err("VNC clipboard text exceeds 8 KiB or contains NUL".into());
++    }
++    Ok(text)
++}
++
++impl Clipboard {
++    pub fn classic_remote(&mut self) {
++        self.local = None;
++        self.requested = false;
++    }
++
++    pub fn upload(&mut self, text: &str) -> Result<Zeroizing<Vec<u8>>, String> {
++        if text.len() > TEXT_LIMIT || text.contains('\0') {
++            return Err("VNC clipboard text exceeds 8 KiB or contains NUL".into());
++        }
++        if self.peer_flags & (TEXT | NOTIFY | PROVIDE) == TEXT | NOTIFY | PROVIDE {
++            self.local = Some(Zeroizing::new(text.into()));
++            return Ok(extended(NOTIFY | TEXT, &[]));
++        }
++        if self.peer_flags & (TEXT | PROVIDE) == TEXT | PROVIDE
++            && text.len() + text.bytes().filter(|b| *b == b'\n').count() + 1
++                <= self.unsolicited_limit
++        {
++            self.local = Some(Zeroizing::new(text.into()));
++            return provide(text);
++        }
++        if text.chars().any(|c| c as u32 > 255) {
++            return Err("VNC server has not enabled Unicode clipboard. This connection can send Latin-1 text.".into());
++        }
++        self.local = None;
++        let mut packet = Zeroizing::new(vec![3, 0, 0, 0]);
++        let count = text.chars().count() as u32;
++        packet.extend(count.to_be_bytes());
++        packet.extend(text.chars().map(|c| c as u8));
++        Ok(packet)
++    }
++
++    pub fn incoming(
++        &mut self,
++        data: &[u8],
++        policy: ClipboardPolicy,
++        view_only: bool,
++    ) -> Result<Reply, String> {
++        let flags = u32::from_be_bytes(
++            data.get(..4)
++                .ok_or("Truncated VNC clipboard flags")?
++                .try_into()
++                .unwrap(),
++        );
++        let format = flags & FORMATS;
++        let actions = flags & !FORMATS;
++        let data = &data[4..];
++        let receive = policy.from_remote();
++        let upload = policy.to_remote() && !view_only;
++        let mut reply = Reply::default();
++        if flags & CAPS != 0 {
++            if data.len() != format.count_ones() as usize * 4 {
++                return Err("Invalid VNC clipboard capabilities".into());
++            }
++            self.peer_flags = flags;
++            self.unsolicited_limit = if format & TEXT != 0 {
++                u32::from_be_bytes(data[..4].try_into().unwrap()) as usize
++            } else {
++                0
++            };
++            let mut caps = CAPS;
++            if receive {
++                caps |= TEXT | NOTIFY | PROVIDE;
++            }
++            if upload {
++                caps |= TEXT | REQUEST | PEEK;
++            }
++            reply.packet = Some(extended(caps, if caps & TEXT != 0 { &[0; 4] } else { &[] }));
++            return Ok(reply);
++        }
++        if self.peer_flags & CAPS == 0 {
++            return Err("VNC extended clipboard arrived before negotiation".into());
++        }
++        if actions != PROVIDE && !data.is_empty() {
++            return Err("Invalid VNC clipboard action length".into());
++        }
++        match actions {
++            REQUEST if upload && format & TEXT != 0 && self.peer_flags & PROVIDE != 0 => {
++                if let Some(text) = &self.local {
++                    reply.packet = Some(provide(text)?);
++                }
++            }
++            PEEK if upload && self.peer_flags & NOTIFY != 0 => {
++                reply.packet = Some(extended(
++                    NOTIFY | if self.local.is_some() { TEXT } else { 0 },
++                    &[],
++                ));
++            }
++            NOTIFY if receive => {
++                self.requested = false;
++                if format & TEXT != 0 {
++                    self.local = None;
++                    if self.peer_flags & REQUEST != 0 {
++                        self.requested = true;
++                        reply.packet = Some(extended(REQUEST | TEXT, &[]));
++                    }
++                }
++            }
++            PROVIDE if receive && format & TEXT != 0 && self.requested => {
++                self.requested = false;
++                reply.text = Some(decode(data, format)?);
++            }
++            REQUEST | PEEK | NOTIFY | PROVIDE => {}
++            _ => return Err("Unsupported VNC clipboard action".into()),
++        }
++        Ok(reply)
++    }
++}
++
++impl Clipboard {
++    pub(super) fn capabilities() -> Zeroizing<Vec<u8>> {
++        extended(CAPS | TEXT | REQUEST | PEEK | NOTIFY | PROVIDE, &[0; 4])
++    }
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    fn incoming(c: &mut Clipboard, p: &[u8], receive: bool) -> Reply {
++        c.incoming(&p[8..], ClipboardPolicy { receive }, false)
++            .unwrap()
++    }
++    #[test]
++    fn vnc_server_clipboard_unicode_negotiation_and_request_bounds() {
++        let mut server = Clipboard::default();
++        let mut client = Clipboard::default();
++        assert!(server.upload("α").is_err());
++        assert!(
++            server
++                .incoming(
++                    &(NOTIFY | TEXT).to_be_bytes(),
++                    ClipboardPolicy { receive: true },
++                    false
++                )
++                .is_err()
++        );
++        let caps = Clipboard::capabilities();
++        incoming(&mut server, &caps, true);
++        incoming(&mut client, &caps, true);
++        let notify = client.upload("α\né").unwrap();
++        let request = incoming(&mut server, &notify, true).packet.unwrap();
++        let provide = incoming(&mut client, &request, true).packet.unwrap();
++        assert_eq!(
++            incoming(&mut server, &provide, true).text.as_deref(),
++            Some("α\né")
++        );
++        assert!(
++            incoming(&mut server, &provide, true).text.is_none(),
++            "unsolicited Provide ignored"
++        );
++        assert!(client.upload(&"a".repeat(TEXT_LIMIT + 1)).is_err());
++        let request = incoming(&mut server, &notify, true).packet.unwrap();
++        let mut corrupt = incoming(&mut client, &request, true).packet.unwrap();
++        corrupt.push(0);
++        assert!(
++            server
++                .incoming(&corrupt[8..], ClipboardPolicy { receive: true }, false)
++                .is_err()
++        );
++    }
++    #[test]
++    fn vnc_server_clipboard_readonly_never_requests_remote_content() {
++        let mut server = Clipboard::default();
++        let caps = Clipboard::capabilities();
++        incoming(&mut server, &caps, false);
++        assert!(
++            server
++                .incoming(
++                    &(NOTIFY | TEXT).to_be_bytes(),
++                    ClipboardPolicy { receive: false },
++                    false
++                )
++                .unwrap()
++                .packet
++                .is_none()
++        );
++        let notify = server.upload("selected display text").unwrap();
++        assert_eq!(notify[0], 3);
++        let provide = server
++            .incoming(
++                &(REQUEST | TEXT).to_be_bytes(),
++                ClipboardPolicy { receive: false },
++                false,
++            )
++            .unwrap()
++            .packet
++            .unwrap();
++        assert_eq!(provide[0], 3);
++    }
++}
+--- /dev/null
++++ b/src/services/vnc/x11/clipboard.rs
+@@ -0,0 +1,296 @@
++//! CLIPBOARD selection only; never PRIMARY or obsolete CUT_BUFFER properties.
++use super::*;
++use x11rb::protocol::Event;
++use x11rb::wrapper::ConnectionExt as _;
++use zeroize::Zeroizing;
++pub(super) struct Clipboard {
++    window: u32,
++    selection: u32,
++    utf8: u32,
++    targets: u32,
++    property: u32,
++    owner: u32,
++    pending: Option<Instant>,
++    text: Option<Zeroizing<String>>,
++    next_read: Instant,
++    fallback: bool,
++    published: bool,
++}
++impl Clipboard {
++    pub(super) fn open(conn: &RustConnection<Timed>, root: u32) -> io::Result<Self> {
++        let atom = |name: &[u8]| -> io::Result<u32> {
++            Ok(conn
++                .intern_atom(false, name)
++                .map_err(error)?
++                .reply()
++                .map_err(error)?
++                .atom)
++        };
++        let selection = atom(b"CLIPBOARD")?;
++        let utf8 = atom(b"UTF8_STRING")?;
++        let targets = atom(b"TARGETS")?;
++        let property = atom(b"_TERMCRAFT_VNC_CLIPBOARD")?;
++        let window = conn.generate_id().map_err(error)?;
++        conn.create_window(
++            0,
++            window,
++            root,
++            0,
++            0,
++            1,
++            1,
++            0,
++            WindowClass::INPUT_ONLY,
++            0,
++            &CreateWindowAux::new(),
++        )
++        .map_err(error)?
++        .check()
++        .map_err(error)?;
++        Ok(Self {
++            window,
++            selection,
++            utf8,
++            targets,
++            property,
++            owner: 0,
++            pending: None,
++            text: None,
++            next_read: Instant::now(),
++            fallback: false,
++            published: false,
++        })
++    }
++    pub(super) fn set(
++        &mut self,
++        conn: &RustConnection<Timed>,
++        text: Zeroizing<String>,
++    ) -> io::Result<()> {
++        if text.len() > 8192 || text.contains('\0') {
++            return Err(error("Clipboard text exceeds limit"));
++        }
++        conn.set_selection_owner(self.window, self.selection, x11rb::CURRENT_TIME)
++            .map_err(error)?
++            .check()
++            .map_err(error)?;
++        if conn
++            .get_selection_owner(self.selection)
++            .map_err(error)?
++            .reply()
++            .map_err(error)?
++            .owner
++            != self.window
++        {
++            return Err(error("Could not own selected clipboard"));
++        }
++        self.text = Some(text);
++        self.published = false;
++        self.owner = self.window;
++        self.pending = None;
++        Ok(())
++    }
++    pub(super) fn poll(
++        &mut self,
++        conn: &RustConnection<Timed>,
++    ) -> io::Result<Option<Zeroizing<String>>> {
++        let mut changed = None;
++        // Bound event work per capture tick, including hostile requestors.
++        for _ in 0..64 {
++            let Some(event) = conn.poll_for_event().map_err(error)? else {
++                break;
++            };
++            match event {
++                Event::SelectionRequest(e)
++                    if e.selection == self.selection && e.owner == self.window =>
++                {
++                    let p = if e.property == 0 {
++                        e.target
++                    } else {
++                        e.property
++                    };
++                    let mut accepted = 0;
++                    if let Some(text) = self.text.as_ref() {
++                        let result = if e.target == self.targets {
++                            conn.change_property32(
++                                PropMode::REPLACE,
++                                e.requestor,
++                                p,
++                                AtomEnum::ATOM,
++                                &[self.targets, self.utf8, AtomEnum::STRING.into()],
++                            )
++                        } else if e.target == self.utf8 {
++                            conn.change_property8(
++                                PropMode::REPLACE,
++                                e.requestor,
++                                p,
++                                self.utf8,
++                                text.as_bytes(),
++                            )
++                        } else if e.target == u32::from(AtomEnum::STRING)
++                            && text.chars().all(|c| c as u32 <= 255)
++                        {
++                            let bytes =
++                                Zeroizing::new(text.chars().map(|c| c as u8).collect::<Vec<_>>());
++                            conn.change_property8(
++                                PropMode::REPLACE,
++                                e.requestor,
++                                p,
++                                AtomEnum::STRING,
++                                &bytes,
++                            )
++                        } else {
++                            let reply = SelectionNotifyEvent {
++                                response_type: SELECTION_NOTIFY_EVENT,
++                                sequence: 0,
++                                time: e.time,
++                                requestor: e.requestor,
++                                selection: e.selection,
++                                target: e.target,
++                                property: 0,
++                            };
++                            let _ = conn
++                                .send_event(false, e.requestor, EventMask::NO_EVENT, reply)
++                                .map_err(error)?
++                                .check();
++                            continue;
++                        };
++                        if result.map_err(error)?.check().is_ok() {
++                            accepted = p;
++                        }
++                    }
++                    let reply = SelectionNotifyEvent {
++                        response_type: SELECTION_NOTIFY_EVENT,
++                        sequence: 0,
++                        time: e.time,
++                        requestor: e.requestor,
++                        selection: e.selection,
++                        target: e.target,
++                        property: accepted,
++                    };
++                    let _ = conn
++                        .send_event(false, e.requestor, EventMask::NO_EVENT, reply)
++                        .map_err(error)?
++                        .check();
++                }
++                Event::SelectionClear(e) if e.selection == self.selection => {
++                    self.text = None;
++                }
++                Event::SelectionNotify(e)
++                    if e.requestor == self.window
++                        && e.selection == self.selection
++                        && self.pending.is_some() =>
++                {
++                    self.pending = None;
++                    if e.property != self.property {
++                        if e.property == 0 && !self.fallback {
++                            self.fallback = true;
++                            conn.convert_selection(
++                                self.window,
++                                self.selection,
++                                AtomEnum::STRING.into(),
++                                self.property,
++                                x11rb::CURRENT_TIME,
++                            )
++                            .map_err(error)?
++                            .check()
++                            .map_err(error)?;
++                            self.pending = Some(Instant::now());
++                        }
++                        continue;
++                    }
++                    let p = conn
++                        .get_property(true, self.window, self.property, AtomEnum::ANY, 0, 2049)
++                        .map_err(error)?
++                        .reply()
++                        .map_err(error)?;
++                    // INCR and other target types are explicitly unsupported, never interpreted as text.
++                    if p.bytes_after != 0
++                        || p.format != 8
++                        || p.type_
++                            != if self.fallback {
++                                u32::from(AtomEnum::STRING)
++                            } else {
++                                self.utf8
++                            }
++                        || p.value.len() > 8192
++                    {
++                        if self.published {
++                            changed = Some(Zeroizing::new(String::new()));
++                            self.published = false;
++                            self.text = None;
++                        }
++                        continue;
++                    }
++                    let bytes = Zeroizing::new(p.value);
++                    let text = if self.fallback {
++                        Some(Zeroizing::new(
++                            bytes.iter().map(|b| char::from(*b)).collect::<String>(),
++                        ))
++                    } else {
++                        std::str::from_utf8(&bytes)
++                            .ok()
++                            .map(|text| Zeroizing::new(text.to_owned()))
++                    };
++                    if let Some(t) = text {
++                        if t.len() > 8192 {
++                            continue;
++                        }
++                        if !t.contains('\0')
++                            && self.text.as_deref().map(String::as_str) != Some(t.as_str())
++                        {
++                            self.text = Some(t.clone());
++                            changed = Some(t);
++                            self.published = true;
++                        }
++                    }
++                }
++                _ => {}
++            }
++        }
++        if self
++            .pending
++            .is_some_and(|t| t.elapsed() > Duration::from_secs(1))
++        {
++            self.pending = None;
++            conn.delete_property(self.window, self.property)
++                .map_err(error)?;
++        }
++        let owner = conn
++            .get_selection_owner(self.selection)
++            .map_err(error)?
++            .reply()
++            .map_err(error)?
++            .owner;
++        if owner != self.owner {
++            if self.published {
++                changed = Some(Zeroizing::new(String::new()));
++                self.published = false;
++            }
++            self.owner = owner;
++            self.pending = None;
++            self.text = None;
++            self.next_read = Instant::now();
++        }
++        if owner != 0
++            && owner != self.window
++            && self.pending.is_none()
++            && Instant::now() >= self.next_read
++        {
++            self.fallback = false;
++            conn.convert_selection(
++                self.window,
++                self.selection,
++                self.utf8,
++                self.property,
++                x11rb::CURRENT_TIME,
++            )
++            .map_err(error)?
++            .check()
++            .map_err(error)?;
++            self.pending = Some(Instant::now());
++            self.next_read = Instant::now() + Duration::from_millis(500);
++        }
++        conn.flush().map_err(error)?;
++        Ok(changed)
++    }
++}
+--- /dev/null
++++ b/src/services/vnc/windows_clipboard.rs
+@@ -0,0 +1,125 @@
++//! CF_UNICODETEXT on the explicitly selected current input desktop.
++use std::{io, ptr};
++use windows_sys::Win32::{
++    Foundation::{GlobalFree, HWND},
++    System::{DataExchange::*, Memory::*},
++    UI::WindowsAndMessaging::*,
++};
++use zeroize::Zeroizing;
++pub(super) struct Clipboard {
++    window: HWND,
++    sequence: u32,
++}
++// Constructed and destroyed only on the source worker. The source stores this lazily.
++unsafe impl Send for Clipboard {}
++struct Open;
++impl Drop for Open {
++    fn drop(&mut self) {
++        unsafe {
++            CloseClipboard();
++        }
++    }
++}
++impl Clipboard {
++    pub(super) fn new() -> io::Result<Self> {
++        unsafe {
++            let class: Vec<u16> = "STATIC\0".encode_utf16().collect();
++            let window = CreateWindowExW(
++                0,
++                class.as_ptr(),
++                ptr::null(),
++                0,
++                0,
++                0,
++                0,
++                0,
++                HWND_MESSAGE,
++                ptr::null_mut(),
++                ptr::null_mut(),
++                ptr::null(),
++            );
++            if window.is_null() {
++                return Err(io::Error::last_os_error());
++            }
++            Ok(Self {
++                window,
++                sequence: 0,
++            })
++        }
++    }
++    fn open(&self) -> Option<Open> {
++        if unsafe { OpenClipboard(self.window) } == 0 {
++            None
++        } else {
++            Some(Open)
++        }
++    }
++    pub(super) fn poll(&mut self) -> io::Result<Option<Zeroizing<String>>> {
++        unsafe {
++            let sequence = GetClipboardSequenceNumber();
++            if sequence == self.sequence {
++                return Ok(None);
++            }
++            let Some(_guard) = self.open() else {
++                return Ok(None);
++            };
++            self.sequence = sequence;
++            let data = GetClipboardData(13);
++            if data.is_null() {
++                return Ok(Some(Zeroizing::new(String::new())));
++            }
++            let size = GlobalSize(data);
++            if size == 0 || size > 32770 || size % 2 != 0 {
++                return Ok(None);
++            }
++            let p = GlobalLock(data);
++            if p.is_null() {
++                return Err(io::Error::last_os_error());
++            }
++            let wide = std::slice::from_raw_parts(p.cast::<u16>(), size / 2);
++            let text = wide.iter().position(|c| *c == 0).and_then(|n| {
++                String::from_utf16(&wide[..n])
++                    .ok()
++                    .map(|t| t.replace("\r\n", "\n"))
++            });
++            GlobalUnlock(data);
++            Ok(text.filter(|t| t.len() <= 8192).map(Zeroizing::new))
++        }
++    }
++    pub(super) fn set(&mut self, text: Zeroizing<String>) -> io::Result<()> {
++        unsafe {
++            if text.len() > 8192 || text.contains('\0') {
++                return Err(io::Error::other("Invalid clipboard text"));
++            }
++            let text = Zeroizing::new(text.replace("\r\n", "\n").replace('\n', "\r\n"));
++            let wide = Zeroizing::new(text.encode_utf16().chain(Some(0)).collect::<Vec<_>>());
++            let Some(_guard) = self.open() else {
++                return Err(io::Error::other("Selected clipboard busy"));
++            };
++            let memory = GlobalAlloc(GMEM_MOVEABLE, wide.len() * 2);
++            if memory.is_null() {
++                return Err(io::Error::last_os_error());
++            }
++            let data = GlobalLock(memory);
++            if data.is_null() {
++                GlobalFree(memory);
++                return Err(io::Error::last_os_error());
++            }
++            ptr::copy_nonoverlapping(wide.as_ptr(), data.cast::<u16>(), wide.len());
++            GlobalUnlock(memory);
++            if EmptyClipboard() == 0 || SetClipboardData(13, memory).is_null() {
++                GlobalFree(memory);
++                return Err(io::Error::last_os_error());
++            }
++            self.sequence = GetClipboardSequenceNumber();
++            Ok(())
++        }
++    }
++}
++impl Drop for Clipboard {
++    fn drop(&mut self) {
++        unsafe {
++            DestroyWindow(self.window);
++        }
++    }
++}

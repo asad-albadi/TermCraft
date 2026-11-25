@@ -1,0 +1,2 @@
+PASS: root target count 72 -> 71; only unintended windows-serial-owner-component target removed; all other target names/kinds unchanged.
+PASS: root format checked without generated fixture artifacts in private MAIN snapshot.

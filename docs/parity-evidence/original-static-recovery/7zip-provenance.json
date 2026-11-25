@@ -1,0 +1,9 @@
+{
+  "source_url": "https://www.7-zip.org/a/7z2501-linux-x64.tar.xz",
+  "source_final_url": "https://www.7-zip.org/a/7z2501-linux-x64.tar.xz",
+  "archive_sha256": "4ca3b7c6f2f67866b92622818b58233dc70367be2f36b498eb0bdeaaa44b53f4",
+  "official_https_retrieval": true,
+  "signature_validation": "No detached signature/hash was supplied by the official HTTPS download; byte equality against existing helper separately recorded",
+  "helper_sha256": "a1860fdf0d6ec395e0e277e5222e9aa488747db4aa5c87d1ec879a0916ba0b2f",
+  "existing_byte_equal": true
+}

@@ -1,0 +1,51 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: method `poll` is never used
+   --> src/ui.rs:147:8
+    |
+104 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+147 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 1 warning
+error[E0599]: no associated function or constant named `read_file` found for struct `ConnectionHandle` in the current scope
+   --> tests/shared_source_ssh.rs:11:38
+    |
+ 11 |     let mut handle=ConnectionHandle::read_file(config,1,RemotePath::from_bytes(file.to_str().unwrap().as_bytes().to_vec()).unwrap()...
+    |                                      ^^^^^^^^^ associated function or constant not found in `ConnectionHandle`
+    |
+note: if you're trying to build a new `ConnectionHandle`, consider using `ConnectionHandle::connect` which returns `Result<ConnectionHandle, String>`
+   --> src/ssh/mod.rs:115:5
+    |
+115 |     pub fn connect(config: ConnectionConfig) -> Result<Self, String> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no variant named `FileContents` found for enum `ConnectionEvent`
+  --> tests/shared_source_ssh.rs:13:111
+   |
+13 | ...e.poll(){match event {ConnectionEvent::FileContents{connection:9000,request:1,bytes}=>result=Some(bytes),ConnectionEvent::Exited{...
+   |                                           ^^^^^^^^^^^^ variant not found in `ConnectionEvent`
+
+error[E0599]: no associated function or constant named `read_file` found for struct `ConnectionHandle` in the current scope
+   --> tests/shared_source_ssh.rs:19:38
+    |
+ 19 |     let mut handle=ConnectionHandle::read_file(server.config(9001,true),2,RemotePath::from_bytes(file.to_str().unwrap().as_bytes()....
+    |                                      ^^^^^^^^^ associated function or constant not found in `ConnectionHandle`
+    |
+note: if you're trying to build a new `ConnectionHandle`, consider using `ConnectionHandle::connect` which returns `Result<ConnectionHandle, String>`
+   --> src/ssh/mod.rs:115:5
+    |
+115 |     pub fn connect(config: ConnectionConfig) -> Result<Self, String> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no variant named `FileContents` found for enum `ConnectionEvent`
+  --> tests/shared_source_ssh.rs:21:102
+   |
+21 | ...e.poll(){match event {ConnectionEvent::FileContents{..}=>panic!("oversized file returned as successful"),ConnectionEvent::Exited{...
+   |                                           ^^^^^^^^^^^^ variant not found in `ConnectionEvent`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (test "shared_source_ssh") due to 4 previous errors

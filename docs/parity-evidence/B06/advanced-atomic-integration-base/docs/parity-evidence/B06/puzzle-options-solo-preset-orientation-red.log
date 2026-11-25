@@ -1,0 +1,24 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-puzzle-options)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.41s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-puzzle-options/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 1 test
+test tests::typed_configuration_reset_and_source_metadata_are_honest ... FAILED
+
+failures:
+
+---- tests::typed_configuration_reset_and_source_metadata_are_honest stdout ----
+
+thread 'tests::typed_configuration_reset_and_source_metadata_are_honest' (357092) panicked at src/games/puzzles/tests.rs:382:9:
+assertion `left == right` failed
+  left: (2, 3)
+ right: (3, 2)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::typed_configuration_reset_and_source_metadata_are_honest
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 47 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

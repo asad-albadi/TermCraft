@@ -1,0 +1,30 @@
+--- target/validation/v03/inputs/xdmcp-fixture/xdmcp_window.py
++++ target/qualification-games-v03/xdmcp-fixture-atomic/xdmcp_window.py
+@@ -4,6 +4,20 @@
+ import pathlib
+ import sys
+ import time
++import tempfile
++
++
++def publish_marker(path, payload):
++    marker = pathlib.Path(path)
++    fd, temporary = tempfile.mkstemp(prefix="." + marker.name + ".", dir=marker.parent)
++    try:
++        with os.fdopen(fd, "w") as stream:
++            stream.write(payload)
++        os.replace(temporary, marker)
++    finally:
++        pathlib.Path(temporary).unlink(missing_ok=True)
++
++
+ x11 = ctypes.CDLL("libX11.so.6")
+ x11.XOpenDisplay.restype = ctypes.c_void_p
+ x11.XDefaultRootWindow.argtypes = [ctypes.c_void_p]
+@@ -29,5 +43,5 @@
+ image = x11.XGetImage(display,window,0,0,1,1,ctypes.c_ulong(-1),2)
+ if not image or x11.XGetPixel(image,0,0) != 0x229944:
+     raise RuntimeError('Negotiated client window did not render its green reference pixel')
+-pathlib.Path(sys.argv[1]).write_text(os.environ['DISPLAY'] + '; mapped window ' + str(window) + '; dimensions ' + str(x11.XDisplayWidth(display,screen)) + 'x' + str(x11.XDisplayHeight(display,screen)) + '; green pixel verified')
++publish_marker(sys.argv[1], os.environ['DISPLAY'] + '; mapped window ' + str(window) + '; dimensions ' + str(x11.XDisplayWidth(display,screen)) + 'x' + str(x11.XDisplayHeight(display,screen)) + '; green pixel verified')
+ time.sleep(20)

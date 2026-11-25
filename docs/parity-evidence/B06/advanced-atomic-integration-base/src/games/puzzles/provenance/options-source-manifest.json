@@ -1,0 +1,186 @@
+{
+  "commit": "f306b9db55453f7d7fc824bbbf89ca6ac7d2d273",
+  "upstream": "https://git.tartarus.org/simon/puzzles.git",
+  "evidence_class": "RECOVERED historical primary source; no original runtime oracle",
+  "files": [
+    {
+      "file": "net.c",
+      "sha256": "e6f5a66c5b054e1a69941a1e0c71eeac017ec1cfdb3e583a7e712470bc13643f",
+      "bytes": 103376,
+      "slices": [
+        {
+          "start": 160,
+          "end": 208,
+          "utf8_sha256": "fe5381402cb5569416347032f4c0a59aa903a901699a67002d27cae2d2e312f1"
+        },
+        {
+          "start": 273,
+          "end": 367,
+          "utf8_sha256": "33ec7d22cfb8237aec7331c8deccaa2f38687524c6f23d55051026ed78c49a0c"
+        },
+        {
+          "start": 1510,
+          "end": 1558,
+          "utf8_sha256": "7eda7aaae3e147c5e9fe7718ce43cac7a3b171360139bd70d74cf4abed3bc279"
+        },
+        {
+          "start": 1746,
+          "end": 1825,
+          "utf8_sha256": "afd150d8fd4f8178e615d75e642f7b0e60c69929e6240160f94cfaba546e0161"
+        }
+      ]
+    },
+    {
+      "file": "mines.c",
+      "sha256": "9abe5e5628344624bf46d97ced69aac0af2e7a4bd82c3a8e6b0e63c303c72e00",
+      "bytes": 85029,
+      "slices": [
+        {
+          "start": 94,
+          "end": 139,
+          "utf8_sha256": "6891d1591752c354749c59fe183d6a3be753cf8e2a47b3bd67ea820145d35fbc"
+        },
+        {
+          "start": 248,
+          "end": 275,
+          "utf8_sha256": "5ba038d187abf0f325d71d35b67eeb3de7534e449be28c411d2b304c673392f1"
+        },
+        {
+          "start": 2306,
+          "end": 2316,
+          "utf8_sha256": "2758bdebfdcb83e1198b4545f93954bcd9106cf7de66e731ddfb15a01c3a7081"
+        },
+        {
+          "start": 2600,
+          "end": 2661,
+          "utf8_sha256": "f2b6600eac29bd58ec355352889bfd340a920f67d1c5e2e4d69c4b43317ba2c7"
+        }
+      ]
+    },
+    {
+      "file": "solo.c",
+      "sha256": "9e4954485f1222966b57b121c7648a932980cb3aa5f7da87a818c0b24024ff8a",
+      "bytes": 159861,
+      "slices": [
+        {
+          "start": 117,
+          "end": 131,
+          "utf8_sha256": "6327344a0efd9b51c850084deaad9f50a5ff8f2367f5fcad8f3f1f4761d7fd37"
+        },
+        {
+          "start": 273,
+          "end": 331,
+          "utf8_sha256": "341196891629e8103b72efe6690e78eee1d5aea236d6a4662578338d7e21b2eb"
+        },
+        {
+          "start": 1800,
+          "end": 1830,
+          "utf8_sha256": "9e00d42114f3ab45428f963d0e24f93ec15203bdc950399576c56dda1b6a68f2"
+        },
+        {
+          "start": 2062,
+          "end": 2179,
+          "utf8_sha256": "584959fb6cd75a7e8ca1f4a6fba7af78437a0a4e9d11d6e6fe1f5d8e2449cb02"
+        },
+        {
+          "start": 3066,
+          "end": 3124,
+          "utf8_sha256": "1348404ab0caae551630d4eb93f1604881edc35b483dae63b05537effa5b0e1e"
+        },
+        {
+          "start": 3568,
+          "end": 3579,
+          "utf8_sha256": "50562b36accaadff3e365db1bbe17aaba8c4211530dcb76f8329ce53c1af833d"
+        },
+        {
+          "start": 3595,
+          "end": 3613,
+          "utf8_sha256": "8ba3799d07175394712ae27227fef1cc4faec663c83b2a321fcdc9abe9050aed"
+        }
+      ]
+    },
+    {
+      "file": "guess.c",
+      "sha256": "a2c569b89395ba733e97c90cac1e5f18de997db30df68deb826977db61c3a227",
+      "bytes": 40836,
+      "slices": [
+        {
+          "start": 49,
+          "end": 101,
+          "utf8_sha256": "24500c8b01b1f034211ab790d8c4546d4a56c824305826019cf1a26616189a72"
+        },
+        {
+          "start": 214,
+          "end": 229,
+          "utf8_sha256": "5755161e02f0929cef50e3dab839c44099fccd402499e21199e9f9ab2a6cd83b"
+        },
+        {
+          "start": 266,
+          "end": 285,
+          "utf8_sha256": "edeb4dd0977bf605fc8b6d99494bd09fc512380f5d2c712d25929bd4808b5115"
+        },
+        {
+          "start": 369,
+          "end": 410,
+          "utf8_sha256": "ee3713b89017e791e74a0900d305a376af676040a2a68a367c40f3ea25b4b538"
+        },
+        {
+          "start": 574,
+          "end": 607,
+          "utf8_sha256": "3c2d540f184e6fad596f1ad2efd6e472944d1583b3e8efaa4801e135427b84d0"
+        },
+        {
+          "start": 791,
+          "end": 800,
+          "utf8_sha256": "00c5d541a0b321f6da8a8ce83149ecca6d4042f9bcb4ac071de4d995e115dc49"
+        }
+      ]
+    },
+    {
+      "file": "map.c",
+      "sha256": "7e1b9ff5aeeeb925af389f4d686210afe08621c16ac6500f9052f5c16eaa7749",
+      "bytes": 90862,
+      "slices": [
+        {
+          "start": 50,
+          "end": 65,
+          "utf8_sha256": "a45eecd8ccfec809023358743913fbb4823fad93d8b8f6a4f264fa0669c3e68c"
+        },
+        {
+          "start": 99,
+          "end": 156,
+          "utf8_sha256": "cf63775e97397bb0f1ff5bd6f9b2efb67bf9a761e65bb451ed34ec1692fdf31e"
+        }
+      ]
+    },
+    {
+      "file": "untangle.c",
+      "sha256": "0677a651273677e72be34955c4fc642f8a6da2e92cfb15a3b26ba1c6a7d01c9d",
+      "bytes": 36815,
+      "slices": [
+        {
+          "start": 119,
+          "end": 155,
+          "utf8_sha256": "9fc40de9aaf8957a56ae4fdd69f6f8c442cf9c84959ad96585720d4cc23cd74f"
+        },
+        {
+          "start": 208,
+          "end": 213,
+          "utf8_sha256": "2c642bd7a28e406cb8e5f92faca09872d540821f668c5b36db5c0daa92161bab"
+        }
+      ]
+    },
+    {
+      "file": "puzzles.but",
+      "sha256": "eb04e99528067795a2b400984d0410ca29a54e695e44c6f4aad7fa16a259d242",
+      "bytes": 127798,
+      "slices": [
+        {
+          "start": 130,
+          "end": 168,
+          "utf8_sha256": "78dfc4383aa3e78d499ece745792340932c66e10b925447088995141c1b202cc"
+        }
+      ]
+    }
+  ]
+}

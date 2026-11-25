@@ -1,0 +1,71 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: method `poll` is never used
+   --> src/ui.rs:168:8
+    |
+123 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+168 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 35.92s
+     Running tests/desktop_carrier.rs (target/debug/deps/desktop_carrier-a2d1db47c450bd6d)
+
+running 4 tests
+test dropping_relay_releases_pending_listener_and_target_socket ... ok
+test relay_accepts_one_loopback_connection_and_moves_exact_bytes ... ok
+test idle_relay_reports_startup_timeout_and_closes_target ... ok
+test rdp_relay_rejects_untrusted_loopback_peer_before_forwarding ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/desktop_gateway.rs (target/debug/deps/desktop_gateway-9e9a0feeac970981)
+
+running 10 tests
+test profile_gateway_keeps_target_credentials_and_identity_separate ... ok
+test saved_protocol_profile_owns_the_gateway_credential_binding ... ok
+test cancelled_retry_lease_closes_relay_before_helper_connects ... ok
+test changed_gateway_host_key_blocks_desktop ... ok
+test target_failure_releases_gateway_channel ... ok
+test gateway_reaches_target_without_public_listener ... ok
+test rdp_retry_relay_reopens_the_channel_on_one_ssh_authentication ... ok
+test vnc_frame_and_pointer_travel_through_the_gateway ... ok
+test cancelling_one_lease_releases_only_its_channel ... ok
+test jump_chain_verifies_and_authenticates_each_gateway ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+

@@ -1,0 +1,2 @@
+blocked: target_exists=False; target_bytes=None
+PASS: failed write left no marker or temporary

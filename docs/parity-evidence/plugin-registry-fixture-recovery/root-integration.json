@@ -1,0 +1,32 @@
+{
+  "files": {
+    "docs/parity-evidence/plugin-registry-fixture-recovery/REPORT.md": "e6cc199eca36f80541ffd68f9e94680ecc99d27ec9fe6f43952bb7893708bf08",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/base-map.json": "80ec64af490a5de05cbeb1b50d38898a36ab8ed29a1cd14404333b10379d3d46",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/base-source-inputs.json": "50cffd6e5442c640ff584301e5aa14d3b800ba4ea2b35946b791b83ce2007e29",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/base-test-inputs.json": "65d679632611fcc88c666544516428d37700c79cae9621f669aa194d8750ba07",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/candidate-map.json": "8e17a92c9eefd92731fe52d9b5db62309120bdfb8800530b3aeb6fdb69d7245e",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/candidate-source-inputs.json": "68e5b92ad554a09187493463ebd12566a7b7c256e88c990de536fefa6aacc11f",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/candidate.patch": "3991451296bd4bb792a8fad5754d281fa8002d3c130e9adc00463248ef2e3f04",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/counterexample.log": "5b7e58e00d643c2c840793049867e816f0083a53df367576a8fbc8cbd06a268d",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/counterexample.patch": "0d06cb4a2a43e8c933b09e5701eadd858c335c300e051b3b9dc340bb9af7e8be",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/final-verification.json": "03c6ccce8f31fe8b50679f585210ad51099f9e5bd57d6d974b9902db6dda4b9f",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/focused-repeat.log": "def8587e9c5638c944780c13753767cf153f8389b045ba5e8b6fa8e21e54f26d",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/focused.log": "65a0c19ffd1e862afaf7a5dc50f17b0518e882af52fdd8c5c6eec177fdd5ca34",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/green.log": "029996f85a79029fac64fbf9c5b9aaffe3c608b051b1aaa1b4ca1bd21de9592c",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/plugins-focused.log": "100a780e52462d7a9c5a202e7808508b07fac85a6ac14103b8218fbf12e305f3",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/private-build-delta.json": "f8e90340e384328c668625b4bd1abf21378fd1e6a07e12bdfed4b96c768a65a3",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/probe_fixture.py": "e4fe2919f13c0479c4bc3307175401470d8d00e1a7f818554abef120ad638583",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/red.log": "5c27bbdd6e3375ba2b48551746e2a932cd935bc9f901588e36897f7a90a45e1f",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/registry-lifecycle.log": "df2ad899492def7986b269a20c4672f5cdb14c99195c8c52c545bec3c6eff782",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/registry.rs.base": "955c2b5340cea52dea9f69b984f5c149409f25950e0a28dee255e4845df07883",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/registry.rs.counterexample": "743eef3030fc9cb68071de1bd5f8d09fb04351c513b6b40b5273892599afa067",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/registry.rs.proposed": "6e0dbe8fe7511de237c9d90630817106a4bf4949fc31f3c024ada8614ec89144",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/repeat-summary.json": "e42b82715069fac119f02e8a7f073772c49467f293357f05b4763cb0c801900e",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/restored.log": "ef9309fb52b00494c96efe46005364fb841d165d8e84df6a9416b49e45f341f5",
+    "docs/parity-evidence/plugin-registry-fixture-recovery/root-diagnosis.json": "8d9db173e6b60740c2ca93413ec88c5d82629d95f1e91c76f3317c12f9e62967",
+    "src/plugins/registry.rs": "6e0dbe8fe7511de237c9d90630817106a4bf4949fc31f3c024ada8614ec89144"
+  },
+  "base_registry_sha256": "955c2b5340cea52dea9f69b984f5c149409f25950e0a28dee255e4845df07883",
+  "exact": true,
+  "review": "review.md"
+}

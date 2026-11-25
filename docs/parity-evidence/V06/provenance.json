@@ -1,0 +1,11 @@
+{
+  "qualified_scope": "bounded Linux x86_64 headless software-rendered native backends, instrumented production Workspace",
+  "package_version": "0.1.706",
+  "bin_name": "termcraft-v06-native-matrix",
+  "package_archive": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v06/package-output/TermCraft-0.1.706-linux-x86_64-arch-xwayland.tar.gz",
+  "package_sha256": "59c5b0a513f8c9cb4e958e0bb5ae95fbfa5037fb74d850033cf63bd301102268",
+  "app_sha256": "ea603394a68bebd30ff66472cb3b7aa9c1a9ce9589bc231c5ecae65bec7bcf6d",
+  "engine_sha256": "cbedd90fbc960d4cc799792cedf89b0afa1f1f74a93ba9fb05bfd4da2f27b2b8",
+  "strict_original_native_all_platform_complete": false,
+  "main_product_source_changes": []
+}

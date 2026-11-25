@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.33s
+     Running tests/scp_browser.rs (app/target/debug/deps/scp_browser-a539af46f7e393bc)
+
+running 1 test
+test malformed_remote_editor_commit_reply_is_indeterminate ... FAILED
+
+failures:
+
+---- malformed_remote_editor_commit_reply_is_indeterminate stdout ----
+
+thread 'malformed_remote_editor_commit_reply_is_indeterminate' (290879) panicked at tests/scp_browser.rs:611:5:
+Failed("SCP helper: invalid digit found in string")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    malformed_remote_editor_commit_reply_is_indeterminate
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.50s
+
+error: test failed, to rerun pass `--test scp_browser`

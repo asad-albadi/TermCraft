@@ -1,0 +1,10 @@
+{
+  "command": "CARGO_BUILD_JOBS=2 cargo test --offline --no-fail-fast",
+  "exit_code": 0,
+  "outer_targets": 55,
+  "passed": 522,
+  "failed": 0,
+  "ignored": 8,
+  "helper_passed": 27,
+  "scope": "Source SHA inventory captured before compilation; subsequent macro, X11 and RDP printer work is outside this gate."
+}

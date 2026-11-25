@@ -1,0 +1,19 @@
+{
+  "exit_code": 0,
+  "unit_passed": 55,
+  "integration_passed": 8,
+  "summaries": [
+    [
+      "ok",
+      "55",
+      "0",
+      "0"
+    ],
+    [
+      "ok",
+      "8",
+      "0",
+      "0"
+    ]
+  ]
+}

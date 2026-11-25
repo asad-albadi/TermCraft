@@ -1,0 +1,1 @@
+html,body{height:100%;margin:0;font:16px system-ui;background:#15231d;color:#e2f0e8}body{display:flex;flex-direction:column}header{padding:12px 20px}h1{font-size:20px;margin:0}p{font-size:14px}form{display:flex;gap:16px;align-items:center;flex-wrap:wrap}input,button{font:inherit}button{padding:5px 12px}main{flex:1;min-height:0;overflow:hidden}a{color:#8fe0ae}

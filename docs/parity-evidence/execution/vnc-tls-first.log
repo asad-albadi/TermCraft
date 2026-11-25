@@ -1,0 +1,19 @@
+     Locking 1 package to highest Rust 1.99.0 compatible version
+      Adding tokio-rustls v0.26.6
+   Compiling tokio-rustls v0.26.6
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.78s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-1d05ac12ecc132c0)
+
+running 8 tests
+test desktop::vnc::tests::classic_vnc_challenge_matches_independent_openssl_vector ... ok
+test desktop::vnc::tests::old_sessions_keep_external_vnc_and_new_security_is_explicit ... ok
+test desktop::vnc::tests::verified_tls_modes_do_not_require_classic_unencrypted_consent ... ok
+test desktop::vnc::tests::selected_security_never_falls_back_to_another_server_offer ... ok
+test desktop::vnc::tests::oversized_resize_and_disconnect_mid_rectangle_are_errors ... ok
+test desktop::vnc::tests::vnc_known_frame_pointer_copyrect_and_resize_are_real_protocol_operations ... ok
+test desktop::vnc::tests::view_only_sends_no_input_even_at_transport_boundary_and_clipboard_is_directional ... ok
+test desktop::vnc::tests::classic_password_wait_does_not_spend_network_timeout_or_leak_plaintext ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 39 filtered out; finished in 1.11s
+

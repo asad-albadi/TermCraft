@@ -1,0 +1,14 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 36.72s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-02640ee8dd3bd2d4)
+
+running 6 tests
+test ui::terminal_settings::tests::profile_editor_migrates_legacy_font_and_rejects_invalid_draft ... ok
+test ui::serial_settings::tests::serial_controls_change_parity_and_flow_control ... ok
+test ui::vnc_settings::tests::vnc_controls_require_consent_and_keep_clipboard_and_keyboard_choices ... ok
+test ui::rdp_settings::tests::rdp_settings_controls_change_saved_clipboard_and_keyboard_choices ... ok
+test ui::rdp_settings::tests::switching_engines_can_clear_incompatible_saved_options ... ok
+test ui::rdp_settings::tests::embedded_rdp_controls_add_read_only_folder_and_enable_admin ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 96 filtered out; finished in 0.21s
+

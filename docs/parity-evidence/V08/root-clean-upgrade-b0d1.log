@@ -1,0 +1,8 @@
+Screenshot saved: /evidence/b0d1.png
+00:00:00.000 [INFO] [backend/backend.c:342] Loading user-specified backends due to WLR_BACKENDS: headless
+00:00:00.000 [INFO] [backend/headless/backend.c:60] Creating headless backend
+00:00:00.000 [INFO] [util/env.c:25] Loading WLR_RENDERER option: pixman
+00:00:00.000 [INFO] [render/pixman/renderer.c:328] Creating pixman renderer
+00:00:00.000 [INFO] [../cage/cage.c:521] Failed to create wlr_drm_lease_manager_v1
+00:00:00.000 [INFO] [xwayland/sockets.c:102] Created /tmp/.X11-unix ourselves -- other users will be unable to create X11 UNIX sockets of their own
+00:00:00.000 [INFO] [backend/headless/backend.c:17] Starting headless backend

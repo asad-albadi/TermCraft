@@ -1,0 +1,35 @@
+Server listening on 127.0.0.1 port 35805.
+Connection from 127.0.0.1 port 58612 on 127.0.0.1 port 35805 rdomain ""
+Connection from 127.0.0.1 port 58596 on 127.0.0.1 port 35805 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 58596 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Accepted key ED25519 SHA256:RgS5VRVzDemFUUeGmBDXWE8aPNGLgsMedRyNd44Rf0k found at /tmp/termcraft-ssh-test-123443-1795552468780199024/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 58612 ssh2 [preauth]
+Accepted key ED25519 SHA256:RgS5VRVzDemFUUeGmBDXWE8aPNGLgsMedRyNd44Rf0k found at /tmp/termcraft-ssh-test-123443-1795552468780199024/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 58612 ssh2: ED25519 SHA256:RgS5VRVzDemFUUeGmBDXWE8aPNGLgsMedRyNd44Rf0k
+User child is on pid 123453
+Attempt to write login records by non-root user (aborting)
+Starting session: command on pts/0 for asad from 127.0.0.1 port 58612 id 0
+Starting session: subsystem 'sftp' for asad from 127.0.0.1 port 58612 id 1
+Connection closed by 127.0.0.1 port 58612
+Close session: user asad from 127.0.0.1 port 58612 id 0
+Close session: user asad from 127.0.0.1 port 58612 id 1
+Transferred: sent 5252, received 3020 bytes
+Closing connection to 127.0.0.1 port 58612
+Attempt to write login records by non-root user (aborting)
+Connection from 127.0.0.1 port 58626 on 127.0.0.1 port 35805 rdomain ""
+Accepted key ED25519 SHA256:RgS5VRVzDemFUUeGmBDXWE8aPNGLgsMedRyNd44Rf0k found at /tmp/termcraft-ssh-test-123443-1795552468780199024/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 58626 ssh2 [preauth]
+Accepted key ED25519 SHA256:RgS5VRVzDemFUUeGmBDXWE8aPNGLgsMedRyNd44Rf0k found at /tmp/termcraft-ssh-test-123443-1795552468780199024/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 58626 ssh2: ED25519 SHA256:RgS5VRVzDemFUUeGmBDXWE8aPNGLgsMedRyNd44Rf0k
+User child is on pid 123462
+Attempt to write login records by non-root user (aborting)
+Starting session: command on pts/0 for asad from 127.0.0.1 port 58626 id 0
+Starting session: subsystem 'sftp' for asad from 127.0.0.1 port 58626 id 1
+Connection closed by 127.0.0.1 port 58626
+Close session: user asad from 127.0.0.1 port 58626 id 0
+Close session: user asad from 127.0.0.1 port 58626 id 1
+Transferred: sent 5252, received 3020 bytes
+Closing connection to 127.0.0.1 port 58626
+Attempt to write login records by non-root user (aborting)

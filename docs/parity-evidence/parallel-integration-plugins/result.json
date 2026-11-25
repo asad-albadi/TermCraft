@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "outer_targets": 61,
+  "passed": 597,
+  "failed": 0,
+  "ignored": 28,
+  "source_unchanged_during_gate": true,
+  "scope": "Merged reviewed P06, B01 and P05; actual Tools plugin pointer workflow included. Private B03/B05/P08-Unix source excluded."
+}

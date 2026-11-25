@@ -1,0 +1,53 @@
+{
+  "qualification": "Bounded clean Arch Linux container observations; not a full V08 or cross-platform parity claim",
+  "fresh_native_gui_save_restart_pty": "passed",
+  "legacy_real_save_current_upgrade_restart_exact_bytes": "passed",
+  "legacy_saved_workspace_sha256": "8ac66ec31f3a39d7227a7930ef282c88dda7f6fafbcaa2a3b10300f280d63441",
+  "corrupt_actual_save_restart_original_bytes": "passed",
+  "corrupt_original_sha256": "0d43944242fa974230a4da353faa2b635c74f362f82318e6da1d3fb917f49e3d",
+  "per_user_install_installed_gui_uninstall_preserves_workspace_defaults_unowned": "passed",
+  "absent_installed_mosh": "explicit provider unavailable; no fallback",
+  "absent_bundled_mosh_dependency": "explicit system Perl missing; no fallback",
+  "direct_iperf_2_3_loopback": [],
+  "direct_unix_ash_pty": [],
+  "debian_wrapper_current_full_arch_archive": {
+    "status": "rejected safely before producing package",
+    "error": "Declare a Debian dependency for libz.so.1 before packaging."
+  },
+  "known_setup_failures": [
+    "Initial xdotool title search matched no window; corrected to owned process ID.",
+    "Initial PTY typing without terminal-widget focus produced no marker; explicit terminal click fixed setup.",
+    "Initial corruption check used unavailable cmp; replaced with Python byte comparison.",
+    "Initial Unix fixture expected busybox archive member; actual member bin/ash corrected.",
+    "Initial direct Unix execution hit Docker tmpfs default noexec; explicit exec on private tmpfs fixed setup."
+  ],
+  "remaining_gaps": [
+    "Native Windows/macOS and physical clean Linux machines",
+    "Full original runtime behavior/signing/notarization",
+    "Native distro installation/upgrade matrix and oldest Debian ABI build",
+    "Credential vault contents across upgrade: fixture covers session/macro/settings only",
+    "Managed app API success paths for all Mosh/Unix/Iperf/browser capabilities; direct payload checks remain distinct"
+  ],
+  "images": {
+    "base": {
+      "registry_digest": "sha256:375a401bb3c6376b37f40b6dfa25067db37ec78d0b7af67ae6315f43a0184a9d",
+      "gui_image": "sha256:c326d40de0700f7086d34670a6d21b0af6d8a6da71bc442fceed67bcd0648fe5"
+    },
+    "input_image": "sha256:bf83b781e2d467fe7cbafb6c4235c3263260fd56cec7cfb9b22dafde0a914a12",
+    "declared_runtime_image": "sha256:1ab61a2bb16febd0a86829a43c26849b06ca82aca31be8385880cc7a3570c79d"
+  },
+  "browser": {
+    "minimal_gui_image": "negative absent-library observation: libopenh264.so.8 unavailable",
+    "declared_runtime_image_version": "BROKEN VERSION PROBE",
+    "sandboxed_native_launch": "unresolved: container lacks usable root-owned setuid helper/unprivileged namespace sandbox; exact SIGABRT log retained",
+    "no_sandbox_bypass": true,
+    "system_clients_absent": {
+      "system_chromium_absent": true,
+      "system_mosh_absent": true,
+      "perl": true,
+      "openssh": true
+    }
+  },
+  "highest_declared_glibc_symbol_version": "2.44",
+  "debian_dependency_script_sha256": "acdfc998fb67aa23ee85efe24961e7d8a8f09dc3beb78ec2c845edce420e2c2f"
+}

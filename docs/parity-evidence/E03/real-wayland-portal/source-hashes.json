@@ -1,0 +1,7 @@
+{
+  "src/services/vnc/wayland.rs": "1a3934c135b0ee5240178eebdedd0f8c05e80aa26cbc0d9ff710c03d6bc97dd9",
+  "src/services/vnc/wayland/portal.rs": "bb319755de31e707160e39d24002c27270c4641ef0861b189ca3a1e180da0a45",
+  "src/services/vnc/wayland/helper.rs": "9f5b5aef95820463644d59e36a2cf4c0d0bfaa71db8bdc30adb36bf141145045",
+  "src/services/vnc/keyboard.rs": "46be1e0351d0f030ba9efec630203c7cb33970ec5f3c4dde3aef247a29afe700",
+  "src/runtime/manifest.rs": "7b0ec300a40a19593728a66ecf1861e129b0e190b8f5ee49e4b2af4d2d27aa51"
+}

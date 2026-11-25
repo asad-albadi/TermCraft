@@ -1,0 +1,196 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 233B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/termcraft-validation-v08:clean-input
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/2] FROM docker.io/library/termcraft-validation-v08:clean-input@sha256:bf83b781e2d467fe7cbafb6c4235c3263260fd56cec7cfb9b22dafde0a914a12
+#4 resolve docker.io/library/termcraft-validation-v08:clean-input@sha256:bf83b781e2d467fe7cbafb6c4235c3263260fd56cec7cfb9b22dafde0a914a12 0.0s done
+#4 CACHED
+
+#5 [2/2] RUN pacman -S --noconfirm --needed tesseract tesseract-data-eng && pacman -Q > /opt/termcraft-validation-fix1-ocr-packages.txt
+#5 0.330 resolving dependencies...
+#5 0.334 looking for conflicting packages...
+#5 0.335 
+#5 0.335 Package (6)               New Version  Net Change  Download Size
+#5 0.335 
+#5 0.335 extra/giflib              6.1.3-2        0.34 MiB       0.10 MiB
+#5 0.335 extra/leptonica           1.87.0-2       3.71 MiB       1.27 MiB
+#5 0.335 extra/openjpeg2           2.5.4-1       13.37 MiB       0.87 MiB
+#5 0.335 extra/tesseract-data-osd  2:4.1.0-5     10.07 MiB       3.64 MiB
+#5 0.335 extra/tesseract           5.5.4-1        4.70 MiB       1.69 MiB
+#5 0.335 extra/tesseract-data-eng  2:4.1.0-5     22.38 MiB       9.03 MiB
+#5 0.335 
+#5 0.335 Total Download Size:   16.60 MiB
+#5 0.335 Total Installed Size:  54.57 MiB
+#5 0.335 
+#5 0.335 :: Proceed with installation? [Y/n] 
+#5 0.335 :: Retrieving packages...
+#5 2.622  tesseract-data-eng-2:4.1.0-5-any downloading...
+#5 2.622  tesseract-data-osd-2:4.1.0-5-any downloading...
+#5 2.622  tesseract-5.5.4-1-x86_64 downloading...
+#5 2.622  leptonica-1.87.0-2-x86_64 downloading...
+#5 2.622  openjpeg2-2.5.4-1-x86_64 downloading...
+#5 2.622  giflib-6.1.3-2-x86_64 downloading...
+#5 2.622 checking keyring...
+#5 2.727 checking package integrity...
+#5 2.949 loading package files...
+#5 2.960 checking for file conflicts...
+#5 2.965 :: Processing package changes...
+#5 2.965 installing giflib...
+#5 2.970 installing openjpeg2...
+#5 2.990 installing leptonica...
+#5 3.001 installing tesseract-data-eng...
+#5 3.056 installing tesseract-data-osd...
+#5 3.077 installing tesseract...
+#5 3.091 Optional dependencies for tesseract
+#5 3.091     icu: for text2image [installed]
+#5 3.091     pango: for text2image [installed]
+#5 3.091     tesseract-data-afr: OCR data (afr)
+#5 3.091     tesseract-data-amh: OCR data (amh)
+#5 3.091     tesseract-data-ara: OCR data (ara)
+#5 3.091     tesseract-data-asm: OCR data (asm)
+#5 3.091     tesseract-data-aze: OCR data (aze)
+#5 3.091     tesseract-data-aze_cyrl: OCR data (aze_cyrl)
+#5 3.091     tesseract-data-bel: OCR data (bel)
+#5 3.091     tesseract-data-ben: OCR data (ben)
+#5 3.091     tesseract-data-bod: OCR data (bod)
+#5 3.091     tesseract-data-bos: OCR data (bos)
+#5 3.091     tesseract-data-bre: OCR data (bre)
+#5 3.091     tesseract-data-bul: OCR data (bul)
+#5 3.091     tesseract-data-cat: OCR data (cat)
+#5 3.091     tesseract-data-ceb: OCR data (ceb)
+#5 3.091     tesseract-data-ces: OCR data (ces)
+#5 3.091     tesseract-data-chi_sim: OCR data (chi_sim)
+#5 3.091     tesseract-data-chi_tra: OCR data (chi_tra)
+#5 3.091     tesseract-data-chr: OCR data (chr)
+#5 3.091     tesseract-data-cos: OCR data (cos)
+#5 3.091     tesseract-data-cym: OCR data (cym)
+#5 3.091     tesseract-data-dan: OCR data (dan)
+#5 3.091     tesseract-data-dan_frak: OCR data (dan_frak)
+#5 3.091     tesseract-data-deu: OCR data (deu)
+#5 3.091     tesseract-data-deu_frak: OCR data (deu_frak)
+#5 3.091     tesseract-data-div: OCR data (div)
+#5 3.091     tesseract-data-dzo: OCR data (dzo)
+#5 3.091     tesseract-data-ell: OCR data (ell)
+#5 3.091     tesseract-data-eng: OCR data (eng) [installed]
+#5 3.091     tesseract-data-enm: OCR data (enm)
+#5 3.091     tesseract-data-epo: OCR data (epo)
+#5 3.091     tesseract-data-equ: OCR data (equ)
+#5 3.091     tesseract-data-est: OCR data (est)
+#5 3.091     tesseract-data-eus: OCR data (eus)
+#5 3.091     tesseract-data-fao: OCR data (fao)
+#5 3.091     tesseract-data-fas: OCR data (fas)
+#5 3.091     tesseract-data-fil: OCR data (fil)
+#5 3.091     tesseract-data-fin: OCR data (fin)
+#5 3.091     tesseract-data-fra: OCR data (fra)
+#5 3.091     tesseract-data-frk: OCR data (frk)
+#5 3.091     tesseract-data-frm: OCR data (frm)
+#5 3.091     tesseract-data-fry: OCR data (fry)
+#5 3.091     tesseract-data-gla: OCR data (gla)
+#5 3.091     tesseract-data-gle: OCR data (gle)
+#5 3.091     tesseract-data-glg: OCR data (glg)
+#5 3.091     tesseract-data-grc: OCR data (grc)
+#5 3.091     tesseract-data-guj: OCR data (guj)
+#5 3.091     tesseract-data-hat: OCR data (hat)
+#5 3.091     tesseract-data-heb: OCR data (heb)
+#5 3.091     tesseract-data-hin: OCR data (hin)
+#5 3.091     tesseract-data-hrv: OCR data (hrv)
+#5 3.091     tesseract-data-hun: OCR data (hun)
+#5 3.091     tesseract-data-hye: OCR data (hye)
+#5 3.091     tesseract-data-iku: OCR data (iku)
+#5 3.091     tesseract-data-ind: OCR data (ind)
+#5 3.091     tesseract-data-isl: OCR data (isl)
+#5 3.091     tesseract-data-ita: OCR data (ita)
+#5 3.091     tesseract-data-ita_old: OCR data (ita_old)
+#5 3.091     tesseract-data-jav: OCR data (jav)
+#5 3.091     tesseract-data-jpn: OCR data (jpn)
+#5 3.091     tesseract-data-jpn_vert: OCR data (jpn_vert)
+#5 3.091     tesseract-data-kan: OCR data (kan)
+#5 3.091     tesseract-data-kat: OCR data (kat)
+#5 3.091     tesseract-data-kat_old: OCR data (kat_old)
+#5 3.091     tesseract-data-kaz: OCR data (kaz)
+#5 3.091     tesseract-data-khm: OCR data (khm)
+#5 3.091     tesseract-data-kir: OCR data (kir)
+#5 3.091     tesseract-data-kmr: OCR data (kmr)
+#5 3.091     tesseract-data-kor: OCR data (kor)
+#5 3.091     tesseract-data-kor_vert: OCR data (kor_vert)
+#5 3.091     tesseract-data-lao: OCR data (lao)
+#5 3.091     tesseract-data-lat: OCR data (lat)
+#5 3.091     tesseract-data-lav: OCR data (lav)
+#5 3.091     tesseract-data-lit: OCR data (lit)
+#5 3.091     tesseract-data-ltz: OCR data (ltz)
+#5 3.091     tesseract-data-mal: OCR data (mal)
+#5 3.091     tesseract-data-mar: OCR data (mar)
+#5 3.091     tesseract-data-mkd: OCR data (mkd)
+#5 3.091     tesseract-data-mlt: OCR data (mlt)
+#5 3.091     tesseract-data-mon: OCR data (mon)
+#5 3.091     tesseract-data-mri: OCR data (mri)
+#5 3.091     tesseract-data-msa: OCR data (msa)
+#5 3.091     tesseract-data-mya: OCR data (mya)
+#5 3.091     tesseract-data-nep: OCR data (nep)
+#5 3.091     tesseract-data-nld: OCR data (nld)
+#5 3.091     tesseract-data-nor: OCR data (nor)
+#5 3.091     tesseract-data-oci: OCR data (oci)
+#5 3.091     tesseract-data-ori: OCR data (ori)
+#5 3.091     tesseract-data-pan: OCR data (pan)
+#5 3.091     tesseract-data-pol: OCR data (pol)
+#5 3.091     tesseract-data-por: OCR data (por)
+#5 3.091     tesseract-data-pus: OCR data (pus)
+#5 3.091     tesseract-data-que: OCR data (que)
+#5 3.091     tesseract-data-ron: OCR data (ron)
+#5 3.091     tesseract-data-rus: OCR data (rus)
+#5 3.091     tesseract-data-san: OCR data (san)
+#5 3.091     tesseract-data-sin: OCR data (sin)
+#5 3.091     tesseract-data-slk: OCR data (slk)
+#5 3.091     tesseract-data-slk_frak: OCR data (slk_frak)
+#5 3.091     tesseract-data-slv: OCR data (slv)
+#5 3.091     tesseract-data-snd: OCR data (snd)
+#5 3.091     tesseract-data-spa: OCR data (spa)
+#5 3.091     tesseract-data-spa_old: OCR data (spa_old)
+#5 3.091     tesseract-data-sqi: OCR data (sqi)
+#5 3.091     tesseract-data-srp: OCR data (srp)
+#5 3.091     tesseract-data-srp_latn: OCR data (srp_latn)
+#5 3.091     tesseract-data-sun: OCR data (sun)
+#5 3.091     tesseract-data-swa: OCR data (swa)
+#5 3.091     tesseract-data-swe: OCR data (swe)
+#5 3.091     tesseract-data-syr: OCR data (syr)
+#5 3.091     tesseract-data-tam: OCR data (tam)
+#5 3.091     tesseract-data-tat: OCR data (tat)
+#5 3.091     tesseract-data-tel: OCR data (tel)
+#5 3.091     tesseract-data-tgk: OCR data (tgk)
+#5 3.091     tesseract-data-tgl: OCR data (tgl)
+#5 3.091     tesseract-data-tha: OCR data (tha)
+#5 3.091     tesseract-data-tir: OCR data (tir)
+#5 3.091     tesseract-data-ton: OCR data (ton)
+#5 3.091     tesseract-data-tur: OCR data (tur)
+#5 3.091     tesseract-data-uig: OCR data (uig)
+#5 3.091     tesseract-data-ukr: OCR data (ukr)
+#5 3.091     tesseract-data-urd: OCR data (urd)
+#5 3.091     tesseract-data-uzb: OCR data (uzb)
+#5 3.091     tesseract-data-uzb_cyrl: OCR data (uzb_cyrl)
+#5 3.091     tesseract-data-vie: OCR data (vie)
+#5 3.091     tesseract-data-yid: OCR data (yid)
+#5 3.091     tesseract-data-yor: OCR data (yor)
+#5 3.239 :: Running post-transaction hooks...
+#5 3.239 (1/1) Arming ConditionNeedsUpdate...
+#5 DONE 3.5s
+
+#6 exporting to image
+#6 exporting layers
+#6 exporting layers 1.8s done
+#6 exporting manifest sha256:11473c164366bc2a2d4298977b93a0ef09331e360670a67766d180e5892a9ab9 done
+#6 exporting config sha256:d5832a626780f0a953813bdf08987085a134bc9167494549fb63dd010d0c910a done
+#6 exporting attestation manifest sha256:442a7c5c51ba4a68b2433aa447f93d3ac37ad1e68058599307d80e400ad844f3 done
+#6 exporting manifest list sha256:bf6f096f91837e486cd919767f8862912d418d7f4343bd25c0269db7b6995563 done
+#6 naming to docker.io/library/termcraft-validation-v08:fix1-ocr done
+#6 unpacking to docker.io/library/termcraft-validation-v08:fix1-ocr
+#6 unpacking to docker.io/library/termcraft-validation-v08:fix1-ocr 0.3s done
+#6 DONE 2.2s

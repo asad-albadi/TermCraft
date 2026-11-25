@@ -1,0 +1,72 @@
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling bitflags v2.13.2
+   Compiling uuid v1.29.2
+   Compiling serde_bytes v0.11.19
+   Compiling serde_json v1.0.154
+   Compiling rustix v1.1.6
+   Compiling rustix v0.38.44
+   Compiling harfrust v0.12.0
+   Compiling png v0.18.1
+   Compiling xkbcommon-dl v0.4.2
+   Compiling glutin v0.32.3
+   Compiling nix v0.31.4
+   Compiling accesskit v0.24.1
+   Compiling zvariant_utils v4.2.0
+   Compiling enumflags2 v0.7.12
+   Compiling zcheapstr v1.4.0
+   Compiling russh-sftp v4.0.0
+   Compiling russh-cryptovec v0.62.0
+   Compiling russh v0.65.4
+   Compiling image v0.25.10
+   Compiling zvariant_derive v5.15.1
+   Compiling zvariant v5.15.1
+   Compiling epaint v0.36.2
+   Compiling zbus_names v4.3.5
+   Compiling wayland-backend v0.3.17
+   Compiling polling v3.11.0
+   Compiling gethostname v1.1.0
+   Compiling fs-set-times v0.20.3
+   Compiling rustix-linux-procfs v0.1.1
+   Compiling tempfile v3.27.0
+   Compiling x11rb v0.13.2
+   Compiling cap-primitives v4.0.3
+   Compiling calloop v0.13.0
+   Compiling calloop v0.14.5
+   Compiling async-io v2.6.0
+   Compiling zbus_macros v5.19.0
+   Compiling egui v0.36.2
+   Compiling async-signal v0.2.14
+   Compiling cap-std v4.0.3
+   Compiling async-process v2.5.0
+   Compiling cap-fs-ext v4.0.3
+   Compiling wayland-client v0.31.15
+   Compiling wayland-csd-frame v0.3.0
+   Compiling arboard v3.6.1
+   Compiling zbus v5.19.0
+   Compiling wayland-protocols v0.32.13
+   Compiling wayland-cursor v0.31.14
+   Compiling calloop-wayland-source v0.3.0
+   Compiling calloop-wayland-source v0.4.1
+   Compiling egui_glow v0.36.2
+   Compiling wayland-protocols-wlr v0.3.12
+   Compiling wayland-protocols-plasma v0.3.12
+   Compiling wayland-protocols-misc v0.3.12
+   Compiling wayland-protocols-experimental v20250721.0.1
+   Compiling rfd v0.17.2
+   Compiling smithay-client-toolkit v0.19.2
+   Compiling smithay-client-toolkit v0.20.0
+   Compiling winit v0.30.13
+   Compiling smithay-clipboard v0.7.3
+   Compiling glutin-winit v0.5.0
+   Compiling egui-winit v0.36.2
+   Compiling eframe v0.36.2
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 33.15s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-c814a3629b30588a)
+
+running 1 test
+test ui::highlighting::tests::rejected_saved_rules_are_not_cloned_into_render_caches ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 50 filtered out; finished in 0.00s
+

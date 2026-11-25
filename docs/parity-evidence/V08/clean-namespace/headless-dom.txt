@@ -1,0 +1,2 @@
+<!DOCTYPE html>
+<html><head><title>V08 Offline Sandbox</title></head><body>V08_SANDBOX_OFFLINE_OK</body></html>

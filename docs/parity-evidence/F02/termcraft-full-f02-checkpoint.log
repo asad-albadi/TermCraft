@@ -1,0 +1,176 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.48s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-7391643cbe6d2a78)
+
+running 25 tests
+test http_server::tests::rejects_encoded_traversal ... ok
+test remote_files::transfer::operations::commit::tests::atomic_commit_preserves_both_files_on_conflict ... ok
+test remote_files::transfer::review_tests::equal_sized_jobs_keep_distinct_immutable_operation_summaries ... ok
+test ssh::worker::budget_tests::directory_budget_bounds_retained_bytes_before_allocating_paths ... ok
+test ssh::auth::tests::agent_factor_preserves_new_authentication_methods ... ok
+test remote_files::transfer::operations::tree::windows_name_tests::windows_download_names_reject_device_aliases_and_path_syntax ... ok
+test remote_files::transfer::tests::queued_cancellation_is_observable_before_worker_start ... ok
+test ssh::x11::tests::display_parser_rejects_remote_targets_and_port_overflow ... ok
+test ssh::x11::tests::authority_requires_matching_display_host_and_protocol ... ok
+test terminal::tests::alternate_screen_restores_primary ... ok
+test ssh::x11::tests::substitutes_only_verified_cookie_in_both_byte_orders ... ok
+test remote_files::transfer::operations::source::cap_backend::tests::capability_backend_moves_files_between_anchored_directories ... ok
+test terminal::tests::cursor_edit_and_erase ... ok
+test ssh::x11::tests::unauthorized_x11_never_connects_to_local_server ... ok
+test terminal::tests::preserves_split_utf8 ... ok
+test ssh::x11::tests::rejects_wrong_cookie_and_oversized_handshakes ... ok
+test tests::protocol_defaults_match_sessions ... ok
+test terminal::tests::scrolling_keeps_history ... ok
+test tests::ssh_preserves_key_paths_without_shell_interpolation ... ok
+test ssh::host_keys::tests::remembering_a_conflicting_key_cannot_expand_the_pin_set ... ok
+test tests::rejects_option_injection_and_bad_hosts ... ok
+test remote_files::transfer::operations::source::cap_backend::tests::capability_backend_rejects_swapped_sources_and_destination_links ... ok
+test remote_files::transfer::operations::source::tests::replaced_children_are_not_followed_after_enumeration ... ok
+test process::backend::tests::real_shell_uses_pty_and_returns_output ... ok
+test process::backend::lifecycle_tests::dropping_tab_ends_foreground_and_background_jobs ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-8f24421c0b68d6f2)
+
+running 22 tests
+test ui::appearance::tests::reads_live_desktop_appearance_portal ... ignored, requires a running desktop appearance portal
+test ui::appearance::tests::portal_values_follow_the_desktop_specification ... ok
+test ui::pages::appearance_tests::search_only_highlights_matching_text_and_inverse_stays_legible ... ok
+test ui::remote_files::transfer_tests::action_dialog_keeps_its_confirmed_target_and_rejects_traversal ... ok
+test ui::remote_files::transfer_tests::folder_download_and_dropped_upload_keep_explicit_roots ... ok
+test ui::remote_files::transfer_tests::download_uses_selected_raw_path_and_requires_a_regular_file ... ok
+test ui::remote_files::transfer_tests::recursive_deletion_requires_the_explicit_contents_choice ... ok
+test ui::remote_files::transfer_tests::remote_drop_cannot_cross_connection_or_escape_local_directory ... ok
+test ui::remote_files::auth_tests::auth_field_leaves_no_secret_in_undo_history ... ok
+test ui::gui_tests::integrated_tab_close_does_not_select_the_tab ... ok
+test ui::gui_tests::closing_an_earlier_tab_preserves_active_session ... ok
+test ui::gui_tests::unauthenticated_terminal_input_cannot_be_recorded_or_queued ... ok
+test ui::gui_tests::appearance_tracks_system_and_honors_overrides ... ok
+test ui::gui_tests::reconnect_keeps_tool_program_and_arguments ... ok
+test ui::appearance::tests::system_theme_updates_do_not_override_explicit_appearance ... ok
+test ui::gui_tests::embedded_ssh_creates_browser_even_when_sidebar_collapsed ... ok
+test ui::gui_tests::system_appearance_without_native_theme_defaults_to_light ... ok
+test ui::gui_tests::all_workspace_pages_and_dialogs_render ... ok
+test ui::remote_files::transfer_tests::old_listing_rows_cannot_be_selected_during_navigation ... ok
+test ui::gui_tests::native_drop_on_local_zone_does_not_upload ... ok
+test ui::gui_tests::terminal_widget_writes_keyboard_input_into_real_shell ... ok
+test ui::gui_tests::sidebar_keyboard_toggle_persists_and_restores ... ok
+
+test result: ok. 21 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 3.04s
+
+     Running tests/connection.rs (app/target/debug/deps/connection-55aae3ba616d8fa3)
+
+running 2 tests
+test sftp_escapes_quotes_and_rejects_newlines ... ok
+test missing_client_is_actionable ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/model.rs (app/target/debug/deps/model-0071675c67646e40)
+
+running 8 tests
+test old_ssh_sessions_keep_openssh_configuration_compatibility ... ok
+test ssh_file_transfer_keeps_connection_options ... ok
+test unknown_tunnel_modes_are_rejected ... ok
+test file_copy_never_overwrites_a_destination ... ok
+test ipv6_tunnels_preserve_address_boundaries ... ok
+test layout_preferences_roundtrip_and_old_stores_load ... ok
+test tunnel_does_not_interpolate_destination ... ok
+test roundtrip_keeps_sessions_and_macros ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/remote_paths.rs (app/target/debug/deps/remote_paths-8febb7c81ea20358)
+
+running 4 tests
+test stale_connection_or_request_cannot_replace_directory ... ok
+test displayed_paths_distinguish_raw_bytes_and_literal_escape_sequences ... ok
+test transfer_refresh_cannot_supersede_pending_user_navigation ... ok
+test remote_paths_preserve_literal_bytes_and_use_posix_separators ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-be9fc2871599b398)
+
+running 19 tests
+
+running 1 test
+test cancelled_download_does_not_overwrite_destination ... ok
+test cancellation_and_conflicts_preserve_existing_destination ... ok
+test composed_symlinks_cannot_publish_an_escape_from_the_selected_tree ... ok
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.19s
+
+
+running 1 test
+test disconnect_keeps_original_destination_and_recoverable_partial ... ok
+test explicit_folder_overwrite_merges_files_and_preserves_unrelated_entries ... ok
+test failed_local_and_remote_io_preserve_existing_data ... ok
+test folder_merge_retains_modes_without_making_staging_read_only_too_early ... ok
+test folder_merge_never_follows_existing_destination_directory_symlinks ... ok
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.19s
+
+
+running 1 test
+test literal_binary_file_round_trip_uses_sftp ... ok
+test missing_sftp_rejects_file_jobs_without_stranding_the_queue ... ok
+test recursive_delete_is_confirmed_bounded_and_never_follows_symlinks ... ok
+test recursive_transfer_preserves_bytes_and_names ... ok
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 0.19s
+
+test injected_disk_full_sync_and_close_errors_preserve_destination_and_partial ... ok
+test remote_delete_requires_confirmed_target ... ok
+test overlapping_overwrite_jobs_commit_in_submission_order ... ok
+test symlink_cycle_is_not_followed ... ok
+test transfer_preserves_executable_modes_after_staging ... ok
+test repeated_tree_cancellation_releases_bounded_sftp_handles ... ok
+test oversized_recursive_delete_stops_before_removing_root_entries ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.89s
+
+     Running tests/ssh_authentication.rs (app/target/debug/deps/ssh_authentication-d95f2fc210a1689d)
+
+running 4 tests
+
+running 1 test
+test x11_cookie_forwarding_shares_the_authenticated_connection ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.09s
+
+test x11_cookie_forwarding_shares_the_authenticated_connection ... ok
+test keyboard_interactive_preserves_prompt_echo_flags ... ok
+test public_key_then_mfa_uses_updated_methods ... ok
+test password_auth_and_stalled_sftp_preserve_shell ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/ssh_browser.rs (app/target/debug/deps/ssh_browser-843a5668a5c7c604)
+
+running 12 tests
+test cancelling_a_host_prompt_stops_the_connection ... ok
+test changed_key_prevents_authentication ... ok
+test embedded_shell_and_browser_share_one_authentication ... ok
+test revoked_host_key_overrides_a_matching_app_pin ... ok
+test closed_sftp_channel_can_reopen_without_reauthenticating ... ok
+test missing_sftp_keeps_shell_usable ... ok
+test tab_separated_wildcard_host_pin_is_enforced ... ok
+test unknown_host_can_be_rejected_before_authentication ... ok
+test single_jump_host_authenticates_each_hop_and_opens_files ... ok
+test full_output_queue_cannot_prevent_cancellation ... ok
+test exit_reason_survives_a_saturated_event_queue ... ok
+test stalled_shell_write_does_not_block_sftp_navigation ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.39s
+
+   Doc-tests harbor_workspace
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

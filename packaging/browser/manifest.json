@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "artifact": {
+    "id": "chromium-157.0.8103.38-arch-x86_64",
+    "status": "installed runtime measured on Arch Linux x86_64; packaging closure pending",
+    "source_version": "157.0.8103.38",
+    "package_version": "157.0.8103.38-1",
+    "source_tag_url": "https://chromium.googlesource.com/chromium/src/+/refs/tags/157.0.8103.38",
+    "recipe_repository_url": "https://gitlab.archlinux.org/archlinux/packaging/packages/chromium",
+    "recipe_sha256_from_buildinfo": "0ae915c9fae3b5b9b8f79f95c95e84813b592cef8064cfa0d13c21a4425a6e84",
+    "archive_url": "https://archive.archlinux.org/packages/c/chromium/chromium-157.0.8103.38-1-x86_64.pkg.tar.zst",
+    "archive_sha256": "487cca20ea684fb1806f8215e7def1291a084b0c7b66885d7c804c7ad94574a3",
+    "archive_signature_sha256": "e13743b37592bf7c7ea8cdf45a95f21749b6a42b73ff4ac1d038deb7f0e93244",
+    "installed_executable": "/usr/lib/chromium/chromium",
+    "executable_sha256": "9b7ed7e974ffc97f15da26574a92e7cb96e5550b1d17e0b94c215181e16cd1ba",
+    "license": "BSD-3-Clause for Chromium with component-specific notices",
+    "installed_license": "/usr/share/licenses/chromium/LICENSE",
+    "license_sha256": "368cca1106be99d39ecd32a38d8305585d802a475effb66380b91ffc9bcf709b",
+    "build_inventory": ["archive:.BUILDINFO", "archive:.PKGINFO"]
+  },
+  "packaged_runtime": {
+    "status": "unqualified",
+    "required_inputs": [
+      "Chromium executable and platform-matched sandbox components",
+      "Resources and locale packs, ICU and V8 data, platform graphics providers",
+      "Binary and private runtime-library inventory plus target OS ABI baseline",
+      "Upstream and third-party notices with corresponding source requirements",
+      "Security update and rollback policy"
+    ]
+  }
+}

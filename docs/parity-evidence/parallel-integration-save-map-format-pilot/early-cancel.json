@@ -1,0 +1,6 @@
+{
+  "reason": "Normalize rustfmt-only UI integration before source-captured full gate",
+  "runner_pid": 581535,
+  "owned_cargo_pid": 581546,
+  "signal": "SIGINT"
+}

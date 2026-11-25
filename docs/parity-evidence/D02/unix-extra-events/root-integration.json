@@ -1,0 +1,50 @@
+{
+  "gate_before_integration": "parallel-integration-final-rust1961-serial-resumed-controlled/result.json",
+  "mechanical_integration": [
+    {
+      "path": "engines/rdp/src/devices.rs",
+      "before": "454b0d6121e5004875d77a6af5b8584bf53f8ba090deef9716b1e4b0a85705c8",
+      "after": "18b2739b293514e5288836940ab4972edb83bd37f46aebb92233d719c2af4d5d"
+    },
+    {
+      "path": "engines/rdp/src/serial_completion.rs",
+      "before": "1c3fe86501b75d796a397a0b25345dc33e36d96d76962fb9f7424b9070c92fbd",
+      "after": "7f7fc55d7adfe1cb4c63889957efe149a37660e75dd806abfc661f089d5b368e"
+    },
+    {
+      "path": "engines/rdp/src/serial_windows.rs",
+      "before": "c200f387d805afd5c6b305d620e51e2d6c22f2f54c9b9bca8024f09a0e96d557",
+      "after": "8bd93833d5b51d33cb552a8c88e0843b1f3c33c002b8e021ae4f0a3ae8c3f241"
+    },
+    {
+      "path": "engines/rdp/src/serial_stats.rs",
+      "before": null,
+      "after": "468137611e628510099249aa70d3626d8420fdc8e5492d1b1c5797e2fed5b0b2"
+    },
+    {
+      "path": "engines/rdp/src/serial_stats_windows.rs",
+      "before": null,
+      "after": "dda675fb125efb9a3478201344cf94e41189d5bbe9de8be64cceaea8562ceeaf"
+    },
+    {
+      "path": "tests/rdp-native-component/generate.py",
+      "before": "756780b8f50b8b4edae77b4514da19ce2150b5d809e0030ef02c6ad7272a9aef",
+      "after": "39468665e9cfe655eb1f78d7cae400baa1d3f2ac94f1857bd3e37f562ec2dd16"
+    },
+    {
+      "path": "tests/windows-serial-control-component/generate.py",
+      "before": "fd000c729b751b40277b75ff230deca96c57c3d53f58df51ca5f4b82404a0f11",
+      "after": "d39b3311e43ebe0714322b20e18f0f80049a7e292a60f55f7c9747bb032cc119"
+    },
+    {
+      "path": "tests/windows-serial-control-component/src/lib.rs",
+      "before": "45b934ac0994ba50ca0d9f608337b71907e57941dcef8f71ea0dfbc877e2c574",
+      "after": "a5f9021f8e563d56ecf35781d5c29abfcfda8c7e58ef242e7f6b11d4abea9322"
+    },
+    {
+      "path": "engines/rdp/src/serial.rs",
+      "before": "709a83e09988d35ea0e4e2010167b1aeee5f8a9c201c63e82171bff1882f73b4",
+      "after": "15d258935e8678b5dad71f757dd05e65efe31e037a9041003483dffb958c1132"
+    }
+  ]
+}

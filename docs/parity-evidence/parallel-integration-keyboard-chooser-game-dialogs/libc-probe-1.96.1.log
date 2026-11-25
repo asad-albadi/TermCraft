@@ -1,0 +1,5 @@
+   Compiling libc v0.2.191
+   Compiling termcraft-libc-probe971 v0.0.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/build-host-diagnostics/libc-probe)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.01s
+     Running `target/build-host-diagnostics/libc-probe/target-1.96.1/debug/termcraft-libc-probe971`
+libc probe passed

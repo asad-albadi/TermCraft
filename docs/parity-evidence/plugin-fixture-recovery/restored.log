@@ -1,0 +1,10 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.913 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/plugin-fixture-recovery/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 22.06s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-26b0083c104d9a9e)
+
+running 1 test
+test plugins::host::unix::verified_image_regressions::mutation_after_verification_executes_original_elf ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 258 filtered out; finished in 0.18s
+

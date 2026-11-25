@@ -1,0 +1,14 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/tunnel_interop-b4213a0a852eff74' --exact local_remote_dynamic_tunnels_carry_exact_payload --nocapture --test-threads=1
+Executable SHA256: 0fa9fd1dcc9cc5e1ccd57f333145ee69b433d68fa65fda1abd5428d3790804fa
+
+running 1 test
+test local_remote_dynamic_tunnels_carry_exact_payload ... observed owned listener local=0100007F:86DD
+echo peer=127.0.0.1:33068, local=127.0.0.1:33395, exact=TUNNEL_OK
+observed owned listener local=0100007F:9F9B
+echo peer=127.0.0.1:33566, local=127.0.0.1:36913, exact=TUNNEL_OK
+observed owned listener local=0100007F:8411
+echo peer=127.0.0.1:59980, local=127.0.0.1:33501, exact=TUNNEL_OK
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.57s
+

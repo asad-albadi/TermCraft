@@ -1,0 +1,16 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `error` found for struct `InputQueue` in the current scope
+  --> tests/process_input.rs:58:79
+   |
+58 |     let deadline=std::time::Instant::now()+Duration::from_secs(2);while queue.error().is_none() && std::time::Instant::now()<deadlin...
+   |                                                                               ^^^^^ private field, not a method
+
+error[E0599]: no method named `error` found for struct `InputQueue` in the current scope
+  --> tests/process_input.rs:59:19
+   |
+59 |     assert!(queue.error().is_some(),"an accepted final write failure must be observable without later input");
+   |                   ^^^^^ private field, not a method
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (test "process_input") due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

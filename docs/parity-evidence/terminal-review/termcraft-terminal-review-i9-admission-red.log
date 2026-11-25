@@ -1,0 +1,31 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `route_mouse` found for struct `ui::TerminalTab` in the current scope
+  --> src/ui/terminal_review_tests.rs:62:424
+   |
+62 | ...,cols:30,layer:ui.layer_id()};w.tabs[0].route_mouse(ctx,&view,true,&events,Modifiers::default());});output.textures_delta.clear();};
+   |                                            ^^^^^^^^^^^ method not found in `ui::TerminalTab`
+   |
+  ::: src/ui.rs:55:1
+   |
+55 | struct TerminalTab {
+   | ------------------ method `route_mouse` not found for this struct
+
+error[E0609]: no field `pending_mouse` on type `ui::TerminalTab`
+  --> src/ui/terminal_review_tests.rs:66:149
+   |
+66 | ...odifiers:Modifiers::default()}]);assert!(w.tabs[0].pending_mouse.is_some(),"refused release must remain pending");
+   |                                                       ^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `id`, `session`, `screen`, `codec`, `terminal_settings` ... and 28 others
+
+error[E0609]: no field `pending_mouse` on type `ui::TerminalTab`
+  --> src/ui/terminal_review_tests.rs:68:81
+   |
+68 |     assert!(w.tabs[0].screen.plain().contains("RELEASE_ACK"));assert!(w.tabs[0].pending_mouse.is_none());
+   |                                                                                 ^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `id`, `session`, `screen`, `codec`, `terminal_settings` ... and 28 others
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 3 previous errors

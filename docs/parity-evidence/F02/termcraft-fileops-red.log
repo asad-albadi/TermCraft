@@ -1,0 +1,27 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no variant named `Mkdir` found for enum `TransferOperation`
+   --> tests/remote_transfers.rs:112:50
+    |
+112 |     let id=h.transfers.submit(TransferOperation::Mkdir{remote:path(&original)}).unwrap();assert_eq!(finish(&mut h,id).outcome,Some(...
+    |                                                  ^^^^^ variant not found in `TransferOperation`
+
+error[E0599]: no variant named `Rename` found for enum `TransferOperation`
+   --> tests/remote_transfers.rs:113:50
+    |
+113 |     let id=h.transfers.submit(TransferOperation::Rename{source:path(&original),destination:path(&renamed),policy:ConflictPolicy::As...
+    |                                                  ^^^^^^ variant not found in `TransferOperation`
+
+error[E0599]: no variant named `Remove` found for enum `TransferOperation`
+   --> tests/remote_transfers.rs:114:50
+    |
+114 |     let id=h.transfers.submit(TransferOperation::Remove{remote:path(&other),confirmed:path(&renamed)}).unwrap();assert!(matches!(fi...
+    |                                                  ^^^^^^ variant not found in `TransferOperation`
+
+error[E0599]: no variant named `Remove` found for enum `TransferOperation`
+   --> tests/remote_transfers.rs:115:50
+    |
+115 |     let id=h.transfers.submit(TransferOperation::Remove{remote:path(&renamed),confirmed:path(&renamed)}).unwrap();assert_eq!(finish...
+    |                                                  ^^^^^^ variant not found in `TransferOperation`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (test "remote_transfers") due to 4 previous errors

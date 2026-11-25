@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/docs/parity-evidence/V08/clean-namespace/review-checks.py", line 38, in <module>
+    result['image_id']=image['Id']; inspect=subprocess.run(['docker','inspect',provenance['owned_container']],capture_output=True,text=True);assert inspect.returncode!=0 and 'No such' in inspect.stderr
+                                                                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

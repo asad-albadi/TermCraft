@@ -1,0 +1,27 @@
+openssh-shell-sftp: passed
+unknown-reject: passed
+unknown-cancel: passed
+changed-reject: passed
+jump-one: passed
+jump-two: passed
+password: passed
+mfa: passed
+key-mfa: passed
+password-mfa: passed
+encrypted-key-cancel: passed
+encrypted-key-agent: passed
+agent-remove: passed
+key-types: passed
+auth-cancel: passed
+reconnect-generation: passed
+reconnect-real-directory: passed
+sftp-roundtrip: passed
+sftp-cancel: passed
+sftp-disconnect: passed
+sftp-io-failure: passed
+sftp-reopen: passed
+proxy: passed
+native-windows: unavailable
+native-macos: unavailable
+independent-dropbear: passed
+Evidence: /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02/docs/parity-evidence/V01/run-linux-final

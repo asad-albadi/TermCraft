@@ -1,0 +1,445 @@
+{
+  "command": [
+    "cargo",
+    "metadata",
+    "--offline",
+    "--locked",
+    "--no-deps",
+    "--format-version",
+    "1",
+    "--manifest-path",
+    "app/Cargo.toml"
+  ],
+  "CARGO_BUILD_JOBS": "2",
+  "targets": [
+    {
+      "name": "harbor_workspace",
+      "kind": [
+        "lib"
+      ]
+    },
+    {
+      "name": "harbor-workspace",
+      "kind": [
+        "bin"
+      ]
+    },
+    {
+      "name": "browser_session",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "cli_dispatch",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "connection",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "credential_vault",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "desktop_carrier",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "desktop_fullscreen",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "desktop_gateway",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "desktop_gateway_adapters",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "desktop_integration",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "ftp_ftps",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "ftp_workspace",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "games",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "highlighting",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "http_sharing",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "legacy_protocols",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "linux_desktop",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "macro_events",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "model",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "multiexec",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "package_manager",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "package_manifest",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "packet_capture",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "plugins",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "process_input",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "protocol_interop",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "rdp_credentials",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "rdp_options",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "rdp_serial_options",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "rdp_session",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "remote_editor",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "remote_environment",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "remote_paths",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "remote_transfers",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "runtime_manifest",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "scp_browser",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "serial_settings",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "service_adapters",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "services",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "session_groups",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "session_import",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "shared_sessions",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "shared_source_ssh",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "shared_sources_network",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "shell_directory",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "shortcuts",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "ssh_agent",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "ssh_authentication",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "ssh_browser",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "ssh_interop",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "ssh_lifecycle",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "ssh_options",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "tab_activity",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "terminal_conformance",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "terminal_mouse",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "terminal_performance",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "terminal_programs",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "terminal_safety",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "terminal_search",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "terminal_selection",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "terminal_settings",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "tools",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "tunnel_interop",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "vnc_session",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "windows_integration",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "workspace_layout",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "workspace_windows",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "x11_extensions",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "x11_forwarding",
+      "kind": [
+        "test"
+      ]
+    },
+    {
+      "name": "xserver_lifecycle",
+      "kind": [
+        "test"
+      ]
+    }
+  ],
+  "target_count": 71,
+  "unintended_owner_target_present": false,
+  "exit_code": 0
+}

@@ -1,0 +1,12 @@
+
+running 7 tests
+test tests::broadcast_requires_explicit_interface_choice ... ok
+test tests::cancellation_prevents_any_packet ... ok
+test tests::old_profiles_default_to_no_listener_and_round_trip_custom_options ... ok
+test tests::listener_consent_and_selected_endpoint_are_required ... ok
+test tests::malformed_and_oversized_replies_are_rejected ... ok
+test tests::cancellation_during_discovery_finishes_promptly ... ok
+test tests::nondefault_port_is_used_and_only_correlated_willing_is_admitted ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s
+

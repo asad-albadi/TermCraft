@@ -1,0 +1,9 @@
+   Compiling b04-components v0.1.0-b04-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b04/component)
+error[E0599]: no method named `edit_text` found for struct `harbor_workspace::registry_fs::RegistryValue` in the current scope
+   --> tests/../../source/tests/windows_integration.rs:357:54
+    |
+357 |     assert_eq!(RegistryValue::parse_text(7,&original.edit_text().unwrap()).unwrap(),original);
+    |                                                      ^^^^^^^^^ method not found in `harbor_workspace::registry_fs::RegistryValue`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `b04-components` (test "windows_integration") due to 1 previous error

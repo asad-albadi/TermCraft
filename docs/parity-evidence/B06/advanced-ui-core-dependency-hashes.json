@@ -1,0 +1,378 @@
+{
+  "docs/parity-evidence/B06/advanced-puzzles-availability-probe.rs": {
+    "sha256": "26a1af0d7559e8dd5e09f19c33678be65ab0937010add16202549542969ba170",
+    "size": 746
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-baseline-availability-red.log": {
+    "sha256": "58c73efb406f7e911203b9f840074073b10cdef4a1c8db562fddfb87c8b92451",
+    "size": 1352
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-clippy.log": {
+    "sha256": "ab9ad83309e621185f701052bfe7a8551cde09c8f0b27fa047db993f4c8b1648",
+    "size": 221
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-clippy.log": {
+    "sha256": "570554210f4dcec8a685b4696744b41329a9724f0f30c0bf42382ea6ad830fe0",
+    "size": 226
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-default-green.log": {
+    "sha256": "42c224b1b0b7e3513de7e0b4cca21a51f1c4e53045cf09d19ff5887e4763d203",
+    "size": 504
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-fmt-check.log": {
+    "sha256": "3189cbd81fd40ddca772af00ae5da660991dceeb9bae7cd34a3ca55f3bd8e461",
+    "size": 58
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-history-green.log": {
+    "sha256": "b5e74faa329777d8f07d4567d8c9bd93ac234f5bf1627a0e57b555d7511371a6",
+    "size": 416
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-macos-check.log": {
+    "sha256": "f5957c1bc714b0eabfddf79fb23448b0db13472233e4b24b6631cdd5b4a42ef2",
+    "size": 226
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-metadata-green.log": {
+    "sha256": "9e77dff2b2cc4ebf1591788bf57348997a3fa32c1b51a55eec83d6002766fdbe",
+    "size": 577
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-metadata-red.log": {
+    "sha256": "1be33a57807afceb24e90cbdd250bfe25966053fb7bfddde2185fa5e9c0ba889",
+    "size": 1268
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-report.md": {
+    "sha256": "4aca98751e7d587e93354a439d006a4afd4d473a757b0682362ebd46e04b2d32",
+    "size": 3924
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-solve-green.log": {
+    "sha256": "d5c6ede9b50d66e1261db6e739d30e0d93e0f42a3e106fab2ac892628552ecab",
+    "size": 424
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-topology-green.log": {
+    "sha256": "c3a596057d4f31f7e2fc31b45463488500a6753c08737977d75cf4272d3c9243",
+    "size": 846
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fix1-windows-check.log": {
+    "sha256": "de52d3cffd1c2658cc7a9dc05081e974d8e9928fe59b6449b517d65398aebd25",
+    "size": 226
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-fmt-check.log": {
+    "sha256": "3189cbd81fd40ddca772af00ae5da660991dceeb9bae7cd34a3ca55f3bd8e461",
+    "size": 58
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-macos-check.log": {
+    "sha256": "ade76a90b068ae4d6bd44c7b52e769cedfb7f7d77ecab1aeae86c744ae53a9b4",
+    "size": 221
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-map-green.log": {
+    "sha256": "67e68c8cddaa746b09ab746494c557640d88b55878333a6cb7811b0e53923e1f",
+    "size": 646
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-map-matrix-green.log": {
+    "sha256": "0f87b32aa7d1e69fce2cb099543cbcf07c092b56521345cc7a3e3ca1c3b12ff5",
+    "size": 1178
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-map-red.log": {
+    "sha256": "e6bb833a6c314eac8b1137b27fdfc5f72bb6f3d978e19667ba5b060ce1efef10",
+    "size": 3464
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutation-jigsaw-regions-red.log": {
+    "sha256": "def68bc1f193c1c5b1c6a59e64f223943760c6fdc6ace12ba2e01a44d4b82084",
+    "size": 1506
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutation-killer-45-residual-red.log": {
+    "sha256": "f613d13df2a3860106cd499cbb8d25a26da269feb44e3f4613001a7d050ca30c",
+    "size": 1610
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutation-killer-completion-sum-red.log": {
+    "sha256": "997f85fa63105c23c0bbe3c83cfee9c2b44274441405493de3ea15f471110a6d",
+    "size": 1099
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutation-killer-sum-table-red.log": {
+    "sha256": "e1fb428d9d92e944fe712cb9d759c0cb2fd80454c2b97246a1a7ea2e3886772f",
+    "size": 1899
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutation-map-forcing-red.log": {
+    "sha256": "edcf861993814b6bb0364897532068997097d62148eabfb8822052106681c7e0",
+    "size": 2475
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutation-results.json": {
+    "sha256": "1d287922a33378ac62777f13de4be1011cab5ce2de76c481af0cf00c3d2aeab2",
+    "size": 1507
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutation-solo-fish-red.log": {
+    "sha256": "1ffb634a4e65a4ae51bd9e83a42de5050984c113deb737fd5f9494d8378ba12f",
+    "size": 2221
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutation-solo-forcing-red.log": {
+    "sha256": "e399fa66a03085919f4a6ca662ca869fb9da9b8bf11e8658d2016a09999a762c",
+    "size": 2201
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutation-solo-intersection-red.log": {
+    "sha256": "c73f2e7440f05b40195e76e2f820409c632fe309df7044b94344f14fe58ad373",
+    "size": 2658
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutation-solo-set-red.log": {
+    "sha256": "45997fb98be74137709f37cfcc618f79acf45868ffdb62b9d5d3dcc0e4efd668",
+    "size": 2253
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-mutations.log": {
+    "sha256": "e9785ec1b686429c94b2e7ac2af48affd5c843b1b0e16b9ded837a3506552c58",
+    "size": 180
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-proposed-availability-green.log": {
+    "sha256": "0bf1e55d9e65cb9f6b0c5cdf3940f2a0b401bbf4fc430683a1e56359442d91ce",
+    "size": 657
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-regression-green.log": {
+    "sha256": "07e7ee9f6f899a0d05edba3831ec01e226f83f1ac5d7dc75c982673dc34e24ba",
+    "size": 5685
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-report.md": {
+    "sha256": "4c4af1ccf9c05a018f5edad08a17cefc5bb4e29e53ca6c943e4ccda30ab9679c",
+    "size": 9665
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-solo-green.log": {
+    "sha256": "0dc011e57b4e189e87a31d811540857ead1031f872e7481e1dbd1d4d854325df",
+    "size": 1044
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-solo-independent-green.log": {
+    "sha256": "10a6431a6f5c9820b87f2f2966e8ddb65fa6b5c2851de3b224db58005b8d3a8e",
+    "size": 2067
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-solo-red.log": {
+    "sha256": "023ab5b5bc656be3030c0d6b4ad5d887f69eb7a07c975b10335c0aaa6c87e014",
+    "size": 1404
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-source-verification.log": {
+    "sha256": "3858bcb4b465f4a507172c7688b9f9e501b43cc1411af4c39c4091a286d3c25a",
+    "size": 161
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-topology-green.log": {
+    "sha256": "08fc24ca77bfa0dec62ac36bc4caecabb99d9b5459cf08a3cdcf5c9704347a75",
+    "size": 889
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-verify-mutations.py": {
+    "sha256": "2a825ae80b6224b42060de4dad238227f5ecb3dda5d9114900dfc22f3a3c07b2",
+    "size": 2550
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-verify-source.py": {
+    "sha256": "bf6f44b95e0130ebbe5bbed2c0c38e9c6efdf5cf7cf19d0e7da379065ec272e4",
+    "size": 1655
+  },
+  "docs/parity-evidence/B06/advanced-puzzles-windows-check.log": {
+    "sha256": "ade76a90b068ae4d6bd44c7b52e769cedfb7f7d77ecab1aeae86c744ae53a9b4",
+    "size": 221
+  },
+  "docs/parity-evidence/B06/puzzle-options-final-clippy.log": {
+    "sha256": "62beb9de2ba7196fbea2ba83f48d69ca84e21eca8f75b46d150212eba9c81c8f",
+    "size": 222
+  },
+  "docs/parity-evidence/B06/puzzle-options-final-fmt.log": {
+    "sha256": "3758c84f0c166988de1b4a09ad5b5fc97bbf09ec778013c723fc643b5feb1d05",
+    "size": 64
+  },
+  "docs/parity-evidence/B06/puzzle-options-final-macos.log": {
+    "sha256": "b7d6a60ad27e4f09022ccba2215c71f69e7300276c576dc9cfc16739c386649f",
+    "size": 222
+  },
+  "docs/parity-evidence/B06/puzzle-options-final-test.log": {
+    "sha256": "54f0320d8f0504af86e8b7999b4e35e47e24425ce8d57f4ce796e665c2a56233",
+    "size": 7086
+  },
+  "docs/parity-evidence/B06/puzzle-options-final-windows.log": {
+    "sha256": "a34aa5269af19577c6d4764c24a8f5a2e9e65eceee8bb67b1c2d84ea5aef3a3b",
+    "size": 222
+  },
+  "docs/parity-evidence/B06/puzzle-options-fix1-clippy.log": {
+    "sha256": "b7d6a60ad27e4f09022ccba2215c71f69e7300276c576dc9cfc16739c386649f",
+    "size": 222
+  },
+  "docs/parity-evidence/B06/puzzle-options-fix1-fmt.log": {
+    "sha256": "f3c0e635c687b9d69160dce60195fae221753f65fe37194aa005255588233c1b",
+    "size": 54
+  },
+  "docs/parity-evidence/B06/puzzle-options-fix1-green.log": {
+    "sha256": "f9ccf8d355dab05f6e024a42e2579ae715a9657b94aae85f2c7ed494be38e099",
+    "size": 1008
+  },
+  "docs/parity-evidence/B06/puzzle-options-fix1-macos.log": {
+    "sha256": "063fb14382bc9454a34d17fdb7ae0a156bffc40569cee1d152ca182fe11cba3c",
+    "size": 222
+  },
+  "docs/parity-evidence/B06/puzzle-options-fix1-net-green.log": {
+    "sha256": "8c5bb882900bd6af17bbb0eb9a7762cfb0d41efb5e405e44fcce5fd3e6258cce",
+    "size": 937
+  },
+  "docs/parity-evidence/B06/puzzle-options-fix1-red.log": {
+    "sha256": "53ed8b8e12f1b0933a82af4741bf171a2c977ce41630ed36e026840f782c994c",
+    "size": 1337
+  },
+  "docs/parity-evidence/B06/puzzle-options-fix1-redo-green.log": {
+    "sha256": "6cee788e5fb12b33dc3b44808197fc0a6e3179cf8c3a49b7a40ac89db0d85138",
+    "size": 412
+  },
+  "docs/parity-evidence/B06/puzzle-options-fix1-report.md": {
+    "sha256": "84401d69eca03b560e6f6b95a80f8c2bff3cb4e2ec15334c2a2b511542030eec",
+    "size": 5159
+  },
+  "docs/parity-evidence/B06/puzzle-options-fix1-verify-source.py": {
+    "sha256": "d6cc58886a16921feccae47d56e5a8e48a06f9043278977c4560df2303e88db1",
+    "size": 1715
+  },
+  "docs/parity-evidence/B06/puzzle-options-fix1-windows.log": {
+    "sha256": "1afa0c204d427b2ad4bc2a34ac9a6445c3a7b2fe6bc64ed910adf1be46ff02d3",
+    "size": 222
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-guess-blanks-red.log": {
+    "sha256": "b26653626af96ee0c8562d1ce639bb27cc1408e8b67c1e0e3be509ddce61c805",
+    "size": 953
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-guess-distinct-red.log": {
+    "sha256": "6fca35ba8e7ab8246f65c0de44ff5477fdd2c291b2605c11cb72b8531799d877",
+    "size": 953
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-mines-corrections-red.log": {
+    "sha256": "fdf2d17529d216f0792e73fee1df31d11a615308ee1213dd86a1c302dfc18119",
+    "size": 997
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-net-barrier-red.log": {
+    "sha256": "83076d6d2a167dbc07d3c2dfcc691ed63f1a61416003919c742b9750e3297000",
+    "size": 965
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-net-loop-red.log": {
+    "sha256": "aacc9ab75a0a307fc75373b6c1f50f0ceb23b08c23e656b58218f6076c018d80",
+    "size": 1475
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-net-wrap-red.log": {
+    "sha256": "a879f5cf4c0cc28bb7f574510283873368c1b93b70cff644d0349ff9e3e3a7a7",
+    "size": 964
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-redo-noop-red.log": {
+    "sha256": "cce0b5063e92a5e3431437660cc20ff441022d168155e5039e917e098a9e35f3",
+    "size": 930
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-results.json": {
+    "sha256": "2a696ce582c14ec973a7e676dc26d9182f57150167ca7d7a2dd65e8b699c8a5b",
+    "size": 3250
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-solo-block-grade-red.log": {
+    "sha256": "07509d0ca45794b39dfb45d5e82c11a314c405edb29fa57f3bb93ecdd0ff97ea",
+    "size": 1496
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-solo-symmetry-red.log": {
+    "sha256": "6b387e4ef9878b11812a11cae67ebe7b342e46d58319364bc44d1562252ba695",
+    "size": 972
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-solve-assisted-red.log": {
+    "sha256": "ae14c3b4c5ba422ace4bbbb397572383b02921dd3fefb647e19fc099bcb54625",
+    "size": 958
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutation-untangle-points-red.log": {
+    "sha256": "184034976ab4e84767fc52a227c9ec1a73313d426a466e4b49f2d80a1d7d7102",
+    "size": 1046
+  },
+  "docs/parity-evidence/B06/puzzle-options-mutations-final.log": {
+    "sha256": "a52346e82a8b9761944416505ab78134976dc43989f1306fbb12709f33342d07",
+    "size": 56
+  },
+  "docs/parity-evidence/B06/puzzle-options-net-barrier-rate-red.log": {
+    "sha256": "95ac31c1aecd015312fcd1c8c15e314e6706a90e45472070915f3192314b2fe7",
+    "size": 1178
+  },
+  "docs/parity-evidence/B06/puzzle-options-report.md": {
+    "sha256": "034462106b587269520ff119c8e0a745894143bbd444455489b5e39667dc41bb",
+    "size": 8994
+  },
+  "docs/parity-evidence/B06/puzzle-options-solo-default-behavioral-red.log": {
+    "sha256": "6c04bb678e74bcacfa91c4c4249331b3ebd480800a4d5b4559ea4ca2834a3c1f",
+    "size": 1864
+  },
+  "docs/parity-evidence/B06/puzzle-options-solo-preset-orientation-red.log": {
+    "sha256": "c368e767e6e59498cb0a8a050574ec4ba4b0d31a2ca3524ba25e88029e3a9207",
+    "size": 1058
+  },
+  "docs/parity-evidence/B06/puzzle-options-verify-mutations.py": {
+    "sha256": "3cfe3e528e03f0b7e5ea53e8ccb7e99759674f87cfbbb83e7fedbcaf53a97c55",
+    "size": 3016
+  },
+  "docs/parity-evidence/B06/puzzle-options-verify-source.py": {
+    "sha256": "313012233d9dcc1efe4da86b347e4384f4fd21cef22d0f69297b126e85e47417",
+    "size": 1703
+  },
+  "src/games/puzzles/PROVENANCE.md": {
+    "sha256": "bd41c14ecc846eb2d2d183981ebe7d261a5dc037f97e01e349eb46fb9b61cfcf",
+    "size": 16742
+  },
+  "src/games/puzzles/config.rs": {
+    "sha256": "460c62b15b85653f6b723887a0e244e2c96a15f264e99d9ea453f96e19c97b4f",
+    "size": 15902
+  },
+  "src/games/puzzles/guess.rs": {
+    "sha256": "97b4e824a1cbb1a087cfd03b74ab8703e22b10cdc6883559b2c97a474984de95",
+    "size": 8415
+  },
+  "src/games/puzzles/map.rs": {
+    "sha256": "48021e0fb77ad2e797e305242dd167751752a5559a39097f253571be240aea5c",
+    "size": 40721
+  },
+  "src/games/puzzles/mines.rs": {
+    "sha256": "47ceafff40fd4730eb411927c254fa3592b33a614cd9aa1f64e22bfcc20e5315",
+    "size": 16564
+  },
+  "src/games/puzzles/mod.rs": {
+    "sha256": "e673ad201af8806ef56c9906007fc935affe194e12243f8784d33260f1929696",
+    "size": 13564
+  },
+  "src/games/puzzles/net.rs": {
+    "sha256": "74aed8b3a2b70b6b8ccd1d7c52aa2fa899ffcc67bfc62dc73ce319df6ed2c1fa",
+    "size": 18859
+  },
+  "src/games/puzzles/provenance/UPSTREAM-LICENCE": {
+    "sha256": "324cba4984cf02666dec301689f11806c75cee0bdef56bc81a5bdc75667dd68b",
+    "size": 1275
+  },
+  "src/games/puzzles/provenance/advanced-source-excerpts.txt": {
+    "sha256": "7dbbe42eb5991983bbfa7c55d1bddb9e67c7f41d6acd90495ed7e16a9d6d9538",
+    "size": 85948
+  },
+  "src/games/puzzles/provenance/advanced-source-manifest.json": {
+    "sha256": "2d9c4b897b61c9dd98a10616f0a42070b78dec9c5656ce8b833aeef7673f21c0",
+    "size": 3143
+  },
+  "src/games/puzzles/provenance/options-source-excerpts.txt": {
+    "sha256": "55eac037125eba9b11d80ed3b8967a7262cca55a446f78af176fc3649e824a4d",
+    "size": 31655
+  },
+  "src/games/puzzles/provenance/options-source-manifest.json": {
+    "sha256": "aea46ce2cfed9aeb874ac1a0857e49b4448fba7eb003489fb94573b89d75cb19",
+    "size": 5558
+  },
+  "src/games/puzzles/provenance/recovered-manual-sections.but": {
+    "sha256": "ef6c371b62dc4ca074f8808f84d4dd657f50f2c8a22f96b439716915bb052abe",
+    "size": 22466
+  },
+  "src/games/puzzles/provenance/recovered-source-excerpts.txt": {
+    "sha256": "8274950155663828b00dfd319c81a765974eaf18331122f3a0af3aeda65f2e90",
+    "size": 64309
+  },
+  "src/games/puzzles/provenance/source-manifest.json": {
+    "sha256": "2def57c10f6675907ad7bdd7815f7fc44bdde3c54115bc586f2c576cf8f93dda",
+    "size": 5862
+  },
+  "src/games/puzzles/solo.rs": {
+    "sha256": "d6feaa52a36766526084a924bb0013b3dbbd1eac9d76757e41887e1464fcce58",
+    "size": 25658
+  },
+  "src/games/puzzles/solo_advanced.rs": {
+    "sha256": "7a5918dcf06c090124ec3db73b3429eae44bb434d2732b6efd9ec02f785ed69f",
+    "size": 41160
+  },
+  "src/games/puzzles/tests.rs": {
+    "sha256": "0704f130e468e2b9a747a06dd159739042109a1728af4707ac3e7283fafe06be",
+    "size": 23277
+  },
+  "src/games/puzzles/untangle.rs": {
+    "sha256": "cdf9cd40fa22ab4242fe516a84cd195f5e75400d0b9a8b889419b09e557a7bd4",
+    "size": 7585
+  }
+}

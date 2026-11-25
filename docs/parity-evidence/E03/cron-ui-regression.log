@@ -1,0 +1,15 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-e03-cron-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-cron)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 38.76s
+     Running unittests src/main.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-4b7b4c0b34479cdd)
+
+running 6 tests
+test ui::managed_servers::tests::telnet_service_password_field_leaves_no_undo_history ... ok
+test ui::managed_servers::tests::ftp_service_password_field_leaves_no_undo_history ... ok
+test ui::managed_ssh_iperf::tests::ssh_service_password_field_leaves_no_undo_history ... ok
+test ui::managed_cron::tests::pointer_save_start_due_stop_and_disabled_persistence ... ok
+test ui::managed_servers::tests::servers_page_buttons_own_real_listeners_and_restart ... ok
+test ui::managed_ssh_iperf::tests::servers_ssh_pointer_start_auth_root_readonly_stop_preserves_local_pty ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 139 filtered out; finished in 3.26s
+

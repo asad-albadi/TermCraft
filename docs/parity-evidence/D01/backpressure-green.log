@@ -1,0 +1,9 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.63s
+     Running unittests src/lib.rs (target/debug/deps/harbor_workspace-94bde7e000a59e92)
+
+running 1 test
+test desktop::queue_tests::focus_release_is_encoded_even_with_full_input_queue ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 37 filtered out; finished in 0.01s
+

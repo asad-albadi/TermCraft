@@ -1,0 +1,46 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.63s
+     Running tests/terminal_conformance.rs (app/target/debug/deps/terminal_conformance-f1f1293098e096af)
+
+running 15 tests
+test editing_either_half_of_a_wide_cell_never_leaves_an_orphan ... ok
+test alternate_resize_restores_primary ... ok
+test erasing_half_a_wide_glyph_uses_the_current_erase_rendition ... FAILED
+test nonprinting_reports_and_modes_preserve_pending_wrap ... ok
+test dec_restore_reinstates_origin_mode_and_survives_widening ... FAILED
+test dec_save_restore_preserves_wrap_and_rendition ... ok
+test origin_insert_and_dec_graphics_modes_follow_vt_commands ... ok
+test combining_and_wide_cells_survive_resize ... ok
+test unsupported_control_strings_and_cancelled_sequences_never_become_visible_text ... ok
+test scroll_region_does_not_corrupt_history ... ok
+test streamed_emoji_clusters_and_margin_wrapping_use_display_columns ... ok
+test widening_a_pending_wrap_cursor_never_overwrites_the_last_character ... ok
+test long_scrollback_search_reuses_unchanged_index ... ok
+test plain_scrollback_retains_ordinary_history_within_a_small_budget ... ok
+test scrollback_memory_and_grapheme_growth_are_bounded ... ok
+
+failures:
+
+---- erasing_half_a_wide_glyph_uses_the_current_erase_rendition stdout ----
+
+thread 'erasing_half_a_wide_glyph_uses_the_current_erase_rendition' (355763) panicked at tests/terminal_conformance.rs:184:141:
+assertion `left == right` failed
+  left: Ink(30, 30, 30)
+ right: Ink(14, 177, 108)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- dec_restore_reinstates_origin_mode_and_survives_widening stdout ----
+
+thread 'dec_restore_reinstates_origin_mode_and_survives_widening' (355760) panicked at tests/terminal_conformance.rs:178:103:
+assertion `left == right` failed
+  left: " "
+ right: "@"
+
+
+failures:
+    dec_restore_reinstates_origin_mode_and_survives_widening
+    erasing_half_a_wide_glyph_uses_the_current_erase_rendition
+
+test result: FAILED. 13 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+error: test failed, to rerun pass `--test terminal_conformance`

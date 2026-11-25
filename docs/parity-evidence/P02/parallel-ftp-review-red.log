@@ -1,0 +1,93 @@
+warning: method `mark_started` is never used
+   --> src/remote_files/transfer.rs:112:19
+    |
+111 | impl Job {
+    | -------- method in this implementation
+112 |     pub(crate) fn mark_started(&self) {
+    |                   ^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (lib) generated 1 warning
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: method `poll` is never used
+   --> src/ui.rs:172:8
+    |
+127 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+172 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.11s
+     Running tests/ftp_ftps.rs (target/debug/deps/ftp_ftps-0df6c1d8ec47cfde)
+
+running 12 tests
+test invalid_credentials_never_open_control_channel ... ok
+
+thread 'pwd_preserves_raw_telnet_escaped_path_round_trip' (278995) panicked at tests/ftp_ftps.rs:357:5:
+assertion `left == right` failed
+  left: [47, 255, 255]
+ right: [47, 255]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'unexpected_preliminary_reply_cannot_supply_next_command_result' (278997) panicked at tests/ftp_ftps.rs:337:5:
+assertion failed: ftp.mkdir(&path(b"/refused")).await.is_err()
+test pwd_preserves_raw_telnet_escaped_path_round_trip ... FAILED
+test unexpected_preliminary_reply_cannot_supply_next_command_result ... FAILED
+test cancel_interrupts_stalled_transfer_and_paths_cannot_inject_commands ... ok
+test verifies_active_peer_and_ignores_pasv_address ... ok
+test ascii_mode_converts_only_selected_text ... ok
+test rejected_protection_and_plain_data_do_not_downgrade ... ok
+test machine_listing_retains_byte_names_and_rejects_unusable_snapshots ... ok
+test bounded_downloads_require_final_success_and_idle_transfers_time_out ... ok
+test binary_transfer_is_byte_exact ... ok
+test ftps_validates_certificate_and_encrypts_selected_channels ... ok
+
+thread 'protected_download_acknowledges_data_close_before_control_completion' (278994) panicked at tests/ftp_ftps.rs:322:14:
+called `Result::unwrap()` on an `Err` value: "FTP RETR timed out."
+test protected_download_acknowledges_data_close_before_control_completion ... FAILED
+
+failures:
+
+failures:
+    protected_download_acknowledges_data_close_before_control_completion
+    pwd_preserves_raw_telnet_escaped_path_round_trip
+    unexpected_preliminary_reply_cannot_supply_next_command_result
+
+test result: FAILED. 9 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.10s
+
+error: test failed, to rerun pass `--test ftp_ftps`

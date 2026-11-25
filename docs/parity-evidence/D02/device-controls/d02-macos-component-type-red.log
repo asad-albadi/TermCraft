@@ -1,0 +1,40 @@
+    Checking tempfile v3.27.0
+    Checking d02-device-native-component v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/tests/rdp-native-component)
+error[E0308]: mismatched types
+   --> src/../../../engines/rdp/src/serial.rs:64:77
+    |
+ 64 |         if self.break_changed { unsafe { libc::ioctl(self.file.as_raw_fd(), libc::TIOCCBRK); } }
+    |                                          -----------                        ^^^^^^^^^^^^^^ expected `u64`, found `i32`
+    |                                          |
+    |                                          arguments to this function are incorrect
+    |
+note: function defined here
+   --> /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.191/src/unix/bsd/mod.rs:611:12
+    |
+611 |     pub fn ioctl(fd: c_int, request: c_ulong, ...) -> c_int;
+    |            ^^^^^
+help: you can convert an `i32` to a `u64` and panic if the converted value doesn't fit
+    |
+ 64 |         if self.break_changed { unsafe { libc::ioctl(self.file.as_raw_fd(), libc::TIOCCBRK.try_into().unwrap()); } }
+    |                                                                                           ++++++++++++++++++++
+
+error[E0308]: mismatched types
+   --> src/../../../engines/rdp/src/serial.rs:663:55
+    |
+663 |             if unsafe { libc::ioctl(file.as_raw_fd(), operation) } != 0 { return Err(tty_status(io::Error::last_os_error())); }
+    |                         -----------                   ^^^^^^^^^ expected `u64`, found `i32`
+    |                         |
+    |                         arguments to this function are incorrect
+    |
+note: function defined here
+   --> /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libc-0.2.191/src/unix/bsd/mod.rs:611:12
+    |
+611 |     pub fn ioctl(fd: c_int, request: c_ulong, ...) -> c_int;
+    |            ^^^^^
+help: you can convert an `i32` to a `u64` and panic if the converted value doesn't fit
+    |
+663 |             if unsafe { libc::ioctl(file.as_raw_fd(), operation.try_into().unwrap()) } != 0 { return Err(tty_status(io::Error::last_os_error())); }
+    |                                                                ++++++++++++++++++++
+
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `d02-device-native-component` (lib test) due to 2 previous errors

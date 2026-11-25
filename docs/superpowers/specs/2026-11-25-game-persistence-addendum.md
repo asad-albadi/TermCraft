@@ -1,0 +1,11 @@
+# B06 game Save/Load implementation addendum
+
+This implements controls already within the approved complete B06 game-functionality scope. The pinned historical puzzles.but lines104–113 describe Load/Save preserving complete Undo/Redo history; recovered terminal Sudoku help also declares save/restore. User authorization is continuous implementation of the complete checklist, with no new milestone approval stops.
+
+Provide explicit TermCraft-owned versioned files for all thirteen independent games. Store initial game/configuration/seed plus a bounded typed successful-operation journal, engine identity, and full-state/history integrity information. Never serialize process handles, shell commands, arbitrary executable inputs or UI credentials. An imported file may only reproduce pure game actions. Original saved-game/ID compatibility is not claimed.
+
+Decode into a separate candidate, with strict size/action/depth/configuration/work budgets, unknown-version/opcode rejection and full final-state/history verification. Unknown engine versions fail clearly rather than silently generating a different hidden board. Preserve active game/history and original bytes on failure. Reset starts a fresh journal; invalid/no-op commands are not saved. Retain meaningful undo/redo/assistance and game-specific choices, including Solitaire passes and mine/Termwalk settings.
+
+The backend encodes/decodes bytes independently of UI; the subsequent UI adapter supplies explicit Save/Load and overwrite/unsaved-change handling using existing project file workflows. Filesystem work is bounded, rejects nonregular sources, publishes atomic saves and never overwrites without an explicit user choice. UI operations use generation identity so background completion cannot replace a newer game. Native/original format and future engine-version migration remain explicit validation work.
+
+Implementation: private typed codec/common-session hooks with focused replay/history/malformed/quota/integrity/file-failure tests; fresh independent review; narrow UI adapter with actual control/input/preservation cases; atomic integration and combined parent gate. No alteration of already accepted puzzle/terminal core rules is required.

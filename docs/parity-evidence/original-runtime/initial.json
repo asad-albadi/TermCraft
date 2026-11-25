@@ -1,0 +1,114 @@
+[
+  {
+    "id": 564,
+    "name": "",
+    "mapped": 2,
+    "size": [
+      1280,
+      720
+    ],
+    "pos": [
+      0,
+      0
+    ],
+    "class": 1
+  },
+  {
+    "id": 2097157,
+    "name": "",
+    "mapped": 2,
+    "size": [
+      1,
+      1
+    ],
+    "pos": [
+      -100,
+      -100
+    ],
+    "class": 1
+  },
+  {
+    "id": 8388611,
+    "name": "Default IME",
+    "mapped": 0,
+    "size": [
+      1,
+      1
+    ],
+    "pos": [
+      0,
+      0
+    ],
+    "class": 1
+  },
+  {
+    "id": 14680065,
+    "name": "MobaXterm",
+    "mapped": 0,
+    "size": [
+      1,
+      1
+    ],
+    "pos": [
+      640,
+      360
+    ],
+    "class": 1
+  },
+  {
+    "id": 14680066,
+    "name": "Default IME",
+    "mapped": 0,
+    "size": [
+      1,
+      1
+    ],
+    "pos": [
+      0,
+      0
+    ],
+    "class": 1
+  },
+  {
+    "id": 14680071,
+    "name": "MobaXterm",
+    "mapped": 0,
+    "size": [
+      1123,
+      732
+    ],
+    "pos": [
+      444,
+      198
+    ],
+    "class": 1
+  },
+  {
+    "id": 14680078,
+    "name": "MobaXterm Configuration",
+    "mapped": 0,
+    "size": [
+      320,
+      240
+    ],
+    "pos": [
+      422,
+      320
+    ],
+    "class": 1
+  },
+  {
+    "id": 14680080,
+    "name": "Session settings",
+    "mapped": 0,
+    "size": [
+      320,
+      240
+    ],
+    "pos": [
+      425,
+      211
+    ],
+    "class": 1
+  }
+]

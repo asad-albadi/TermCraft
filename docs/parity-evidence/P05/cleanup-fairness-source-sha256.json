@@ -1,0 +1,6 @@
+{
+  "src/packages/mod.rs": "2561dccc22ed17b6d85e33a93d80c699a4ad6f8dc45e91592eaa2ba8c4466297",
+  "src/packages/install.rs": "4402eef4ad3caf04240d1e35cbee49e89adfa0917f56a43ffef8de2901e29e59",
+  "src/packages/index.rs": "e17d6b906f9fe9c4fc4e8288e50a75db26d0ed068c0ae23c43e18be883277704",
+  "../../p05-handoff/shared.patch": "135d261df5d6be5acfe6e2435e98baf8fa39dac827d0d2d9688f8d313413a9f3"
+}

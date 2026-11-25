@@ -1,0 +1,15 @@
+{
+  "status": "unavailable",
+  "auto_open_devices": false,
+  "designated_device": null,
+  "adapter_vendor_model_serial": null,
+  "os": null,
+  "wiring": null,
+  "baud_cases": null,
+  "data_parity_stop_flow_cases": null,
+  "expected_payload_hex": null,
+  "observed_payload_hex": null,
+  "unplug_visible_error": null,
+  "reconnect_same_device_identity": null,
+  "note": "A human must explicitly designate the device and wiring before any future hardware run. This template is not a test result."
+}

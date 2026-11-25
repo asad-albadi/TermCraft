@@ -1,0 +1,66 @@
+   Compiling harbor-workspace v0.1.0-v01v02 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/v01-v02)
+warning: methods `send` and `poll` are never used
+   --> src/ui.rs:165:8
+    |
+147 | impl TerminalTab {
+    | ---------------- methods in this implementation
+...
+165 |     fn send(&mut self, data: &[u8]) {
+    |        ^^^^
+...
+209 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+    --> src/ui/shared_sessions.rs:691:19
+     |
+ 640 | impl Workspace {
+     | -------------- methods in this implementation
+...
+ 691 |     pub(super) fn shared_sources_busy(&self) -> bool {
+     |                   ^^^^^^^^^^^^^^^^^^^
+...
+1006 |     pub(super) fn refresh_shared_source_with(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "termcraft-v01v02-private") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.80s
+     Running tests/ssh_interop.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_interop-402819b4a2c8008c)
+
+running 1 test
+
+thread 'encrypted_key_agent_authenticates_pinned_openssh_then_expires' (131328) panicked at tests/ssh_interop.rs:219:5:
+assertion `left == right` failed: encrypted identity must be observed authenticating at the pinned endpoint
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test encrypted_key_agent_authenticates_pinned_openssh_then_expires ... FAILED
+
+failures:
+
+failures:
+    encrypted_key_agent_authenticates_pinned_openssh_then_expires
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.88s
+
+error: test failed, to rerun pass `--test ssh_interop`

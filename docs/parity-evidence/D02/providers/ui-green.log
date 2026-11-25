@@ -1,0 +1,11 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.00s
+     Running unittests src/main.rs (app/target/debug/deps/harbor_workspace-29e3f133fb9121f7)
+
+running 3 tests
+test ui::rdp_settings::tests::embedded_rdp_controls_add_read_only_folder_and_enable_admin ... ok
+test ui::rdp_settings::tests::rdp_settings_controls_change_saved_clipboard_and_keyboard_choices ... ok
+test ui::rdp_settings::tests::switching_engines_can_clear_incompatible_saved_options ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 97 filtered out; finished in 0.12s
+

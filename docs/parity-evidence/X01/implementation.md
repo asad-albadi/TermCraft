@@ -1,0 +1,33 @@
+# X01 managed X server implementation
+
+The qualified engine is stock Xwayland 24.1.15 from the pinned Arch Linux x86_64 package revision 1. The app uses an independent, rootful window on a Wayland compositor. Windowed and fullscreen options are explicit. Monitor placement belongs to the compositor. The dependency boundary is the Arch runtime ABI and its shared libraries, xkbcomp and keyboard configuration. Other Linux distributions and architectures require their own builds and qualification.
+
+- `packaging/x11/manifest.json` records the exact package, executable, upstream and build recipe SHA-256 pins. The staging script includes the engine's complete upstream COPYING and the Arch PKGINFO and BUILDINFO records. The stage was made from a verified Arch cache archive, and the official archive URL independently returned the same SHA-256. No system installation was performed.
+- `XServerManager` hashes the selected executable bytes, seals that exact image in an immutable executable memory file, and launches the sealed image. TermCraft atomically reserves a high-numbered display, owns the lock and local Unix sockets, and passes the already-bound file descriptors to Xwayland. The engine never selects a display or scans pre-existing socket names. A ready display number and successful private-cookie handshake are required. Authority files and their directory are 0600 and 0700 respectively, and the app leaves the desktop DISPLAY and XAUTHORITY untouched.
+- The Servers page supports bundle selection, window mode selection, startup status, cancellation, local client environment copy, and stop. Its worker retains and reaps the owned lease. Graceful shutdown removes owned auth files, socket names and lock files, and the normal app exit waits for worker cleanup after rendering has ended.
+- Native Windows and macOS extraction candidates have pinned source and binary inputs. They remain unavailable in the UI pending lifecycle implementation, native qualification, and redistribution review. XQuartz needs a private relocation and signing workflow. The Arch engine build disables XDMCP. X11-forwarded session wiring and extension equivalence remain separate checkpoints.
+
+## Verification
+
+- `red.log` records the original missing lifecycle API. The standard command `CARGO_BUILD_JOBS=2 cargo test --offline --test xserver_lifecycle -- --nocapture` passed three deterministic tests and listed the five isolated live tests as ignored.
+- `isolated-live.log` records five passing live tests using Bubblewrap, Cage's headless Wayland output and an actual pre-existing Xwayland display :0. The fixture checked that the mount and network namespaces were isolated and substituted the pinned engine for the compositor's own Xwayland inside that namespace. The tests matched the sealed executable image byte for byte against the staged engine, rendered an actual X11 window and read a nonblank pixel, confirmed :0's pre-existing inode and process survived, verified cookie acceptance and wrong-cookie rejection with no TCP listener, stopped and dropped two owned displays independently, and forced a failed Wayland startup to verify temporary socket, lock and authority cleanup.
+- `ui-green.log` records missing-bundle and cancellation checks. `ui-isolated-live.log` records the Servers page controller starting and stopping the real packaged engine in the same isolated fixture.
+- The initial live auto-display configuration caused Xwayland's automatic scan to remove the host :0 pathname while the original server and established connections stayed alive. Testing on the host stopped. The missing name was restored from the same compositor's second socket without restarting or replacing the server, and peer credentials were verified. See `host-socket-recovery.json`. The final launch code uses explicit pre-bound sockets, and all later live checks used private namespaces.
+
+Headless pixel verification establishes that an X11 window was viewable inside the managed display. It does not establish native monitor placement, hardware rendering, XDMCP or macOS/Windows lifecycle equivalence.
+
+## Release packaging
+
+The optional `--xwayland-archive` argument accepts only the exact pinned Arch package for Linux x86_64. The packager stages into its private build directory and emits a distinct `-arch-xwayland.tar.gz` filename. All five provider files are covered by the release file inventory, and the executable's actual dynamic dependencies are listed with the app and RDP engine. Other Linux targets and existing Debian artifacts continue to use their respective package inputs.
+
+- `packager-red.log` records that the release packager initially rejected the Xwayland option as an unknown parameter. `packager-green.log` records nine passing Python packaging tests, including a real pinned package with executable permission, license, build and package inventories, and checks for missing archive, wrong hash and wrong platform.
+- The initial frozen native application-archive build was stopped before publication to let the coordinating agent qualify the post-printer source snapshot. Its partial output is in `release-build.log`. The engine stage and its isolated tests used the exact payload that the release packager stages.
+
+The runtime lives in `src/x11/{mod,engine,platform}.rs`. The Servers card and its state worker are in `src/ui/xserver.rs` with hooks in `src/ui.rs` and `src/ui/servers.rs`. `tests/xserver_lifecycle.rs` and `tests/support/run_xserver_isolated.sh` cover the Linux lifecycle, and `tests/packaging_release.py` covers the package boundary. The coordinator owns the next full Rust gate and final release-archive substitution test.
+
+
+## Independent review fixes
+
+- The original descriptor was bound to the package inode, but another writer could still change its contents. The verified bytes now go into an executable Linux memfd with write, growth, shrink and seal changes prohibited. The child receives the installation path as its program name for diagnostics and uses the sealed image for execution. This retains the original ELF interpreter and declared Arch library dependencies.
+- The readiness connection now uses nonblocking local sockets and retries queue saturation only while the single startup deadline and cancellation flag allow it. The same checks govern writing the authentication request and reading the response.
+- `review-red.log` reproduces both findings. `review-green.log` passes both regressions, including a private saturated listener with prompt cancellation, an owned child reaped, and its socket, lock and runtime directory removed. The compiled live fixture additionally verifies the running image comes from a sealed memfd and compares its contents to the pinned package.

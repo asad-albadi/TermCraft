@@ -1,0 +1,9 @@
+{
+  "exit_code": 0,
+  "outer_targets": 58,
+  "passed": 554,
+  "failed": 0,
+  "ignored": 15,
+  "scope": "Captured source hashes at compilation; later runtime private staging/startup probe and X02/smartcard changes are outside this gate.",
+  "helper_passed": 39
+}

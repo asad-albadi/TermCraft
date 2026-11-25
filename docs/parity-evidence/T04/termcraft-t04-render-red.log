@@ -1,0 +1,9 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0425]: cannot find function `terminal_layout_selected` in this scope
+    --> src/ui/pages.rs:1753:21
+     |
+1753 |         let (job,_)=terminal_layout_selected(&screen.grid()[0],&FontId::monospace(14.),false,"界",0.,None,Some(&rules),Some(2..3));
+     |                     ^^^^^^^^^^^^^^^^^^^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 1 previous error

@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.80s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-a067e425c77b94fa)
+
+running 1 test
+test ssh::host_keys::tests::remembering_a_conflicting_key_cannot_expand_the_pin_set ... FAILED
+
+failures:
+
+---- ssh::host_keys::tests::remembering_a_conflicting_key_cannot_expand_the_pin_set stdout ----
+
+thread 'ssh::host_keys::tests::remembering_a_conflicting_key_cannot_expand_the_pin_set' (170687) panicked at src/ssh/host_keys.rs:65:9:
+assertion failed: remember("fixture", 2222, &b, &path).is_err()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ssh::host_keys::tests::remembering_a_conflicting_key_cannot_expand_the_pin_set
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

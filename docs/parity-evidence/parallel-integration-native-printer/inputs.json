@@ -1,0 +1,10 @@
+{
+  "E03_HELPER": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-vnc-composed/wayland-helper-release",
+    "sha256": "26c3495d140afc8e90f318783af7a2a8b9484d69aa6e3c5c3c5e3c684096236e"
+  },
+  "TERMCRAFT_TEST_XEPHYR_ARCHIVE": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04/source-packages/xephyr.pkg.tar.zst",
+    "sha256": "599d85569d0a99c83b2e4529c009f03c6921db428aa14f28aecc36cf7362f714"
+  }
+}

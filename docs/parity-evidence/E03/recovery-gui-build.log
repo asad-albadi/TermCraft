@@ -1,0 +1,3 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.59s
+  Executable unittests src/main.rs (target/debug/deps/harbor_workspace-80877b55ca4b4e50)

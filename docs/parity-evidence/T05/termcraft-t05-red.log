@@ -1,0 +1,9 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0432]: unresolved import `harbor_workspace::terminal::paste`
+ --> tests/terminal_safety.rs:1:33
+  |
+1 | use harbor_workspace::terminal::paste::{PasteController,PasteDecision,PasteSettings,CloseController,CloseDecision};
+  |                                 ^^^^^ could not find `paste` in `terminal`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `harbor-workspace` (test "terminal_safety") due to 1 previous error

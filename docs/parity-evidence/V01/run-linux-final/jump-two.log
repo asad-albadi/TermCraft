@@ -1,0 +1,8 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_options-3a83901b4c8feaa9' --exact two_configured_gateways_authenticate_in_order_before_target --nocapture --test-threads=1
+Executable SHA256: 120c72e67fb6db24a9b7ca6263e0fe35bf5729c69c70985d18e5a496342be937
+
+running 1 test
+test two_configured_gateways_authenticate_in_order_before_target ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.56s
+

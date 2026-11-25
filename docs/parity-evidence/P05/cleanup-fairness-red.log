@@ -1,0 +1,23 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-p05-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p05)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 20s
+     Running unittests src/lib.rs (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-8158f983e701b475)
+
+running 1 test
+test packages::retirement_tests::closed_ninth_release_is_collected_behind_eight_live_leases ... FAILED
+
+failures:
+
+---- packages::retirement_tests::closed_ninth_release_is_collected_behind_eight_live_leases stdout ----
+
+thread 'packages::retirement_tests::closed_ninth_release_is_collected_behind_eight_live_leases' (540382) panicked at src/packages/mod.rs:766:9:
+closed ninth release was starved
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    packages::retirement_tests::closed_ninth_release_is_collected_behind_eight_live_leases
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 70 filtered out; finished in 30.74s
+
+error: test failed, to rerun pass `--lib`

@@ -1,0 +1,1623 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -4,6 +4,7 @@
+ edition = "2024"
+ 
+ [dependencies]
++chrono = "=0.4.45"
+ des = { version = "=0.9.0", features = ["zeroize"] }
+ rustls = { version = "=0.23.46", default-features = false, features = ["ring", "std", "tls12"] }
+ rustls-platform-verifier = "=0.7.1"
+@@ -53,7 +54,7 @@
+ widestring = "=1.2.1"
+ cap-std = "=4.0.3"
+ cap-fs-ext = "=4.0.3"
+-windows-sys = { version = "0.61", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Console", "Win32_System_Registry", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_Services", "Win32_System_IO", "Win32_Security", "Win32_Security_Authorization", "Win32_Devices_Communication", "Win32_Storage_FileSystem"] }
++windows-sys = { version = "0.61", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Console", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_Services", "Win32_System_IO", "Win32_Security", "Win32_Security_Authorization", "Win32_Devices_Communication", "Win32_Storage_FileSystem"] }
+ 
+ [target.'cfg(target_os = "linux")'.dependencies]
+ zbus = "5.19"
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -1804,6 +1804,7 @@
+  "cap-fs-ext",
+  "cap-std",
+  "chacha20poly1305",
++ "chrono",
+  "des",
+  "eframe",
+  "encoding_rs",
+--- a/src/services/mod.rs
++++ b/src/services/mod.rs
+@@ -1,4 +1,5 @@
+ //! Listeners and protocol workers owned by the current workspace.
++pub mod cron;
+ mod files;
+ mod iperf;
+ mod sshd;
+@@ -24,6 +25,7 @@
+     Telnet,
+     Ssh,
+     Iperf,
++    Cron,
+ }
+ 
+ pub enum ServiceAuth {
+@@ -34,6 +36,7 @@
+ 
+ pub enum ServiceRuntime {
+     Embedded,
++    Cron(cron::CronServiceConfig),
+     Ssh(SshServiceConfig),
+     Iperf(IperfServiceConfig),
+     Shell { executable: PathBuf },
+--- a/src/services/supervisor.rs
++++ b/src/services/supervisor.rs
+@@ -36,6 +36,7 @@
+     pub state: ServiceState,
+     pub address: Option<SocketAddr>,
+     pub error: Option<String>,
++    pub cron: Option<super::cron::CronStatus>,
+     pub log: VecDeque<&'static str>,
+ }
+ 
+@@ -46,6 +47,13 @@
+ }
+ 
+ impl ServiceSupervisor {
++    pub fn start_cron(&self, config: super::cron::CronServiceConfig) -> Result<ServiceId, String> {
++        self.start(cron_config(config))
++    }
++    pub fn begin_cron(&self, config: super::cron::CronServiceConfig) -> Result<ServiceId, String> {
++        self.begin(cron_config(config))
++    }
++
+     pub fn start_ssh(&self, config: super::SshServiceConfig) -> Result<ServiceId, String> {
+         self.start(ssh_config(config))
+     }
+@@ -101,6 +109,7 @@
+                 state: ServiceState::Starting,
+                 address: None,
+                 error: None,
++                cron: None,
+                 log: VecDeque::new(),
+             }),
+         });
+@@ -167,6 +176,26 @@
+ }
+ 
+ impl Context {
++    pub(super) fn stop_flag(&self) -> &AtomicBool {
++        &self.stop
++    }
++    pub(super) fn cron_started(&self, cron: super::cron::CronStatus) {
++        let mut s = self.status.lock().unwrap();
++        s.state = ServiceState::Running;
++        s.cron = Some(cron);
++    }
++    pub(super) fn cron_update(&self, cron: super::cron::CronStatus) {
++        self.status.lock().unwrap().cron = Some(cron);
++    }
++    pub(super) fn cron_failed(&self, error: String) {
++        let mut s = self.status.lock().unwrap();
++        s.state = ServiceState::Failed;
++        s.error = Some(error);
++    }
++    pub(super) fn cron_stopped(&self) {
++        self.status.lock().unwrap().state = ServiceState::Stopped;
++    }
++
+     pub(super) fn request_stop(&self) {
+         self.stop.store(true, Ordering::Release);
+         let mut status = self.status.lock().unwrap();
+@@ -202,6 +231,18 @@
+     }
+ }
+ 
++fn cron_config(config: super::cron::CronServiceConfig) -> ServiceConfig {
++    ServiceConfig {
++        protocol: ServiceProtocol::Cron,
++        bind: ([127, 0, 0, 1], 0).into(),
++        allow_non_loopback: false,
++        root: None,
++        auth: super::ServiceAuth::Unauthenticated,
++        allow_write: false,
++        lifetime: config.lifetime,
++        runtime: ServiceRuntime::Cron(config),
++    }
++}
+ fn ssh_config(config: super::SshServiceConfig) -> ServiceConfig {
+     ServiceConfig {
+         protocol: ServiceProtocol::Ssh,
+@@ -325,6 +366,15 @@
+ }
+ 
+ fn run(config: ServiceConfig, context: &Arc<Context>, ready: mpsc::SyncSender<Result<(), String>>) {
++    if matches!(config.protocol, ServiceProtocol::Cron) {
++        if let ServiceRuntime::Cron(cron) = config.runtime {
++            super::cron::run(cron, context, ready);
++        } else {
++            context.cron_failed("Cron requires a scheduler configuration.".into());
++            let _ = ready.send(Err("Cron requires a scheduler configuration.".into()));
++        }
++        return;
++    }
+     let lifetime = config.lifetime;
+     let setup = Listener::bind(config).and_then(|listener| {
+         let address = listener.address().map_err(bind_error)?;
+--- a/src/model.rs
++++ b/src/model.rs
+@@ -663,6 +663,7 @@
+         Telnet => (2323, 3600),
+         Ssh => (2222, 3600),
+         Iperf => (5201, 3600),
++        Cron => (0, 0), // Scheduler has no listener; active until explicitly stopped.
+     };
+     (([127, 0, 0, 1], port).into(), lifetime)
+ }
+--- a/src/ui.rs
++++ b/src/ui.rs
+@@ -28,6 +28,7 @@
+ mod http_share;
+ mod layout;
+ mod macro_events;
++mod managed_cron;
+ mod managed_servers;
+ mod managed_ssh_iperf;
+ mod mosh_startup;
+@@ -616,6 +617,7 @@
+     http_started: Option<Instant>,
+     xserver: xserver::State,
+     managed_servers: managed_servers::ManagedServers,
++    managed_cron: managed_cron::ManagedCron,
+     managed_ssh_iperf: managed_ssh_iperf::ManagedSshIperf,
+     status: String,
+     status_time: Instant,
+@@ -850,6 +852,7 @@
+             http_started: None,
+             xserver: xserver::State::for_context(ctx),
+             managed_servers: Default::default(),
++            managed_cron: Default::default(),
+             managed_ssh_iperf: Default::default(),
+             status,
+             status_time: Instant::now(),
+--- a/src/ui/servers.rs
++++ b/src/ui/servers.rs
+@@ -18,8 +18,9 @@
+    self.managed_servers.cards(ui);
+    let service_data=self.store_path.parent().unwrap_or(std::path::Path::new("."));
+    self.managed_ssh_iperf.cards(ui,service_data);
++   ui.add_space(17.);self.managed_cron.card(ui,service_data);
+    ui.add_space(17.);self.xserver_card(ui);
+-   ui.add_space(17.);CollapsingHeader::new("Additional original server types").show(ui,|ui|{ui.label("VNC server, NFS and cron remain feature gaps. FTPS server support in Personal is still unverified.");});
++   ui.add_space(17.);CollapsingHeader::new("Additional original server types").show(ui,|ui|{ui.label("VNC server and NFS remain feature gaps. FTPS server support in Personal is still unverified.");});
+   });
+     }
+ }
+--- a/src/ui/managed_servers.rs
++++ b/src/ui/managed_servers.rs
+@@ -258,7 +258,7 @@
+             .map_err(|_| "Enter an IP address and port, for example 127.0.0.1:2121.")?;
+         let make_password = || Secret::new(self.password.as_str());
+         let mut config = match self.protocol {
+-            ServiceProtocol::Ssh | ServiceProtocol::Iperf => {
++            ServiceProtocol::Ssh | ServiceProtocol::Iperf | ServiceProtocol::Cron => {
+                 return Err("Use the SSH or Iperf service card.".into());
+             }
+             ServiceProtocol::Ftp => ServiceConfig::ftp(
+--- /dev/null
++++ b/src/services/cron.rs
+@@ -0,0 +1,614 @@
++//! App-owned scheduler: user-authored commands only, never OS crontabs.
++use super::supervisor::Context;
++use chrono::{Datelike, Local, LocalResult, NaiveDate, TimeZone as _, Timelike, Utc};
++use serde::{Deserialize, Serialize};
++use std::{
++    collections::BTreeSet,
++    path::{Path, PathBuf},
++    sync::Arc,
++    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
++};
++const MAX_JOBS: usize = 32;
++const MAX_FILE: u64 = 256 * 1024;
++#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
++pub enum CronTimezone {
++    #[default]
++    Utc,
++    SystemLocal,
++}
++#[derive(Clone, Debug, Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++pub struct CronJob {
++    pub id: String,
++    pub schedule: String,
++    pub enabled: bool,
++    pub program: PathBuf,
++    pub arguments: Vec<String>,
++    pub directory: PathBuf,
++    pub max_seconds: u32,
++}
++#[derive(Clone, Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++struct Entry {
++    job: CronJob,
++    #[serde(default)]
++    last_minute: Option<u64>,
++}
++#[derive(Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++struct FileConfig {
++    version: u8,
++    #[serde(default)]
++    timezone: CronTimezone,
++    entries: Vec<Entry>,
++}
++pub trait CronClock: Send + Sync {
++    fn unix_seconds(&self) -> u64;
++}
++struct SystemClock;
++impl CronClock for SystemClock {
++    fn unix_seconds(&self) -> u64 {
++        SystemTime::now()
++            .duration_since(UNIX_EPOCH)
++            .unwrap_or_default()
++            .as_secs()
++    }
++}
++#[derive(Clone)]
++pub struct CronServiceConfig {
++    pub store: PathBuf,
++    pub clock: Arc<dyn CronClock>,
++    pub lifetime: Option<Duration>,
++    barrier: Arc<dyn CommitBarrier>,
++}
++impl CronServiceConfig {
++    pub fn new(store: PathBuf) -> Self {
++        Self {
++            store,
++            clock: Arc::new(SystemClock),
++            lifetime: None,
++            barrier: Arc::new(NativeBarrier),
++        }
++    }
++}
++#[derive(Clone, Debug)]
++pub struct CronJobStatus {
++    pub id: String,
++    pub enabled: bool,
++    pub next_run: Option<u64>,
++    pub last_event: &'static str,
++    pub last_result: Option<String>,
++}
++#[derive(Clone, Debug)]
++pub struct CronStatus {
++    pub timezone: CronTimezone,
++    pub jobs: Vec<CronJobStatus>,
++}
++#[derive(Clone)]
++pub struct Schedule {
++    fields: [BTreeSet<u32>; 5],
++    unrestricted: [bool; 2],
++}
++impl Schedule {
++    pub fn parse(text: &str) -> Result<Self, String> {
++        let parts: Vec<_> = text.split_whitespace().collect();
++        if parts.len() != 5 || text.len() > 256 {
++            return Err("Use five cron fields: minute hour day month weekday.".into());
++        }
++        let bounds = [(0, 59), (0, 23), (1, 31), (1, 12), (0, 7)];
++        let mut fields: [BTreeSet<u32>; 5] = Default::default();
++        for (i, part) in parts.iter().enumerate() {
++            let value = |s: &str| -> Result<u32, String> {
++                let upper = s.to_ascii_uppercase();
++                let named = if i == 3 {
++                    [
++                        "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT",
++                        "NOV", "DEC",
++                    ]
++                    .iter()
++                    .position(|n| *n == upper)
++                    .map(|v| v as u32 + 1)
++                } else if i == 4 {
++                    ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
++                        .iter()
++                        .position(|n| *n == upper)
++                        .map(|v| v as u32)
++                } else {
++                    None
++                };
++                named
++                    .or_else(|| {
++                        s.bytes()
++                            .all(|c| c.is_ascii_digit())
++                            .then(|| s.parse().ok())
++                            .flatten()
++                    })
++                    .ok_or_else(|| {
++                        "Unsupported cron value; use numbers or month/weekday names.".into()
++                    })
++            };
++            for item in part.split(',') {
++                let pair: Vec<_> = item.split('/').collect();
++                if pair.len() > 2 {
++                    return Err("Invalid cron step.".into());
++                }
++                let step = if pair.len() == 2 {
++                    pair[1].parse::<u32>().map_err(|_| "Invalid cron step.")?
++                } else {
++                    1
++                };
++                if step == 0 || step > bounds[i].1 - bounds[i].0 + 1 {
++                    return Err("Cron step is outside its field range.".into());
++                }
++                let (start, end) = if pair[0] == "*" {
++                    bounds[i]
++                } else if let Some((a, b)) = pair[0].split_once('-') {
++                    (value(a)?, value(b)?)
++                } else {
++                    let n = value(pair[0])?;
++                    (n, if pair.len() == 2 { bounds[i].1 } else { n })
++                };
++                if start < bounds[i].0 || end > bounds[i].1 || start > end {
++                    return Err("Cron value is outside its field range.".into());
++                }
++                for n in (start..=end).step_by(step as usize) {
++                    fields[i].insert(if i == 4 && n == 7 { 0 } else { n });
++                }
++            }
++        }
++        Ok(Self {
++            fields,
++            unrestricted: [parts[2].starts_with('*'), parts[4].starts_with('*')],
++        })
++    }
++    fn day_matches(&self, date: NaiveDate) -> bool {
++        let dom = self.fields[2].contains(&date.day());
++        let dow = self.fields[4].contains(&date.weekday().num_days_from_sunday());
++        self.fields[3].contains(&date.month())
++            && if self.unrestricted[0] || self.unrestricted[1] {
++                dom && dow
++            } else {
++                dom || dow
++            }
++    }
++    pub fn matches(&self, seconds: u64) -> bool {
++        self.matches_zone(seconds, CronTimezone::Utc)
++    }
++    fn matches_zone(&self, seconds: u64, zone: CronTimezone) -> bool {
++        let Some(dt) = i64::try_from(seconds)
++            .ok()
++            .and_then(|s| Utc.timestamp_opt(s, 0).single())
++        else {
++            return false;
++        };
++        let (date, h, m) = match zone {
++            CronTimezone::Utc => (dt.date_naive(), dt.hour(), dt.minute()),
++            CronTimezone::SystemLocal => {
++                let d = dt.with_timezone(&Local);
++                (d.date_naive(), d.hour(), d.minute())
++            }
++        };
++        self.day_matches(date) && self.fields[0].contains(&m) && self.fields[1].contains(&h)
++    }
++    pub fn next_after(&self, seconds: u64) -> Option<u64> {
++        self.next_in(seconds, CronTimezone::Utc)
++    }
++    pub fn next_in(&self, seconds: u64, zone: CronTimezone) -> Option<u64> {
++        let dt = Utc
++            .timestamp_opt(i64::try_from(seconds).ok()?, 0)
++            .single()?;
++        let mut date = match zone {
++            CronTimezone::Utc => dt.date_naive(),
++            CronTimezone::SystemLocal => dt.with_timezone(&Local).date_naive(),
++        };
++        for _ in 0..=366 * 8 {
++            if self.day_matches(date) {
++                let mut best = None;
++                for h in &self.fields[1] {
++                    for m in &self.fields[0] {
++                        let n = date.and_hms_opt(*h, *m, 0)?;
++                        let candidates = match zone {
++                            CronTimezone::Utc => vec![Utc.from_utc_datetime(&n).timestamp()],
++                            CronTimezone::SystemLocal => match Local.from_local_datetime(&n) {
++                                LocalResult::None => vec![],
++                                LocalResult::Single(d) => vec![d.timestamp()],
++                                LocalResult::Ambiguous(a, b) => vec![a.timestamp(), b.timestamp()],
++                            },
++                        };
++                        for s in candidates {
++                            if s >= 0 && s as u64 > seconds {
++                                best = Some(best.map_or(s as u64, |b: u64| b.min(s as u64)));
++                            }
++                        }
++                    }
++                }
++                if best.is_some() {
++                    return best;
++                }
++            }
++            date = date.succ_opt()?;
++        }
++        None
++    }
++}
++fn validate(jobs: &[CronJob]) -> Result<(), String> {
++    if jobs.len() > MAX_JOBS {
++        return Err("At most 32 managed jobs are supported.".into());
++    }
++    let mut ids = BTreeSet::new();
++    for j in jobs {
++        Schedule::parse(&j.schedule)?;
++        if j.id.trim().is_empty()
++            || j.id.len() > 80
++            || j.id.chars().any(char::is_control)
++            || !ids.insert(&j.id)
++        {
++            return Err("Job names must be unique, nonempty and at most 80 characters.".into());
++        }
++        if !j.program.is_absolute()
++            || !j.directory.is_absolute()
++            || !j.program.is_file()
++            || !j.directory.is_dir()
++        {
++            return Err("Choose an existing absolute executable and working folder.".into());
++        }
++        if j.program.to_str().is_none()
++            || j.arguments.len() > 64
++            || j.arguments
++                .iter()
++                .any(|a| a.len() > 8192 || a.contains('\0'))
++            || !(1..=86400).contains(&j.max_seconds)
++        {
++            return Err("Use at most 64 arguments and a runtime limit of 1–86400 seconds.".into());
++        }
++    }
++    Ok(())
++}
++fn load(path: &Path) -> Result<FileConfig, String> {
++    use std::io::Read;
++    let file = crate::platform::private_file::open(path, false)
++        .map_err(|_| "Could not read the managed cron file.")?;
++    let mut bytes = Vec::new();
++    file.take(MAX_FILE + 1)
++        .read_to_end(&mut bytes)
++        .map_err(|_| "Could not read the managed cron file.")?;
++    if bytes.len() as u64 > MAX_FILE {
++        return Err("Cron file is too large.".into());
++    }
++    let data: FileConfig = serde_json::from_slice(&bytes)
++        .map_err(|_| "Invalid cron file; existing configuration was preserved.")?;
++    if data.version != 1 {
++        return Err("Unsupported cron file version.".into());
++    }
++    validate(
++        &data
++            .entries
++            .iter()
++            .map(|e| e.job.clone())
++            .collect::<Vec<_>>(),
++    )?;
++    Ok(data)
++}
++// A platform commit boundary, kept separate so failures can be exercised after a real rename.
++trait CommitBarrier: Send + Sync {
++    fn finish(&self, target: &Path) -> std::io::Result<()>;
++}
++struct NativeBarrier;
++impl CommitBarrier for NativeBarrier {
++    fn finish(&self, target: &Path) -> std::io::Result<()> {
++        #[cfg(unix)]
++        {
++            let parent = target
++                .parent()
++                .ok_or_else(|| std::io::Error::other("Missing cron folder"))?;
++            std::fs::File::open(parent)?.sync_all()?;
++            #[cfg(target_os = "macos")]
++            {
++                // F_FULLFSYNC asks the device to flush after filesystem metadata has been synced.
++                use std::os::fd::AsRawFd;
++                let file = std::fs::OpenOptions::new()
++                    .read(true)
++                    .write(true)
++                    .open(target)?;
++                if unsafe { libc::fcntl(file.as_raw_fd(), libc::F_FULLFSYNC) } == -1 {
++                    return Err(std::io::Error::last_os_error());
++                }
++            }
++        }
++        // Windows replacement itself uses MOVEFILE_WRITE_THROUGH below.
++        #[cfg(windows)]
++        let _ = target;
++        Ok(())
++    }
++}
++fn replace_staged(temporary: tempfile::NamedTempFile, target: &Path) -> std::io::Result<()> {
++    #[cfg(unix)]
++    {
++        temporary.persist(target).map_err(|e| e.error)?;
++    }
++    #[cfg(windows)]
++    {
++        use std::os::windows::ffi::OsStrExt;
++        use windows_sys::Win32::Storage::FileSystem::{
++            MOVEFILE_REPLACE_EXISTING, MOVEFILE_WRITE_THROUGH, MoveFileExW,
++        };
++        let staged = temporary.into_temp_path();
++        let source: Vec<_> = staged.as_os_str().encode_wide().chain(Some(0)).collect();
++        let destination: Vec<_> = target.as_os_str().encode_wide().chain(Some(0)).collect();
++        if source[..source.len() - 1].contains(&0)
++            || destination[..destination.len() - 1].contains(&0)
++        {
++            return Err(std::io::Error::new(
++                std::io::ErrorKind::InvalidInput,
++                "Cron path contains NUL",
++            ));
++        }
++        // Same-directory staged file: no cross-volume copy fallback and no delayed reboot move.
++        if unsafe {
++            MoveFileExW(
++                source.as_ptr(),
++                destination.as_ptr(),
++                MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH,
++            )
++        } == 0
++        {
++            return Err(std::io::Error::last_os_error());
++        }
++    }
++    Ok(())
++}
++fn persist(path: &Path, data: &FileConfig) -> Result<(), String> {
++    persist_with_barrier(path, data, &NativeBarrier)
++}
++fn persist_with_barrier(
++    path: &Path,
++    data: &FileConfig,
++    barrier: &dyn CommitBarrier,
++) -> Result<(), String> {
++    use std::io::Write;
++    let bytes =
++        serde_json::to_vec_pretty(data).map_err(|_| "Could not encode cron configuration.")?;
++    if bytes.len() as u64 > MAX_FILE {
++        return Err("Cron file is too large.".into());
++    }
++    let parent = path.parent().ok_or("Choose a cron storage folder.")?;
++    std::fs::create_dir_all(parent).map_err(|_| "Could not create cron storage.")?;
++    let mut temporary = tempfile::NamedTempFile::new_in(parent)
++        .map_err(|_| "Could not stage cron configuration.")?;
++    crate::platform::private_file::verify(temporary.as_file())
++        .map_err(|_| "Could not secure cron configuration.")?;
++    temporary
++        .write_all(&bytes)
++        .and_then(|_| temporary.as_file().sync_all())
++        .map_err(|_| "Could not write cron configuration.")?;
++    replace_staged(temporary, path).map_err(|_| "Could not durably replace cron configuration.")?;
++    barrier
++        .finish(path)
++        .map_err(|_| "Could not durably commit the cron directory; no command was launched.")?;
++    Ok(())
++}
++pub fn load_jobs(path: &Path) -> Result<Vec<CronJob>, String> {
++    Ok(load(path)?.entries.into_iter().map(|e| e.job).collect())
++}
++pub fn load_timezone(path: &Path) -> Result<CronTimezone, String> {
++    Ok(load(path)?.timezone)
++}
++pub fn save_jobs(path: &Path, jobs: Vec<CronJob>) -> Result<(), String> {
++    let zone = if path.exists() {
++        load(path)?.timezone
++    } else {
++        CronTimezone::Utc
++    };
++    save_jobs_with_timezone(path, jobs, zone)
++}
++fn store_lock(path: &Path) -> Result<std::fs::File, String> {
++    let parent = path.parent().ok_or("Choose a cron storage folder.")?;
++    std::fs::create_dir_all(parent).map_err(|_| "Could not create cron storage.")?;
++    let file = crate::platform::private_file::open(&path.with_extension("cron-lock"), true)
++        .map_err(|_| "Could not secure the cron lock file.")?;
++    file.try_lock().map_err(|_| "This cron file is already owned by an active scheduler or save; stop it before editing.")?;
++    Ok(file)
++}
++pub fn save_jobs_with_timezone(
++    path: &Path,
++    jobs: Vec<CronJob>,
++    timezone: CronTimezone,
++) -> Result<(), String> {
++    validate(&jobs)?;
++    let _lock = store_lock(path)?;
++    let old = if path.exists() {
++        Some(load(path)?)
++    } else {
++        None
++    };
++    let entries = jobs
++        .into_iter()
++        .map(|job| {
++            let last_minute = old
++                .as_ref()
++                .and_then(|d| d.entries.iter().find(|e| e.job.id == job.id))
++                .and_then(|e| e.last_minute);
++            Entry { job, last_minute }
++        })
++        .collect();
++    persist(
++        path,
++        &FileConfig {
++            version: 1,
++            timezone,
++            entries,
++        },
++    )
++}
++struct Running {
++    index: usize,
++    process: crate::process::Process,
++    began: Instant,
++}
++pub(super) fn run(
++    config: CronServiceConfig,
++    context: &Arc<Context>,
++    ready: std::sync::mpsc::SyncSender<Result<(), String>>,
++) {
++    let _lock = match store_lock(&config.store) {
++        Ok(lock) => lock,
++        Err(e) => {
++            context.cron_failed(e.clone());
++            let _ = ready.send(Err(e));
++            return;
++        }
++    };
++    if config
++        .lifetime
++        .is_some_and(|d| d < Duration::from_secs(1) || d > Duration::from_secs(86400))
++    {
++        let e = "Scheduler lifetime must be 1 second to 24 hours.".to_string();
++        context.cron_failed(e.clone());
++        let _ = ready.send(Err(e));
++        return;
++    }
++    let result = load(&config.store);
++    let mut data = match result {
++        Ok(d) => d,
++        Err(e) => {
++            context.cron_failed(e.clone());
++            let _ = ready.send(Err(e));
++            return;
++        }
++    };
++    let schedules: Vec<_> = data
++        .entries
++        .iter()
++        .map(|e| Schedule::parse(&e.job.schedule).unwrap())
++        .collect();
++    let mut state = CronStatus {
++        timezone: data.timezone,
++        jobs: data
++            .entries
++            .iter()
++            .map(|e| CronJobStatus {
++                id: e.job.id.clone(),
++                enabled: e.job.enabled,
++                next_run: None,
++                last_result: None,
++                last_event: if e.job.enabled { "Waiting" } else { "Disabled" },
++            })
++            .collect(),
++    };
++    let began = Instant::now();
++    let mut last_tick = None;
++    let mut running: Vec<Running> = vec![];
++    context.cron_started(state.clone());
++    let _ = ready.send(Ok(()));
++    while !context.cancelled() && !config.lifetime.is_some_and(|d| began.elapsed() >= d) {
++        let now = config.clock.unix_seconds();
++        let minute = now / 60;
++        running.retain_mut(|r| {
++            // Discard output; never put command text or output in logs. The process backend queue is bounded.
++            for _ in 0..256 {
++                if r.process.rx.try_recv().is_err() {
++                    break;
++                }
++            }
++            r.process.poll();
++            let timeout = r.began.elapsed()
++                >= Duration::from_secs(data.entries[r.index].job.max_seconds as u64);
++            if r.process.exited || timeout {
++                state.jobs[r.index].last_result = Some(if timeout {
++                    "Stopped at runtime limit".into()
++                } else {
++                    r.process.exit_message.clone()
++                });
++                state.jobs[r.index].last_event = if timeout {
++                    "Runtime limit reached"
++                } else {
++                    "Process exited"
++                };
++                context.log("Cron process finished.");
++                false
++            } else {
++                true
++            }
++        });
++        if last_tick != Some(minute) {
++            last_tick = Some(minute);
++            let mut admitted = running.len();
++            for (i, entry) in data.entries.iter_mut().enumerate() {
++                state.jobs[i].next_run = if entry.job.enabled {
++                    schedules[i].next_in(
++                        entry
++                            .last_minute
++                            .map(|last| last.saturating_mul(60).saturating_add(59))
++                            .unwrap_or(now)
++                            .max(now),
++                        data.timezone,
++                    )
++                } else {
++                    None
++                };
++                if !entry.job.enabled
++                    || entry.last_minute.is_some_and(|last| minute <= last)
++                    || !schedules[i].matches_zone(now, data.timezone)
++                {
++                    continue;
++                }
++                entry.last_minute = Some(minute);
++                state.jobs[i].last_event = if running.iter().any(|r| r.index == i) {
++                    "Skipped: previous run active"
++                } else if admitted >= 4 {
++                    "Skipped: process limit"
++                } else {
++                    admitted += 1;
++                    "Due"
++                };
++            }
++            // Durable intent before launch: a crash may omit a run, but never replays that recorded minute.
++            if let Err(e) = persist_with_barrier(&config.store, &data, config.barrier.as_ref()) {
++                context.cron_failed(e);
++                return;
++            }
++            for (i, entry) in data.entries.iter().enumerate() {
++                if state.jobs[i].last_event != "Due" {
++                    continue;
++                }
++                match crate::process::Process::spawn_with_environment_cancellable(
++                    entry.job.program.to_str().unwrap(),
++                    &entry.job.arguments,
++                    Some(&entry.job.directory),
++                    80,
++                    24,
++                    &[],
++                    context.stop_flag(),
++                ) {
++                    Ok(process) => {
++                        running.push(Running {
++                            index: i,
++                            process,
++                            began: Instant::now(),
++                        });
++                        state.jobs[i].last_event = "Running";
++                        state.jobs[i].last_result = None;
++                        context.log("Cron process started.");
++                    }
++                    Err(_) => {
++                        state.jobs[i].last_event = "Command could not start";
++                        context.log("Cron command startup failed.");
++                    }
++                }
++            }
++        }
++        context.cron_update(state.clone());
++        std::thread::sleep(super::supervisor::POLL);
++    }
++    drop(running);
++    for s in &mut state.jobs {
++        if s.last_event == "Running" {
++            s.last_event = "Stopped";
++        }
++    }
++    context.cron_update(state);
++    drop(_lock);
++    context.cron_stopped();
++}
++#[cfg(test)]
++mod tests;
+--- /dev/null
++++ b/src/services/cron/tests.rs
+@@ -0,0 +1,327 @@
++use super::*;
++#[test]
++fn numeric_calendar_and_rejected_extensions() {
++    let cron = Schedule::parse("*/15 9-17 * * 1-5").unwrap();
++    assert!(cron.matches(1_704_099_600)); // 2024-01-01 09:00 UTC Monday
++    let either = Schedule::parse("0 9 2 * MON").unwrap();
++    assert!(either.matches(1_704_099_600));
++    assert!(either.matches(1_704_186_000));
++    assert!(!either.matches(1_704_272_400));
++    for bad in [
++        "@hourly",
++        "0 0 0 * * *",
++        "0 0 L * *",
++        "60 * * * *",
++        "*/0 * * * *",
++    ] {
++        assert!(Schedule::parse(bad).is_err(), "{bad}");
++    }
++}
++use std::sync::atomic::{AtomicU64, Ordering};
++struct Clock(AtomicU64);
++impl CronClock for Clock {
++    fn unix_seconds(&self) -> u64 {
++        self.0.load(Ordering::Acquire)
++    }
++}
++#[cfg(unix)]
++fn job(root: &std::path::Path, script: &str) -> CronJob {
++    CronJob {
++        id: "fixture".into(),
++        schedule: "* * * * *".into(),
++        enabled: true,
++        program: "/bin/sh".into(),
++        arguments: vec!["-c".into(), script.into()],
++        directory: root.into(),
++        max_seconds: 5,
++    }
++}
++fn wait(mut condition: impl FnMut() -> bool) {
++    let end = std::time::Instant::now() + Duration::from_secs(6);
++    while !condition() {
++        assert!(std::time::Instant::now() < end, "timed out");
++        std::thread::sleep(Duration::from_millis(20));
++    }
++}
++#[cfg(unix)]
++#[test]
++fn real_due_process_once_disable_restart_and_corrupt_preserve() {
++    let dir = tempfile::tempdir().unwrap();
++    let path = dir.path().join("jobs.json");
++    let j = job(dir.path(), "printf x >> ran");
++    save_jobs(&path, vec![j.clone()]).unwrap();
++    let before = std::fs::read(&path).unwrap();
++    let mut bad = j.clone();
++    bad.schedule = "@hourly".into();
++    assert!(save_jobs(&path, vec![bad]).is_err());
++    assert_eq!(std::fs::read(&path).unwrap(), before);
++    let clock = Arc::new(Clock(AtomicU64::new(1_704_099_600)));
++    let supervisor = crate::services::ServiceSupervisor::default();
++    let mut config = CronServiceConfig::new(path.clone());
++    config.clock = clock.clone();
++    let id = supervisor.start_cron(config.clone()).unwrap();
++    wait(|| dir.path().join("ran").exists());
++    std::thread::sleep(Duration::from_millis(150));
++    assert_eq!(std::fs::read(dir.path().join("ran")).unwrap(), b"x");
++    supervisor.stop(id).unwrap();
++    wait(|| supervisor.status(id).unwrap().state == crate::services::ServiceState::Stopped);
++    let id = supervisor.start_cron(config.clone()).unwrap();
++    std::thread::sleep(Duration::from_millis(150));
++    assert_eq!(std::fs::read(dir.path().join("ran")).unwrap(), b"x");
++    // Jump several minutes: only the current minute runs, no catch-up replay.
++    clock.0.fetch_add(600, Ordering::Release);
++    wait(|| std::fs::read(dir.path().join("ran")).unwrap().len() == 2);
++    clock.0.fetch_sub(120, Ordering::Release);
++    std::thread::sleep(Duration::from_millis(150));
++    assert_eq!(std::fs::read(dir.path().join("ran")).unwrap().len(), 2);
++    assert_eq!(
++        supervisor.status(id).unwrap().cron.as_ref().unwrap().jobs[0].next_run,
++        Some(1_704_100_260)
++    );
++    supervisor.stop(id).unwrap();
++    wait(|| supervisor.status(id).unwrap().state == crate::services::ServiceState::Stopped);
++    let mut disabled = j;
++    disabled.enabled = false;
++    save_jobs(&path, vec![disabled]).unwrap();
++    clock.0.fetch_add(600, Ordering::Release);
++    let id = supervisor.start_cron(config.clone()).unwrap();
++    std::thread::sleep(Duration::from_millis(150));
++    assert_eq!(std::fs::read(dir.path().join("ran")).unwrap().len(), 2);
++    supervisor.stop(id).unwrap();
++    wait(|| supervisor.status(id).unwrap().state == crate::services::ServiceState::Stopped);
++    let last = std::fs::read(&path).unwrap();
++    std::fs::write(&path, b"{broken").unwrap();
++    assert!(load_jobs(&path).is_err());
++    assert!(supervisor.start_cron(config).is_err());
++    std::fs::write(&path, last).unwrap();
++    assert!(!load_jobs(&path).unwrap()[0].enabled);
++}
++#[cfg(unix)]
++#[test]
++fn stop_and_deadline_kill_owned_descendants_leave_unrelated() {
++    let dir = tempfile::tempdir().unwrap();
++    let path = dir.path().join("jobs.json");
++    let mut unrelated = std::process::Command::new("sleep")
++        .arg("30")
++        .spawn()
++        .unwrap();
++    save_jobs(
++        &path,
++        vec![job(dir.path(), "sleep 30 & echo $! > child; wait")],
++    )
++    .unwrap();
++    let supervisor = crate::services::ServiceSupervisor::default();
++    let id = supervisor
++        .start_cron(CronServiceConfig::new(path.clone()))
++        .unwrap();
++    wait(|| dir.path().join("child").exists());
++    let pid = std::fs::read_to_string(dir.path().join("child"))
++        .unwrap()
++        .trim()
++        .parse::<i32>()
++        .unwrap();
++    supervisor.stop(id).unwrap();
++    wait(|| supervisor.status(id).unwrap().state == crate::services::ServiceState::Stopped);
++    // Linux can retain an orphan zombie until its system reaper runs; it must no longer execute.
++    wait(|| {
++        std::fs::read_to_string(format!("/proc/{pid}/stat"))
++            .map(|s| s.split_whitespace().nth(2) == Some("Z"))
++            .unwrap_or(true)
++    });
++    assert!(unrelated.try_wait().unwrap().is_none());
++    unrelated.kill().unwrap();
++    unrelated.wait().unwrap();
++    let mut j = job(dir.path(), "sleep 30");
++    j.id = "deadline".into();
++    j.max_seconds = 1;
++    save_jobs(&path, vec![j]).unwrap();
++    let id = supervisor.start_cron(CronServiceConfig::new(path)).unwrap();
++    wait(|| {
++        supervisor.status(id).unwrap().cron.as_ref().unwrap().jobs[0].last_event
++            == "Runtime limit reached"
++    });
++    supervisor.stop(id).unwrap();
++}
++#[test]
++fn utc_day_rules_leap_and_dst_dates() {
++    // UTC has no skipped/repeated wall times at DST transitions.
++    let every = Schedule::parse("30 1 * * *").unwrap();
++    assert_eq!(every.next_after(1_730_593_800), Some(1_730_597_400));
++    assert_eq!(
++        Schedule::parse("0 0 29 2 *")
++            .unwrap()
++            .next_after(1_704_067_200),
++        Some(1_709_164_800)
++    );
++    assert!(
++        Schedule::parse("0 0 30 2 *")
++            .unwrap()
++            .next_after(1_704_067_200)
++            .is_none()
++    );
++}
++#[test]
++fn local_dst_gaps_and_repeated_instants() {
++    const FLAG: &str = "TERMCRAFT_CRON_DST_FIXTURE";
++    if std::env::var_os(FLAG).is_none() {
++        let output = std::process::Command::new(std::env::current_exe().unwrap())
++            .args([
++                "--exact",
++                "services::cron::tests::local_dst_gaps_and_repeated_instants",
++                "--nocapture",
++            ])
++            .env(FLAG, "1")
++            .env("TZ", "America/New_York")
++            .output()
++            .unwrap();
++        assert!(
++            output.status.success(),
++            "{}",
++            String::from_utf8_lossy(&output.stdout)
++        );
++        return;
++    }
++    let repeated = Schedule::parse("30 1 * * *").unwrap();
++    assert_eq!(
++        repeated.next_in(1_730_611_799, CronTimezone::SystemLocal),
++        Some(1_730_611_800)
++    );
++    assert_eq!(
++        repeated.next_in(1_730_611_800, CronTimezone::SystemLocal),
++        Some(1_730_615_400)
++    );
++    let gap = Schedule::parse("30 2 * * *").unwrap();
++    assert_eq!(
++        gap.next_in(1_709_969_400, CronTimezone::SystemLocal),
++        Some(1_710_138_600)
++    );
++    assert!(Schedule::parse("0 9 * JAN-MAR MON-FRI").is_ok());
++}
++#[cfg(unix)]
++#[test]
++fn same_store_has_one_owner_and_rejects_live_edits() {
++    let dir = tempfile::tempdir().unwrap();
++    let path = dir.path().join("jobs.json");
++    let j = job(dir.path(), "printf x >> once");
++    save_jobs(&path, vec![j.clone()]).unwrap();
++    let supervisor = crate::services::ServiceSupervisor::default();
++    let config = CronServiceConfig::new(path.clone());
++    let first = supervisor.start_cron(config.clone()).unwrap();
++    assert!(
++        supervisor.start_cron(config).is_err(),
++        "same store must have one active scheduler"
++    );
++    assert!(
++        save_jobs(&path, vec![j]).is_err(),
++        "active scheduler owns the persisted watermark"
++    );
++    supervisor.stop(first).unwrap();
++}
++#[cfg(unix)]
++#[test]
++fn concurrency_cap_and_service_lifetime_are_real_process_bounds() {
++    let dir = tempfile::tempdir().unwrap();
++    let path = dir.path().join("jobs.json");
++    let jobs = (0..6)
++        .map(|n| {
++            let mut j = job(dir.path(), "printf x >> starts; sleep 30");
++            j.id = format!("job-{n}");
++            j
++        })
++        .collect();
++    save_jobs(&path, jobs).unwrap();
++    let supervisor = crate::services::ServiceSupervisor::default();
++    let mut config = CronServiceConfig::new(path);
++    config.lifetime = Some(Duration::from_secs(1));
++    let id = supervisor.start_cron(config).unwrap();
++    wait(|| std::fs::read(dir.path().join("starts")).is_ok_and(|v| v.len() == 4));
++    let status = supervisor.status(id).unwrap();
++    let jobs = &status.cron.as_ref().unwrap().jobs;
++    assert_eq!(
++        jobs.iter()
++            .filter(|j| j.last_event == "Skipped: process limit")
++            .count(),
++        2
++    );
++    wait(|| supervisor.status(id).unwrap().state == crate::services::ServiceState::Stopped);
++    assert_eq!(std::fs::read(dir.path().join("starts")).unwrap(), b"xxxx");
++    assert!(supervisor.status(id).unwrap().log.len() <= 32);
++}
++#[cfg(unix)]
++#[test]
++fn nonzero_exit_is_visible_without_output_or_command_logging() {
++    let dir = tempfile::tempdir().unwrap();
++    let path = dir.path().join("jobs.json");
++    save_jobs(
++        &path,
++        vec![job(dir.path(), "printf SECRET_FIXTURE_OUTPUT; exit 17")],
++    )
++    .unwrap();
++    let supervisor = crate::services::ServiceSupervisor::default();
++    let id = supervisor.start_cron(CronServiceConfig::new(path)).unwrap();
++    wait(|| {
++        supervisor.status(id).unwrap().cron.as_ref().unwrap().jobs[0].last_event == "Process exited"
++    });
++    let status = supervisor.status(id).unwrap();
++    assert!(
++        status.cron.as_ref().unwrap().jobs[0]
++            .last_result
++            .as_ref()
++            .unwrap()
++            .contains("17")
++    );
++    assert!(!format!("{status:?}").contains("SECRET_FIXTURE_OUTPUT"));
++    supervisor.stop(id).unwrap();
++}
++#[cfg(unix)]
++#[test]
++fn durable_commit_barrier_precedes_launch_and_failure_prevents_execution() {
++    use std::sync::{Mutex, mpsc};
++    struct Barrier {
++        entered: mpsc::SyncSender<()>,
++        release: Mutex<mpsc::Receiver<bool>>,
++    }
++    impl CommitBarrier for Barrier {
++        fn finish(&self, parent: &Path) -> std::io::Result<()> {
++            self.entered.send(()).unwrap();
++            if !self.release.lock().unwrap().recv().unwrap() {
++                return Err(std::io::Error::other("injected directory sync failure"));
++            }
++            NativeBarrier.finish(parent)
++        }
++    }
++    let dir = tempfile::tempdir().unwrap();
++    let path = dir.path().join("jobs.json");
++    save_jobs(&path, vec![job(dir.path(), "printf x >> committed")]).unwrap();
++    let supervisor = crate::services::ServiceSupervisor::default();
++    let clock = Arc::new(Clock(AtomicU64::new(1_704_099_600)));
++    for succeed in [false, true] {
++        let (entered_tx, entered_rx) = mpsc::sync_channel(1);
++        let (release_tx, release_rx) = mpsc::sync_channel(1);
++        let mut config = CronServiceConfig::new(path.clone());
++        config.clock = clock.clone();
++        config.barrier = Arc::new(Barrier {
++            entered: entered_tx,
++            release: Mutex::new(release_rx),
++        });
++        let id = supervisor.start_cron(config).unwrap();
++        entered_rx.recv_timeout(Duration::from_secs(3)).unwrap();
++        // The actual private file was staged, synced and renamed; its parent commit is still held.
++        assert_eq!(
++            load(&path).unwrap().entries[0].last_minute,
++            Some(clock.unix_seconds() / 60)
++        );
++        assert!(!dir.path().join("committed").exists());
++        release_tx.send(succeed).unwrap();
++        if succeed {
++            wait(|| dir.path().join("committed").exists());
++            assert_eq!(std::fs::read(dir.path().join("committed")).unwrap(), b"x");
++            supervisor.stop(id).unwrap();
++            wait(|| supervisor.status(id).unwrap().state == crate::services::ServiceState::Stopped);
++        } else {
++            wait(|| supervisor.status(id).unwrap().state == crate::services::ServiceState::Failed);
++            assert!(!dir.path().join("committed").exists());
++            clock.0.fetch_add(60, Ordering::Release);
++        }
++    }
++}
+--- /dev/null
++++ b/src/ui/managed_cron.rs
+@@ -0,0 +1,466 @@
++use super::*;
++use harbor_workspace::services::{
++    ServiceId, ServiceState, ServiceStatus, ServiceSupervisor,
++    cron::{self, CronJob, CronServiceConfig, CronTimezone},
++};
++use std::{
++    path::{Path, PathBuf},
++    sync::{Arc, Mutex, mpsc},
++};
++#[derive(Clone, Default)]
++struct Snapshot {
++    jobs: Vec<CronJob>,
++    timezone: CronTimezone,
++    status: Option<ServiceStatus>,
++    error: Option<String>,
++    revision: u64,
++    saved_identity: Option<String>,
++}
++enum Action {
++    Save(Vec<CronJob>, CronTimezone, Option<String>),
++    Start,
++    Stop,
++    Reload,
++}
++struct Worker {
++    send: mpsc::SyncSender<Action>,
++    snapshot: Arc<Mutex<Snapshot>>,
++}
++impl Worker {
++    fn new(path: PathBuf) -> Self {
++        let (send, receive) = mpsc::sync_channel(4);
++        let snapshot = Arc::new(Mutex::new(Snapshot::default()));
++        let shared = snapshot.clone();
++        std::thread::spawn(move || {
++            let supervisor = ServiceSupervisor::default();
++            let mut id: Option<ServiceId> = None;
++            let mut state = Snapshot::default();
++            let reload = |state: &mut Snapshot| {
++                if path.exists() {
++                    match cron::load_jobs(&path)
++                        .and_then(|jobs| Ok((jobs, cron::load_timezone(&path)?)))
++                    {
++                        Ok((jobs, zone)) => {
++                            state.jobs = jobs;
++                            state.timezone = zone;
++                            state.error = None;
++                        }
++                        Err(e) => state.error = Some(e),
++                    }
++                }
++                state.saved_identity = None;
++                state.revision += 1;
++            };
++            reload(&mut state);
++            loop {
++                match receive.recv_timeout(Duration::from_millis(100)) {
++                    Ok(Action::Save(jobs, zone, identity)) => {
++                        let busy = id.and_then(|i| supervisor.status(i)).is_some_and(|s| {
++                            matches!(
++                                s.state,
++                                ServiceState::Starting
++                                    | ServiceState::Running
++                                    | ServiceState::Stopping
++                            )
++                        });
++                        if busy {
++                            state.error = Some("Stop the scheduler before editing jobs.".into());
++                        } else {
++                            match cron::save_jobs_with_timezone(&path, jobs, zone) {
++                                Ok(()) => {
++                                    reload(&mut state);
++                                    state.saved_identity = identity;
++                                }
++                                Err(e) => state.error = Some(e),
++                            }
++                        }
++                    }
++                    Ok(Action::Reload) => reload(&mut state),
++                    Ok(Action::Start) => {
++                        let busy = id.and_then(|i| supervisor.status(i)).is_some_and(|s| {
++                            matches!(
++                                s.state,
++                                ServiceState::Starting
++                                    | ServiceState::Running
++                                    | ServiceState::Stopping
++                            )
++                        });
++                        if !busy {
++                            match supervisor.begin_cron(CronServiceConfig::new(path.clone())) {
++                                Ok(i) => {
++                                    id = Some(i);
++                                    state.error = None;
++                                }
++                                Err(e) => state.error = Some(e),
++                            }
++                        }
++                    }
++                    Ok(Action::Stop) => {
++                        if let Some(i) = id {
++                            let _ = supervisor.stop(i);
++                        }
++                    }
++                    Err(mpsc::RecvTimeoutError::Disconnected) => break,
++                    Err(mpsc::RecvTimeoutError::Timeout) => {}
++                }
++                state.status = id.and_then(|i| supervisor.status(i));
++                *shared.lock().unwrap() = state.clone();
++            }
++            // Dropping the supervisor cancels and joins only its owned workers.
++        });
++        Self { send, snapshot }
++    }
++}
++#[derive(Default)]
++pub(super) struct ManagedCron {
++    worker: Option<Worker>,
++    revision: u64,
++    jobs: Vec<CronJob>,
++    timezone: CronTimezone,
++    selected: Option<usize>,
++    name: String,
++    expression: String,
++    program: String,
++    arguments: String,
++    directory: String,
++    seconds: u32,
++    enabled: bool,
++    error: Option<String>,
++}
++impl ManagedCron {
++    fn send(&mut self, action: Action) {
++        if self.worker.as_ref().unwrap().send.try_send(action).is_err() {
++            self.error = Some("Scheduler is busy; try again shortly.".into());
++        }
++    }
++    fn reset_editor(&mut self) {
++        self.selected = None;
++        self.name.clear();
++        self.expression = "* * * * *".into();
++        self.program.clear();
++        self.arguments.clear();
++        self.directory.clear();
++        self.seconds = 300;
++        self.enabled = true;
++    }
++    fn select(&mut self, index: usize) {
++        let j = &self.jobs[index];
++        self.selected = Some(index);
++        self.name = j.id.clone();
++        self.expression = j.schedule.clone();
++        self.program = j.program.to_string_lossy().into();
++        self.arguments = j.arguments.join("\n");
++        self.directory = j.directory.to_string_lossy().into();
++        self.seconds = j.max_seconds;
++        self.enabled = j.enabled;
++    }
++    pub(super) fn card(&mut self, ui: &mut Ui, data: &Path) {
++        if self.worker.is_none() {
++            self.worker = Some(Worker::new(data.join("services/cron-jobs.json")));
++            self.expression = "* * * * *".into();
++            self.seconds = 300;
++            self.enabled = true;
++        }
++        let snapshot = self
++            .worker
++            .as_ref()
++            .unwrap()
++            .snapshot
++            .try_lock()
++            .ok()
++            .map(|s| s.clone())
++            .unwrap_or_default();
++        if snapshot.revision > self.revision {
++            let identity = snapshot.saved_identity.clone().or_else(|| {
++                self.selected
++                    .and_then(|i| self.jobs.get(i))
++                    .map(|j| j.id.clone())
++            });
++            self.revision = snapshot.revision;
++            self.jobs = snapshot.jobs.clone();
++            self.timezone = snapshot.timezone;
++            if let Some(index) =
++                identity.and_then(|id| self.jobs.iter().position(|job| job.id == id))
++            {
++                self.select(index);
++            } else {
++                self.reset_editor();
++            }
++        }
++        let busy = snapshot.status.as_ref().is_some_and(|s| {
++            matches!(
++                s.state,
++                ServiceState::Starting | ServiceState::Running | ServiceState::Stopping
++            )
++        });
++        ui.ctx().request_repaint_after(Duration::from_millis(250));
++        surface(ui).show(ui, |ui| {
++            ui.label(RichText::new("Cron scheduled commands").size(18.).strong());
++            ui.label("Runs only while this scheduler and workspace are open. Jobs run with your account’s full permissions. Stop cancels active jobs; closing the app stops scheduling.");
++            if let Some(status) = &snapshot.status {
++                ui.label(format!("Scheduler: {:?}", status.state));
++                if let Some(error) = &status.error {
++                    ui.colored_label(Color32::from_rgb(210, 65, 65), error);
++                }
++            }
++            ui.horizontal(|ui| {
++                if busy {
++                    if ui.button("Stop scheduler / cancel jobs").clicked() {
++                        self.send(Action::Stop);
++                    }
++                } else {
++                    if ui.button("Start scheduler").clicked() {
++                        self.send(Action::Start);
++                    }
++                    if ui.button("Reload saved jobs").clicked() {
++                        self.send(Action::Reload);
++                    }
++                }
++            });
++            ui.add_enabled_ui(!busy, |ui| {
++                ui.horizontal(|ui| {
++                    ui.label("Timezone");
++                    ui.selectable_value(&mut self.timezone, CronTimezone::Utc, "UTC");
++                    ui.selectable_value(&mut self.timezone, CronTimezone::SystemLocal, "System local");
++                });
++                ui.small("Five fields: minute hour day month weekday. Supports *, lists, ranges, steps, JAN–DEC and SUN–SAT. Sunday = 0 or 7; day and weekday use OR when neither starts with *. No @aliases, seconds, ?, L, W, #, or inline environment settings.");
++                ui.small("Missed minutes are skipped; restart checks the current minute once. A recorded attempt is never replayed after clock rollback. Local DST gaps are skipped; repeated local minutes can run twice at their distinct UTC instants. No overlap per job; at most 4 concurrent commands / 32 jobs.");
++                ui.horizontal_wrapped(|ui| {
++                    for i in 0..self.jobs.len() {
++                        if ui.selectable_label(self.selected == Some(i), &self.jobs[i].id).clicked() {
++                            self.select(i);
++                        }
++                    }
++                    if ui.button("New job").clicked() {
++                        self.reset_editor();
++                    }
++                });
++                Grid::new("cron-job-form").num_columns(2).show(ui, |ui| {
++                    ui.label("Job name");
++                    ui.text_edit_singleline(&mut self.name);
++                    ui.end_row();
++                    ui.label("Schedule");
++                    ui.text_edit_singleline(&mut self.expression);
++                    ui.end_row();
++                    ui.label("Executable (absolute path)");
++                    ui.text_edit_singleline(&mut self.program);
++                    ui.end_row();
++                    ui.label("Arguments (one per line)");
++                    ui.add(TextEdit::multiline(&mut self.arguments).desired_rows(3));
++                    ui.end_row();
++                    ui.label("Working folder (absolute path)");
++                    ui.text_edit_singleline(&mut self.directory);
++                    ui.end_row();
++                    ui.label("Maximum runtime");
++                    ui.add(DragValue::new(&mut self.seconds).range(1..=86400).suffix(" seconds"));
++                    ui.end_row();
++                    ui.label("Enabled");
++                    ui.checkbox(&mut self.enabled, "Allow scheduled runs");
++                    ui.end_row();
++                });
++                ui.small("Commands and arguments are saved locally. Keep passwords and tokens out of arguments; use your command’s secure credential store. Output is discarded. Scripts require an explicitly chosen interpreter and script argument.");
++                ui.horizontal(|ui| {
++                    if ui.button("Save job and timezone").clicked() {
++                        let job = CronJob {
++                            id: self.name.clone(), schedule: self.expression.clone(), enabled: self.enabled,
++                            program: self.program.clone().into(),
++                            arguments: if self.arguments.is_empty() { vec![] } else { self.arguments.lines().map(String::from).collect() },
++                            directory: self.directory.clone().into(), max_seconds: self.seconds,
++                        };
++                        let identity=job.id.clone();
++                        let mut jobs = self.jobs.clone();
++                        if let Some(i) = self.selected.filter(|i| *i < jobs.len()) { jobs[i] = job; } else { jobs.push(job); }
++                        self.send(Action::Save(jobs, self.timezone, Some(identity)));
++                    }
++                    if self.selected.is_some() && ui.button("Remove selected job").clicked() {
++                        let mut jobs = self.jobs.clone();
++                        jobs.remove(self.selected.unwrap());
++                        self.send(Action::Save(jobs, self.timezone, None));
++                    }
++                });
++            });
++            if let Some(status) = snapshot.status.as_ref().and_then(|s| s.cron.as_ref()) {
++                for job in &status.jobs {
++                    let next = job.next_run.and_then(|n| chrono::DateTime::from_timestamp(n as i64, 0))
++                        .map(|d| d.to_rfc3339()).unwrap_or_else(|| "none within 8 years / disabled".into());
++                    let result = job.last_result.as_ref().map(|s| format!(" ({s})")).unwrap_or_default();
++                    ui.label(format!("{} — {}{} — next: {}", job.id, job.last_event, result, next));
++                }
++            }
++            for error in [&self.error, &snapshot.error].into_iter().flatten() {
++                ui.colored_label(Color32::from_rgb(210, 65, 65), error);
++            }
++        });
++    }
++}
++#[cfg(test)]
++mod tests {
++    use super::*;
++    fn text_position(shape: &egui::Shape, text: &str) -> Option<Pos2> {
++        match shape {
++            egui::Shape::Text(t) if t.galley.text() == text => Some(t.pos + t.galley.size() * 0.5),
++            egui::Shape::Vec(v) => v.iter().find_map(|s| text_position(s, text)),
++            _ => None,
++        }
++    }
++    fn frame(
++        ctx: &Context,
++        form: &mut ManagedCron,
++        data: &Path,
++        events: Vec<egui::Event>,
++    ) -> egui::FullOutput {
++        let mut output = ctx.run_ui(
++            egui::RawInput {
++                screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1200., 1600.))),
++                events,
++                ..Default::default()
++            },
++            |ui| {
++                form.card(ui, data);
++            },
++        );
++        output.textures_delta.clear();
++        output
++    }
++    fn click(ctx: &Context, form: &mut ManagedCron, data: &Path, label: &str) {
++        let out = frame(ctx, form, data, vec![]);
++        let pos = out
++            .shapes
++            .iter()
++            .find_map(|s| text_position(&s.shape, label))
++            .expect(label);
++        for pressed in [true, false] {
++            frame(
++                ctx,
++                form,
++                data,
++                vec![
++                    egui::Event::PointerMoved(pos),
++                    egui::Event::PointerButton {
++                        pos,
++                        button: egui::PointerButton::Primary,
++                        pressed,
++                        modifiers: egui::Modifiers::NONE,
++                    },
++                ],
++            );
++        }
++    }
++    #[cfg(unix)]
++    #[test]
++    fn pointer_save_start_due_stop_and_disabled_persistence() {
++        let data = tempfile::tempdir().unwrap();
++        let ctx = Context::default();
++        let mut form = ManagedCron::default();
++        frame(&ctx, &mut form, data.path(), vec![]);
++        let end = Instant::now() + Duration::from_secs(10);
++        while form.revision == 0 {
++            assert!(Instant::now() < end);
++            std::thread::sleep(Duration::from_millis(20));
++            frame(&ctx, &mut form, data.path(), vec![]);
++        }
++        form.name = "pointer job".into();
++        form.program = "/bin/sh".into();
++        form.arguments = "-c\nprintf pointer > marker; sleep 30".into();
++        form.directory = data.path().to_string_lossy().into();
++        click(&ctx, &mut form, data.path(), "Save job and timezone");
++        while form.jobs.is_empty() {
++            assert!(Instant::now() < end);
++            std::thread::sleep(Duration::from_millis(20));
++            frame(&ctx, &mut form, data.path(), vec![]);
++        }
++        // Consecutive edits must update the saved job without reselecting its name.
++        for expression in ["*/2 * * * *", "* * * * *"] {
++            let revision = form.revision;
++            form.expression = expression.into();
++            click(&ctx, &mut form, data.path(), "Save job and timezone");
++            loop {
++                std::thread::sleep(Duration::from_millis(20));
++                frame(&ctx, &mut form, data.path(), vec![]);
++                let snapshot = form
++                    .worker
++                    .as_ref()
++                    .unwrap()
++                    .snapshot
++                    .lock()
++                    .unwrap()
++                    .clone();
++                assert!(snapshot.error.is_none(), "{:?}", snapshot.error);
++                if form.revision > revision {
++                    break;
++                }
++                assert!(Instant::now() < end);
++            }
++            let jobs = cron::load_jobs(&data.path().join("services/cron-jobs.json")).unwrap();
++            assert_eq!(jobs.len(), 1);
++            assert_eq!(jobs[0].schedule, expression);
++        }
++        click(&ctx, &mut form, data.path(), "Start scheduler");
++        while !data.path().join("marker").exists() {
++            assert!(Instant::now() < end);
++            std::thread::sleep(Duration::from_millis(20));
++            frame(&ctx, &mut form, data.path(), vec![]);
++        }
++        assert_eq!(
++            std::fs::read(data.path().join("marker")).unwrap(),
++            b"pointer"
++        );
++        loop {
++            let output = frame(&ctx, &mut form, data.path(), vec![]);
++            if output
++                .shapes
++                .iter()
++                .any(|s| text_position(&s.shape, "Scheduler: Running").is_some())
++            {
++                break;
++            }
++            assert!(Instant::now() < end);
++            std::thread::sleep(Duration::from_millis(20));
++        }
++        click(&ctx, &mut form, data.path(), "Stop scheduler / cancel jobs");
++        loop {
++            std::thread::sleep(Duration::from_millis(20));
++            frame(&ctx, &mut form, data.path(), vec![]);
++            if form
++                .worker
++                .as_ref()
++                .unwrap()
++                .snapshot
++                .lock()
++                .unwrap()
++                .status
++                .as_ref()
++                .unwrap()
++                .state
++                == ServiceState::Stopped
++            {
++                break;
++            }
++            assert!(Instant::now() < end);
++        }
++        form.select(0);
++        click(&ctx, &mut form, data.path(), "Allow scheduled runs");
++        assert!(!form.enabled);
++        click(&ctx, &mut form, data.path(), "Save job and timezone");
++        while cron::load_jobs(&data.path().join("services/cron-jobs.json")).unwrap()[0].enabled {
++            assert!(Instant::now() < end);
++            std::thread::sleep(Duration::from_millis(20));
++        }
++        assert!(
++            cron::load_jobs(&data.path().join("services/cron-jobs.json")).unwrap()[0].enabled
++                == false
++        );
++        let mut restarted = ManagedCron::default();
++        loop {
++            frame(&ctx, &mut restarted, data.path(), vec![]);
++            if restarted.revision > 0 {
++                break;
++            }
++            assert!(Instant::now() < end);
++            std::thread::sleep(Duration::from_millis(20));
++        }
++        assert_eq!(restarted.jobs.len(), 1);
++        assert_eq!(restarted.jobs[0].schedule, "* * * * *");
++        assert!(!restarted.jobs[0].enabled);
++    }
++}

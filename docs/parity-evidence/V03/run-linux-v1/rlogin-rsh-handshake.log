@@ -1,0 +1,9 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/legacy_protocols-cc0023d05356aa7e' --exact configured_legacy_port_and_user_reach_server --nocapture --test-threads=1
+
+running 1 test
+test configured_legacy_port_and_user_reach_server ... Rlogin successful handshake unavailable: cannot bind a reserved TCP source port
+Rsh successful handshake unavailable: cannot bind a reserved TCP source port
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.02s
+

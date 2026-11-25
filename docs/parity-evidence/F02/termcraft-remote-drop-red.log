@@ -1,0 +1,69 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0422]: cannot find struct, variant or union type `RemoteDragPayload` in this scope
+   --> src/ui/remote_files.rs:625:21
+    |
+625 | ...   let payload=RemoteDragPayload{connection:41,path:RemotePath::from_bytes(b"/remote/file".to_vec()).unwrap(),kind:EntryKind::Fi...
+    |                   ^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0422]: cannot find struct, variant or union type `RemoteDragPayload` in this scope
+   --> src/ui/remote_files.rs:628:21
+    |
+628 | ...   let payload=RemoteDragPayload{path:RemotePath::from_bytes(b"/remote/..".to_vec()).unwrap(),..payload};assert!(state.download_...
+    |                   ^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0609]: no field `local_download` on type `ui::remote_files::TransferUi`
+   --> src/ui/remote_files.rs:624:51
+    |
+624 |         let mut state=TransferUi::default();state.local_download=Some(PathBuf::from("/chosen/local"));
+    |                                                   ^^^^^^^^^^^^^^ unknown field
+    |
+    = note: available fields are: `selected`, `form`, `overwrite`, `picker`, `events`, `error`
+
+error[E0599]: no method named `download_drop_operation` found for struct `ui::remote_files::TransferUi` in the current scope
+   --> src/ui/remote_files.rs:626:23
+    |
+ 60 | pub(super) struct TransferUi {
+    | ---------------------------- method `download_drop_operation` not found for this struct
+...
+626 |         assert!(state.download_drop_operation(&payload,42).is_err());
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a method `download_operation` with a similar name, but with different arguments
+   --> src/ui/remote_files.rs:76:5
+    |
+ 76 |     fn download_operation(&self, local: PathBuf) -> Result<TransferOperation, String> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `download_drop_operation` found for struct `ui::remote_files::TransferUi` in the current scope
+   --> src/ui/remote_files.rs:627:21
+    |
+ 60 | pub(super) struct TransferUi {
+    | ---------------------------- method `download_drop_operation` not found for this struct
+...
+627 |         match state.download_drop_operation(&payload,41).unwrap(){TransferOperation::Download{local,remote,..}=>{assert_eq!(local,P...
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a method `download_operation` with a similar name, but with different arguments
+   --> src/ui/remote_files.rs:76:5
+    |
+ 76 |     fn download_operation(&self, local: PathBuf) -> Result<TransferOperation, String> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0599]: no method named `download_drop_operation` found for struct `ui::remote_files::TransferUi` in the current scope
+   --> src/ui/remote_files.rs:628:125
+    |
+ 60 | pub(super) struct TransferUi {
+    | ---------------------------- method `download_drop_operation` not found for this struct
+...
+628 |         let payload=RemoteDragPayload{path:RemotePath::from_bytes(b"/remote/..".to_vec()).unwrap(),..payload};assert!(state.download_drop_operation(&p...
+    |                                                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^
+    |
+help: there is a method `download_operation` with a similar name, but with different arguments
+   --> src/ui/remote_files.rs:76:5
+    |
+ 76 |     fn download_operation(&self, local: PathBuf) -> Result<TransferOperation, String> {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some errors have detailed explanations: E0422, E0599, E0609.
+For more information about an error, try `rustc --explain E0422`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 6 previous errors

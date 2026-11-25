@@ -1,0 +1,143 @@
+   Compiling harbor-workspace v0.1.948 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/tunnel-claim-fix2/source)
+warning: methods `send` and `poll` are never used
+   --> src/ui.rs:168:8
+    |
+150 | impl TerminalTab {
+    | ---------------- methods in this implementation
+...
+168 |     fn send(&mut self, data: &[u8]) {
+    |        ^^^^
+...
+212 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+    --> src/ui/shared_sessions.rs:691:19
+     |
+ 640 | impl Workspace {
+     | -------------- methods in this implementation
+...
+ 691 |     pub(super) fn shared_sources_busy(&self) -> bool {
+     |                   ^^^^^^^^^^^^^^^^^^^
+...
+1006 |     pub(super) fn refresh_shared_source_with(
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "termcraft-tunnel-claim948") generated 3 warnings
+warning: methods `terminate_owned_sftp`, `restart_with_new_host_key`, and `accepted_authentications` are never used
+   --> tests/support/ssh_server.rs:172:12
+    |
+ 69 | impl SshServer {
+    | -------------- methods in this implementation
+...
+172 |     pub fn terminate_owned_sftp(&self) {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+191 |     pub fn restart_with_new_host_key(&mut self) {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+220 |     pub fn accepted_authentications(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (test "tunnel_interop") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.24s
+     Running tests/tunnel_interop.rs (target/debug/deps/tunnel_interop-d296d5010305b98d)
+
+running 14 tests
+fixture candidate 127.0.0.1:45939 rejected while claimed, available after drop
+test fixture_port_claim_survives_socket_handoff_and_releases_on_drop ... ok
+echo peer=127.0.0.1:34006, local=127.0.0.1:44545, exact=TUNNEL_OK
+observed owned listener local=0100007F:8CA7
+echo peer=127.0.0.1:47544, local=127.0.0.1:40281, exact=TUNNEL_OK
+test dynamic_ipv4 ... ok
+observed owned listener local=00000000000000000000000001000000:80FB
+echo peer=[::1]:54804, local=[::1]:44351, exact=TUNNEL_OK
+test dynamic_ipv6 ... ok
+observed owned listener local=0200007F:95B9
+echo peer=127.0.0.1:34014, local=127.0.0.1:44545, exact=TUNNEL_OK
+echo peer=127.0.0.1:58248, local=127.0.0.2:42151, exact=TUNNEL_OK
+deterministic wrong endpoint 127.0.0.1:46587: "SSH-2.0-O"
+observed owned listener local=0100007F:A5BF
+echo peer=127.0.0.1:36574, local=127.0.0.1:36217, exact=TUNNEL_OK
+test local_ipv4 ... ok
+observed owned listener local=0100007F:95EB
+echo peer=127.0.0.1:55484, local=127.0.0.1:37131, exact=TUNNEL_OK
+test remote_ipv4 ... ok
+observed owned listener local=0100007F:9F8F
+echo peer=127.0.0.1:35068, local=127.0.0.1:43391, exact=TUNNEL_OK
+observed owned listener local=00000000000000000000000001000000:88D1
+echo peer=[::1]:58052, local=[::1]:36103, exact=TUNNEL_OK
+echo peer=127.0.0.1:34024, local=127.0.0.1:44545, exact=TUNNEL_OK
+test local_ipv6 ... ok
+real SSH process subsequently rejected occupied requested port: continue
+Error: remote port forwarding failed for listen port 46587
+
+Local: bind [127.0.0.1]:36535: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 36535
+Could not request local forwarding.
+
+test released_forward_port_can_connect_to_wrong_ssh_endpoint ... ok
+observed owned listener local=00000000000000000000000001000000:A413
+test destination_failure_is_observable ... ok
+echo peer=[::1]:42458, local=[::1]:39595, exact=TUNNEL_OK
+test remote_ipv6 ... ok
+all 18 fixture claims distinct before concurrent forward handoff: [35537, 42785, 45123, 46195, 37013, 46381, 33261, 35697, 40107, 45651, 44615, 35333, 43647, 46797, 35083, 45029, 39331, 37317]
+echo peer=127.0.0.1:34038, local=127.0.0.1:44545, exact=TUNNEL_OK
+Remote: Error: remote port forwarding failed for listen port 33979
+
+echo peer=[::1]:41250, local=[::1]:39331, exact=TUNNEL_OK
+echo peer=127.0.0.1:40664, local=127.0.0.1:42785, exact=TUNNEL_OK
+echo peer=127.0.0.1:44970, local=127.0.0.1:37013, exact=TUNNEL_OK
+echo peer=127.0.0.1:35978, local=127.0.0.1:44615, exact=TUNNEL_OK
+echo peer=[::1]:40628, local=[::1]:35697, exact=TUNNEL_OK
+echo peer=[::1]:34906, local=[::1]:46797, exact=TUNNEL_OK
+parallel roundtrip Dynamic [::1]:37317: exact=TUNNEL_OK; count=1; cancelled; rebound
+parallel roundtrip Dynamic 127.0.0.1:46381: exact=TUNNEL_OK; count=1; cancelled; rebound
+parallel roundtrip Local [::1]:40107: exact=TUNNEL_OK; count=1; cancelled; rebound
+parallel roundtrip Remote [::1]:35083: exact=TUNNEL_OK; count=1; cancelled; rebound
+parallel roundtrip Remote 127.0.0.1:35333: exact=TUNNEL_OK; count=1; cancelled; rebound
+parallel roundtrip Local 127.0.0.1:45123: exact=TUNNEL_OK; count=1; cancelled; rebound
+test parallel_forward_handoffs_keep_distinct_claims_and_real_roundtrips ... ok
+echo peer=127.0.0.1:34046, local=127.0.0.1:44545, exact=TUNNEL_OK
+observed owned listener local=0200007F:9489
+echo peer=127.0.0.1:41244, local=127.0.0.2:37851, exact=TUNNEL_OK
+Dynamic: bind [127.0.0.1]:33673: Address already in use
+channel_setup_fwd_listener_tcpip: cannot listen to port: 33673
+Could not request local forwarding.
+
+observed owned listener local=0100007F:AA25
+echo peer=127.0.0.1:49616, local=127.0.0.1:44265, exact=TUNNEL_OK
+test tunnel_port_conflict_is_visible ... ok
+echo peer=127.0.0.1:34054, local=127.0.0.1:44545, exact=TUNNEL_OK
+test closing_tunnel_releases_listener ... ok
+observed owned listener local=0200007F:A4EB
+echo peer=127.0.0.1:32922, local=127.0.0.2:40541, exact=TUNNEL_OK
+test explicit_nondefault_loopback_bind ... ok
+observed owned listener local=0100007F:AD5B
+echo peer=127.0.0.1:38474, local=127.0.0.1:39827, exact=TUNNEL_OK
+test local_remote_dynamic_tunnels_carry_exact_payload ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s
+

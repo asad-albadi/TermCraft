@@ -1,0 +1,113 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: constant `PROTOCOL` is never used
+ --> src/ssh/x11.rs:6:7
+  |
+6 | const PROTOCOL: &[u8] = b"MIT-MAGIC-COOKIE-1";
+  |       ^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: enum `Endpoint` is never used
+ --> src/ssh/x11.rs:7:6
+  |
+7 | enum Endpoint {
+  |      ^^^^^^^^
+
+warning: struct `DisplayTarget` is never constructed
+  --> src/ssh/x11.rs:12:8
+   |
+12 | struct DisplayTarget { endpoint: Endpoint, number: u16, screen: u32 }
+   |        ^^^^^^^^^^^^^
+
+warning: associated function `parse` is never used
+  --> src/ssh/x11.rs:14:8
+   |
+13 | impl DisplayTarget {
+   | ------------------ associated function in this implementation
+14 |     fn parse(display: &str) -> Result<Self, String> {
+   |        ^^^^^
+
+warning: function `authority_cookie` is never used
+  --> src/ssh/x11.rs:30:4
+   |
+30 | fn authority_cookie(bytes:&[u8], display:u16, hostname:&[u8], unix:bool) -> Result<Zeroizing<[u8;16]>,String> {
+   |    ^^^^^^^^^^^^^^^^
+
+warning: function `read_setup` is never used
+  --> src/ssh/x11.rs:44:10
+   |
+44 | async fn read_setup<R:AsyncRead+Unpin>(remote:&mut R, fake:&[u8;16], real:&[u8;16]) -> Result<Zeroizing<Vec<u8>>,String> {
+   |          ^^^^^^^^^^
+
+warning: struct `Forwarder` is never constructed
+  --> src/ssh/x11.rs:53:19
+   |
+53 | pub(super) struct Forwarder { target:DisplayTarget, real:Zeroizing<[u8;16]>, fake:Zeroizing<[u8;16]>, slots:Arc<tokio::sync::Semapho...
+   |                   ^^^^^^^^^
+
+warning: associated items `from_environment`, `cookie_hex`, `screen`, `permit`, and `bridge` are never used
+  --> src/ssh/x11.rs:55:12
+   |
+54 | impl Forwarder {
+   | -------------- associated items in this implementation
+55 |     pub fn from_environment() -> Result<Arc<Self>,String> {
+   |            ^^^^^^^^^^^^^^^^
+...
+72 |     pub fn cookie_hex(&self) -> String {self.fake.iter().map(|b|format!("{b:02x}")).collect()}
+   |            ^^^^^^^^^^
+73 |     pub fn screen(&self) -> u32 {self.target.screen}
+   |            ^^^^^^
+74 |     pub fn permit(&self) -> Option<tokio::sync::OwnedSemaphorePermit> {self.slots.clone().try_acquire_owned().ok()}
+   |            ^^^^^^
+75 |     pub async fn bridge<R:AsyncRead+AsyncWrite+Unpin>(&self, mut remote:R) -> Result<(),String> {
+   |                  ^^^^^^
+
+warning: `harbor-workspace` (lib) generated 8 warnings
+warning: methods `terminate_owned_sftp` and `accepted_authentications` are never used
+   --> tests/support/ssh_server.rs:101:12
+    |
+ 14 | impl SshServer {
+    | -------------- methods in this implementation
+...
+101 |     pub fn terminate_owned_sftp(&self) {
+    |            ^^^^^^^^^^^^^^^^^^^^
+...
+120 |     pub fn accepted_authentications(&self) -> usize {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (test "ssh_authentication") generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.24s
+     Running tests/ssh_authentication.rs (app/target/debug/deps/ssh_authentication-27820895a5ec415c)
+
+running 1 test
+
+running 1 test
+
+thread 'x11_cookie_forwarding_shares_the_authenticated_connection' (185132) panicked at tests/ssh_authentication.rs:127:54:
+Embedded X11 must be available: "Embedded X11 forwarding is not available yet. Select OpenSSH compatibility for this session to preserve trusted X11 forwarding."
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test x11_cookie_forwarding_shares_the_authenticated_connection ... FAILED
+
+failures:
+
+failures:
+    x11_cookie_forwarding_shares_the_authenticated_connection
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.04s
+
+
+thread 'x11_cookie_forwarding_shares_the_authenticated_connection' (185129) panicked at tests/ssh_authentication.rs:123:9:
+assertion failed: status.success()
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test x11_cookie_forwarding_shares_the_authenticated_connection ... FAILED
+
+failures:
+
+failures:
+    x11_cookie_forwarding_shares_the_authenticated_connection
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.04s
+
+error: test failed, to rerun pass `--test ssh_authentication`

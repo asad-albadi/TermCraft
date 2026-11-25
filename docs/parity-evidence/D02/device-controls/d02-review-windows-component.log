@@ -1,0 +1,11 @@
+    Checking d02-device-native-component v0.1.0-d02-device-20261125 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-device-completion/tests/rdp-native-component)
+warning: unused variable: `metadata`
+   --> src/drives.rs:233:29
+    |
+233 |             let (file, dir, metadata) = if directory {
+    |                             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_metadata`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `d02-device-native-component` (lib test) generated 1 warning (run `cargo fix --lib -p d02-device-native-component --tests` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.24s

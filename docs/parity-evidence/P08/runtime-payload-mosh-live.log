@@ -1,0 +1,12 @@
+
+running 1 test
+
+running 1 test
+test staged_runtime_runs_with_empty_path ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 1.08s
+
+test staged_runtime_runs_with_empty_path ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 1.13s
+

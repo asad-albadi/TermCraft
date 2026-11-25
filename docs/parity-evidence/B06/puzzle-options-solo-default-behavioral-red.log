@@ -1,0 +1,28 @@
+   Compiling b06-options-baseline-proof v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-puzzle-options/baseline-proof)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.04s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-puzzle-options/baseline-proof/target/debug/deps/b06_options_baseline_proof-2c1a55cce8b7c9fa)
+
+running 2 tests
+
+thread 'solo::options_tests::default_clues_have_half_turn_symmetry' (355905) panicked at src/games/puzzles/solo.rs:245:17:
+assertion `left == right` failed: seed 0 cell 0
+  left: true
+ right: false
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test solo::options_tests::default_clues_have_half_turn_symmetry ... FAILED
+
+thread 'solo::options_tests::default_is_solved_using_only_block_position_elimination' (355906) panicked at src/games/puzzles/solo.rs:278:13:
+assertion `left == right` failed: seed 9
+  left: [0, 0, 0, 0, 0, 0, 3, 7, 5, 5, 7, 3, 8, 0, 2, 9, 4, 6, 6, 0, 9, 7, 5, 3, 2, 8, 1, 2, 0, 8, 5, 9, 0, 7, 0, 3, 3, 0, 7, 0, 2, 8, 0, 5, 9, 9, 5, 0, 1, 3, 7, 8, 0, 0, 7, 0, 1, 0, 0, 0, 5, 3, 0, 0, 0, 0, 3, 0, 5, 0, 0, 7, 4, 3, 5, 2, 7, 0, 0, 0, 0]
+ right: [1, 8, 2, 4, 6, 9, 3, 7, 5, 5, 7, 3, 8, 1, 2, 9, 4, 6, 6, 4, 9, 7, 5, 3, 2, 8, 1, 2, 6, 8, 5, 9, 4, 7, 1, 3, 3, 1, 7, 6, 2, 8, 4, 5, 9, 9, 5, 4, 1, 3, 7, 8, 6, 2, 7, 2, 1, 9, 8, 6, 5, 3, 4, 8, 9, 6, 3, 4, 5, 1, 2, 7, 4, 3, 5, 2, 7, 1, 6, 9, 8]
+test solo::options_tests::default_is_solved_using_only_block_position_elimination ... FAILED
+
+failures:
+
+failures:
+    solo::options_tests::default_clues_have_half_turn_symmetry
+    solo::options_tests::default_is_solved_using_only_block_position_elimination
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 29 filtered out; finished in 0.06s
+
+error: test failed, to rerun pass `--lib`

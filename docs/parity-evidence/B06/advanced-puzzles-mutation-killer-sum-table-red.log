@@ -1,0 +1,40 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/mutants/killer-sum-table)
+warning: variable does not need to be mutable
+   --> src/games/puzzles/solo_advanced.rs:289:13
+    |
+289 |         let mut t = vec![vec![Vec::new(); 46]; 5];
+    |             ----^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `sum`
+   --> src/games/puzzles/solo_advanced.rs:293:21
+    |
+293 |                 let sum: usize = (1..=9).filter(|v| bits & (1 << v) != 0).sum();
+    |                     ^^^ help: if this is intentional, prefix it with an underscore: `_sum`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `b06-puzzle-options-private` (lib test) generated 2 warnings (run `cargo fix --lib -p b06-puzzle-options-private --tests` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 4.37s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/mutation-target/release/deps/b06_puzzle_options_private-beed19bb514c887b)
+
+running 1 test
+
+thread 'solo::advanced::rule_tests::killer_distinct_sum_table_matches_independent_enumeration' (422629) panicked at src/games/puzzles/solo_advanced.rs:1103:17:
+assertion `left == right` failed
+  left: []
+ right: [6]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test solo::advanced::rule_tests::killer_distinct_sum_table_matches_independent_enumeration ... FAILED
+
+failures:
+
+failures:
+    solo::advanced::rule_tests::killer_distinct_sum_table_matches_independent_enumeration
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 64 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

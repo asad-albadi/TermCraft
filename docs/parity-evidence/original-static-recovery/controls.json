@@ -1,0 +1,546 @@
+[
+  {
+    "game": "greed",
+    "provenance": "recovered",
+    "measured": false,
+    "source_member": "CygUtils.plugin/bin/greed.exe",
+    "decoded_sha256": "6bd41af503c2acf433d5c878c3679a07f6376440f1d19e32c08162c8b6275d0d",
+    "rules": "Erase the grid by moving N squares in a direction, N is first number in that direction. Cannot cross erased squares or leave grid. Game ends if no valid moves exist. Score is erased squares.",
+    "controls": "hjklyubn or numeric keypad move; Ctrl-L redraw; p toggle valid move highlighting; q quit; ? help.",
+    "source_strings": [
+      {
+        "offset": "0x286a",
+        "text": "%s - Hit '?' for help."
+      },
+      {
+        "offset": "0x2db4",
+        "text": " The object of Greed is to erase as much of the screen as"
+      },
+      {
+        "offset": "0x2df0",
+        "text": " possible by moving around in a grid of numbers.  To move"
+      },
+      {
+        "offset": "0x2e2c",
+        "text": " your cursor, simply use the 'hjklyubn' keys or your number"
+      },
+      {
+        "offset": "0x2e68",
+        "text": " keypad.  Your location is signified by the '%c' symbol."
+      },
+      {
+        "offset": "0x2ea4",
+        "text": " When you move in a direction, you erase N number of grid"
+      },
+      {
+        "offset": "0x2ee0",
+        "text": " squares in that direction, N being the first number in that"
+      },
+      {
+        "offset": "0x2f20",
+        "text": " direction.  Your score reflects the total number of squares"
+      },
+      {
+        "offset": "0x2f60",
+        "text": " eaten.  Greed will not let you make a move that would have"
+      },
+      {
+        "offset": "0x2f9c",
+        "text": " placed you off the grid or over a previously eaten square"
+      },
+      {
+        "offset": "0x2fd8",
+        "text": " unless no valid moves exist, in which case your game ends."
+      },
+      {
+        "offset": "0x3014",
+        "text": " Other Greed commands are 'Ctrl-L' to redraw the screen,"
+      },
+      {
+        "offset": "0x3050",
+        "text": " 'p' to toggle the highlighting of the possible moves, and"
+      },
+      {
+        "offset": "0x308c",
+        "text": " 'q' to quit.  Command line options to Greed are '-s' to"
+      },
+      {
+        "offset": "0x30c5",
+        "text": " output the high score file."
+      }
+    ],
+    "limitations": []
+  },
+  {
+    "game": "sudoku",
+    "provenance": "recovered",
+    "measured": false,
+    "source_member": "CygUtils.plugin/bin/sudoku.exe",
+    "decoded_sha256": "2bed2565a72468fc5c5b1b706913df4c46e4f2add886cf50f71303025cea909d",
+    "rules": "Each column, row and 3x3 box contains each digit 1 through 9.",
+    "controls": "h/l cursor horizontal (vertical labels interspersed with control bytes, not claimed); 1-9 place; 0 or . clear; c clear board; f fix squares; n new board; q quit; s save; r restart; u undo; v solve; ? hint.",
+    "source_strings": [
+      {
+        "offset": "0x6470",
+        "text": "Fill the grid so that"
+      },
+      {
+        "offset": "0x6486",
+        "text": "every column, row and"
+      },
+      {
+        "offset": "0x649c",
+        "text": "3x3 box contains each"
+      },
+      {
+        "offset": "0x64b2",
+        "text": "of the digits 1 to 9."
+      },
+      {
+        "offset": "0x64ca",
+        "text": "  h   l move cursor"
+      },
+      {
+        "offset": "0x64e0",
+        "text": "1-9  place digit"
+      },
+      {
+        "offset": "0x64f1",
+        "text": "0 .  clear digit"
+      },
+      {
+        "offset": "0x6502",
+        "text": "c   clear board"
+      },
+      {
+        "offset": "0x6512",
+        "text": "f   fix squares"
+      },
+      {
+        "offset": "0x6522",
+        "text": "n   new board"
+      },
+      {
+        "offset": "0x6530",
+        "text": "q   quit game"
+      },
+      {
+        "offset": "0x653e",
+        "text": "s   save"
+      },
+      {
+        "offset": "0x6547",
+        "text": "r   restart"
+      },
+      {
+        "offset": "0x6553",
+        "text": "u   undo last move"
+      },
+      {
+        "offset": "0x6566",
+        "text": "v   solve"
+      },
+      {
+        "offset": "0x6570",
+        "text": "?   request hint"
+      }
+    ],
+    "limitations": []
+  },
+  {
+    "game": "soliterm",
+    "provenance": "recovered",
+    "measured": false,
+    "source_member": "CygUtils.plugin/bin/soliterm.exe",
+    "decoded_sha256": "61135275b72804d4eac811c7f71e53c9c65c3029acba7e2912a62f98fa1ab610",
+    "rules": "Solitaire; binary exposes --freecell and --klondike and --passes number option. Detailed legal-move rules not established.",
+    "controls": "Click source card then destination; arrows move cursor; Space selects cards. Minimum terminal 68x20, q quits terminal-too-small prompt.",
+    "source_strings": [
+      {
+        "offset": "0x6681",
+        "text": "%s v%s"
+      },
+      {
+        "offset": "0x6688",
+        "text": "Solitaire games for your terminal, by Mobatek"
+      },
+      {
+        "offset": "0x66b6",
+        "text": "https://mobaxterm.mobatek.net"
+      },
+      {
+        "offset": "0x66d4",
+        "text": "Use your mouse to select and move cards:"
+      },
+      {
+        "offset": "0x6700",
+        "text": "click on a card, then click on the destination stack"
+      },
+      {
+        "offset": "0x6738",
+        "text": "You can also move cursor with keyboard arrows"
+      },
+      {
+        "offset": "0x6768",
+        "text": "and select cards with <SPACE> key."
+      },
+      {
+        "offset": "0x678b",
+        "text": "%-12s"
+      },
+      {
+        "offset": "0x696c",
+        "text": "Please increase your terminal size to at least 68x20 or press q to quit."
+      },
+      {
+        "offset": "0x69b9",
+        "text": "usage: %s [-v|--version] [-h|--help] [-f|--freecell] [-k|--klondike [-p|--passes=NUMBER]]"
+      },
+      {
+        "offset": "0x6a14",
+        "text": "    -f, --freecell Play freecell solitaire"
+      },
+      {
+        "offset": "0x6a40",
+        "text": "    -k, --klondike Play klondike solitaire"
+      },
+      {
+        "offset": "0x6a6c",
+        "text": "    -p, --passes   Number of passes through the deck (for klondike)"
+      },
+      {
+        "offset": "0x6ab0",
+        "text": "    -v, --version  Show version"
+      },
+      {
+        "offset": "0x6ad0",
+        "text": "    -h, --help     Show this message"
+      }
+    ],
+    "limitations": [
+      "No claim that default variant or every in-game key is established."
+    ]
+  },
+  {
+    "game": "termwalk",
+    "provenance": "recovered",
+    "measured": false,
+    "source_member": "CygUtils.plugin/bin/termwalk.exe",
+    "decoded_sha256": "209ab4832c9e8627b561655e665bee2620d80ae1d219ac3cc89897201c4377c4",
+    "rules": "Connect every server to the central router. Grid-size option accepts an odd number.",
+    "controls": "Mouse or keyboard supported; resource strings identify New game, Increase/Decrease grid size, Solve grid, Quit game. Exact key bindings unresolved.",
+    "source_strings": [
+      {
+        "offset": "0x3e40",
+        "text": "New game"
+      },
+      {
+        "offset": "0x3e49",
+        "text": "Increase grid size"
+      },
+      {
+        "offset": "0x3e5c",
+        "text": "Decrease grid size"
+      },
+      {
+        "offset": "0x3e6f",
+        "text": "Solve grid"
+      },
+      {
+        "offset": "0x3e7a",
+        "text": "Quit game"
+      },
+      {
+        "offset": "0x3ed4",
+        "text": "Use your mouse or keyboard to connect every server to the central router"
+      },
+      {
+        "offset": "0x3f1d",
+        "text": "1.0.0"
+      },
+      {
+        "offset": "0x3f23",
+        "text": "Termwalk v%s"
+      },
+      {
+        "offset": "0x3f34",
+        "text": "Play netwalk game into your terminal"
+      },
+      {
+        "offset": "0x3f5c",
+        "text": "Copyright 2020 Mobatek (https://mobaxterm.mobatek.net)"
+      },
+      {
+        "offset": "0x3f93",
+        "text": "Termwalk"
+      },
+      {
+        "offset": "0x3f9d",
+        "text": "usage: %s [-v|--version] [-h|--help] [-s ODD_NUMBER|--grid-size=ODD_NUMBER]"
+      },
+      {
+        "offset": "0x3fec",
+        "text": "    -s, --grid-size  Size of the grid (must be an odd number)"
+      },
+      {
+        "offset": "0x402c",
+        "text": "    -v, --version    Show version"
+      },
+      {
+        "offset": "0x4050",
+        "text": "    -h, --help       Show this message"
+      }
+    ],
+    "limitations": []
+  },
+  {
+    "game": "ctris",
+    "provenance": "recovered",
+    "measured": false,
+    "source_member": "CygUtils.plugin/bin/ctris.exe",
+    "decoded_sha256": "ab550fbb73e851d8a423fa08b4e77df5313177b4ca3bed09f432007e9504d365",
+    "rules": "Rules not established by help strings. Version v0.42; build date Jul 25 2007.",
+    "controls": "-o uses old style keys; -c enables counterclockwise rotation; p resumes pause; exact movement/drop bindings unresolved.",
+    "source_strings": [
+      {
+        "offset": "0x402c",
+        "text": "ctris %s, built on %s."
+      },
+      {
+        "offset": "0x4043",
+        "text": "(c) Dominik Hackl [dominik@hackl.dhs.org]"
+      },
+      {
+        "offset": "0x406d",
+        "text": "Homepage: http://www.hackl.dhs.org/ctris"
+      },
+      {
+        "offset": "0x4096",
+        "text": "ALL PARTS OF CTRIS ARE UNDER THE TERMS OF GPL. SEE DOCUMENTATION FOR MORE INFO"
+      },
+      {
+        "offset": "0x40e6",
+        "text": "Jul 25 2007"
+      },
+      {
+        "offset": "0x40f2",
+        "text": "v0.42"
+      },
+      {
+        "offset": "0x40f8",
+        "text": "removing highscore-file (\"%s\")..."
+      },
+      {
+        "offset": "0x411a",
+        "text": "done"
+      },
+      {
+        "offset": "0x4120",
+        "text": "Help:"
+      },
+      {
+        "offset": "0x4126",
+        "text": "-h             parameter list"
+      },
+      {
+        "offset": "0x4144",
+        "text": "-o             use old style keys"
+      },
+      {
+        "offset": "0x4166",
+        "text": "-v             version info"
+      },
+      {
+        "offset": "0x4182",
+        "text": "-i             enable hide cursor workaround"
+      },
+      {
+        "offset": "0x41af",
+        "text": "-r             remove highscore-file"
+      },
+      {
+        "offset": "0x41d4",
+        "text": "-c             enable couterclockwise rotation"
+      },
+      {
+        "offset": "0x4405",
+        "text": "Press 'p' to continue!"
+      }
+    ],
+    "limitations": []
+  },
+  {
+    "game": "ninvaders",
+    "provenance": "recovered",
+    "measured": false,
+    "source_member": "CygUtils.plugin/bin/ninvaders.exe",
+    "decoded_sha256": "0afc333055ef30d40923705d264077a1359ea76480d531d6b385cc9fbb33a9d4",
+    "rules": "Exact rules not established; difficulty skill -l 0=NIGHTMARE, 1=okay, 9=May I play daddy?!",
+    "controls": "SPACE starts; remaining in-game bindings unresolved.",
+    "source_strings": [
+      {
+        "offset": "0x4200",
+        "text": "*** nInvaders %i.%i.%i"
+      },
+      {
+        "offset": "0x4218",
+        "text": "*** (C)opyleft 2k2 by Dettus"
+      },
+      {
+        "offset": "0x4238",
+        "text": "*** dettus@matrixx-bielefeld.de"
+      },
+      {
+        "offset": "0x425c",
+        "text": "Additional code by Mike Saarna,"
+      },
+      {
+        "offset": "0x4280",
+        "text": "Sebastian Gutsfeld -> segoh@gmx.net,"
+      },
+      {
+        "offset": "0x42a8",
+        "text": "Alexander Hollinger -> alexander.hollinger@gmx.net and"
+      },
+      {
+        "offset": "0x42e0",
+        "text": "Matthias Thar -> hiast2@compuserve.de"
+      },
+      {
+        "offset": "0x430a",
+        "text": "Usage: nInvaders [-l skill] [-gpl]"
+      },
+      {
+        "offset": "0x432e",
+        "text": "   where -l 0=NIGHTMARE"
+      },
+      {
+        "offset": "0x4347",
+        "text": "         -l 1=okay"
+      },
+      {
+        "offset": "0x435c",
+        "text": "         -l 9=May I play daddy?!"
+      },
+      {
+        "offset": "0x4381",
+        "text": "         -gpl shows you the license file"
+      },
+      {
+        "offset": "0x4845",
+        "text": "Press SPACE to start"
+      }
+    ],
+    "limitations": []
+  },
+  {
+    "game": "nimesweeper",
+    "provenance": "recovered",
+    "measured": false,
+    "source_member": "CygUtils.plugin/bin/nimesweeper.exe",
+    "decoded_sha256": "7bf9da43fa963fd32ac6202f879dbf4f1b3229b8936563b72d0f43a825726b60",
+    "rules": "Help declares newbie 16x16/40 mines, easy 16x24/75 default, medium 30x16/99, hard 38x20/160. Do not equate these with MobaXterm menu-selected override.",
+    "controls": "Arrow keys move; f flag/unflag; Space uncover; p pause; h or F1 help; t or F2 best times; c or F3 difficulty; r or F5 restart; q or Escape quit.",
+    "source_strings": [
+      {
+        "offset": "0x57a0",
+        "text": "-d[level]\tSet difficulty level:"
+      },
+      {
+        "offset": "0x57c4",
+        "text": "  -d1, --newbie\tDifficulty level is newbie:"
+      },
+      {
+        "offset": "0x57f4",
+        "text": "  \t\tMinefield - 16x16, Mines - 40."
+      },
+      {
+        "offset": "0x5818",
+        "text": "  -d2, --easy\tDifficulty level is easy:"
+      },
+      {
+        "offset": "0x5844",
+        "text": "  \t\tMinefield - 16x24, Mines - 75. (Default)"
+      },
+      {
+        "offset": "0x5874",
+        "text": "  -d3, --medium\tDifficulty level is medium:"
+      },
+      {
+        "offset": "0x58a4",
+        "text": "  \t\tMinefield - 30x16, Mines - 99."
+      },
+      {
+        "offset": "0x58c8",
+        "text": "  -d4, --hard\tDifficulty level is hard:"
+      },
+      {
+        "offset": "0x58f4",
+        "text": "  \t\tMinefield - 38x20, Mines - 160."
+      },
+      {
+        "offset": "0x5919",
+        "text": "-h, --help\tShow this help"
+      },
+      {
+        "offset": "0x5934",
+        "text": "-n, --new\t(Maybe as root) Create a new scores file:"
+      },
+      {
+        "offset": "0x5969",
+        "text": "\t\t(%s)"
+      },
+      {
+        "offset": "0x5974",
+        "text": "-v, --version\tShow version information"
+      },
+      {
+        "offset": "0x599c",
+        "text": "-Game Controls-"
+      },
+      {
+        "offset": "0x59b0",
+        "text": "Move Cursor:           Arrow keys."
+      },
+      {
+        "offset": "0x59d4",
+        "text": "Flag/Unflag a square:  %c"
+      },
+      {
+        "offset": "0x59ef",
+        "text": "Uncover a square:      Space"
+      },
+      {
+        "offset": "0x5a0d",
+        "text": "Pause/Unpause game:    %c"
+      },
+      {
+        "offset": "0x5a28",
+        "text": "Show help:             %c, F1"
+      },
+      {
+        "offset": "0x5a48",
+        "text": "Show best times:       %c, F2"
+      },
+      {
+        "offset": "0x5a68",
+        "text": "Change difficulty:     %c, F3"
+      },
+      {
+        "offset": "0x5a88",
+        "text": "Restart game:          %c, F5"
+      },
+      {
+        "offset": "0x5aa8",
+        "text": "Quit:                  %c, Esc"
+      },
+      {
+        "offset": "0x5ac9",
+        "text": "Report bugs to d4n13l@lycos.com"
+      }
+    ],
+    "limitations": [
+      "%c values recovered from immediate printf arguments in disassembly at VA 0x404839 f, 0x404883 p, 0x4048a3 h, 0x4048c3 t, 0x4048e3 c, 0x404903 r, 0x404923 q; raw CODE offset = VA - 0x400c00."
+    ]
+  }
+]

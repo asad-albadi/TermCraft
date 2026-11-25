@@ -1,0 +1,38 @@
+{
+  "xwayland_archive": {
+    "path": "/var/cache/pacman/pkg/xorg-xwayland-24.1.15-1-x86_64.pkg.tar.zst",
+    "sha256": "0a8be13f25f64f22ed110f4890e907cfceb34009aeab5b0fd316b6a92ab15a7f"
+  },
+  "xephyr_archive": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/x04/source-packages/xephyr.pkg.tar.zst",
+    "sha256": "599d85569d0a99c83b2e4529c009f03c6921db428aa14f28aecc36cf7362f714"
+  },
+  "mosh_archive": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/mosh-1.4.0-35-x86_64.pkg.tar.zst",
+    "sha256": "5dfbab541564596e912a1fbbe9424e269230a6cee598abad962c0cfbf04408bc"
+  },
+  "mosh_source": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/mosh-1.4.0.tar.gz",
+    "sha256": "ae581fbddf038730af9eee4d319a483288395a0722d0c94c7efb7fdbdbb0dbac"
+  },
+  "mosh_recipe": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/runtime-inputs/PKGBUILD",
+    "sha256": "a3dd7235722b11d96da04faa70f429480f459def3310047f5d9f9ea22517d4c7"
+  },
+  "wayland_helper": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/qualification-vnc-composed/wayland-helper-release",
+    "sha256": "26c3495d140afc8e90f318783af7a2a8b9484d69aa6e3c5c3c5e3c684096236e"
+  },
+  "mosh_dependencies": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p01-mosh-closure/cache"
+  },
+  "iperf_runtime": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b03"
+  },
+  "unix_cache": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/p05-cache"
+  },
+  "browser_inputs": {
+    "path": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p01-browser/browser-inputs"
+  }
+}

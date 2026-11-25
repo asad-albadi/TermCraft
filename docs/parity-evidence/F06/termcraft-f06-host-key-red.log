@@ -1,0 +1,22 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.99s
+     Running tests/ssh_lifecycle.rs (app/target/debug/deps/ssh_lifecycle-7068c92c1740f5cf)
+
+running 1 test
+test recovery_never_crosses_a_changed_trust_once_server_key ... FAILED
+
+failures:
+
+---- recovery_never_crosses_a_changed_trust_once_server_key stdout ----
+
+thread 'recovery_never_crosses_a_changed_trust_once_server_key' (331693) panicked at tests/ssh_lifecycle.rs:348:5:
+Network address reuse must not equate different verified host keys
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    recovery_never_crosses_a_changed_trust_once_server_key
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 11 filtered out; finished in 0.43s
+
+error: test failed, to rerun pass `--test ssh_lifecycle`

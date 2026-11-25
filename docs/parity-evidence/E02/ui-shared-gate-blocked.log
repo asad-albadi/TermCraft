@@ -1,0 +1,44 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: unused import: `File`
+  --> src/x11/platform.rs:18:19
+   |
+18 |     use std::fs::{File, OpenOptions};
+   |                   ^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0277]: the trait bound `sha2::Sha256: std::io::Write` is not satisfied
+   --> src/x11/platform.rs:242:29
+    |
+242 |         io::copy(&mut file, &mut hasher)
+    |         --------            ^^^^^^^^^^^ the trait `std::io::Write` is not implemented for `sha2::Sha256`
+    |         |
+    |         required by a bound introduced by this call
+    |
+note: required by a bound in `std::io::copy`
+   --> /rustc/b940084d7eb6a299eb4bfeb8e34901bc051e7ac4/library/alloc/src/io/copy.rs:79:0
+
+error[E0277]: the trait bound `Array<u8, UInt<UInt<UInt<UInt<_, B0>, B0>, B0>, B0>>: LowerHex` is not satisfied
+   --> src/x11/platform.rs:244:28
+    |
+244 |         if format!("{:x}", hasher.finalize()) != ENGINE_SHA256 {
+    |                     ----   ^^^^^^^^^^^^^^^^^ the trait `LowerHex` is not implemented for `des::cipher::Array<u8, UInt<UInt<UInt<UInt<UInt<UInt<UTerm, B1>, B0>, B0>, B0>, B0>, B0>>`
+    |                     |
+    |                     required by this formatting parameter
+    |
+    = help: the following other types implement trait `LowerHex`:
+              &T
+              &mut T
+              AtFlags
+              BoxedUint
+              BytesMut
+              ControlModes
+              DragPanButtons
+              DupFlags
+            and 365 others
+    = note: the full name for the type has been written to '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/harbor_workspace-7d5f47d64ee4a2a5.long-type-11299499977883262151.txt'
+    = note: consider using `--verbose` to print the full type name to the console
+
+For more information about this error, try `rustc --explain E0277`.
+warning: `harbor-workspace` (lib) generated 1 warning
+error: could not compile `harbor-workspace` (lib) due to 2 previous errors; 1 warning emitted

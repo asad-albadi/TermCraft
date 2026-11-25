@@ -1,0 +1,462 @@
+{
+  "schema": 1,
+  "scope": "V03 controlled Linux owned endpoints; neither independent deployed interoperability nor native/original parity",
+  "cases": [
+    {
+      "id": "ftp-binary-active-passive",
+      "protocol": "FTP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "fixture user/password; plaintext",
+      "encoding_options": "binary; active and passive",
+      "steps": "upload, download, MLSD, SIZE, rename, remove file and directory",
+      "expected": "exact binary bytes and three data connections in each mode",
+      "target": "ftp_ftps",
+      "test": "binary_transfer_is_byte_exact",
+      "inputs": []
+    },
+    {
+      "id": "ftp-ascii",
+      "protocol": "FTP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "fixture user/password; plaintext",
+      "encoding_options": "ASCII and binary",
+      "steps": "upload/download text in selected transfer type",
+      "expected": "ASCII CRLF conversion and binary preservation",
+      "target": "ftp_ftps",
+      "test": "ascii_mode_converts_only_selected_text",
+      "inputs": []
+    },
+    {
+      "id": "ftps-tls-policy",
+      "protocol": "FTP/FTPS",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned CA, wrong CA, wrong hostname; TLS",
+      "encoding_options": "explicit and implicit TLS; private and clear data policies",
+      "steps": "connect valid and invalid cert targets; transfer TLS data",
+      "expected": "valid trust succeeds; invalid CA/name rejected; selected channel encryption asserted",
+      "target": "ftp_ftps",
+      "test": "ftps_validates_certificate_and_encrypts_selected_channels",
+      "inputs": []
+    },
+    {
+      "id": "ftps-no-downgrade",
+      "protocol": "FTP/FTPS",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned TLS certificate",
+      "encoding_options": "PROT P; server rejection and plaintext data sabotage",
+      "steps": "connect rejecting PROT and non-TLS data peers",
+      "expected": "no silent plaintext downgrade",
+      "target": "ftp_ftps",
+      "test": "rejected_protection_and_plain_data_do_not_downgrade",
+      "inputs": []
+    },
+    {
+      "id": "ftp-data-peer",
+      "protocol": "FTP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "fixture password",
+      "encoding_options": "active and passive peer identity",
+      "steps": "hostile advertised PASV address and alternate active peer",
+      "expected": "active alien rejected, PASV host ignored",
+      "target": "ftp_ftps",
+      "test": "verifies_active_peer_and_ignores_pasv_address",
+      "inputs": []
+    },
+    {
+      "id": "ftp-cancel-injection",
+      "protocol": "FTP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "fixture password",
+      "encoding_options": "stalled data; raw paths",
+      "steps": "cancel stalled transfer, attempt CRLF path injection",
+      "expected": "bounded cancellation and path rejection",
+      "target": "ftp_ftps",
+      "test": "cancel_interrupts_stalled_transfer_and_paths_cannot_inject_commands",
+      "inputs": []
+    },
+    {
+      "id": "ftp-transfer-failure",
+      "protocol": "FTP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "fixture password",
+      "encoding_options": "bounded bytes, final reply and timeout",
+      "steps": "download excessive bytes, failing final reply and stalled peer",
+      "expected": "failures surfaced and connection retired as asserted",
+      "target": "ftp_ftps",
+      "test": "bounded_downloads_require_final_success_and_idle_transfers_time_out",
+      "inputs": []
+    },
+    {
+      "id": "ftp-raw-listing",
+      "protocol": "FTP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "fixture password",
+      "encoding_options": "MLSD raw names",
+      "steps": "list byte paths and invalid snapshots",
+      "expected": "raw names preserved; unusable listing rejected",
+      "target": "ftp_ftps",
+      "test": "machine_listing_retains_byte_names_and_rejects_unusable_snapshots",
+      "inputs": []
+    },
+    {
+      "id": "telnet-iac",
+      "protocol": "Telnet",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+      "encoding_options": "IAC/BINARY/NAWS/NVT",
+      "steps": "negotiate options and terminal size over loopback TCP",
+      "expected": "only text displayed; exact negotiation and NAWS bytes",
+      "target": "legacy_protocols",
+      "test": "telnet_iac_is_not_displayed_as_text",
+      "inputs": []
+    },
+    {
+      "id": "telnet-echo-enter",
+      "protocol": "Telnet",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+      "encoding_options": "echo, CR/LF enter",
+      "steps": "negotiate peer echo and send terminal line",
+      "expected": "echo state and ordered line bytes asserted",
+      "target": "legacy_protocols",
+      "test": "telnet_enter_completes_line_and_echo_tracks_peer_negotiation",
+      "inputs": []
+    },
+    {
+      "id": "rlogin-rsh-handshake",
+      "protocol": "Rlogin/Rsh",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+      "encoding_options": "reserved source ports; configured endpoint/user",
+      "steps": "perform both protocols handshakes; exchange output/input; close",
+      "expected": "reserved source peer, alice, terminal/command fields, exact stdin and EOF",
+      "target": "legacy_protocols",
+      "test": "configured_legacy_port_and_user_reach_server",
+      "inputs": [
+        "tests/support/run_protocol_reserved_isolated.sh"
+      ],
+      "reserved_namespace": true,
+      "requires": [
+        "bwrap",
+        "ip",
+        "bash"
+      ]
+    },
+    {
+      "id": "rlogin-window",
+      "protocol": "Rlogin",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+      "encoding_options": "urgent TCP window negotiation",
+      "steps": "peer requests window size through OOB",
+      "expected": "expected protocol window update bytes",
+      "target": "legacy_protocols",
+      "test": "rlogin_window_size_follows_server_urgent_request",
+      "inputs": [
+        "tests/support/run_protocol_reserved_isolated.sh"
+      ],
+      "reserved_namespace": true,
+      "requires": [
+        "bwrap",
+        "ip",
+        "bash"
+      ]
+    },
+    {
+      "id": "rlogin-flush",
+      "protocol": "Rlogin",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+      "encoding_options": "urgent output flush",
+      "steps": "send queued and unread pre-mark data then urgent flush",
+      "expected": "pre-mark data discarded; post-mark data retained",
+      "target": "legacy_protocols",
+      "test": "rlogin_urgent_flush_discards_queued_and_unread_pre_mark_data",
+      "inputs": [
+        "tests/support/run_protocol_reserved_isolated.sh"
+      ],
+      "reserved_namespace": true,
+      "requires": [
+        "bwrap",
+        "ip",
+        "bash"
+      ]
+    },
+    {
+      "id": "rsh-cancel-handshake",
+      "protocol": "Rsh",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "private fixture only; reserved-port handshake for Rlogin/Rsh",
+      "encoding_options": "reserved source; unfinished handshake",
+      "steps": "withhold ack then close transport",
+      "expected": "exact rsh greeting and prompt cancellation",
+      "target": "legacy_protocols",
+      "test": "close_interrupts_unacknowledged_legacy_handshake",
+      "inputs": [
+        "tests/support/run_protocol_reserved_isolated.sh"
+      ],
+      "reserved_namespace": true,
+      "requires": [
+        "bwrap",
+        "ip",
+        "bash"
+      ]
+    },
+    {
+      "id": "rdp-frame-input",
+      "protocol": "RDP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+      "encoding_options": "TLS/NLA; BGRA frame/input",
+      "steps": "authenticate and receive fixture frame; send input",
+      "expected": "known frame color and server input observations",
+      "target": "rdp_session",
+      "test": "rdp_frame_updates_render_inside_workspace",
+      "inputs": [
+        "inputs/termcraft-rdp-engine",
+        "inputs/termcraft-rdp-engine-evaluation"
+      ]
+    },
+    {
+      "id": "rdp-certificate-change",
+      "protocol": "RDP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+      "encoding_options": "TLS certificate pin",
+      "steps": "reconnect changed owned certificate",
+      "expected": "resolution required; no key sent to untrusted replacement",
+      "target": "rdp_session",
+      "test": "rdp_certificate_change_requires_resolution",
+      "inputs": [
+        "inputs/termcraft-rdp-engine",
+        "inputs/termcraft-rdp-engine-evaluation"
+      ]
+    },
+    {
+      "id": "rdp-resize",
+      "protocol": "RDP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+      "encoding_options": "server display update",
+      "steps": "receive initial and resized framebuffer",
+      "expected": "initial and renegotiated dimensions",
+      "target": "rdp_session",
+      "test": "server_display_resize_renegotiates_the_framebuffer",
+      "inputs": [
+        "inputs/termcraft-rdp-engine",
+        "inputs/termcraft-rdp-engine-evaluation"
+      ]
+    },
+    {
+      "id": "rdp-close",
+      "protocol": "RDP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+      "encoding_options": "owned helper lifecycle",
+      "steps": "connect then close",
+      "expected": "owned helper reaped, server sees close, events empty",
+      "target": "rdp_session",
+      "test": "closing_rdp_releases_transport",
+      "inputs": [
+        "inputs/termcraft-rdp-engine",
+        "inputs/termcraft-rdp-engine-evaluation"
+      ]
+    },
+    {
+      "id": "rdp-focus-input",
+      "protocol": "RDP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned IronRDP server and helper; fixture TLS/NLA credentials",
+      "encoding_options": "cursor and focus input",
+      "steps": "receive cursor and release pressed input on focus change",
+      "expected": "cursor event plus exact server key/button releases",
+      "target": "rdp_session",
+      "test": "remote_cursor_and_focus_release_reach_real_connection",
+      "inputs": [
+        "inputs/termcraft-rdp-engine",
+        "inputs/termcraft-rdp-engine-evaluation"
+      ]
+    },
+    {
+      "id": "vnc-pixels-input",
+      "protocol": "VNC",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned loopback RFB endpoint; fixture None security",
+      "encoding_options": "RFB 3.8 Raw/CopyRect/Hextile; key/pointer",
+      "steps": "negotiate endpoint; receive pixels and send canvas input",
+      "expected": "exact known pixels, keys and pointer coordinates",
+      "target": "vnc_session",
+      "test": "vnc_known_frame_and_pointer_coordinates_match",
+      "inputs": []
+    },
+    {
+      "id": "vnc-view-only",
+      "protocol": "VNC",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned loopback RFB endpoint; fixture None security",
+      "encoding_options": "view-only",
+      "steps": "send keyboard/pointer in view-only mode",
+      "expected": "no server input bytes",
+      "target": "vnc_session",
+      "test": "view_only_sends_no_keyboard_or_pointer",
+      "inputs": []
+    },
+    {
+      "id": "vnc-resize",
+      "protocol": "VNC",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned loopback RFB endpoint; fixture None security",
+      "encoding_options": "DesktopSize",
+      "steps": "receive resize rectangle",
+      "expected": "new dimensions and framebuffer",
+      "target": "vnc_session",
+      "test": "vnc_resize_reinitializes_framebuffer",
+      "inputs": []
+    },
+    {
+      "id": "vnc-unicode-clipboard",
+      "protocol": "VNC",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned loopback RFB endpoint; fixture None security",
+      "encoding_options": "ExtendedClipboard; UTF-8",
+      "steps": "exchange clipboard via session API only",
+      "expected": "exact Unicode on both wire directions; host clipboard untouched",
+      "target": "vnc_session",
+      "test": "unicode_clipboard_round_trips_over_negotiated_tcp_session",
+      "inputs": []
+    },
+    {
+      "id": "vnc-cancel-incomplete",
+      "protocol": "VNC",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned loopback RFB endpoint; fixture None security",
+      "encoding_options": "incomplete frame",
+      "steps": "close session while peer stalls rectangle",
+      "expected": "carrier closes and worker finishes",
+      "target": "vnc_session",
+      "test": "vnc_cancel_closes_supplied_tcp_carrier_during_incomplete_rectangle",
+      "inputs": []
+    },
+    {
+      "id": "xdmcp-real-desktop",
+      "protocol": "XDMCP",
+      "version": "owned fixture version pinned by source/input inventory",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned xdm 1.1.17; MIT-MAGIC-COOKIE; no login credentials",
+      "encoding_options": "UDP 1177; display 177; private veth; pinned Xephyr 21.1.26; clipboard Disabled",
+      "steps": "discover manager; MANAGE; map window; verify pixels/monitor; wrong cookie; concurrent close/cleanup",
+      "expected": "real managed authenticated desktop, green pixels, selected monitor, wrong-cookie rejection and owned cleanup preserving private Cage",
+      "target": "lib",
+      "test": "x11::xdmcp_engine::tests::actual_xdm_nondefault_port_opens_selected_display_and_cleanup_preserves_host",
+      "inputs": [
+        "inputs/xdmcp-engine/x11/linux-x86_64/Xephyr",
+        "inputs/xdmcp-fixture/xdm",
+        "inputs/compositor/x11/linux-x86_64/Xwayland"
+      ],
+      "ignored": true,
+      "isolated_xdmcp": true,
+      "requires": [
+        "bwrap",
+        "ip",
+        "cage",
+        "python3",
+        "bash"
+      ]
+    },
+    {
+      "id": "vnc-tls-password-tcp",
+      "protocol": "VNC",
+      "version": "RFB 3.8 VeNCrypt 0.2 X509Vnc 261; source-pinned owned endpoint",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned ephemeral self-signed TLS, explicit CA; password challenge",
+      "encoding_options": "TLS; raw frame; supplied real TCP carrier",
+      "steps": "connect private loopback endpoint, negotiate VeNCrypt and certificate trust, assert frame/input or reject",
+      "expected": "verified TLS password response, green pixel, pointer wire bytes and closed carrier",
+      "target": "protocol_interop",
+      "test": "vnc_tls_password_real_tcp_pixels_input_and_cleanup",
+      "inputs": [],
+      "requires": [
+        "openssl"
+      ]
+    },
+    {
+      "id": "vnc-tls-reject-tcp",
+      "protocol": "VNC",
+      "version": "RFB 3.8 VeNCrypt 0.2 X509Vnc 261; source-pinned owned endpoint",
+      "target_os": "Linux x86_64",
+      "auth_security": "owned ephemeral self-signed TLS, explicit CA; password challenge",
+      "encoding_options": "TLS; raw frame; supplied real TCP carrier",
+      "steps": "connect private loopback endpoint, negotiate VeNCrypt and certificate trust, assert frame/input or reject",
+      "expected": "wrong CA rejected before authentication prompt or response",
+      "target": "protocol_interop",
+      "test": "vnc_untrusted_tls_real_tcp_never_prompts_for_password",
+      "inputs": [],
+      "requires": [
+        "openssl"
+      ]
+    },
+    {
+      "id": "vnc-gateway",
+      "protocol": "VNC/SSH",
+      "version": "source-pinned russh owned gateway fixture; RDP row validates carrier, not complete RDP endpoint",
+      "target_os": "Linux x86_64",
+      "auth_security": "ephemeral owned SSH keys; no host authorized_keys",
+      "encoding_options": "private TCP gateway channels",
+      "steps": "connect gateway; exercise exact bytes or changed-key block; close",
+      "expected": "exact VNC frame and pointer through authenticated owned SSH gateway; channel cleanup",
+      "target": "desktop_gateway",
+      "test": "vnc_frame_and_pointer_travel_through_the_gateway",
+      "inputs": []
+    },
+    {
+      "id": "rdp-gateway-retry",
+      "protocol": "RDP carrier/SSH",
+      "version": "source-pinned russh owned gateway fixture; RDP row validates carrier, not complete RDP endpoint",
+      "target_os": "Linux x86_64",
+      "auth_security": "ephemeral owned SSH keys; no host authorized_keys",
+      "encoding_options": "private TCP gateway channels",
+      "steps": "connect gateway; exercise exact bytes or changed-key block; close",
+      "expected": "relay retry reconnects exactly one channel on same SSH auth; wrong token rejected; cleanup",
+      "target": "desktop_gateway",
+      "test": "rdp_retry_relay_reopens_the_channel_on_one_ssh_authentication",
+      "inputs": []
+    },
+    {
+      "id": "gateway-trust",
+      "protocol": "RDP/VNC carrier/SSH",
+      "version": "source-pinned russh owned gateway fixture; RDP row validates carrier, not complete RDP endpoint",
+      "target_os": "Linux x86_64",
+      "auth_security": "ephemeral owned SSH keys; no host authorized_keys",
+      "encoding_options": "private TCP gateway channels",
+      "steps": "connect gateway; exercise exact bytes or changed-key block; close",
+      "expected": "changed gateway key prevents desktop target connection",
+      "target": "desktop_gateway",
+      "test": "changed_gateway_host_key_blocks_desktop",
+      "inputs": []
+    }
+  ]
+}

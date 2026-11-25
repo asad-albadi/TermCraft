@@ -1,0 +1,34 @@
+{
+  "optional_installed_clients": {
+    "ssh": "OpenSSH compatibility sessions and SSH-based X11 forwarding",
+    "sftp": "OpenSSH compatibility file sessions",
+    "mosh": "Mosh client and corresponding server with UDP connectivity",
+    "telnet": "Compatibility Telnet sessions",
+    "ftp": "Compatibility FTP sessions",
+    "xfreerdp": "External FreeRDP client on Linux/macOS",
+    "xfreerdp3": "Preferred external FreeRDP client when available",
+    "rsh": "Compatibility remote shell sessions",
+    "rlogin": "Compatibility remote login sessions",
+    "mstsc.exe": "External Windows Remote Desktop client",
+    "vncviewer": "External VNC viewer",
+    "wl-paste": "Optional Wayland clipboard integration"
+  },
+  "remote_requirements": {
+    "SCP compatibility mode": "POSIX remote host with Python 3 and a supported atomic rename primitive",
+    "SSH X11 forwarding": "A local X server and SSH server support for X11 forwarding"
+  },
+  "optional_native_providers": {
+    "linux": {"libpcap": "Live capture is available only with the operating system's compatible libpcap and existing capture privileges."},
+    "macos": {"libpcap": "Live capture is available only with the operating system's compatible libpcap and existing capture privileges."},
+    "windows": {}
+  },
+  "linux_display_libraries": {
+    "Wayland with EGL": ["libwayland-client.so.0", "libwayland-egl.so.1", "libwayland-cursor.so.0", "libxkbcommon.so.0", "libEGL.so.1"],
+    "X11 with GLX or EGL": ["libX11.so.6", "libX11-xcb.so.1", "libxcb.so.1", "libXcursor.so.1", "libXi.so.6", "libXrandr.so.2", "libxkbcommon.so.0", "libxkbcommon-x11.so.0", "libGL.so.1 or libEGL.so.1"]
+  },
+  "platform_requirements": {
+    "linux": ["glibc and shared libraries listed under linked_libraries", "X11 or Wayland display", "OpenGL with the host driver, EGL or GLX and associated display client libraries", "OS certificate store for network TLS", "POSIX shell for local terminals", "optional xdg-desktop-portal and xdg-open for file integration", "optional Python 3 for menu registration"],
+    "windows": ["Native Windows desktop with OpenGL drivers and the OS certificate store", "PowerShell, Explorer and Windows console support for local integration", "Microsoft Visual C++ runtime if imported by the native binaries"],
+    "macos": ["Native macOS desktop/OpenGL frameworks and the OS certificate store", "POSIX shell and open for local integration"]
+  }
+}

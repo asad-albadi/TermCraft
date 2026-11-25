@@ -1,0 +1,24 @@
+{
+  "archive": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/dist/snapshots/eb8145e78a000c02daf6de8327dc9f96b19222a74b53dfd0e024b926f3992eed/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing.tar.gz",
+  "archive_sha256": "eb8145e78a000c02daf6de8327dc9f96b19222a74b53dfd0e024b926f3992eed",
+  "source_sha256": "b5893bf70362241fbff489979d315307a34549e107f24b6f0de99388fbde6f2e",
+  "profile": "genuine locked offline release of app and RDP helper; optional Wayland helper supplied as independently qualified release input",
+  "scope": "Unsigned Arch-compatible Linux x86_64/glibc2.44 declared runtime. Clean private X11 startup/helper/RDP initial negotiation; Direct hostname XDMCP and clipboard/cancellation in separate configured-host private namespace. Keyboard/Indirect new increments not in this source; no native Windows/macOS/hardware/original/signing parity claim.",
+  "files_verified": 3372,
+  "app_gate": {
+    "passed": 970,
+    "failed": 0,
+    "ignored": 65,
+    "outer_targets": 71,
+    "captured_files": 739,
+    "source_changes": []
+  },
+  "helper_gate": {
+    "unit": 76,
+    "integration": 10,
+    "failed": 0
+  },
+  "review": "docs/parity-evidence/parallel-integration-clipboard-serial-package/release-review.md",
+  "qualified_package_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-45-clipboard-serial-qualified/eb8145e78a000c02daf6de8327dc9f96b19222a74b53dfd0e024b926f3992eed/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing",
+  "known_issue": "On portal-capable Linux without Zenity, overwriting an existing game save silently declines the old external confirmation; old file/dirty game preserved. Real native Save/Load/UndoRedo/cancel/invalid-file protection pass. App-owned confirmation fix1966 is private pending review/native verification."
+}

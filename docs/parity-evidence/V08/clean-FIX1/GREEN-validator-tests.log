@@ -1,0 +1,10 @@
+test_falsified_semantics_are_rejected (__main__.GateTests.test_falsified_semantics_are_rejected) ... ok
+test_integrity_rejects_edited_file_and_omitted_index (__main__.GateTests.test_integrity_rejects_edited_file_and_omitted_index) ... ok
+test_missing_each_required_record_rejected (__main__.GateTests.test_missing_each_required_record_rejected) ... ok
+test_valid_partial_is_explicitly_incomplete (__main__.GateTests.test_valid_partial_is_explicitly_incomplete) ... ok
+test_wrong_truncated_empty_raw_reports_and_ui_rejected (__main__.GateTests.test_wrong_truncated_empty_raw_reports_and_ui_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 2.508s
+
+OK

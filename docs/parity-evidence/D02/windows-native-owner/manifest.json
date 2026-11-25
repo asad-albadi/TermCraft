@@ -1,0 +1,132 @@
+{
+  "private_identity": {
+    "version": "0.1.9878",
+    "app_binary": "termcraft-win-owner-9878",
+    "helper_binary": "termcraft-rdp-win-owner-9878"
+  },
+  "integration_file_count": 13,
+  "owner_delta_files": [
+    "engines/rdp/src/serial_windows.rs",
+    "tests/windows-serial-owner-component/Cargo.toml",
+    "tests/windows-serial-owner-component/Cargo.lock",
+    "tests/windows-serial-owner-component/generate.py",
+    "tests/windows-serial-owner-component/main.rs",
+    "tests/windows-serial-owner-component/README.md"
+  ],
+  "unchanged_stats_files": [
+    "engines/rdp/src/devices.rs",
+    "engines/rdp/src/serial_completion.rs",
+    "engines/rdp/src/serial_stats.rs",
+    "engines/rdp/src/serial_stats_windows.rs",
+    "tests/rdp-native-component/generate.py",
+    "tests/windows-serial-control-component/generate.py",
+    "tests/windows-serial-control-component/src/lib.rs"
+  ],
+  "files": {
+    "engines/rdp/src/devices.rs": {
+      "accepted_stats_fix1_base": "18b2739b293514e5288836940ab4972edb83bd37f46aebb92233d719c2af4d5d",
+      "owner_payload": "18b2739b293514e5288836940ab4972edb83bd37f46aebb92233d719c2af4d5d",
+      "owner_source": "18b2739b293514e5288836940ab4972edb83bd37f46aebb92233d719c2af4d5d",
+      "original_cumulative_base": "454b0d6121e5004875d77a6af5b8584bf53f8ba090deef9716b1e4b0a85705c8",
+      "main_observed_at_packaging": "18b2739b293514e5288836940ab4972edb83bd37f46aebb92233d719c2af4d5d",
+      "in_owner_delta": false
+    },
+    "engines/rdp/src/serial_completion.rs": {
+      "accepted_stats_fix1_base": "7f7fc55d7adfe1cb4c63889957efe149a37660e75dd806abfc661f089d5b368e",
+      "owner_payload": "7f7fc55d7adfe1cb4c63889957efe149a37660e75dd806abfc661f089d5b368e",
+      "owner_source": "7f7fc55d7adfe1cb4c63889957efe149a37660e75dd806abfc661f089d5b368e",
+      "original_cumulative_base": "1c3fe86501b75d796a397a0b25345dc33e36d96d76962fb9f7424b9070c92fbd",
+      "main_observed_at_packaging": "7f7fc55d7adfe1cb4c63889957efe149a37660e75dd806abfc661f089d5b368e",
+      "in_owner_delta": false
+    },
+    "engines/rdp/src/serial_windows.rs": {
+      "accepted_stats_fix1_base": "8bd93833d5b51d33cb552a8c88e0843b1f3c33c002b8e021ae4f0a3ae8c3f241",
+      "owner_payload": "9b13c1a1615f23c49e585d8004bf9111f58336d9d6f46812f0e9ba50e73be489",
+      "owner_source": "9b13c1a1615f23c49e585d8004bf9111f58336d9d6f46812f0e9ba50e73be489",
+      "original_cumulative_base": "c200f387d805afd5c6b305d620e51e2d6c22f2f54c9b9bca8024f09a0e96d557",
+      "main_observed_at_packaging": "8bd93833d5b51d33cb552a8c88e0843b1f3c33c002b8e021ae4f0a3ae8c3f241",
+      "in_owner_delta": true
+    },
+    "engines/rdp/src/serial_stats.rs": {
+      "accepted_stats_fix1_base": "468137611e628510099249aa70d3626d8420fdc8e5492d1b1c5797e2fed5b0b2",
+      "owner_payload": "468137611e628510099249aa70d3626d8420fdc8e5492d1b1c5797e2fed5b0b2",
+      "owner_source": "468137611e628510099249aa70d3626d8420fdc8e5492d1b1c5797e2fed5b0b2",
+      "original_cumulative_base": null,
+      "main_observed_at_packaging": "468137611e628510099249aa70d3626d8420fdc8e5492d1b1c5797e2fed5b0b2",
+      "in_owner_delta": false
+    },
+    "engines/rdp/src/serial_stats_windows.rs": {
+      "accepted_stats_fix1_base": "dda675fb125efb9a3478201344cf94e41189d5bbe9de8be64cceaea8562ceeaf",
+      "owner_payload": "dda675fb125efb9a3478201344cf94e41189d5bbe9de8be64cceaea8562ceeaf",
+      "owner_source": "dda675fb125efb9a3478201344cf94e41189d5bbe9de8be64cceaea8562ceeaf",
+      "original_cumulative_base": null,
+      "main_observed_at_packaging": "dda675fb125efb9a3478201344cf94e41189d5bbe9de8be64cceaea8562ceeaf",
+      "in_owner_delta": false
+    },
+    "tests/rdp-native-component/generate.py": {
+      "accepted_stats_fix1_base": "39468665e9cfe655eb1f78d7cae400baa1d3f2ac94f1857bd3e37f562ec2dd16",
+      "owner_payload": "39468665e9cfe655eb1f78d7cae400baa1d3f2ac94f1857bd3e37f562ec2dd16",
+      "owner_source": "39468665e9cfe655eb1f78d7cae400baa1d3f2ac94f1857bd3e37f562ec2dd16",
+      "original_cumulative_base": "756780b8f50b8b4edae77b4514da19ce2150b5d809e0030ef02c6ad7272a9aef",
+      "main_observed_at_packaging": "39468665e9cfe655eb1f78d7cae400baa1d3f2ac94f1857bd3e37f562ec2dd16",
+      "in_owner_delta": false
+    },
+    "tests/windows-serial-control-component/generate.py": {
+      "accepted_stats_fix1_base": "d39b3311e43ebe0714322b20e18f0f80049a7e292a60f55f7c9747bb032cc119",
+      "owner_payload": "d39b3311e43ebe0714322b20e18f0f80049a7e292a60f55f7c9747bb032cc119",
+      "owner_source": "d39b3311e43ebe0714322b20e18f0f80049a7e292a60f55f7c9747bb032cc119",
+      "original_cumulative_base": "fd000c729b751b40277b75ff230deca96c57c3d53f58df51ca5f4b82404a0f11",
+      "main_observed_at_packaging": "d39b3311e43ebe0714322b20e18f0f80049a7e292a60f55f7c9747bb032cc119",
+      "in_owner_delta": false
+    },
+    "tests/windows-serial-control-component/src/lib.rs": {
+      "accepted_stats_fix1_base": "a5f9021f8e563d56ecf35781d5c29abfcfda8c7e58ef242e7f6b11d4abea9322",
+      "owner_payload": "a5f9021f8e563d56ecf35781d5c29abfcfda8c7e58ef242e7f6b11d4abea9322",
+      "owner_source": "a5f9021f8e563d56ecf35781d5c29abfcfda8c7e58ef242e7f6b11d4abea9322",
+      "original_cumulative_base": "45b934ac0994ba50ca0d9f608337b71907e57941dcef8f71ea0dfbc877e2c574",
+      "main_observed_at_packaging": "a5f9021f8e563d56ecf35781d5c29abfcfda8c7e58ef242e7f6b11d4abea9322",
+      "in_owner_delta": false
+    },
+    "tests/windows-serial-owner-component/Cargo.toml": {
+      "accepted_stats_fix1_base": null,
+      "owner_payload": "73d8d5b7ab4d7e8f652a47cf63ca08c9e16322dfb0a65b33e3d8ce0ad67ecb48",
+      "owner_source": "73d8d5b7ab4d7e8f652a47cf63ca08c9e16322dfb0a65b33e3d8ce0ad67ecb48",
+      "original_cumulative_base": null,
+      "main_observed_at_packaging": null,
+      "in_owner_delta": true
+    },
+    "tests/windows-serial-owner-component/Cargo.lock": {
+      "accepted_stats_fix1_base": null,
+      "owner_payload": "e4e8b3f2c611e4b52100f9cda317c3a330078b6dbb9f9e2701252a91d61450be",
+      "owner_source": "e4e8b3f2c611e4b52100f9cda317c3a330078b6dbb9f9e2701252a91d61450be",
+      "original_cumulative_base": null,
+      "main_observed_at_packaging": null,
+      "in_owner_delta": true
+    },
+    "tests/windows-serial-owner-component/generate.py": {
+      "accepted_stats_fix1_base": null,
+      "owner_payload": "2524f7eaba2796f5e3eb1d8b37d651f57b0a6c40f8b9f3cb898c2f6f2a3f728f",
+      "owner_source": "2524f7eaba2796f5e3eb1d8b37d651f57b0a6c40f8b9f3cb898c2f6f2a3f728f",
+      "original_cumulative_base": null,
+      "main_observed_at_packaging": null,
+      "in_owner_delta": true
+    },
+    "tests/windows-serial-owner-component/main.rs": {
+      "accepted_stats_fix1_base": null,
+      "owner_payload": "39e9c360d4f1de2f94828336373cb290a24a8c94781eadad02a2f54c549a30ca",
+      "owner_source": "39e9c360d4f1de2f94828336373cb290a24a8c94781eadad02a2f54c549a30ca",
+      "original_cumulative_base": null,
+      "main_observed_at_packaging": null,
+      "in_owner_delta": true
+    },
+    "tests/windows-serial-owner-component/README.md": {
+      "accepted_stats_fix1_base": null,
+      "owner_payload": "8d2c28ec8cc3b99927e82a22a7758128e2255336793208d45ee5fb0dbffa230e",
+      "owner_source": "8d2c28ec8cc3b99927e82a22a7758128e2255336793208d45ee5fb0dbffa230e",
+      "original_cumulative_base": null,
+      "main_observed_at_packaging": null,
+      "in_owner_delta": true
+    }
+  },
+  "main_note": "Parent is integrating accepted Stats FIX1 and a separate Linux serial change concurrently. This worker did not edit MAIN. Apply owner-delta.patch against accepted Stats FIX1 hashes; original-baseline cumulative patch is archival only."
+}

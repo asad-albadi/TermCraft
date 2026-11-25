@@ -1,0 +1,2 @@
+Request 1d79edb200d7870ff39563948f7995110d445966f8e6268b8dcdb4ed970bbb31 accepted by the existing workspace; results appear in its terminal tabs.
+{"mode": "minimal", "version": {"exit_code": 127, "timed_out": false, "log": "browser-minimal-version.log"}, "status": "EXPECTED_DEPENDENCY_ERROR", "qualification": "NEGATIVE_ONLY"}

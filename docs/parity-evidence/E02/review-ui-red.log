@@ -1,0 +1,38 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.26s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-35a5b814e387799d)
+
+running 8 tests
+
+thread 'ui::macro_events::tests::timed_macro_starts_output_wait_after_the_ninth_input_reaches_the_transport' (349688) panicked at src/ui/macro_events.rs:861:9:
+stale output completed the wait
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test ui::macro_events::tests::timed_macro_starts_output_wait_after_the_ninth_input_reaches_the_transport ... FAILED
+
+thread 'ui::macro_events::tests::timed_macro_waits_for_focus_in_a_detached_terminal_on_another_root_page' (349692) panicked at /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/epaint-0.36.2/src/textures.rs:337:9:
+Dropped TexturesDelta with 2 unapplied deltas. Deltas need to be handled. If you want to drop this intentionally call `clear` before dropping.
+test ui::macro_events::tests::timed_macro_waits_for_its_pty_output_and_calls_the_named_child ... ok
+test ui::macro_events::tests::timed_macro_waits_for_focus_in_a_detached_terminal_on_another_root_page ... FAILED
+test ui::macro_events::tests::timed_macro_startup_survives_duplication_and_named_cli_runs_once ... ok
+test ui::macro_events::tests::timed_macro_never_records_unauthenticated_terminal_input ... ok
+test ui::vnc_integration_tests::timed_macro_records_vnc_gui_input_and_releases_held_buttons_on_cancel ... ok
+
+thread 'ui::macro_events::tests::timed_macro_wait_ignores_pty_output_before_paste_confirmation' (349691) panicked at src/ui/macro_events.rs:706:13:
+macro fixture did not complete
+test ui::macro_events::tests::timed_macro_wait_ignores_pty_output_before_paste_confirmation ... FAILED
+
+thread 'ui::macro_events::tests::timed_macro_startup_sees_the_first_authenticated_ssh_output' (349689) panicked at src/ui/macro_events.rs:706:13:
+macro fixture did not complete
+test ui::macro_events::tests::timed_macro_startup_sees_the_first_authenticated_ssh_output ... FAILED
+
+failures:
+
+failures:
+    ui::macro_events::tests::timed_macro_starts_output_wait_after_the_ninth_input_reaches_the_transport
+    ui::macro_events::tests::timed_macro_startup_sees_the_first_authenticated_ssh_output
+    ui::macro_events::tests::timed_macro_wait_ignores_pty_output_before_paste_confirmation
+    ui::macro_events::tests::timed_macro_waits_for_focus_in_a_detached_terminal_on_another_root_page
+
+test result: FAILED. 4 passed; 4 failed; 0 ignored; 0 measured; 116 filtered out; finished in 6.15s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

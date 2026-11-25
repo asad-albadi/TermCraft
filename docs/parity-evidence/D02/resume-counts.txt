@@ -1,0 +1,2 @@
+raw passed=259, failed=127, ignored=6
+individual failure diagnostic blocks=125

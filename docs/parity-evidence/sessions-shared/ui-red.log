@@ -1,0 +1,285 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `poll_shared_sources` found for mutable reference `&mut ui::Workspace` in the current scope
+ --> src/ui/shared_sessions.rs:7:97
+  |
+7 | ...ow()+Duration::from_secs(4);loop{w.poll_shared_sources(ctx);if !w.shared_sources_busy(){break;}assert!(Instant::now()<end);std::th...
+  |                                       ^^^^^^^^^^^^^^^^^^^ method not found in `&mut ui::Workspace`
+
+error[E0599]: no method named `shared_sources_busy` found for mutable reference `&mut ui::Workspace` in the current scope
+ --> src/ui/shared_sessions.rs:7:128
+  |
+7 | ...p{w.poll_shared_sources(ctx);if !w.shared_sources_busy(){break;}assert!(Instant::now()<end);std::thread::sleep(Duration::from_mill...
+  |                                       ^^^^^^^^^^^^^^^^^^^ method not found in `&mut ui::Workspace`
+
+error[E0599]: no method named `add_shared_source` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:12:147
+    |
+ 12 | ....unwrap();let id=config.id.clone();w.add_shared_source(config,&ctx);wait(&ctx,&mut w);
+    |                                         ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `add_shared_source` not found for this struct
+
+error[E0599]: no method named `shared_snapshot` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:13:65
+    |
+ 13 |         assert_eq!(w.store.sessions[0].id,local.id);let entry=w.shared_snapshot(&id).unwrap().entries[0].id.clone();
+    |                                                                 ^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `shared_snapshot` not found for this struct
+
+error[E0599]: no method named `shared_cache_path` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:14:19
+    |
+ 14 |         assert!(w.shared_cache_path(&id).is_file());assert!(Store::load(&w.store_path).unwrap().shared_sources[0].cached.is_none());
+    |                   ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `shared_cache_path` not found for this struct
+
+error[E0599]: no method named `copy_shared_to_local` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:15:11
+    |
+ 15 | ...   w.copy_shared_to_local(&id,&entry);assert_eq!(w.store.sessions.len(),2);assert_ne!(w.store.sessions[1].id,entry);assert_eq!(w...
+    |         ^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `copy_shared_to_local` not found for this struct
+
+error[E0599]: no method named `refresh_shared_source` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:16:42
+    |
+ 16 | ...   fs::remove_file(path).unwrap();w.refresh_shared_source(&id,&ctx);wait(&ctx,&mut w);assert!(w.shared_snapshot(&id).unwrap().st...
+    |                                        ^^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `refresh_shared_source` not found for this struct
+
+error[E0599]: no method named `shared_snapshot` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:16:102
+    |
+ 16 | ...&id,&ctx);wait(&ctx,&mut w);assert!(w.shared_snapshot(&id).unwrap().stale);
+    |                                          ^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `shared_snapshot` not found for this struct
+
+error[E0599]: no method named `shared_snapshot` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:17:167
+    |
+ 17 | ...econd_ctx,&mut second);assert!(second.shared_snapshot(&id).unwrap().stale);assert_eq!(second.shared_snapshot(&id).unwrap().entri...
+    |                                          ^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `shared_snapshot` not found for this struct
+
+error[E0599]: no method named `shared_snapshot` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:17:222
+    |
+ 17 | ...id).unwrap().stale);assert_eq!(second.shared_snapshot(&id).unwrap().entries[0].id,entry);
+    |                                          ^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `shared_snapshot` not found for this struct
+
+error[E0599]: no method named `shared_cache_path` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:18:91
+    |
+ 18 | ...nsExt;assert_eq!(fs::metadata(second.shared_cache_path(&id)).unwrap().permissions().mode()&0o077,0);}
+    |                                         ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `shared_cache_path` not found for this struct
+
+error[E0599]: no method named `add_shared_source` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:23:141
+    |
+ 23 | ...ce).unwrap();let id=cfg.id.clone();w.add_shared_source(cfg,&ctx);wait(&ctx,&mut w);fs::remove_file(path).unwrap();w.refresh_shar...
+    |                                         ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `add_shared_source` not found for this struct
+
+error[E0599]: no method named `refresh_shared_source` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:23:220
+    |
+ 23 | ...);fs::remove_file(path).unwrap();w.refresh_shared_source(&id,&ctx);wait(&ctx,&mut w);
+    |                                       ^^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `refresh_shared_source` not found for this struct
+
+error[E0599]: no method named `shared_session_tree` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:25:182
+    |
+ 25 | ...2::ZERO,vec2(800.,900.))),..Default::default()},|ui|w.shared_session_tree(ui));output.textures_delta.clear();labels.clear();for ...
+    |                                                          ^^^^^^^^^^^^^^^^^^^
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `shared_session_tree` not found for this struct
+    |
+help: there is a method `new_session` with a similar name
+    |
+ 25 -         let mut labels=String::new();for _ in 0..2 {let mut output=ctx.run_ui(RawInput{screen_rect:Some(Rect::from_min_size(Pos2::ZERO,vec2(800.,900.))),..Default::default()},|ui|w.shared_session_tree(ui));output.textures_delta.clear();labels.clear();for shape in output.shapes{text(&shape.shape,&mut labels);}}
+ 25 +         let mut labels=String::new();for _ in 0..2 {let mut output=ctx.run_ui(RawInput{screen_rect:Some(Rect::from_min_size(Pos2::ZERO,vec2(800.,900.))),..Default::default()},|ui|w.new_session(ui));output.textures_delta.clear();labels.clear();for shape in output.shapes{text(&shape.shape,&mut labels);}}
+    |
+
+error[E0599]: no method named `add_shared_source` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:40:136
+    |
+ 40 | ...ce).unwrap();let id=cfg.id.clone();w.add_shared_source(cfg,&ctx);wait(&ctx,&mut w);
+    |                                         ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `add_shared_source` not found for this struct
+
+error[E0599]: no method named `refresh_shared_source_with` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:42:11
+    |
+ 42 |         w.refresh_shared_source_with(&id,&ctx,move|auth|Arc::new(PromptReader{auth,owner:old,received:capture}));
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `refresh_shared_source_with` not found for this struct
+
+error[E0599]: no method named `has_shared_prompt` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:43:64
+    |
+ 43 | ...   let end=Instant::now()+Duration::from_secs(3);while !w.has_shared_prompt(){w.poll_shared_sources(&ctx);assert!(Instant::now()...
+    |                                                              ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `has_shared_prompt` not found for this struct
+
+error[E0599]: no method named `poll_shared_sources` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:43:86
+    |
+ 43 | ...s(3);while !w.has_shared_prompt(){w.poll_shared_sources(&ctx);assert!(Instant::now()<end);std::thread::sleep(Duration::from_mill...
+    |                                        ^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `poll_shared_sources` not found for this struct
+
+error[E0599]: no method named `cancel_shared_source` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:44:11
+    |
+ 44 | ...   w.cancel_shared_source(&id);assert!(!w.submit_shared_auth(&id,old,vec!["owned secret".to_owned().into()],None));assert!(!rece...
+    |         ^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `cancel_shared_source` not found for this struct
+
+error[E0599]: no method named `submit_shared_auth` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:44:48
+    |
+ 44 | ...   w.cancel_shared_source(&id);assert!(!w.submit_shared_auth(&id,old,vec!["owned secret".to_owned().into()],None));assert!(!rece...
+    |                                              ^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `submit_shared_auth` not found for this struct
+
+error[E0599]: no method named `refresh_shared_source_with` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:45:40
+    |
+ 45 | ...   let capture=received.clone();w.refresh_shared_source_with(&id,&ctx,move|auth|Arc::new(PromptReader{auth,owner:old+1,received:...
+    |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `refresh_shared_source_with` not found for this struct
+
+error[E0599]: no method named `has_shared_prompt` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:46:64
+    |
+ 46 | ...   let end=Instant::now()+Duration::from_secs(3);while !w.has_shared_prompt(){w.poll_shared_sources(&ctx);assert!(Instant::now()...
+    |                                                              ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `has_shared_prompt` not found for this struct
+
+error[E0599]: no method named `poll_shared_sources` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:46:86
+    |
+ 46 | ...s(3);while !w.has_shared_prompt(){w.poll_shared_sources(&ctx);assert!(Instant::now()<end);std::thread::sleep(Duration::from_mill...
+    |                                        ^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `poll_shared_sources` not found for this struct
+
+error[E0599]: no method named `submit_shared_auth` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:47:20
+    |
+ 47 |         assert!(!w.submit_shared_auth(&id,old,vec!["owned secret".to_owned().into()],None));
+    |                    ^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `submit_shared_auth` not found for this struct
+
+error[E0599]: no method named `submit_shared_auth` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:48:19
+    |
+ 48 | ...   assert!(w.submit_shared_auth(&id,old+1,vec!["owned secret".to_owned().into()],None));wait(&ctx,&mut w);assert!(received.load(...
+    |                 ^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `submit_shared_auth` not found for this struct
+
+error[E0599]: no method named `shared_cache_path` found for struct `ui::Workspace` in the current scope
+   --> src/ui/shared_sessions.rs:49:39
+    |
+ 49 |         assert!(!fs::read_to_string(w.shared_cache_path(&id)).unwrap().contains("owned secret"));
+    |                                       ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:373:1
+    |
+373 | pub struct Workspace {
+    | -------------------- method `shared_cache_path` not found for this struct
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 26 previous errors

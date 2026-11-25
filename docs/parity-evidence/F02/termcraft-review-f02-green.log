@@ -1,0 +1,20 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.01s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-a3e649926aaf12fc)
+
+running 12 tests
+test cancelled_active_download_retains_partial_and_preserves_destination ... ok
+test composed_symlinks_cannot_publish_an_escape_from_the_selected_tree ... ok
+test failed_local_and_remote_io_preserve_existing_data ... ok
+test disconnect_keeps_original_destination_and_recoverable_partial ... ok
+test cancellation_and_conflicts_preserve_existing_destination ... ok
+test file_management_is_literal_and_deletion_requires_the_confirmed_target ... ok
+test literal_binary_file_round_trip_uses_sftp ... ok
+test missing_sftp_rejects_file_jobs_without_stranding_the_queue ... ok
+test recursive_transfer_preserves_names_bytes_and_symlink_cycles ... ok
+test transfer_preserves_executable_modes_after_staging ... ok
+test repeated_tree_cancellation_releases_bounded_sftp_handles ... ok
+test overlapping_overwrite_jobs_commit_in_submission_order ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.65s
+

@@ -1,0 +1,12 @@
+checking file src/browser/mod.rs
+checking file src/browser/pipe.rs
+checking file src/browser/engine.rs
+checking file src/browser/windows_pipe.rs
+checking file src/runtime/mod.rs
+checking file src/ui.rs
+checking file src/ui/pages.rs
+checking file src/ui/web_browser.rs
+checking file src/ui/web_browser_tests.rs
+checking file scripts/package-release.py
+checking file packaging/browser/README.md
+checking file tests/browser_session.rs

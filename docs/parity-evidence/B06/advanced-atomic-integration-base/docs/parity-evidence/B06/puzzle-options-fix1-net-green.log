@@ -1,0 +1,14 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.00s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-puzzle-options/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 7 tests
+test net::added_source_fixtures::recovered_half_turn_is_two_quarters_and_lock_protected ... ok
+test net::configuration_tests::wrapped_seam_connects_but_barrier_stops_it ... ok
+test net::additional_configuration_tests::default_fallback_is_unique_and_loops_do_not_win ... ok
+test net::barrier_rate_tests::source_barrier_fraction_is_exact_and_rates_are_nested_on_same_candidate ... ok
+test net::recovered_fixtures::recovered_rotation_and_lock_transitions ... ok
+test net::configuration_tests::source_stock_sizes_wrap_and_barriers_are_real_rules ... ok
+test net::tests::tree_solution_and_locks ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 43 filtered out; finished in 0.03s
+

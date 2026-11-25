@@ -1,0 +1,5 @@
+# Plugin integration boundary
+
+`CARGO_BUILD_JOBS=2 cargo test --offline --locked --all-targets --no-fail-fast` exited 0: **597 passed, 0 failed, 28 ignored across 61 outer targets**. Captured main source hashes stayed unchanged throughout compilation and execution. Nested fixture subprocess summaries are excluded. The main application timestamp was refreshed before compilation so the root executable was rebuilt after the shared private build window; all private app-producing builders paused during this gate.
+
+This includes reviewed P06 plugin code and its actual Tools-page consent/invoke/cancel/disable pointer workflow, the four new image/lifecycle regressions, seven plugin lifecycle cases and prior B01/P05 code. Private B03, B05 and P08 Unix staging work is outside this source cut. Opt-in P05 regressions after the generalized archive helper change are recorded separately under `../P06/merged-package-regression.log`. The unchanged helper last passed 49 tests at `../parallel-integration-clean/`. Native Windows/macOS execution and original plugin compatibility remain unverified.

@@ -1,0 +1,9 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.01s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-4aa8822a5d2e7f03)
+
+running 1 test
+test ui::vnc_integration_tests::embedded_vnc_workspace_paints_real_frame_and_cursor_and_routes_scaled_input ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 108 filtered out; finished in 1.33s
+

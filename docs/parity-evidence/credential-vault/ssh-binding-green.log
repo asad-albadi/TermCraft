@@ -1,0 +1,42 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: method `poll` is never used
+   --> src/ui.rs:150:8
+    |
+107 | impl TerminalTab {
+    | ---------------- method in this implementation
+...
+150 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `credential` is never read
+   --> src/ui/remote_files.rs:567:9
+    |
+561 | pub(super) struct AuthForm {
+    |                   -------- field in this struct
+...
+567 |     pub credential: Option<harbor_workspace::ssh::ChallengeCredential>,
+    |         ^^^^^^^^^^
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:524:19
+    |
+486 | impl Workspace {
+    | -------------- methods in this implementation
+...
+524 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+837 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 15.90s
+     Running tests/ssh_lifecycle.rs (target/debug/deps/ssh_lifecycle-f83e6faaca7748c3)
+
+running 1 test
+test password_credential_binding_uses_verified_endpoint_and_typed_method ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 14 filtered out; finished in 0.13s
+

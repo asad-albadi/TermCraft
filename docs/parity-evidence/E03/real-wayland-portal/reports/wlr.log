@@ -1,0 +1,466 @@
+2026/11/25 12:48:00 [TRACE] - config: parsing setction screencast, key chooser_type, value simple
+2026/11/25 12:48:00 [TRACE] - config: parsing setction screencast, key chooser_cmd, value /tmp/chooser.sh
+2026/11/25 12:48:00 [TRACE] - config: parsing setction screencast, key max_fps, value 15
+2026/11/25 12:48:00 [DEBUG] - config: outputname:  (null)
+2026/11/25 12:48:00 [DEBUG] - config: max_fps:  15.000000
+2026/11/25 12:48:00 [DEBUG] - config: exec_before:  (null)
+2026/11/25 12:48:00 [DEBUG] - config: exec_after:  (null)
+2026/11/25 12:48:00 [DEBUG] - config: chooser_cmd: /tmp/chooser.sh
+2026/11/25 12:48:00 [DEBUG] - config: chooser_type: simple
+2026/11/25 12:48:00 [DEBUG] - config: force_mod_linear: 0
+2026/11/25 12:48:00 [DEBUG] - dbus: connected
+2026/11/25 12:48:00 [DEBUG] - wlroots: wl_display connected
+2026/11/25 12:48:00 [DEBUG] - pipewire: pw_loop created
+2026/11/25 12:48:00 [DEBUG] - pipewire: establishing connection to core
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wl_fixes  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wl_shm  (Version: 2)
+2026/11/25 12:48:00 [DEBUG] - wlroots: |-- registered to interface wl_shm (Version 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wl_compositor  (Version: 6)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wl_subcompositor  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wl_data_device_manager  (Version: 3)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwlr_gamma_control_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zxdg_output_manager_v1  (Version: 3)
+2026/11/25 12:48:00 [DEBUG] - wlroots: |-- registered to interface zxdg_output_manager_v1 (Version 3)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register ext_idle_notifier_v1  (Version: 2)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwp_idle_inhibit_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwlr_layer_shell_v1  (Version: 5)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register xdg_wm_base  (Version: 5)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwp_tablet_manager_v2  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register org_kde_kwin_server_decoration_manager  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zxdg_decoration_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwp_relative_pointer_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwp_pointer_constraints_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wp_presentation  (Version: 2)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wp_alpha_modifier_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwlr_output_manager_v1  (Version: 4)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwlr_output_power_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwp_input_method_manager_v2  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwp_text_input_manager_v3  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register ext_foreign_toplevel_list_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: |-- registered to interface ext_foreign_toplevel_list_v1 (Version 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwlr_foreign_toplevel_manager_v1  (Version: 3)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register ext_session_lock_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register ext_workspace_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwlr_export_dmabuf_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwlr_screencopy_manager_v1  (Version: 3)
+2026/11/25 12:48:00 [DEBUG] - wlroots: |-- registered to interface zwlr_screencopy_manager_v1 (Version 3)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register ext_image_copy_capture_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: |-- registered to interface ext_image_copy_capture_manager_v1 (Version 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register ext_output_image_capture_source_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: |-- registered to interface ext_output_image_capture_source_manager_v1 (Version 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwlr_data_control_manager_v1  (Version: 2)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register ext_data_control_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wp_security_context_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wp_viewporter  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wp_single_pixel_buffer_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wp_content_type_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wp_fractional_scale_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register ext_foreign_toplevel_image_capture_source_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: |-- registered to interface ext_foreign_toplevel_image_capture_source_manager_v1 (Version 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wp_tearing_control_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zxdg_exporter_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zxdg_importer_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zxdg_exporter_v2  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zxdg_importer_v2  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register xdg_activation_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register xdg_toplevel_tag_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wp_cursor_shape_manager_v1  (Version: 2)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wp_color_representation_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwp_virtual_keyboard_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwlr_virtual_pointer_manager_v1  (Version: 2)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwp_keyboard_shortcuts_inhibit_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwp_pointer_gestures_v1  (Version: 3)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register ext_transient_seat_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wl_seat  (Version: 9)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register zwp_primary_selection_device_manager_v1  (Version: 1)
+2026/11/25 12:48:00 [DEBUG] - wlroots: interface to register wl_output  (Version: 4)
+2026/11/25 12:48:00 [DEBUG] - wlroots: |-- registered to interface wl_output (Version 4)
+2026/11/25 12:48:00 [DEBUG] - wayland: registry listeners run
+2026/11/25 12:48:00 [DEBUG] - wayland: using ext_image_copy_capture
+2026/11/25 12:48:00 [DEBUG] - wayland: xdg_output listeners run
+2026/11/25 12:48:00 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:00 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:00 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:00 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:00 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:00 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:00 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:01 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:01 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:01 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:01 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:01 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:01 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:01 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:01 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:03 [TRACE] - event-loop: got wayland event
+2026/11/25 12:48:04 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:04 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:04 [INFO] - dbus: create session method invoked
+2026/11/25 12:48:04 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_10/harbor_1
+2026/11/25 12:48:04 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_10/harbor_1
+2026/11/25 12:48:04 [INFO] - dbus: app_id: 
+2026/11/25 12:48:04 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:04 [INFO] - dbus: select sources method invoked
+2026/11/25 12:48:04 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_10/harbor_2
+2026/11/25 12:48:04 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_10/harbor_1
+2026/11/25 12:48:04 [INFO] - dbus: app_id: 
+2026/11/25 12:48:04 [DEBUG] - dbus: select sources: found matching session /org/freedesktop/portal/desktop/session/1_10/harbor_1
+2026/11/25 12:48:04 [INFO] - dbus: option types: 3
+2026/11/25 12:48:04 [INFO] - dbus: option multiple: 0
+2026/11/25 12:48:04 [INFO] - wlroots: capturable output: 55 HEADLESS-1
+2026/11/25 12:48:04 [INFO] - wlroots: capturable toplevel: 38302b295f5da9367810d81333f1b329 app_id: zenity title: PRIVATE PORTAL TARGET 640x480
+2026/11/25 12:48:04 [DEBUG] - wlroots: chooser /tmp/chooser.sh (2)
+2026/11/25 12:48:04 [DEBUG] - wlroots: chooser called
+2026/11/25 12:48:04 [TRACE] - exec chooser called: cmd /tmp/chooser.sh, pipe chooser_in (13,14), pipe chooser_out (15,16)
+2026/11/25 12:48:04 [ERROR] - wlroots: no output found
+2026/11/25 12:48:04 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:04 [INFO] - dbus: session closed
+2026/11/25 12:48:04 [DEBUG] - dbus: destroying session 0x55e9b7562560
+2026/11/25 12:48:04 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:04 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:04 [INFO] - dbus: create session method invoked
+2026/11/25 12:48:04 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_11/harbor_1
+2026/11/25 12:48:04 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_11/harbor_1
+2026/11/25 12:48:04 [INFO] - dbus: app_id: 
+2026/11/25 12:48:04 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:04 [INFO] - dbus: select sources method invoked
+2026/11/25 12:48:04 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_11/harbor_2
+2026/11/25 12:48:04 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_11/harbor_1
+2026/11/25 12:48:04 [INFO] - dbus: app_id: 
+2026/11/25 12:48:04 [DEBUG] - dbus: select sources: found matching session /org/freedesktop/portal/desktop/session/1_11/harbor_1
+2026/11/25 12:48:04 [INFO] - dbus: option types: 3
+2026/11/25 12:48:04 [INFO] - dbus: option multiple: 0
+2026/11/25 12:48:04 [INFO] - wlroots: capturable output: 55 HEADLESS-1
+2026/11/25 12:48:04 [INFO] - wlroots: capturable toplevel: 38302b295f5da9367810d81333f1b329 app_id: zenity title: PRIVATE PORTAL TARGET 640x480
+2026/11/25 12:48:04 [DEBUG] - wlroots: chooser /tmp/chooser.sh (2)
+2026/11/25 12:48:04 [DEBUG] - wlroots: chooser called
+2026/11/25 12:48:04 [TRACE] - exec chooser called: cmd /tmp/chooser.sh, pipe chooser_in (13,14), pipe chooser_out (15,16)
+2026/11/25 12:48:06 [ERROR] - wlroots: no output found
+2026/11/25 12:48:06 [INFO] - dbus: session closed
+2026/11/25 12:48:06 [DEBUG] - dbus: destroying session 0x55e9b7562560
+2026/11/25 12:48:06 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: create session method invoked
+2026/11/25 12:48:07 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_12/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_12/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: app_id: 
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: select sources method invoked
+2026/11/25 12:48:07 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_12/harbor_2
+2026/11/25 12:48:07 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_12/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: app_id: 
+2026/11/25 12:48:07 [DEBUG] - dbus: select sources: found matching session /org/freedesktop/portal/desktop/session/1_12/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: option types: 3
+2026/11/25 12:48:07 [INFO] - dbus: option multiple: 0
+2026/11/25 12:48:07 [INFO] - wlroots: capturable output: 55 HEADLESS-1
+2026/11/25 12:48:07 [INFO] - wlroots: capturable toplevel: 38302b295f5da9367810d81333f1b329 app_id: zenity title: PRIVATE PORTAL TARGET 640x480
+2026/11/25 12:48:07 [DEBUG] - wlroots: chooser /tmp/chooser.sh (2)
+2026/11/25 12:48:07 [DEBUG] - wlroots: chooser called
+2026/11/25 12:48:07 [TRACE] - exec chooser called: cmd /tmp/chooser.sh, pipe chooser_in (13,14), pipe chooser_out (15,16)
+2026/11/25 12:48:07 [TRACE] - wlroots: chooser /tmp/chooser.sh selects HEADLESS-1
+2026/11/25 12:48:07 [INFO] - xdpw: screencast instance 0x55e9b7564740 has 1 references
+2026/11/25 12:48:07 [INFO] - xdpw: 1 active screencast instances
+2026/11/25 12:48:07 [INFO] - wlroots: output: HEADLESS-1
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: start method invoked
+2026/11/25 12:48:07 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_12/harbor_3
+2026/11/25 12:48:07 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_12/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: app_id: 
+2026/11/25 12:48:07 [INFO] - dbus: parent_window: 
+2026/11/25 12:48:07 [DEBUG] - dbus: start: found matching session /org/freedesktop/portal/desktop/session/1_12/harbor_1
+2026/11/25 12:48:07 [TRACE] - ext: session callbacks registered
+2026/11/25 12:48:07 [TRACE] - ext: shm_format: XR24 (34325258)
+2026/11/25 12:48:07 [TRACE] - ext: done handler
+2026/11/25 12:48:07 [DEBUG] - ext: buffer constraints changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream update parameters
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "connecting"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is -1
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "paused"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is 43
+2026/11/25 12:48:07 [DEBUG] - dbus: start: returning node 43
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [DEBUG] - pipewire: Format negotiated:
+2026/11/25 12:48:07 [DEBUG] - pipewire: buffer_type: 0 (4)
+2026/11/25 12:48:07 [DEBUG] - pipewire: format: 8
+2026/11/25 12:48:07 [DEBUG] - pipewire: modifier: 0
+2026/11/25 12:48:07 [DEBUG] - pipewire: size: (640, 480)
+2026/11/25 12:48:07 [DEBUG] - pipewire: max_framerate: (15 / 1)
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [DEBUG] - pipewire: add buffer event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: selected buffertype 2
+2026/11/25 12:48:07 [DEBUG] - pipewire: add buffer event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: selected buffertype 2
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "streaming"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is 43
+2026/11/25 12:48:07 [TRACE] - pipewire: dequeueing buffer
+2026/11/25 12:48:07 [TRACE] - ext: start screencopy
+2026/11/25 12:48:07 [TRACE] - ext: frame callbacks registered
+2026/11/25 12:48:07 [TRACE] - event-loop: got wayland event
+2026/11/25 12:48:07 [TRACE] - ext: damage: 0,0x640,480
+2026/11/25 12:48:07 [TRACE] - ext: transform handler 0
+2026/11/25 12:48:07 [TRACE] - ext: timestamp 4721:400138683
+2026/11/25 12:48:07 [TRACE] - ext: ready event handler
+2026/11/25 12:48:07 [TRACE] - pipewire: enqueueing buffer
+2026/11/25 12:48:07 [TRACE] - ********************
+2026/11/25 12:48:07 [TRACE] - pipewire: plane 0
+2026/11/25 12:48:07 [TRACE] - pipewire: fd 21
+2026/11/25 12:48:07 [TRACE] - pipewire: maxsize 1228800
+2026/11/25 12:48:07 [TRACE] - pipewire: size 1228800
+2026/11/25 12:48:07 [TRACE] - pipewire: stride 2560
+2026/11/25 12:48:07 [TRACE] - pipewire: offset 0
+2026/11/25 12:48:07 [TRACE] - pipewire: chunk flags 0
+2026/11/25 12:48:07 [TRACE] - pipewire: width 640
+2026/11/25 12:48:07 [TRACE] - pipewire: height 480
+2026/11/25 12:48:07 [TRACE] - pipewire: y_invert 0
+2026/11/25 12:48:07 [TRACE] - ********************
+2026/11/25 12:48:07 [TRACE] - pipewire: on process event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: dequeueing buffer
+2026/11/25 12:48:07 [TRACE] - fps_limit: elapsed time since the last measurement: 1220765, target 66666666, should delay for 65445901 (ns)
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [TRACE] - event-loop: got a timer event
+2026/11/25 12:48:07 [TRACE] - ext: start screencopy
+2026/11/25 12:48:07 [TRACE] - ext: frame callbacks registered
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: session closed
+2026/11/25 12:48:07 [DEBUG] - dbus: destroying session 0x55e9b7562560
+2026/11/25 12:48:07 [DEBUG] - xdpw: screencast instance 0x55e9b7564740 now has 0 references
+2026/11/25 12:48:07 [TRACE] - xdpw: destroying screencast instance
+2026/11/25 12:48:07 [DEBUG] - xdpw: destroying cast instance
+2026/11/25 12:48:07 [DEBUG] - pipewire: destroying stream
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "paused"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is 43
+2026/11/25 12:48:07 [TRACE] - pipewire: enqueueing buffer
+2026/11/25 12:48:07 [TRACE] - ********************
+2026/11/25 12:48:07 [TRACE] - pipewire: plane 0
+2026/11/25 12:48:07 [TRACE] - pipewire: fd 23
+2026/11/25 12:48:07 [TRACE] - pipewire: maxsize 1228800
+2026/11/25 12:48:07 [TRACE] - pipewire: size 1228800
+2026/11/25 12:48:07 [TRACE] - pipewire: stride 2560
+2026/11/25 12:48:07 [TRACE] - pipewire: offset 0
+2026/11/25 12:48:07 [TRACE] - pipewire: chunk flags 1
+2026/11/25 12:48:07 [TRACE] - pipewire: width 640
+2026/11/25 12:48:07 [TRACE] - pipewire: height 480
+2026/11/25 12:48:07 [TRACE] - pipewire: y_invert 0
+2026/11/25 12:48:07 [TRACE] - ********************
+2026/11/25 12:48:07 [DEBUG] - pipewire: remove buffer event handle
+2026/11/25 12:48:07 [DEBUG] - pipewire: remove buffer event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "unconnected"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is -1
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got wayland event
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: create session method invoked
+2026/11/25 12:48:07 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_14/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_14/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: app_id: 
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: select sources method invoked
+2026/11/25 12:48:07 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_14/harbor_2
+2026/11/25 12:48:07 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_14/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: app_id: 
+2026/11/25 12:48:07 [DEBUG] - dbus: select sources: found matching session /org/freedesktop/portal/desktop/session/1_14/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: option types: 3
+2026/11/25 12:48:07 [INFO] - dbus: option multiple: 0
+2026/11/25 12:48:07 [INFO] - wlroots: capturable output: 55 HEADLESS-1
+2026/11/25 12:48:07 [INFO] - wlroots: capturable toplevel: 38302b295f5da9367810d81333f1b329 app_id: zenity title: PRIVATE PORTAL TARGET 640x480
+2026/11/25 12:48:07 [DEBUG] - wlroots: chooser /tmp/chooser.sh (2)
+2026/11/25 12:48:07 [DEBUG] - wlroots: chooser called
+2026/11/25 12:48:07 [TRACE] - exec chooser called: cmd /tmp/chooser.sh, pipe chooser_in (13,14), pipe chooser_out (15,16)
+2026/11/25 12:48:07 [TRACE] - wlroots: chooser /tmp/chooser.sh selects HEADLESS-1
+2026/11/25 12:48:07 [INFO] - xdpw: screencast instance 0x55e9b7564740 has 1 references
+2026/11/25 12:48:07 [INFO] - xdpw: 1 active screencast instances
+2026/11/25 12:48:07 [INFO] - wlroots: output: HEADLESS-1
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: start method invoked
+2026/11/25 12:48:07 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_14/harbor_3
+2026/11/25 12:48:07 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_14/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: app_id: 
+2026/11/25 12:48:07 [INFO] - dbus: parent_window: 
+2026/11/25 12:48:07 [DEBUG] - dbus: start: found matching session /org/freedesktop/portal/desktop/session/1_14/harbor_1
+2026/11/25 12:48:07 [TRACE] - ext: session callbacks registered
+2026/11/25 12:48:07 [TRACE] - ext: shm_format: XR24 (34325258)
+2026/11/25 12:48:07 [TRACE] - ext: done handler
+2026/11/25 12:48:07 [DEBUG] - ext: buffer constraints changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream update parameters
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "connecting"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is -1
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "paused"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is 45
+2026/11/25 12:48:07 [DEBUG] - dbus: start: returning node 45
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [DEBUG] - pipewire: Format negotiated:
+2026/11/25 12:48:07 [DEBUG] - pipewire: buffer_type: 0 (4)
+2026/11/25 12:48:07 [DEBUG] - pipewire: format: 8
+2026/11/25 12:48:07 [DEBUG] - pipewire: modifier: 0
+2026/11/25 12:48:07 [DEBUG] - pipewire: size: (640, 480)
+2026/11/25 12:48:07 [DEBUG] - pipewire: max_framerate: (15 / 1)
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [DEBUG] - pipewire: add buffer event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: selected buffertype 2
+2026/11/25 12:48:07 [DEBUG] - pipewire: add buffer event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: selected buffertype 2
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "streaming"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is 45
+2026/11/25 12:48:07 [TRACE] - pipewire: dequeueing buffer
+2026/11/25 12:48:07 [TRACE] - ext: start screencopy
+2026/11/25 12:48:07 [TRACE] - ext: frame callbacks registered
+2026/11/25 12:48:07 [TRACE] - event-loop: got wayland event
+2026/11/25 12:48:07 [TRACE] - ext: damage: 0,0x640,480
+2026/11/25 12:48:07 [TRACE] - ext: transform handler 0
+2026/11/25 12:48:07 [TRACE] - ext: timestamp 4721:800988530
+2026/11/25 12:48:07 [TRACE] - ext: ready event handler
+2026/11/25 12:48:07 [TRACE] - pipewire: enqueueing buffer
+2026/11/25 12:48:07 [TRACE] - ********************
+2026/11/25 12:48:07 [TRACE] - pipewire: plane 0
+2026/11/25 12:48:07 [TRACE] - pipewire: fd 21
+2026/11/25 12:48:07 [TRACE] - pipewire: maxsize 1228800
+2026/11/25 12:48:07 [TRACE] - pipewire: size 1228800
+2026/11/25 12:48:07 [TRACE] - pipewire: stride 2560
+2026/11/25 12:48:07 [TRACE] - pipewire: offset 0
+2026/11/25 12:48:07 [TRACE] - pipewire: chunk flags 0
+2026/11/25 12:48:07 [TRACE] - pipewire: width 640
+2026/11/25 12:48:07 [TRACE] - pipewire: height 480
+2026/11/25 12:48:07 [TRACE] - pipewire: y_invert 0
+2026/11/25 12:48:07 [TRACE] - ********************
+2026/11/25 12:48:07 [TRACE] - pipewire: on process event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: dequeueing buffer
+2026/11/25 12:48:07 [TRACE] - fps_limit: elapsed time since the last measurement: 1036561, target 66666666, should delay for 65630105 (ns)
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got a timer event
+2026/11/25 12:48:07 [TRACE] - ext: start screencopy
+2026/11/25 12:48:07 [TRACE] - ext: frame callbacks registered
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [DEBUG] - pipewire: remove buffer event handle
+2026/11/25 12:48:07 [DEBUG] - pipewire: remove buffer event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "paused"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is 45
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: session closed
+2026/11/25 12:48:07 [DEBUG] - dbus: destroying session 0x55e9b7566390
+2026/11/25 12:48:07 [DEBUG] - xdpw: screencast instance 0x55e9b7564740 now has 0 references
+2026/11/25 12:48:07 [TRACE] - xdpw: destroying screencast instance
+2026/11/25 12:48:07 [DEBUG] - xdpw: destroying cast instance
+2026/11/25 12:48:07 [DEBUG] - pipewire: destroying stream
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "unconnected"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is -1
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got wayland event
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: create session method invoked
+2026/11/25 12:48:07 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_15/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_15/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: app_id: 
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: select sources method invoked
+2026/11/25 12:48:07 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_15/harbor_2
+2026/11/25 12:48:07 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_15/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: app_id: 
+2026/11/25 12:48:07 [DEBUG] - dbus: select sources: found matching session /org/freedesktop/portal/desktop/session/1_15/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: option types: 3
+2026/11/25 12:48:07 [INFO] - dbus: option multiple: 0
+2026/11/25 12:48:07 [INFO] - wlroots: capturable output: 55 HEADLESS-1
+2026/11/25 12:48:07 [INFO] - wlroots: capturable toplevel: 38302b295f5da9367810d81333f1b329 app_id: zenity title: PRIVATE PORTAL TARGET 640x480
+2026/11/25 12:48:07 [DEBUG] - wlroots: chooser /tmp/chooser.sh (2)
+2026/11/25 12:48:07 [DEBUG] - wlroots: chooser called
+2026/11/25 12:48:07 [TRACE] - exec chooser called: cmd /tmp/chooser.sh, pipe chooser_in (13,14), pipe chooser_out (15,16)
+2026/11/25 12:48:07 [TRACE] - wlroots: chooser /tmp/chooser.sh selects HEADLESS-1
+2026/11/25 12:48:07 [INFO] - xdpw: screencast instance 0x55e9b7564740 has 1 references
+2026/11/25 12:48:07 [INFO] - xdpw: 1 active screencast instances
+2026/11/25 12:48:07 [INFO] - wlroots: output: HEADLESS-1
+2026/11/25 12:48:07 [TRACE] - event-loop: got dbus event
+2026/11/25 12:48:07 [INFO] - dbus: start method invoked
+2026/11/25 12:48:07 [INFO] - dbus: request_handle: /org/freedesktop/portal/desktop/request/1_15/harbor_3
+2026/11/25 12:48:07 [INFO] - dbus: session_handle: /org/freedesktop/portal/desktop/session/1_15/harbor_1
+2026/11/25 12:48:07 [INFO] - dbus: app_id: 
+2026/11/25 12:48:07 [INFO] - dbus: parent_window: 
+2026/11/25 12:48:07 [DEBUG] - dbus: start: found matching session /org/freedesktop/portal/desktop/session/1_15/harbor_1
+2026/11/25 12:48:07 [TRACE] - ext: session callbacks registered
+2026/11/25 12:48:07 [TRACE] - ext: shm_format: XR24 (34325258)
+2026/11/25 12:48:07 [TRACE] - ext: done handler
+2026/11/25 12:48:07 [DEBUG] - ext: buffer constraints changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream update parameters
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "connecting"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is -1
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "paused"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is 45
+2026/11/25 12:48:07 [DEBUG] - dbus: start: returning node 45
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [DEBUG] - pipewire: Format negotiated:
+2026/11/25 12:48:07 [DEBUG] - pipewire: buffer_type: 0 (4)
+2026/11/25 12:48:07 [DEBUG] - pipewire: format: 8
+2026/11/25 12:48:07 [DEBUG] - pipewire: modifier: 0
+2026/11/25 12:48:07 [DEBUG] - pipewire: size: (640, 480)
+2026/11/25 12:48:07 [DEBUG] - pipewire: max_framerate: (15 / 1)
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [DEBUG] - pipewire: add buffer event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: selected buffertype 2
+2026/11/25 12:48:07 [DEBUG] - pipewire: add buffer event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: selected buffertype 2
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event
+2026/11/25 12:48:07 [TRACE] - pipewire: stream parameters changed
+2026/11/25 12:48:07 [INFO] - pipewire: stream state changed to "streaming"
+2026/11/25 12:48:07 [INFO] - pipewire: node id is 45
+2026/11/25 12:48:07 [TRACE] - pipewire: dequeueing buffer
+2026/11/25 12:48:07 [TRACE] - ext: start screencopy
+2026/11/25 12:48:07 [TRACE] - ext: frame callbacks registered
+2026/11/25 12:48:07 [TRACE] - event-loop: got wayland event
+2026/11/25 12:48:07 [TRACE] - ext: damage: 0,0x640,480
+2026/11/25 12:48:07 [TRACE] - ext: transform handler 0
+2026/11/25 12:48:07 [TRACE] - ext: timestamp 4722:216179489
+2026/11/25 12:48:07 [TRACE] - ext: ready event handler
+2026/11/25 12:48:07 [TRACE] - pipewire: enqueueing buffer
+2026/11/25 12:48:07 [TRACE] - ********************
+2026/11/25 12:48:07 [TRACE] - pipewire: plane 0
+2026/11/25 12:48:07 [TRACE] - pipewire: fd 21
+2026/11/25 12:48:07 [TRACE] - pipewire: maxsize 1228800
+2026/11/25 12:48:07 [TRACE] - pipewire: size 1228800
+2026/11/25 12:48:07 [TRACE] - pipewire: stride 2560
+2026/11/25 12:48:07 [TRACE] - pipewire: offset 0
+2026/11/25 12:48:07 [TRACE] - pipewire: chunk flags 0
+2026/11/25 12:48:07 [TRACE] - pipewire: width 640
+2026/11/25 12:48:07 [TRACE] - pipewire: height 480
+2026/11/25 12:48:07 [TRACE] - pipewire: y_invert 0
+2026/11/25 12:48:07 [TRACE] - ********************
+2026/11/25 12:48:07 [TRACE] - pipewire: on process event handle
+2026/11/25 12:48:07 [TRACE] - pipewire: dequeueing buffer
+2026/11/25 12:48:07 [TRACE] - fps_limit: elapsed time since the last measurement: 1113465, target 66666666, should delay for 65553201 (ns)
+2026/11/25 12:48:07 [TRACE] - event-loop: got pipewire event

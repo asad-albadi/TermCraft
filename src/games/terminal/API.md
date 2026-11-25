@@ -1,0 +1,14 @@
+# Terminal core API (frozen)
+`TerminalKind::{Soliterm,Termwalk,Ctris,Sudoku,Nimesweeper,Ninvaders,Greed}`, `ALL`, `selector()`, `help()`.
+`TerminalSession::new(kind,seed)`, `new_solitaire(seed,SolitaireVariant::{Freecell,Klondike},passes:u8)`, `new_mines(seed,MinePreset::{Newbie,Easy,Medium,Hard})`.
+`kind/seed/outcome/scene/apply/input/undo/can_undo/reset`; `apply` returns `Result<bool,&'static str>`, noops do not enter bounded history. `Outcome::{Playing,Won,Lost}`. Scene is cloned owned data.
+`TerminalScene` has seven same-name variants wrapping `SolitermScene/TermwalkScene/CtrisScene/SudokuScene/NimesweeperScene/NinvadersScene/GreedScene`. Every field public; see modules.
+`TerminalInput`: `Rotate{cell:usize,clockwise:bool}`, `Digit{cell:usize,value:u8}`, `Reveal/Flag/Chord{cell:usize}`, `Move{dx:i8,dy:i8}`, `Tick,Drop,Fire,Start,Pause,Draw`, `Transfer{from:CardPile,to:CardPile,count:usize}`.
+CardPile: `Tableau(usize),Reserve(usize),Foundation(usize),Waste`. Card: `rank:u8` (Ace=1), `suit:u8` (0 clubs,1 diamonds,2 hearts,3 spades), `face_up:bool`. Soliterm scene: `variant,tableau:Vec<Vec<Card>>,reserve:[Option<Card>;4],foundations:[u8;4],stock_count:usize,waste:Vec<Card>,passes_left:u8`.
+CtrisScene: `width:usize,height:usize,settled:Vec<u8>,active:Piece,next:u8,score:u32,lines:u32,paused:bool`; Piece `{kind:u8,rotation:u8,x:i32,y:i32}`, `Piece::cells()->[(i32,i32);4]` public.
+NinvadersScene: `width:i32,height:i32,player_x:i32,player_y:i32,enemies:Vec<Invader>,player_shots:Vec<(i32,i32)>,enemy_shots:Vec<(i32,i32)>,lives:u8,score:u32,started:bool,paused:bool`. Invader `{x:i32,y:i32}`.
+Grids: Sudoku 81 cells/fixed; Walk width/height/router/pipes (N=1,E=2,S=4,W=8)/connected; Mines width/height/mines/cells/paused (`MineCell::{Hidden,Flagged,Open(u8),Mine}`); Greed width/height/cells (0 erased)/player/erased/legal_directions.
+Pointer coordinates should map to bounded row-major cell indices in UI; core accepts no floats and rejects invalid cells/deltas. No wall time; UI explicitly sends Tick once per desired step. Fire/Start are separate for nInvaders. Default Freecell choice and conventional controls are independent implementation choices, not original behavior claims.
+Additive constructor: `new_termwalk(seed,size)->Result<TerminalSession,&'static str>` accepts only odd grid sizes 3..=15. Default constructor remains 5×5. No scene shape changes.
+
+Review alignment: `Piece::cells()` saturates coordinate additions for arbitrary i32 x/y; valid session positions retain their exact four cells. nInvaders `player_y` is the authoritative draw/hit row (currently 22), with player projectiles originating one row above. Paused Ctris/Nimesweeper/started nInvaders ignore ordinary gameplay input before validation and return `Ok(false)` without an undo entry; pause/unpause and start remain lifecycle inputs. Invalid active input returns `Err` atomically.

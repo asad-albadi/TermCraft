@@ -1,0 +1,50 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/mutants/solo-fish)
+warning: unreachable statement
+   --> src/games/puzzles/solo_advanced.rs:190:5
+    |
+188 |    return 0; // mutation: suppress this source deduction
+    |    -------- any code following this expression is unreachable
+189 |
+190 | /     for digit in 1..=n {
+191 | |         let bit = 1 << digit;
+192 | |         let rows: Vec<_> = (0..n)
+193 | |             .filter(|&y| (0..n).any(|x| p[y * n + x] & bit != 0))
+...   |
+228 | |     }
+    | |_____^ unreachable statement
+    |
+    = note: `#[warn(unreachable_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `p`
+   --> src/games/puzzles/solo_advanced.rs:187:9
+    |
+187 | fn fish(p: &mut [u32], n: usize) -> usize {
+    |         ^ help: if this is intentional, prefix it with an underscore: `_p`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `n`
+   --> src/games/puzzles/solo_advanced.rs:187:24
+    |
+187 | fn fish(p: &mut [u32], n: usize) -> usize {
+    |                        ^ help: if this is intentional, prefix it with an underscore: `_n`
+
+warning: `b06-puzzle-options-private` (lib test) generated 3 warnings (run `cargo fix --lib -p b06-puzzle-options-private --tests` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 4.44s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/mutation-target/release/deps/b06_puzzle_options_private-beed19bb514c887b)
+
+running 1 test
+
+thread 'solo::advanced::rule_tests::extreme_fish_eliminates_common_columns' (421893) panicked at src/games/puzzles/solo_advanced.rs:1055:9:
+assertion failed: fish(&mut p, 9) > 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test solo::advanced::rule_tests::extreme_fish_eliminates_common_columns ... FAILED
+
+failures:
+
+failures:
+    solo::advanced::rule_tests::extreme_fish_eliminates_common_columns
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 64 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

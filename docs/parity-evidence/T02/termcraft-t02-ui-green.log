@@ -1,0 +1,9 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.02s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-9a2e8410f611c3b2)
+
+running 1 test
+test ui::pages::appearance_tests::terminal_view_routes_mouse_without_broadcast_or_macro_recording ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 31 filtered out; finished in 1.13s
+

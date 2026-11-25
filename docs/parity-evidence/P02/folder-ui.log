@@ -1,0 +1,11 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 37.49s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-029b71f3dc8b57b8)
+
+running 2 tests
+test ui::ftp::tests::ftp_recursive_delete_requires_explicit_contents_choice_and_exact_path ... ok
+test ui::ftp::tests::graphical_ftp_session_connects_opens_edits_and_guards_tab_close ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 110 filtered out; finished in 2.62s
+

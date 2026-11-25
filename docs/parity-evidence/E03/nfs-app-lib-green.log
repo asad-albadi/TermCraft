@@ -1,0 +1,19 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0-e03-nfs-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-nfs)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.35s
+     Running unittests src/lib.rs (app/target/debug/deps/harbor_workspace-d3f4e058d52b1d51)
+
+running 10 tests
+test services::nfs::tests::invalid_names_stale_replaced_objects_and_cross_export_keys ... ok
+test services::nfs::tests::hardlink_added_after_lookup_blocks_each_inode_mutation ... ok
+test services::nfs::tests::readonly_and_created_write_boundary ... ok
+test services::nfs::tests::symlink_escape_raw_names_and_size_limits ... ok
+test services::nfs::tests::create_modes_truncate_replacement_cookies_and_quota ... ok
+test services::nfs::tests::cancellation_closes_idle_partial_records_and_only_owned_sockets ... ok
+test services::nfs_lifecycle_tests::nfs_supervisor_owns_lifecycle_and_rejects_unapproved_network_exposure ... ok
+test services::nfs::tests::raw_wire_traversal_cross_export_invalid_handles_versions_and_record_limits ... ok
+test services::nfs::tests::independent_libnfs_hardlink_alias_preserves_outside_bytes ... ok
+test services::nfs::tests::independent_libnfs_and_owned_stop ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 78 filtered out; finished in 0.19s
+

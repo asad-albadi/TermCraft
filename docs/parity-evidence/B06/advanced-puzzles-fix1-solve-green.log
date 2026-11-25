@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.00s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/fix1/work/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 1 test
+test tests::explicit_solve_is_atomic_assisted_undoable_and_guess_gives_up ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.03s
+

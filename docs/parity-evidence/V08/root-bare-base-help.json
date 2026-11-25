@@ -1,0 +1,25 @@
+{
+  "image": "archlinux@sha256:375a401bb3c6376b37f40b6dfa25067db37ec78d0b7af67ae6315f43a0184a9d",
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--network",
+    "none",
+    "--read-only",
+    "--cap-drop",
+    "ALL",
+    "--security-opt",
+    "no-new-privileges",
+    "--tmpfs",
+    "/tmp:rw,nosuid",
+    "--mount",
+    "type=bind,src=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-interop-xdmcp-devices-qualified/b0d1f602e02a06050afa4196b3f4e6f6c5e3b1b370ddb741b01295a1d09c1a98/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium,dst=/opt/termcraft,readonly",
+    "--entrypoint",
+    "/opt/termcraft/harbor-workspace",
+    "archlinux@sha256:375a401bb3c6376b37f40b6dfa25067db37ec78d0b7af67ae6315f43a0184a9d",
+    "--help"
+  ],
+  "exit_code": 0,
+  "qualification": "Existing immutable b0d1 release on bare Arch base, no host library mounts/network/credentials; diagnostic only, predates current source"
+}

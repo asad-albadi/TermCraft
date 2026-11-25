@@ -1,0 +1,45 @@
+{
+  "source_snapshot": "a6a540d3ddb1f08478a598c322a9ca12ee663c3acb2601db3529e1e74f5546fe",
+  "manifest_files_verified": 966,
+  "assets": [
+    "assets/Interface-LICENSE",
+    "assets/Interface.ttf",
+    "assets/Terminal-LICENSE",
+    "assets/Terminal.ttf",
+    "assets/termcraft-logo.png",
+    "assets/termcraft-mascot.png"
+  ],
+  "archive_sha256": "1572babd5ae1000c72203bcd2e4bf6f54b94d8f49be519da720f4292914fa863",
+  "debian_sha256": "86fe5e6041f95d22a75932c5474c8d30fabd8303c51f1cc886fc6d375d182ac7",
+  "scope": "Frozen Linux packaging baseline; later macro/X11/printer source changes not included.",
+  "wayland": {
+    "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
+    "archive_sha256": "1572babd5ae1000c72203bcd2e4bf6f54b94d8f49be519da720f4292914fa863",
+    "manifest_schema": 1,
+    "platform": "linux",
+    "display_backend": "Wayland",
+    "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+    "screen_size": [
+      938,
+      990
+    ],
+    "rdp_helper_wire_version": 1,
+    "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+    "rdp_helper_child_location_verified": true
+  },
+  "x11": {
+    "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
+    "archive_sha256": "1572babd5ae1000c72203bcd2e4bf6f54b94d8f49be519da720f4292914fa863",
+    "manifest_schema": 1,
+    "platform": "linux",
+    "display_backend": "X11",
+    "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
+    "screen_size": [
+      938,
+      990
+    ],
+    "rdp_helper_wire_version": 1,
+    "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+    "rdp_helper_child_location_verified": true
+  }
+}

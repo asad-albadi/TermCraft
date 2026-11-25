@@ -1,0 +1,141 @@
+test_absent_option_has_no_payload (__main__.UnixRelease.test_absent_option_has_no_payload) ... ok
+test_composes_with_xwayland_and_mosh (__main__.UnixRelease.test_composes_with_xwayland_and_mosh) ... ERROR
+test_corrupt_binary_source_and_missing_cache_fail_closed (__main__.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed) ... 
+  test_corrupt_binary_source_and_missing_cache_fail_closed (__main__.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed) (key='binary_sha256') ... ERROR
+  test_corrupt_binary_source_and_missing_cache_fail_closed (__main__.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed) (key='source_sha256') ... ERROR
+  test_corrupt_binary_source_and_missing_cache_fail_closed (__main__.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed) (key='config_sha256') ... ERROR
+test_corrupt_binary_source_and_missing_cache_fail_closed (__main__.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed) ... ERROR
+test_optional_payload_inventory_sources_notices_and_no_overwrite (__main__.UnixRelease.test_optional_payload_inventory_sources_notices_and_no_overwrite) ... ERROR
+test_unsupported_target_and_architecture_rejected (__main__.UnixRelease.test_unsupported_target_and_architecture_rejected) ... 
+  test_unsupported_target_and_architecture_rejected (__main__.UnixRelease.test_unsupported_target_and_architecture_rejected) (target='macos', arch='x86_64') ... ERROR
+  test_unsupported_target_and_architecture_rejected (__main__.UnixRelease.test_unsupported_target_and_architecture_rejected) (target='linux', arch='aarch64') ... ERROR
+  test_unsupported_target_and_architecture_rejected (__main__.UnixRelease.test_unsupported_target_and_architecture_rejected) (target='windows', arch='aarch64') ... ERROR
+test_windows_payload_verified_without_execution (__main__.UnixRelease.test_windows_payload_verified_without_execution) ... ERROR
+
+======================================================================
+ERROR: test_composes_with_xwayland_and_mosh (__main__.UnixRelease.test_composes_with_xwayland_and_mosh)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 119, in test_composes_with_xwayland_and_mosh
+    archive = self.release(unix_cache=CACHE, xwayland_archive=Path('fixture'), mosh_inputs=('fixture',)*3)
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 37, in release
+    return self.package.package_release('linux', self.base / 'out', self.app, self.helper,
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        source=ROOT, **kwargs)
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+TypeError: package_release() got an unexpected keyword argument 'unix_cache'
+
+======================================================================
+ERROR: test_corrupt_binary_source_and_missing_cache_fail_closed (__main__.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed) (key='binary_sha256')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 89, in test_corrupt_binary_source_and_missing_cache_fail_closed
+    self.release(unix_cache=cache)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 37, in release
+    return self.package.package_release('linux', self.base / 'out', self.app, self.helper,
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        source=ROOT, **kwargs)
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+TypeError: package_release() got an unexpected keyword argument 'unix_cache'
+
+======================================================================
+ERROR: test_corrupt_binary_source_and_missing_cache_fail_closed (__main__.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed) (key='source_sha256')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 89, in test_corrupt_binary_source_and_missing_cache_fail_closed
+    self.release(unix_cache=cache)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 37, in release
+    return self.package.package_release('linux', self.base / 'out', self.app, self.helper,
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        source=ROOT, **kwargs)
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+TypeError: package_release() got an unexpected keyword argument 'unix_cache'
+
+======================================================================
+ERROR: test_corrupt_binary_source_and_missing_cache_fail_closed (__main__.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed) (key='config_sha256')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 89, in test_corrupt_binary_source_and_missing_cache_fail_closed
+    self.release(unix_cache=cache)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 37, in release
+    return self.package.package_release('linux', self.base / 'out', self.app, self.helper,
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        source=ROOT, **kwargs)
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+TypeError: package_release() got an unexpected keyword argument 'unix_cache'
+
+======================================================================
+ERROR: test_corrupt_binary_source_and_missing_cache_fail_closed (__main__.UnixRelease.test_corrupt_binary_source_and_missing_cache_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 91, in test_corrupt_binary_source_and_missing_cache_fail_closed
+    self.release(unix_cache=self.base / 'missing')
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 37, in release
+    return self.package.package_release('linux', self.base / 'out', self.app, self.helper,
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        source=ROOT, **kwargs)
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+TypeError: package_release() got an unexpected keyword argument 'unix_cache'
+
+======================================================================
+ERROR: test_optional_payload_inventory_sources_notices_and_no_overwrite (__main__.UnixRelease.test_optional_payload_inventory_sources_notices_and_no_overwrite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 49, in test_optional_payload_inventory_sources_notices_and_no_overwrite
+    archive = self.release(unix_cache=CACHE)
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 37, in release
+    return self.package.package_release('linux', self.base / 'out', self.app, self.helper,
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                        source=ROOT, **kwargs)
+                                        ^^^^^^^^^^^^^^^^^^^^^^
+TypeError: package_release() got an unexpected keyword argument 'unix_cache'
+
+======================================================================
+ERROR: test_unsupported_target_and_architecture_rejected (__main__.UnixRelease.test_unsupported_target_and_architecture_rejected) (target='macos', arch='x86_64')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 98, in test_unsupported_target_and_architecture_rejected
+    self.package.package_release(target, self.base/'out', self.app, self.helper, source=ROOT, unix_cache=CACHE)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: package_release() got an unexpected keyword argument 'unix_cache'
+
+======================================================================
+ERROR: test_unsupported_target_and_architecture_rejected (__main__.UnixRelease.test_unsupported_target_and_architecture_rejected) (target='linux', arch='aarch64')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 98, in test_unsupported_target_and_architecture_rejected
+    self.package.package_release(target, self.base/'out', self.app, self.helper, source=ROOT, unix_cache=CACHE)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: package_release() got an unexpected keyword argument 'unix_cache'
+
+======================================================================
+ERROR: test_unsupported_target_and_architecture_rejected (__main__.UnixRelease.test_unsupported_target_and_architecture_rejected) (target='windows', arch='aarch64')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 98, in test_unsupported_target_and_architecture_rejected
+    self.package.package_release(target, self.base/'out', self.app, self.helper, source=ROOT, unix_cache=CACHE)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: package_release() got an unexpected keyword argument 'unix_cache'
+
+======================================================================
+ERROR: test_windows_payload_verified_without_execution (__main__.UnixRelease.test_windows_payload_verified_without_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 101, in test_windows_payload_verified_without_execution
+    stage = module(ROOT / 'packaging/unix-runtime/stage-release.py')
+  File "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/tests/packaging_unix_release.py", line 22, in module
+    spec.loader.exec_module(result)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 896, in get_code
+  File "<frozen importlib._bootstrap_external>", line 954, in get_data
+FileNotFoundError: [Errno 2] No such file or directory: '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/p08-unix/packaging/unix-runtime/stage-release.py'
+
+----------------------------------------------------------------------
+Ran 6 tests in 1.489s
+
+FAILED (errors=10)

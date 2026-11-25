@@ -1,0 +1,20 @@
+# From repository root. Every validation uses offline locked jobs2.
+# One-time root-approved NEW component lock initialization:
+CARGO_BUILD_JOBS=2 cargo generate-lockfile --offline --manifest-path app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/Cargo.toml
+
+# Existing Linux helper and the original 8 fake-PC/SC integration cases (+framing tests):
+CARGO_TARGET_DIR='/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target' cargo test --manifest-path app/target/agent-work/d02-native-smartcard/candidate/engines/rdp/Cargo.toml --offline --locked -j 2
+
+# For each mutually-exclusive fixture feature pcsc-test-macos and pcsc-test-windows:
+cargo build --manifest-path app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/Cargo.toml --features pcsc-test-macos --bin d02-smartcard-native-fixture --offline --locked -j 2
+D02_NATIVE_FIXTURE_BINARY='/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/target/debug/d02-smartcard-native-fixture' cargo test --manifest-path app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/Cargo.toml --features pcsc-test-macos --offline --locked -j 2
+cargo build --manifest-path app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/Cargo.toml --features pcsc-test-windows --bin d02-smartcard-native-fixture --offline --locked -j 2
+D02_NATIVE_FIXTURE_BINARY='/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/target/debug/d02-smartcard-native-fixture' cargo test --manifest-path app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/Cargo.toml --features pcsc-test-windows --offline --locked -j 2
+
+# Native source/ABI component type checks, no runtime/SDK linking claim:
+cargo check --manifest-path app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/Cargo.toml --target x86_64-pc-windows-msvc --tests --offline --locked -j 2
+cargo check --manifest-path app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/Cargo.toml --target aarch64-apple-darwin --tests --offline --locked -j 2
+cargo fmt --manifest-path app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/Cargo.toml -- --check
+
+# Command quoting regression (RED snapshot red-process-command.rs, then corrected source GREEN):
+cargo test --manifest-path app/target/agent-work/d02-native-smartcard/candidate/tests/rdp-smartcard-native-component/Cargo.toml --features pcsc-test-windows --offline --locked -j 2 quotes_unicode_helper_path_without_literal_backslashes

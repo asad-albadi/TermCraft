@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "artifacts": [
+    {
+      "id": "xwayland-24.1.15-arch-x86_64",
+      "status": "qualified Linux x86_64 candidate on the Arch Linux runtime ABI and a Wayland compositor",
+      "version": "24.1.15",
+      "package_version": "24.1.15-1",
+      "entry_point": "x11/linux-x86_64/Xwayland",
+      "executable_sha256": "cbedd90fbc960d4cc799792cedf89b0afa1f1f74a93ba9fb05bfd4da2f27b2b8",
+      "archive_url": "https://archive.archlinux.org/packages/x/xorg-xwayland/xorg-xwayland-24.1.15-1-x86_64.pkg.tar.zst",
+      "archive_sha256": "0a8be13f25f64f22ed110f4890e907cfceb34009aeab5b0fd316b6a92ab15a7f",
+      "source_url": "https://www.x.org/releases/individual/xserver/xwayland-24.1.15.tar.xz",
+      "source_sha256": "7311b4bcda22cfc19cb99680eb1c35cfc1ea885981310639f0429fe2948c122e",
+      "recipe_url": "https://gitlab.archlinux.org/archlinux/packaging/packages/xorg-xwayland/-/raw/24.1.15-1/PKGBUILD",
+      "recipe_sha256": "7e9a5b878a1604399d62ae260d43041f81cb59d9ef5d3e7b604c6c03cf2061b8",
+      "build_inventory": "x11/linux-x86_64/BUILDINFO",
+      "package_inventory": "x11/linux-x86_64/PKGINFO",
+      "license": "x11/linux-x86_64/COPYING",
+      "runtime_packages": ["libx11", "libxcomposite", "libxrandr", "glibc", "nettle", "libepoxy", "libxfont2", "pixman", "xorg-server-common", "libxcvt", "mesa", "libglvnd", "libxau", "wayland", "libdrm", "libtirpc", "libei", "libxshmfence", "libdecor", "xorg-xkbcomp", "xkeyboard-config"],
+      "required_session": "Wayland compositor with xdg-shell",
+      "capability_probe_libraries": ["libX11.so.6", "libGL.so.1", "libXcomposite.so.1", "libXrandr.so.2"],
+      "capability_probe_policy": "Active native GLX rendering, opaque Composite output composition, RandR screen-size transition and event before releasing clients; no indirect GLX enablement; unsupported libraries, modes and platform providers remain explicit",
+      "build_options": ["ipv6", "xcsecurity", "dri3", "glamor", "libdecor"],
+      "disabled_build_options": ["xdmcp", "xvfb"]
+    },
+    {
+      "id": "vcxsrv-21.1.16.1-windows-x86_64",
+      "status": "unqualified extraction candidate",
+      "version": "21.1.16.1",
+      "archive_url": "https://github.com/marchaesen/vcxsrv/releases/download/21.1.16.1/vcxsrv-64.21.1.16.1.installer.noadmin.exe",
+      "archive_sha256": "dea6c7d67d3d15b4ed45c87b63a83c88f4aceaaef5425630f0e97a0bad70d620",
+      "source_url": "https://github.com/marchaesen/vcxsrv/tree/b1c7712a2584b263f44fa24e8c493f4f59c472ea",
+      "license": "GPL-3.0-or-later for the upstream packaging with component licenses and corresponding source review required",
+      "runtime_inputs": ["Win64 PE and MSVC runtime", "upstream software rendering DLLs", "xkbcomp.exe", "xkbdata", "bundled fonts"],
+      "engine_name": "vcxsrv.exe",
+      "private_candidate": {"artifact_id": "vcxsrv-21.1.16.1-termcraft-private1-windows-x86_64", "source_contract": "packaging/x11/native/source-contract.json", "patch": "packaging/x11/native/vcxsrv-private-transport.patch", "approved_executable_sha256": null, "runtime_approved": false}
+    },
+    {
+      "id": "xquartz-2.8.6-macos-universal",
+      "status": "unqualified extraction candidate; private relocation and signing still required",
+      "version": "2.8.6",
+      "archive_url": "https://github.com/XQuartz/XQuartz/releases/download/XQuartz-2.8.6/XQuartz-2.8.6.pkg",
+      "archive_sha256": "9ac35a505095bfbd3009c3b4772f0c6421e2f79c4210ab908459270d1c447909",
+      "source_url": "https://github.com/XQuartz/XQuartz/tree/db446ed66b76f386b815e8b095beb56aa368424a",
+      "license": "X.Org and per-component licenses; XQuartz About and corresponding source review required",
+      "runtime_inputs": ["macOS x86_64 and arm64", "native XQuartz.app helper and frameworks", "opt/X11 dylibs, data and xkbcomp"],
+      "engine_name": "Xquartz",
+      "private_candidate": {"artifact_id": "xquartz-2.8.6-termcraft-private1-macos-universal", "source_contract": "packaging/x11/native/source-contract.json", "patch": "packaging/x11/native/xquartz-private-entry.patch", "approved_executable_sha256": null, "runtime_approved": false}
+    }
+  ]
+}

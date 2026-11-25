@@ -1,0 +1,574 @@
+[
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "openssh-shell-sftp.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=openssh-shell-sftp; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=shell+literal SFTP list; expected=SSH_OK and exact literal path, one server authentication",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_browser-6a8ad83dd46fcc62' --exact embedded_shell_and_browser_share_one_authentication --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "0b977551249ea481df00a7450b7baa06e0cfbb1c8da01c33136585bb2be4457d"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "unknown-reject.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=unknown-reject; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=unknown; jump=direct; operation=reject trust; expected=zero accepted authentications",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_browser-6a8ad83dd46fcc62' --exact unknown_host_can_be_rejected_before_authentication --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "427487ff2b475b23f7df28afe92fdab34d6f6a0fa7c3867637d74c1c867db8e6"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "unknown-cancel.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=unknown-cancel; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=unknown; jump=direct; operation=cancel trust; expected=finished connection; zero authentication",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_browser-6a8ad83dd46fcc62' --exact cancelling_a_host_prompt_stops_the_connection --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "e3323e9454fcec6ec97b99446b9fd4df98580d4e6d6aabb2708b8db679ad7933"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "changed-reject.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=changed-reject; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=changed; jump=direct; operation=reject changed pin; expected=zero accepted authentications",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_browser-6a8ad83dd46fcc62' --exact changed_key_prevents_authentication --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "f7b2df515175ab83cdd263f4ac85b5b67fca4a9d420dd5e88c2db775aaecea02"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "jump-one.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=jump-one; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=one gateway; operation=SFTP list; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_browser-6a8ad83dd46fcc62' --exact single_jump_host_authenticates_each_hop_and_opens_files --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "ce916cfa73576eaf2b9dd3ff6ed31ee78759bd77cb3fbd9c55ec4ce85df0acce"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "jump-two.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=jump-two; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=two gateways; operation=ordered auth and target operation; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_options-3a83901b4c8feaa9' --exact two_configured_gateways_authenticate_in_order_before_target --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "758026ab08d1cb091d576eb91f6e1e16e3723e4d8677695ba8513347b82d377f"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "password.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=password; endpoint=russh controlled; version=0.65.4; auth=password; trust=known; jump=direct; operation=password and shell while SFTP stalls; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_authentication-05d6262f32c90e79' --exact password_auth_and_stalled_sftp_preserve_shell --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "dbb4fc675837aac113ce99ce1864d4520e61118acab45a5998153f7841bc63fe"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "mfa.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=mfa; endpoint=russh controlled; version=0.65.4; auth=keyboard-interactive; trust=known; jump=direct; operation=keyboard interactive echo flags; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_authentication-05d6262f32c90e79' --exact keyboard_interactive_preserves_prompt_echo_flags --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "fb9600bb328e40e75ae9d5a247ed01a29146792e776a6c4af18b6269e3f1b421"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "key-mfa.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=key-mfa; endpoint=russh controlled; version=0.65.4; auth=key+MFA; trust=known; jump=direct; operation=multistep auth; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_authentication-05d6262f32c90e79' --exact public_key_then_mfa_uses_updated_methods --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "9511f13e1267b9983537f42f4f8eb239524fc1a978a9015774ddeb78fd612f8e"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "password-mfa.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=password-mfa; endpoint=russh controlled; version=0.65.4; auth=password+MFA; trust=known; jump=direct; operation=multistep auth; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_lifecycle-abaa568787857db5' --exact password_then_mfa_uses_the_new_methods_without_repeating_password --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "175d5d2b1259e181698b1a3b8283e46745285b0b1991ae127371ec5a3c09b369"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "encrypted-key-cancel.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=encrypted-key-cancel; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=encrypted key; trust=known; jump=direct; operation=cancel key unlock, reject late secret; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_lifecycle-abaa568787857db5' --exact cancelling_encrypted_key_unlock_rejects_late_passphrases --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "eb85e39936b72692acb27bb38f7d1f86a8f337189d4a47d6d8c42ca01ceb779e"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "encrypted-key-agent.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=encrypted-key-agent; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=encrypted key+agent; trust=known; jump=direct; operation=encrypted key import into owned agent, pinned OpenSSH authentication, expiry rejection; expected=encrypted bytes/fingerprint preserved; one observed authentication; expired identity rejects fresh connection without credentials prompt",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_interop-402819b4a2c8008c' --exact encrypted_key_agent_authenticates_pinned_openssh_then_expires --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "7b9bc40721cc992a49353403a7fdaeb94792380794a1a3de8daf71fcadcc654a"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "agent-remove.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=agent-remove; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=agent; trust=known; jump=direct; operation=agent identity add/remove observed auth; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_agent-2d144c00deeb961c' --exact removing_identity_updates_authentication --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "ab35eccffbef7f1b75afee42f01229370402b08979fd00480d7d67bf9b9d06ff"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "key-types.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=key-types; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=ECDSA/RSA; trust=known; jump=direct; operation=actual ECDSA/RSA authentication; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_agent-2d144c00deeb961c' --exact generated_ecdsa_and_rsa_keys_authenticate_with_openssh --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "b9e4ca488a448eeeee1b0ee957fc04abfc736712b48b3009b039435acc0b86a2"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "auth-cancel.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=auth-cancel; endpoint=russh controlled; version=0.65.4; auth=password; trust=known; jump=direct; operation=auth cancel; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_lifecycle-abaa568787857db5' --exact cancel_auth_stops_the_entire_attempt --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "c55060170a6af60f469fd5aa04d50b5adf9e957ad4c448e76fded8525f9f4bf3"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "reconnect-generation.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=reconnect-generation; endpoint=russh controlled; version=0.65.4; auth=password; trust=known; jump=direct; operation=reconnect rejects stale prompt/listing; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_lifecycle-abaa568787857db5' --exact reconnect_discards_old_challenges_and_listings --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "c80407e41932d3d41614d2f1d65684aa7d354240de288d430fc379b80d0af3b1"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "reconnect-real-directory.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=reconnect-real-directory; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=real old listing rejected after reconnect; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_lifecycle-abaa568787857db5' --exact reconnect_rejects_real_old_directory_snapshots --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "7e818f8880114819be0bb91adf2a815a718f079b92b07a7b6448af19644380f0"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "sftp-roundtrip.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=sftp-roundtrip; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=binary transfer with literal filenames; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/remote_transfers-5b12b9e73ea589cb' --exact literal_binary_file_round_trip_uses_sftp --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "22f352ce8e39a0e9f241b36898b7d2e1ce71d766109f90a33fa2dec21f38a522"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "sftp-cancel.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=sftp-cancel; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=cancel transfer preserves existing file; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/remote_transfers-5b12b9e73ea589cb' --exact cancelled_download_does_not_overwrite_destination --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "6c881f3a5ab6ad2b25801fee6744dbafde9c803e5ad47a4ef96e9c2166835be1"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "sftp-disconnect.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=sftp-disconnect; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=interrupted download preserves original and partial; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/remote_transfers-5b12b9e73ea589cb' --exact disconnect_keeps_original_destination_and_recoverable_partial --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "1b9102731c20375d6b5a7dd115ef456b10fd7d43ca4de399fa83135746df1484"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "sftp-io-failure.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=sftp-io-failure; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=ENOSPC sync close fault preservation; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/remote_transfers-5b12b9e73ea589cb' --exact injected_disk_full_sync_and_close_errors_preserve_destination_and_partial --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "394e88e2a60d70b9ce5ff327f39f35ffe6ee1a6e14cb5bea3119db9505eadf50"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "sftp-reopen.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=sftp-reopen; endpoint=OpenSSH; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=key; trust=known; jump=direct; operation=reopen SFTP channel without new authentication; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_browser-6a8ad83dd46fcc62' --exact closed_sftp_channel_can_reopen_without_reauthenticating --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "9e8714a491c1174699f9794548f11ccfe4206d4274e00f546d4480a3d7509866"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "proxy.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=proxy; endpoint=OpenSSH + controlled proxies; version=OpenSSH_10.6p2, OpenSSL 4.1.0 23 Oct 2026; auth=typed proxy credentials; trust=known; jump=controlled HTTP+SOCKS proxies; operation=HTTP/SOCKS proxy auth; expected=named runtime assertions hold",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_options-3a83901b4c8feaa9' --exact proxy_authentication_uses_private_typed_prompts_for_http_and_socks --nocapture --test-threads=1",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "bcd54419b604f819994bb58ff14ed164ac1b643253709076fa1dd5ec7ec3dad9"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "native-windows.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=native-windows; endpoint=OpenSSH; version=unavailable; auth=full required matrix; trust=known/unknown/changed; jump=direct/one/two gateways; operation=native SSH/SFTP runtime; expected=native runtime assertions",
+    "termcraft_behavior": "unavailable: named test asserts the declared observation; see complete log",
+    "test_command": "not executed: endpoint unavailable",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "unavailable",
+    "remaining_limitations": [
+      "Native Windows runner unavailable in this Linux environment; no native result claimed."
+    ],
+    "artifact_sha256": "2c00ebce7b7202065ac086abf54517cb909fe980cac7b2cb265113817afcdc81"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "native-macos.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=native-macos; endpoint=OpenSSH; version=unavailable; auth=full required matrix; trust=known/unknown/changed; jump=direct/one/two gateways; operation=native SSH/SFTP runtime; expected=native runtime assertions",
+    "termcraft_behavior": "unavailable: named test asserts the declared observation; see complete log",
+    "test_command": "not executed: endpoint unavailable",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "unavailable",
+    "remaining_limitations": [
+      "Native macOS runner unavailable in this Linux environment; no native result claimed."
+    ],
+    "artifact_sha256": "7e6151e525fae706435f15d51cc49ce72e9e1231207291f887c43506d8069ba1"
+  },
+  {
+    "point_id": "V01",
+    "target": {
+      "product": "TermCraft",
+      "version": "0.1.0",
+      "edition": "Personal 26.6 parity validation"
+    },
+    "sources": [
+      "independent-dropbear.log"
+    ],
+    "capture_date": "2026-11-24",
+    "observation_kind": "implementation-test",
+    "observed_behavior": "id=independent-dropbear; endpoint=Dropbear with external OpenSSH SFTP subsystem; version=2026.94; auth=Ed25519 key; trust=known private Ed25519 host pin; jump=direct; operation=shell and literal binary SFTP roundtrip; expected=DROPBEAR_SHELL_OK, exact 90000 binary bytes, literal filename, one authentication",
+    "termcraft_behavior": "passed: named test asserts the declared observation; see complete log",
+    "test_command": "'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/ssh_interop-402819b4a2c8008c' --exact independent_dropbear_key_shell_and_sftp_roundtrip --nocapture --test-threads=1 --ignored",
+    "platform": "Linux-7.3.4-1-cachyos-x86_64-with-glibc2.44",
+    "result": "passed",
+    "remaining_limitations": [
+      "Fixture evidence does not establish native Windows/macOS or original Personal runtime parity."
+    ],
+    "artifact_sha256": "a15ded12d258fa3f93c1d0bb41a6381aaee5106030160e3baa1f67ce5e865d54"
+  }
+]

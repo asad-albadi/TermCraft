@@ -1,0 +1,34 @@
+{
+  "authority": null,
+  "capabilities": {
+    "Ok": {
+      "composite_pixels": true,
+      "composite_version": "0.4",
+      "dimensions": [
+        640,
+        480
+      ],
+      "errors": [],
+      "glx_version": "1.4",
+      "initial_mode_restored": true,
+      "opengl": {
+        "direct": true,
+        "matched_pixels": 4096,
+        "renderer": "llvmpipe (LLVM 23.1.4, 256 bits)",
+        "sampled_pixels": 4096,
+        "scene_png_base64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABFElEQVR4Ae3AA6AkWZbG8f937o3IzKdyS2Oubdu2bdu2bdu2bWmMnpZKr54yMyLu+Xa3anqmhztr1a8azH8jmf9OBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xvB/28E/78R/P9G8P8bwf9vBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xvB/28E/78R/P9G8P8bwf9vBP+/Efz/RvD/G8H/bwT/vxH8/0bw/xtVmP9ORvw3Ivj/jeD/N4L/3wj+fyP4/43g/zeC/98I/n8j+P+N4P83gv/fCP5/I/j/jeD/N4L/3wj+fyP4/43g/zeC/98I/n8j+P+N4P83gv/fCP5/I/j/jeD/N4L/3wj+fyP4/43g/zeC/9/4R9W2BYMffFTgAAAAAElFTkSuQmCC",
+        "software": true,
+        "vendor": "Mesa",
+        "version": "4.6 (Compatibility Profile) Mesa 26.2.6-arch3.1"
+      },
+      "randr_change": [
+        720,
+        400
+      ],
+      "randr_version": "1.6"
+    }
+  },
+  "display": null,
+  "error": null,
+  "running": false
+}

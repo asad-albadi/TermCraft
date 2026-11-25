@@ -1,0 +1,41 @@
+127.0.0.1 - - [25/Nov/2026 00:59:34] "GET /offline.html HTTP/1.1" 200 -
+127.0.0.1 - - [25/Nov/2026 00:59:34] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:34] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:41] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:41] "GET /receipt?value=V HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:41] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:41] "GET /receipt?value=V0 HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:41] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:41] "GET /receipt?value=V08 HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_ HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_N HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NA HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NAT HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATI HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIV HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIVE HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIVE_ HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIVE_I HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIVE_IN HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIVE_INP HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIVE_INPU HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIVE_INPUT HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIVE_INPUT_ HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIVE_INPUT_O HTTP/1.1" 404 -
+127.0.0.1 - - [25/Nov/2026 00:59:42] code 404, message File not found
+127.0.0.1 - - [25/Nov/2026 00:59:42] "GET /receipt?value=V08_NATIVE_INPUT_OK HTTP/1.1" 404 -

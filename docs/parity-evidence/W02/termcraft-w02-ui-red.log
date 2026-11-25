@@ -1,0 +1,126 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0609]: no field `windows` on type `ui::Workspace`
+  --> src/ui/windows.rs:10:11
+   |
+10 |         w.windows.rename(id, "My title".into());
+   |           ^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 57 others
+
+error[E0599]: no method named `detach_terminal` found for struct `ui::Workspace` in the current scope
+   --> src/ui/windows.rs:12:11
+    |
+ 12 |         w.detach_terminal(id);
+    |           ^^^^^^^^^^^^^^^
+    |
+   ::: src/ui.rs:365:1
+    |
+365 | pub struct Workspace {
+    | -------------------- method `detach_terminal` not found for this struct
+    |
+help: there is a method `terminals` with a similar name
+    |
+ 12 -         w.detach_terminal(id);
+ 12 +         w.terminals(id);
+    |
+
+error[E0599]: no method named `detached_windows` found for struct `ui::Workspace` in the current scope
+   --> src/ui/windows.rs:14:145
+    |
+ 14 | ...0.))), ..Default::default() }, |ui| w.detached_windows(ui.ctx()));
+    |                                          ^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:365:1
+    |
+365 | pub struct Workspace {
+    | -------------------- method `detached_windows` not found for this struct
+
+error[E0599]: no method named `terminal_title` found for struct `ui::Workspace` in the current scope
+   --> src/ui/windows.rs:19:22
+    |
+ 19 |         assert_eq!(w.terminal_title(id), "My title");
+    |                      ^^^^^^^^^^^^^^
+    |
+   ::: src/ui.rs:365:1
+    |
+365 | pub struct Workspace {
+    | -------------------- method `terminal_title` not found for this struct
+    |
+help: there is a method `terminals` with a similar name
+    |
+ 19 -         assert_eq!(w.terminal_title(id), "My title");
+ 19 +         assert_eq!(w.terminals(id), "My title");
+    |
+
+error[E0599]: no method named `reattach_terminal` found for struct `ui::Workspace` in the current scope
+   --> src/ui/windows.rs:24:11
+    |
+ 24 |         w.reattach_terminal(id);
+    |           ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:365:1
+    |
+365 | pub struct Workspace {
+    | -------------------- method `reattach_terminal` not found for this struct
+
+error[E0609]: no field `windows` on type `ui::Workspace`
+  --> src/ui/windows.rs:25:19
+   |
+25 |         assert!(w.windows.detached().is_empty());
+   |                   ^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 57 others
+
+error[E0599]: no method named `terminal_title` found for struct `ui::Workspace` in the current scope
+   --> src/ui/windows.rs:28:22
+    |
+ 28 |         assert_eq!(w.terminal_title(id), "My title");
+    |                      ^^^^^^^^^^^^^^
+    |
+   ::: src/ui.rs:365:1
+    |
+365 | pub struct Workspace {
+    | -------------------- method `terminal_title` not found for this struct
+    |
+help: there is a method `terminals` with a similar name
+    |
+ 28 -         assert_eq!(w.terminal_title(id), "My title");
+ 28 +         assert_eq!(w.terminals(id), "My title");
+    |
+
+error[E0599]: no method named `detach_terminal` found for struct `ui::Workspace` in the current scope
+   --> src/ui/windows.rs:30:11
+    |
+ 30 |         w.detach_terminal(id);
+    |           ^^^^^^^^^^^^^^^
+    |
+   ::: src/ui.rs:365:1
+    |
+365 | pub struct Workspace {
+    | -------------------- method `detach_terminal` not found for this struct
+    |
+help: there is a method `terminals` with a similar name
+    |
+ 30 -         w.detach_terminal(id);
+ 30 +         w.terminals(id);
+    |
+
+error[E0609]: no field `windows` on type `ui::Workspace`
+  --> src/ui/windows.rs:35:22
+   |
+35 |         assert_ne!(w.windows.window(id), 0);
+   |                      ^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 57 others
+
+error[E0609]: no field `windows` on type `ui::Workspace`
+  --> src/ui/windows.rs:37:19
+   |
+37 |         assert!(w.windows.detached().is_empty());
+   |                   ^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 57 others
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 10 previous errors

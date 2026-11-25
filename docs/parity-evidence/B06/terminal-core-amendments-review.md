@@ -1,0 +1,21 @@
+# Terminal core amendment review
+
+Reviewed 2026-11-25. **Accepted scoped five-file amendment.** All four followups from `terminal-core-review.md` are ADDRESSED in owned core code/documentation/evidence. No new blocking defect was found in the amendment. Root may integrate the original accepted eight-file payload followed by this exact patch. Common UI acceptance remains separate and must consume `NinvadersScene::player_y`.
+
+| Earlier finding | Status | Scoped assessment |
+|---|---|---|
+| Shooter player-row ambiguity (P2) | ADDRESSED | `NinvadersScene` now exports `player_y`; one private `PLAYER_Y` constant supplies the scene, enemy-shot damage, enemy ground contact, projectile origin and duplicate-at-origin check. The new fixture reads the public row and verifies shot origin, no premature damage, on-row damage, and ground loss. Existing ordinary behavior remains row 22. The additive public field is intentional; downstream exhaustive struct construction must include it, and renderers must use it. This does not certify the separate in-progress UI. |
+| Arbitrary public Piece overflow (P3) | ADDRESSED | Both offset additions now saturate, making `cells()` total for all public kinds/rotations/i32 positions. Shape lookup and rotation arithmetic were already bounded. API/provenance explicitly describe merged coordinates outside the board at integer limits; reachable session positions remain exact. The new test covers all 256 kind values, five rotation values including 255, and both coordinate extremes. The retained RED log reproduces the former debug arithmetic panic rather than a setup/compile failure. |
+| Paused-input rejection documentation (P3) | ADDRESSED | Behavior intentionally remains ignore-before-validation. API/provenance now qualify this for paused Ctris, Mines, and started nInvaders, with lifecycle exceptions. The new session test confirms `Ok(false)`, unchanged scene/history for malformed digit/delta and Tick, plus rejection after unpause. No behavior change was needed. |
+| Independent Sudoku solver evidence wording (P3) | ADDRESSED | Main `terminal-core.md` now explicitly describes owner checks as production-solver consistency checks and separately attributes the independent review's bitmask MRV certificates for seeds 64–127. No generator/solver implementation changed or newly claimed original oracle was introduced. |
+
+## Independent verification
+
+- SHA-256 of patch exactly `79257d2559792f36d009e0fbe116702f5d05f06c1161e05a83cd6c099bb49acc`. Original eight-file tar remains exactly `7a5f17d6f6003f4a55f25cf9b921669bb5ff0ef8609754ebcc6c86026b04c4d8`.
+- Main and private amendment manifests are identical. All eight preserved baseline files match original tar members and recorded hashes. Exactly five changed paths, three unchanged paths, all expected under `src/games/terminal/`; inspected patch contains only those five file sections, no path escape or unrelated edits.
+- Applied the exact patch with `patch --batch --fuzz=0 -p1` to a separate private baseline copy at `target/agent-work/b06-terminal-review/amended-component`. Every resulting file matches its amended manifest hash/size and owner's private amended source byte-for-byte. This validates actual application, beyond a dry run.
+- On that independently reconstructed candidate, fresh `CARGO_BUILD_JOBS=2 cargo test --offline --lib --manifest-path app/target/agent-work/b06-terminal-review/amended-component/Cargo.toml public_`: **2 passed**, 31 filtered out; this exercises Piece saturation and authoritative shooter row.
+- Fresh same Cargo command with filter `paused_inputs_are_ignored_before_validation_without_history`: **1 passed**, 32 filtered out. Fresh `cargo fmt --check` with the same jobs limit and candidate manifest passed.
+- Read the owner's retained actual Piece overflow RED log. Owner's reported 33-test covering run is separate evidence; this rereview intentionally did not repeat the full suite or broad application tests.
+
+No main product source was edited. Only this amendment review was added to main evidence; the reconstructed candidate and build artifacts remain private. All review subprocesses exited synchronously and no owned jobs remain. Earlier historical parity limitations, full B06/native scope, and separate integrated UI verification remain unchanged.

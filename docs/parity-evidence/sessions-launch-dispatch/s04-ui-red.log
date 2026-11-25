@@ -1,0 +1,47 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `attach_dispatch` found for struct `ui::Workspace` in the current scope
+   --> src/ui/cli_dispatch.rs:10:5
+    |
+ 10 |   w.attach_dispatch(primary,CliAction::Activate);
+    |     ^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:375:1
+    |
+375 | pub struct Workspace {
+    | -------------------- method `attach_dispatch` not found for this struct
+
+error[E0599]: no method named `poll_dispatch` found for struct `ui::Workspace` in the current scope
+   --> src/ui/cli_dispatch.rs:14:5
+    |
+ 14 |   w.poll_dispatch(&ctx);w.poll_dispatch(&ctx);assert_eq!(w.tabs.len(),1);assert!(w.tabs[0].process.is_some());
+    |     ^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:375:1
+    |
+375 | pub struct Workspace {
+    | -------------------- method `poll_dispatch` not found for this struct
+
+error[E0599]: no method named `poll_dispatch` found for struct `ui::Workspace` in the current scope
+   --> src/ui/cli_dispatch.rs:14:27
+    |
+ 14 |   w.poll_dispatch(&ctx);w.poll_dispatch(&ctx);assert_eq!(w.tabs.len(),1);assert!(w.tabs[0].process.is_some());
+    |                           ^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:375:1
+    |
+375 | pub struct Workspace {
+    | -------------------- method `poll_dispatch` not found for this struct
+
+error[E0599]: no method named `dispatch_action` found for struct `ui::Workspace` in the current scope
+   --> src/ui/cli_dispatch.rs:20:5
+    |
+ 20 |   w.dispatch_action(CliAction::RunCommand{command:"printf 'CLI_SENTINEL\\n'; pwd".into(),session:None,cwd:Some(dir.clone()),exit_wh...
+    |     ^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:375:1
+    |
+375 | pub struct Workspace {
+    | -------------------- method `dispatch_action` not found for this struct
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 4 previous errors

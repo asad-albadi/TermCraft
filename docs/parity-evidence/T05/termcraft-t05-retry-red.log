@@ -1,0 +1,24 @@
+warning: unused import: `File`
+ --> src/serial.rs:2:10
+  |
+2 |     fs::{File, OpenOptions},
+  |          ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (lib) generated 1 warning (run `cargo fix --lib -p harbor-workspace` to apply 1 suggestion)
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `retry_last_chunk` found for struct `PasteController` in the current scope
+  --> tests/terminal_safety.rs:36:101
+   |
+36 | ...),settings));let first=c.tick(now);c.retry_last_chunk();assert!(!c.finished());assert_eq!(c.tick(now),first);
+   |                                         ^^^^^^^^^^^^^^^^ method not found in `PasteController`
+
+error[E0599]: no method named `retry_last_chunk` found for struct `PasteController` in the current scope
+  --> tests/terminal_safety.rs:37:97
+   |
+37 | ...nto(),settings));let _=c.tick(now);c.retry_last_chunk();assert!(c.cancel().is_empty());
+   |                                         ^^^^^^^^^^^^^^^^ method not found in `PasteController`
+
+For more information about this error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (test "terminal_safety") due to 2 previous errors

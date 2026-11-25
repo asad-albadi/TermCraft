@@ -1,0 +1,29 @@
+     Locking 7 packages to highest Rust 1.99.0 compatible versions
+ Downgrading async-trait v0.1.92 -> v0.1.89 (available: v0.1.92)
+      Adding nfsembed v0.3.0
+      Adding ppv-lite86 v0.2.21
+      Adding rand v0.8.8
+      Adding rand_chacha v0.3.1
+      Adding rand_core v0.6.4
+      Adding twox-hash v2.1.5
+    Blocking waiting for file lock on build directory
+    Checking getrandom v0.2.17
+    Checking ppv-lite86 v0.2.21
+    Checking ring v0.17.14
+    Checking rand_core v0.6.4
+    Checking rand_chacha v0.3.1
+   Compiling async-trait v0.1.89
+    Checking rustls-webpki v0.103.17
+    Checking rand v0.8.8
+    Checking rustls v0.23.46
+    Checking iana-time-zone v0.1.65
+    Checking twox-hash v2.1.5
+    Checking russh v0.65.4
+    Checking rustls-platform-verifier v0.7.1
+    Checking ureq v3.5.2
+    Checking tokio-rustls v0.26.6
+    Checking nfsembed v0.3.0
+    Checking chrono v0.4.45
+    Checking zbus v5.19.0
+    Checking harbor-workspace v0.1.0-e03-nfs-private (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/e03-nfs)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 18.23s

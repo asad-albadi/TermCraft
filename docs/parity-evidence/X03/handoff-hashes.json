@@ -1,0 +1,23 @@
+{
+  "shared_base_sha256": {
+    "src/main.rs": "0c80699d25dadf3c06dcd0f9419c74e1da884aa197d8b52c4167e1680c7f2cc2",
+    "src/x11/mod.rs": "d0b70671436501e0d9b8132d0cdd186d03aefa046cc9a9983a5385048bf0d501",
+    "src/ui/xserver.rs": "aac69ccd0fcab5c16ece4de62e2d5b3bfe1e51dce8fcfedfce8df3869acd4911",
+    "packaging/x11/manifest.json": "455aaf0d452e3cdd7070af2e873bbe5a3022b884595211fe0fba3e13f38f42a1"
+  },
+  "private_final_sha256": {
+    "src/main.rs": "75a9e9e464866cfaa4440be8fa232c1f21ccb68f6e879be38119d8a8cd1f5369",
+    "src/x11/mod.rs": "4aac3d7b07085575cf7defa26bcf2ee76e0a099c1f53a847a6edb900de2d64dd",
+    "src/ui/xserver.rs": "214da69b6b13a46035f61fe849e136e7980c10fc5f7bfd5578600dd544724ce8",
+    "packaging/x11/manifest.json": "48201ffed3127429a70a693dee8110e15f2653e3358b2f3cf038c5d8c77a4957",
+    "src/x11/capabilities.rs": "6374348478856ba0021de5fa1dc23fe7e7b6f2644031824a4ddd8d3f03533cd1",
+    "src/x11/native_capabilities.rs": "c01efafb06b73adbbfdf7b82d74a1d13dea5a1da16132fa0176a8b03a2045cba",
+    "tests/x11_extensions.rs": "4adb8f11968fb0c587612f99bdd75dcca3698c185437b616e04fc245ad030811"
+  },
+  "patch_sha256": "0cc9c6d1bc652a3582a22b2092ad0a004391f11bce7266dc07376ebcea02a4b8",
+  "qualified_executables_sha256": {
+    "x03-probe-app": "80199a5cf2afd01b8b84d4eff4f0db318903e117d6ddbfb461cdd86b47194efa",
+    "x03-ui-tests": "54619f3727dfa313d464ea058a4ae0b73f07f1426b3bd2b934e6739570a4720d",
+    "x11_extensions": "bfa1f8d93421cab46c1ca35dd66f38bfd41fbb072353e3ef7c48b0b81faf6201"
+  }
+}

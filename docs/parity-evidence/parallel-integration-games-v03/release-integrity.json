@@ -1,0 +1,9 @@
+{
+  "archive": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-games-v03-reviewed/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing.tar.gz",
+  "archive_sha256": "68f356f63c92a9a6aced6abe3d845ab9d064e5da0d37b52ff0c4c99f0fc4b117",
+  "package_root": "/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/package-games-v03-qualified/68f356f63c92a9a6aced6abe3d845ab9d064e5da0d37b52ff0c4c99f0fc4b117/TermCraft-0.1.0-linux-x86_64-arch-xwayland-xdmcp-mosh-unix-chromium-wayland-sharing",
+  "source_sha256": "4726eebadb56a15c2e9ed9f4018a63ffe9a55e9834ad927fea5472f2f2c29b53",
+  "files_verified": 1415,
+  "wayland_helper_sha256": "26c3495d140afc8e90f318783af7a2a8b9484d69aa6e3c5c3c5e3c684096236e",
+  "qualification": "Extracted manifest integrity only; current native/clean/startup/helper checks pending"
+}

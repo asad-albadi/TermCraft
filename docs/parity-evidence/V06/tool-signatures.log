@@ -1,0 +1,16 @@
+gpg: WARNING: unsafe ownership on homedir '/etc/pacman.d/gnupg'
+gpg: Signature made Wed Jun 24 00:19:23 2026 +04
+gpg:                using EDDSA key 35BAE1BF9A6B317021E690C26E7CE0B0A36DA2AE
+gpg: Note: trustdb not writable
+gpg: Good signature from "Brett Cornwall <brett@i--b.com>" [unknown]
+gpg:                 aka "Brett Cornwall <ainola@archlinux.org>" [full]
+gpg: WARNING: unsafe ownership on homedir '/etc/pacman.d/gnupg'
+gpg: Signature made Sat Jul 13 03:43:25 2024 +04
+gpg:                using RSA key 04DC3FB1445FECA813C27EFAEA4F7B321A906AD9
+gpg: Note: trustdb not writable
+gpg: Good signature from "Daniel M. Capella <polyzen@archlinux.org>" [full]
+gpg: WARNING: unsafe ownership on homedir '/etc/pacman.d/gnupg'
+gpg: Signature made Sun Mar 15 22:31:06 2026 +04
+gpg:                using EDDSA key EB3D764FF5D87E0818A3E0E5F05E8C12131AEB5E
+gpg: Note: trustdb not writable
+gpg: Good signature from "Carl Smedstad <carsme@archlinux.org>" [full]

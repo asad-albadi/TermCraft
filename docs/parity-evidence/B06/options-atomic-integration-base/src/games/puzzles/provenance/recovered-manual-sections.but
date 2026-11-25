@@ -1,0 +1,573 @@
+\C{net} \i{Net}
+
+\cfg{winhelp-topic}{games.net}
+
+(\e{Note:} the \i{Windows} version of this game is called
+\i\cw{NETGAME.EXE} to avoid clashing with Windows's own \cw{NET.EXE}.)
+
+I originally saw this in the form of a Flash game called \i{FreeNet}
+\k{FreeNet}, written by Pavils Jurjans; there are several other
+implementations under the name \i{NetWalk}. The computer prepares a
+network by connecting up the centres of squares in a grid, and then
+shuffles the network by rotating every tile randomly. Your job is to
+rotate it all back into place. The successful solution will be an
+entirely connected network, with no closed loops. \#{The latter
+clause means that there are no closed paths within the network.
+Could this be clearer? "No closed paths"?} As a visual aid,
+all tiles which are connected to the one in the middle are
+highlighted. 
+
+\B{FreeNet} \W{http://www.jurjans.lv/stuff/net/FreeNet.htm}\cw{http://www.jurjans.lv/stuff/net/FreeNet.htm}
+
+\H{net-controls} \i{Net controls}
+
+\IM{Net controls} controls, for Net
+\IM{Net controls} keys, for Net
+\IM{Net controls} shortcuts (keyboard), for Net
+
+This game can be played with either the keyboard or the mouse. The
+controls are:
+
+\dt \e{Select tile}: mouse pointer, arrow keys
+
+\dt \e{Rotate tile anticlockwise}: left mouse button, \q{A} key
+
+\dt \e{Rotate tile clockwise}: right mouse button, \q{D} key
+
+\dt \e{Rotate tile by 180 degrees}: \q{F} key
+
+\dt \e{Lock (or unlock) tile}: middle mouse button, shift-click, \q{S} key
+
+\dd You can lock a tile once you're sure of its orientation. You can
+also unlock it again, but while it's locked you can't accidentally
+turn it.
+
+The following controls are not necessary to complete the game, but may
+be useful:
+
+\dt \e{Shift grid}: Shift + arrow keys
+
+\dd On grids that wrap, you can move the origin of the grid, so that
+tiles that were on opposite sides of the grid can be seen together.
+
+\dt \e{Move centre}: Ctrl + arrow keys
+
+\dd You can change which tile is used as the source of highlighting.
+(It doesn't ultimately matter which tile this is, as every tile will
+be connected to every other tile in a correct solution, but it may be
+helpful in the intermediate stages of solving the puzzle.)
+
+\dt \e{Jumble tiles}: \q{J} key
+
+\dd This key turns all tiles that are not locked to random
+orientations.
+
+(All the actions described in \k{common-actions} are also available.)
+
+\H{net-params} \I{parameters, for Net}Net parameters
+
+These parameters are available from the \q{Custom...} option on the
+\q{Type} menu.
+
+\dt \e{Width}, \e{Height}
+
+\dd Size of grid in tiles.
+
+\dt \e{Walls wrap around}
+
+\dd If checked, flow can pass from the left edge to the right edge,
+and from top to bottom, and vice versa.
+
+\dt \e{Barrier probability}
+
+\dd A number between 0.0 and 1.0 controlling whether an immovable
+barrier is placed between two tiles to prevent flow between them (a
+higher number gives more barriers). Since barriers are immovable, they
+act as constraints on the solution (i.e., hints).
+
+\lcont{
+
+The grid generation in Net has been carefully arranged so that the
+barriers are independent of the rest of the grid. This means that if
+you note down the random seed used to generate the current puzzle
+(see \k{common-id}), change the \e{Barrier probability} parameter,
+and then re-enter the same random seed, you should see exactly the
+same starting grid, with the only change being the number of
+barriers. So if you're stuck on a particular grid and need a hint,
+you could start up another instance of Net, set up the same
+parameters but a higher barrier probability, and enter the game seed
+from the original Net window.
+
+}
+
+\dt \e{Ensure unique solution}
+
+\dd Normally, Net will make sure that the puzzles it presents have
+only one solution. Puzzles with ambiguous sections can be more
+difficult and more subtle, so if you like you can turn off this
+feature and risk having ambiguous puzzles. (Also, finding \e{all}
+the possible solutions can be an additional challenge for an
+advanced player.)
+
+
+
+\C{mines} \i{Mines}
+
+\cfg{winhelp-topic}{games.mines}
+
+You have a grid of covered squares, some of which contain mines, but
+you don't know which. Your job is to uncover every square which does
+\e{not} contain a mine. If you uncover a square containing a mine,
+you lose. If you uncover a square which does not contain a mine, you
+are told how many mines are contained within the eight surrounding
+squares.
+
+This game needs no introduction; popularised by Windows, it is
+perhaps the single best known desktop puzzle game in existence.
+
+This version of it has an unusual property. By default, it will
+generate its mine positions in such a way as to ensure that you
+never need to \e{guess} where a mine is: you will always be able to
+deduce it somehow. So you will never, as can happen in other
+versions, get to the last four squares and discover that there are
+two mines left but you have no way of knowing for sure where they
+are.
+
+\H{mines-controls} \I{controls, for Mines}Mines controls
+
+This game is played with the mouse.
+
+If you left-click in a covered square, it will be uncovered.
+
+If you right-click in a covered square, it will place a flag which
+indicates that the square is believed to be a mine. Left-clicking in
+a marked square will not uncover it, for safety. You can right-click
+again to remove a mark placed in error.
+
+If you left-click in an \e{uncovered} square, it will \q{clear
+around} the square. This means: if the square has exactly as many
+flags surrounding it as it should have mines, then all the covered
+squares next to it which are \e{not} flagged will be uncovered. So
+once you think you know the location of all the mines around a
+square, you can use this function as a shortcut to avoid having to
+click on each of the remaining squares one by one.
+
+If you uncover a square which has \e{no} mines in the surrounding
+eight squares, then it is obviously safe to uncover those squares in
+turn, and so on if any of them also has no surrounding mines. This
+will be done for you automatically; so sometimes when you uncover a
+square, a whole new area will open up to be explored.
+
+You can also use the cursor keys to move around the minefield.
+Pressing the return key in a covered square uncovers it, and in an
+uncovered square will clear around it (so it acts as the left button),
+pressing the space bar in a covered square will place a flag
+(similarly, it acts as the right button).
+
+All the actions described in \k{common-actions} are also available.
+
+Even Undo is available, although you might consider it cheating to
+use it. If you step on a mine, the program will only reveal the mine
+in question (unlike most other implementations, which reveal all of
+them). You can then Undo your fatal move and continue playing if you
+like. The program will track the number of times you died (and Undo
+will not reduce that counter), so when you get to the end of the
+game you know whether or not you did it without making any errors.
+
+(If you really want to know the full layout of the grid, which other
+implementations will show you after you die, you can always use the
+Solve menu option.)
+
+\H{mines-parameters} \I{parameters, for Mines}Mines parameters
+
+The options available from the \q{Custom...} option on the \q{Type}
+menu are:
+
+\dt \e{Width}, \e{Height}
+
+\dd Size of grid in squares.
+
+\dt \e{Mines}
+
+\dd Number of mines in the grid. You can enter this as an absolute
+mine count, or alternatively you can put a \cw{%} sign on the end in
+which case the game will arrange for that proportion of the squares
+in the grid to be mines.
+
+\lcont{
+
+Beware of setting the mine count too high. At very high densities,
+the program may spend forever searching for a solvable grid.
+
+}
+
+\dt \e{Ensure solubility}
+
+\dd When this option is enabled (as it is by default), Mines will
+ensure that the entire grid can be fully deduced starting from the
+initial open space. If you prefer the riskier grids generated by
+other implementations, you can switch off this option.
+
+
+
+\C{solo} \i{Solo}
+
+\cfg{winhelp-topic}{games.solo}
+
+You have a square grid, which is divided into as many equally sized
+sub-blocks as the grid has rows. Each square must be filled in with
+a digit from 1 to the size of the grid, in such a way that
+
+\b every row contains only one occurrence of each digit
+
+\b every column contains only one occurrence of each digit
+
+\b every block contains only one occurrence of each digit.
+
+\b (optionally, by default off) each of the square's two main
+diagonals contains only one occurrence of each digit.
+
+You are given some of the numbers as clues; your aim is to place the
+rest of the numbers correctly.
+
+Under the default settings, the sub-blocks are square or
+rectangular. The default puzzle size is 3\by\.3 (a 9\by\.9 actual
+grid, divided into nine 3\by\.3 blocks). You can also select sizes
+with rectangular blocks instead of square ones, such as 2\by\.3 (a
+6\by\.6 grid divided into six 3\by\.2 blocks). Alternatively, you
+can select \q{jigsaw} mode, in which the sub-blocks are arbitrary
+shapes which differ between individual puzzles.
+
+Another available mode is \q{killer}. In this mode, clues are not
+given in the form of filled-in squares; instead, the grid is divided
+into \q{cages} by coloured lines, and for each cage the game tells
+you what the sum of all the digits in that cage should be. Also, no
+digit may appear more than once within a cage, even if the cage
+crosses the boundaries of existing regions.
+
+If you select a puzzle size which requires more than 9 digits, the
+additional digits will be letters of the alphabet. For example, if
+you select 3\by\.4 then the digits which go in your grid will be 1
+to 9, plus \cq{a}, \cq{b} and \cq{c}. This cannot be selected for
+killer puzzles.
+
+I first saw this puzzle in \i{Nikoli} \k{nikoli-solo}, although it's
+also been popularised by various newspapers under the name
+\q{Sudoku} or \q{Su Doku}.  Howard Garns is considered the inventor
+of the modern form of the puzzle, and it was first published in
+\e{Dell Pencil Puzzles and Word Games}.  A more elaborate treatment
+of the history of the puzzle can be found on Wikipedia
+\k{wikipedia-solo}.
+
+\B{nikoli-solo} \W{http://www.nikoli.co.jp/puzzles/1/index_text-e.htm}\cw{http://www.nikoli.co.jp/puzzles/1/index_text-e.htm}
+
+\B{wikipedia-solo} \W{http://en.wikipedia.org/wiki/Sudoku}\cw{http://en.wikipedia.org/wiki/Sudoku}
+
+\H{solo-controls} \I{controls, for Solo}Solo controls
+
+To play Solo, simply click the mouse in any empty square and then
+type a digit or letter on the keyboard to fill that square. If you
+make a mistake, click the mouse in the incorrect square and press
+Space to clear it again (or use the Undo feature).
+
+If you \e{right}-click in a square and then type a number, that
+number will be entered in the square as a \q{pencil mark}. You can
+have pencil marks for multiple numbers in the same square. Squares
+containing filled-in numbers cannot also contain pencil marks.
+
+The game pays no attention to pencil marks, so exactly what you use
+them for is up to you: you can use them as reminders that a
+particular square needs to be re-examined once you know more about a
+particular number, or you can use them as lists of the possible
+numbers in a given square, or anything else you feel like.
+
+To erase a single pencil mark, right-click in the square and type
+the same number again.
+
+All pencil marks in a square are erased when you left-click and type
+a number, or when you left-click and press space. Right-clicking and
+pressing space will also erase pencil marks.
+
+Alternatively, use the cursor keys to move the mark around the grid.
+Pressing the return key toggles the mark (from a normal mark to a
+pencil mark), and typing a number in is entered in the square in the
+appropriate way; typing in a 0 or using the space bar will clear a
+filled square. 
+
+(All the actions described in \k{common-actions} are also available.)
+
+\H{solo-parameters} \I{parameters, for Solo}Solo parameters
+
+Solo allows you to configure two separate dimensions of the puzzle
+grid on the \q{Type} menu: the number of columns, and the number of
+rows, into which the main grid is divided. (The size of a block is
+the inverse of this: for example, if you select 2 columns and 3 rows,
+each actual block will have 3 columns and 2 rows.)
+
+If you tick the \q{X} checkbox, Solo will apply the optional extra
+constraint that the two main diagonals of the grid also contain one
+of every digit. (This is sometimes known as \q{Sudoku-X} in
+newspapers.) In this mode, the squares on the two main diagonals
+will be shaded slightly so that you know it's enabled.
+
+If you tick the \q{Jigsaw} checkbox, Solo will generate randomly
+shaped sub-blocks. In this mode, the actual grid size will be taken
+to be the product of the numbers entered in the \q{Columns} and
+\q{Rows} boxes. There is no reason why you have to enter a number
+greater than 1 in both boxes; Jigsaw mode has no constraint on the
+grid size, and it can even be a prime number if you feel like it.
+
+If you tick the \q{Killer} checkbox, Solo will generate a set of
+of cages, which are randomly shaped and drawn in an outline of a
+different colour.  Each of these regions contains a smaller clue
+which shows the digit sum of all the squares in this region.
+
+You can also configure the type of symmetry shown in the generated
+puzzles. More symmetry makes the puzzles look prettier but may also
+make them easier, since the symmetry constraints can force more
+clues than necessary to be present. Completely asymmetric puzzles
+have the freedom to contain as few clues as possible.
+
+Finally, you can configure the difficulty of the generated puzzles.
+Difficulty levels are judged by the complexity of the techniques of
+deduction required to solve the puzzle: each level requires a mode
+of reasoning which was not necessary in the previous one. In
+particular, on difficulty levels \q{Trivial} and \q{Basic} there
+will be a square you can fill in with a single number at all times,
+whereas at \q{Intermediate} level and beyond you will have to make
+partial deductions about the \e{set} of squares a number could be in
+(or the set of numbers that could be in a square).
+\#{Advanced, Extreme?}
+At \q{Unreasonable} level, even this is not enough, and you will
+eventually have to make a guess, and then backtrack if it turns out
+to be wrong.
+
+Generating difficult puzzles is itself difficult: if you select one
+of the higher difficulty levels, Solo may have to make many attempts
+at generating a puzzle before it finds one hard enough for you. Be
+prepared to wait, especially if you have also configured a large
+puzzle size.
+
+
+
+\C{guess} \i{Guess}
+
+\cfg{winhelp-topic}{games.guess}
+
+You have a set of coloured pegs, and have to reproduce a
+predetermined sequence of them (chosen by the computer) within a
+certain number of guesses. 
+
+Each guess gets marked with the number of correctly-coloured pegs
+in the correct places (in black), and also the number of
+correctly-coloured pegs in the wrong places (in white). 
+
+This game is also known (and marketed, by Hasbro, mainly) as
+a board game \q{\i{Mastermind}}, with 6 colours, 4 pegs per row,
+and 10 guesses. However, this version allows custom settings of number
+of colours (up to 10), number of pegs per row, and number of guesses. 
+
+Guess was contributed to this collection by James Harvey.
+
+\H{guess-controls} \i{Guess controls}
+
+\IM{Guess controls} controls, for Guess
+\IM{Guess controls} keys, for Guess
+\IM{Guess controls} shortcuts (keyboard), for Guess
+
+This game can be played with either the keyboard or the mouse.
+
+With the mouse, drag a coloured peg from the tray on the left-hand
+side to its required position in the current guess; pegs may also be
+dragged from current and past guesses to copy them elsewhere. To
+remove a peg, drag it off its current position to somewhere invalid.
+
+Right-clicking in the current guess adds a \q{hold} marker; pegs
+that have hold markers will be automatically added to the next guess
+after marking.
+
+Alternatively, with the keyboard, the up and down cursor keys can be
+used to select a peg colour, the left and right keys to select a
+peg position, and the space bar or Enter key to place a peg of the
+selected colour in the chosen position. \q{D} or Backspace removes a
+peg, and \q{H} adds a hold marker.
+
+When the guess is complete, the smaller feedback pegs will be highlighted;
+clicking on these (or moving the peg cursor to them with the arrow keys
+and pressing the space bar or Enter key) will mark the current guess,
+copy any held pegs to the next guess, and move the \q{current guess}
+marker.
+
+If you correctly position all the pegs the solution will be displayed
+below; if you run out of guesses (or select \q{Solve...}) the solution
+will also be revealed.
+
+(All the actions described in \k{common-actions} are also available.)
+
+\H{guess-parameters} \I{parameters, for Guess}Guess parameters
+
+These parameters are available from the \q{Custom...} option on the
+\q{Type} menu. The default game matches the parameters for the 
+board game \q{Mastermind}. 
+
+\dt \e{Colours}
+
+\dd Number of colours the solution is chosen from; from 2 to 10
+(more is harder).
+
+\dt \e{Pegs per guess}
+
+\dd Number of pegs per guess (more is harder).
+
+\dt \e{Guesses}
+
+\dd Number of guesses you have to find the solution in (fewer is harder).
+
+\dt \e{Allow blanks}
+
+\dd Allows blank pegs to be given as part of a guess (makes it easier, because
+you know that those will never be counted as part of the solution). This
+is turned off by default. 
+
+\lcont{
+
+Note that this doesn't allow blank pegs in the solution; if you really wanted
+that, use one extra colour.
+
+}
+
+\dt \e{Allow duplicates}
+
+\dd Allows the solution (and the guesses) to contain colours more than once;
+this increases the search space (making things harder), and is turned on by
+default.
+
+
+
+\C{map} \i{Map}
+
+\cfg{winhelp-topic}{games.map}
+
+You are given a map consisting of a number of regions. Your task is
+to colour each region with one of four colours, in such a way that
+no two regions sharing a boundary have the same colour. You are
+provided with some regions already coloured, sufficient to make the
+remainder of the solution unique.
+
+Only regions which share a length of border are required to be
+different colours. Two regions which meet at only one \e{point}
+(i.e. are diagonally separated) may be the same colour.
+
+I believe this puzzle is original; I've never seen an implementation
+of it anywhere else. The concept of a \i{four-colouring} puzzle was
+suggested by Owen Dunn; credit must also go to Nikoli and to Verity
+Allan for inspiring the train of thought that led to me realising
+Owen's suggestion was a viable puzzle. Thanks also to Gareth Taylor
+for many detailed suggestions.
+
+\H{map-controls} \i{Map controls}
+
+\IM{Map controls} controls, for Map
+
+To colour a region, click the left mouse button on an existing
+region of the desired colour and drag that colour into the new
+region.
+
+(The program will always ensure the starting puzzle has at least one
+region of each colour, so that this is always possible!)
+
+If you need to clear a region, you can drag from an empty region, or
+from the puzzle boundary if there are no empty regions left.
+
+Dragging a colour using the \e{right} mouse button will stipple the
+region in that colour, which you can use as a note to yourself that
+you think the region \e{might} be that colour. A region can contain
+stipples in multiple colours at once. (This is often useful at the
+harder difficulty levels.)
+
+You can also use the cursor keys to move around the map: the colour of
+the cursor indicates the position of the colour you would drag (which
+is not obvious if you're on a region's boundary, since it depends on the
+direction from which you approached the boundary). Pressing the return
+key starts a drag of that colour, as above, which you control with the
+cursor keys; pressing the return key again finishes the drag. The
+space bar can be used similarly to create a stippled region. 
+Double-pressing the return key (without moving the cursor) will clear
+the region, as a drag from an empty region does: this is useful with
+the cursor mode if you have filled the entire map in but need to 
+correct the layout.
+
+If you press L during play, the game will toggle display of a number
+in each region of the map. This is useful if you want to discuss a
+particular puzzle instance with a friend \dash having an unambiguous
+name for each region is much easier than trying to refer to them all
+by names such as \q{the one down and right of the brown one on the
+top border}.
+
+(All the actions described in \k{common-actions} are also available.)
+
+\H{map-parameters} \I{parameters, for Map}Map parameters
+
+These parameters are available from the \q{Custom...} option on the
+\q{Type} menu.
+
+\dt \e{Width}, \e{Height}
+
+\dd Size of grid in squares.
+
+\dt \e{Regions}
+
+\dd Number of regions in the generated map.
+
+\dt \e{Difficulty}
+
+\dd In \q{Easy} mode, there should always be at least one region
+whose colour can be determined trivially. In \q{Normal} and \q{Hard}
+modes, you will have to use increasingly complex logic to deduce the
+colour of some regions. However, it will always be possible without
+having to guess or backtrack.
+
+\lcont{
+
+In \q{Unreasonable} mode, the program will feel free to generate
+puzzles which are as hard as it can possibly make them: the only
+constraint is that they should still have a unique solution. Solving
+Unreasonable puzzles may require guessing and backtracking.
+
+}
+
+
+
+\C{untangle} \i{Untangle}
+
+\cfg{winhelp-topic}{games.untangle}
+
+You are given a number of points, some of which have lines drawn
+between them. You can move the points about arbitrarily; your aim is
+to position the points so that no line crosses another.
+
+I originally saw this in the form of a Flash game called \i{Planarity}
+\k{Planarity}, written by John Tantalo.
+
+\B{Planarity} \W{http://home.cwru.edu/~jnt5/Planarity}\cw{http://home.cwru.edu/~jnt5/Planarity}
+
+\H{untangle-controls} \i{Untangle controls}
+
+\IM{Untangle controls} controls, for Untangle
+
+To move a point, click on it with the left mouse button and drag it
+into a new position.
+
+(All the actions described in \k{common-actions} are also available.)
+
+\H{untangle-parameters} \I{parameters, for Untangle}Untangle parameters
+
+There is only one parameter available from the \q{Custom...} option
+on the \q{Type} menu:
+
+\dt \e{Number of points}
+
+\dd Controls the size of the puzzle, by specifying the number of
+points in the generated graph.
+
+

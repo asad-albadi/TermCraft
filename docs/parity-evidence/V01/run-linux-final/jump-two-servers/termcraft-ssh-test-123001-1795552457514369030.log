@@ -1,0 +1,14 @@
+Server listening on 127.0.0.1 port 45185.
+Connection from 127.0.0.1 port 43500 on 127.0.0.1 port 45185 rdomain ""
+kex_exchange_identification: Connection closed by remote host [preauth]
+Connection closed by 127.0.0.1 port 43500 [preauth]
+srclimit_penalise: ipv4: new 127.0.0.1/32 deferred penalty of 1.000 seconds for penalty: connections without attempting authentication
+Connection from 127.0.0.1 port 43512 on 127.0.0.1 port 45185 rdomain ""
+Accepted key ED25519 SHA256:W5yeiRv6cQ8W70QbHBghlZODzDXATOeWpDCyKPDC5Wc found at /tmp/termcraft-ssh-test-123001-1795552457514369030/authorized_keys:1
+Postponed publickey for asad from 127.0.0.1 port 43512 ssh2 [preauth]
+Accepted key ED25519 SHA256:W5yeiRv6cQ8W70QbHBghlZODzDXATOeWpDCyKPDC5Wc found at /tmp/termcraft-ssh-test-123001-1795552457514369030/authorized_keys:1
+Accepted publickey for asad from 127.0.0.1 port 43512 ssh2: ED25519 SHA256:W5yeiRv6cQ8W70QbHBghlZODzDXATOeWpDCyKPDC5Wc
+User child is on pid 123025
+Connection closed by 127.0.0.1 port 43512
+Transferred: sent 9416, received 6296 bytes
+Closing connection to 127.0.0.1 port 43512

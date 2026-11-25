@@ -1,0 +1,18 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0432]: unresolved import `harbor_workspace::remote_files::capabilities`
+ --> tests/scp_browser.rs:5:51
+  |
+5 | use harbor_workspace::{remote_files::{RemotePath, capabilities::RemoteBackendKind, transfer::{TransferOperation, TransferOutcome, Con...
+  |                                                   ^^^^^^^^^^^^ could not find `capabilities` in `remote_files`
+
+error[E0609]: no field `remote_backend` on type `Session`
+ --> tests/scp_browser.rs:9:62
+  |
+9 |     let mut config = server.config(50, true); config.session.remote_backend = RemoteBackendKind::Scp;
+  |                                                              ^^^^^^^^^^^^^^ unknown field
+  |
+  = note: available fields are: `name`, `ssh_engine`, `folder`, `protocol`, `host` ... and 15 others
+
+Some errors have detailed explanations: E0432, E0609.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `harbor-workspace` (test "scp_browser") due to 2 previous errors

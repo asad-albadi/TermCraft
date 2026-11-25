@@ -1,0 +1,58 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.86s
+     Running tests/ssh_lifecycle.rs (app/target/debug/deps/ssh_lifecycle-7068c92c1740f5cf)
+
+running 11 tests
+test credential_titles_identify_the_role_host_and_port ... FAILED
+test password_then_mfa_uses_the_new_methods_without_repeating_password ... FAILED
+test browser_retry_does_not_reauthenticate ... ok
+test cancelling_encrypted_key_unlock_rejects_late_passphrases ... ok
+test reconnect_discards_old_challenges_and_listings ... ok
+test reconnect_rejects_real_old_directory_snapshots ... ok
+test prompted_username_identity_survives_fresh_editor_recovery_without_implicit_upload ... ok
+test recovery_from_an_unsuccessful_open_cannot_replace_a_fresh_document ... FAILED
+test recovery_import_preserves_unsaved_destination_edits ... FAILED
+test cancel_auth_stops_the_entire_attempt ... ok
+test server_disconnect_retires_a_visible_password_prompt_without_an_answer ... FAILED
+
+failures:
+
+---- credential_titles_identify_the_role_host_and_port stdout ----
+
+thread 'credential_titles_identify_the_role_host_and_port' (331200) panicked at tests/ssh_lifecycle.rs:301:74:
+Ambiguous endpoint: Sign in as asad on 127.0.0.1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- password_then_mfa_uses_the_new_methods_without_repeating_password stdout ----
+
+thread 'password_then_mfa_uses_the_new_methods_without_repeating_password' (331201) panicked at tests/ssh_lifecycle.rs:291:155:
+assertion `left == right` failed: Password acceptance must advance to MFA
+  left: 1
+ right: 2
+
+---- recovery_from_an_unsuccessful_open_cannot_replace_a_fresh_document stdout ----
+
+thread 'recovery_from_an_unsuccessful_open_cannot_replace_a_fresh_document' (331205) panicked at tests/ssh_lifecycle.rs:312:5:
+assertion failed: !target.can_import_from(&failed)
+
+---- recovery_import_preserves_unsaved_destination_edits stdout ----
+
+thread 'recovery_import_preserves_unsaved_destination_edits' (331206) panicked at tests/ssh_lifecycle.rs:319:5:
+assertion failed: target.import_recovery_from(&source).is_err()
+
+---- server_disconnect_retires_a_visible_password_prompt_without_an_answer stdout ----
+
+thread 'server_disconnect_retires_a_visible_password_prompt_without_an_answer' (331207) panicked at tests/ssh_lifecycle.rs:336:5:
+A disconnected password prompt waited forever for local input
+
+
+failures:
+    credential_titles_identify_the_role_host_and_port
+    password_then_mfa_uses_the_new_methods_without_repeating_password
+    recovery_from_an_unsuccessful_open_cannot_replace_a_fresh_document
+    recovery_import_preserves_unsaved_destination_edits
+    server_disconnect_retires_a_visible_password_prompt_without_an_answer
+
+test result: FAILED. 6 passed; 5 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.44s
+
+error: test failed, to rerun pass `--test ssh_lifecycle`

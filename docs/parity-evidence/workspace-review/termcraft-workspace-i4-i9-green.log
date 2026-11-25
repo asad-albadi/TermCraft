@@ -1,0 +1,14 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.82s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-127cf14f51e8fab8)
+
+running 6 tests
+test ui::workspace_review_tests::embedded_child_cannot_close_a_different_focused_window ... ok
+test ui::workspace_review_tests::multiexec_failure_survives_next_success_until_acknowledged ... ok
+test ui::workspace_review_tests::multiexec_toggle_preserves_explicit_membership ... ok
+test ui::workspace_review_tests::detach_reconciles_root_toolbar_and_reconnect_preserves_window_and_peers ... ok
+test ui::workspace_review_tests::detached_dispatcher_consumes_modifier_text_before_painting_terminal ... ok
+test ui::workspace_review_tests::opaque_client_password_keyboard_and_paste_stay_private ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 68 filtered out; finished in 1.63s
+

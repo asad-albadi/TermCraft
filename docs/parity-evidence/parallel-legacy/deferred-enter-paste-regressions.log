@@ -1,0 +1,18 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.00s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-4aa8822a5d2e7f03)
+
+running 10 tests
+test ui::terminal_review_tests::cursor_report_waits_until_the_paste_transaction_ends ... ok
+test ui::cli_dispatch::tests::named_macro_targets_its_new_terminal_and_respects_paste_confirmation ... ok
+test ui::terminal_review_tests::paste_then_enter_in_one_frame_keeps_wire_order ... ok
+test ui::broadcast::tests::painted_keyboard_and_paste_use_only_the_selected_real_transports ... ok
+test ui::workspace_review_tests::opaque_client_password_keyboard_and_paste_stay_private ... ok
+test ui::terminal_review_tests::cancelling_recorded_paste_records_logical_text_without_framing ... ok
+test ui::gui_tests::broadcast_paste_cancel_and_stale_target_send_no_payload ... ok
+test ui::workspace_review_tests::paste_and_close_confirmations_show_custom_titles_and_terminal_identity ... ok
+test ui::shortcuts::tests::native_paste_payload_and_shortcut_do_not_request_another_clipboard_read ... ok
+test ui::terminal_review_tests::telnet_paste_and_enter_same_frame_use_the_mode_at_delivery ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 100 filtered out; finished in 3.38s
+

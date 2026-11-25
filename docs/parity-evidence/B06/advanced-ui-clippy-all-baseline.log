@@ -1,0 +1,3 @@
+    Checking harbor-workspace v0.1.610 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced-ui/work)
+error: could not compile `harbor-workspace` (lib test) due to 2 previous errors; 112 warnings emitted
+warning: build failed, waiting for other jobs to finish...

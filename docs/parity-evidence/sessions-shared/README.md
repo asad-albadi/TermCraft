@@ -1,0 +1,1 @@
+S02 Linux implementation evidence; 312 passed / 6 ignored in the final full run. Windows source-subset compilation excludes the full network/crypto/UI application. Owned TLS/SSH fixtures do not contact production servers. Native Windows/macOS, original-app behavior and S05 credential integration remain pending. See PARITY_PROGRESS.md for scope and rulings.

@@ -1,0 +1,50 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0599]: no method named `enable_broadcast_all` found for struct `ui::Workspace` in the current scope
+   --> src/ui/broadcast.rs:12:11
+    |
+ 12 |         w.enable_broadcast_all();
+    |           ^^^^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:366:1
+    |
+366 | pub struct Workspace {
+    | -------------------- method `enable_broadcast_all` not found for this struct
+
+error[E0609]: no field `broadcast_group` on type `ui::Workspace`
+  --> src/ui/broadcast.rs:13:11
+   |
+13 |         w.broadcast_group.select(w.tabs[1].id, false);
+   |           ^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 61 others
+
+error[E0599]: no method named `dispatch_keyboard` found for struct `ui::Workspace` in the current scope
+   --> src/ui/broadcast.rs:35:11
+    |
+ 35 |         w.dispatch_keyboard(a,b"Q");
+    |           ^^^^^^^^^^^^^^^^^ method not found in `ui::Workspace`
+    |
+   ::: src/ui.rs:366:1
+    |
+366 | pub struct Workspace {
+    | -------------------- method `dispatch_keyboard` not found for this struct
+
+error[E0609]: no field `broadcast_report` on type `ui::Workspace`
+  --> src/ui/broadcast.rs:36:22
+   |
+36 |         assert_eq!(w.broadcast_report.failed[0].0,c);
+   |                      ^^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 61 others
+
+error[E0609]: no field `broadcast_group` on type `ui::Workspace`
+  --> src/ui/broadcast.rs:39:20
+   |
+39 |         assert!(!w.broadcast_group.selected().contains(&c));
+   |                    ^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `logo`, `desktop_theme`, `store`, `store_path`, `store_ok` ... and 61 others
+
+Some errors have detailed explanations: E0599, E0609.
+For more information about an error, try `rustc --explain E0599`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 5 previous errors

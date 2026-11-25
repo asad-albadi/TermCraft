@@ -1,0 +1,145 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0432]: unresolved import `harbor_workspace::x11::XDisplaySource`
+  --> tests/x11_forwarding.rs:10:11
+   |
+10 |     x11::{XDisplaySource, XServerLease},
+   |           ^^^^^^^^^^^^^^ no `XDisplaySource` in `x11`
+   |
+help: a similar name exists in the module
+   |
+10 -     x11::{XDisplaySource, XServerLease},
+10 +     x11::{XDisplayMode, XServerLease},
+   |
+
+error[E0283]: type annotations needed
+   --> tests/x11_forwarding.rs:128:94
+    |
+128 |         let key = PrivateKey::new(Ed25519Keypair::from_seed(&[41; 32]).into(), "X11 fixture".into()).unwrap();
+    |                   --------------- required by a bound introduced by this call                ^^^^
+    |
+    = note: the type must implement `Into<russh::keys::ssh_key::Comment>`
+note: required by a bound in `PrivateKey::new`
+   --> /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ssh-key-0.7.0-rc.12/src/private.rs:215:53
+    |
+215 |     pub fn new(key_data: KeypairData, comment: impl Into<Comment>) -> Result<Self> {
+    |                                                     ^^^^^^^^^^^^^ required by this bound in `PrivateKey::new`
+help: try using a fully qualified path to specify the expected types
+    |
+128 -         let key = PrivateKey::new(Ed25519Keypair::from_seed(&[41; 32]).into(), "X11 fixture".into()).unwrap();
+128 +         let key = PrivateKey::new(Ed25519Keypair::from_seed(&[41; 32]).into(), <&str as Into<T>>::into("X11 fixture")).unwrap();
+    |
+help: consider removing this method call, as the receiver has type `&'static str` and `&'static str: Into<russh::keys::ssh_key::Comment>` trivially holds
+    |
+128 -         let key = PrivateKey::new(Ed25519Keypair::from_seed(&[41; 32]).into(), "X11 fixture".into()).unwrap();
+128 +         let key = PrivateKey::new(Ed25519Keypair::from_seed(&[41; 32]).into(), "X11 fixture").unwrap();
+    |
+
+error[E0283]: type annotations needed
+   --> tests/x11_forwarding.rs:128:94
+    |
+128 |         let key = PrivateKey::new(Ed25519Keypair::from_seed(&[41; 32]).into(), "X11 fixture".into()).unwrap();
+    |                                                                                              ^^^^
+    |
+    = note: multiple `impl`s satisfying `_: From<&str>` found in the following crates: `bytes`, `egui`, `winnow`, `zune_core`, `zune_jpeg`:
+            - impl From<&'static str> for egui::id::Id;
+            - impl From<&'static str> for russh::keys::ssh_encoding::bytes::Bytes;
+            - impl From<&'static str> for winnow::error::StrContextValue;
+            - impl From<&'static str> for zune_core::bytestream::reader::ZByteIoError;
+            - impl From<&'static str> for zune_jpeg::errors::DecodeErrors;
+    = note: required for `&str` to implement `Into<_>`
+help: try using a fully qualified path to specify the expected types
+    |
+128 -         let key = PrivateKey::new(Ed25519Keypair::from_seed(&[41; 32]).into(), "X11 fixture".into()).unwrap();
+128 +         let key = PrivateKey::new(Ed25519Keypair::from_seed(&[41; 32]).into(), <&str as Into<T>>::into("X11 fixture")).unwrap();
+    |
+
+error[E0560]: struct `harbor_workspace::model::Session` has no field named `x11_source`
+   --> tests/x11_forwarding.rs:155:17
+    |
+155 |                 x11_source: XDisplaySource::Owned,
+    |                 ^^^^^^^^^^ `harbor_workspace::model::Session` does not have this field
+    |
+    = note: available fields are: `startup_macro`, `ftp_options`, `browser_options`, `vnc_options`, `rdp_options` ... and 28 others
+
+error[E0599]: no associated function or constant named `connect_with_x11` found for struct `ConnectionHandle` in the current scope
+   --> tests/x11_forwarding.rs:161:41
+    |
+161 |         let mut ssh = ConnectionHandle::connect_with_x11(config, owned.client_display()).unwrap();
+    |                                         ^^^^^^^^^^^^^^^^ associated function or constant not found in `ConnectionHandle`
+    |
+note: if you're trying to build a new `ConnectionHandle` consider using one of the following associated functions:
+      ConnectionHandle::connect
+      ConnectionHandle::read_file
+   --> src/ssh/mod.rs:144:5
+    |
+144 |       pub fn connect(config: ConnectionConfig) -> Result<Self, String> {
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+147 | /     pub fn read_file(
+148 | |         mut config: ConnectionConfig,
+149 | |         request: u64,
+150 | |         path: RemotePath,
+151 | |         limit: usize,
+152 | |     ) -> Result<Self, String> {
+    | |_____________________________^
+
+error[E0599]: no method named `client_display` found for reference `&XServerLease` in the current scope
+   --> tests/x11_forwarding.rs:161:72
+    |
+161 |         let mut ssh = ConnectionHandle::connect_with_x11(config, owned.client_display()).unwrap();
+    |                                                                        ^^^^^^^^^^^^^^
+    |
+help: there is a method `display` with a similar name
+    |
+161 -         let mut ssh = ConnectionHandle::connect_with_x11(config, owned.client_display()).unwrap();
+161 +         let mut ssh = ConnectionHandle::connect_with_x11(config, owned.display()).unwrap();
+    |
+
+Some errors have detailed explanations: E0283, E0432, E0560, E0599.
+For more information about an error, try `rustc --explain E0283`.
+error: could not compile `harbor-workspace` (test "x11_forwarding") due to 6 previous errors
+warning: build failed, waiting for other jobs to finish...
+warning: methods `send` and `poll` are never used
+   --> src/ui.rs:136:8
+    |
+135 | impl TerminalTab {
+    | ---------------- methods in this implementation
+136 |     fn send(&mut self, data: &[u8]) {
+    |        ^^^^
+...
+180 |     fn poll(&mut self) {
+    |        ^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: methods `shared_sources_busy` and `refresh_shared_source_with` are never used
+   --> src/ui/shared_sessions.rs:684:19
+    |
+640 | impl Workspace {
+    | -------------- methods in this implementation
+...
+684 |     pub(super) fn shared_sources_busy(&self) -> bool {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+999 |     pub(super) fn refresh_shared_source_with(
+    |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `generated_key_paths`, `start_owned_agent`, `add_agent_identity`, and `generate_key_bundle` are never used
+   --> src/ui/ssh_keys.rs:126:19
+    |
+112 | impl Workspace {
+    | -------------- methods in this implementation
+...
+126 |     pub(super) fn generated_key_paths(&self) -> Option<&KeyPairPaths> {
+    |                   ^^^^^^^^^^^^^^^^^^^
+...
+129 |     pub(super) fn start_owned_agent(&mut self, ctx: &Context) {
+    |                   ^^^^^^^^^^^^^^^^^
+...
+132 |     pub(super) fn add_agent_identity(
+    |                   ^^^^^^^^^^^^^^^^^^
+...
+151 |     pub(super) fn generate_key_bundle(
+    |                   ^^^^^^^^^^^^^^^^^^^
+
+warning: `harbor-workspace` (bin "harbor-workspace") generated 3 warnings

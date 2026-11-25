@@ -1,0 +1,7 @@
+'/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/deps/desktop_gateway-59742f3ccab061fd' --exact rdp_retry_relay_reopens_the_channel_on_one_ssh_authentication --nocapture --test-threads=1
+
+running 1 test
+test rdp_retry_relay_reopens_the_channel_on_one_ssh_authentication ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 0.16s
+

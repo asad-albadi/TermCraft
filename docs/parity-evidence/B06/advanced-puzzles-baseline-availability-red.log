@@ -1,0 +1,29 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/baseline-behavioral-proof)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.73s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/baseline-behavioral-proof/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 2 tests
+test tests::remaining_solo_presets_have_configurations ... FAILED
+test tests::remaining_map_presets_have_configurations ... FAILED
+
+failures:
+
+---- tests::remaining_solo_presets_have_configurations stdout ----
+
+thread 'tests::remaining_solo_presets_have_configurations' (423136) panicked at src/games/puzzles/tests.rs:623:20:
+3x3 Intermediate is unavailable
+
+---- tests::remaining_map_presets_have_configurations stdout ----
+
+thread 'tests::remaining_map_presets_have_configurations' (423135) panicked at src/games/puzzles/tests.rs:617:20:
+20x15, 30 regions, Hard is unavailable
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    tests::remaining_map_presets_have_configurations
+    tests::remaining_solo_presets_have_configurations
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 50 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--lib`

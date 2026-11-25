@@ -1,0 +1,36 @@
+    Blocking waiting for file lock on build directory
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+error[E0559]: variant `ui::remote_files::FileActionForm::Delete` has no field named `directory`
+   --> src/ui/remote_files.rs:878:67
+    |
+878 |         let mut form=FileActionForm::Delete{target:target.clone(),directory:true,include_contents:false};
+    |                                                                   ^^^^^^^^^ `ui::remote_files::FileActionForm::Delete` does not have this field
+    |
+    = note: all struct fields are already assigned
+
+error[E0559]: variant `ui::remote_files::FileActionForm::Delete` has no field named `include_contents`
+   --> src/ui/remote_files.rs:878:82
+    |
+878 |         let mut form=FileActionForm::Delete{target:target.clone(),directory:true,include_contents:false};
+    |                                                                                  ^^^^^^^^^^^^^^^^ `ui::remote_files::FileActionForm::Delete` does not have this field
+    |
+    = note: all struct fields are already assigned
+
+error[E0026]: variant `ui::remote_files::FileActionForm::Delete` does not have a field named `include_contents`
+   --> src/ui/remote_files.rs:880:39
+    |
+880 |         if let FileActionForm::Delete{include_contents,..}=&mut form{*include_contents=true;}
+    |                                       ^^^^^^^^^^^^^^^^
+    |                                       |
+    |                                       variant `ui::remote_files::FileActionForm::Delete` does not have this field
+    |                                       help: `ui::remote_files::FileActionForm::Delete` has a field named `target`
+
+error[E0599]: no variant named `RemoveTree` found for enum `TransferOperation`
+   --> src/ui/remote_files.rs:881:90
+    |
+881 | ...icy::Ask).unwrap(),TransferOperation::RemoveTree{remote,confirmed}if remote==target&&confirmed==target));
+    |                                          ^^^^^^^^^^ variant not found in `TransferOperation`
+
+Some errors have detailed explanations: E0026, E0559, E0599.
+For more information about an error, try `rustc --explain E0026`.
+error: could not compile `harbor-workspace` (bin "harbor-workspace" test) due to 4 previous errors

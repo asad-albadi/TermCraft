@@ -1,0 +1,160 @@
+    Checking primefield v0.14.0
+    Checking bytemuck v1.25.2
+    Checking thiserror v2.0.21
+    Checking futures-util v0.3.34
+    Checking windows-core v0.62.2
+    Checking rfc6979 v0.6.0
+    Checking elliptic-curve v0.14.3
+    Checking tokio v1.53.3
+    Checking ssh-encoding v0.3.0
+    Checking curve25519-dalek v5.0.0
+    Checking crypto-primes v0.7.2
+   Compiling ring v0.17.14
+   Compiling getrandom v0.3.4
+    Checking serde v1.0.229
+    Checking wnaf v0.14.1
+    Checking font-types v0.12.6
+    Checking color v0.3.3
+    Checking emath v0.36.2
+    Checking image v0.25.10
+    Checking ssh-cipher v0.3.0
+    Checking russh-cryptovec v0.62.0
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:22:
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/mem.h:18:
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/base.h(60,1): warning: '_Static_assert' is incompatible with C standards before C11 [-Wpre-c11-compat]
+warning: ring@0.17.14:    60 | OPENSSL_STATIC_ASSERT(sizeof(int32_t) == sizeof(int), "int isn't 32 bits.");
+warning: ring@0.17.14:       | ^
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/type_check.h(29,42): note: expanded from macro 'OPENSSL_STATIC_ASSERT'
+warning: ring@0.17.14:    29 | #define OPENSSL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+warning: ring@0.17.14:       |                                          ^
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:22:
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/mem.h:18:
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/base.h(61,1): warning: '_Static_assert' is incompatible with C standards before C11 [-Wpre-c11-compat]
+warning: ring@0.17.14:    61 | OPENSSL_STATIC_ASSERT(sizeof(uint32_t) == sizeof(unsigned int), "unsigned int isn't 32 bits.");
+warning: ring@0.17.14:       | ^
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/type_check.h(29,42): note: expanded from macro 'OPENSSL_STATIC_ASSERT'
+warning: ring@0.17.14:    29 | #define OPENSSL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+warning: ring@0.17.14:       |                                          ^
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:22:
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/mem.h:18:
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/base.h(62,1): warning: '_Static_assert' is incompatible with C standards before C11 [-Wpre-c11-compat]
+warning: ring@0.17.14:    62 | OPENSSL_STATIC_ASSERT(sizeof(size_t) == sizeof(uintptr_t), "uintptr_t and size_t differ.");
+warning: ring@0.17.14:       | ^
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/type_check.h(29,42): note: expanded from macro 'OPENSSL_STATIC_ASSERT'
+warning: ring@0.17.14:    29 | #define OPENSSL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+warning: ring@0.17.14:       |                                          ^
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:22:
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/mem.h:18:
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/base.h(63,1): warning: '_Static_assert' is incompatible with C standards before C11 [-Wpre-c11-compat]
+warning: ring@0.17.14:    63 | OPENSSL_STATIC_ASSERT(sizeof(size_t) <= sizeof(uint64_t), "size_t is larger than uint64_t.");
+warning: ring@0.17.14:       | ^
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/type_check.h(29,42): note: expanded from macro 'OPENSSL_STATIC_ASSERT'
+warning: ring@0.17.14:    29 | #define OPENSSL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+warning: ring@0.17.14:       |                                          ^
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:22:
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/mem.h:18:
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/base.h(64,1): warning: '_Static_assert' is incompatible with C standards before C11 [-Wpre-c11-compat]
+warning: ring@0.17.14:    64 | OPENSSL_STATIC_ASSERT(sizeof(size_t) >= sizeof(uint32_t), "size_t is smaller than uint32_t.");
+warning: ring@0.17.14:       | ^
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/type_check.h(29,42): note: expanded from macro 'OPENSSL_STATIC_ASSERT'
+warning: ring@0.17.14:    29 | #define OPENSSL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+warning: ring@0.17.14:       |                                          ^
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:24:
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/internal.h:20:
+warning: ring@0.17.14: In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/../internal.h:20:
+warning: ring@0.17.14: /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/check.h(27,11): fatal error: 'assert.h' file not found
+warning: ring@0.17.14:    27 | # include <assert.h>
+warning: ring@0.17.14:       |           ^~~~~~~~~~
+warning: ring@0.17.14: 5 warnings and 1 error generated.
+error: failed to run custom build command for `ring v0.17.14`
+
+Caused by:
+  process didn't exit successfully: `/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/debug/build/ring-ee7f48cac780d9fc/build-script-build` (exit status: 1)
+  --- stdout
+  cargo:rerun-if-env-changed=CARGO_MANIFEST_DIR
+  cargo:rerun-if-env-changed=CARGO_PKG_NAME
+  cargo:rerun-if-env-changed=CARGO_PKG_VERSION_MAJOR
+  cargo:rerun-if-env-changed=CARGO_PKG_VERSION_MINOR
+  cargo:rerun-if-env-changed=CARGO_PKG_VERSION_PATCH
+  cargo:rerun-if-env-changed=CARGO_PKG_VERSION_PRE
+  cargo:rerun-if-env-changed=CARGO_MANIFEST_LINKS
+  cargo:rerun-if-env-changed=RING_PREGENERATE_ASM
+  cargo:rerun-if-env-changed=OUT_DIR
+  cargo:rerun-if-env-changed=CARGO_CFG_TARGET_ARCH
+  cargo:rerun-if-env-changed=CARGO_CFG_TARGET_OS
+  cargo:rerun-if-env-changed=CARGO_CFG_TARGET_ENV
+  cargo:rerun-if-env-changed=CARGO_CFG_TARGET_ENDIAN
+  cargo:rerun-if-env-changed=VCINSTALLDIR
+  VCINSTALLDIR = None
+  cargo:rerun-if-env-changed=CC_x86_64-pc-windows-msvc
+  CC_x86_64-pc-windows-msvc = None
+  cargo:rerun-if-env-changed=CC_x86_64_pc_windows_msvc
+  CC_x86_64_pc_windows_msvc = Some(clang-cl)
+  cargo:rerun-if-env-changed=CC_KNOWN_WRAPPER_CUSTOM
+  CC_KNOWN_WRAPPER_CUSTOM = None
+  cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+  cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+  CRATE_CC_NO_DEFAULTS = None
+  cargo:rerun-if-env-changed=CFLAGS
+  CFLAGS = None
+  cargo:rerun-if-env-changed=TARGET_CFLAGS
+  TARGET_CFLAGS = None
+  cargo:rerun-if-env-changed=CFLAGS_x86_64_pc_windows_msvc
+  CFLAGS_x86_64_pc_windows_msvc = None
+  cargo:rerun-if-env-changed=CFLAGS_x86_64-pc-windows-msvc
+  CFLAGS_x86_64-pc-windows-msvc = None
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:22:
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/mem.h:18:
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/base.h(60,1): warning: '_Static_assert' is incompatible with C standards before C11 [-Wpre-c11-compat]
+  cargo:warning=   60 | OPENSSL_STATIC_ASSERT(sizeof(int32_t) == sizeof(int), "int isn't 32 bits.");
+  cargo:warning=      | ^
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/type_check.h(29,42): note: expanded from macro 'OPENSSL_STATIC_ASSERT'
+  cargo:warning=   29 | #define OPENSSL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+  cargo:warning=      |                                          ^
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:22:
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/mem.h:18:
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/base.h(61,1): warning: '_Static_assert' is incompatible with C standards before C11 [-Wpre-c11-compat]
+  cargo:warning=   61 | OPENSSL_STATIC_ASSERT(sizeof(uint32_t) == sizeof(unsigned int), "unsigned int isn't 32 bits.");
+  cargo:warning=      | ^
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/type_check.h(29,42): note: expanded from macro 'OPENSSL_STATIC_ASSERT'
+  cargo:warning=   29 | #define OPENSSL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+  cargo:warning=      |                                          ^
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:22:
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/mem.h:18:
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/base.h(62,1): warning: '_Static_assert' is incompatible with C standards before C11 [-Wpre-c11-compat]
+  cargo:warning=   62 | OPENSSL_STATIC_ASSERT(sizeof(size_t) == sizeof(uintptr_t), "uintptr_t and size_t differ.");
+  cargo:warning=      | ^
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/type_check.h(29,42): note: expanded from macro 'OPENSSL_STATIC_ASSERT'
+  cargo:warning=   29 | #define OPENSSL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+  cargo:warning=      |                                          ^
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:22:
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/mem.h:18:
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/base.h(63,1): warning: '_Static_assert' is incompatible with C standards before C11 [-Wpre-c11-compat]
+  cargo:warning=   63 | OPENSSL_STATIC_ASSERT(sizeof(size_t) <= sizeof(uint64_t), "size_t is larger than uint64_t.");
+  cargo:warning=      | ^
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/type_check.h(29,42): note: expanded from macro 'OPENSSL_STATIC_ASSERT'
+  cargo:warning=   29 | #define OPENSSL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+  cargo:warning=      |                                          ^
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:22:
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/mem.h:18:
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/base.h(64,1): warning: '_Static_assert' is incompatible with C standards before C11 [-Wpre-c11-compat]
+  cargo:warning=   64 | OPENSSL_STATIC_ASSERT(sizeof(size_t) >= sizeof(uint32_t), "size_t is smaller than uint32_t.");
+  cargo:warning=      | ^
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/type_check.h(29,42): note: expanded from macro 'OPENSSL_STATIC_ASSERT'
+  cargo:warning=   29 | #define OPENSSL_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+  cargo:warning=      |                                          ^
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c:24:
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/internal.h:20:
+  cargo:warning=In file included from /home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/../internal.h:20:
+  cargo:warning=/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include/ring-core/check.h(27,11): fatal error: 'assert.h' file not found
+  cargo:warning=   27 | # include <assert.h>
+  cargo:warning=      |           ^~~~~~~~~~
+  cargo:warning=5 warnings and 1 error generated.
+
+  --- stderr
+
+
+  error occurred in cc-rs: command did not execute successfully (status code exit status: 1): "clang-cl" "-nologo" "-MD" "-Z7" "-Brepro" "--target=x86_64-pc-windows-msvc" "-I" "/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/include" "-I" "/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/pregenerated" "-W4" "/Gy" "/Zc:wchar_t" "/Zc:forScope" "/Zc:inline" "/Wall" "/wd4127" "/wd4464" "/wd4514" "/wd4710" "/wd4711" "/wd4820" "/wd5045" "-DNDEBUG" "-Fo/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/x86_64-pc-windows-msvc/debug/build/ring-a77633119637c9ab/out/25ac62e5b3c53843-curve25519.o" "-c" "--" "/home/asad/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ring-0.17.14/crypto/curve25519/curve25519.c"
+
+
+warning: build failed, waiting for other jobs to finish...

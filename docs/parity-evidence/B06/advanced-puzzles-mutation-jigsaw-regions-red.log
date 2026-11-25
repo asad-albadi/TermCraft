@@ -1,0 +1,28 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/mutants/jigsaw-regions)
+warning: unused variable: `regions`
+  --> src/games/puzzles/solo_advanced.rs:17:5
+   |
+17 |     regions: &[usize],
+   |     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_regions`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `b06-puzzle-options-private` (lib test) generated 1 warning (run `cargo fix --lib -p b06-puzzle-options-private --tests` to apply 1 suggestion)
+    Finished `release` profile [optimized] target(s) in 4.27s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/mutation-target/release/deps/b06_puzzle_options_private-beed19bb514c887b)
+
+running 1 test
+
+thread 'solo::advanced::topology_tests::jigsaw_peer_conflicts_follow_irregular_regions_instead_of_boxes' (422735) panicked at src/games/puzzles/solo_advanced.rs:1135:9:
+assertion failed: s.conflicts()[a]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test solo::advanced::topology_tests::jigsaw_peer_conflicts_follow_irregular_regions_instead_of_boxes ... FAILED
+
+failures:
+
+failures:
+    solo::advanced::topology_tests::jigsaw_peer_conflicts_follow_irregular_regions_instead_of_boxes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 64 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`

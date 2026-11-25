@@ -1,0 +1,12 @@
+{
+  "implementation_checkpoint": true,
+  "full_parity": false,
+  "full_gate": "docs/parity-evidence/parallel-integration-services-unix/result.json",
+  "explicit_live_passes": {
+    "library_archive_retirement": 5,
+    "package_PTY_workflows": 4,
+    "Tools_GUI": 1
+  },
+  "native_windows": "not executed",
+  "original_MobApt_compatibility": "not established"
+}

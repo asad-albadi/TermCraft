@@ -1,0 +1,10 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced/proposed-availability-proof)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.13s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/proposed-availability-proof/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 2 tests
+test tests::remaining_map_presets_have_configurations ... ok
+test tests::remaining_solo_presets_have_configurations ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 65 filtered out; finished in 0.00s
+

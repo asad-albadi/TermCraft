@@ -1,0 +1,15 @@
+{
+  "files": {
+    "engines/rdp/src/serial.rs": "2730a2be6382e93f2d0256a2390750e8605b0c92213a0064e92b8257e2d5f4de",
+    "docs/parity-evidence/D02/serial-purge/README.md": "80b15166e566d192ffe3be639e5f8dd4264a7c250200f366acc8b8231eed98ff",
+    "docs/parity-evidence/D02/serial-purge/commands.txt": "63ad7e242fd4e1d0244a5a75618ad1e85358b2cce611f4da3f1d201c7a6f270f",
+    "docs/parity-evidence/D02/serial-purge/format.log": "0ca2ceeaae65b8f9a3e8400bf89958c5d661d05edc2cedf554b0fbfdcb55af68",
+    "docs/parity-evidence/D02/serial-purge/green-helper-full.log": "9ed1d3e3a87d0be8fc2de1ff187a3180f256e2fe42ee45fb134afe060acfdc71",
+    "docs/parity-evidence/D02/serial-purge/green-purge.log": "02447ef9d3917a390476e93842d5d8fac0f279bc237854219472941c1d8926a2",
+    "docs/parity-evidence/D02/serial-purge/red-mapping.log": "d6c6dba88748fe1edacd69d9375f7f0abdf8742921087ac612b26060e9106567",
+    "docs/parity-evidence/D02/serial-purge/red.log": "2e9eb9ccb0097e8d889bb486dde4553c120f00f9969d2c4f221b1cad8c78782b",
+    "docs/parity-evidence/D02/serial-purge/setup-missing-loader.log": "7be4d4594ee52819a39814b3ca39d028ff75b40ceae2e71104b9030da662d8e6"
+  },
+  "review": "review.md",
+  "exact": true
+}

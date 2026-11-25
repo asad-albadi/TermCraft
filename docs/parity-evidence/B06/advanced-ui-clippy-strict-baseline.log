@@ -1,0 +1,1972 @@
+    Blocking waiting for file lock on build directory
+   Compiling syn v2.0.119
+    Checking constant_time_eq v0.6.1
+    Checking typed-path v0.13.0
+   Compiling zeroize_derive v1.5.0
+   Compiling tracing-attributes v0.1.31
+    Checking zeroize v1.9.2
+    Checking hybrid-array v0.4.15
+    Checking der v0.8.3
+    Checking crypto-common v0.2.2
+    Checking block-buffer v0.12.1
+    Checking block-padding v0.4.2
+    Checking digest v0.11.3
+    Checking inout v0.2.6
+    Checking cipher v0.5.2
+    Checking hmac v0.13.0
+    Checking universal-hash v0.6.1
+    Checking polyval v0.7.3
+    Checking sha2 v0.11.1
+    Checking aead v0.6.1
+    Checking crypto-bigint v0.7.11
+    Checking ghash v0.6.0
+    Checking aes v0.9.4
+    Checking ctr v0.10.1
+    Checking pbkdf2 v0.13.0
+    Checking aes-gcm v0.11.1
+    Checking salsa20 v0.11.0
+    Checking spki v0.8.1
+    Checking scrypt v0.12.0
+    Checking cbc v0.2.1
+    Checking pkcs5 v0.8.1
+    Checking pkcs8 v0.11.0
+    Checking tracing v0.1.44
+    Checking signature v3.0.0
+   Compiling thiserror-impl v1.0.69
+    Checking hkdf v0.13.0
+    Checking sec1 v0.8.1
+   Compiling enumflags2_derive v0.7.12
+    Checking elliptic-curve v0.14.3
+    Checking thiserror v1.0.69
+    Checking primefield v0.14.0
+    Checking rustls-pki-types v1.16.0
+    Checking wnaf v0.14.1
+    Checking calloop v0.13.0
+    Checking rfc6979 v0.6.0
+    Checking chacha20 v0.10.2
+    Checking ecdsa v0.17.0
+    Checking calloop-wayland-source v0.3.0
+    Checking primeorder v0.14.0
+    Checking calloop v0.14.5
+    Checking smithay-client-toolkit v0.19.2
+    Checking calloop-wayland-source v0.4.1
+    Checking rustls-webpki v0.103.17
+   Compiling enumflags2 v0.7.12
+    Checking ssh-encoding v0.3.0
+    Checking poly1305 v0.9.1
+   Compiling curve25519-dalek-derive v0.1.1
+   Compiling zvariant v5.15.1
+    Checking curve25519-dalek v5.0.0
+    Checking rustls v0.23.46
+    Checking winit v0.30.13
+    Checking smithay-client-toolkit v0.20.0
+    Checking crypto-primes v0.7.2
+    Checking ed25519 v3.0.0
+    Checking pkcs1 v0.8.0
+    Checking blowfish v0.10.0
+    Checking blake2 v0.11.0
+    Checking argon2 v0.6.0
+    Checking bcrypt-pbkdf v0.11.0
+    Checking ed25519-dalek v3.0.0
+    Checking rsa v0.10.0
+    Checking smithay-clipboard v0.7.3
+   Compiling zbus_names v4.3.5
+    Checking ssh-cipher v0.3.0
+    Checking p256 v0.14.0
+    Checking p521 v0.14.0
+    Checking p384 v0.14.0
+    Checking rand v0.10.4
+    Checking rustls-native-certs v0.8.4
+    Checking shake v0.1.0
+    Checking sha3 v0.12.0
+    Checking sha1 v0.11.0
+    Checking kem v0.3.0
+    Checking module-lattice v0.2.4
+   Compiling async-trait v0.1.89
+    Checking ml-kem v0.3.4
+    Checking ssh-key v0.7.0-rc.12
+    Checking rustls-platform-verifier v0.7.1
+    Checking num-bigint v0.5.1
+   Compiling zbus_macros v5.19.0
+    Checking egui-winit v0.36.2
+    Checking glutin-winit v0.5.0
+    Checking russh-cryptovec v0.62.0
+    Checking webpki-roots v1.0.12
+   Compiling enum_dispatch v0.3.13
+   Compiling delegate v0.13.5
+    Checking russh v0.65.4
+    Checking zbus v5.19.0
+    Checking ureq v3.5.2
+    Checking eframe v0.36.2
+    Checking nfsembed v0.3.0
+    Checking tokio-rustls v0.26.6
+    Checking chacha20poly1305 v0.11.0
+    Checking des v0.9.0
+    Checking zip v9.8.2
+    Checking harbor-workspace v0.1.610 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-advanced-ui/work)
+error: unnecessary `>= y + 1` or `x - 1 >=`
+   --> src/services/vnc/clipboard.rs:119:16
+    |
+119 |               && text.len() + text.bytes().filter(|b| *b == b'\n').count() + 1
+    |  ________________^
+120 | |                 <= self.unsolicited_limit
+    | |_________________________________________^ help: change it to: `text.len() + text.bytes().filter(|b| *b == b'\n').count() < self.unsolicited_limit`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#int_plus_one
+    = note: `-D clippy::int-plus-one` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::int_plus_one)]`
+
+error: operator precedence might not be obvious
+   --> src/terminal/mouse.rs:121:21
+    |
+121 |                     32 + self.pressed.trailing_zeros() as u8 | event.modifiers.bits(),
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider parenthesizing your expression: `(32 + self.pressed.trailing_zeros() as u8) | event.modifiers.bits()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#precedence
+    = note: `-D clippy::precedence` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::precedence)]`
+
+error: unnecessary `>= y + 1` or `x - 1 >=`
+   --> src/desktop/vnc_clipboard.rs:109:16
+    |
+109 |               && text.len() + text.bytes().filter(|b| *b == b'\n').count() + 1
+    |  ________________^
+110 | |                 <= self.unsolicited_limit
+    | |_________________________________________^ help: change it to: `text.len() + text.bytes().filter(|b| *b == b'\n').count() < self.unsolicited_limit`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#int_plus_one
+
+error: file is loaded as a module multiple times: `src/remote_files/transfer/operations/commit.rs`
+  |
+  = help: replace all but one `mod` item with `use` items
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#duplicate_mod
+  = note: `-D clippy::duplicate-mod` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(clippy::duplicate_mod)]`
+
+error: this `if` statement can be collapsed
+   --> src/http_server.rs:332:9
+    |
+332 | /         if let Some(end) = received.windows(4).position(|bytes| bytes == b"\r\n\r\n") {
+333 | |             if end + 4 <= HEADER_LIMIT {
+334 | |                 break end;
+335 | |             }
+336 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+332 ~         if let Some(end) = received.windows(4).position(|bytes| bytes == b"\r\n\r\n")
+333 ~             && end + 4 <= HEADER_LIMIT {
+334 |                 break end;
+335 ~             }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/services/nfs.rs:670:9
+    |
+670 | /         if let Ok(kind) = destination_dir.symlink_metadata(dest.file_name().unwrap()) {
+671 | |             if !kind.is_file() && !kind.is_dir() {
+672 | |                 return Err(NfsError::Access);
+673 | |             }
+674 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+670 ~         if let Ok(kind) = destination_dir.symlink_metadata(dest.file_name().unwrap())
+671 ~             && !kind.is_file() && !kind.is_dir() {
+672 |                 return Err(NfsError::Access);
+673 ~             }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/services/sshd.rs:419:9
+    |
+419 | /         if let Some(shell) = self.shells.get(&id) {
+420 | |             if data.len() > 32768
+421 | |                 || shell
+422 | |                     .input
+...   |
+429 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+419 ~         if let Some(shell) = self.shells.get(&id)
+420 ~             && (data.len() > 32768
+421 |                 || shell
+422 |                     .input
+423 |                     .try_send(ShellInput::Data(data.to_vec()))
+424 ~                     .is_err())
+425 |             {
+426 |                 self.shells.remove(&id);
+427 |                 session.close(id)?;
+428 ~             }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/services/sshd.rs:453:9
+    |
+453 | /         if name == "sftp" && self.sftp_workers.len() < 4 && self.share.is_some() {
+454 | |             if let Some(channel) = self.channels.remove(&id) {
+455 | |                 session.channel_success(id)?;
+456 | |                 let control = Arc::new(SftpControl::default());
+...   |
+467 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+453 ~         if name == "sftp" && self.sftp_workers.len() < 4 && self.share.is_some()
+454 ~             && let Some(channel) = self.channels.remove(&id) {
+455 |                 session.channel_success(id)?;
+...
+465 |                 return Ok(());
+466 ~             }
+    |
+
+error: you seem to be trying to use `match` for destructuring a single pattern. Consider using `if let`
+   --> src/services/sshd.rs:716:9
+    |
+716 | /         match self
+717 | |             .handles
+718 | |             .remove(h.as_bytes())
+719 | |             .ok_or(StatusCode::Failure)?
+...   |
+722 | |             _ => {}
+723 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#single_match
+    = note: `-D clippy::single-match` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::single_match)]`
+help: try
+    |
+716 ~         if let Open::Write(stage, _) = self
+717 +             .handles
+718 +             .remove(h.as_bytes())
+719 +             .ok_or(StatusCode::Failure)? { stage.publish(|| Ok(())).map_err(code)? }
+    |
+
+error: this let-binding has unit value
+   --> src/services/sshd.rs:894:17
+    |
+894 | /                 let _ = runtime.block_on(async {
+895 | |                     let _ = tokio::time::timeout(Duration::from_millis(250), handle.eof(id)).await;
+896 | |                     let _ =
+897 | |                         tokio::time::timeout(Duration::from_millis(250), handle.close(id)).await;
+898 | |                 });
+    | |___________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#let_unit_value
+    = note: `-D clippy::let-unit-value` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::let_unit_value)]`
+help: omit the `let` binding
+    |
+894 -                 let _ = runtime.block_on(async {
+894 +                 runtime.block_on(async {
+    |
+
+error: comparison to empty slice
+   --> src/services/ftp.rs:501:8
+    |
+501 |     if parts.next()? != "" {
+    |        ^^^^^^^^^^^^^^^^^^^ help: using `!is_empty` is clearer and more explicit: `!parts.next()?.is_empty()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#comparison_to_empty
+    = note: `-D clippy::comparison-to-empty` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::comparison_to_empty)]`
+
+error: comparison to empty slice
+   --> src/services/ftp.rs:508:12
+    |
+508 |         || parts.next()? != ""
+    |            ^^^^^^^^^^^^^^^^^^^ help: using `!is_empty` is clearer and more explicit: `!parts.next()?.is_empty()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#comparison_to_empty
+
+error: methods called `from_*` usually take no `self`
+ --> src/services/vnc/clipboard.rs:5:20
+  |
+5 |     fn from_remote(&self) -> bool {
+  |                    ^^^^^
+  |
+  = help: consider choosing a less ambiguous name
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#wrong_self_convention
+  = note: `-D clippy::wrong-self-convention` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(clippy::wrong_self_convention)]`
+
+error: using `chunks_exact_mut` with a constant chunk size
+   --> src/services/vnc.rs:475:27
+    |
+475 |     for block in response.chunks_exact_mut(8) {
+    |                           ^^^^^^^^^^^^^^^^^^^ help: consider using `as_chunks_mut` instead: `as_chunks_mut::<8>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: the loop variable `i` is used to index `rgba`
+   --> src/services/vnc.rs:540:18
+    |
+540 |         for i in 0..3 {
+    |                  ^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_range_loop
+    = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator and enumerate()
+    |
+540 -         for i in 0..3 {
+540 +         for (i, <item>) in rgba.iter().enumerate().take(3) {
+    |
+
+error: this `if` statement can be collapsed
+   --> src/services/vnc.rs:641:17
+    |
+641 | /                 if let Some(text) = local {
+642 | |                     if let Ok(packet) = clipboard.upload(&text) {
+643 | |                         send(s, &packet, c)?;
+644 | |                     }
+645 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+641 ~                 if let Some(text) = local
+642 ~                     && let Ok(packet) = clipboard.upload(&text) {
+643 |                         send(s, &packet, c)?;
+644 ~                     }
+    |
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/services/vnc.rs:683:30
+    |
+683 |                         && b.chunks_exact(4).any(|v| {
+    |                              ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<4>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: this `if` statement can be collapsed
+   --> src/services/vnc.rs:787:25
+    |
+787 | /                         if data.len() >= 4
+788 | |                             && u32::from_be_bytes(data[..4].try_into().unwrap()) & (1 << 24) == 0
+789 | |                         {
+790 | |                             if let Some(packet) = reply.packet {
+...   |
+793 | |                         }
+    | |_________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+788 ~                             && u32::from_be_bytes(data[..4].try_into().unwrap()) & (1 << 24) == 0
+789 ~                             && let Some(packet) = reply.packet {
+790 |                                 send(s, &packet, c)?;
+791 ~                             }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/services/vnc.rs:804:21
+    |
+804 | /                     if control {
+805 | |                         if let Some(text) = text {
+806 | |                             if text.len() > 8192 || text.contains('\0') {
+807 | |                                 return Err(io::Error::other("Invalid clipboard text"));
+...   |
+814 | |                     }
+    | |_____________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+804 ~                     if control
+805 ~                         && let Some(text) = text {
+806 |                             if text.len() > 8192 || text.contains('\0') {
+...
+812 |                                 .map_err(|_| io::Error::other("VNC clipboard queue full"))?;
+813 ~                         }
+    |
+
+error: consider using `sort_by_key`
+  --> src/terminal/highlight.rs:69:9
+   |
+69 |         compiled.sort_by(|a, b| b.rule.precedence.cmp(&a.rule.precedence));
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_sort_by
+   = note: `-D clippy::unnecessary-sort-by` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::unnecessary_sort_by)]`
+help: try
+   |
+69 -         compiled.sort_by(|a, b| b.rule.precedence.cmp(&a.rule.precedence));
+69 +         compiled.sort_by_key(|a| std::cmp::Reverse(a.rule.precedence));
+   |
+
+error: this `if` statement can be collapsed
+  --> src/terminal/history.rs:23:9
+   |
+23 | /         if let Some(first) = cells.first() {
+24 | |             if cells.iter().all(|c| {
+25 | |                 c.width == 1
+26 | |                     && !c.continuation
+...  |
+50 | |         }
+   | |_________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+   |
+23 ~         if let Some(first) = cells.first()
+24 ~             && cells.iter().all(|c| {
+25 |                 c.width == 1
+...
+48 |                 };
+49 ~             }
+   |
+
+error: this `if` statement can be collapsed
+   --> src/terminal.rs:568:21
+    |
+568 | /                     if let Some((kind, title)) = self.sequence.split_once(';') {
+569 | |                         if kind == "0" || kind == "2" {
+570 | |                             let title: String = title
+571 | |                                 .chars()
+...   |
+580 | |                     }
+    | |_____________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+568 ~                     if let Some((kind, title)) = self.sequence.split_once(';')
+569 ~                         && (kind == "0" || kind == "2") {
+570 |                             let title: String = title
+...
+578 |                             }
+579 ~                         }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/terminal.rs:676:9
+    |
+676 | /         if let Some((row, col)) = self.last_printed {
+677 | |             if let Some(text) = unicode::extension(&self.grid[row][col].text, c) {
+678 | |                 let mut old = self.grid[row][col].clone();
+679 | |                 let width = unicode::width(&text).max(1).min(self.cols);
+...   |
+692 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+676 ~         if let Some((row, col)) = self.last_printed
+677 ~             && let Some(text) = unicode::extension(&self.grid[row][col].text, c) {
+678 |                 let mut old = self.grid[row][col].clone();
+...
+690 |                 return;
+691 ~             }
+    |
+
+error: this `if` statement can be collapsed
+    --> src/terminal.rs:1010:36
+     |
+1010 |   ...                   } else if !on {
+     |  ______________________________^
+1011 | | ...                       if let Some(saved) = self.alternate.take() {
+1012 | | ...                           let previous_cols =
+1013 | | ...                               saved.grid.first().map(Vec::len).unwrap_or(self.cols);
+...    |
+1033 | | ...                   }
+     | |_______________________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+     |
+1010 ~                             } else if !on
+1011 ~                                 && let Some(saved) = self.alternate.take() {
+1012 |                                     let previous_cols =
+ ...
+1031 |                                     }
+1032 ~                                 }
+     |
+
+error: large size difference between variants
+ --> src/remote_files/scp/source.rs:2:1
+  |
+2 | /  pub(super) enum UploadSource {
+3 | |/     File {
+4 | ||         file: tokio::fs::File,
+5 | ||         before: std::fs::Metadata,
+6 | ||     },
+  | ||_____- the largest variant contains at least 280 bytes
+7 | |      Memory(std::io::Cursor<Vec<u8>>),
+  | |      -------------------------------- the second-largest variant contains at least 32 bytes
+8 | |  }
+  | |__^ the entire enum is at least 280 bytes
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_enum_variant
+  = note: `-D clippy::large-enum-variant` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(clippy::large_enum_variant)]`
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+  |
+5 -         before: std::fs::Metadata,
+5 +         before: Box<std::fs::Metadata>,
+  |
+
+error: this `if` statement can be collapsed
+  --> src/remote_files/scp.rs:38:9
+   |
+38 | /         if let Some(channel) = self.channel.take() {
+39 | |             if let Ok(runtime) = tokio::runtime::Handle::try_current() {
+40 | |                 runtime.spawn(async move {
+41 | |                     let _ = tokio::time::timeout(Duration::from_secs(2), channel.close()).await;
+...  |
+44 | |         }
+   | |_________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+   |
+38 ~         if let Some(channel) = self.channel.take()
+39 ~             && let Ok(runtime) = tokio::runtime::Handle::try_current() {
+40 |                 runtime.spawn(async move {
+41 |                     let _ = tokio::time::timeout(Duration::from_secs(2), channel.close()).await;
+42 |                 });
+43 ~             }
+   |
+
+error: this function has too many arguments (8/7)
+   --> src/remote_files/scp.rs:396:5
+    |
+396 | /     async fn upload_source(
+397 | |         &self,
+398 | |         job: &Job,
+399 | |         mut source: UploadSource,
+...   |
+404 | |         folder: bool,
+405 | |     ) -> Result<UploadResult, String> {
+    | |_____________________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+    = note: `-D clippy::too-many-arguments` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::too_many_arguments)]`
+
+error: manual implementation of `.is_multiple_of()`
+   --> src/remote_files/scp.rs:686:8
+    |
+686 |     if bytes.len() % 2 != 0 || bytes.len() > 128 * 1024 {
+    |        ^^^^^^^^^^^^^^^^^^^^ help: replace with: `!bytes.len().is_multiple_of(2)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+    = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: this `if` statement can be collapsed
+   --> src/remote_files/transfer.rs:141:9
+    |
+141 | /         if let TransferOperation::Document(request) = &self.operation {
+142 | |             if !request.enter_commit() {
+143 | |                 return false;
+144 | |             }
+145 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+141 ~         if let TransferOperation::Document(request) = &self.operation
+142 ~             && !request.enter_commit() {
+143 |                 return false;
+144 ~             }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/remote_files/transfer/operations.rs:102:13
+    |
+102 | /             if remote_exists(sftp, destination).await? {
+103 | |                 if let Some(outcome) = conflict(*policy) {
+104 | |                     return Ok(outcome);
+105 | |                 }
+106 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+102 ~             if remote_exists(sftp, destination).await?
+103 ~                 && let Some(outcome) = conflict(*policy) {
+104 |                     return Ok(outcome);
+105 ~                 }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/remote_files/transfer/operations.rs:154:13
+    |
+154 | /             if exists {
+155 | |                 if let Some(outcome) = conflict(*policy) {
+156 | |                     return Ok(outcome);
+157 | |                 }
+158 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+154 ~             if exists
+155 ~                 && let Some(outcome) = conflict(*policy) {
+156 |                     return Ok(outcome);
+157 ~                 }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/remote_files/transfer/operations.rs:257:5
+    |
+257 | /     if existing.is_some() {
+258 | |         if let Some(outcome) = conflict(policy) {
+259 | |             return Ok(outcome);
+260 | |         }
+261 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+257 ~     if existing.is_some()
+258 ~         && let Some(outcome) = conflict(policy) {
+259 |             return Ok(outcome);
+260 ~         }
+    |
+
+error: casting to the same type is unnecessary (`u32` -> `u32`)
+   --> src/remote_files/transfer/operations/source.rs:159:36
+    |
+159 |                         .then_some(stat.st_mode as u32 & 0o777),
+    |                                    ^^^^^^^^^^^^^^^^^^^ help: try: `stat.st_mode`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+    = note: `-D clippy::unnecessary-cast` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::unnecessary_cast)]`
+
+error: this `if` statement can be collapsed
+   --> src/remote_files/transfer/operations/tree.rs:337:5
+    |
+337 | /     if exists {
+338 | |         if let Some(outcome) = conflict(policy) {
+339 | |             return Ok(outcome);
+340 | |         }
+341 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+337 ~     if exists
+338 ~         && let Some(outcome) = conflict(policy) {
+339 |             return Ok(outcome);
+340 ~         }
+    |
+
+error: casting to the same type is unnecessary (`u64` -> `u64`)
+   --> src/remote_files/transfer/local_stage.rs:332:34
+    |
+332 | ...   if held.dev() != value.st_dev as u64 || held.ino() != value.st_ino as u64 { Err("Selected merge directory or staging identity...
+    |                        ^^^^^^^^^^^^^^^^^^^ help: try: `value.st_dev`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+error: casting to the same type is unnecessary (`u64` -> `u64`)
+   --> src/remote_files/transfer/local_stage.rs:332:71
+    |
+332 | ...   if held.dev() != value.st_dev as u64 || held.ino() != value.st_ino as u64 { Err("Selected merge directory or staging identity...
+    |                                                             ^^^^^^^^^^^^^^^^^^^ help: try: `value.st_ino`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+error: unneeded `return` statement
+   --> src/remote_files/transfer/local_stage.rs:375:13
+    |
+375 | /             return std::fs::read_link(format!("/proc/self/fd/{}", file.as_raw_fd()))
+376 | |                 .map_err(|e| e.to_string());
+    | |___________________________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_return
+    = note: `-D clippy::needless-return` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_return)]`
+help: remove `return`
+    |
+375 ~             std::fs::read_link(format!("/proc/self/fd/{}", file.as_raw_fd()))
+376 ~                 .map_err(|e| e.to_string())
+    |
+
+error: the borrowed expression implements the required traits
+  --> src/ssh/auth.rs:45:39
+   |
+45 |       let legacy = serde_json::to_value(&(
+   |  _______________________________________^
+46 | |         session.host.as_str(),
+47 | |         session.port,
+48 | |         session.user.as_str(),
+...  |
+51 | |         session.ssh_engine,
+52 | |     ))
+   | |_____^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_borrows_for_generic_args
+   = note: `-D clippy::needless-borrows-for-generic-args` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::needless_borrows_for_generic_args)]`
+help: change this to
+   |
+45 ~     let legacy = serde_json::to_value((
+46 +         session.host.as_str(),
+47 +         session.port,
+48 +         session.user.as_str(),
+49 +         session.key.as_str(),
+50 +         session.jump.as_str(),
+51 +         session.ssh_engine,
+52 ~     ))
+   |
+
+error: this `if` statement can be collapsed
+   --> src/ssh/auth.rs:322:13
+    |
+322 | /             if let Some(agent_endpoint) = agent_endpoint {
+323 | |                 if let Ok(mut agent) = agent_endpoint.connect().await {
+324 | |                     if let Ok(identities) = agent.request_identities().await {
+325 | |                         for identity in identities.into_iter().take(32) {
+...   |
+358 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+322 ~             if let Some(agent_endpoint) = agent_endpoint
+323 ~                 && let Ok(mut agent) = agent_endpoint.connect().await {
+324 |                     if let Ok(identities) = agent.request_identities().await {
+...
+356 |                     }
+357 ~                 }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/ssh/auth.rs:323:17
+    |
+323 | /                 if let Ok(mut agent) = agent_endpoint.connect().await {
+324 | |                     if let Ok(identities) = agent.request_identities().await {
+325 | |                         for identity in identities.into_iter().take(32) {
+326 | |                             let hash = handle
+...   |
+357 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+323 ~                 if let Ok(mut agent) = agent_endpoint.connect().await
+324 ~                     && let Ok(identities) = agent.request_identities().await {
+325 |                         for identity in identities.into_iter().take(32) {
+...
+355 |                         }
+356 ~                     }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/ssh/shell_integration.rs:152:5
+    |
+152 | /     if let Some((address, scope)) = host.split_once('%') {
+153 | |         if let Ok(ip) = address.parse::<std::net::Ipv6Addr>() {
+154 | |             return format!("{ip}%{scope}");
+155 | |         }
+156 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+152 ~     if let Some((address, scope)) = host.split_once('%')
+153 ~         && let Ok(ip) = address.parse::<std::net::Ipv6Addr>() {
+154 |             return format!("{ip}%{scope}");
+155 ~         }
+    |
+
+error: this function has too many arguments (12/7)
+   --> src/ssh/worker.rs:354:1
+    |
+354 | / pub(super) async fn run(
+355 | |     config: ConnectionConfig,
+356 | |     purpose: Purpose,
+357 | |     display: XDisplayBinding,
+...   |
+366 | |     editor_endpoint: Arc<std::sync::Mutex<crate::remote_files::editor::Endpoint>>,
+367 | | ) -> Result<(), String> {
+    | |_______________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+
+error: you seem to be trying to use `match` for destructuring a single pattern. Consider using `if let`
+   --> src/ssh/worker.rs:858:13
+    |
+858 | /             match command {
+859 | |                 ConnectionCommand::Input(bytes) => {
+860 | |                     let result = writer.data(bytes.as_slice()).await;
+861 | |                     pending.fetch_sub(bytes.len(), Ordering::AcqRel);
+...   |
+864 | |                 _ => {} // Other controls use independent coalescing channels.
+865 | |             }
+    | |_____________^
+    |
+    = note: you might want to preserve the comments from inside the `match`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#single_match
+help: try
+    |
+858 ~             if let ConnectionCommand::Input(bytes) = command {
+859 +                 let result = writer.data(bytes.as_slice()).await;
+860 +                 pending.fetch_sub(bytes.len(), Ordering::AcqRel);
+861 +                 result.map_err(|e| e.to_string())?;
+862 +             }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/ssh/worker.rs:887:5
+    |
+887 | /     if let Some(backend) = &scp {
+888 | |         if let Some((request, path)) = pending_listing.take() {
+889 | |             let backend = backend.clone();
+890 | |             jobs.spawn(async move {
+...   |
+903 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+887 ~     if let Some(backend) = &scp
+888 ~         && let Some((request, path)) = pending_listing.take() {
+889 |             let backend = backend.clone();
+...
+901 |             });
+902 ~         }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/ssh/worker.rs:963:13
+    |
+963 | /             if file_jobs.is_empty() {
+964 | |                 if let Some(job) = file_pending.pop_front() {
+965 | |                     file_jobs.spawn(crate::remote_files::transfer::run_scp(job, backend.clone()));
+966 | |                 }
+967 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+963 ~             if file_jobs.is_empty()
+964 ~                 && let Some(job) = file_pending.pop_front() {
+965 |                     file_jobs.spawn(crate::remote_files::transfer::run_scp(job, backend.clone()));
+966 ~                 }
+    |
+
+error: length comparison to one
+   --> src/ssh/worker.rs:969:19
+    |
+969 |             while file_jobs.len() < 1 {
+    |                   ^^^^^^^^^^^^^^^^^^^ help: using `is_empty` is clearer and more explicit: `file_jobs.is_empty()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#len_zero
+    = note: `-D clippy::len-zero` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::len_zero)]`
+
+error: this `if` statement can be collapsed
+    --> src/ssh/worker.rs:998:20
+     |
+ 998 |               } else if let Some(session) = &sftp {
+     |  ____________________^
+ 999 | |                 if let Some((request, path)) = pending_listing.take() {
+1000 | |                     let session = session.clone();
+1001 | |                     jobs.spawn(async move { (request, listing(session, id, request, path).await) });
+1002 | |                 }
+1003 | |             }
+     | |_____________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+     |
+ 998 ~             } else if let Some(session) = &sftp
+ 999 ~                 && let Some((request, path)) = pending_listing.take() {
+1000 |                     let session = session.clone();
+1001 |                     jobs.spawn(async move { (request, listing(session, id, request, path).await) });
+1002 ~                 }
+     |
+
+error: this let-binding has unit value
+   --> src/ssh/mod.rs:268:13
+    |
+268 | / ...   let result=match tokio::runtime::Builder::new_current_thread().enable_all().build() {
+269 | | ...       Ok(runtime)=>runtime.block_on(async {
+270 | | ...           let result=tokio::select! { biased;
+271 | | ...               _=cancelled.changed()=>Err("Connection cancelled".into()),
+...   |
+278 | | ...       Err(_)=>{*final_state.lock().unwrap_or_else(|p|p.into_inner())=Some(ConnectionEvent::Exited{connection:id,message:"Coul...
+279 | | ...   };
+    | |________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#let_unit_value
+help: omit the `let` binding and replace variable usages with `()`
+    |
+268 ~             match tokio::runtime::Builder::new_current_thread().enable_all().build() {
+269 |                 Ok(runtime)=>runtime.block_on(async {
+...
+279 |             };
+280 ~             let _=(); done.store(true,Ordering::Release);
+    |
+
+error: this let-binding has unit value
+   --> src/ssh/mod.rs:280:13
+    |
+280 |             let _=result; done.store(true,Ordering::Release);
+    |             ^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#let_unit_value
+help: omit the `let` binding
+    |
+280 -             let _=result; done.store(true,Ordering::Release);
+280 +             result; done.store(true,Ordering::Release);
+    |
+
+error: this `if` statement can be collapsed
+  --> src/ssh/config.rs:66:9
+   |
+66 | /         if let Some(path) = &self.config_file {
+67 | |             if path.as_os_str().is_empty() {
+68 | |                 return Err("Choose an SSH configuration file.".into());
+69 | |             }
+70 | |         }
+   | |_________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+   |
+66 ~         if let Some(path) = &self.config_file
+67 ~             && path.as_os_str().is_empty() {
+68 |                 return Err("Choose an SSH configuration file.".into());
+69 ~             }
+   |
+
+error: this `if` statement can be collapsed
+   --> src/ssh/config.rs:184:13
+    |
+184 | /             if let Some(value) = config.get("proxyjump") {
+185 | |                 if value.text != "none" {
+186 | |                     report.unsupported.push(ConfigField {
+187 | |                         field: "Nested ProxyJump".into(),
+...   |
+193 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+184 ~             if let Some(value) = config.get("proxyjump")
+185 ~                 && value.text != "none" {
+186 |                     report.unsupported.push(ConfigField {
+...
+191 |                     });
+192 ~                 }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/ssh/config.rs:298:9
+    |
+298 | /         if let Some(value) = rest.first_mut() {
+299 | |             if value.starts_with('=') {
+300 | |                 *value = value[1..].into();
+301 | |             }
+302 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+298 ~         if let Some(value) = rest.first_mut()
+299 ~             && value.starts_with('=') {
+300 |                 *value = value[1..].into();
+301 ~             }
+    |
+
+error: very complex type used. Consider factoring parts into `type` definitions
+  --> src/sessions/import_moba.rs:16:23
+   |
+16 |     let mut sections: Vec<(String, Vec<(usize, String, String)>)> = Vec::new();
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+   = note: `-D clippy::type-complexity` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::type_complexity)]`
+
+error: very complex type used. Consider factoring parts into `type` definitions
+  --> src/sessions/import_putty.rs:52:23
+   |
+52 |     let mut sessions: Vec<(String, usize, Vec<(usize, String, String)>)> = Vec::new();
+   |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+
+error: manual implementation of `.is_multiple_of()`
+  --> src/sessions/mod.rs:15:12
+   |
+15 |         if (bytes.len() - 2) % 2 != 0 {
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `!(bytes.len() - 2).is_multiple_of(2)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: using `chunks_exact` with a constant chunk size
+  --> src/sessions/mod.rs:19:32
+   |
+19 |         let words = bytes[2..].chunks_exact(2).map(|b| {
+   |                                ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: stripping a prefix manually
+  --> src/platform/path_map.rs:35:24
+   |
+35 |             let tail = &normalized[2..];
+   |                        ^^^^^^^^^^^^^^^^
+   |
+note: the prefix was tested here
+  --> src/platform/path_map.rs:34:20
+   |
+34 |         let tail = if normalized.starts_with("\\\\") {
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_strip
+   = note: `-D clippy::manual-strip` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::manual_strip)]`
+help: try using the `strip_prefix` method
+   |
+34 ~         let tail = if let Some(tail) = normalized.strip_prefix("\\\\") {
+35 ~             let parts: Vec<_> = tail.split('\\').collect();
+   |
+
+error: manual implementation of `.is_multiple_of()`
+  --> src/platform/registry_fs.rs:98:20
+   |
+98 |                 if self.bytes.len() % 2 != 0 {
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `!self.bytes.len().is_multiple_of(2)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/platform/registry_fs.rs:103:22
+    |
+103 |                     .chunks_exact(2)
+    |                      ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: manual implementation of `.is_multiple_of()`
+   --> src/platform/registry_fs.rs:154:26
+    |
+154 |             1 | 2 | 7 if self.bytes.len() % 2 == 0 => String::from_utf16_lossy(
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace with: `self.bytes.len().is_multiple_of(2)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/platform/registry_fs.rs:157:22
+    |
+157 |                     .chunks_exact(2)
+    |                      ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<2>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: this `if` statement can be collapsed
+   --> src/platform/windows_integration.rs:307:13
+    |
+307 | /             if let Some(actual) = store.snapshot_cancellable(key, cancel)? {
+308 | |                 if actual.values().any(|value| {
+309 | |                     matches!(value.kind, 1 | 2 | 7)
+310 | |                         && value.display().to_lowercase().contains(&executable)
+...   |
+314 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+307 ~             if let Some(actual) = store.snapshot_cancellable(key, cancel)?
+308 ~                 && actual.values().any(|value| {
+309 |                     matches!(value.kind, 1 | 2 | 7)
+...
+312 |                     return Err("This executable still has Explorer/protocol/file registrations. Use Tools > Windows Explorer integration > Remove mine before uninstalling. Edited registrations are preserved and require inspection.".into());
+313 ~                 }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/cli.rs:305:9
+    |
+305 | /         if let Some(path) = path {
+306 | |             if !path.is_absolute() {
+307 | |                 *path = base.join(&*path)
+308 | |             }
+309 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+305 ~         if let Some(path) = path
+306 ~             && !path.is_absolute() {
+307 |                 *path = base.join(&*path)
+308 ~             }
+    |
+
+error: very complex type used. Consider factoring parts into `type` definitions
+  --> src/credentials/format.rs:93:6
+   |
+93 | ) -> Result<(Header, Zeroizing<[u8; 32]>, Zeroizing<Vec<u8>>), String> {
+   |      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#type_complexity
+
+error: this `if` statement can be collapsed
+   --> src/credentials/mod.rs:104:17
+    |
+104 | /                 if let SshSecretKind::KeyPassphrase { key_digest } = kind {
+105 | |                     if !digest(key_digest) {
+106 | |                         return Err("Invalid key credential binding.".into());
+107 | |                     }
+108 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+104 ~                 if let SshSecretKind::KeyPassphrase { key_digest } = kind
+105 ~                     && !digest(key_digest) {
+106 |                         return Err("Invalid key credential binding.".into());
+107 ~                     }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/credentials/keys.rs:116:13
+    |
+116 | /             if let Some((name, v)) = line.split_once(':') {
+117 | |                 if matches!(
+118 | |                     name,
+119 | |                     "Argon2-Memory" | "Argon2-Passes" | "Argon2-Parallelism"
+...   |
+135 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+116 ~             if let Some((name, v)) = line.split_once(':')
+117 ~                 && matches!(
+118 |                     name,
+...
+133 |                     }
+134 ~                 }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/credentials/keys.rs:270:9
+    |
+270 | /         if let Some(passphrase) = settings.passphrase {
+271 | |             if !passphrase.expose().is_empty() {
+272 | |                 key = key
+273 | |                     .encrypt(&mut OsRandom, passphrase.expose())
+...   |
+276 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+270 ~         if let Some(passphrase) = settings.passphrase
+271 ~             && !passphrase.expose().is_empty() {
+272 |                 key = key
+273 |                     .encrypt(&mut OsRandom, passphrase.expose())
+274 |                     .map_err(|_| "Private-key encryption failed")?
+275 ~             }
+    |
+
+error: using `chunks_exact_mut` with a constant chunk size
+  --> src/desktop/vnc_encoding.rs:37:44
+   |
+37 |             for pixel in frame.pixels[row].chunks_exact_mut(4) {
+   |                                            ^^^^^^^^^^^^^^^^^^^ help: consider using `as_chunks_mut` instead: `as_chunks_mut::<4>().0`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact_mut` with a constant chunk size
+  --> src/desktop/vnc_encoding.rs:59:14
+   |
+59 |             .chunks_exact_mut(4)
+   |              ^^^^^^^^^^^^^^^^^^^ help: consider using `as_chunks_mut` instead: `as_chunks_mut::<4>().0.iter_mut()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact` with a constant chunk size
+  --> src/desktop/vnc_encoding.rs:60:23
+   |
+60 |             .zip(data.chunks_exact(4))
+   |                       ^^^^^^^^^^^^^^^
+   |
+help: consider using `as_chunks::<4>()` instead
+  --> src/desktop/vnc_encoding.rs:60:23
+   |
+60 |             .zip(data.chunks_exact(4))
+   |                       ^^^^^^^^^^^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact_mut` with a constant chunk size
+   --> src/desktop/vnc_encoding.rs:198:33
+    |
+198 |         for (col, pixel) in row.chunks_exact_mut(4).enumerate() {
+    |                                 ^^^^^^^^^^^^^^^^^^^ help: consider using `as_chunks_mut` instead: `as_chunks_mut::<4>().0.iter_mut()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact_mut` with a constant chunk size
+   --> src/desktop/vnc.rs:193:25
+    |
+193 |     for block in result.chunks_exact_mut(8) {
+    |                         ^^^^^^^^^^^^^^^^^^^ help: consider using `as_chunks_mut` instead: `as_chunks_mut::<8>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: manually reimplementing `div_ceil`
+   --> src/desktop/vnc.rs:595:41
+    |
+595 | ...                   for _ in 0..((delta.unsigned_abs() as usize + 119) / 120).min(8) {
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: consider using `.div_ceil()`: `(delta.unsigned_abs() as usize).div_ceil(120)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_div_ceil
+    = note: `-D clippy::manual-div-ceil` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_div_ceil)]`
+
+error: large size difference between variants
+  --> src/desktop/wire.rs:36:1
+   |
+36 | /  pub enum Input {
+37 | |      Configure(Config),
+   | |      ----------------- the largest variant contains at least 360 bytes
+38 | |      Trust {
+39 | |          id: u64,
+...  |
+42 | |/     Authenticate {
+43 | ||         id: u64,
+44 | ||         user: String,
+45 | ||         password: String,
+46 | ||         domain: String,
+47 | ||     },
+   | ||_____- the second-largest variant contains at least 80 bytes
+...  |
+76 | |      Close,
+77 | |  }
+   | |__^ the entire enum is at least 360 bytes
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#large_enum_variant
+help: consider boxing the large fields or introducing indirection in some other way to reduce the total size of the enum
+   |
+37 -     Configure(Config),
+37 +     Configure(Box<Config>),
+   |
+
+error: this function has too many arguments (8/7)
+   --> src/desktop/mod.rs:616:1
+    |
+616 | / fn supervise(
+617 | |     path: PathBuf,
+618 | |     mut config: wire::Config,
+619 | |     stream: Option<std::net::TcpStream>,
+...   |
+624 | |     cancel: Arc<AtomicBool>,
+625 | | ) -> Result<(), String> {
+    | |_______________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+
+error: this `if` statement can be collapsed
+    --> src/desktop/mod.rs:1048:5
+     |
+1048 | /     if let DesktopInput::Clipboard { text } = input {
+1049 | |         if !clipboard.to_remote() || text.len() > 8192 {
+1050 | |             return Err("Clipboard upload is disabled or exceeds 8192 UTF-8 bytes".into());
+1051 | |         }
+1052 | |     }
+     | |_____^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+     |
+1048 ~     if let DesktopInput::Clipboard { text } = input
+1049 ~         && (!clipboard.to_remote() || text.len() > 8192) {
+1050 |             return Err("Clipboard upload is disabled or exceeds 8192 UTF-8 bytes".into());
+1051 ~         }
+     |
+
+error: this `if` statement can be collapsed
+   --> src/protocols/mod.rs:298:17
+    |
+298 | /                 if let Wire::Rlogin(login) = &mut protocol {
+299 | |                     if login.receive_control(&stream, size, &mut pending)? {
+300 | |                         flush_output(output_queue, &mut display);
+301 | |                     }
+302 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+298 ~                 if let Wire::Rlogin(login) = &mut protocol
+299 ~                     && login.receive_control(&stream, size, &mut pending)? {
+300 |                         flush_output(output_queue, &mut display);
+301 ~                     }
+    |
+
+error: casting to the same type is unnecessary (`u64` -> `u64`)
+  --> src/tools/capture/staging.rs:37:26
+   |
+37 |         Ok(held.dev() == named.st_dev as u64 && held.ino() == named.st_ino as u64)
+   |                          ^^^^^^^^^^^^^^^^^^^ help: try: `named.st_dev`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+error: casting to the same type is unnecessary (`u64` -> `u64`)
+  --> src/tools/capture/staging.rs:37:63
+   |
+37 |         Ok(held.dev() == named.st_dev as u64 && held.ino() == named.st_ino as u64)
+   |                                                               ^^^^^^^^^^^^^^^^^^^ help: try: `named.st_ino`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+error: using `chunks_exact_mut` with a constant chunk size
+   --> src/tools/capture.rs:342:75
+    |
+342 |                 for (field, destination) in fields.into_iter().zip(record.chunks_exact_mut(4)) {
+    |                                                                           ^^^^^^^^^^^^^^^^^^^
+    |
+help: consider using `as_chunks_mut::<4>()` instead
+   --> src/tools/capture.rs:342:75
+    |
+342 |                 for (field, destination) in fields.into_iter().zip(record.chunks_exact_mut(4)) {
+    |                                                                           ^^^^^^^^^^^^^^^^^^^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: this `if` statement can be collapsed
+   --> src/x11/xdmcp.rs:218:17
+    |
+218 | /                 if allowed {
+219 | |                     if let Some((hostname, status)) = parse_willing(&buffer[..n]) {
+220 | |                         results.insert(
+221 | |                             source,
+...   |
+229 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+218 ~                 if allowed
+219 ~                     && let Some((hostname, status)) = parse_willing(&buffer[..n]) {
+220 |                         results.insert(
+...
+227 |                         );
+228 ~                     }
+    |
+
+error: manual `!RangeInclusive::contains` implementation
+   --> src/x11/xdmcp.rs:303:8
+    |
+303 |       if display < 1
+    |  ________^
+304 | |         || display > 59535
+    | |__________________________^ help: use: `!(1..=59535).contains(&display)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_range_contains
+    = note: `-D clippy::manual-range-contains` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_range_contains)]`
+
+error: this `if` statement can be collapsed
+   --> src/x11/xdmcp_engine.rs:261:9
+    |
+261 | /         if let Ok(n) = log.read(&mut buffer) {
+262 | |             if diagnostics.len() < 4096 {
+263 | |                 diagnostics.extend_from_slice(&buffer[..n.min(4096 - diagnostics.len())]);
+264 | |             }
+265 | |         }
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+261 ~         if let Ok(n) = log.read(&mut buffer)
+262 ~             && diagnostics.len() < 4096 {
+263 |                 diagnostics.extend_from_slice(&buffer[..n.min(4096 - diagnostics.len())]);
+264 ~             }
+    |
+
+error: this `if` statement can be collapsed
+  --> src/x11/xdmcp_listener.rs:16:9
+   |
+16 | /         if let Ok(link) = std::fs::read_link(entry.path()) {
+17 | |             if let Some(inode) = link
+18 | |                 .to_str()
+19 | |                 .and_then(|s| s.strip_prefix("socket:["))
+...  |
+25 | |         }
+   | |_________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+   |
+16 ~         if let Ok(link) = std::fs::read_link(entry.path())
+17 ~             && let Some(inode) = link
+18 |                 .to_str()
+...
+23 |                 owned.insert(inode);
+24 ~             }
+   |
+
+error: manual `Range::contains` implementation
+  --> src/games/terminal/blocks.rs:92:33
+   |
+92 |             x >= 0 && x < 10 && y >= 0 && y < 20 && self.board[y as usize * 10 + x as usize] == 0
+   |                                 ^^^^^^^^^^^^^^^^ help: use: `(0..20).contains(&y)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_range_contains
+
+error: manual `Range::contains` implementation
+  --> src/games/terminal/blocks.rs:92:13
+   |
+92 |             x >= 0 && x < 10 && y >= 0 && y < 20 && self.board[y as usize * 10 + x as usize] == 0
+   |             ^^^^^^^^^^^^^^^^ help: use: `(0..10).contains(&x)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_range_contains
+
+error: using `contains()` instead of `iter().any()` is more efficient
+   --> src/games/terminal/blocks.rs:102:27
+    |
+102 |             .filter(|row| row.iter().any(|&x| x == 0))
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `row.contains(&0)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_contains
+    = note: `-D clippy::manual-contains` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_contains)]`
+
+error: manual implementation of `.is_multiple_of()`
+   --> src/games/terminal/invaders.rs:144:20
+    |
+144 |                 if self.ticks % 4 == 0 {
+    |                    ^^^^^^^^^^^^^^^^^^^ help: replace with: `self.ticks.is_multiple_of(4)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: this `if` statement can be collapsed
+   --> src/games/terminal/invaders.rs:161:17
+    |
+161 | /                 if self.ticks % 12 == 0 && self.enemy_shots.len() < 8 {
+162 | |                     if let Some(e) = self
+163 | |                         .enemies
+164 | |                         .iter()
+...   |
+169 | |                 }
+    | |_________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+161 ~                 if self.ticks % 12 == 0 && self.enemy_shots.len() < 8
+162 ~                     && let Some(e) = self
+163 |                         .enemies
+...
+167 |                         self.enemy_shots.push((e.x, e.y + 1));
+168 ~                     }
+    |
+
+error: manual implementation of `.is_multiple_of()`
+   --> src/games/terminal/invaders.rs:161:20
+    |
+161 |                 if self.ticks % 12 == 0 && self.enemy_shots.len() < 8 {
+    |                    ^^^^^^^^^^^^^^^^^^^^ help: replace with: `self.ticks.is_multiple_of(12)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: manual implementation of `.is_multiple_of()`
+   --> src/games/terminal/mod.rs:175:41
+    |
+175 |         if !(3..=15).contains(&size) || size % 2 == 0 {
+    |                                         ^^^^^^^^^^^^^ help: replace with: `size.is_multiple_of(2)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: could not compile `harbor-workspace` (lib) due to 91 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: items after a test module
+   --> src/http_server.rs:235:1
+    |
+235 |   mod tests {
+    |   ^^^^^^^^^
+...
+309 |   fn serve(mut stream: TcpStream, share: &Share, stop: &AtomicBool) -> Result<String, String> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+315 | / fn serve_request(
+316 | |     stream: &mut TcpStream,
+317 | |     share: &Share,
+318 | |     stop: &AtomicBool,
+319 | | ) -> io::Result<&'static str> {
+    | |_____________________________^
+...
+396 |   struct Request<'a> {
+    |   ^^^^^^^^^^^^^^^^^^
+...
+402 |   impl<'a> Request<'a> {
+    |   ^^^^^^^^^^^^^^^^^^^^
+...
+450 |   impl Share {
+    |   ^^^^^^^^^^
+...
+466 |   fn check_transfer(deadline: Instant, stop: &AtomicBool) -> io::Result<()> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+476 | / fn read_until(
+477 | |     stream: &mut TcpStream,
+478 | |     buffer: &mut [u8],
+479 | |     deadline: Instant,
+480 | |     stop: &AtomicBool,
+481 | | ) -> io::Result<usize> {
+    | |______________________^
+...
+497 | / fn response_headers(
+498 | |     stream: &mut TcpStream,
+499 | |     status: &str,
+500 | |     size: Option<u64>,
+501 | |     extra: &str,
+502 | | ) -> io::Result<()> {
+    | |___________________^
+...
+506 |   fn render_headers(status: &str, size: Option<u64>, extra: &str) -> String {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+518 | / fn write_transfer(
+519 | |     writer: &mut impl Write,
+520 | |     mut bytes: &[u8],
+521 | |     deadline: Instant,
+522 | |     stop: &AtomicBool,
+523 | | ) -> io::Result<()> {
+    | |___________________^
+...
+536 |   fn empty(stream: &mut TcpStream, status: &'static str, extra: &str) -> io::Result<&'static str> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+546 |   fn open_directory(root: &Dir, path: &Path) -> io::Result<Dir> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+554 |   fn open_regular(dir: &Dir, name: &std::ffi::OsStr) -> io::Result<File> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+572 | / fn list_directory(
+573 | |     stream: &mut TcpStream,
+574 | |     dir: &Dir,
+575 | |     path: &Path,
+...   |
+578 | |     deadline: Instant,
+579 | | ) -> io::Result<&'static str> {
+    | |_____________________________^
+...
+630 | / fn listing_over_limit(
+631 | |     stream: &mut TcpStream,
+632 | |     head: bool,
+633 | |     deadline: Instant,
+634 | |     stop: &AtomicBool,
+635 | | ) -> io::Result<&'static str> {
+    | |_____________________________^
+...
+650 |   enum ByteRange {
+    |   ^^^^^^^^^^^^^^
+...
+656 |   fn byte_range(value: Option<&str>, size: u64) -> ByteRange {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+696 |   fn decimal(value: &str) -> Option<u64> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+703 | / fn download(
+704 | |     stream: &mut TcpStream,
+705 | |     mut file: File,
+706 | |     request: &Request<'_>,
+...   |
+709 | |     deadline: Instant,
+710 | | ) -> io::Result<&'static str> {
+    | |_____________________________^
+...
+768 |   struct StagedUpload<'a> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^
+...
+773 |   impl Drop for StagedUpload<'_> {
+    |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+779 | / fn upload(
+780 | |     stream: &mut TcpStream,
+781 | |     share: &Share,
+782 | |     request: &Request<'_>,
+...   |
+786 | |     stop: &AtomicBool,
+787 | | ) -> io::Result<&'static str> {
+    | |_____________________________^
+...
+873 | / fn write_upload(
+874 | |     stream: &mut TcpStream,
+875 | |     file: &mut File,
+876 | |     length: u64,
+...   |
+879 | |     stop: &AtomicBool,
+880 | | ) -> io::Result<()> {
+    | |___________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+    = note: `-D clippy::items-after-test-module` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::items_after_test_module)]`
+    = help: move the items to before the test module was defined
+
+error: manual implementation of `.is_multiple_of()`
+    --> src/services/nfs.rs:1196:19
+     |
+1196 |             while v.len() % 4 != 0 {
+     |                   ^^^^^^^^^^^^^^^^ help: replace with: `!v.len().is_multiple_of(4)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+     = note: `-D clippy::manual-is-multiple-of` implied by `-D warnings`
+     = help: to override `-D warnings` add `#[allow(clippy::manual_is_multiple_of)]`
+
+error: used `assert_eq!` with a literal bool
+   --> src/services/vnc/wayland/fixture.rs:161:9
+    |
+161 | /         assert_eq!(
+162 | |             bool::try_from(opts.get("multiple").unwrap()).unwrap(),
+163 | |             false
+164 | |         );
+    | |_________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#bool_assert_comparison
+    = note: `-D clippy::bool-assert-comparison` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::bool_assert_comparison)]`
+help: replace it with `assert!(..)`
+    |
+161 ~         assert!(
+162 ~             !bool::try_from(opts.get("multiple").unwrap()).unwrap()
+    |
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/services/vnc/wayland/fixture.rs:376:20
+    |
+376 |     assert!(a.rgba.chunks_exact(4).all(|p| p[3] == 255));
+    |                    ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<4>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+    = note: `-D clippy::chunks-exact-to-as-chunks` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::chunks_exact_to_as_chunks)]`
+
+error: using `chunks_exact` with a constant chunk size
+   --> src/services/vnc/wayland/fixture.rs:379:14
+    |
+379 |             .chunks_exact(4)
+    |              ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<4>().0.iter()`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: using `chunks_exact_mut` with a constant chunk size
+   --> src/services/vnc.rs:475:27
+    |
+475 |     for block in response.chunks_exact_mut(8) {
+    |                           ^^^^^^^^^^^^^^^^^^^ help: consider using `as_chunks_mut` instead: `as_chunks_mut::<8>().0`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: this `if` statement can be collapsed
+   --> src/services/vnc_service_tests.rs:504:13
+    |
+504 | /             if let Some(x11rb::protocol::Event::KeyRelease(event)) = x.poll_for_event().unwrap() {
+505 | |                 if event.detail == held_code {
+506 | |                     break;
+507 | |                 }
+508 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+504 ~             if let Some(x11rb::protocol::Event::KeyRelease(event)) = x.poll_for_event().unwrap()
+505 ~                 && event.detail == held_code {
+506 |                     break;
+507 ~                 }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/services/vnc_service_tests.rs:698:13
+    |
+698 | /             if let Some(Event::SelectionNotify(e)) = x.poll_for_event().unwrap() {
+699 | |                 if e.property == property {
+700 | |                     break;
+701 | |                 }
+702 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+698 ~             if let Some(Event::SelectionNotify(e)) = x.poll_for_event().unwrap()
+699 ~                 && e.property == property {
+700 |                     break;
+701 ~                 }
+    |
+
+error: this `if` statement can be collapsed
+   --> src/services/vnc_service_tests.rs:831:13
+    |
+831 | /             if let Some(Event::SelectionNotify(e)) = x.poll_for_event().unwrap() {
+832 | |                 if e.property == property {
+833 | |                     break;
+834 | |                 }
+835 | |             }
+    | |_____________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+    |
+831 ~             if let Some(Event::SelectionNotify(e)) = x.poll_for_event().unwrap()
+832 ~                 && e.property == property {
+833 |                     break;
+834 ~                 }
+    |
+
+error: items after a test module
+   --> src/remote_files/editor.rs:443:1
+    |
+443 |   mod review_tests {
+    |   ^^^^^^^^^^^^^^^^
+...
+523 | / pub(crate) async fn loaded(
+524 | |     request: &EditorRequest,
+525 | |     root: PathBuf,
+526 | |     bytes: Vec<u8>,
+527 | |     metadata: Metadata,
+528 | | ) -> Result<TransferOutcome, String> {
+    | |____________________________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+    = help: move the items to before the test module was defined
+
+error: manual implementation of `.is_multiple_of()`
+   --> src/remote_files/scp.rs:686:8
+    |
+686 |     if bytes.len() % 2 != 0 || bytes.len() > 128 * 1024 {
+    |        ^^^^^^^^^^^^^^^^^^^^ help: replace with: `!bytes.len().is_multiple_of(2)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_is_multiple_of
+
+error: this `if` statement can be collapsed
+  --> src/remote_files/transfer/operations/tree.rs:28:9
+   |
+28 | /         if let Some(suffix) = stem.strip_prefix(prefix) {
+29 | |             if suffix.chars().count() == 1
+30 | |                 && suffix
+31 | |                     .chars()
+...  |
+37 | |         }
+   | |_________^
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+help: collapse nested if block
+   |
+28 ~         if let Some(suffix) = stem.strip_prefix(prefix)
+29 ~             && suffix.chars().count() == 1
+30 |                 && suffix
+...
+35 |                 return false;
+36 ~             }
+   |
+
+error: items after a test module
+   --> src/remote_files/transfer/folder_archive/unix.rs:282:1
+    |
+282 | mod tests {
+    | ^^^^^^^^^
+...
+353 | pub(crate) async fn finalize(root: File, modes: FolderModes) -> Result<(), String> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+    = help: move the items to before the test module was defined
+
+error: items after a test module
+   --> src/ssh/auth.rs:455:1
+    |
+455 | mod tests {
+    | ^^^^^^^^^
+...
+470 | fn key_digest(path: &str) -> Option<String> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+490 | pub fn gateway_reference_key(host: &str, port: u16, user: &str) -> String {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+    = help: move the items to before the test module was defined
+
+error: items after a test module
+    --> src/ssh/worker.rs:1061:1
+     |
+1061 |   mod budget_tests {
+     |   ^^^^^^^^^^^^^^^^
+...
+1081 | / async fn handshake<T>(
+1082 | |     future: impl std::future::Future<Output = Result<T, russh::Error>>,
+1083 | |     timeout: Duration,
+1084 | |     prompts: &Challenges,
+1085 | |     label: &str,
+1086 | | ) -> Result<T, String> {
+     | |______________________^
+...
+1108 | / async fn report_environment_failure(
+1109 | |     events: &mpsc::Sender<ConnectionEvent>,
+1110 | |     id: ConnectionId,
+1111 | |     error: &str,
+1112 | | ) -> Result<(), String> {
+     | |_______________________^
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+     = help: move the items to before the test module was defined
+
+error: using `chunks_exact` with a constant chunk size
+  --> src/desktop/vnc_tests.rs:37:10
+   |
+37 |         .chunks_exact(4)
+   |          ^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<4>().0.iter()`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: `format!` in `assert!` args
+   --> src/x11/xdmcp_engine.rs:555:13
+    |
+555 | /             assert!(
+556 | |                 start.elapsed() < Duration::from_secs(5),
+557 | |                 "xdm did not answer: {}",
+558 | |                 format!(
+...   |
+563 | |             );
+    | |_____________^
+    |
+    = help: combine the `format!(..)` arguments with the outer `assert!(..)` call
+    = help: or consider changing `format!` to `format_args!`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#format_in_format_args
+    = note: `-D clippy::format-in-format-args` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::format_in_format_args)]`
+
+error: `format!` in `panic!` args
+   --> src/x11/xdmcp_engine.rs:576:17
+    |
+576 | /                 panic!(
+577 | |                     "{e}; xdm: {}",
+578 | |                     format!(
+579 | |                         "{} {}",
+...   |
+583 | |                 )
+    | |_________________^
+    |
+    = help: combine the `format!(..)` arguments with the outer `panic!(..)` call
+    = help: or consider changing `format!` to `format_args!`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#format_in_format_args
+
+error: `format!` in `assert!` args
+   --> src/x11/xdmcp_engine.rs:590:13
+    |
+590 | /             assert!(
+591 | |                 session.is_running().unwrap(),
+592 | |                 "engine: {}; xdm: {}",
+593 | |                 String::from_utf8_lossy(&session.diagnostics),
+...   |
+599 | |             );
+    | |_____________^
+    |
+    = help: combine the `format!(..)` arguments with the outer `assert!(..)` call
+    = help: or consider changing `format!` to `format_args!`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#format_in_format_args
+
+error: `format!` in `assert!` args
+   --> src/x11/xdmcp_engine.rs:601:13
+    |
+601 | /             assert!(
+602 | |                 start.elapsed() < Duration::from_secs(8),
+603 | |                 "xdm did not manage the display: {}",
+604 | |                 format!(
+...   |
+609 | |             );
+    | |_____________^
+    |
+    = help: combine the `format!(..)` arguments with the outer `assert!(..)` call
+    = help: or consider changing `format!` to `format_args!`
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#format_in_format_args
+
+error: using `chunks_exact` with a constant chunk size
+  --> src/browser/native_macos.rs:34:30
+   |
+34 |         for entry in entries.chunks_exact(20) {
+   |                              ^^^^^^^^^^^^^^^^ help: consider using `as_chunks` instead: `as_chunks::<20>().0`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#chunks_exact_to_as_chunks
+
+error: manual `RangeInclusive::contains` implementation
+   --> src/games/terminal/blocks.rs:287:24
+    |
+287 |                       && y >= i32::MIN
+    |  ________________________^
+288 | |                     && y <= i32::MIN + 3));
+    | |________________________________________^ help: use: `(i32::MIN..=i32::MIN + 3).contains(&y)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_range_contains
+
+error: manual `RangeInclusive::contains` implementation
+   --> src/games/terminal/blocks.rs:285:56
+    |
+285 |                   assert!(p.cells().iter().all(|&(x, y)| x >= i32::MIN
+    |  ________________________________________________________^
+286 | |                     && x <= i32::MIN + 3
+    | |________________________________________^ help: use: `(i32::MIN..=i32::MIN + 3).contains(&x)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_range_contains
+
+error: this comparison involving the minimum or maximum element for this type contains a case that is always true or always false
+   --> src/games/terminal/blocks.rs:285:56
+    |
+285 |                 assert!(p.cells().iter().all(|&(x, y)| x >= i32::MIN
+    |                                                        ^^^^^^^^^^^^^
+    |
+    = help: because `i32::MIN` is the minimum value for this type, this comparison is always true
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#absurd_extreme_comparisons
+    = note: `#[deny(clippy::absurd_extreme_comparisons)]` on by default
+
+error: this comparison involving the minimum or maximum element for this type contains a case that is always true or always false
+   --> src/games/terminal/blocks.rs:287:24
+    |
+287 |                     && y >= i32::MIN
+    |                        ^^^^^^^^^^^^^
+    |
+    = help: because `i32::MIN` is the minimum value for this type, this comparison is always true
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#absurd_extreme_comparisons
+
+error: could not compile `harbor-workspace` (lib test) due to 114 previous errors

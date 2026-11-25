@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-advanced/fix1/work/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 2 tests
+test solo::options_tests::default_clues_have_half_turn_symmetry ... ok
+test solo::options_tests::default_is_solved_using_only_block_position_elimination ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 64 filtered out; finished in 0.45s
+

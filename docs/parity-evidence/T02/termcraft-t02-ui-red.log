@@ -1,0 +1,62 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: field `mouse` is never read
+  --> src/ui.rs:54:5
+   |
+50 | struct TerminalTab {
+   |        ----------- field in this struct
+...
+54 |     mouse: terminal_mouse::Router,
+   |     ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `harbor-workspace` (bin "harbor-workspace" test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.25s
+     Running unittests src/main.rs (target/debug/deps/harbor_workspace-9a2e8410f611c3b2)
+
+running 1 test
+test ui::pages::appearance_tests::terminal_view_routes_mouse_without_broadcast_or_macro_recording ... FAILED
+
+failures:
+
+---- ui::pages::appearance_tests::terminal_view_routes_mouse_without_broadcast_or_macro_recording stdout ----
+
+thread 'ui::pages::appearance_tests::terminal_view_routes_mouse_without_broadcast_or_macro_recording' (372168) panicked at src/ui/pages.rs:1487:9:
+missing SGR press: READY
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    ui::pages::appearance_tests::terminal_view_routes_mouse_without_broadcast_or_macro_recording
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 30 filtered out; finished in 3.14s
+
+error: test failed, to rerun pass `--bin harbor-workspace`

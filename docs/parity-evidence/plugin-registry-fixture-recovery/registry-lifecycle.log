@@ -1,0 +1,8 @@
+
+running 3 tests
+test plugins::registry::lifecycle_regressions::paused_retirement_allows_registry_changes_and_cancels ... ok
+test plugins::registry::lifecycle_regressions::retirement_preserves_replacement_after_verification ... ok
+test plugins::registry::lifecycle_regressions::registry_executes_granted_elf_when_installed_inode_changes_after_verification ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 289 filtered out; finished in 0.10s
+

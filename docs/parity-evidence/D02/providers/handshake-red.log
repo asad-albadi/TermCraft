@@ -1,0 +1,15 @@
+   Compiling termcraft-rdp-engine v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/engines/rdp)
+error[E0425]: cannot find function `cluster` in module `super`
+  --> src/config.rs:81:24
+   |
+81 |         assert!(super::cluster(&options).is_none());
+   |                        ^^^^^^^ not found in `super`
+
+error[E0425]: cannot find function `cluster` in module `super`
+  --> src/config.rs:83:56
+   |
+83 |         let encoded = ironrdp_core::encode_vec(&super::cluster(&options).unwrap()).unwrap();
+   |                                                        ^^^^^^^ not found in `super`
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `termcraft-rdp-engine` (bin "termcraft-rdp-engine" test) due to 2 previous errors

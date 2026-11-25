@@ -1,0 +1,131 @@
+Building source snapshot 05f622127981dc85fdf3f49c785c3284d0aea2601d2acdb614784bc8f2bc9354
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling cfg-if v1.0.5
+   Compiling libc v0.2.191
+   Compiling syn v2.0.119
+   Compiling subtle v2.6.1
+   Compiling typenum v1.20.1
+   Compiling rand_core v0.10.1
+   Compiling getrandom v0.4.3
+   Compiling syn v3.0.10
+   Compiling zeroize_derive v1.5.0
+   Compiling zeroize v1.9.2
+   Compiling hybrid-array v0.4.15
+   Compiling crypto-common v0.2.2
+   Compiling cmov v0.5.4
+   Compiling ctutils v0.4.8
+   Compiling block-buffer v0.12.1
+   Compiling const-oid v0.10.3
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling flagset v0.4.7
+   Compiling cpufeatures v0.3.1
+   Compiling base64ct v1.8.3
+   Compiling pem-rfc7468 v1.0.0
+   Compiling der_derive v0.8.0
+   Compiling digest v0.11.3
+   Compiling displaydoc v0.2.7
+   Compiling cpubits v0.1.1
+   Compiling version_check v0.9.5
+   Compiling der v0.8.3
+   Compiling generic-array v0.14.7
+   Compiling bitflags v2.13.2
+   Compiling synstructure v0.14.0
+   Compiling stable_deref_trait v1.2.1
+   Compiling spki v0.8.1
+   Compiling once_cell v1.21.4
+   Compiling memchr v2.8.3
+   Compiling thiserror v2.0.21
+   Compiling crypto-bigint v0.7.11
+   Compiling thiserror-impl v2.0.21
+   Compiling zerofrom-derive v0.1.8
+   Compiling find-msvc-tools v0.1.15
+   Compiling byteorder v1.5.0
+   Compiling shlex v2.0.1
+   Compiling cc v1.11.3
+   Compiling zerofrom v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling block-padding v0.4.2
+   Compiling serde_core v1.0.229
+   Compiling inout v0.2.6
+   Compiling yoke v0.8.4
+   Compiling sha1 v0.11.0
+   Compiling hmac v0.13.0
+   Compiling der_derive v0.7.3
+   Compiling semver v1.0.28
+   Compiling minimal-lexical v0.2.1
+   Compiling const-oid v0.9.6
+
+thread 'rustc' (195633) panicked at /rustc-dev/31fca3adb283cc9dfd56b49cdee9a96eb9c96ffd/compiler/rustc_mir_dataflow/src/move_paths/builder.rs:589:36:
+index out of bounds: the len is 6740 but the index is 2102741
+stack backtrace:
+   0:     0x7f63d8025fab - <<std[2b826acdc1f5e0a6]::sys::backtrace::BacktraceLock>::print::DisplayBacktrace as core[2a04ef4615689bd8]::fmt::Display>::fmt
+   1:     0x7f63d861e648 - core[2a04ef4615689bd8]::fmt::write
+   2:     0x7f63d9ab7e36 - <std[2b826acdc1f5e0a6]::sys::stdio::unix::Stderr as std[2b826acdc1f5e0a6]::io::Write>::write_fmt
+   3:     0x7f63d7ffc2b8 - std[2b826acdc1f5e0a6]::panicking::default_hook::{closure#0}
+   4:     0x7f63d8019613 - std[2b826acdc1f5e0a6]::panicking::default_hook
+   5:     0x7f63d6ff107c - std[2b826acdc1f5e0a6]::panicking::update_hook::<alloc[6396a74c74b4abac]::boxed::Box<rustc_driver_impl[ca870b9720f08484]::install_ice_hook::{closure#1}>>::{closure#0}
+   6:     0x7f63d80198f2 - std[2b826acdc1f5e0a6]::panicking::panic_with_hook
+   7:     0x7f63d7ffc378 - std[2b826acdc1f5e0a6]::panicking::panic_handler::{closure#0}
+   8:     0x7f63d7ff08d9 - std[2b826acdc1f5e0a6]::sys::backtrace::__rust_end_short_backtrace::<std[2b826acdc1f5e0a6]::panicking::panic_handler::{closure#0}, !>
+   9:     0x7f63d7ffdddd - __rustc[38dafaa32e25e62e]::rust_begin_unwind
+  10:     0x7f63d4b7062c - core[2a04ef4615689bd8]::panicking::panic_fmt
+  11:     0x7f63d4d6e6c3 - core[2a04ef4615689bd8]::panicking::panic_bounds_check
+  12:     0x7f63d4d28539 - rustc_borrowck[bb79da333275b0f]::borrowck_check_region_constraints
+  13:     0x7f63d914e725 - <rustc_borrowck[bb79da333275b0f]::root_cx::BorrowCheckRootCtxt>::do_mir_borrowck
+  14:     0x7f63d914902f - rustc_borrowck[bb79da333275b0f]::mir_borrowck
+  15:     0x7f63d9148e65 - rustc_query_impl[2bb66b0b4b541c6]::query_impl::mir_borrowck::invoke_provider_fn::__rust_begin_short_backtrace
+  16:     0x7f63d89191e6 - rustc_query_impl[2bb66b0b4b541c6]::execution::try_execute_query::<rustc_data_structures[54f0ca9a24a0440d]::vec_cache::VecCache<rustc_span[5da20f4497c12b67]::def_id::LocalDefId, rustc_middle[cbe0dc6bf6ab09ab]::query::erase::ErasedData<[u8; 8usize]>, rustc_middle[cbe0dc6bf6ab09ab]::dep_graph::graph::DepNodeIndex>, false>
+  17:     0x7f63d8918883 - rustc_query_impl[2bb66b0b4b541c6]::query_impl::mir_borrowck::execute_query_non_incr::__rust_end_short_backtrace
+  18:     0x7f63d890ad78 - rustc_mir_transform[6dff8f2233d34ebf]::mir_drops_elaborated_and_const_checked
+  19:     0x7f63d890a3ab - rustc_query_impl[2bb66b0b4b541c6]::query_impl::mir_drops_elaborated_and_const_checked::invoke_provider_fn::__rust_begin_short_backtrace
+  20:     0x7f63d89191e6 - rustc_query_impl[2bb66b0b4b541c6]::execution::try_execute_query::<rustc_data_structures[54f0ca9a24a0440d]::vec_cache::VecCache<rustc_span[5da20f4497c12b67]::def_id::LocalDefId, rustc_middle[cbe0dc6bf6ab09ab]::query::erase::ErasedData<[u8; 8usize]>, rustc_middle[cbe0dc6bf6ab09ab]::dep_graph::graph::DepNodeIndex>, false>
+  21:     0x7f63d8919c5b - rustc_query_impl[2bb66b0b4b541c6]::query_impl::mir_drops_elaborated_and_const_checked::execute_query_non_incr::__rust_end_short_backtrace
+  22:     0x7f63d926b21e - rustc_mir_transform[6dff8f2233d34ebf]::mir_for_ctfe
+  23:     0x7f63d926aa53 - rustc_query_impl[2bb66b0b4b541c6]::query_impl::mir_for_ctfe::invoke_provider_fn::__rust_begin_short_backtrace
+  24:     0x7f63d865f8ca - rustc_query_impl[2bb66b0b4b541c6]::execution::try_execute_query::<rustc_middle[cbe0dc6bf6ab09ab]::query::caches::DefIdCache<rustc_middle[cbe0dc6bf6ab09ab]::query::erase::ErasedData<[u8; 8usize]>>, false>
+  25:     0x7f63d95481ce - rustc_query_impl[2bb66b0b4b541c6]::query_impl::mir_for_ctfe::execute_query_non_incr::__rust_end_short_backtrace
+  26:     0x7f63d9547c1e - <rustc_const_eval[3c971f5f0ab67b27]::interpret::eval_context::InterpCx<rustc_const_eval[3c971f5f0ab67b27]::const_eval::machine::CompileTimeMachine>>::load_mir
+  27:     0x7f63d5ddf4ad - rustc_const_eval[3c971f5f0ab67b27]::const_eval::eval_queries::eval_to_allocation_raw_provider
+  28:     0x7f63d8e039d6 - rustc_query_impl[2bb66b0b4b541c6]::query_impl::eval_to_allocation_raw::invoke_provider_fn::__rust_begin_short_backtrace
+  29:     0x7f63d8e03083 - rustc_query_impl[2bb66b0b4b541c6]::execution::try_execute_query::<rustc_middle[cbe0dc6bf6ab09ab]::query::caches::DefaultCache<rustc_middle[cbe0dc6bf6ab09ab]::ty::PseudoCanonicalInput<rustc_middle[cbe0dc6bf6ab09ab]::mir::interpret::GlobalId>, rustc_middle[cbe0dc6bf6ab09ab]::query::erase::ErasedData<[u8; 24usize]>>, false>
+  30:     0x7f63d8e02a7f - rustc_query_impl[2bb66b0b4b541c6]::query_impl::eval_to_allocation_raw::execute_query_non_incr::__rust_end_short_backtrace
+  31:     0x7f63d8e04cf0 - rustc_const_eval[3c971f5f0ab67b27]::const_eval::eval_queries::eval_to_const_value_raw_provider
+  32:     0x7f63d8e04856 - rustc_query_impl[2bb66b0b4b541c6]::query_impl::eval_to_const_value_raw::invoke_provider_fn::__rust_begin_short_backtrace
+  33:     0x7f63d8e02f7b - rustc_query_impl[2bb66b0b4b541c6]::execution::try_execute_query::<rustc_middle[cbe0dc6bf6ab09ab]::query::caches::DefaultCache<rustc_middle[cbe0dc6bf6ab09ab]::ty::PseudoCanonicalInput<rustc_middle[cbe0dc6bf6ab09ab]::mir::interpret::GlobalId>, rustc_middle[cbe0dc6bf6ab09ab]::query::erase::ErasedData<[u8; 24usize]>>, false>
+  34:     0x7f63d8e02b3f - rustc_query_impl[2bb66b0b4b541c6]::query_impl::eval_to_const_value_raw::execute_query_non_incr::__rust_end_short_backtrace
+  35:     0x7f63d891c942 - <rustc_middle[cbe0dc6bf6ab09ab]::ty::context::TyCtxt>::par_hir_body_owners::<rustc_hir_analysis[6a76c2e64a7a3377]::check_crate::{closure#1}>::{closure#0}
+  36:     0x7f63d891bf2d - rustc_hir_analysis[6a76c2e64a7a3377]::check_crate
+  37:     0x7f63d96f923c - rustc_interface[c468f08876874b33]::passes::analysis
+  38:     0x7f63d97c7e09 - rustc_query_impl[2bb66b0b4b541c6]::execution::try_execute_query::<rustc_middle[cbe0dc6bf6ab09ab]::query::caches::SingleCache<rustc_middle[cbe0dc6bf6ab09ab]::query::erase::ErasedData<[u8; 0usize]>>, false>
+  39:     0x7f63d97c7a69 - rustc_query_impl[2bb66b0b4b541c6]::query_impl::analysis::execute_query_non_incr::__rust_end_short_backtrace
+  40:     0x7f63d97a6082 - rustc_interface[c468f08876874b33]::interface::run_compiler::<(), rustc_driver_impl[ca870b9720f08484]::run_compiler::{closure#0}>::{closure#1}
+  41:     0x7f63d978af7e - std[2b826acdc1f5e0a6]::sys::backtrace::__rust_begin_short_backtrace::<rustc_interface[c468f08876874b33]::util::run_in_thread_with_globals<rustc_interface[c468f08876874b33]::util::run_in_thread_pool_with_globals<rustc_interface[c468f08876874b33]::interface::run_compiler<(), rustc_driver_impl[ca870b9720f08484]::run_compiler::{closure#0}>::{closure#1}, ()>::{closure#0}, ()>::{closure#0}::{closure#0}, ()>
+  42:     0x7f63d978b820 - <std[2b826acdc1f5e0a6]::thread::lifecycle::spawn_unchecked<rustc_interface[c468f08876874b33]::util::run_in_thread_with_globals<rustc_interface[c468f08876874b33]::util::run_in_thread_pool_with_globals<rustc_interface[c468f08876874b33]::interface::run_compiler<(), rustc_driver_impl[ca870b9720f08484]::run_compiler::{closure#0}>::{closure#1}, ()>::{closure#0}, ()>::{closure#0}::{closure#0}, ()>::{closure#1} as core[2a04ef4615689bd8]::ops::function::FnOnce<()>>::call_once::{shim:vtable#0}
+  43:     0x7f63d978c6ac - <std[2b826acdc1f5e0a6]::sys::thread::unix::Thread>::new::thread_start
+  44:     0x7f63d30ac93f - <unknown>
+  45:     0x7f63d314eeec - <unknown>
+  46:                0x0 - <unknown>
+
+error: the compiler unexpectedly panicked. This is a bug
+
+note: we would appreciate a bug report: https://github.com/rust-lang/rust/issues/new?labels=C-bug%2C+I-ICE%2C+T-compiler&template=ice.md
+
+note: rustc 1.96.1 (31fca3adb 2026-06-26) running on x86_64-unknown-linux-gnu
+
+note: compiler flags: --crate-type lib -C opt-level=3 -C embed-bitcode=no -C strip=debuginfo
+
+note: some of the compiler flags provided by cargo are hidden
+
+query stack during panic:
+#0 [mir_borrowck] borrow-checking `db::gen::DB`
+#1 [mir_drops_elaborated_and_const_checked] elaborating drops for `db::gen::DB`
+... and 4 other queries... use `env RUST_BACKTRACE=1` to see the full query stack
+error: could not compile `const-oid` (lib)
+
+Caused by:
+  process didn't exit successfully: `rustc --crate-name const_oid --edition=2021 '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1961/package-cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/const-oid-0.9.6/src/lib.rs' --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type lib --emit=dep-info,metadata,link -C opt-level=3 -C embed-bitcode=no --cfg 'feature="db"' --cfg 'feature="std"' --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values("arbitrary", "db", "std"))' -C metadata=6deeb3d61a1dfdb0 -C extra-filename=-8c340b6ef085a18e --out-dir '/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1961/package-helper/release/deps' -C strip=debuginfo -L 'dependency=/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1961/package-helper/release/deps' --cap-lints allow` (exit status: 101)
+warning: build failed, waiting for other jobs to finish...
+Packaging failed: Command '['cargo', 'build', '--release', '--locked', '--offline', '--manifest-path', PosixPath('/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1961/package-sources/05f622127981dc85fdf3f49c785c3284d0aea2601d2acdb614784bc8f2bc9354/engines/rdp/Cargo.toml'), '--target-dir', PosixPath('/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/release-rust1961/package-helper')]' returned non-zero exit status 101.

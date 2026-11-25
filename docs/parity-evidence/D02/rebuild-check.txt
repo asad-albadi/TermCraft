@@ -1,0 +1,9 @@
+2026-11-24 · Craft Anything rebuild_check
+Project: /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6
+Build: passed — Build succeeded.
+App screenshot: passed — Program starts and draws at 942×1005.
+Mechanics sheet readable, but original mechanics/appearance/runtime behavior not measured; comparison remains incomplete.
+Screenshot source: checks/round-0/screenshot.png; copied here as startup.png.
+Separate build_command_run test attempt was refused: MCP tool call requires approval, but approval policy is never.
+
+Final rerun after the fullscreen availability clarification: build passed; app screenshot passed at 942×1005; original mechanics/runtime comparisons remain incomplete.

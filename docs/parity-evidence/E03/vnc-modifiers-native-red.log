@@ -1,0 +1,28 @@
+00:00:00.000 [INFO] [backend/backend.c:342] Loading user-specified backends due to WLR_BACKENDS: headless
+00:00:00.000 [INFO] [backend/headless/backend.c:60] Creating headless backend
+00:00:00.000 [INFO] [util/env.c:25] Loading WLR_RENDERER option: pixman
+00:00:00.000 [INFO] [render/pixman/renderer.c:328] Creating pixman renderer
+00:00:00.000 [INFO] [../cage/cage.c:521] Failed to create wlr_drm_lease_manager_v1
+00:00:00.014 [INFO] [backend/headless/backend.c:17] Starting headless backend
+00:00:00.071 [INFO] [xwayland/server.c:108] Starting Xwayland on :0
+Xwayland glamor: GBM Wayland interfaces not available
+Failed to initialize glamor, falling back to sw
+
+running 1 test
+test services::vnc_service_tests::isolated::owned_x11_vnc_dynamic_auth_control_stop_and_app_client ... Independent vncdotool 1.3.0 authenticated and observed the live green owned-window pixels
+
+thread 'services::vnc_service_tests::isolated::owned_x11_vnc_dynamic_auth_control_stop_and_app_client' (8) panicked at src/services/vnc_service_tests.rs:369:9:
+assertion `left == right` failed: RFB uppercase A must not require a client Shift event
+  left: 97
+ right: 65
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    services::vnc_service_tests::isolated::owned_x11_vnc_dynamic_auth_control_stop_and_app_client
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 82 filtered out; finished in 4.43s
+
+(EE) failed to read Wayland events: Broken pipe

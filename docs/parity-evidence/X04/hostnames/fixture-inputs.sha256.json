@@ -1,0 +1,9 @@
+{
+  "target/agent-work/x04-clipboard/fixture/lib/libXpm.so.4": "e02df8ee6e0bff934a13563d9543e1a727620399ddf43d5c211d6846830768ac",
+  "target/agent-work/x04-clipboard/fixture/libXdmGreet.so": "ab10ec35cf6045a27261ac4e6003127e23b5e9be0f054005cae69cf08f0a03ae",
+  "target/agent-work/x04-clipboard/fixture/xdm": "d0f9df84fa1313b9e9155d2a5e5f790af7a760a8918239bd60b7b3dc3a27d946",
+  "target/agent-work/x04-clipboard/fixture/xdmcp_output.py": "5376c6c050de55abb91eb5fb8fb798edf006c7f3c47d48e111d0876ac073ea2f",
+  "target/agent-work/x04-clipboard/fixture/xdmcp_window.py": "c6f4b506dbc28f7194ea84b464864a1409b26227b24d7444d999c96849b50eea",
+  "target/agent-work/x04/engine-package/x11/linux-x86_64/Xephyr": "d7f1f49ee428fd06b26707a79ba6d65b4e9ada4e6b53aca4146baaa92c79e593",
+  "target/x11-arch-package/x11/linux-x86_64/Xwayland": "cbedd90fbc960d4cc799792cedf89b0afa1f1f74a93ba9fb05bfd4da2f27b2b8"
+}

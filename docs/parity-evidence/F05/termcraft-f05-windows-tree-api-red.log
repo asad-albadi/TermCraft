@@ -1,0 +1,42 @@
+    Checking termcraft-native-commit-check v0.0.0 (/tmp/termcraft-native-commit-check)
+warning: unused import: `portable::build`
+  --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/folder_archive.rs:81:16
+   |
+81 | pub(crate) use portable::build;
+   |                ^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0599]: no associated function or constant named `create_tree` found for struct `local_stage::windows::WindowsStage` in the current scope
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/local_stage/windows.rs:238:62
+    |
+ 25 | pub(super) struct WindowsStage {
+    | ------------------------------ associated function or constant `create_tree` not found for this struct
+...
+238 |         let (stage, path, root, mut archive) = WindowsStage::create_tree(destination.clone()).unwrap();
+    |                                                              ^^^^^^^^^^^ associated function or constant not found in `local_stage::windows::WindowsStage`
+    |
+help: there is an associated function `create` with a similar name
+    |
+238 -         let (stage, path, root, mut archive) = WindowsStage::create_tree(destination.clone()).unwrap();
+238 +         let (stage, path, root, mut archive) = WindowsStage::create(destination.clone()).unwrap();
+    |
+
+error[E0599]: no associated function or constant named `create_tree` found for struct `local_stage::windows::WindowsStage` in the current scope
+   --> /home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/src/remote_files/transfer/local_stage/windows.rs:246:63
+    |
+ 25 | pub(super) struct WindowsStage {
+    | ------------------------------ associated function or constant `create_tree` not found for this struct
+...
+246 |         let (mut stage, path, _root, archive) = WindowsStage::create_tree(destination.clone()).unwrap(); drop(archive);
+    |                                                               ^^^^^^^^^^^ associated function or constant not found in `local_stage::windows::WindowsStage`
+    |
+help: there is an associated function `create` with a similar name
+    |
+246 -         let (mut stage, path, _root, archive) = WindowsStage::create_tree(destination.clone()).unwrap(); drop(archive);
+246 +         let (mut stage, path, _root, archive) = WindowsStage::create(destination.clone()).unwrap(); drop(archive);
+    |
+
+For more information about this error, try `rustc --explain E0599`.
+warning: `termcraft-native-commit-check` (lib test) generated 1 warning
+error: could not compile `termcraft-native-commit-check` (lib test) due to 2 previous errors; 1 warning emitted

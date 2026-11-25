@@ -1,0 +1,993 @@
+--- a/src/main.rs
++++ b/src/main.rs
+@@ -1,5 +1,8 @@
+ mod ui;
+ fn main() -> eframe::Result {
++    if let Some(code) = harbor_workspace::x11::capability_probe_entry() {
++        std::process::exit(code);
++    }
+     #[cfg(windows)]
+     if let Some(code) = harbor_workspace::plugins::windows_bootstrap() {
+         std::process::exit(code);
+--- a/src/x11/mod.rs
++++ b/src/x11/mod.rs
+@@ -1,6 +1,10 @@
+ //! Lifecycle for a local X display owned by TermCraft.
+ 
++mod capabilities;
+ mod engine;
++#[cfg(target_os = "linux")]
++mod native_capabilities;
++pub use capabilities::{OpenGlEvidence, XCapabilities, capability_probe_entry};
+ mod forwarding;
+ pub mod remote_environment;
+ pub use forwarding::{XClientDisplay, XDisplaySource, XForwardingLease, XTrustMode};
+--- a/src/ui/xserver.rs
++++ b/src/ui/xserver.rs
+@@ -1,6 +1,6 @@
+ use super::*;
+ use harbor_workspace::x11::{
+-    XClientDisplay, XDisplayMode, XDisplaySource, XServerManager, XServerOptions,
++    XCapabilities, XClientDisplay, XDisplayMode, XDisplaySource, XServerManager, XServerOptions,
+ };
+ use std::sync::{
+     Arc,
+@@ -14,13 +14,16 @@
+     options: XServerOptions,
+     context: Option<Context>,
+     bundle_root: Option<PathBuf>,
++    probe_executable: Option<PathBuf>,
+     worker: Option<Worker>,
+     display: Option<XClientDisplay>,
+     pending: Vec<u64>,
+     error: Option<String>,
++    capabilities: Option<Result<XCapabilities, String>>,
+ }
+ 
+ enum Event {
++    Capabilities(Result<XCapabilities, String>),
+     Ready(XClientDisplay),
+     Ended(Result<(), String>),
+ }
+@@ -69,13 +72,15 @@
+             return;
+         }
+         let manager = self.install_manager();
++        let probe_executable = self.probe_executable.clone();
+         let options = self.options.clone();
+-        let (sender, events) = mpsc::sync_channel(2);
++        let (sender, events) = mpsc::sync_channel(3);
+         let (stop, stop_requested) = mpsc::sync_channel(1);
+         let cancelled = Arc::new(AtomicBool::new(false));
+         let worker_cancelled = Arc::clone(&cancelled);
+         let ctx = ctx.clone();
+         self.error = None;
++        self.capabilities = None;
+         match std::thread::Builder::new()
+             .name("termcraft-xserver".into())
+             .spawn(move || {
+@@ -87,6 +92,29 @@
+                 let result = manager
+                     .start_cancellable(options, &worker_cancelled)
+                     .and_then(|mut lease| {
++                        // Probe before clients are released: an active RandR check may
++                        // briefly switch the newly owned display and then restore it.
++                        let capabilities = match &probe_executable {
++                            Some(executable) => XCapabilities::probe_with_executable(
++                                &lease.client_display(),
++                                executable,
++                                &worker_cancelled,
++                            ),
++                            None => {
++                                XCapabilities::probe(&lease.client_display(), &worker_cancelled)
++                            }
++                        };
++                        // A crashed or timed-out driver may have interrupted a mode
++                        // transition. Discard this fresh display before exposing clients.
++                        if let Err(error) = &capabilities {
++                            let error = error.clone();
++                            report(Event::Capabilities(capabilities));
++                            lease.stop_owned()?;
++                            return Err(error);
++                        }
++                        if !report(Event::Capabilities(capabilities)) {
++                            return lease.stop_owned();
++                        }
+                         if worker_cancelled.load(Ordering::Relaxed)
+                             || !report(Event::Ready(lease.client_display()))
+                         {
+@@ -126,6 +154,7 @@
+     pub(super) fn poll(&mut self) {
+         while let Some(worker) = &self.worker {
+             match worker.events.try_recv() {
++                Ok(Event::Capabilities(report)) => self.capabilities = Some(report),
+                 Ok(Event::Ready(display)) => self.display = Some(display),
+                 Ok(Event::Ended(result)) => {
+                     self.error = if worker.stopping() {
+@@ -407,6 +436,25 @@
+                 }
+                 if let Some(display) = &state.display {
+                     ui.label(format!("Running on display {}", display.display()));
++                    if let Some(capabilities) = &state.capabilities {
++                        match capabilities {
++                            Ok(report) => {
++                                ui.label(format!("GLX: {} · Composite: {} · RandR: {}",
++                                    report.glx_version.as_deref().unwrap_or("unavailable"),
++                                    report.composite_version.as_deref().unwrap_or("unavailable"),
++                                    report.randr_version.as_deref().unwrap_or("unavailable")));
++                                if let Some(gl) = &report.opengl {
++                                    ui.label(format!("{} · {} · pixels {}/{}", gl.renderer,
++                                        if gl.software { "software rendering" } else { "driver rendering (hardware unqualified)" },
++                                        gl.matched_pixels, gl.sampled_pixels));
++                                } else { ui.label("OpenGL rendering unavailable or unverified"); }
++                                ui.label(if report.composite_pixels { "Composite redirect/readback verified" } else { "Composite rendering unverified" });
++                                ui.label(format!("Screen {}×{} · resolution change {}", report.dimensions[0], report.dimensions[1], if report.randr_change.is_some() { "verified with event; initial size restored" } else { "unavailable or unverified" }));
++                                for error in &report.errors { ui.colored_label(Color32::from_rgb(200, 120, 50), error); }
++                            }
++                            Err(error) => { ui.label(format!("Graphics capability check failed: {error}")); }
++                        }
++                    }
+                     ui.label(format!(
+                         "Authority file {}",
+                         display.authority_path().display()
+@@ -507,6 +555,11 @@
+             let ctx = Context::default();
+             let root = tempfile::tempdir().unwrap();
+             let mut workspace = Workspace::new_context(&ctx, None, root.path().into());
++            workspace.xserver.probe_executable = Some(
++                std::env::var_os("TERMCRAFT_TEST_X11_PROBE")
++                    .expect("set the qualified app probe executable")
++                    .into(),
++            );
+             workspace.xserver.bundle_root = Some(if enabled {
+                 package.clone()
+             } else {
+@@ -704,6 +757,11 @@
+         let ctx = Context::default();
+         let root = tempfile::tempdir().unwrap();
+         let mut workspace = Workspace::new_context(&ctx, None, root.path().to_owned());
++        workspace.xserver.probe_executable = Some(
++            std::env::var_os("TERMCRAFT_TEST_X11_PROBE")
++                .expect("set the qualified app probe executable")
++                .into(),
++        );
+         workspace.xserver.bundle_root = Some(
+             std::env::var_os("TERMCRAFT_TEST_XSERVER_PACKAGE")
+                 .unwrap()
+@@ -757,6 +815,53 @@
+     }
+ 
+     #[test]
++    #[ignore = "requires the isolated Wayland fixture and a qualified Xwayland bundle"]
++    fn crashed_probe_discards_fresh_display_before_releasing_clients() {
++        use std::os::unix::fs::PermissionsExt;
++        assert_eq!(
++            std::env::var("TERMCRAFT_TEST_XSERVER_ISOLATED").as_deref(),
++            Ok("1")
++        );
++        let directory = tempfile::tempdir().unwrap();
++        let executable = directory.path().join("crashing-probe");
++        let authority = directory.path().join("authority-path");
++        std::fs::write(
++            &executable,
++            format!(
++                "#!/bin/sh\nprintf '%s' \"$XAUTHORITY\" > '{}'\nexit 139\n",
++                authority.display()
++            ),
++        )
++        .unwrap();
++        std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o700)).unwrap();
++        let mut state = State {
++            bundle_root: Some(
++                std::env::var_os("TERMCRAFT_TEST_XSERVER_PACKAGE")
++                    .unwrap()
++                    .into(),
++            ),
++            probe_executable: Some(executable),
++            ..State::default()
++        };
++        state.start(&Context::default());
++        poll_until_stopped(&mut state);
++        assert!(state.display.is_none());
++        assert!(
++            state
++                .error
++                .as_deref()
++                .unwrap()
++                .contains("X capability probe failed")
++        );
++        assert!(state.capabilities.as_ref().unwrap().is_err());
++        let authority = std::fs::read_to_string(authority).unwrap();
++        assert!(
++            !std::path::Path::new(&authority).exists(),
++            "failed probe display must be discarded"
++        );
++    }
++
++    #[test]
+     fn xserver_ui_cancels_in_background() {
+         let root = tempfile::tempdir().unwrap();
+         let mut state = State {
+@@ -781,6 +886,11 @@
+         let root = std::env::var_os("TERMCRAFT_TEST_XSERVER_PACKAGE").unwrap();
+         let mut state = State {
+             bundle_root: Some(PathBuf::from(root)),
++            probe_executable: Some(
++                std::env::var_os("TERMCRAFT_TEST_X11_PROBE")
++                    .expect("set the qualified app probe executable")
++                    .into(),
++            ),
+             ..State::default()
+         };
+         state.start(&Context::default());
+--- a/packaging/x11/manifest.json
++++ b/packaging/x11/manifest.json
+@@ -17,8 +17,10 @@
+       "build_inventory": "x11/linux-x86_64/BUILDINFO",
+       "package_inventory": "x11/linux-x86_64/PKGINFO",
+       "license": "x11/linux-x86_64/COPYING",
+-      "runtime_packages": ["glibc", "nettle", "libepoxy", "libxfont2", "pixman", "xorg-server-common", "libxcvt", "mesa", "libglvnd", "libxau", "wayland", "libdrm", "libtirpc", "libei", "libxshmfence", "libdecor", "xorg-xkbcomp", "xkeyboard-config"],
++      "runtime_packages": ["libx11", "libxcomposite", "libxrandr", "glibc", "nettle", "libepoxy", "libxfont2", "pixman", "xorg-server-common", "libxcvt", "mesa", "libglvnd", "libxau", "wayland", "libdrm", "libtirpc", "libei", "libxshmfence", "libdecor", "xorg-xkbcomp", "xkeyboard-config"],
+       "required_session": "Wayland compositor with xdg-shell",
++      "capability_probe_libraries": ["libX11.so.6", "libGL.so.1", "libXcomposite.so.1", "libXrandr.so.2"],
++      "capability_probe_policy": "Active native GLX rendering, opaque Composite output composition, RandR screen-size transition and event before releasing clients; no indirect GLX enablement; unsupported libraries, modes and platform providers remain explicit",
+       "build_options": ["ipv6", "xcsecurity", "dri3", "glamor", "libdecor"],
+       "disabled_build_options": ["xdmcp", "xvfb"]
+     },
+--- a/src/x11/capabilities.rs
++++ b/src/x11/capabilities.rs
+@@ -0,0 +1,147 @@
++//! Active checks run in a short-lived child: Xlib/GL driver state and credentials
++//! never enter the UI process, and a wedged graphics driver can be terminated.
++use super::XClientDisplay;
++use serde::{Deserialize, Serialize};
++use std::{
++    path::Path,
++    process::{Command, Stdio},
++    sync::atomic::{AtomicBool, Ordering},
++    time::{Duration, Instant},
++};
++
++#[derive(Clone, Debug, Serialize, Deserialize)]
++pub struct OpenGlEvidence {
++    pub vendor: String,
++    pub renderer: String,
++    pub version: String,
++    pub direct: bool,
++    pub software: bool,
++    pub matched_pixels: u32,
++    pub sampled_pixels: u32,
++    /// PNG encoded from the actual glReadPixels buffer (OpenGL bottom-up rows).
++    pub scene_png_base64: String,
++}
++#[derive(Clone, Debug, Default, Serialize, Deserialize)]
++pub struct XCapabilities {
++    pub glx_version: Option<String>,
++    pub opengl: Option<OpenGlEvidence>,
++    pub composite_version: Option<String>,
++    pub composite_pixels: bool,
++    pub randr_version: Option<String>,
++    pub dimensions: [u32; 2],
++    /// An actual observed size transition, never inferred from advertised modes.
++    pub randr_change: Option<[u32; 2]>,
++    #[serde(default)]
++    pub initial_mode_restored: bool,
++    pub errors: Vec<String>,
++}
++impl XCapabilities {
++    pub fn rendering_verified(&self) -> bool {
++        self.opengl
++            .as_ref()
++            .is_some_and(|gl| gl.sampled_pixels > 0 && gl.matched_pixels == gl.sampled_pixels)
++    }
++    /// Blocking active qualification; invoke before clients attach to a fresh owned
++    /// display. Temporarily changes an advertised screen mode and restores it.
++    /// On a child crash/timeout, the owner must discard that fresh server because
++    /// an interrupted native driver cannot guarantee its initial mode was restored.
++    pub fn probe(display: &XClientDisplay, cancelled: &AtomicBool) -> Result<Self, String> {
++        let exe = std::env::current_exe().map_err(|e| e.to_string())?;
++        Self::probe_with_executable(display, &exe, cancelled)
++    }
++    pub fn probe_with_executable(
++        display: &XClientDisplay,
++        exe: &Path,
++        cancelled: &AtomicBool,
++    ) -> Result<Self, String> {
++        display.ensure_running()?;
++        let output = tempfile::tempfile().map_err(|e| e.to_string())?;
++        let mut command = Command::new(exe);
++        command
++            .arg("--termcraft-x11-capability-probe")
++            .envs(display.environment()?)
++            .env_remove("WAYLAND_SOCKET")
++            .stdin(Stdio::null())
++            .stdout(output.try_clone().map_err(|e| e.to_string())?)
++            .stderr(Stdio::null());
++        let mut child = command
++            .spawn()
++            .map_err(|e| format!("Could not start X capability probe: {e}"))?;
++        let deadline = Instant::now() + Duration::from_secs(8);
++        loop {
++            if cancelled.load(Ordering::Relaxed)
++                || display.ensure_running().is_err()
++                || Instant::now() >= deadline
++            {
++                let _ = child.kill();
++                let _ = child.wait();
++                return Err(
++                    "X capability probe cancelled, display stopped, or graphics driver timed out"
++                        .into(),
++                );
++            }
++            match child.try_wait() {
++                Ok(Some(status)) => {
++                    if !status.success() {
++                        return Err(format!(
++                            "X capability probe failed ({status}); native graphics libraries or context may be unavailable"
++                        ));
++                    }
++                    use std::io::{Read, Seek, SeekFrom};
++                    let mut output = output;
++                    output.seek(SeekFrom::Start(0)).map_err(|e| e.to_string())?;
++                    let mut data = Vec::new();
++                    output
++                        .take(65537)
++                        .read_to_end(&mut data)
++                        .map_err(|e| e.to_string())?;
++                    if data.len() > 65536 {
++                        return Err("X capability response exceeded limit".into());
++                    }
++                    return serde_json::from_slice(&data)
++                        .map_err(|e| format!("Invalid X capability response: {e}"));
++                }
++                Ok(None) => std::thread::sleep(Duration::from_millis(20)),
++                Err(e) => {
++                    let _ = child.kill();
++                    let _ = child.wait();
++                    return Err(e.to_string());
++                }
++            }
++        }
++    }
++}
++/// Internal subprocess entry; no UI, persistence, or global environment mutation.
++pub fn capability_probe_entry() -> Option<i32> {
++    if std::env::args().nth(1).as_deref() != Some("--termcraft-x11-capability-probe") {
++        return None;
++    }
++    #[cfg(target_os = "linux")]
++    let result = unsafe { super::native_capabilities::probe() };
++    #[cfg(not(target_os = "linux"))]
++    let result: Result<XCapabilities, String> =
++        Err("Native graphics probing is unavailable on this platform".into());
++    match result {
++        Ok(report) => {
++            println!("{}", serde_json::to_string(&report).unwrap());
++            Some(0)
++        }
++        Err(error) => {
++            eprintln!("{error}");
++            Some(1)
++        }
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn extension_advertisement_is_not_render_verification() {
++        let report = XCapabilities {
++            glx_version: Some("1.4".into()),
++            ..Default::default()
++        };
++        assert!(!report.rendering_verified());
++    }
++}
+--- a/src/x11/native_capabilities.rs
++++ b/src/x11/native_capabilities.rs
+@@ -0,0 +1,427 @@
++//! Linux native-library implementation. Called only in the disposable probe process.
++//! All function pointers are resolved before use; a missing optional library is evidence,
++//! never a successful capability. No native graphics library is linked on other targets.
++use super::capabilities::{OpenGlEvidence, XCapabilities};
++use libloading::Library;
++use std::{
++    ffi::{CStr, c_char, c_int, c_uint, c_ulong, c_void},
++    ptr,
++    sync::atomic::{AtomicI32, Ordering},
++};
++type Display = c_void;
++type Xid = c_ulong;
++#[repr(C)]
++struct VisualInfo {
++    visual: *mut c_void,
++    visualid: Xid,
++    screen: c_int,
++    depth: c_int,
++    class: c_int,
++    red_mask: c_ulong,
++    green_mask: c_ulong,
++    blue_mask: c_ulong,
++    colormap_size: c_int,
++    bits_per_rgb: c_int,
++}
++#[repr(C)]
++struct WindowAttributes {
++    background_pixmap: Xid,
++    background_pixel: c_ulong,
++    border_pixmap: Xid,
++    border_pixel: c_ulong,
++    bit_gravity: c_int,
++    win_gravity: c_int,
++    backing_store: c_int,
++    backing_planes: c_ulong,
++    backing_pixel: c_ulong,
++    save_under: c_int,
++    event_mask: std::ffi::c_long,
++    do_not_propagate_mask: std::ffi::c_long,
++    override_redirect: c_int,
++    colormap: Xid,
++    cursor: Xid,
++}
++#[repr(C)]
++struct ScreenSize {
++    width: c_int,
++    height: c_int,
++    mwidth: c_int,
++    mheight: c_int,
++}
++#[repr(C)]
++struct XErrorEvent {
++    event_type: c_int,
++    display: *mut Display,
++    resourceid: Xid,
++    serial: c_ulong,
++    error_code: u8,
++    request_code: u8,
++    minor_code: u8,
++}
++static X_ERROR: AtomicI32 = AtomicI32::new(0);
++unsafe extern "C" fn error_handler(_: *mut Display, event: *mut XErrorEvent) -> c_int {
++    X_ERROR.store(unsafe { (*event).error_code } as i32, Ordering::Relaxed);
++    0
++}
++macro_rules! sym {
++    ($lib:expr, $name:literal, $ty:ty) => {
++        *$lib
++            .get::<$ty>(concat!($name, "\0").as_bytes())
++            .map_err(|e| e.to_string())?
++    };
++}
++macro_rules! call { ($lib:expr, $name:literal, ($($ty:ty),*) -> $ret:ty, $($arg:expr),* $(,)?) => { (sym!($lib, $name, unsafe extern "C" fn($($ty),*) -> $ret))($($arg),*) }; }
++unsafe fn text(pointer: *const u8) -> String {
++    if pointer.is_null() {
++        String::new()
++    } else {
++        unsafe { CStr::from_ptr(pointer.cast()) }
++            .to_string_lossy()
++            .into_owned()
++    }
++}
++
++pub(super) unsafe fn probe() -> Result<XCapabilities, String> {
++    unsafe {
++        let x = Library::new("libX11.so.6").map_err(|e| format!("Native Xlib unavailable: {e}"))?;
++        call!(&x, "XSetErrorHandler", (unsafe extern "C" fn(*mut Display,*mut XErrorEvent)->c_int) -> *mut c_void, error_handler);
++        let d = call!(&x, "XOpenDisplay", (*const c_char) -> *mut Display, ptr::null());
++        if d.is_null() {
++            return Err("Cannot authenticate to the owned X display".into());
++        }
++        // Xlib stores extension close-display callbacks in these libraries.
++        // Keep every loaded library alive until after XCloseDisplay.
++        let gl = Library::new("libGL.so.1");
++        let comp = Library::new("libXcomposite.so.1");
++        let rr = Library::new("libXrandr.so.2");
++        let mut report = XCapabilities::default();
++        let root = call!(&x, "XDefaultRootWindow", (*mut Display) -> Xid, d);
++        report.dimensions = geometry(&x, d, root)?;
++        report.initial_mode_restored = true;
++        if let Err(e) = gl
++            .as_ref()
++            .map_err(|e| e.to_string())
++            .and_then(|lib| glx(&x, lib, d, root, &mut report))
++        {
++            report.errors.push(format!("OpenGL/GLX: {e}"));
++        }
++        X_ERROR.store(0, Ordering::Relaxed);
++        if let Err(e) = comp
++            .as_ref()
++            .map_err(|e| e.to_string())
++            .and_then(|lib| composite(&x, lib, d, root, &mut report))
++        {
++            report.errors.push(format!("Composite: {e}"));
++        }
++        X_ERROR.store(0, Ordering::Relaxed);
++        if let Err(e) = rr
++            .as_ref()
++            .map_err(|e| e.to_string())
++            .and_then(|lib| randr(&x, lib, d, root, &mut report))
++        {
++            report.errors.push(format!("RandR: {e}"));
++        }
++        call!(&x, "XCloseDisplay", (*mut Display) -> c_int, d);
++        if !report.initial_mode_restored {
++            return Err("Graphics probe could not restore the initial screen mode; discard this fresh owned display".into());
++        }
++        Ok(report)
++    }
++}
++unsafe fn sync(x: &Library, d: *mut Display) -> Result<(), String> {
++    unsafe {
++        call!(x, "XSync", (*mut Display,c_int)->c_int, d, 0);
++        let error = X_ERROR.swap(0, Ordering::Relaxed);
++        if error == 0 {
++            Ok(())
++        } else {
++            Err(format!("live X request failed with protocol error {error}"))
++        }
++    }
++}
++unsafe fn geometry(x: &Library, d: *mut Display, window: Xid) -> Result<[u32; 2], String> {
++    unsafe {
++        let (mut root, mut px, mut py, mut w, mut h, mut border, mut depth) = (0, 0, 0, 0, 0, 0, 0);
++        let ok = call!(x,"XGetGeometry",(*mut Display,Xid,*mut Xid,*mut c_int,*mut c_int,*mut c_uint,*mut c_uint,*mut c_uint,*mut c_uint)->c_int,d,window,&mut root,&mut px,&mut py,&mut w,&mut h,&mut border,&mut depth);
++        sync(x, d)?;
++        if ok == 0 {
++            return Err("Cannot query live drawable dimensions".into());
++        }
++        Ok([w, h])
++    }
++}
++unsafe fn glx(
++    x: &Library,
++    gl: &Library,
++    d: *mut Display,
++    root: Xid,
++    r: &mut XCapabilities,
++) -> Result<(), String> {
++    unsafe {
++        let (mut major, mut minor) = (0, 0);
++        if call!(&gl,"glXQueryVersion",(*mut Display,*mut c_int,*mut c_int)->c_int,d,&mut major,&mut minor)
++            == 0
++        {
++            return Err("extension unavailable".into());
++        }
++        r.glx_version = Some(format!("{major}.{minor}"));
++        let screen = call!(x,"XDefaultScreen",(*mut Display)->c_int,d);
++        let mut attrs = [4, 5, 8, 8, 9, 8, 10, 8, 0]; // RGBA, doublebuffer, RGB >= 8
++        let visual = call!(&gl,"glXChooseVisual",(*mut Display,c_int,*mut c_int)->*mut VisualInfo,d,screen,attrs.as_mut_ptr());
++        if visual.is_null() {
++            return Err("no suitable RGBA GLX visual".into());
++        }
++        let colormap = call!(x,"XCreateColormap",(*mut Display,Xid,*mut c_void,c_int)->Xid,d,root,(*visual).visual,0);
++        let mut wa: WindowAttributes = std::mem::zeroed();
++        wa.colormap = colormap;
++        wa.border_pixel = 0;
++        let window = call!(x,"XCreateWindow",(*mut Display,Xid,c_int,c_int,c_uint,c_uint,c_uint,c_int,c_uint,*mut c_void,c_ulong,*mut WindowAttributes)->Xid,d,root,0,0,64,64,0,(*visual).depth,1,(*visual).visual,(1<<13)|(1<<3),&mut wa);
++        call!(x,"XMapWindow",(*mut Display,Xid)->c_int,d,window);
++        sync(x, d)?;
++        let context = call!(&gl,"glXCreateContext",(*mut Display,*mut VisualInfo,*mut c_void,c_int)->*mut c_void,d,visual,ptr::null_mut(),1);
++        call!(x,"XFree",(*mut c_void)->c_int,visual.cast());
++        if context.is_null() {
++            call!(x,"XDestroyWindow",(*mut Display,Xid)->c_int,d,window);
++            call!(x,"XFreeColormap",(*mut Display,Xid)->c_int,d,colormap);
++            return Err(
++                "GLX context unavailable (indirect GLX remains disabled by server policy)".into(),
++            );
++        }
++        let current =
++            call!(&gl,"glXMakeCurrent",(*mut Display,Xid,*mut c_void)->c_int,d,window,context);
++        let render = (|| -> Result<OpenGlEvidence, String> {
++            sync(x, d)?;
++            if current == 0 {
++                return Err("GLX context could not become current".into());
++            }
++            let string = sym!(
++                &gl,
++                "glGetString",
++                unsafe extern "C" fn(c_uint) -> *const u8
++            );
++            let vendor = text(string(0x1f00));
++            let renderer = text(string(0x1f01));
++            let version = text(string(0x1f02));
++            call!(&gl,"glViewport",(c_int,c_int,c_int,c_int)->(),0,0,64,64);
++            call!(&gl,"glDrawBuffer",(c_uint)->(),0x0405); // back
++            call!(&gl,"glEnable",(c_uint)->(),0x0c11); // scissor test
++            let colors = [
++                [1., 0., 0., 1.],
++                [0., 1., 0., 1.],
++                [0., 0., 1., 1.],
++                [1., 1., 0., 1.],
++            ];
++            for (i, color) in colors.iter().enumerate() {
++                call!(&gl,"glScissor",(c_int,c_int,c_int,c_int)->(),(i%2) as i32*32,(i/2) as i32*32,32,32);
++                call!(&gl,"glClearColor",(f32,f32,f32,f32)->(),color[0],color[1],color[2],color[3]);
++                call!(&gl,"glClear",(c_uint)->(),0x4000);
++            }
++            call!(&gl,"glFinish",()->(),);
++            call!(&gl,"glReadBuffer",(c_uint)->(),0x0405);
++            let mut pixels = vec![0u8; 64 * 64 * 4];
++            call!(&gl,"glReadPixels",(c_int,c_int,c_int,c_int,c_uint,c_uint,*mut c_void)->(),0,0,64,64,0x1908,0x1401,pixels.as_mut_ptr().cast());
++            let error = call!(&gl,"glGetError",()->c_uint,);
++            if error != 0 {
++                return Err(format!("OpenGL render/readback error {error:#x}"));
++            }
++            let mut matched = 0;
++            for y in 0..64 {
++                for px in 0..64 {
++                    let expected = colors[(y / 32) * 2 + px / 32];
++                    let actual = &pixels[(y * 64 + px) * 4..][..3];
++                    if actual
++                        .iter()
++                        .zip(expected)
++                        .all(|(a, b)| (*a as f32 - b * 255.).abs() <= 3.)
++                    {
++                        matched += 1;
++                    }
++                }
++            }
++            call!(&gl,"glXSwapBuffers",(*mut Display,Xid)->(),d,window);
++            let lower = renderer.to_ascii_lowercase();
++            use base64::Engine;
++            use image::ImageEncoder;
++            let mut png = Vec::new();
++            image::codecs::png::PngEncoder::new(&mut png)
++                .write_image(&pixels, 64, 64, image::ExtendedColorType::Rgba8)
++                .map_err(|error| format!("Could not encode actual GL readback: {error}"))?;
++            let scene_png_base64 = base64::engine::general_purpose::STANDARD.encode(png);
++            Ok(OpenGlEvidence {
++                vendor,
++                renderer,
++                version,
++                direct: call!(&gl,"glXIsDirect",(*mut Display,*mut c_void)->c_int,d,context) != 0,
++                software: ["llvmpipe", "softpipe", "swrast", "software", "swr"]
++                    .iter()
++                    .any(|s| lower.contains(s)),
++                matched_pixels: matched,
++                sampled_pixels: 4096,
++                scene_png_base64,
++            })
++        })();
++        call!(&gl,"glXMakeCurrent",(*mut Display,Xid,*mut c_void)->c_int,d,0,ptr::null_mut());
++        call!(&gl,"glXDestroyContext",(*mut Display,*mut c_void)->(),d,context);
++        call!(x,"XDestroyWindow",(*mut Display,Xid)->c_int,d,window);
++        call!(x,"XFreeColormap",(*mut Display,Xid)->c_int,d,colormap);
++        r.opengl = Some(render?);
++        if !r.rendering_verified() {
++            return Err("known four-color GL scene failed tolerant pixel reference".into());
++        }
++        Ok(())
++    }
++}
++unsafe fn composite(
++    x: &Library,
++    lib: &Library,
++    d: *mut Display,
++    root: Xid,
++    r: &mut XCapabilities,
++) -> Result<(), String> {
++    unsafe {
++        let (mut major, mut minor) = (0, 0);
++        if call!(&lib,"XCompositeQueryVersion",(*mut Display,*mut c_int,*mut c_int)->c_int,d,&mut major,&mut minor)
++            == 0
++        {
++            return Err("extension unavailable".into());
++        }
++        r.composite_version = Some(format!("{major}.{minor}"));
++        let window = call!(x,"XCreateSimpleWindow",(*mut Display,Xid,c_int,c_int,c_uint,c_uint,c_uint,c_ulong,c_ulong)->Xid,d,root,0,0,32,32,0,0,0);
++        call!(&lib,"XCompositeRedirectWindow",(*mut Display,Xid,c_int)->(),d,window,1);
++        call!(x,"XMapWindow",(*mut Display,Xid)->c_int,d,window);
++        sync(x, d)?;
++        let pixmap = call!(&lib,"XCompositeNameWindowPixmap",(*mut Display,Xid)->Xid,d,window);
++        let gc = call!(x,"XCreateGC",(*mut Display,Xid,c_ulong,*mut c_void)->*mut c_void,d,window,0,ptr::null_mut());
++        call!(x,"XSetForeground",(*mut Display,*mut c_void,c_ulong)->c_int,d,gc,0x00ff00);
++        call!(x,"XFillRectangle",(*mut Display,Xid,*mut c_void,c_int,c_int,c_uint,c_uint)->c_int,d,window,gc,0,0,32,32);
++        sync(x, d)?;
++        // Manual opaque composition: paint a blue output, copy the redirected
++        // green window's offscreen pixmap into its left half, then read the output.
++        let output = call!(x,"XCreateSimpleWindow",(*mut Display,Xid,c_int,c_int,c_uint,c_uint,c_uint,c_ulong,c_ulong)->Xid,d,root,80,0,64,32,0,0,0x0000ff);
++        call!(x,"XMapWindow",(*mut Display,Xid)->c_int,d,output);
++        call!(x,"XCopyArea",(*mut Display,Xid,Xid,*mut c_void,c_int,c_int,c_uint,c_uint,c_int,c_int)->c_int,d,pixmap,output,gc,0,0,32,32,0,0);
++        sync(x, d)?;
++        let image = call!(x,"XGetImage",(*mut Display,Xid,c_int,c_int,c_uint,c_uint,c_ulong,c_int)->*mut c_void,d,output,0,0,64,32,c_ulong::MAX,2);
++        if !image.is_null() {
++            let get_pixel = sym!(
++                x,
++                "XGetPixel",
++                unsafe extern "C" fn(*mut c_void, c_int, c_int) -> c_ulong
++            );
++            r.composite_pixels = [
++                (4, 4, 0x00ff00),
++                (16, 16, 0x00ff00),
++                (28, 28, 0x00ff00),
++                (40, 16, 0x0000ff),
++                (60, 28, 0x0000ff),
++            ]
++            .iter()
++            .all(|(px, py, color)| get_pixel(image, *px, *py) & 0xffffff == *color);
++            call!(x,"XDestroyImage",(*mut c_void)->c_int,image);
++        }
++        call!(x,"XDestroyWindow",(*mut Display,Xid)->c_int,d,output);
++        call!(x,"XFreeGC",(*mut Display,*mut c_void)->c_int,d,gc);
++        call!(x,"XFreePixmap",(*mut Display,Xid)->c_int,d,pixmap);
++        call!(&lib,"XCompositeUnredirectWindow",(*mut Display,Xid,c_int)->(),d,window,1);
++        call!(x,"XDestroyWindow",(*mut Display,Xid)->c_int,d,window);
++        sync(x, d)?;
++        if !r.composite_pixels {
++            return Err("redirected window pixmap did not contain the painted reference".into());
++        }
++        Ok(())
++    }
++}
++unsafe fn randr(
++    x: &Library,
++    lib: &Library,
++    d: *mut Display,
++    root: Xid,
++    r: &mut XCapabilities,
++) -> Result<(), String> {
++    unsafe {
++        let (mut major, mut minor) = (0, 0);
++        if call!(&lib,"XRRQueryVersion",(*mut Display,*mut c_int,*mut c_int)->c_int,d,&mut major,&mut minor)
++            == 0
++        {
++            return Err("extension unavailable".into());
++        }
++        r.randr_version = Some(format!("{major}.{minor}"));
++        let (mut event_base, mut error_base) = (0, 0);
++        call!(&lib,"XRRQueryExtension",(*mut Display,*mut c_int,*mut c_int)->c_int,d,&mut event_base,&mut error_base);
++        call!(&lib,"XRRSelectInput",(*mut Display,Xid,c_int)->(),d,root,1);
++        let config = call!(&lib,"XRRGetScreenInfo",(*mut Display,Xid)->*mut c_void,d,root);
++        if config.is_null() {
++            return Err("screen configuration query unavailable".into());
++        }
++        let mut rotation = 0u16;
++        let current = call!(&lib,"XRRConfigCurrentConfiguration",(*mut c_void,*mut u16)->u16,config,&mut rotation);
++        let mut count = 0;
++        let sizes = call!(&lib,"XRRConfigSizes",(*mut c_void,*mut c_int)->*mut ScreenSize,config,&mut count);
++        let choice = if !sizes.is_null() && (0..=1024).contains(&count) {
++            (0..count)
++                .filter(|i| {
++                    *i != current as i32
++                        && (*sizes.add(*i as usize)).width > 0
++                        && (*sizes.add(*i as usize)).height > 0
++                })
++                .min_by_key(|i| {
++                    let size = &*sizes.add(*i as usize);
++                    (size.width as i64 * size.height as i64
++                        - r.dimensions[0] as i64 * r.dimensions[1] as i64)
++                        .abs()
++                })
++        } else {
++            None
++        };
++        let result = if let Some(choice) = choice {
++            let size = &*sizes.add(choice as usize);
++            let requested = [size.width as u32, size.height as u32];
++            // Resolve event functions before changing state, so a missing symbol
++            // cannot bypass restoration after a successful mode request.
++            let pending = sym!(x, "XPending", unsafe extern "C" fn(*mut Display) -> c_int);
++            let next = sym!(
++                x,
++                "XNextEvent",
++                unsafe extern "C" fn(*mut Display, *mut c_void) -> c_int
++            );
++            r.initial_mode_restored = false;
++            let status = call!(&lib,"XRRSetScreenConfig",(*mut Display,*mut c_void,Xid,c_int,u16,c_ulong)->c_int,d,config,root,choice,rotation,0);
++            let synced = sync(x, d);
++            let actual = geometry(x, d, root);
++            let mut observed = false;
++            while pending(d) > 0 {
++                let mut event = [0 as c_ulong; 24];
++                next(d, event.as_mut_ptr().cast());
++                if *(event.as_ptr().cast::<c_int>()) == event_base {
++                    observed = true;
++                }
++            }
++            // Always restore the provider's initial mode, including a partially successful request.
++            call!(&lib,"XRRSetScreenConfig",(*mut Display,*mut c_void,Xid,c_int,u16,c_ulong)->c_int,d,config,root,current as i32,rotation,0);
++            let restored = sync(x, d).and_then(|_| geometry(x, d, root));
++            if restored? != r.dimensions {
++                return Err("provider failed to restore its initial resolution".into());
++            }
++            r.initial_mode_restored = true;
++            if status == 0
++                && synced.is_ok()
++                && actual.as_ref().is_ok_and(|size| *size == requested)
++                && observed
++            {
++                r.randr_change = Some(requested);
++                Ok(())
++            } else {
++                Err(format!(
++                    "provider does not support requested mode change: status={status}, requested={requested:?}, actual={actual:?}, screen-change event={observed}"
++                ))
++            }
++        } else {
++            Err(
++                "provider advertises no alternate screen sizes; resolution changes unavailable"
++                    .into(),
++            )
++        };
++        call!(&lib,"XRRFreeScreenConfigInfo",(*mut c_void)->(),config);
++        result
++    }
++}
+--- a/tests/x11_extensions.rs
++++ b/tests/x11_extensions.rs
+@@ -0,0 +1,174 @@
++#![cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
++#[allow(dead_code)]
++#[path = "support/xserver.rs"]
++mod support;
++use harbor_workspace::x11::{XCapabilities, XServerLease};
++use std::{path::PathBuf, sync::atomic::AtomicBool};
++
++fn probe(lease: &XServerLease, cancelled: &AtomicBool) -> Result<XCapabilities, String> {
++    let executable = std::env::var_os("TERMCRAFT_TEST_X11_PROBE")
++        .map(PathBuf::from)
++        .unwrap_or_else(|| PathBuf::from(env!("CARGO_BIN_EXE_harbor-workspace")));
++    XCapabilities::probe_with_executable(&lease.client_display(), &executable, cancelled)
++}
++fn report(lease: &XServerLease) -> XCapabilities {
++    let report = probe(lease, &AtomicBool::new(false)).unwrap();
++    println!("{}", serde_json::to_string_pretty(&report).unwrap());
++    report
++}
++#[test]
++fn capability_report_does_not_turn_extension_presence_into_render_success() {
++    let report: XCapabilities = serde_json::from_str(r#"{"glx_version":"1.4","opengl":null,"composite_version":"0.4","composite_pixels":false,"randr_version":"1.6","dimensions":[1280,720],"randr_change":null,"errors":["GLX context unavailable"]}"#).unwrap();
++    assert!(!report.rendering_verified());
++}
++#[test]
++#[ignore = "only through tests/support/run_xserver_isolated.sh"]
++fn xcapabilities_reflect_real_server() {
++    let lease = support::start();
++    let report = report(&lease);
++    assert_eq!(report.composite_version.as_deref(), Some("0.4"));
++    assert!(report.composite_pixels, "{report:?}");
++    assert!(report.randr_version.is_some());
++    assert!(report.glx_version.is_some());
++    assert!(report.dimensions[0] > 0);
++    assert!(report.errors.is_empty(), "{report:?}");
++}
++#[test]
++#[ignore = "only through tests/support/run_xserver_isolated.sh"]
++fn known_gl_scene_renders_nonblank() {
++    let lease = support::start();
++    let report = report(&lease);
++    assert!(report.rendering_verified(), "{report:?}");
++    let gl = report.opengl.unwrap();
++    assert_eq!(gl.matched_pixels, 4096);
++    assert!(!gl.vendor.is_empty());
++    assert!(!gl.renderer.is_empty());
++    assert!(!gl.version.is_empty());
++    use base64::Engine;
++    let png = base64::engine::general_purpose::STANDARD
++        .decode(&gl.scene_png_base64)
++        .unwrap();
++    let image = image::load_from_memory(&png).unwrap();
++    assert_eq!((image.width(), image.height()), (64, 64));
++    let rgba = image.to_rgba8();
++    for (x, y, expected) in [
++        (16, 16, [255u8, 0, 0]),
++        (48, 16, [0, 255, 0]),
++        (16, 48, [0, 0, 255]),
++        (48, 48, [255, 255, 0]),
++    ] {
++        assert!(
++            rgba.get_pixel(x, y).0[..3]
++                .iter()
++                .zip(expected)
++                .all(|(actual, expected)| actual.abs_diff(expected) <= 3)
++        );
++    }
++    if let Some(destination) = std::env::var_os("TERMCRAFT_TEST_X11_SCENE_PNG") {
++        std::fs::write(destination, png).unwrap();
++    }
++    // A direct GLX context may still use llvmpipe; never infer GPU acceleration.
++    if gl.renderer.to_ascii_lowercase().contains("llvmpipe") {
++        assert!(gl.software);
++    }
++}
++#[test]
++#[ignore = "only through tests/support/run_xserver_isolated.sh"]
++fn randr_resolution_change_is_observed() {
++    use x11rb::{connection::Connection, protocol::xproto::ConnectionExt};
++    let lease = support::start();
++    let report = report(&lease);
++    assert!(report.initial_mode_restored);
++    let changed = report
++        .randr_change
++        .expect("fixture must support an actual change and event");
++    assert_ne!(changed, report.dimensions);
++    let client = support::client(&lease, true).unwrap();
++    let root = client.setup().roots[0].root;
++    let geometry = client.get_geometry(root).unwrap().reply().unwrap();
++    assert_eq!(
++        [geometry.width as u32, geometry.height as u32],
++        report.dimensions,
++        "initial screen dimensions must be restored"
++    );
++}
++#[test]
++#[ignore = "only through tests/support/run_xserver_isolated.sh"]
++fn cancelled_probe_keeps_owned_display_usable() {
++    let mut lease = support::start();
++    assert!(probe(&lease, &AtomicBool::new(true)).is_err());
++    assert!(lease.is_running().unwrap());
++    assert!(support::window_is_visible_on_display(
++        &support::client(&lease, true).unwrap()
++    ));
++}
++
++#[test]
++#[ignore = "only through tests/support/run_xserver_isolated.sh"]
++fn invalid_cookie_cannot_probe_owned_display() {
++    use std::process::{Command, Stdio};
++    let mut lease = support::start();
++    let wrong = tempfile::NamedTempFile::new().unwrap();
++    let mut record = std::fs::read(lease.authority_path()).unwrap();
++    *record.last_mut().unwrap() ^= 0xff;
++    std::fs::write(wrong.path(), record).unwrap();
++    let executable = std::env::var_os("TERMCRAFT_TEST_X11_PROBE")
++        .map(PathBuf::from)
++        .unwrap_or_else(|| PathBuf::from(env!("CARGO_BIN_EXE_harbor-workspace")));
++    let status = Command::new(executable)
++        .arg("--termcraft-x11-capability-probe")
++        .env("DISPLAY", lease.display())
++        .env("XAUTHORITY", wrong.path())
++        .stdin(Stdio::null())
++        .stdout(Stdio::null())
++        .stderr(Stdio::null())
++        .status()
++        .unwrap();
++    assert!(!status.success());
++    assert!(lease.is_running().unwrap());
++    assert!(support::window_is_visible_on_display(
++        &support::client(&lease, true).unwrap()
++    ));
++}
++
++#[test]
++#[ignore = "only through tests/support/run_xserver_isolated.sh; process cancellation, not graphics evidence"]
++fn cancellation_reaps_a_stalled_probe_process() {
++    use std::{
++        os::unix::fs::PermissionsExt,
++        sync::{Arc, atomic::Ordering},
++        time::{Duration, Instant},
++    };
++    let mut lease = support::start();
++    let directory = tempfile::tempdir().unwrap();
++    let executable = directory.path().join("stalled-probe");
++    let pid_file = directory.path().join("pid");
++    std::fs::write(
++        &executable,
++        format!(
++            "#!/bin/sh\nprintf '%s' \"$$\" > '{}'\nexec /bin/sleep 30\n",
++            pid_file.display()
++        ),
++    )
++    .unwrap();
++    std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o700)).unwrap();
++    let cancelled = Arc::new(AtomicBool::new(false));
++    let worker_cancelled = Arc::clone(&cancelled);
++    let flag = std::thread::spawn(move || {
++        std::thread::sleep(Duration::from_millis(150));
++        worker_cancelled.store(true, Ordering::Relaxed);
++    });
++    let start = Instant::now();
++    assert!(
++        XCapabilities::probe_with_executable(&lease.client_display(), &executable, &cancelled)
++            .is_err()
++    );
++    flag.join().unwrap();
++    assert!(start.elapsed() < Duration::from_secs(2));
++    let pid: u32 = std::fs::read_to_string(pid_file).unwrap().parse().unwrap();
++    assert!(
++        !std::path::Path::new(&format!("/proc/{pid}")).exists(),
++        "stalled probe must be reaped"
++    );
++    assert!(lease.is_running().unwrap());
++}

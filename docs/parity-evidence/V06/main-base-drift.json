@@ -1,0 +1,14 @@
+[
+  {
+    "path": "src/ui.rs",
+    "tested_base_sha256": "710ea401d58b44183b90811095af4958627063fd6e5bd8d1e2a0ce21b951b22c",
+    "current_main_sha256": "698e55be9c8fd8c101660ed9e887cb13230134c64fb93af718bdf18ff966279a",
+    "reason": "external registry/games integration after V06 snapshot; V06 did not modify MAIN product sources"
+  },
+  {
+    "path": "src/ui/windows.rs",
+    "tested_base_sha256": "d67917e5d92dc10077116b561b25ef9af1a45554f773025886a15de85c73d701",
+    "current_main_sha256": "b312974d14594bfcaae5572cc383e8d986babd2cc87db00232630f1fa8f835d2",
+    "reason": "external registry/games integration after V06 snapshot; V06 did not modify MAIN product sources"
+  }
+]

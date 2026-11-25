@@ -1,0 +1,31 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+warning: use of deprecated associated function `smol_str::SmolStr::new_inline_from_ascii`: Use `new_inline` instead
+  --> src/terminal/history.rs:21:129
+   |
+21 | ...ytes().enumerate(){cells[col].text=smol_str::SmolStr::new_inline_from_ascii(1,&[byte]);}cells
+   |                                                          ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: type `Rendition` is more private than the item `HistoryLine::Compact::rendition`
+ --> src/terminal/history.rs:6:65
+  |
+6 | pub(super) enum HistoryLine { Compact { text:smol_str::SmolStr, rendition:Rendition, columns:usize }, Full(Vec<Cell>) }
+  |                                                                 ^^^^^^^^^^^^^^^^^^^ field `HistoryLine::Compact::rendition` is reachable at visibility `pub(in crate::terminal)`
+  |
+note: but type `Rendition` is only usable at visibility `pub(self)`
+ --> src/terminal/history.rs:5:1
+  |
+5 | struct Rendition {fg:Ink,bg:Ink,bold:bool,inverse:bool}
+  | ^^^^^^^^^^^^^^^^
+  = note: `#[warn(private_interfaces)]` on by default
+
+warning: `harbor-workspace` (lib) generated 2 warnings
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.87s
+     Running tests/terminal_conformance.rs (app/target/debug/deps/terminal_conformance-f1f1293098e096af)
+
+running 1 test
+test plain_scrollback_retains_ordinary_history_within_a_small_budget ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 10 filtered out; finished in 0.03s
+

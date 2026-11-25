@@ -1,0 +1,14 @@
+   Compiling b06-puzzle-options-private v0.0.1 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app/target/agent-work/b06-puzzle-options)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.35s
+     Running unittests src/games/puzzles/mod.rs (app/target/agent-work/b06-puzzle-options/target/debug/deps/b06_puzzle_options_private-3f44d280165f513b)
+
+running 6 tests
+test tests::net_solve_locks_every_configured_tile_atomically_through_history ... ok
+test tests::net_solve_locks_every_default_tile_atomically_through_history ... ok
+test tests::mines_explicit_solve_after_death_reveals_corrections_and_undo_hides_them ... ok
+test untangle::configuration_tests::stock_point_counts_have_valid_solved_embeddings ... ok
+test tests::explicit_solve_is_atomic_assisted_undoable_and_guess_gives_up ... ok
+test solo::options_tests::default_is_solved_using_only_block_position_elimination ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 44 filtered out; finished in 0.52s
+

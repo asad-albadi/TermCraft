@@ -1,0 +1,9 @@
+   Compiling harbor-workspace v0.1.0 (/home/asad/Documents/Craft Anything/mobaxterm-personal-26-6/app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.88s
+     Running tests/remote_transfers.rs (app/target/debug/deps/remote_transfers-be9fc2871599b398)
+
+running 1 test
+test recursive_delete_is_confirmed_bounded_and_never_follows_symlinks ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 16 filtered out; finished in 0.22s
+
