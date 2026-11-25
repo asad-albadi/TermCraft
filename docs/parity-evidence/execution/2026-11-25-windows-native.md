@@ -198,6 +198,15 @@ created and mapped a real X window in the private engine and observed the
 viewable window through the forwarded connection. The engine and listener
 were then removed through owned shutdown.
 
+The same shell-free candidate passed the standalone Windows XDMCP peer test
+`python tests/windows_xdmcp_candidate.py --candidate <staged tree> --inventory <staging report> --evidence <new directory>`.
+An independent loopback UDP peer received DirectQuery, sent WILLING, received
+REQUEST, assigned a synthetic X cookie and observed MANAGE. The actual
+Windows X listener denied anonymous setup and accepted the assigned cookie.
+For IndirectQuery the peer verified the actual request and returned WILLING.
+The probe does not complete an indirect chooser session, launch a real
+display manager or enable the Windows application provider.
+
 ## Windows browser compatibility follow-up
 
 `cargo +1.96.1 test --locked --test browser_session -- --include-ignored --test-threads=1`
