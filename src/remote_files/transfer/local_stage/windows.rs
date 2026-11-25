@@ -12,13 +12,18 @@ use std::{
     path::{Path, PathBuf},
     sync::Arc,
 };
-use windows_sys::Win32::{
-    Foundation::{ERROR_ALREADY_EXISTS, ERROR_FILE_EXISTS, HANDLE},
-    Storage::FileSystem::{
-        BY_HANDLE_FILE_INFORMATION, FILE_ATTRIBUTE_REPARSE_POINT, FILE_FLAG_BACKUP_SEMANTICS,
-        FILE_FLAG_OPEN_REPARSE_POINT, FILE_RENAME_INFO, FILE_SHARE_DELETE, FILE_SHARE_READ,
-        FILE_SHARE_WRITE, FileRenameInfo, GetFileInformationByHandle, GetFinalPathNameByHandleW,
-        SetFileInformationByHandle,
+use windows_sys::{
+    Wdk::Storage::FileSystem::{
+        FILE_RENAME_INFORMATION, FileRenameInformation, NtSetInformationFile,
+    },
+    Win32::{
+        Foundation::{ERROR_ALREADY_EXISTS, ERROR_FILE_EXISTS, HANDLE, RtlNtStatusToDosError},
+        Storage::FileSystem::{
+            BY_HANDLE_FILE_INFORMATION, FILE_ATTRIBUTE_REPARSE_POINT, FILE_FLAG_BACKUP_SEMANTICS,
+            FILE_FLAG_OPEN_REPARSE_POINT, FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE,
+            GetFileInformationByHandle, GetFinalPathNameByHandleW,
+        },
+        System::IO::IO_STATUS_BLOCK,
     },
 };
 #[derive(Clone)]
@@ -53,12 +58,35 @@ fn identity(file: &File) -> io::Result<(u32, u32, u32)> {
         value.nFileIndexLow,
     ))
 }
+const DIRECTORY_FLAGS: u32 = FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT;
+const SHARE: u32 = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+
 fn directory(path: &Path) -> io::Result<File> {
-    let file = std::fs::OpenOptions::new()
+    validate_directory(
+        std::fs::OpenOptions::new()
+            .read(true)
+            .share_mode(SHARE)
+            .custom_flags(DIRECTORY_FLAGS)
+            .open(path)?,
+    )
+}
+
+fn child_directory(
+    parent: &cap_std::fs::Dir,
+    name: impl AsRef<Path>,
+    access: u32,
+) -> io::Result<File> {
+    let mut options = cap_std::fs::OpenOptions::new();
+    options
         .read(true)
-        .share_mode(FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE)
-        .custom_flags(FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT)
-        .open(path)?;
+        .follow(FollowSymlinks::No)
+        .access_mode(access)
+        .share_mode(SHARE)
+        .custom_flags(DIRECTORY_FLAGS);
+    validate_directory(parent.open_with(name, &options)?.into_std())
+}
+
+fn validate_directory(file: File) -> io::Result<File> {
     let metadata = file.metadata()?;
     if !metadata.is_dir() || metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0 {
         return Err(io::Error::other(
@@ -154,18 +182,17 @@ impl WindowsStage {
                 .collect::<String>()
         ));
         capability.create_dir(&container_name)?;
-        let container = capability.open_dir_nofollow(&container_name)?;
+        let container = cap_std::fs::Dir::from_std_file(child_directory(
+            &capability,
+            &container_name,
+            0x80000000,
+        )?);
         container.create_dir("tree")?;
-        let root = container.open_dir_nofollow("tree")?.into_std_file();
+        let root = child_directory(&container, "tree", 0x80000000)?;
         let path = parent_path.join(&container_name).join("tree");
         // Only reopen the newly created directory to obtain DELETE access. Its held identity must
         // match the capability-created root before it can receive bytes or authorize a rename.
-        let rename_root = std::fs::OpenOptions::new()
-            .read(true)
-            .access_mode(0x80000000 | 0x00010000)
-            .share_mode(FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE)
-            .custom_flags(FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT)
-            .open(&path)?;
+        let rename_root = child_directory(&container, "tree", 0x80000000 | 0x00010000)?;
         if identity(&rename_root)? != identity(&root)? {
             return Err(io::Error::other(
                 "Owned folder root changed while opening its rename handle",
@@ -209,9 +236,7 @@ impl WindowsStage {
             .as_ref()
             .ok_or_else(|| io::Error::other("Missing private folder container"))?;
         let parent = cap_std::fs::Dir::from_std_file(self.parent.try_clone()?);
-        let named = parent
-            .open_dir_nofollow(&tree.container_name)?
-            .into_std_file();
+        let named = child_directory(&parent, &tree.container_name, 0x80000000)?;
         if identity(&named)? != identity(&tree.container)? {
             return Err(io::Error::other(
                 "Owned folder container changed; no unrelated publication or cleanup attempted",
@@ -219,7 +244,7 @@ impl WindowsStage {
         }
         if tree_needed {
             let container = cap_std::fs::Dir::from_std_file(tree.container.try_clone()?);
-            let named = container.open_dir_nofollow("tree")?.into_std_file();
+            let named = child_directory(&container, "tree", 0x80000000)?;
             if identity(&named)? != identity(&self.file)? {
                 return Err(io::Error::other(
                     "Owned staged tree changed; publication stopped",
@@ -231,7 +256,7 @@ impl WindowsStage {
     pub(super) fn attach_merge_target(&mut self) -> io::Result<File> {
         self.validate_container(true)?;
         let parent = cap_std::fs::Dir::from_std_file(self.parent.try_clone()?);
-        let selected = parent.open_dir_nofollow(&self.target)?.into_std_file();
+        let selected = child_directory(&parent, &self.target, 0x80000000)?;
         self.tree
             .as_mut()
             .ok_or_else(|| io::Error::other("Missing folder staging"))?
@@ -242,7 +267,7 @@ impl WindowsStage {
         self.validate_container(true)?;
         let tree = self.tree.as_ref().unwrap();
         let parent = cap_std::fs::Dir::from_std_file(self.parent.try_clone()?);
-        let selected = parent.open_dir_nofollow(&self.target)?.into_std_file();
+        let selected = child_directory(&parent, &self.target, 0x80000000)?;
         if identity(&selected)?
             != identity(
                 tree.merge_target
@@ -322,32 +347,33 @@ impl WindowsStage {
             self.validate_container(true)?;
         }
         let name = self.target.encode_wide().collect::<Vec<_>>();
-        let offset = std::mem::offset_of!(FILE_RENAME_INFO, FileName);
-        let length = std::mem::size_of::<FILE_RENAME_INFO>().max(offset + name.len() * 2);
+        let length = size_of::<FILE_RENAME_INFORMATION>() + name.len() * size_of::<u16>();
         let mut buffer = vec![0usize; length.div_ceil(std::mem::size_of::<usize>())];
+        let mut result = IO_STATUS_BLOCK::default();
         // SAFETY: usize allocation provides pointer alignment; allocation holds the entire variable-size
-        // FILE_RENAME_INFO, including its UTF-16 tail. The source and parent handles stay owned throughout.
-        let result = unsafe {
-            let information = buffer.as_mut_ptr().cast::<FILE_RENAME_INFO>();
+        // FILE_RENAME_INFORMATION, including its UTF-16 tail. Both handles stay owned throughout.
+        let status = unsafe {
+            let information = buffer.as_mut_ptr().cast::<FILE_RENAME_INFORMATION>();
             (*information).Anonymous.ReplaceIfExists = overwrite;
             (*information).RootDirectory = self.parent.as_raw_handle() as HANDLE;
             (*information).FileNameLength = (name.len() * 2) as u32;
             std::ptr::copy_nonoverlapping(
                 name.as_ptr(),
-                buffer.as_mut_ptr().cast::<u8>().add(offset).cast::<u16>(),
+                std::ptr::addr_of_mut!((*information).FileName).cast(),
                 name.len(),
             );
-            SetFileInformationByHandle(
+            NtSetInformationFile(
                 self.file.as_raw_handle() as HANDLE,
-                FileRenameInfo,
+                &mut result,
                 information.cast(),
                 length as u32,
+                FileRenameInformation,
             )
         };
-        if result != 0 {
+        if status >= 0 {
             return Ok(true);
         }
-        let error = io::Error::last_os_error();
+        let error = io::Error::from_raw_os_error(unsafe { RtlNtStatusToDosError(status) } as i32);
         if !overwrite
             && matches!(error.raw_os_error(), Some(code) if code == ERROR_ALREADY_EXISTS as i32 || code == ERROR_FILE_EXISTS as i32)
         {
@@ -390,7 +416,16 @@ mod tests {
         drop(stage);
         let (stage, _, writer) = WindowsStage::create(root.join("chosen/other")).unwrap();
         drop(writer);
-        std::fs::rename(root.join("chosen"), root.join("moved")).unwrap();
+        if let Err(error) = std::fs::rename(root.join("chosen"), root.join("moved")) {
+            // NTFS can refuse a parent rename while a child is open. The
+            // original path remains anchored for the lifetime of the stage.
+            assert!(matches!(error.raw_os_error(), Some(5 | 32)), "{error}");
+            assert!(root.join("chosen").is_dir());
+            assert!(!root.join("moved").exists());
+            drop(stage);
+            std::fs::remove_dir_all(root).unwrap();
+            return;
+        }
         std::fs::create_dir(root.join("chosen")).unwrap();
         std::fs::write(root.join("chosen/other"), b"unrelated").unwrap();
         assert!(stage.commit(true).is_err());

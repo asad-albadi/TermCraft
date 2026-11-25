@@ -6,7 +6,6 @@ pub(super) fn owned_process_fixture_slot() -> std::sync::MutexGuard<'static, ()>
     static SLOT: std::sync::Mutex<()> = std::sync::Mutex::new(());
     SLOT.lock().unwrap_or_else(|poisoned| poisoned.into_inner())
 }
-#[cfg(unix)]
 pub(super) fn owned_workspace() -> (Context, tempfile::TempDir, Workspace) {
     let ctx = Context::default();
     let root = tempfile::tempdir().unwrap();

@@ -296,6 +296,11 @@ impl ReviewedArchive {
             serde_json::to_writer_pretty(&mut metadata, &self.metadata)
                 .map_err(io::Error::other)?;
             metadata.sync_all()?;
+            // The Windows capability directory handles deny delete sharing.
+            // Close the staging handles before publishing the owned directory.
+            drop(metadata);
+            drop(payload);
+            drop(stage);
             cancelled(cancel)?;
             // An exclusive root lock closes the concurrent-import existence/rename race.
             let mut options = cap_std::fs::OpenOptions::new();

@@ -3,7 +3,12 @@ use harbor_workspace::desktop::rdp_options::{RdpOptions, SerialMapping};
 fn serial_mappings_are_explicit_bounded_and_reject_ambiguous_devices() {
     let mapping = SerialMapping {
         name: "COM1".into(),
-        path: "/dev/ttyS0".into(),
+        path: if cfg!(windows) {
+            r"\\.\COM7"
+        } else {
+            "/dev/ttyS0"
+        }
+        .into(),
         read_only: true,
     };
     let mut options = RdpOptions {

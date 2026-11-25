@@ -281,7 +281,7 @@ fn redirected_drive_names_cannot_collide_after_protocol_truncation() {
 }
 
 #[test]
-fn printer_mapping_is_explicit_linux_only_and_rejected_by_installed_adapters() {
+fn printer_mapping_is_explicit_and_rejected_by_installed_adapters() {
     let mut session = Session {
         protocol: "RDP".into(),
         host: "server.example".into(),
@@ -297,7 +297,7 @@ fn printer_mapping_is_explicit_linux_only_and_rejected_by_installed_adapters() {
             .rdp_options
             .negotiate(&RdpCapabilities::embedded())
             .is_ok(),
-        cfg!(target_os = "linux")
+        cfg!(any(target_os = "linux", target_os = "macos", windows))
     );
     let encoded = serde_json::to_string(&session).unwrap();
     let roundtrip: Session = serde_json::from_str(&encoded).unwrap();
@@ -309,7 +309,15 @@ fn printer_mapping_is_explicit_linux_only_and_rejected_by_installed_adapters() {
         harbor_workspace::desktop::DesktopConfig::new(1, session.clone(), "unused-engine".into()),
     );
     assert!(attempt.err().unwrap().contains("View-only"));
-    for queue in ["", "..", "bad/name", "bad%2f", "bad\r\nHost"] {
+    for queue in ["", "bad/name", "bad\\name", "bad\r\nHost"]
+        .into_iter()
+        .chain(
+            (!cfg!(windows))
+                .then_some(["..", "bad%2f"])
+                .into_iter()
+                .flatten(),
+        )
+    {
         session.rdp_options.printer_mapping.as_mut().unwrap().queue = queue.into();
         assert!(session.rdp_options.validate().is_err());
     }
@@ -327,7 +335,7 @@ fn explicit_pcsc_reader_is_required_and_platform_bounded() {
         serde_json::from_str(r#"{"smartcard_reader":"Fixture Reader 00 00"}"#).unwrap();
     assert_eq!(
         options.negotiate(&capability).is_ok(),
-        cfg!(target_os = "linux")
+        cfg!(any(target_os = "linux", target_os = "macos", windows))
     );
     options.smartcard = true;
     assert!(options.negotiate(&capability).is_err());

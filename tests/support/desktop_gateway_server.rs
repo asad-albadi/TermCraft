@@ -219,6 +219,7 @@ impl Fixture {
         loop {
             match self.target.accept() {
                 Ok((stream, _)) => {
+                    stream.set_nonblocking(false).unwrap();
                     stream.set_read_timeout(Some(WAIT)).unwrap();
                     stream.set_write_timeout(Some(WAIT)).unwrap();
                     return stream;

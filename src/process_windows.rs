@@ -215,6 +215,9 @@ impl Process {
             }
             let mut startup: STARTUPINFOEXW = std::mem::zeroed();
             startup.StartupInfo.cb = std::mem::size_of::<STARTUPINFOEXW>() as u32;
+            // Null standard handles let ConPTY supply its console streams even
+            // when TermCraft itself was launched with redirected stdio.
+            startup.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
             startup.lpAttributeList = list;
             let command = std::iter::once(program.to_string())
                 .chain(args.iter().cloned())

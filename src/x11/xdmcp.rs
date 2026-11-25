@@ -239,6 +239,12 @@ pub fn discover(
                         | std::io::ErrorKind::TimedOut
                         | std::io::ErrorKind::Interrupted
                 ) => {}
+            // Winsock reports an ICMP port-unreachable on a previous datagram
+            // as a receive error. A peer can close after answering our first query.
+            #[cfg(windows)]
+            Err(e)
+                if e.raw_os_error()
+                    == Some(windows_sys::Win32::Networking::WinSock::WSAECONNRESET) => {}
             Err(e) => return Err(format!("XDMCP reply failed: {e}")),
         }
     }

@@ -103,6 +103,8 @@ impl InstanceBroker {
             .map(|b| format!("{b:02x}"))
             .collect::<String>();
         let mut lock = crate::platform::private_file::open(&workspace.join("instance.lock"), true)?;
+        #[cfg(windows)]
+        let record_path = workspace.join("instance.json");
         match lock.try_lock() {
             Ok(()) => {
                 let token = random()?;
@@ -138,10 +140,16 @@ impl InstanceBroker {
                     token,
                 };
                 let data = serde_json::to_vec(&record).map_err(ioerr)?;
-                lock.set_len(0).map_err(ioerr)?;
-                lock.seek(SeekFrom::Start(0)).map_err(ioerr)?;
-                lock.write_all(&data).map_err(ioerr)?;
-                lock.sync_all().map_err(ioerr)?;
+                // Windows enforces the byte-range lock on reads by other
+                // handles. Keep discovery data in its own private file there.
+                #[cfg(windows)]
+                let mut metadata = crate::platform::private_file::open(&record_path, true)?;
+                #[cfg(not(windows))]
+                let metadata = &mut lock;
+                metadata.set_len(0).map_err(ioerr)?;
+                metadata.seek(SeekFrom::Start(0)).map_err(ioerr)?;
+                metadata.write_all(&data).map_err(ioerr)?;
+                metadata.sync_all().map_err(ioerr)?;
                 let (tx, rx) = mpsc::sync_channel(32);
                 let stop = Arc::new(AtomicBool::new(false));
                 let stopped = stop.clone();
@@ -177,9 +185,21 @@ impl InstanceBroker {
             Err(std::fs::TryLockError::WouldBlock) => {
                 let end = Instant::now() + Duration::from_secs(2);
                 loop {
-                    lock.seek(SeekFrom::Start(0)).map_err(ioerr)?;
+                    #[cfg(windows)]
+                    let mut metadata =
+                        match crate::platform::private_file::open(&record_path, false) {
+                            Ok(file) => file,
+                            Err(_) if !record_path.exists() && Instant::now() < end => {
+                                std::thread::sleep(Duration::from_millis(10));
+                                continue;
+                            }
+                            Err(error) => return Err(error),
+                        };
+                    #[cfg(not(windows))]
+                    let metadata = &mut lock;
+                    metadata.seek(SeekFrom::Start(0)).map_err(ioerr)?;
                     let mut bytes = Vec::new();
-                    (&mut lock)
+                    metadata
                         .take(16385)
                         .read_to_end(&mut bytes)
                         .map_err(ioerr)?;
@@ -273,6 +293,11 @@ fn transfer(stream: &mut Stream, buf: &mut [u8], write: bool, end: Instant) -> R
             stream.read(&mut buf[done..])
         };
         match result {
+            // A nonblocking Windows named pipe can report zero bytes while
+            // the other end is still preparing its frame.
+            #[cfg(windows)]
+            Ok(0) => std::thread::sleep(Duration::from_millis(2)),
+            #[cfg(not(windows))]
             Ok(0) => return Err("Dispatch peer closed the connection.".into()),
             Ok(n) => done += n,
             Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {

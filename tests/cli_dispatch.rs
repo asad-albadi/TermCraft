@@ -30,7 +30,12 @@ fn cli_missing_value_returns_error_not_panic() {
         "--session".into(),
         "saved-id".into(),
         "--cwd".into(),
-        "/path with spaces".into(),
+        if cfg!(windows) {
+            r"C:\path with spaces"
+        } else {
+            "/path with spaces"
+        }
+        .into(),
     ])
     .unwrap();
     assert!(matches!(parsed,CliAction::OpenSession{id,cwd:Some(_),..} if id=="saved-id"));
@@ -108,10 +113,17 @@ fn malformed_oversized_and_unauthenticated_ipc_are_rejected() {
     let Binding::Primary(mut primary) = InstanceBroker::bind(root.path()).unwrap() else {
         panic!()
     };
+    let record = if cfg!(windows) {
+        "instance.json"
+    } else {
+        "instance.lock"
+    };
     let metadata: serde_json::Value =
-        serde_json::from_slice(&std::fs::read(root.path().join("instance.lock")).unwrap()).unwrap();
+        serde_json::from_slice(&std::fs::read(root.path().join(record)).unwrap()).unwrap();
     for payload in [b"not-json".to_vec(),serde_json::to_vec(&serde_json::json!({"version":1,"workspace":metadata["workspace"],"token":"wrong","id":"bad-auth","action":{"NewTab":{"cwd":null,"exit_when_done":false}}})).unwrap(),vec![b'X';65537]]{
-  let name=metadata["name"].as_str().unwrap().to_ns_name::<GenericNamespaced>().unwrap();let mut stream=Stream::connect(name).unwrap();stream.set_recv_timeout(Some(Duration::from_secs(2))).unwrap();
+  let name=metadata["name"].as_str().unwrap().to_ns_name::<GenericNamespaced>().unwrap();let mut stream=Stream::connect(name).unwrap();
+  #[cfg(unix)]
+  stream.set_recv_timeout(Some(Duration::from_secs(2))).unwrap();
   stream.write_all(&(payload.len()as u32).to_be_bytes()).unwrap();if payload.len()<=65536{stream.write_all(&payload).unwrap();}
   let mut len=[0;4];stream.read_exact(&mut len).unwrap();let mut response=vec![0;u32::from_be_bytes(len)as usize];stream.read_exact(&mut response).unwrap();
   let response:serde_json::Value=serde_json::from_slice(&response).unwrap();assert!(response["receipt"].is_null());assert!(response["error"].is_string());
