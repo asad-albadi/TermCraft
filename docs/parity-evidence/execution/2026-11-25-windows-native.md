@@ -62,6 +62,10 @@ probe. Its exact extracted RDP helper passed 10 software endpoint tests.
 The current Windows account then exercised installed startup, shortcut
 targets, foreign-file refusal, preserved workspace and encrypted vault, and
 uninstall using the `2b88d9c` and `5069518` executables.
+Replaying the installer with the same archives confirmed that duplicate
+installation and uninstall over modified or extra files were refused.
+After the original version was removed, a fresh install of the same
+version matched its original executable digest and removed cleanly.
 
 ## Verified locally
 
@@ -215,9 +219,15 @@ before resizing prevents an older Chromium capture from restoring stale page
 geometry. The passing replay covered repeated 300×200 and 460×320 panes,
 pointer clicks at responsive coordinates, wheel scrolling with matching preview
 and below-the-fold pointer input, Unicode form text, navigation,
-proxy and site authentication, and untrusted TLS rejection. The published
-Windows package still needs an independently audited and pinned redistributable
-browser payload and separate active sandbox qualification.
+proxy and site authentication, and untrusted TLS rejection. An independent
+Windows token observer identified the fixture executable and queried live
+browser and renderer tokens. The browser broker ran at medium integrity
+(`0x2000`). The observed renderer processes ran with restricted tokens
+at untrusted integrity (`0x0000`). No fixture process was running in
+AppContainer, and the per-session profile directories were gone after exit.
+This records the observed installed compatibility sandbox. A Windows
+redistributable browser payload still needs a separate license/resource
+audit, artifact pins, and the same startup and sandbox probes.
 
 ## Pageant
 
@@ -285,3 +295,7 @@ forwarding remains open.
   tracked separately in [issue #3](https://github.com/asad-albadi/TermCraft/issues/3).
   The failure was in the Linux-specific helper test. The native Windows
   helper replay independently passed 35 tests.
+- The Linux release job in the same hosted release matrix also failed its
+  package contract because the pinned Linux iperf2 binary requires
+  `GLIBC_2.43` and the Ubuntu 24.04 runner did not provide it. This was
+  observed in the Linux job before archive publication.

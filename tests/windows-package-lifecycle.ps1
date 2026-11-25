@@ -92,6 +92,30 @@ try {
     }
 
     $first = $installed[0]
+    $duplicateRefused = $false
+    try { & $first.Installer -Action Install }
+    catch {
+        if ($_.Exception.Message -notlike '*already exists*') { throw }
+        $duplicateRefused = $true
+    }
+    if (!$duplicateRefused) { throw 'Duplicate installation replaced the existing version.' }
+
+    $notice = Join-Path $first.Path 'PRIVACY.md'
+    $originalNotice = [IO.File]::ReadAllBytes($notice)
+    [IO.File]::WriteAllText($notice, 'a locally modified privacy file')
+    try {
+        $modifiedRefused = $false
+        try { & $first.Installer -Action Uninstall }
+        catch {
+            if ($_.Exception.Message -notlike '*file hash differs*') { throw }
+            $modifiedRefused = $true
+        }
+        if (!$modifiedRefused -or [IO.File]::ReadAllText($notice) -ne 'a locally modified privacy file') {
+            throw 'Uninstall failed to preserve a modified package file.'
+        }
+    } finally {
+        [IO.File]::WriteAllBytes($notice, $originalNotice)
+    }
     $extra = Join-Path $first.Path 'additional-file.txt'
     [IO.File]::WriteAllText($extra, 'must survive refusal')
     try {
@@ -116,8 +140,16 @@ try {
             throw 'An installed version or Start menu shortcut remained after uninstall.'
         }
     }
+    & $first.Installer -Action Install
+    if ((Get-FileHash -LiteralPath (Join-Path $first.Path 'harbor-workspace.exe')).Hash -ne $appHashes[0]) {
+        throw 'Reinstalled executable differs from the original package.'
+    }
+    & $first.Installer -Action Uninstall
+    if ((Test-Path -LiteralPath $first.Path) -or (Test-Path -LiteralPath $first.Link)) {
+        throw 'The reinstalled version or its shortcut remained after uninstall.'
+    }
     Assert-WorkspacePreserved
-    Write-Output 'Verified per-user side-by-side installation, both installed GUI startups, shortcuts, extra-file refusal, workspace preservation, and uninstall.'
+    Write-Output 'Verified side-by-side installation, installed GUI startups, shortcuts, duplicate and unsafe-uninstall refusal, exact reinstall, workspace preservation, and uninstall.'
     Write-Output "Installed GUI SHA-256, in execution order: $($appHashes -join ', ')"
 } finally {
     foreach ($entry in $installed) {
