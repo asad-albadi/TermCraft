@@ -619,8 +619,8 @@ pub(crate) mod serial {
                     &mut master,
                     &mut slave,
                     path.as_mut_ptr(),
-                    std::ptr::null(),
-                    std::ptr::null(),
+                    std::ptr::null_mut(),
+                    std::ptr::null_mut(),
                 )
             },
             0
