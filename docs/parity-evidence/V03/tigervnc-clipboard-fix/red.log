@@ -1,0 +1,27 @@
+
+running 4 tests
+test clipboard::regression::actual_tigervnc_1_12_sync_flush_provide_is_decoded ... FAILED
+test clipboard::regression::requested_provide_and_policy_gates_are_retained ... FAILED
+test clipboard::regression::legacy_finished_zlib_still_decodes ... ok
+test clipboard::regression::malformed_trailing_truncated_and_bomb_are_rejected ... ok
+
+failures:
+
+---- clipboard::regression::actual_tigervnc_1_12_sync_flush_provide_is_decoded stdout ----
+
+thread 'clipboard::regression::actual_tigervnc_1_12_sync_flush_provide_is_decoded' (296763) panicked at target/agent-work/independent-protocol-daemons/fix/regression.rs:2:147:
+called `Result::unwrap()` on an `Err` value: "Invalid or oversized VNC clipboard compression"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- clipboard::regression::requested_provide_and_policy_gates_are_retained stdout ----
+
+thread 'clipboard::regression::requested_provide_and_policy_gates_are_retained' (296766) panicked at target/agent-work/independent-protocol-daemons/fix/regression.rs:5:648:
+called `Result::unwrap()` on an `Err` value: "Invalid or oversized VNC clipboard compression"
+
+
+failures:
+    clipboard::regression::actual_tigervnc_1_12_sync_flush_provide_is_decoded
+    clipboard::regression::requested_provide_and_policy_gates_are_retained
+
+test result: FAILED. 2 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

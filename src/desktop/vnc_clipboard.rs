@@ -57,13 +57,46 @@ fn provide(text: &str) -> Result<Zeroizing<Vec<u8>>, String> {
 fn decode(data: &[u8], formats: u32) -> Result<String, String> {
     let mut bytes = Zeroizing::new(vec![0; 4 + UTF8_WIRE_LIMIT + 1]);
     let mut decoder = Decompress::new(true);
-    if decoder
-        .decompress(data, &mut bytes, FlushDecompress::Finish)
-        .map_err(|_| "Invalid VNC clipboard compression")?
-        != Status::StreamEnd
-        || decoder.total_in() as usize != data.len()
-    {
+    let status = decoder
+        .decompress(data, &mut bytes, FlushDecompress::Sync)
+        .map_err(|_| "Invalid VNC clipboard compression")?;
+    if decoder.total_in() as usize != data.len() {
         return Err("Invalid or oversized VNC clipboard compression".into());
+    }
+    if status != Status::StreamEnd {
+        // TigerVNC finishes each independent clipboard packet with Z_SYNC_FLUSH,
+        // leaving the zlib stream open. Prove that the packet ends at a complete
+        // empty stored-block boundary, rather than accepting arbitrary truncation.
+        let written = decoder.total_out() as usize;
+        if status != Status::Ok || !data.ends_with(&[0, 0, 255, 255]) || written == bytes.len() {
+            return Err("Invalid or oversized VNC clipboard compression".into());
+        }
+        let (mut a, mut b) = (1u32, 0u32);
+        for &byte in &bytes[..written] {
+            a = (a + u32::from(byte)) % 65521;
+            b = (b + a) % 65521;
+        }
+        let checksum = ((b << 16) | a).to_be_bytes();
+        let finish = [
+            1,
+            0,
+            0,
+            255,
+            255,
+            checksum[0],
+            checksum[1],
+            checksum[2],
+            checksum[3],
+        ];
+        if decoder
+            .decompress(&finish, &mut bytes[written..], FlushDecompress::Finish)
+            .map_err(|_| "Invalid VNC clipboard compression")?
+            != Status::StreamEnd
+            || decoder.total_in() as usize != data.len() + finish.len()
+            || decoder.total_out() as usize != written
+        {
+            return Err("Invalid or oversized VNC clipboard compression".into());
+        }
     }
     let data = &bytes[..decoder.total_out() as usize];
     let length = data.get(..4).ok_or("Missing VNC clipboard text length")?;
@@ -197,5 +230,118 @@ impl Clipboard {
             _ => return Err("Unsupported VNC clipboard action".into()),
         }
         Ok(reply)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    // TigerVNC 1.12.0 Z_SYNC_FLUSH PROVIDE containing only owned synthetic text.
+    const TIGERVNC_PROVIDE: [u8; 35] = [
+        120, 156, 98, 96, 96, 16, 15, 118, 13, 10, 115, 13, 138, 119, 246, 241, 12, 112, 242, 119,
+        12, 114, 137, 247, 15, 247, 115, 117, 97, 0, 0, 0, 0, 255, 255,
+    ];
+
+    #[test]
+    fn actual_tigervnc_1_12_sync_flush_provide_is_decoded() {
+        let bytes = &TIGERVNC_PROVIDE[..];
+        assert_eq!(decode(bytes, TEXT).unwrap(), "SERVER_CLIPBOARD_OWNED");
+    }
+    #[test]
+    fn legacy_finished_zlib_still_decodes() {
+        let wire = provide("owned unicode Ω\nline").unwrap();
+        assert_eq!(decode(&wire[12..], TEXT).unwrap(), "owned unicode Ω\nline");
+    }
+    #[test]
+    fn malformed_trailing_truncated_and_bomb_are_rejected() {
+        let bytes = &TIGERVNC_PROVIDE[..];
+        for n in 0..bytes.len() {
+            assert!(
+                decode(&bytes[..n], TEXT).is_err(),
+                "accepted truncation {n}"
+            );
+        }
+        let mut extra = bytes.to_vec();
+        extra.extend([0, 1, 0, 254, 255, b'x', 0, 0, 0, 255, 255]);
+        assert!(decode(&extra, TEXT).is_err());
+        let mut junk = bytes.to_vec();
+        junk.extend(b"junk");
+        assert!(decode(&junk, TEXT).is_err());
+        let mut corrupt = bytes.to_vec();
+        corrupt[4] ^= 128;
+        assert!(decode(&corrupt, TEXT).is_err());
+        let text = "A".repeat(UTF8_WIRE_LIMIT + 1000);
+        let wire = provide(&text).unwrap();
+        assert!(decode(&wire[12..], TEXT).is_err());
+    }
+    #[test]
+    fn requested_provide_and_policy_gates_are_retained() {
+        let bytes = &TIGERVNC_PROVIDE[..];
+        let mut c = Clipboard::default();
+        let flags = CAPS | TEXT | REQUEST | PROVIDE | NOTIFY;
+        let mut caps = flags.to_be_bytes().to_vec();
+        caps.extend(8192u32.to_be_bytes());
+        c.incoming(&caps, ClipboardPolicy::Bidirectional, false)
+            .unwrap();
+        let mut packet = (PROVIDE | TEXT).to_be_bytes().to_vec();
+        packet.extend(bytes);
+        assert!(
+            c.incoming(&packet, ClipboardPolicy::Bidirectional, false)
+                .unwrap()
+                .text
+                .is_none()
+        );
+        c.incoming(
+            &(NOTIFY | TEXT).to_be_bytes(),
+            ClipboardPolicy::Bidirectional,
+            false,
+        )
+        .unwrap();
+        assert_eq!(
+            c.incoming(&packet, ClipboardPolicy::Bidirectional, false)
+                .unwrap()
+                .text
+                .as_deref(),
+            Some("SERVER_CLIPBOARD_OWNED")
+        );
+        c.incoming(
+            &(NOTIFY | TEXT).to_be_bytes(),
+            ClipboardPolicy::Disabled,
+            false,
+        )
+        .unwrap();
+        assert!(
+            c.incoming(&packet, ClipboardPolicy::Disabled, false)
+                .unwrap()
+                .text
+                .is_none()
+        );
+    }
+    #[test]
+    fn sync_flush_bounds_and_finished_trailing_bytes_are_rejected() {
+        let mut completed = provide("owned").unwrap()[12..].to_vec();
+        completed.push(0);
+        assert!(decode(&completed, TEXT).is_err());
+        let mut concatenated = provide("owned").unwrap()[12..].to_vec();
+        concatenated.extend_from_slice(&provide("other").unwrap()[12..]);
+        assert!(decode(&concatenated, TEXT).is_err());
+        for (count, allowed) in [
+            (TEXT_LIMIT, true),
+            (TEXT_LIMIT + 1, false),
+            (UTF8_WIRE_LIMIT + 1000, false),
+        ] {
+            let mut encoder = ZlibEncoder::new(Vec::new(), Compression::fast());
+            encoder
+                .write_all(&((count + 1) as u32).to_be_bytes())
+                .unwrap();
+            encoder.write_all(&vec![b'A'; count]).unwrap();
+            encoder.write_all(&[0]).unwrap();
+            encoder.flush().unwrap();
+            assert_eq!(
+                decode(encoder.get_ref(), TEXT).is_ok(),
+                allowed,
+                "length {count}"
+            );
+        }
     }
 }

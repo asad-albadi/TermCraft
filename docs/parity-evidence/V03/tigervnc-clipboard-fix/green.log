@@ -1,0 +1,10 @@
+
+running 5 tests
+test clipboard::tests::actual_tigervnc_1_12_sync_flush_provide_is_decoded ... ok
+test clipboard::tests::requested_provide_and_policy_gates_are_retained ... ok
+test clipboard::tests::legacy_finished_zlib_still_decodes ... ok
+test clipboard::tests::sync_flush_bounds_and_finished_trailing_bytes_are_rejected ... ok
+test clipboard::tests::malformed_trailing_truncated_and_bomb_are_rejected ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
