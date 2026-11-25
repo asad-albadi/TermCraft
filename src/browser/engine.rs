@@ -413,13 +413,27 @@ impl Browser<'_> {
         self.size = [width, height];
         self.viewport_revision = revision;
         self.shared.frame.lock().unwrap().take();
-        // An emulated screenshot can restore its previous viewport when it
-        // completes. Resize the owned headless window without device emulation.
         self.call(
             false,
             "Browser.setContentsSize",
             json!({"windowId":self.window,"width":width,"height":height}),
         )?;
+        #[cfg(target_os = "macos")]
+        {
+            // AppKit clamps the native window width. Chromium needs both the
+            // CSS viewport and the visible surface sized for matching input
+            // coordinates and screenshot pixels.
+            self.call(
+                true,
+                "Emulation.setDeviceMetricsOverride",
+                json!({"width":width,"height":height,"deviceScaleFactor":1,"mobile":false}),
+            )?;
+            self.call(
+                true,
+                "Emulation.setVisibleSize",
+                json!({"width":width,"height":height}),
+            )?;
+        }
         Ok(())
     }
 

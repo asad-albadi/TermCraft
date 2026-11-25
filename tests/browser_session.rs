@@ -1,4 +1,4 @@
-#![cfg(any(target_os = "linux", windows))]
+#![cfg(any(target_os = "linux", target_os = "macos", windows))]
 
 #[path = "support/browser_fixture.rs"]
 mod browser_fixture;
@@ -36,6 +36,19 @@ fn chromium_available() -> bool {
         .and_then(|catalog| catalog.resolve(ToolId::Browser))
         .expect("Native Windows fixture requires installed Chromium or Google Chrome");
     true
+}
+
+#[cfg(target_os = "macos")]
+fn chromium_available() -> bool {
+    use harbor_workspace::runtime::{RuntimeCatalog, ToolId};
+    let available = RuntimeCatalog::for_current_executable()
+        .and_then(|catalog| catalog.resolve(ToolId::Browser))
+        .is_ok();
+    assert!(
+        available || std::env::var_os("TERMCRAFT_REQUIRE_CHROMIUM").is_none(),
+        "macOS browser qualification requires a native installed Chrome or Chromium"
+    );
+    available
 }
 
 #[cfg(windows)]
@@ -292,6 +305,7 @@ fn chromium_routes_through_configured_proxy_and_signs_in_only_after_consent() {
     assert!(origin.requests.lock().unwrap().is_empty());
 }
 
+#[track_caller]
 fn wait_until(session: &Session, mut condition: impl FnMut() -> bool) {
     // Debug builds verify the complete 429MB bundle before starting Chromium.
     let startup_budget = if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
