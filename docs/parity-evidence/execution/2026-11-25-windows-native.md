@@ -67,6 +67,22 @@ installation and uninstall over modified or extra files were refused.
 After the original version was removed, a fresh install of the same
 version matched its original executable digest and removed cleanly.
 
+The local unsigned package rebuilt at `57c122a` declares the native
+OpenGL 2.0-or-later GUI requirement and retains the 990-file layout.
+The relocated GUI probe and all 10 RDP software-endpoint cases passed with
+the exact extracted helper. The build command was the same as above, with
+output `target/windows-qualification/57c122a`.
+The installed `5069518` and `57c122a` GUI pair passed the expanded
+same-account lifecycle. The synthetic vault hash matched its original
+bytes and it unlocked after both installs and the reinstall were removed.
+
+| Latest local package input or artifact | SHA-256 |
+| --- | --- |
+| Frozen package inputs | `2037fccdcd444d6998f9b78c831a244154574f8383298612a86d8ce002a662e0` |
+| Packaged GUI | `de7c1fc4bdc9f6ee07dd1e0f71d53d6b1ba7c6233dde574881583bc19ef55299` |
+| Packaged RDP helper | `ab6e6e704b226b79ef8d5c149dc9127b651550ecd4b0db79164f73654d775e8a` |
+| Unsigned Windows x64 ZIP | `45f5f50404d09476cc4ba811011022e1c59675efe1d41cd0aa342f3af753978a` |
+
 ## Verified locally
 
 - The first native helper run had 31 passes and four failures. Commit
@@ -251,6 +267,30 @@ data and proved the same connection refused signing after key removal. The
 fixture process and window were removed after cleanup. Real-account agent
 forwarding remains open.
 
+## Native desktop capture and hosted Windows build
+
+The real Windows VNC view-only provider passed
+`cargo +1.96.1 test --locked --lib windows_native_view_only_capture_starts_and_releases_listener -- --ignored`.
+A native primary-desktop frame validated before publishing the loopback
+listener. A local client read the RFB 3.8 greeting, disconnected before
+authentication, and observed listener removal after stopping the managed
+service. The test retained no screenshots and sent no desktop pixels,
+clipboard data or input to the connection.
+
+[The clean Windows 2025 runner](https://github.com/asad-albadi/TermCraft/actions/runs/45692468865/job/139481228493)
+passed the package contract suite and built the unsigned ZIP
+`606ff9ab626e1e6bb4018c2f32cb2c3759670638e961d5098baa48d229a574f3`.
+Packaged command-line help and the adjacent RDP helper wire handshake passed
+there. The very next GUI step returned
+`OpenGL(PainterError("egui_glow requires opengl 2.0+. "))`. The installed-GUI
+test was skipped after that failure. The same downloaded ZIP passed relocated
+native GUI startup and the exact RDP child identity check on the supported
+local Windows desktop. It also passed the installed GUI and exact-reinstall
+test beside the local package on that desktop. This establishes a clean build, standalone helper
+startup and supported-host GUI behavior. Clean-user GUI, genuine
+release-to-release upgrade and activation still require a Windows desktop
+with an OpenGL 2.0 or later context.
+
 ## Outstanding evidence
 
 - The first executable root run reported 557 passes, 46 failures and 9 ignored
@@ -267,6 +307,9 @@ forwarding remains open.
   executed separately. The terminal model processed 360,000 input lines and
   retained 113,751,152 bytes within its 128 MiB budget. Native GPU frame timing
   was outside the CPU renderer benchmark.
+- The final `57c122a` locked Windows root suite reported 606 passes, zero
+  failures and 23 ignored. The extra opt-in test is the native VNC capture
+  case, which passed separately on the supported desktop.
 - The private VcXsrv build, owned start/stop and controlled embedded SSH
   forwarding passed. The runtime approval pin remains unset while MSVC
   redistribution notices, installed OpenSSH forwarding, Direct and Indirect
