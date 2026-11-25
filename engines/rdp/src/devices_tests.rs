@@ -377,15 +377,18 @@ fn drive_handles_enforce_requested_access_and_exclusive_sharing() {
     );
     b.process(&request(1, metadata, 4, 2, 0, &[0; 32])).unwrap();
     b.process(&request(1, append, 5, 2, 0, &[0; 32])).unwrap();
-    assert_eq!(
-        value(&b.process(&request(1, 0, 6, 0, 0, &exclusive)).unwrap(), 12),
-        0
-    );
+    let response = b.process(&request(1, 0, 6, 0, 0, &exclusive)).unwrap();
+    assert_eq!(value(&response, 12), 0);
+    let exclusive_id = value(&response, 16);
     assert_ne!(
         value(&open(&mut b, "file", 0x40000000, 5), 12),
         0,
         "exclusive share allowed another handle to truncate data"
     );
+    let closed = b
+        .process(&request(1, exclusive_id, 7, 2, 0, &[0; 32]))
+        .unwrap();
+    assert_eq!(value(&closed, 12), 0);
     assert_eq!(
         std::fs::read(root.path().join("file")).unwrap(),
         b"original"
@@ -416,7 +419,9 @@ fn unsupported_drive_mutations_never_change_files() {
         b"original"
     );
     let id = value(&open(&mut b, "file", 0xc0010000, 1), 16);
-    for (class, data) in [(13, vec![]), (10, vec![0; 6])] {
+    // Windows supports a zero-length disposition request. Use malformed
+    // requests to verify that rejected mutations leave the contents intact.
+    for (class, data) in [(13, vec![0]), (10, vec![0; 6])] {
         let mut body = Vec::new();
         word(&mut body, class);
         word(&mut body, data.len() as u32);

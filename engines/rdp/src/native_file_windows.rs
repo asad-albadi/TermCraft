@@ -6,10 +6,19 @@ use std::{
     os::windows::{ffi::OsStrExt, io::AsRawHandle},
     path::Path,
 };
-use windows_sys::Win32::Storage::FileSystem::{
-    FILE_ALLOCATION_INFO, FILE_DISPOSITION_INFO, FILE_ID_INFO, FILE_RENAME_INFO,
-    FILE_STANDARD_INFO, FileAllocationInfo, FileDispositionInfo, FileIdInfo, FileRenameInfo,
-    FileStandardInfo, GetFileInformationByHandleEx, SetFileInformationByHandle,
+use windows_sys::{
+    Wdk::Storage::FileSystem::{
+        FILE_RENAME_INFORMATION, FileRenameInformation, NtSetInformationFile,
+    },
+    Win32::{
+        Foundation::RtlNtStatusToDosError,
+        Storage::FileSystem::{
+            FILE_ALLOCATION_INFO, FILE_DISPOSITION_INFO, FILE_ID_INFO, FILE_STANDARD_INFO,
+            FileAllocationInfo, FileDispositionInfo, FileIdInfo, FileStandardInfo,
+            GetFileInformationByHandleEx, SetFileInformationByHandle,
+        },
+        System::IO::IO_STATUS_BLOCK,
+    },
 };
 
 pub(super) fn allocate(file: &File, size: u64) -> io::Result<()> {
@@ -68,10 +77,10 @@ pub(super) fn rename(file: &File, parent: &Dir, name: &Path, replace: bool) -> i
     {
         return Err(io::ErrorKind::InvalidInput.into());
     }
-    let bytes = std::mem::offset_of!(FILE_RENAME_INFO, FileName) + (name.len() + 1) * 2;
+    let bytes = size_of::<FILE_RENAME_INFORMATION>() + name.len() * size_of::<u16>();
     // Vec<usize> supplies native alignment for the variable length Windows struct.
     let mut storage = vec![0usize; bytes.div_ceil(size_of::<usize>())];
-    let info = storage.as_mut_ptr().cast::<FILE_RENAME_INFO>();
+    let info = storage.as_mut_ptr().cast::<FILE_RENAME_INFORMATION>();
     unsafe {
         (*info).Anonymous.ReplaceIfExists = replace;
         (*info).RootDirectory = parent.as_raw_handle();
@@ -82,16 +91,22 @@ pub(super) fn rename(file: &File, parent: &Dir, name: &Path, replace: bool) -> i
             name.len(),
         );
     }
-    let ok = unsafe {
-        SetFileInformationByHandle(
+    // The native information class resolves the relative name against this
+    // directory handle. The Win32 wrapper rejected this request on Windows.
+    let mut result = IO_STATUS_BLOCK::default();
+    let status = unsafe {
+        NtSetInformationFile(
             file.as_raw_handle(),
-            FileRenameInfo,
+            &mut result,
             info.cast(),
             bytes as u32,
+            FileRenameInformation,
         )
     };
-    if ok == 0 {
-        Err(io::Error::last_os_error())
+    if status < 0 {
+        Err(io::Error::from_raw_os_error(
+            unsafe { RtlNtStatusToDosError(status) } as i32,
+        ))
     } else {
         Ok(())
     }
