@@ -86,7 +86,7 @@ Implementation and platform limits are recorded in the [feature matrix](FEATURE_
 | Platform | Current status |
 | --- | --- |
 | Linux x86-64 | Strongest implementation and validation coverage. Native Debian 12 core packages and a separate Arch-compatible optional-runtime bundle are qualified within their declared scopes. |
-| Windows | Reviewed source and packaging foundations exist. Native engines, providers, installers and interactive qualification remain unfinished. |
+| Windows x86-64 | The native GUI and adjacent RDP helper have a verified unsigned portable package and per-user installer on a supported desktop. Clean-user graphics and activation, optional runtimes, native engine release approval and broader device and workflow qualification remain open. |
 | macOS | Reviewed source and bundle foundations exist. Native engines, providers, Intel/Apple Silicon delivery and interactive qualification remain unfinished. |
 
 The full optional Linux bundle and Debian core package have different contents and ABI requirements. The Arch-compatible optional bundle requires its declared runtime, including glibc 2.44; it is not a general Debian package. Debian core omits the optional X/browser/Mosh/Wayland runtime payloads. See [packaging documentation](packaging/README.md) and [current qualification](docs/parity-evidence/execution/2026-11-25-local-completion.md).

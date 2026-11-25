@@ -1,6 +1,10 @@
 Extract the ZIP and open harbor-workspace.exe for portable use. Keep
 termcraft-rdp-engine.exe beside the main executable.
 
+GUI startup requires a Windows desktop with an OpenGL 2.0 or later context.
+The hosted Windows runner can check the command-line entry and helper handshake
+without that graphics capability. Installed and portable GUI tests require it.
+
 For a per-user Start menu installation, open PowerShell in the extracted
 directory and run the included installer.
   .\install-per-user.ps1 -Action Install
