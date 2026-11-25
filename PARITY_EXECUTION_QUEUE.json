@@ -461,16 +461,17 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "",
-      "remaining": "Linux workflows are implemented, but two traced real-package chooser transitions reproduced early clipboard-client lifecycle/reset feedback and initializer EOF. Private native parent-identity classification plus bounded complete endpoint recovery fixes are in final review; current d6 artifact retains known defect. Native Windows/macOS/original coverage remains separate.",
-      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "remaining": "Linux direct/indirect chooser, clipboard, keyboard and cleanup workflows are implemented. Reviewed parent-identity lifecycle and bounded endpoint recovery fixes are integrated; genuine source22bb full398d traced and untraced actual-app qualification passed. Native Windows/macOS engines and original comparison remain.",
+      "validation_remaining": "Source22bb root981passed/0failed/73ignored; genuine full398d actual-app traced and untraced strict-auth clipboard/chooser/keyboard/cancel tests passed. New source d1a54 differs only in optional Wayland helper; final full release rebuild is active, no XDMCP changes.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/X04/hostnames/root-integration.json",
         "docs/parity-evidence/X04/clipboard-lifecycle/root-integration.json",
         "docs/parity-evidence/X04/keyboard-chooser/root-integration.json",
-        "target/agent-work/current-packaged-xdmcp/reliability-boundary/owner-handoff.md"
+        "target/agent-work/current-packaged-xdmcp/reliability-boundary/owner-handoff.md",
+        "docs/parity-evidence/parallel-integration-post-xdmcp-reset-fix/result.json"
       ],
-      "next_action": "Finish independent native/Rust review and actual production candidate tests, integrate exact payloads, rerun source/packaged regression gates and publish a newly qualified local artifact; do not stop at external environments yet.",
+      "next_action": "Retain qualified Linux behavior and exact native engine gates. Native Windows/macOS engines and original workflow comparison require supported environments.",
       "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
     },
     {
@@ -501,12 +502,12 @@
         "F01"
       ],
       "dependency": "",
-      "remaining": "Supply and integrate required protocol clients instead of depending on users to install every client separately. Validate a clean-machine setup.",
+      "remaining": "Linux optional protocol/runtime bundle is integrated and qualified for declared Arch x86_64 ABI, with actual empty-client-PATH Mosh SSH/UDP and sandboxed embedded Chromium. Debian12 core deliberately omits these optional native payloads. Native Windows/macOS required-client payloads and clean-runtime qualification remain.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md"
       ],
-      "next_action": "Supply and integrate required protocol clients instead of depending on users to install every client separately. Validate a clean-machine setup."
+      "next_action": "Preserve qualified Linux runtime closure, finish current optional Wayland rebuild, and build/qualify Windows/macOS payloads on supported native hosts."
     },
     {
       "id": "P02",
@@ -622,8 +623,8 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "",
-      "remaining": "Qualified current Debian12 core source d6e6c3 native ordinary release, real0.1.0\u21920.1.0-1 packaging revision upgrade/replacement/remove/reinstall and complete testworkspace/vault/corrupt-byte preservation. Source-current full optional Arch artifact is building after a compiler crash; other distributions, Windows/macOS installers/lifecycle/signing remain.",
-      "validation_remaining": "Exact Arch-compatible Linux archive integrity, isolated clean startup/helper and configured-host packaged XDMCP are qualified for b589 only. New source, native Windows/macOS and newer Debian lifecycle remain open.",
+      "remaining": "Source22bb full398d optional Arch-compatible bundle and Debian12 core0409/revision2 are genuinely built and independently accepted within scope. Actual apt revision1-to2 upgrade/replacement/remove/reinstall preserved workspace/vault/corrupt bytes. New optional Wayland idle-sharing fix d1a54 is integrated; updated full bundle qualification is active. Other distributions and native Windows/macOS installers/lifecycle remain.",
+      "validation_remaining": "Source22bb 3372 full-bundle hashes and1074 core hashes pass. Debian42commands/16bytepairs/5lifecycle inventories pass; full actual XDMCP/browser/Mosh checks pass. Updated optional Wayland helper/full release and actual GUI idle/Stop acceptance remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/parallel-packaging/review.md",
@@ -632,9 +633,10 @@
         "docs/parity-evidence/P08/debian-native/qualification/evidence-summary.md",
         "docs/parity-evidence/P08/debian-revision/review.md",
         "docs/parity-evidence/P08/current-debian-core-upgrade-d6e6c3/evidence-summary.md",
-        "docs/parity-evidence/V08/current-core-qualification/review.md"
+        "docs/parity-evidence/V08/current-core-qualification/review.md",
+        "docs/parity-evidence/P08/post-xdmcp-fix-debian-core-upgrade-22bbf268/evidence-summary.md"
       ],
-      "next_action": "After current source integration gate, qualify the next coherent release; preserve measured Debian/default13game and Arch/optional payload scopes. Finish native Windows/macOS packaging and signing in their supported environments.",
+      "next_action": "Finish updated genuine optional Linux bundle and real GUI idle/Stop checks. Preserve Debian12 core and Arch optional ABI scopes; then qualify native Windows/macOS releases in supported environments.",
       "interface_prerequisite_note": "Pinned Linux runtime/package manifests already exist and qualified immutable artifacts demonstrate the packaging interface; remaining full P01/native closure is separate from further Linux package validation."
     },
     {
@@ -757,7 +759,7 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "",
-      "remaining": "Reviewed embedded Chromium workflow and private pipe/process source backends are present for Linux, Windows and macOS. Finish packaged browser runtime closure and native provider qualification.",
+      "remaining": "Reviewed embedded Chromium and private process/pipe source backends are present for Linux, Windows and macOS. Genuine source22bb Linux bundle passes actual normal-app navigation/input/resize/PTY and five nested sandboxed renderer checks with clean cleanup. Native Windows/macOS browser packaging and interactive provider qualification remain.",
       "validation_remaining": "Native Windows/Linux/macOS and original runtime comparisons remain pending; static exact-target and official scope evidence established.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -769,7 +771,7 @@
         "docs/parity-evidence/E01/windows/README.md",
         "docs/parity-evidence/E01/resize-macos-review.md"
       ],
-      "next_action": "Package and qualify the browser engine; run native Windows/macOS private profile, input and lifecycle workflows. Keep System Chromium and legacy external-browser choices explicit."
+      "next_action": "Retain verified Linux managed Chromium runtime and sandbox behavior. Build and exercise native Windows/macOS bundled browsers, private profile/input and lifecycle workflows."
     },
     {
       "id": "E02",
@@ -795,7 +797,7 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "",
-      "remaining": "Reviewed Cron/NFS/VNC/native provider source and offline noVNC viewer are merged. Real private Linux ScreenCast/wlr and GNOME/Mutter RemoteDesktop exact-production providers now pass capture, actual keyboard/pointer, held-input Release/Stop, view-only/denial/cancel and cleanup checks with independent review. Current full-bundle GUI, physical consent/GPU/monitors, Windows/macOS and original services remain separate.",
+      "remaining": "Reviewed Cron/NFS/VNC/native providers and offline noVNC viewer are integrated. Real private native Linux provider capture/control matrices passed. Genuine full398d GUI Start/consent/RFB authentication then exposed static-desktop helper timeout; reviewed fix is integrated as deebc2e/source d1a54. Genuine updated helper/full bundle and actual GUI idle/input/held-inputStop/backend-loss acceptance are in progress. Physical GPU/monitors, Windows/macOS and original service qualification remain.",
       "validation_remaining": "Native Windows/Linux/macOS and original runtime comparisons remain pending; static exact-target and official scope evidence established.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -808,9 +810,10 @@
         "docs/parity-evidence/E03/composition-integration/root-browser-qualified.json",
         "docs/parity-evidence/E03/real-wayland-portal/HANDOFF.md",
         "docs/parity-evidence/E03/real-wayland-rd/HANDOFF.md",
-        "docs/parity-evidence/E03/real-wayland-rd/review.md"
+        "docs/parity-evidence/E03/real-wayland-rd/review.md",
+        "docs/parity-evidence/E03/wayland-idle-fix/independent-review.md"
       ],
-      "next_action": "Finish current optional Linux artifact qualification; retain exact headless native control scope and external physical/native/original evidence gaps."
+      "next_action": "Complete updated genuine helper/package and actual GUI idle/input/Stop/backend-loss checks; then retain exact headless Linux scope and qualify physical/native/original workflows in supported environments."
     },
     {
       "id": "E04",
@@ -893,7 +896,7 @@
       ],
       "dependency": "",
       "remaining": "Reviewed reproducible controlled Linux endpoint matrix and runner integrated;30 exact endpoint cases pass across FTP/FTPS, Telnet, Rlogin/Rsh, RDP, VNC, XDMCP and owned gateways.",
-      "validation_remaining": "Native Windows/macOS, original comparison, independent deployed daemons and end-to-end RDP clipboard/device redirection remain unverified.",
+      "validation_remaining": "Controlled Linux endpoint checkpoint retained; representative independent deployed RDP, FTP/FTPS, VNC-server and legacy-terminal daemon interoperability remains local work and is now assigned. Native Windows/macOS/original and additional server/version combinations remain separate.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/V03/README.md",
@@ -901,7 +904,7 @@
         "docs/parity-evidence/V03/root-tcp-tls.log",
         "docs/parity-evidence/V03/root-runner-contracts.log"
       ],
-      "next_action": "Retain reviewed runner and exact frozen fixture inputs; collect independent deployed/native/original and end-to-end device evidence without counting missing endpoints as passes."
+      "next_action": "Complete bounded independent daemon interoperability using owned containers/displays; preserve genuine failures and unchanged controlled negative matrices."
     },
     {
       "id": "V04",
@@ -970,7 +973,7 @@
         "B05"
       ],
       "dependency": "",
-      "remaining": "Reviewed clean native Debian12 current-core scenario now covers declared dependencies, real0.1.0\u21920.1.0-1 upgrade, replacement/removal/reinstall, full workspace/encrypted-test-vault/corrupt-original preservation, actual app/sealed-helper startup and configured native GTK game files. Full optional Arch payload closure, other native platforms and original evidence remain separate.",
+      "remaining": "Reviewed clean native Debian12 current-core scenario now covers declared dependencies, real0.1.0→0.1.0-1 upgrade, replacement/removal/reinstall, full workspace/encrypted-test-vault/corrupt-original preservation, actual app/sealed-helper startup and configured native GTK game files. Full optional Arch payload closure, other native platforms and original evidence remain separate.",
       "validation_remaining": "Current Debian core and configured GTK artifact qualified by independent review; full optional Arch artifact, Windows/macOS and original cells remain unverified.",
       "evidence": [
         "PARITY_PROGRESS.md",
