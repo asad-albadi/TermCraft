@@ -55,7 +55,6 @@ jobs:
           xcodebuild -version
           xcrun --sdk macosx --show-sdk-version
           cargo test --locked --manifest-path engines/rdp/Cargo.toml
-          }
       - run: cargo test --locked --test package_manifest
       - run: python scripts/package-release.py --output dist
       - if: runner.os == 'Linux'
