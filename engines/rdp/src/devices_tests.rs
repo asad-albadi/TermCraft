@@ -594,7 +594,7 @@ fn drive_allocation_is_released_on_last_remote_close_and_disconnect() {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 pub(crate) mod serial {
     use super::*;
     use crate::{
@@ -992,15 +992,26 @@ pub(crate) mod serial {
         transfer.extend(b"flow");
         send(&mut channel, handle, 3, 4, &transfer);
         std::thread::sleep(Duration::from_millis(10));
-        assert!(channel.poll().unwrap().is_empty());
+        // Darwin may accept the write into its paused output queue. The
+        // portable contract is that the PTY peer cannot read it before XON.
+        let mut packets: Vec<_> = channel
+            .poll()
+            .unwrap()
+            .iter()
+            .map(|p| p.encode_unframed_pdu().unwrap())
+            .collect();
+        assert!(packets.len() <= usize::from(cfg!(target_os = "macos")));
         assert_eq!(
             master.read(&mut [0; 4]).unwrap_err().kind(),
             std::io::ErrorKind::WouldBlock
         );
         send(&mut channel, handle, 4, 14, &ioctl(0x001b003c, &[], 0));
-        let mut packets = completions(&mut channel, 2);
+        packets.extend(completions(&mut channel, 2 - packets.len()));
         packets.sort_by_key(|p| value(p, 8));
+        assert_eq!(packets.len(), 2);
         assert!(packets.iter().all(|p| value(p, 12) == 0));
+        assert_eq!((value(&packets[0], 8), value(&packets[0], 16)), (3, 4));
+        assert_eq!(value(&packets[1], 8), 4);
         let mut data = [0; 4];
         master.read_exact(&mut data).unwrap();
         assert_eq!(&data, b"flow");

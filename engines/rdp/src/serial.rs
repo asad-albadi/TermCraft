@@ -262,6 +262,11 @@ impl Port {
         // descriptor bound when the mapping was initialized.
         let endpoint = self.binding.endpoint.as_ref().map_err(|error| *error)?;
         let file = endpoint.try_clone().map_err(status)?;
+        // Darwin's tcgetattr can still succeed on a slave after its PTY peer
+        // has hung up. Reject the dead binding before changing its line state.
+        if cfg!(target_os = "macos") && has_hung_up(&file).map_err(tty_status)? {
+            return Err(DISCONNECTED);
+        }
         let attributes = get_attributes(&file)?;
         let original = if writes {
             let mut raw = attributes;
@@ -647,6 +652,11 @@ fn bind_endpoint(path: &Path, expected: DeviceIdentity, read_only: bool) -> Resu
     let metadata = file.metadata().map_err(status)?;
     if !metadata.file_type().is_char_device() || identity(&metadata) != expected {
         return Err(DENIED);
+    }
+    // Darwin can report ENODEV from tcgetattr on a non-TTY such as /dev/null.
+    // Use the native TTY probe to recognize ENOTTY at admission.
+    if cfg!(target_os = "macos") && unsafe { libc::isatty(file.as_raw_fd()) } == 0 {
+        return Err(tty_status(io::Error::last_os_error()));
     }
     get_attributes(&file)?;
     Ok(file)
@@ -1135,7 +1145,7 @@ const SPEEDS: &[(u32, libc::speed_t)] = &[
     (230400, libc::B230400),
 ];
 
-#[cfg(all(test, target_os = "linux"))]
+#[cfg(all(test, any(target_os = "linux", target_os = "macos")))]
 mod tests {
     use super::*;
     use crate::devices_tests::serial::pty;
