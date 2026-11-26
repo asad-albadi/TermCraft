@@ -209,6 +209,39 @@
   and the candidate inventory SHA-256 was
   `c6f30b64d1a19587117b3be9ebbe4122b900f380e1ff75b46c4216330358a073`.
   The candidate passed the binary-cookie and Direct/Indirect wire checks.
+- The same clean candidate exchanged synthetic Unicode text in both
+  directions on a private Win32 window station and desktop. The fixture
+  verified the owned VcXsrv loopback listener, a window from the same PID on
+  the isolated desktop, and cookie-required X11 setup before clipboard
+  access. Windows denied creation of the private station from the medium
+  token. An elevated fixture child provided the required station access.
+  On the alternate loopback address the original candidate timed out while
+  its clipboard worker attempted to connect to the hard-coded `127.0.0.1`.
+- The clean candidate's three app-local Microsoft VC143 CRT files came
+  from the installed x64 `Microsoft.VC143.CRT` redistribution directory.
+  All three matched the hashes, file version and valid Authenticode
+  observations above. The release distributor's applicable terms and notices
+  remain part of the exact artifact approval.
+- The Windows mapped-drive replay used the independently locked optimized
+  helper at `93af690` with MSVC 14.44.35207 and Windows SDK 10.0.26100.0.
+  Its independent lock SHA-256 was
+  `ca94e4a19abf7abaf809f319e8931d3c70eb95520bac8efa9afe7e4e1f014f07`.
+  The exact release helper SHA-256 was
+  `4ea33adb5321494cc791fd1e03dd4b5347beb451af639481454963f6ac2c1a83`.
+  FreeRDP proxy 3.33.1 provided TLS/NLA in front of a real xrdp 0.10.6.1
+  Xorg session (xorgxrdp 0.10.5, FUSE 3.17.2, kernel 6.12.118).
+  The Windows helper originally returned `STATUS_OBJECT_NAME_NOT_FOUND`
+  for xrdp's missing-file lookup, which FUSE surfaced as EIO before a create
+  request. The scoped status correction uses `STATUS_NO_SUCH_FILE` for the
+  metadata-only Windows lookup. The exact release helper authenticated,
+  read both mapped drives, created and read back a writable file, refused
+  a read-only create, and completed a handle-relative rename. Separate
+  checks on Windows matched file bytes and path state. Explicit helper
+  `Close` returned exit 0. The guest retired the FUSE mounts and the owned
+  VM and SSH-forward loopback listeners then closed. The independent Rust
+  suite passed all 36 tests. The first optimized replay hit the loopback
+  proxy's separate backend activation timeout under QEMU. The retry passed
+  with the same helper and a warmed guest.
 - `cargo +1.96.1 test --locked --test windows_conpty` passed both tests.
   The native child wrote the main console, entered the alternate buffer,
   accepted input and received a resize from 80 × 25 to 100 × 32. TermCraft's
@@ -233,12 +266,14 @@
   reported 20 passed and 4 ignored. The opt-in native inactive-desktop test
   passed separately, confirming the provider denied startup, capture and
   control on a private desktop that never received foreground input.
-  The new authenticated one-pixel loopback probe compiled. It and the
-  previous native greeting probe stopped before opening a listener because
-  the host reported the interactive Windows session as disconnected. A
-  disposable unlocked session is needed for the positive pixel/control
-  replay. Windows providers for an individual window, a secondary monitor
-  and a virtual display are still absent.
+  The authenticated one-pixel probe first refused to open a listener while
+  the session was disconnected. After the session reconnected,
+  `cargo +1.96.1 test --locked --lib windows_vnc_authenticated_view_only_pixel_and_stop -- --ignored --nocapture`
+  passed with one test. It authenticated on loopback, received a raw GDI
+  pixel without recording its value, then verified client and listener
+  teardown. Control and clipboard were disabled for this replay. Windows
+  providers for an individual window, a secondary monitor and a virtual
+  display are still absent.
 
 ## Native build
 
@@ -502,6 +537,28 @@ artifact attestation or included component notices. Windows identified
 `chrome.exe` and 13 other PE files as unsigned. This was a static provenance
 assessment. [Publisher release](https://github.com/ungoogled-software/ungoogled-chromium-windows/releases/tag/158.0.8127.36-1.1).
 
+The Windows bundled launch path verifies the compiled platform manifest,
+copies each approved resource into the existing private profile while hashing
+it, and uses the ordinary Windows Chromium bootstrap and owned job. The
+release packager requires the same repository approval and verifies the
+exact ZIP and per-file inventory. Synthetic Python staging checks passed
+approval refusal, exact extraction, replacement-byte rejection, and
+case-alias rejection. A private compiled-pin replay used the publisher's
+Chrome for Testing archive above and reported five integration tests passed.
+It exercised Unicode input, resize and scrolling, TLS, proxy authentication
+and cancellation. The branch's Windows approval remains disabled while the
+source-built Chromium candidate is qualified.
+
+The upstream Chromium tag `158.0.8127.88` resolved to
+`0cefb18236a23db1ebb6b2bc040fbbaf8cbe759e`. Its checked-out `DEPS` SHA-256
+was `db3d3a3f508dd4210446814aa977d6ef9e4a046194b04a94ad6a0d3ea5f39017`
+and depot_tools was `2e69d2953ddf4a4c671c701773991ff68475db00`. The
+side-by-side VS 2026 Build Tools installation completed at 18.11.12405.450
+with MSVC 14.52.37025. Windows SDK and x64 debugging tools installed at
+10.0.28000.2270. An initial source dependency fetch returned HTTP 429 from
+Chromium's libgav1 repository. A four-job retry proceeded through the
+owned worktree checkouts. This records source and toolchain setup.
+
 ## Pageant
 
 The standalone Windows x64 Pageant 0.85 binary matched the publisher's
@@ -602,3 +659,9 @@ with an OpenGL 2.0 or later context.
   byte-for-byte. [CI on main](https://github.com/asad-albadi/TermCraft/actions/runs/45745650311)
   and [CI on the branch](https://github.com/asad-albadi/TermCraft/actions/runs/45747710710)
   independently reproduced the Linux allocation cleanup failure.
+- [Linux CI on `1b52f14`](https://github.com/asad-albadi/TermCraft/actions/runs/45849634074/job/140012310105)
+  still reported the helper allocation failure (81 passed, one failed).
+  The independent shared XDMCP Rust checks ran afterwards and reported
+  seven passed, zero failed and nine ignored. The earlier exploratory Linux
+  workspace replay also failed SSH fixtures at the unchanged hard-coded
+  `/usr/bin/sshd` path. That replay lacked the fixture executable there.

@@ -13,32 +13,32 @@ This validates the archive, safely extracts it, applies the exact private patch,
 
 ## Windows native build recipe
 
-Use a Windows x86_64 native worker with Visual Studio 2022/VC143 and the Windows SDK. The pinned source's `buildall.sh` includes host-specific tool paths and an upstream NSIS installer step. On a native x64 Developer PowerShell, the underlying release build can run directly in the prepared source tree:
+Run `build-private-windows.ps1` from a native x64 Visual Studio 2022 Developer
+PowerShell. Provide the pinned source archive, an unused build directory
+without spaces, and the native tools. The opt-in `windows_x_fixture` release
+workflow records the dependency versions and verifies all downloaded hashes.
 
 ```powershell
-$env:IS64 = '1'
-$env:CFLAGS = '-FS'
-$env:CL = '/FS'
-$env:MHMAKECONF = (Get-Location).Path
-$env:PYTHON3 = (Get-Command python.exe).Source
-msbuild freetype/MSBuild.sln -t:Build -p:Configuration=Release -p:Platform=x64 -m:2
-New-Item -ItemType Directory -Path openssl/release64
-Push-Location openssl/release64
-perl.exe ../Configure VC-WIN64A --release
-jom.exe /J 4
-Pop-Location
-Push-Location pthreads
-nmake.exe VC-static EXTRAVERSION=
-Pop-Location
-msbuild tools/mhmake/mhmakevc10.sln -t:Build -p:Configuration=Release -p:Platform=x64 -m:2
-tools/mhmake/Release64/mhmake.exe -P4 -C xorg-server MAKESERVER=1
+$tools = @('C:/tools/jom', 'C:/tools/nasm', 'C:/tools/perl/perl/bin',
+    'C:/tools/winflexbison', 'C:/tools/gperf/usr/bin')
+./packaging/x11/native/build-private-windows.ps1 `
+    -SourceArchive C:/offline/vcxsrv-source.tar.gz `
+    -BuildDirectory C:/tc-x11-build `
+    -PythonExecutable C:/tools/x11-python/Scripts/python.exe `
+    -GitUnixBin 'C:/Program Files/Git/usr/bin' -ToolDirectories $tools
 ```
 
-Make NASM, Jom, Strawberry Perl, WinFlexBison, Python with lxml, Mako, PyYAML, Meson and Ninja, and GNU gperf available in this shell. Resolve the pinned tree's hard-coded WinFlexBison and Python launcher paths through that shell's PATH, and use Git Bash for the two upstream `wsl ./` recipes in `xorg-server/dix/makefile` and `xorg-server/xkeyboard-config/makefile`. Keep MSVC's executable directories ahead of Git's Unix tools so the build uses the MSVC linker. Preserve the native backslash form of `MHMAKECONF` because mhmake compares directory prefixes literally. Use a build directory with no spaces.
+The Python environment needs lxml, Mako, PyYAML, Meson and Ninja. The recipe
+adapts the pinned upstream tool paths in its prepared copy, builds the native
+components and stages the adjacent DLLs, fonts, xkbcomp and XKB data. Its
+output includes `build-inputs.json`, `candidate-inventory.json` and
+`pe-imports.txt`. The output stays in the build directory.
 
-Stage the server, `xorg-server/obj64/servrelease/vcxsrv.exe`, with the matching DLLs, fonts, xkbcomp and XKB data from the same build. The upstream x64 NSIS recipe lists the runtime files. Record exact PE imports, file hashes, toolchain versions, compiler options, corresponding source, the TermCraft patch and the MSVC redistribution notices before approving a payload.
-
-Use `stage-private-windows.ps1` with the prepared source directory, an empty candidate destination and the x64 VC143 CRT directory. Save its JSON output outside the candidate directory. The qualification test expects the staged directory at `x11/windows-x86_64-private1` beneath `TERMCRAFT_TEST_WINDOWS_X11_ROOT` and the JSON report at `TERMCRAFT_TEST_WINDOWS_X11_INVENTORY`.
+For an existing build, `stage-private-windows.ps1` takes the prepared source
+directory, an empty candidate destination and the x64 VC143 CRT directory.
+Save its JSON output outside the candidate directory. The qualification test
+expects `x11/windows-x86_64-private1` beneath `TERMCRAFT_TEST_WINDOWS_X11_ROOT`
+and the JSON report at `TERMCRAFT_TEST_WINDOWS_X11_INVENTORY`.
 
 To exercise the private Windows capability probe with the authenticated
 wire fixture, pass a native TermCraft executable as

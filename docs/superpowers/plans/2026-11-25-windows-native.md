@@ -65,7 +65,7 @@
 
 - [x] Replay installed Chromium compatibility against independent Windows loopback fixtures after fixing isolated startup and viewport/input handling.
 - [x] Exercise add/list/remove with the standalone Pageant process and a synthetic key. Verify ownership and cleanup.
-- [x] Exercise native primary-display capture with view-only VNC, a loopback-only listener and no screen pixels sent to the test client.
+- [x] Authenticate to native primary-display capture with view-only VNC, receive one raw pixel over loopback without recording it, then verify client and listener teardown.
 - [ ] Use `packaging/browser/stage-runtime.py` and `tests/browser_session.rs` to identify and test the bundled runtime. Run native profile isolation, sandbox, resize/input, cancellation and cleanup checks against a private peer.
 - [ ] Exercise locally available services and capture/control, and run `windows_integration`, `ssh_agent` and `session_import` as part of the root suite. Verify Pageant, vault ACLs and recovery, imports, shared definitions, gateways, proxies and reconnects with synthetic data.
 - [ ] Record exact fixture status for physical serial/network/device and original Personal 26.6 comparisons.
