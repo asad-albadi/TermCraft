@@ -46,6 +46,26 @@ pub fn setup(
     if !address.ip().is_loopback() {
         return Err("Native X transport must be loopback-only".into());
     }
+    setup_tcp(address, cookie, flag)
+}
+
+#[cfg(windows)]
+pub(super) fn setup_owned_tcp(
+    address: SocketAddr,
+    cookie: Option<&[u8; 16]>,
+    flag: &AtomicBool,
+) -> Result<bool, String> {
+    // The Windows launcher verifies ownership of this exact local listener
+    // with the IP Helper table before calling this path.
+    setup_tcp(address, cookie, flag)
+}
+
+fn setup_tcp(
+    address: SocketAddr,
+    cookie: Option<&[u8; 16]>,
+    flag: &AtomicBool,
+) -> Result<bool, String> {
+    cancelled(flag)?;
     let slice = Duration::from_millis(25);
     let deadline = Instant::now() + Duration::from_millis(150);
     let mut stream = TcpStream::connect_timeout(&address, slice).map_err(|e| e.to_string())?;

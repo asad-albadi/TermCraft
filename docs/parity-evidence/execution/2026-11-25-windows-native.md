@@ -144,6 +144,34 @@
   ownership and removal of the listener and private runtime. The Windows
   snapshot and runtime directories use explicit current-user ownership.
   [Microsoft CRT stream modes](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/fopen-wfopen)
+- The Windows x64 application routes Direct and Indirect XDMCP through its
+  owned native lease. It requires explicit consent, a unicast IPv4 manager
+  and one local advertised address. The regular owned X server still binds
+  loopback, and the XDMCP candidate checks the reserved endpoint and process
+  owner before accepting readiness. The app describes listener readiness
+  while manager authentication is pending. Both application modes, using
+  numeric and hostname entry points, reached the existing fail-closed
+  artifact gate in the locked Windows XDMCP replay (19 passed).
+- The updated Windows runtime patch SHA-256 is
+  `2199f0fc0751205d97f903bd2b0687f181e3337594837900c20fb00a8c577394`.
+  The candidate executable SHA-256 is
+  `d9466511531f881de451c4715a575935d58024b83ddb6823bc54b64a6a450bea`
+  and its inventory SHA-256 is
+  `22a4c1195d886eda5ebd3a8a3b50ca61b1e2240647d99c0e3660b9e24651a0fa`.
+  In addition to both independent native wire cases, the Rust provider
+  fixture on `127.0.0.2` completed Direct REQUEST, ACCEPT and MANAGE,
+  authenticated with the manager's cookie and proved exact listener
+  ownership and cleanup. This is a second loopback address, not an
+  observation of physical adapter or routed-network behavior.
+- The same inventory passed the embedded SSH case and a separate installed
+  OpenSSH case through ConPTY, with Git for Windows' OpenSSH 9.9p2
+  (executable SHA-256
+  `50f2ed2c4eacea177dc208bbb70679307f5d5fcace69c2c74703da41c1b92ad9`).
+  The test used a staged xauth 1.0.10, isolated SSH config and authority,
+  strict host-key verification and a private fixture peer. The system
+  Win32-OpenSSH 9.5p2 and the publisher's isolated 10.4p1 preview both
+  reported no xauth data despite a direct xauth lookup succeeding. Neither
+  passed authenticated forwarding in this fixture.
 - `cargo +1.96.1 test --locked --test windows_conpty` passed both tests.
   The native child wrote the main console, entered the alternate buffer,
   accepted input and received a resize from 80 × 25 to 100 × 32. TermCraft's

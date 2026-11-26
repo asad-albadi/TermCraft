@@ -44,6 +44,13 @@ The transport patch changes listener binds to IPv4/IPv6 loopback, configures che
 
 Windows XKB starts the adjacent `xkbcomp.exe` directly with explicit input and output paths. It inherits the server's job and does not load Command Processor startup hooks. The server reads its own runtime directory for user-level X configuration.
 
+The private Windows XDMCP provider accepts one explicit local IPv4 address
+with per-session consent. It reserves the chosen address and display port,
+passes the restriction to the private engine, and verifies that the resulting
+listener belongs to the owned process. The regular owned display continues
+to reserve loopback. Both paths require protocol authentication, including
+binary Xauthority cookies and credentials negotiated by an XDMCP manager.
+
 ## macOS native build recipe
 
 A native arm64 and x86_64 worker needs the Xcode macOS SDK, meson/ninja/pkg-config/bison/flex/mig, and the complete pinned XQuartz dependency source/build closure. The release `.pkg` is an inspection/dependency input; never execute its installation scripts. Configure patched xserver with `--wrap-mode=nodownload`, `-Dxquartz=true -Dxorg=false -Dxephyr=false -Dxnest=false -Dxvfb=false -Dxcsecurity=true`, an application-specific `-Dbundle-id-prefix=org.termcraft.private`, and empty Sparkle feed/key options. Use private prefix, XKB and font data paths. Build `hw/xquartz/mach-startup/X11.bin` plus the generated bundle resources. Do **not** run `meson install`: upstream's bundle install hook attempts root ownership. Copy only the build outputs, nib/resources, private xkbcomp/data/fonts and matching dependency dylibs into a fresh staging tree.

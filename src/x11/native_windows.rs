@@ -1,4 +1,6 @@
 //! Private Windows provider. The unpatched upstream executable is never accepted.
+#[cfg(target_arch = "x86_64")]
+use super::xdmcp::{QueryMode, XdmcpConfig, windows_network};
 use super::{
     XDisplayMode, XServerLease, XServerOptions,
     native_artifact::{VerifiedSnapshot, protect_directory},
@@ -6,7 +8,7 @@ use super::{
 };
 use std::{
     ffi::OsString,
-    net::{SocketAddr, TcpListener},
+    net::{Ipv4Addr, SocketAddr, TcpListener},
     path::Path,
     sync::atomic::AtomicBool,
     time::{Duration, Instant},
@@ -34,11 +36,74 @@ pub(super) fn start(
         );
     }
     let pin = native_policy::windows_pin()?;
-    launch(root, options, flag, pin)
+    let request = DisplayRequest {
+        fullscreen: options.display_mode == XDisplayMode::Fullscreen,
+        ..DisplayRequest::local()
+    };
+    launch(root, request, flag, pin)
 }
+
+#[cfg(target_arch = "x86_64")]
+pub(super) fn start_xdmcp(
+    root: &Path,
+    config: &XdmcpConfig,
+    width: u32,
+    height: u32,
+    flag: &AtomicBool,
+) -> Result<XServerLease, String> {
+    native_transport::cancelled(flag)?;
+    let request = DisplayRequest::xdmcp(config, width, height)?;
+    let pin = native_policy::windows_pin()?;
+    launch(root, request, flag, pin)
+}
+
+struct DisplayRequest {
+    address: Ipv4Addr,
+    display: Option<u16>,
+    fullscreen: bool,
+    extra: Vec<OsString>,
+}
+
+impl DisplayRequest {
+    fn local() -> Self {
+        Self {
+            address: Ipv4Addr::LOCALHOST,
+            display: None,
+            fullscreen: false,
+            extra: Vec::new(),
+        }
+    }
+
+    #[cfg(target_arch = "x86_64")]
+    fn xdmcp(config: &XdmcpConfig, width: u32, height: u32) -> Result<Self, String> {
+        let (manager, address) = windows_network(config, width, height)?;
+        let query = if config.mode == QueryMode::Indirect {
+            "-indirect"
+        } else {
+            "-query"
+        };
+        Ok(Self {
+            address,
+            display: config.display,
+            fullscreen: config.fullscreen,
+            extra: vec![
+                "-screen".into(),
+                "0".into(),
+                format!("{width}x{height}").into(),
+                "-from".into(),
+                address.to_string().into(),
+                "-port".into(),
+                manager.port().to_string().into(),
+                query.into(),
+                manager.ip().to_string().into(),
+            ],
+        })
+    }
+}
+
 fn launch(
     root: &Path,
-    options: XServerOptions,
+    request: DisplayRequest,
     flag: &AtomicBool,
     pin: &native_policy::NativePin<'_>,
 ) -> Result<XServerLease, String> {
@@ -50,7 +115,16 @@ fn launch(
     let runtime_guard = protect_directory(runtime.path())?;
     // Let the OS choose one owned ephemeral port. No X display scanning or
     // deletion occurs. A race after release fails the engine's exclusive bind.
-    let reservation = TcpListener::bind("127.0.0.1:0").map_err(|e| e.to_string())?;
+    let port = request
+        .display
+        .map_or(Some(0), |display| display.checked_add(6000))
+        .ok_or("Display is outside the Windows X port range")?;
+    let reservation = TcpListener::bind((request.address, port)).map_err(|e| {
+        format!(
+            "Cannot reserve the private X display on {}: {e}",
+            request.address
+        )
+    })?;
     let address = reservation.local_addr().map_err(|e| e.to_string())?;
     let display = address
         .port()
@@ -81,15 +155,22 @@ fn launch(
     arguments.push(authority_path.as_os_str().into());
     arguments.push("-logfile".into());
     arguments.push(runtime.path().join("server.log").into_os_string());
-    if options.display_mode == XDisplayMode::Fullscreen {
+    if request.fullscreen {
         arguments.push("-fullscreen".into());
     }
+    arguments.extend(request.extra);
     let mut environment = vec![
         ("PATH".into(), image.root().as_os_str().into()),
         ("TEMP".into(), runtime.path().as_os_str().into()),
         ("TMP".into(), runtime.path().as_os_str().into()),
         ("HOME".into(), runtime.path().as_os_str().into()),
     ];
+    if request.address != Ipv4Addr::LOCALHOST {
+        environment.push((
+            "TERMCRAFT_X11_LISTEN_IPV4".into(),
+            request.address.to_string().into(),
+        ));
+    }
     for name in ["SystemRoot", "WINDIR"] {
         if let Some(value) = std::env::var_os(name) {
             environment.push((name.into(), value));
@@ -117,14 +198,14 @@ fn launch(
             return Err("Private Windows X server timed out opening its reserved display".into());
         }
         if owns_listener(process.id().ok_or("Native X process exited")?, address)? {
-            match native_transport::setup(address, None, flag) {
+            match native_transport::setup_owned_tcp(address, None, flag) {
                 Ok(true) => {
                     return Err(
                         "Private Windows X server allowed a client without Xauthority".into(),
                     );
                 }
                 Ok(false) => {
-                    if native_transport::setup(address, Some(&cookie), flag)?
+                    if native_transport::setup_owned_tcp(address, Some(&cookie), flag)?
                         && owns_listener(process.id().ok_or("Native X process exited")?, address)?
                     {
                         break;
@@ -138,7 +219,7 @@ fn launch(
     native_transport::cancelled(flag)?;
     Ok(XServerLease {
         alive: tokio::sync::watch::Sender::new(true),
-        display: format!("127.0.0.1:{display}"),
+        display: format!("{}:{display}", request.address),
         authority_path,
         process,
         _native_image: image,
@@ -148,6 +229,9 @@ fn launch(
 }
 
 fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
+    let SocketAddr::V4(expected) = address else {
+        return Err("The private Windows X listener requires an IPv4 address".into());
+    };
     let mut size = 0;
     unsafe {
         GetExtendedTcpTable(
@@ -195,10 +279,13 @@ fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
         };
         let mut found = false;
         for row in rows.iter().filter(|row| row.dwOwningPid == pid) {
-            if row.dwLocalAddr != u32::from_ne_bytes([127, 0, 0, 1])
+            if row.dwLocalAddr != u32::from_ne_bytes(expected.ip().octets())
                 || u16::from_be(row.dwLocalPort as u16) != address.port()
             {
-                return Err("Private X engine opened an unowned or non-loopback listener".into());
+                return Err(
+                    "Private X engine opened a listener outside its reserved address and port"
+                        .into(),
+                );
             }
             found = true;
         }
@@ -225,9 +312,7 @@ mod candidate_qualification {
         ));
     }
 
-    #[test]
-    #[ignore = "requires the privately rebuilt Windows X engine and its review inventory"]
-    fn privately_built_engine_owns_listener_and_stops_cleanly() {
+    fn fixture_lease(request: DisplayRequest) -> XServerLease {
         let root = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_WINDOWS_X11_ROOT").unwrap());
         let inventory =
             PathBuf::from(std::env::var_os("TERMCRAFT_TEST_WINDOWS_X11_INVENTORY").unwrap());
@@ -243,12 +328,14 @@ mod candidate_qualification {
             executable: "vcxsrv.exe",
             version: "local qualification",
         };
-        let options = XServerOptions {
-            artifact_id: native_policy::WINDOWS_ARTIFACT.into(),
-            ..Default::default()
-        };
+        launch(&root, request, &AtomicBool::new(false), &pin).unwrap()
+    }
+
+    #[test]
+    #[ignore = "requires the privately rebuilt Windows X engine and its review inventory"]
+    fn privately_built_engine_owns_listener_and_stops_cleanly() {
         let flag = AtomicBool::new(false);
-        let lease = launch(&root, options, &flag, &pin).unwrap();
+        let lease = fixture_lease(DisplayRequest::local());
         let pid = lease.process_id().unwrap();
         let display: u16 = lease.display().split_once(':').unwrap().1.parse().unwrap();
         let address: SocketAddr = ([127, 0, 0, 1], display + 6000).into();
@@ -293,5 +380,175 @@ mod candidate_qualification {
         lease.stop_owned().unwrap();
         assert!(!owns_listener(pid, address).unwrap());
         assert!(!runtime.exists());
+    }
+
+    #[test]
+    #[ignore = "requires the private Windows X candidate, native xauth and a selected OpenSSH client"]
+    fn installed_windows_openssh_forwards_authenticated_x11() {
+        use crate::process::Process;
+        use std::process::Command;
+
+        let lease = fixture_lease(DisplayRequest::local());
+        let fixture = ssh_fixture::Fixture::start();
+        let config = fixture.config(1);
+        let scratch = tempfile::tempdir().unwrap();
+        let empty_config = scratch.path().join("ssh_config");
+        std::fs::write(&empty_config, "").unwrap();
+        let known_hosts = scratch.path().join("known_hosts");
+        std::fs::copy(config.app_known_hosts, &known_hosts).unwrap();
+        let system_root = PathBuf::from(std::env::var_os("SystemRoot").unwrap());
+        let ssh = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_WINDOWS_OPENSSH").unwrap());
+        assert!(ssh.is_absolute() && ssh.is_file());
+        let xauth = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_WINDOWS_XAUTH").unwrap());
+        assert!(xauth.is_absolute() && xauth.is_file());
+        let authority = scratch.path().join(".Xauthority");
+        std::fs::copy(lease.authority_path(), &authority).unwrap();
+        let listing = Command::new(&xauth)
+            .arg("list")
+            .arg(lease.display())
+            .env("XAUTHORITY", &authority)
+            .output()
+            .unwrap();
+        assert!(listing.status.success() && !listing.stdout.is_empty());
+        let xauth_root = xauth.parent().unwrap();
+        let path =
+            std::env::join_paths([xauth_root.to_owned(), system_root.join("System32")]).unwrap();
+        let args = vec![
+            "-vv".into(),
+            "-Y".into(),
+            "-T".into(),
+            "-F".into(),
+            empty_config.to_str().unwrap().to_owned(),
+            "-oBatchMode=yes".into(),
+            "-oIdentityFile=none".into(),
+            "-oIdentityAgent=none".into(),
+            "-oPreferredAuthentications=none".into(),
+            "-oGlobalKnownHostsFile=none".into(),
+            "-oStrictHostKeyChecking=yes".into(),
+            format!(
+                "-oUserKnownHostsFile=\"{}\"",
+                known_hosts.display().to_string().replace('\\', "/")
+            ),
+            format!(
+                "-oXAuthLocation=\"{}\"",
+                xauth.display().to_string().replace('\\', "/")
+            ),
+            "-p".into(),
+            config.session.port.to_string(),
+            "fixture@127.0.0.1".into(),
+        ];
+        let environment = [
+            (
+                "ComSpec".into(),
+                system_root.join("System32/cmd.exe").into_os_string(),
+            ),
+            ("PATH".into(), path),
+            ("HOME".into(), scratch.path().into()),
+            ("USERPROFILE".into(), scratch.path().into()),
+            ("TEMP".into(), scratch.path().into()),
+            ("TMP".into(), scratch.path().into()),
+            ("DISPLAY".into(), lease.display().into()),
+            ("XAUTHORITY".into(), authority.into_os_string()),
+        ];
+        let mut child = Process::spawn_with_environment(
+            ssh.to_str().unwrap(),
+            &args,
+            Some(xauth_root),
+            120,
+            35,
+            &environment,
+        )
+        .unwrap();
+        let deadline = Instant::now() + Duration::from_secs(8);
+        let mut log = Vec::new();
+        let connection = loop {
+            if let Some(request) = fixture.take_request() {
+                break fixture.x_client(&request, true).is_ok_and(|client| {
+                    client
+                        .get_input_focus()
+                        .is_ok_and(|request| request.reply().is_ok())
+                });
+            }
+            child.poll();
+            if child.exited || Instant::now() >= deadline {
+                break false;
+            }
+            if let Ok(chunk) = child.rx.recv_timeout(Duration::from_millis(15)) {
+                log.extend(chunk);
+            }
+        };
+        while let Ok(chunk) = child.rx.try_recv() {
+            log.extend(chunk);
+        }
+        drop(child);
+        assert!(
+            connection,
+            "Installed OpenSSH X11 probe failed:\n{}",
+            String::from_utf8_lossy(&log)
+        );
+        lease.stop_owned().unwrap();
+    }
+
+    #[test]
+    #[cfg(target_arch = "x86_64")]
+    #[ignore = "requires the private Windows XDMCP candidate and its review inventory"]
+    fn private_xdmcp_binds_only_the_requested_interface_and_accepts_the_manager() {
+        use std::net::UdpSocket;
+
+        fn receive(peer: &UdpSocket, opcode: u8) -> (Vec<u8>, SocketAddr) {
+            let mut packet = [0; 1024];
+            let (size, sender) = peer.recv_from(&mut packet).unwrap();
+            assert!(size >= 6);
+            assert_eq!(&packet[..4], &[0, 1, 0, opcode]);
+            assert_eq!(
+                u16::from_be_bytes([packet[4], packet[5]]) as usize,
+                size - 6
+            );
+            (packet[6..size].to_vec(), sender)
+        }
+
+        fn send(peer: &UdpSocket, target: SocketAddr, opcode: u8, data: &[u8]) {
+            let mut packet = vec![0, 1, 0, opcode];
+            packet.extend_from_slice(&(data.len() as u16).to_be_bytes());
+            packet.extend_from_slice(data);
+            peer.send_to(&packet, target).unwrap();
+        }
+
+        let interface = Ipv4Addr::new(127, 0, 0, 2);
+        let peer = UdpSocket::bind((interface, 0)).unwrap();
+        peer.set_read_timeout(Some(Duration::from_secs(5))).unwrap();
+        let config = XdmcpConfig {
+            selected_endpoint: Some(peer.local_addr().unwrap()),
+            advertise_address: Some(interface),
+            allow_network_listener: true,
+            ..Default::default()
+        };
+        let lease = fixture_lease(DisplayRequest::xdmcp(&config, 800, 600).unwrap());
+        let pid = lease.process_id().unwrap();
+        let (host, display) = lease.display().split_once(':').unwrap();
+        assert_eq!(host, interface.to_string());
+        let display: u16 = display.parse().unwrap();
+        let address = (interface, display + 6000).into();
+        let flag = AtomicBool::new(false);
+        assert!(owns_listener(pid, address).unwrap());
+
+        let (_, target) = receive(&peer, 2);
+        assert_eq!(target.ip(), interface);
+        send(&peer, target, 5, b"\0\0\0\x07fixture\0\x05ready");
+        let (request, sender) = receive(&peer, 7);
+        assert_eq!(sender, target);
+        assert_eq!(&request[..2], &display.to_be_bytes());
+        let cookie = [41; 16];
+        let mut accepted = b"\0\0\0\x11\0\0\0\0\0\x12MIT-MAGIC-COOKIE-1\0\x10".to_vec();
+        accepted.extend(cookie);
+        send(&peer, target, 8, &accepted);
+        let (manage, sender) = receive(&peer, 10);
+        assert_eq!(sender, target);
+        assert_eq!(&manage[..4], &17u32.to_be_bytes());
+        assert_eq!(&manage[4..6], &display.to_be_bytes());
+        assert!(!native_transport::setup_owned_tcp(address, None, &flag).unwrap());
+        assert!(native_transport::setup_owned_tcp(address, Some(&cookie), &flag).unwrap());
+        lease.stop_owned().unwrap();
+        assert!(!owns_listener(pid, address).unwrap());
     }
 }

@@ -220,3 +220,23 @@
      }
  #ifdef XSERVER_DTRACE
      else if ((auditTrailLevel > 1) || XSERVER_CLIENT_AUTH_ENABLED())
+--- a/X11/xtrans/Xtranssock.c
++++ b/X11/xtrans/Xtranssock.c
+@@ -1385,0 +1386,17 @@
++#ifdef WIN32
++        /* A Windows XDMCP session can explicitly bind one local IPv4 address.
++           The regular owned X server supplies no override and stays loopback. */
++        {
++            const char *requested = getenv("TERMCRAFT_X11_LISTEN_IPV4");
++            if (requested != NULL) {
++                struct in_addr *address = &((struct sockaddr_in *)&sockname)->sin_addr;
++                u_long host_address;
++                if (inet_pton(AF_INET, requested, address) != 1)
++                    return TRANS_CREATE_LISTENER_FAILED;
++                host_address = ntohl(address->s_addr);
++                if (host_address == INADDR_ANY || host_address == INADDR_BROADCAST ||
++                    (host_address & 0xf0000000UL) == 0xe0000000UL)
++                    return TRANS_CREATE_LISTENER_FAILED;
++            }
++        }
++#endif

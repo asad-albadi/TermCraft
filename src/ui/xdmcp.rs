@@ -401,11 +401,19 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     if !state.advertise.is_empty() && s.xdmcp_options.advertise_address.is_none() {
         ui.colored_label(Color32::RED, "Enter a valid local IPv4 address");
     }
-    ui.checkbox(
-        &mut s.xdmcp_options.allow_network_listener,
-        "Allow unencrypted XDMCP/X11 and this session's TCP listener on all interfaces",
-    );
-    ui.small("XDMCP and X11 are unencrypted. Use a trusted isolated network. The advertised address does not restrict the TCP listener. X11 access control remains enabled. Linux requires the pinned owned Xephyr payload and a host X11 display; native Windows/macOS engines still require qualification.");
+    if cfg!(all(windows, target_arch = "x86_64")) {
+        ui.checkbox(
+            &mut s.xdmcp_options.allow_network_listener,
+            "Allow unencrypted XDMCP/X11 and this session's TCP listener on the selected address",
+        );
+        ui.small("Use a trusted isolated network. The private Windows engine binds only the selected local IPv4 address and requires X11 authentication. The engine needs an approved native package.");
+    } else {
+        ui.checkbox(
+            &mut s.xdmcp_options.allow_network_listener,
+            "Allow unencrypted XDMCP/X11 and this session's TCP listener on all interfaces",
+        );
+        ui.small("XDMCP and X11 are unencrypted. Use a trusted isolated network. The advertised address does not restrict the TCP listener. X11 access control remains enabled. Linux requires the pinned owned Xephyr payload and a host X11 display; other platforms need a qualified engine.");
+    }
 }
 pub(super) fn start(session: &Session) -> Result<ManagedXdmcp, String> {
     if session.host.parse::<std::net::IpAddr>().is_err() {

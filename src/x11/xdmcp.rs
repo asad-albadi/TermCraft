@@ -41,9 +41,9 @@ pub struct XdmcpConfig {
     pub clipboard_display: Option<String>,
     /// Optional selected Xauthority; otherwise read the inherited authority without modifying it.
     pub clipboard_authority: Option<std::path::PathBuf>,
-    /// Address advertised to the manager, NOT a restriction on the X11 listener.
+    /// Address advertised to the manager. The private Windows engine also binds to this address.
     pub advertise_address: Option<Ipv4Addr>,
-    /// Explicit permission for the upstream engine to listen on all X11 TCP interfaces.
+    /// Explicit permission for this session's unencrypted XDMCP and X11 TCP listener.
     pub allow_network_listener: bool,
     /// Explicit broadcast network choice. Never inferred from host/interface enumeration.
     pub discovery_network: Option<BroadcastNetwork>,
@@ -313,6 +313,66 @@ pub(super) fn registered_layout(catalog: &str, id: &str) -> bool {
         .any(|line| line.split_whitespace().next() == Some(id))
 }
 
+#[cfg(all(windows, target_arch = "x86_64"))]
+pub(super) fn windows_options(config: &XdmcpConfig, width: u32, height: u32) -> Result<(), String> {
+    if config.mode == QueryMode::Broadcast {
+        return Err(
+            "Select a discovered endpoint and choose Direct or Indirect before connecting".into(),
+        );
+    }
+    if !config.allow_network_listener {
+        return Err("Explicitly allow unencrypted XDMCP and its X11 TCP listener for this session on a trusted network".into());
+    }
+    if config
+        .display
+        .is_some_and(|display| !(1..=59535).contains(&display))
+        || !(200..=8192).contains(&width)
+        || !(200..=8192).contains(&height)
+    {
+        return Err("Choose display 1–59535 and desktop dimensions 200–8192".into());
+    }
+    if config.monitor.is_some() {
+        return Err("Monitor selection is unavailable for the private Windows XDMCP engine".into());
+    }
+    if !config.keyboard.is_empty() {
+        return Err("Session keyboard layouts are unavailable for the private Windows XDMCP engine; clear the layout to inherit the host keyboard".into());
+    }
+    if config.clipboard != ClipboardPolicy::Disabled {
+        return Err("Clipboard sharing is unavailable for the private Windows XDMCP engine".into());
+    }
+    if config.advertise_address.is_some_and(|address| {
+        address.is_unspecified() || address.is_multicast() || address.is_broadcast()
+    }) {
+        return Err("Choose a local unicast IPv4 address to advertise to the XDMCP manager".into());
+    }
+    Ok(())
+}
+
+/// Validate the resolved endpoint. The provider must reserve the returned local address before launch.
+#[cfg(all(windows, target_arch = "x86_64"))]
+pub(super) fn windows_network(
+    config: &XdmcpConfig,
+    width: u32,
+    height: u32,
+) -> Result<(std::net::SocketAddrV4, Ipv4Addr), String> {
+    windows_options(config, width, height)?;
+    let endpoint = config
+        .selected_endpoint
+        .ok_or("Discover and select an XDMCP endpoint first")?;
+    DiscoveryRequest::direct(endpoint).validate()?;
+    let SocketAddr::V4(endpoint) = endpoint else {
+        return Err("The private Windows XDMCP engine requires a unicast IPv4 endpoint".into());
+    };
+    let address = config.advertise_address.unwrap_or(Ipv4Addr::LOCALHOST);
+    if !endpoint.ip().is_loopback() && address.is_loopback() {
+        return Err(
+            "Choose an explicit local non-loopback IPv4 address to advertise to this XDMCP manager"
+                .into(),
+        );
+    }
+    Ok((endpoint, address))
+}
+
 /// Validated Xephyr options. Broadcast is discovery-only; connect to a selected endpoint.
 pub fn engine_arguments(
     config: &XdmcpConfig,
@@ -432,6 +492,100 @@ pub fn engine_arguments(
 mod tests {
     use super::*;
     use std::net::{SocketAddr, UdpSocket};
+
+    #[cfg(all(windows, target_arch = "x86_64"))]
+    #[test]
+    fn windows_xdmcp_only_defaults_to_loopback_for_loopback_managers() {
+        let mut config = XdmcpConfig {
+            selected_endpoint: Some("127.0.0.1:1177".parse().unwrap()),
+            allow_network_listener: true,
+            ..Default::default()
+        };
+        assert_eq!(
+            windows_network(&config, 800, 600).unwrap().1,
+            Ipv4Addr::LOCALHOST
+        );
+        config.selected_endpoint = Some("192.0.2.2:177".parse().unwrap());
+        for address in [None, Some(Ipv4Addr::LOCALHOST)] {
+            config.advertise_address = address;
+            assert!(
+                windows_network(&config, 800, 600)
+                    .unwrap_err()
+                    .contains("explicit local non-loopback")
+            );
+        }
+        let address = Ipv4Addr::new(192, 0, 2, 1);
+        config.advertise_address = Some(address);
+        assert_eq!(
+            windows_network(&config, 800, 600).unwrap(),
+            ("192.0.2.2:177".parse().unwrap(), address)
+        );
+        for bad in [
+            Ipv4Addr::UNSPECIFIED,
+            Ipv4Addr::BROADCAST,
+            Ipv4Addr::new(224, 0, 0, 1),
+        ] {
+            config.advertise_address = Some(bad);
+            assert!(
+                windows_network(&config, 800, 600)
+                    .unwrap_err()
+                    .contains("local unicast IPv4")
+            );
+        }
+    }
+
+    #[cfg(all(windows, target_arch = "x86_64"))]
+    #[test]
+    fn windows_xdmcp_requires_consent_and_rejects_unsupported_options() {
+        let mut config = XdmcpConfig {
+            selected_endpoint: Some("127.0.0.1:1177".parse().unwrap()),
+            ..Default::default()
+        };
+        assert!(
+            windows_network(&config, 800, 600)
+                .unwrap_err()
+                .contains("listener")
+        );
+        config.allow_network_listener = true;
+        for endpoint in ["[::1]:1177", "127.0.0.1:0", "255.255.255.255:1177"] {
+            config.selected_endpoint = Some(endpoint.parse().unwrap());
+            assert!(windows_network(&config, 800, 600).is_err());
+        }
+        config.selected_endpoint = Some("127.0.0.1:1177".parse().unwrap());
+        assert!(windows_network(&config, 199, 600).is_err());
+        assert!(windows_network(&config, 800, 8193).is_err());
+        config.display = Some(59536);
+        assert!(windows_network(&config, 800, 600).is_err());
+        config.display = Some(59535);
+        assert!(windows_network(&config, 800, 600).is_ok());
+        config.mode = QueryMode::Broadcast;
+        assert!(
+            windows_network(&config, 800, 600)
+                .unwrap_err()
+                .contains("Direct or Indirect")
+        );
+        config.mode = QueryMode::Indirect;
+        config.monitor = Some("DISPLAY1".into());
+        assert!(
+            windows_network(&config, 800, 600)
+                .unwrap_err()
+                .contains("Monitor")
+        );
+        config.monitor = None;
+        config.keyboard = "us".into();
+        assert!(
+            windows_network(&config, 800, 600)
+                .unwrap_err()
+                .contains("keyboard")
+        );
+        config.keyboard.clear();
+        config.clipboard = ClipboardPolicy::Bidirectional;
+        assert!(
+            windows_network(&config, 800, 600)
+                .unwrap_err()
+                .contains("Clipboard")
+        );
+    }
     #[test]
     fn nondefault_port_is_used_and_only_correlated_willing_is_admitted() {
         let server = UdpSocket::bind("127.0.0.1:0").unwrap();
