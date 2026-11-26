@@ -378,6 +378,7 @@ class NativePackageLayout(unittest.TestCase):
                     path.write_bytes(macho + b"fixture launcher")
                     path.chmod(0o755)
                 with (patch.object(package, "build_macos_launcher", side_effect=fixture_launcher),
+                      patch.object(package, "macos_build_metadata", side_effect=AssertionError("unverified inputs have no build SDK")),
                       patch.object(package, "cargo_notices", return_value=[]),
                       patch.object(package, "native_libraries", return_value={"libraries": []})):
                     archive = package.package_release(target, base / "out", app, helper)
@@ -393,6 +394,8 @@ class NativePackageLayout(unittest.TestCase):
                         for name in (entry, engine):
                             self.assertEqual((bundle.getinfo(name).external_attr >> 16) & 0o777, 0o755)
                     if target == "macos":
+                        manifest = json.loads(bundle.read("TermCraft.app/Contents/Resources/PACKAGE-MANIFEST.json"))
+                        self.assertNotIn("macos", manifest["build"])
                         plist = plistlib.loads(bundle.read("TermCraft.app/Contents/Info.plist"))
                         self.assertEqual(plist["CFBundleExecutable"], "termcraft-desktop-launcher")
                         self.assertIn("TermCraft.app/Contents/MacOS/termcraft-desktop-launcher", names)

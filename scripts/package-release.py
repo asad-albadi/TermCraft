@@ -773,7 +773,7 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
                  for p in sorted(root.rglob("*")) if p.is_symlink()}
         if links:
             manifest["symlinks"] = links
-        if target == "macos":
+        if target == "macos" and build_inputs is not None:
             manifest["build"]["macos"] = macos_build_metadata(arch)
         if wayland is not None:
             manifest["wayland_helper_version"] = wayland["version"]
