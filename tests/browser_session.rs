@@ -32,9 +32,14 @@ fn chromium_available() -> bool {
 #[cfg(windows)]
 fn chromium_available() -> bool {
     use harbor_workspace::runtime::{RuntimeCatalog, ToolId};
+    let provider = if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
+        ToolId::BundledChromium
+    } else {
+        ToolId::Browser
+    };
     RuntimeCatalog::for_current_executable()
-        .and_then(|catalog| catalog.resolve(ToolId::Browser))
-        .expect("Native Windows fixture requires installed Chromium or Google Chrome");
+        .and_then(|catalog| catalog.resolve(provider))
+        .expect("Native Windows fixture requires the explicitly selected browser provider");
     true
 }
 
@@ -69,7 +74,7 @@ fn browser(generation: u64, address: String, proxy: String) -> Session {
 #[test]
 #[cfg_attr(
     windows,
-    ignore = "requires native Windows and an installed Chrome or Chromium"
+    ignore = "requires native Windows and the selected Chromium provider"
 )]
 fn chromium_renders_and_submits_browser_input() {
     if !chromium_available() {
@@ -217,7 +222,7 @@ fn chromium_renders_and_submits_browser_input() {
 #[test]
 #[cfg_attr(
     windows,
-    ignore = "requires native Windows and an installed Chrome or Chromium"
+    ignore = "requires native Windows and the selected Chromium provider"
 )]
 fn chromium_cancels_site_auth_without_credentials_and_rejects_untrusted_tls() {
     if !chromium_available() {
@@ -276,7 +281,7 @@ fn chromium_cancels_site_auth_without_credentials_and_rejects_untrusted_tls() {
 #[test]
 #[cfg_attr(
     windows,
-    ignore = "requires native Windows and an installed Chrome or Chromium"
+    ignore = "requires native Windows and the selected Chromium provider"
 )]
 fn chromium_routes_through_configured_proxy_and_signs_in_only_after_consent() {
     if !chromium_available() {

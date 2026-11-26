@@ -25,13 +25,15 @@ use windows_sys::Win32::{
     },
 };
 
+use crate::runtime::{RuntimeCatalog, ToolId};
+
 #[path = "windows_pipe/bootstrap.rs"]
 pub(super) mod bootstrap;
 
 const MAX_MESSAGE: usize = 12 * 1024 * 1024;
 const CONNECTION_ERROR: &str = "Private Chromium connection failed.";
 const CANCELLED: &str = "Browser closed.";
-const START_ERROR: &str = "Could not launch installed Chromium in its private Windows process job.";
+const START_ERROR: &str = "Could not launch Chromium in its private Windows process job.";
 
 pub(super) struct Pipe {
     process: Process,
@@ -47,14 +49,19 @@ impl Pipe {
         cancel: &AtomicBool,
         runtime: super::Runtime,
     ) -> Result<Self, String> {
-        if runtime == super::Runtime::BundledChromium {
-            return Err("No qualified bundled Chromium payload for Windows".into());
-        }
-        let chromium = installed_chromium()?;
+        let catalog = RuntimeCatalog::for_current_executable()?;
         let security =
             OwnerSecurity::new().map_err(|_| "Could not secure the private browser profile.")?;
         let profile =
             Profile::new(&security).map_err(|_| "Could not create a private browser profile.")?;
+        let chromium = match runtime {
+            super::Runtime::SystemChromium => {
+                catalog.resolve(ToolId::SystemChromium)?.executable()?
+            }
+            super::Runtime::BundledChromium => {
+                catalog.stage_bundled_browser(&profile.path.join("runtime"), cancel)?
+            }
+        };
         let (writer, browser_reader) = pipe_pair(false, &security).map_err(|_| CONNECTION_ERROR)?;
         let (reader, browser_writer) = pipe_pair(true, &security).map_err(|_| CONNECTION_ERROR)?;
         let process = bootstrap::start(
@@ -138,7 +145,7 @@ impl Pipe {
                 })?;
             match count {
                 None => return Ok(None),
-                Some(0) => return Err("The Chromium process exited. Check the installed browser and sandbox configuration.".into()),
+                Some(0) => return Err("The Chromium process exited. Check the selected browser and sandbox configuration.".into()),
                 Some(count) => self.pending.extend_from_slice(&bytes[..count]),
             }
         }
@@ -668,12 +675,6 @@ fn spawn(
         }
         Ok(process)
     }
-}
-
-fn installed_chromium() -> Result<PathBuf, String> {
-    crate::runtime::RuntimeCatalog::for_current_executable()?
-        .resolve(crate::runtime::ToolId::Browser)?
-        .executable()
 }
 
 fn environment(profile: &Path) -> io::Result<Vec<(&'static str, OsString)>> {

@@ -22,6 +22,9 @@ struct Manifest {
     executable: PathBuf,
     version: String,
     files: Vec<Entry>,
+    #[cfg(windows)]
+    #[serde(default)]
+    approved: bool,
 }
 #[derive(Deserialize)]
 struct Entry {
@@ -35,6 +38,10 @@ pub(crate) static VERIFIED_CHUNKS: std::sync::atomic::AtomicUsize =
     std::sync::atomic::AtomicUsize::new(0);
 
 const FAILURE: &str = "The selected bundled Chromium runtime is unavailable or damaged";
+#[cfg(windows)]
+const PIN: &[u8] = include_bytes!("../../packaging/browser/runtime-manifest-windows.json");
+#[cfg(not(windows))]
+const PIN: &[u8] = include_bytes!("../../packaging/browser/runtime-manifest.json");
 
 fn relative(path: &Path) -> Result<(), String> {
     if path.components().next().is_none()
@@ -79,6 +86,15 @@ pub(super) fn resolve_cancellable(
     verify(resources, cancelled, None)
 }
 
+#[cfg(windows)]
+pub(super) fn prepare_windows(
+    resources: &Path,
+    snapshot: &Path,
+    cancelled: &AtomicBool,
+) -> Result<super::ToolProvider, String> {
+    verify(resources, cancelled, Some(snapshot))
+}
+
 #[cfg(unix)]
 pub(super) fn prepare(
     resources: &Path,
@@ -107,16 +123,17 @@ fn verify(
         }
     };
     check_cancel()?;
-    let info: Manifest = serde_json::from_str(include_str!(
-        "../../packaging/browser/runtime-manifest.json"
-    ))
-    .map_err(|_| FAILURE)?;
+    let info: Manifest = serde_json::from_slice(PIN).map_err(|_| FAILURE)?;
     if info.schema_version != 1
         || info.platform != std::env::consts::OS
         || info.architecture != std::env::consts::ARCH
         || !resources.is_absolute()
     {
         return Err(format!("{FAILURE}: no qualified payload for this platform"));
+    }
+    #[cfg(windows)]
+    if !info.approved {
+        return Err(format!("{FAILURE}: Windows artifact approval required"));
     }
     relative(&info.root)?;
     relative(&info.executable)?;
@@ -139,7 +156,7 @@ fn verify(
         .take(1024 * 1024)
         .read_to_end(&mut bytes)
         .map_err(|_| FAILURE)?;
-    if bytes != include_bytes!("../../packaging/browser/runtime-manifest.json") {
+    if bytes != PIN {
         return Err(format!("{FAILURE}: manifest mismatch"));
     }
     let mut entry_found = false;
@@ -241,6 +258,27 @@ fn verify(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(all(windows, target_arch = "x86_64"))]
+    #[test]
+    fn local_manifest_cannot_approve_the_windows_browser() {
+        let resources = tempfile::tempdir().unwrap();
+        let installed = resources.path().join("browser/windows-x86_64");
+        std::fs::create_dir_all(&installed).unwrap();
+        std::fs::write(
+            installed.join("BROWSER-MANIFEST.json"),
+            b"{\"approved\":true}",
+        )
+        .unwrap();
+        let error = resolve(resources.path()).unwrap_err();
+        let pin: Manifest = serde_json::from_slice(PIN).unwrap();
+        let expected = if pin.approved {
+            "manifest mismatch"
+        } else {
+            "Windows artifact approval required"
+        };
+        assert!(error.contains(expected), "{error}");
+    }
+
     #[test]
     fn rejects_escaping_or_empty_runtime_paths() {
         for path in [
