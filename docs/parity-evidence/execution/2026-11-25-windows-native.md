@@ -729,6 +729,9 @@ With Git for Windows OpenSSL 3.2.4 on `PATH`,
 zero failed and 32 ignored across 76 test binaries. A first run from a fresh
 shell could not locate `openssl` and failed the two VeNCrypt cases. The
 targeted replay and the complete rerun passed with the installed fixture.
+[Hosted Windows PR CI at `748fad6`](https://github.com/asad-albadi/TermCraft/actions/runs/45865347381/job/140066635979)
+independently reported the same 616 passed, zero failed and 32 ignored. The
+locked helper reported 36 passed, zero failed and zero ignored.
 
 The real Windows VNC view-only provider passed
 `cargo +1.96.1 test --locked --lib windows_native_view_only_capture_starts_and_releases_listener -- --ignored`.
