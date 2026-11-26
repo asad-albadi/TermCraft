@@ -173,10 +173,9 @@ error in `src/ui/layout.rs:255` on the branch and a clean archive of current
 
 The remaining Apple Silicon software work includes bundled Chromium with a
 pinned native source and signed resource tree, Direct and Indirect XDMCP with
-a native session-owned network and authentication path, and full Finder Services
-activation. The AppKit provider passed literal folder and mixed-selection
-checks. The programmatic Services invocation returned false and actual Finder
-menu activation remains unverified. XQuartz deliberately disables upstream
+a native session-owned network and authentication path. AppKit Services
+registration and dispatch passed on macOS 14.8.7 for modern and legacy
+folder payloads. The Finder menu interaction remains a manual check. XQuartz deliberately disables upstream
 host pasteboard sync, so X11 selection tests cover only the private display.
 Public distribution approval and release automation replay remain open.
 

@@ -36,6 +36,9 @@ class DesktopIntegration:
             if field.strip() == 'path':
                 paths.add(re.sub(r' \(0x[0-9a-fA-F]+\)$', '', value.strip()))
         return paths
+    def _refresh_services(self):
+        launcher = self.bundle / 'Contents/MacOS/termcraft-desktop-launcher'
+        subprocess.run([launcher, '--refresh-services'], check=True, capture_output=True, timeout=10)
     def status(self):
         return str(self.bundle) in self._owned() and str(self.bundle) in self._registered()
     def install_user(self):
@@ -44,6 +47,7 @@ class DesktopIntegration:
         with tempfile.NamedTemporaryFile(mode='w',dir=self.receipt.parent,delete=False) as output:
             json.dump({'owner':OWNER,'bundles':owned,'version':1},output);temporary=output.name
         os.replace(temporary,self.receipt)
+        self._refresh_services()
     def remove_user(self):
         owned=self._owned()
         # A moved/replaced release may have registered more than one owned path.
@@ -58,7 +62,9 @@ class DesktopIntegration:
         registered = self._registered() if owned else set()
         for name in owned:
             if name in registered: self._run('-u',name)
-        if owned:self.receipt.unlink()
+        if owned:
+            self._refresh_services()
+            self.receipt.unlink()
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('action',choices=['install','uninstall','status']);args=parser.parse_args()
     try:
@@ -68,5 +74,5 @@ def main():
         if args.action=='install':integration.install_user()
         elif args.action=='uninstall':integration.remove_user()
         else:print('installed' if integration.status() else 'not installed')
-    except (OSError,ValueError,subprocess.CalledProcessError) as error:parser.exit(1,f'{error}\n')
+    except (OSError,ValueError,subprocess.SubprocessError) as error:parser.exit(1,f'{error}\n')
 if __name__=='__main__':main()

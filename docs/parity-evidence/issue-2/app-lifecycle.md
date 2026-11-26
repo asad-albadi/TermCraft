@@ -37,7 +37,21 @@ re-registered, launched with an empty PATH and removed. Font size 21, vault
 bytes and recovery bytes survived. The vault unlocked with the test password
 after each launch, and unrelated LaunchServices paths remained registered.
 
-The AppKit Services provider accepted a real folder pasteboard and produced
-literal `--data-dir` and `--cwd` arguments. It rejected a mixed folder/file
-selection before dispatching any item. `NSPerformService` returned false from
-the command-line harness, and Finder's Services menu invocation remains open.
+The Sonoma 14.8.7 replay registered the installed bundle and invoked
+`NSPerformService("TermCraft/Open terminal here", ...)`. AppKit requires the
+full registered name for programmatic invocation. The original call with only
+the visible menu label returned false before reaching the provider.
+
+The modern file URL pasteboard opened a terminal at the literal selected
+folder. The original launcher failed the same test with a legacy
+`NSFilenamesPboardType` payload. The patched launcher opened both folders,
+including the apostrophe, percent sign, and spaces, in the existing isolated
+workspace. Installation and removal refreshed Services using AppKit. The
+fixture observed the two working directories through `lsof` and confirmed
+the bundle was unregistered on removal.
+
+Run `python3 scripts/check-macos-services.py /path/to/extracted/TermCraft.app`
+in an isolated native macOS desktop login with Command Line Tools. The verified
+launcher-only repack reused the previously qualified GUI and RDP helper. Its ZIP
+SHA-256 was `ca8ffc6a4aca62087a3ba35db5712dc3a127434c3dadc7c68b47b8b8f34f2926`.
+The remaining Finder check is the visible context-menu interaction.

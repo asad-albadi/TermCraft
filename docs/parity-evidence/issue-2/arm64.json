@@ -28,11 +28,13 @@
     {"name": "Core X11 pixmap readback and private-display UTF-8 clipboard on macOS 26.6.2 and 14.8.7", "result": "passed"},
     {"name": "Bash, Zsh and Fish integration", "result": "passed", "passed": 9, "failed": 0, "ignored": 0},
     {"name": "Signed upstream Dropbear fixture, pinned-key shell and literal SFTP round trip", "result": "passed", "passed": 1, "failed": 0, "ignored": 0},
-    {"name": "Native terminal programs", "result": "passed", "passed": 3, "failed": 0, "ignored": 0}
+    {"name": "Native terminal programs", "result": "passed", "passed": 3, "failed": 0, "ignored": 0},
+    {"name": "AppKit registered folder Services from modern and legacy pasteboards on macOS 14.8.7", "result": "passed", "passed": 2, "failed": 0, "ignored": 0}
   ],
   "unavailable": [
     {"requirement": "Bundled Chromium", "reason": "Installed Chrome passed. The native bundled provider needs an audited source-built and signed resource inventory."},
-    {"requirement": "Direct/Indirect XDMCP, active graphics, host clipboard and Finder Services menu", "reason": "XQuartz windowed authentication and SSH/X passed; XDMCP requires a native session engine, and full graphics and host clipboard need separate observations. The AppKit service handler passed its tests, while NSPerformService returned false from the CLI harness."},
+    {"requirement": "Direct/Indirect XDMCP, active graphics and host clipboard", "reason": "XQuartz windowed authentication and SSH/X passed; XDMCP requires a native session engine, and full graphics and host clipboard need separate observations."},
+    {"requirement": "Finder context-menu interaction", "reason": "Registered AppKit Services opened literal folders using both pasteboard formats. The visible Finder menu interaction remains manual."},
     {"requirement": "Public distribution approval", "reason": "Exact XQuartz bytes are approved for the windowed runtime. Release workflow distribution, signing policy and final approval are open."},
     {"requirement": "GPU, external displays, devices, adapter transitions and TCC permissions", "reason": "These require physical fixtures or a human-operated permission session."}
   ]
