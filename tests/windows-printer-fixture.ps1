@@ -93,8 +93,18 @@ try {
     throw
 } finally {
     $listener.Stop()
-    if ($createdQueue) { Remove-Printer -Name $queue -ErrorAction Continue }
-    if ($createdPort) { Remove-PrinterPort -Name $queue -ErrorAction Continue }
+    if ($createdQueue) { Remove-Printer -Name $queue }
+    if ($createdPort) {
+        $cleanup = [Diagnostics.Stopwatch]::StartNew()
+        while (Get-PrinterPort -Name $queue -ErrorAction SilentlyContinue) {
+            try {
+                Remove-PrinterPort -Name $queue
+            } catch {
+                if ($cleanup.Elapsed.TotalSeconds -gt 15) { throw }
+                Start-Sleep -Milliseconds 200
+            }
+        }
+    }
     if ($createdDriver) { Remove-PrinterDriver -Name $driver -ErrorAction Continue }
     if (Get-Printer -Name $queue -ErrorAction SilentlyContinue) { throw 'Fixture printer queue remains.' }
     if (Get-PrinterPort -Name $queue -ErrorAction SilentlyContinue) { throw 'Fixture printer port remains.' }

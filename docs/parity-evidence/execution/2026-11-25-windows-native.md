@@ -679,7 +679,12 @@ exact same source and toolchain were used in a second same-volume build
 directory. `gn gen out/TermCraftNinja` with `use_siso = false` produced the
 graph for `ninja -C out/TermCraftNinja -j 6 chrome mini_installer`. Native
 compilation resumed and the Windows commit limit remained stable in the
-initial C++ batches. A complete runtime and private package replay remain open.
+initial C++ batches. A later run with 16 Ninja jobs hit Python 3.11.9
+`MemoryError` while multiple Blink processes each spawned a worker per CPU.
+The 11 generated `generate_bindings.py` commands in `toolchain.ninja` were
+given the upstream `--single_process` flag. All 11 binding actions then
+completed at 10 Ninja jobs. The incremental C++ build resumed with 16 jobs
+after that phase. A complete runtime and private package replay remain open.
 
 ## Windows device components
 
@@ -703,6 +708,20 @@ parameter error with explicit SNMP index zero. An independent native local
 port replay reproduced that error and showed that omitting the parameter
 creates a disabled-SNMP loopback port with the exact requested port number.
 The hosted fixture now checks those reported settings before creating its queue.
+Once the test queue was available, the actual packaged worker returned
+`0xc0000001` during INIT. The same result reproduced using a read-only
+open of the installed Windows PDF queue. Direct `GetPrinterW` calls returned
+Win32 error 122 and required eight bytes for level 6, although its structure
+contains one four-byte field. With an aligned eight-byte buffer the API
+returned status zero and reported eight bytes. The helper now bounds that
+response before reading the status DWORD. The hosted fixture retries removal
+of the owned port while Windows completes asynchronous queue removal.
+The separately locked helper passed 36 tests with zero failures and zero
+ignored on Rust 1.96.1, MSVC 14.44.35207 and Windows SDK 10.0.26100.0. The
+rebuilt debug worker SHA-256 was
+`1a0d12f1329f64458d73876f8d53e317538f3d9b4a9b973dcf18e429307723f7`.
+Its actual printer-worker INIT acknowledged the same PDF queue with status
+zero. This was a readiness check. It submitted no print job to that queue.
 
 ## Personal 26.6 reference replay
 

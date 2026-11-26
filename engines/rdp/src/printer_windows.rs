@@ -137,18 +137,22 @@ impl Backend for Native {
         Ok(this)
     }
     fn ready(&mut self) -> Result<(), u32> {
-        // Level 6 has only one DWORD status: no untrusted returned pointers.
-        let mut status = PRINTER_INFO_6 { dwStatus: 0 };
+        // Win64 aligns the response to eight bytes even though level 6 has one DWORD.
+        let mut status = 0u64;
+        let capacity = size_of::<u64>() as u32;
         let mut needed = 0;
         ok(unsafe {
             GetPrinterW(
                 self.handle,
                 6,
-                (&mut status as *mut PRINTER_INFO_6).cast(),
-                size_of::<PRINTER_INFO_6>() as u32,
+                (&mut status as *mut u64).cast(),
+                capacity,
                 &mut needed,
             )
         })?;
+        if !(size_of::<PRINTER_INFO_6>() as u32..=capacity).contains(&needed) {
+            return Err(0xc0000001);
+        }
         let bad = PRINTER_STATUS_ERROR
             | PRINTER_STATUS_PAUSED
             | PRINTER_STATUS_PENDING_DELETION
@@ -159,7 +163,7 @@ impl Backend for Native {
             | PRINTER_STATUS_PAPER_OUT
             | PRINTER_STATUS_NO_TONER
             | PRINTER_STATUS_USER_INTERVENTION;
-        if status.dwStatus & bad != 0 {
+        if (status as u32) & bad != 0 {
             return Err(0xc00000a3);
         }
         self.raw_supported()
