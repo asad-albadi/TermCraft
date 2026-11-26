@@ -15,7 +15,7 @@ on:
         type: boolean
         default: false
       windows_printer_fixture:
-        description: Verify the packaged printer worker with a disposable local file port
+        description: Verify the packaged printer worker with a disposable loopback RAW port
         type: boolean
         default: false
 

@@ -41,18 +41,19 @@ function Invoke-PrinterWorker($Frames) {
 $helperPath = (Resolve-Path -LiteralPath $Helper).Path
 $driver = 'Generic / Text Only'
 $queue = 'TermCraft-Print-' + [guid]::NewGuid().ToString('N')
-$port = Join-Path $env:RUNNER_TEMP "$queue.prn"
+$listener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
 $createdPort = $createdQueue = $createdDriver = $false
 $spoolerWasRunning = (Get-Service Spooler).Status -eq 'Running'
 try {
+    $listener.Start()
     if (!$spoolerWasRunning) { Start-Service Spooler }
     if (!(Get-PrinterDriver -Name $driver -ErrorAction SilentlyContinue)) {
         Add-PrinterDriver -Name $driver
         $createdDriver = $true
     }
-    Add-PrinterPort -Name $port
+    Add-PrinterPort -Name $queue -PrinterHostAddress 127.0.0.1 -PortNumber $listener.LocalEndpoint.Port -SNMP 0
     $createdPort = $true
-    Add-Printer -Name $queue -DriverName $driver -PortName $port
+    Add-Printer -Name $queue -DriverName $driver -PortName $queue
     $createdQueue = $true
 
     $payload = [Text.Encoding]::ASCII.GetBytes("TermCraft Winspool fixture`r`n")
@@ -60,24 +61,38 @@ try {
     $begin = [byte[]](@(3) + [BitConverter]::GetBytes([uint32]$payload.Length))
     $write = [byte[]](@(4) + $payload)
     Invoke-PrinterWorker @($initialize, [byte[]]@(2), $begin, [byte[]]@(6))
-    if ((Test-Path -LiteralPath $port) -or @(Get-PrintJob -PrinterName $queue).Count) {
-        throw 'The aborted printer worker left a job or created the port output.'
+    if ($listener.Pending() -or (Get-PrintJob -PrinterName $queue)) {
+        throw 'The aborted printer worker left a job or connected to the RAW port.'
     }
     Invoke-PrinterWorker @($initialize, $begin, $write, [byte[]]@(5))
-    $timer = [Diagnostics.Stopwatch]::StartNew()
-    do {
-        if ((Test-Path -LiteralPath $port) -and !(Get-PrintJob -PrinterName $queue)) { break }
-        Start-Sleep -Milliseconds 100
-    } while ($timer.Elapsed.TotalSeconds -lt 15)
-    $actual = [IO.File]::ReadAllBytes($port)
-    if (![Linq.Enumerable]::SequenceEqual[byte]($actual, $payload) -or (Get-PrintJob -PrinterName $queue)) {
-        throw 'The completed Winspool job has different bytes or remains queued.'
+    $received = $listener.AcceptTcpClientAsync().WaitAsync([TimeSpan]::FromSeconds(15)).GetAwaiter().GetResult()
+    try {
+        $stream = $received.GetStream()
+        $stream.ReadTimeout = 5000
+        $actual = [byte[]]::new($payload.Length)
+        $stream.ReadExactly($actual)
+        if (![Linq.Enumerable]::SequenceEqual[byte]($actual, $payload) -or $stream.ReadByte() -ne -1) {
+            throw 'The RAW spool monitor sent different bytes.'
+        }
+    } finally {
+        $received.Dispose()
     }
-    Get-FileHash -LiteralPath $helperPath, $port
+    $timer = [Diagnostics.Stopwatch]::StartNew()
+    while (Get-PrintJob -PrinterName $queue) {
+        if ($timer.Elapsed.TotalSeconds -gt 10) { throw 'The completed job remains queued.' }
+        Start-Sleep -Milliseconds 100
+    }
+    Get-FileHash -LiteralPath $helperPath
     Write-Output 'Winspool accepted the exact RAW bytes and the aborted job left no output.'
+} catch {
+    Write-Warning $_.Exception.Message
+    throw
 } finally {
-    if ($createdQueue) { Remove-Printer -Name $queue }
-    if ($createdPort) { Remove-PrinterPort -Name $port }
-    if ($createdDriver) { Remove-PrinterDriver -Name $driver }
+    $listener.Stop()
+    if ($createdQueue) { Remove-Printer -Name $queue -ErrorAction Continue }
+    if ($createdPort) { Remove-PrinterPort -Name $queue -ErrorAction Continue }
+    if ($createdDriver) { Remove-PrinterDriver -Name $driver -ErrorAction Continue }
+    if (Get-Printer -Name $queue -ErrorAction SilentlyContinue) { throw 'Fixture printer queue remains.' }
+    if (Get-PrinterPort -Name $queue -ErrorAction SilentlyContinue) { throw 'Fixture printer port remains.' }
     if (!$spoolerWasRunning -and (Get-Service Spooler).Status -eq 'Running') { Stop-Service Spooler }
 }

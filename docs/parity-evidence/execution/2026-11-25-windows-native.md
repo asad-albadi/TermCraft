@@ -673,9 +673,13 @@ and local execution. Successful C++ and Rust compilation confirms the
 same-volume layout. With 12 workers, the build stopped after 5,635 completed
 actions when Windows exhausted its commit allowance and could no longer
 launch `clang-cl.exe`. The 12,337 MiB page file recorded 11,733 MiB peak use.
-The incremental retry reuses that output with
-`autoninja -C out/TermCraftNative -j 6 chrome mini_installer`. A complete
-source-built runtime and its private package replay remain open.
+The incremental retry with six Siso workers spent over 15 minutes checking
+filesystem inputs before compiling. The Siso output was retained and the
+exact same source and toolchain were used in a second same-volume build
+directory. `gn gen out/TermCraftNinja` with `use_siso = false` produced the
+graph for `ninja -C out/TermCraftNinja -j 6 chrome mini_installer`. Native
+compilation resumed and the Windows commit limit remained stable in the
+initial C++ batches. A complete runtime and private package replay remain open.
 
 ## Windows device components
 
@@ -689,8 +693,10 @@ the protocol states without a serial device. The same command with
 framing and Windows process-argument tests. The printer component built
 the Winspool source and ran zero tests. An actual packaged RDP worker opened
 an isolated nonexistent queue and returned `0xc0000034` before reading a
-print job. A separately dispatched Windows fixture exercises a temporary
-local file-backed queue for RAW bytes and abort behavior.
+print job. The first hosted Windows spool fixture surfaced a PrintManagement
+cleanup failure for its path-named local port. The replacement uses a temporary
+named queue with a RAW port to an owned loopback listener. It checks the
+actual bytes, abort behavior and spooler cleanup without a physical device.
 
 ## Pageant
 
