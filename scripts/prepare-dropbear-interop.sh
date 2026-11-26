@@ -67,8 +67,8 @@ fi
 case "$interop_sftp" in *[!a-zA-Z0-9_./+-]*) echo 'Unsupported SFTP subsystem path characters' >&2; exit 1;; esac
 printf '#define SFTPSERVER_PATH "%s"\n#define DROPBEAR_SVR_PASSWORD_AUTH 0\n#define DROPBEAR_SVR_PAM_AUTH 0\n' "$interop_sftp" > "$interop_build/localoptions.h"
 if [ "$(uname -s)" = Darwin ]; then
-    # Darwin lacks setresgid. Use Dropbear's existing child-time user switch.
-    printf '#define DROPBEAR_SVR_DROP_PRIVS 0\n' >> "$interop_build/localoptions.h"
+    # Darwin lacks setresgid. Switch in the session child and omit Unix socket forwarding.
+    printf '#define DROPBEAR_SVR_DROP_PRIVS 0\n#define DROPBEAR_SVR_LOCALSTREAMFWD 0\n#define DROPBEAR_SVR_REMOTESTREAMFWD 0\n' >> "$interop_build/localoptions.h"
 fi
 cd "$interop_build"
 ./configure --disable-zlib --disable-syslog --disable-shadow --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --disable-loginfunc --disable-pututline --disable-pututxline --enable-bundled-libtom > "$interop_parent/configure.log" 2>&1
