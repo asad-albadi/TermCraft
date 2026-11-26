@@ -25,18 +25,22 @@ pub(in crate::remote_files::transfer) enum SourceNode {
     Symlink(Vec<u8>),
 }
 
-fn rustix_mode(value: u32) -> Result<rustix::fs::Mode, String> {
-    u16::try_from(value)
-        .map(rustix::fs::Mode::from_raw_mode)
+#[cfg(unix)]
+fn checked_raw_mode(value: u32) -> Result<rustix::fs::RawMode, String> {
+    rustix::fs::RawMode::try_from(value)
         .map_err(|_| "POSIX mode does not fit the platform raw mode type".into())
 }
 
-#[cfg(test)]
+#[cfg(all(test, unix))]
 mod mode_tests {
     #[test]
     fn encoded_modes_are_checked_before_rustix_conversion() {
-        assert_eq!(super::rustix_mode(0o755).unwrap().as_raw_mode(), 0o755);
-        assert!(super::rustix_mode(u32::from(u16::MAX) + 1).is_err());
+        assert_eq!(
+            rustix::fs::FileType::from_raw_mode(super::checked_raw_mode(0o120755).unwrap()),
+            rustix::fs::FileType::Symlink
+        );
+        #[cfg(target_os = "macos")]
+        assert!(super::checked_raw_mode(u32::from(u16::MAX) + 1).is_err());
     }
 }
 #[cfg(unix)]
@@ -97,9 +101,7 @@ impl SourceDir {
             use rustix::fs::{AtFlags, FileType, Mode, OFlags};
             use std::os::unix::fs::MetadataExt;
             // Mode describes permissions only and strips the file-type bits.
-            let raw_mode = u16::try_from(entry.mode)
-                .map_err(|_| "POSIX mode does not fit the platform raw mode type")?;
-            if FileType::from_raw_mode(raw_mode.into()) == FileType::Symlink {
+            if FileType::from_raw_mode(checked_raw_mode(entry.mode)?) == FileType::Symlink {
                 let target = rustix::fs::readlinkat(&*root, &entry.name, Vec::new())
                     .map_err(err)?
                     .into_bytes();
