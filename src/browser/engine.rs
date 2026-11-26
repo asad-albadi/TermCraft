@@ -209,14 +209,25 @@ impl Browser<'_> {
         params: Value,
         timeout: Duration,
     ) -> Result<Value, String> {
+        let message = self.response(target, method, params, timeout)?;
+        if message.get("error").is_some() {
+            return Err(format!("Chromium could not complete {method}."));
+        }
+        Ok(message["result"].clone())
+    }
+
+    fn response(
+        &mut self,
+        target: bool,
+        method: &str,
+        params: Value,
+        timeout: Duration,
+    ) -> Result<Value, String> {
         let id = self.issue(target, method, params)?;
         let deadline = Instant::now() + timeout;
         while let Some(message) = self.pipe.receive(deadline, &self.shared.cancelled)? {
             if message["id"] == id {
-                if message.get("error").is_some() {
-                    return Err(format!("Chromium could not complete {method}."));
-                }
-                return Ok(message["result"].clone());
+                return Ok(message);
             }
             self.event(&message)?;
         }
@@ -362,7 +373,26 @@ impl Browser<'_> {
             "Target.getTargetInfo",
             json!({"targetId":self.target}),
         )?;
-        let history = self.call(true, "Page.getNavigationHistory", json!({}))?;
+        let response = self.response(
+            true,
+            "Page.getNavigationHistory",
+            json!({}),
+            REQUEST_TIMEOUT,
+        )?;
+        if let Some(error) = response.get("error") {
+            // A history navigation can briefly leave CDP attached to the
+            // inactive renderer. The next metadata poll sees the active page.
+            if error["code"].as_i64() == Some(-32000)
+                && matches!(
+                    error["message"].as_str(),
+                    Some("Not attached to an active page" | "Not attached to a page")
+                )
+            {
+                return Ok(());
+            }
+            return Err("Chromium could not complete Page.getNavigationHistory.".into());
+        }
+        let history = &response["result"];
         let entries = history["entries"]
             .as_array()
             .ok_or("Invalid browser history response.")?;
@@ -445,10 +475,15 @@ impl Browser<'_> {
         // restores the old view size. Finish that restoration before resizing.
         if self.screenshot_format == image::ImageFormat::Png {
             while let Some(capture) = self.capture {
-                let message = self
+                let Some(message) = self
                     .pipe
                     .receive(capture.deadline, &self.shared.cancelled)?
-                    .ok_or("Chromium timed out while finishing the previous preview.")?;
+                else {
+                    // Navigation can retire the renderer and its pending
+                    // request. Use the same deadline as the ordinary poll.
+                    self.capture = None;
+                    break;
+                };
                 self.event(&message)?;
             }
         }
