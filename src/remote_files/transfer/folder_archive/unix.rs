@@ -14,7 +14,7 @@ fn error(e: impl std::fmt::Display) -> String {
     e.to_string()
 }
 fn raw_mode(value: u32) -> Result<Mode, String> {
-    u16::try_from(value)
+    fs::RawMode::try_from(value)
         .map(Mode::from_raw_mode)
         .map_err(|_| "Folder archive mode does not fit the platform raw mode type".into())
 }
