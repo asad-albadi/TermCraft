@@ -81,6 +81,97 @@ fn typed_registry_value_input_is_bounded_and_literal() {
     assert!(RegistryValue::parse_text(1, "bad\0value").is_err());
     assert!(RegistryValue::parse_text(99, "anything").is_err());
 }
+
+#[cfg(windows)]
+#[test]
+#[ignore = "temporarily installs the real per-user integration for an explicitly supplied staged executable"]
+fn packaged_windows_registration_dispatches_and_guards_uninstall() {
+    use harbor_workspace::{
+        cli::CliAction,
+        ipc::{Binding, InstanceBroker},
+    };
+    use std::{path::PathBuf, process::Command, sync::atomic::AtomicBool, time::Duration};
+    use windows_sys::Win32::{
+        Foundation::{CloseHandle, WAIT_OBJECT_0},
+        System::Threading::{GetExitCodeProcess, WaitForSingleObject},
+        UI::Shell::{
+            SEE_MASK_FLAG_NO_UI, SEE_MASK_NOCLOSEPROCESS, SHELLEXECUTEINFOW, ShellExecuteExW,
+        },
+    };
+
+    let executable = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_ACTIVATION_EXE").unwrap());
+    assert!(executable.is_absolute() && executable.is_file());
+    let integration = WindowsIntegration::new(executable.to_str().unwrap()).unwrap();
+    let cancel = AtomicBool::new(false);
+    assert!(
+        !integration.status(&cancel).unwrap(),
+        "fixture already registered"
+    );
+    integration.install_user(&cancel).unwrap();
+    struct Registration(WindowsIntegration);
+    impl Drop for Registration {
+        fn drop(&mut self) {
+            let _ = self.0.remove_user(&AtomicBool::new(false));
+        }
+    }
+    let owned = Registration(integration);
+    assert!(owned.0.status(&cancel).unwrap());
+    let guard = || {
+        Command::new(&executable)
+            .arg("--windows-integration-uninstall-guard")
+            .output()
+            .unwrap()
+            .status
+            .code()
+    };
+    assert_eq!(guard(), Some(3));
+
+    // Route a deliberately invalid URL through the real Windows shell. It must
+    // reach the registered parser and exit before opening any workspace.
+    let invalid: Vec<u16> = "termcraft://invalid-qualification-request\0"
+        .encode_utf16()
+        .collect();
+    let mut launch = SHELLEXECUTEINFOW {
+        cbSize: std::mem::size_of::<SHELLEXECUTEINFOW>() as u32,
+        fMask: SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI,
+        lpFile: invalid.as_ptr(),
+        ..Default::default()
+    };
+    let launched = unsafe { ShellExecuteExW(&mut launch) };
+    assert_ne!(launched, 0, "{}", std::io::Error::last_os_error());
+    assert!(!launch.hProcess.is_null());
+    let mut exit = 0;
+    let completed = unsafe {
+        let result = WaitForSingleObject(launch.hProcess, 8000) == WAIT_OBJECT_0
+            && GetExitCodeProcess(launch.hProcess, &mut exit) != 0;
+        CloseHandle(launch.hProcess);
+        result
+    };
+    assert!(completed);
+    assert_eq!(exit, 2);
+
+    let local = tempfile::tempdir().unwrap();
+    let Binding::Primary(mut workspace) =
+        InstanceBroker::bind(&local.path().join("Harbor")).unwrap()
+    else {
+        panic!("private activation workspace was occupied")
+    };
+    let result = Command::new(&executable)
+        .env("LOCALAPPDATA", local.path())
+        .args([
+            "--windows-activation-url",
+            "termcraft://session/qualification-fixture",
+        ])
+        .output()
+        .unwrap();
+    assert!(result.status.success());
+    let request = workspace.recv_timeout(Duration::from_secs(4)).unwrap();
+    assert!(
+        matches!(request.action, CliAction::OpenSession { id, .. } if id == "qualification-fixture")
+    );
+    owned.0.remove_user(&cancel).unwrap();
+    assert_eq!(guard(), Some(0));
+}
 #[cfg(windows)]
 mod native_windows {
     use super::*;

@@ -1,5 +1,34 @@
 # Windows x64 qualification for issue #1
 
+## Continuation on main cf7ee4d
+
+- The Windows BusyBox-w32 archive staged successfully with SHA-256
+  `4649824ec37541b1939b0c18805b6475adba268bbbd743525413e033803cf081`.
+  The pinned upstream PE, source and license checksums are unchanged. An
+  independent audit compared the full generated member list and checked
+  every one of the 24 applet files and the license against their source
+  checksums. Native installation, a drive-qualified path with spaces, and
+  a real ConPTY command using the private home all passed in
+  `cargo +1.96.1 test --locked --test package_manager -- --include-ignored`
+  (2 passed).
+- The opt-in `packaged_windows_registration_dispatches_and_guards_uninstall`
+  test installed real per-user handlers pointing to the staged executable.
+  Windows shell routing rejected a malformed TermCraft URL before opening a
+  workspace. The registered entry point then delivered a valid bookmark to
+  an isolated IPC receiver. The packaged uninstaller guard refused removal
+  while the handlers existed and passed after the fixture removed them.
+- The rebuilt private X candidate returned a real core keyboard mapping
+  and advertised XKEYBOARD, GLX, RANDR and Composite to an authenticated
+  client. These are protocol observations. Physical presentation, keyboard
+  layout switching, clipboard bridging and the Indirect chooser remain open.
+- The software-rendering fixture used [Mesa for Windows 26.3.1](https://github.com/pal1000/mesa-dist-win/releases/tag/26.3.1).
+  The Windows release workflow checks the archive and the two extracted DLLs
+  against pinned SHA-256 fingerprints. Local relocated startup observed the
+  app load both fixture DLLs and reach the exact packaged RDP helper. The
+  installed GUI test also passed with the same fixture. It removed the two
+  temporary DLLs before checking uninstall. The release archive contains
+  neither fixture DLL.
+
 ## Native build
 
 The branch started from `98b213d`. This run used Windows 11 Pro x64 build
