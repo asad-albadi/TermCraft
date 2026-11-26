@@ -509,7 +509,7 @@
       ],
       "dependency": "Native Windows/macOS required-client payload builds and clean-runtime hosts. Declared Arch-compatible Linux optional closure and Debian12 core scopes are qualified separately.",
       "remaining": "Linux optional protocol/runtime bundle is integrated and qualified for declared Arch x86_64 ABI, with actual empty-client-PATH Mosh SSH/UDP and sandboxed embedded Chromium. Debian12 core deliberately omits these optional native payloads. Native Windows/macOS required-client payloads and clean-runtime qualification remain.",
-      "validation_remaining": "Windows x64 core package startup passed with empty PATH. The optional pinned BusyBox-w32 archive was independently reproduced, staged and exercised through native ConPTY. Windows Chromium/Mosh and other optional native payloads remain open.",
+      "validation_remaining": "Windows x64 core startup passed with empty PATH. A private combined Windows package carried source-built Chromium, private X, BusyBox-w32 and the locked RDP helper. Windows production approval, Mosh and other optional native payloads remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/execution/2026-11-25-windows-native.md"
@@ -770,9 +770,9 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS packaged Chromium runtimes and interactive profile, input and lifecycle qualification.",
-      "remaining": "Reviewed embedded Chromium and private process/pipe source backends are present for Linux, Windows and macOS. Genuine source22bb Linux bundle passes actual normal-app navigation/input/resize/PTY and five nested sandboxed renderer checks with clean cleanup. Native Windows/macOS browser packaging and interactive provider qualification remain.",
-      "validation_remaining": "Native Windows/Linux/macOS and original runtime comparisons remain pending; static exact-target and official scope evidence established.",
+      "dependency": "Windows production artifact approval, a native macOS browser payload and original workflow fixtures.",
+      "remaining": "Source22bb Linux bundle passed packaged navigation/input/resize/PTY and nested renderer sandbox checks. A relocated private Windows x64 package used the exact source-built Chromium with native AppContainer, input and cleanup evidence.",
+      "validation_remaining": "Complete Windows production artifact approval, macOS packaging and runtime qualification, and original workflow comparisons. The Windows evidence applies to the exact private candidate.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/original-scope/README.md",
@@ -781,7 +781,8 @@
         "docs/parity-evidence/parallel-integration-reviewed/result.json",
         "docs/parity-evidence/E01/macos/README.md",
         "docs/parity-evidence/E01/windows/README.md",
-        "docs/parity-evidence/E01/resize-macos-review.md"
+        "docs/parity-evidence/E01/resize-macos-review.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },

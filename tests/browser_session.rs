@@ -103,8 +103,13 @@ fn chromium_renders_and_submits_browser_input() {
         ),
         "/scroll" => Response::html(
             r#"<title>Scroll fixture</title><body style="margin:0;height:1500px;background:red">
-            <button aria-label="Below fold" style="position:absolute;top:600px;width:100%;height:900px;border:0;background:lime"
-                onclick="fetch('/scroll-hit')"></button></body>"#,
+            <button aria-label="Below fold" style="position:absolute;top:600px;width:100%;height:900px;border:0;background:green"
+                onclick="fetch('/scroll-hit')"></button>
+            <script>
+              document.addEventListener("scrollend", () => {
+                document.querySelector("button").style.background = "lime";
+              }, {once: true});
+            </script></body>"#,
         ),
         _ => Response::html(
             "<title>Fixture</title><body style='margin:0;background:red'>\
@@ -198,6 +203,7 @@ fn chromium_renders_and_submits_browser_input() {
         .unwrap();
     wait_until(&session, || {
         session.take_frame().is_some_and(|frame| {
+            // The page turns the button bright green after scrolling settles.
             frame.size == [460, 320] && frame.rgba[pixel] < 40 && frame.rgba[pixel + 1] > 200
         })
     });

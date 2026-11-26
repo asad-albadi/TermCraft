@@ -72,14 +72,14 @@
 - [x] Launch the privately pinned package from a relocated GUI and prove exact runtime startup, loopback navigation and profile/snapshot cleanup.
 - [x] Build pinned upstream Chromium, record exact x64 installer and runtime hashes, and inventory the versioned resources and notices.
 - [x] Reproduce the Chromium network AppContainer's launch failure, then verify the scoped runtime read and execute grants and the owner-only profile ACL.
-- [ ] Replay the exact source-built Chromium candidate through package, GUI and browser tests.
+- [x] Replay the exact source-built Chromium candidate through package, GUI and browser tests. Verify the network AppContainer, restricted renderers and exact registry, process and profile cleanup.
 - [x] Exercise add/list/remove with the standalone Pageant process and a synthetic key. Verify ownership and cleanup.
 - [x] Authenticate to native primary-display capture with view-only VNC, receive one raw pixel over loopback without recording it, then verify client and listener teardown.
 - [x] Run native Npcap against two isolated loopback endpoints. Verify the filter, PCAP output, bounded capture, cancellation and destination preservation.
 - [x] Run a real managed Cron job on Windows. Verify restart and clock-jump behavior, disabled jobs and corrupt store detection.
 - [x] Verify native Eastern daylight-saving transitions with the timezone isolated to the hosted Windows runner.
 - [x] Exercise explicit Windows Iperf2/3 compatibility with independent TCP and UDP clients and verify listener cleanup.
-- [ ] Use `packaging/browser/stage-runtime.py` and `tests/browser_session.rs` to identify and test the bundled runtime. Run native profile isolation, sandbox, resize/input, cancellation and cleanup checks against a private peer.
+- [x] Use `packaging/browser/stage-runtime.py` and `tests/browser_session.rs` to identify and test the bundled runtime. Run native profile isolation, sandbox, resize/input, cancellation and cleanup checks against a private peer.
 - [ ] Exercise locally available services and capture/control, and run `windows_integration`, `ssh_agent` and `session_import` as part of the root suite. Verify Pageant, vault ACLs and recovery, imports, shared definitions, gateways, proxies and reconnects with synthetic data.
 - [x] Verify the supplied Personal 26.6 binary and run the isolated reference terminal and SSH bookmark replays. Compare the same synthetic inputs with the relocated TermCraft package and record the limits of the observations.
 - [ ] Record exact fixture status for physical serial/network/device and original Personal 26.6 comparisons.

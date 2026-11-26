@@ -657,7 +657,9 @@ was `db3d3a3f508dd4210446814aa977d6ef9e4a046194b04a94ad6a0d3ea5f39017`
 and depot_tools was `2e69d2953ddf4a4c671c701773991ff68475db00`. The
 side-by-side VS 2026 Build Tools installation completed at 18.11.12405.450
 with MSVC 14.52.37025. Windows SDK and x64 debugging tools installed at
-10.0.28000.2270. An initial source dependency fetch returned HTTP 429 from
+10.0.28000.2270. The pinned compiler was Clang 24.0.0git at LLVM revision
+`e063be79adf127cce301fe5948273102a33012b6`, with GN 2603 (`938087829fcb`)
+and Ninja 1.12.1. An initial source dependency fetch returned HTTP 429 from
 Chromium's libgav1 repository. A four-job retry proceeded through the
 owned worktree checkouts, but V8's general ref fetch hit a transfer timeout.
 A shallow fetch of the exact DEPS revision
@@ -728,6 +730,59 @@ available for normal private-tree removal. TermCraft now creates that private
 layout and scopes deregistration to the executable path of its verified
 bundled snapshot.
 [Chromium AppContainer creation](https://chromium.googlesource.com/chromium/src/+/0cefb18236a23db1ebb6b2bc040fbbaf8cbe759e/sandbox/win/src/app_container_base.cc).
+
+The final private package used the `4151e62` source archive and the Windows
+browser/Cargo changes through `5c1fc3d`. The frozen source digest was
+`c4d3f053fdea571f1137318179169411380d55ac346170290361dca31b325459`.
+`package-release.py --browser-inputs … --windows-x11-runtime … --unix-cache …`
+built the GUI and the independently locked helper with Rust 1.96.1, MSVC
+14.44.35207 and Windows SDK 10.0.26100.0. The private Chromium pin SHA-256
+was `bebb61f35e94583132a32f7f8ed859c57a54d7de5628222eb42e8a41da57e827`.
+The combined 6,376-file archive SHA-256 was
+`85576b1c91d51111e2f352f1028e4fee7668b54548c1f1fa675bc083b299ad33`.
+The GUI SHA-256 was
+`ec6a126f88a614a9956203d3e467739d768606857b7944a900ce8c5799cedaba`.
+Its adjacent helper SHA-256 was
+`9316d1c8905d9af58b9c7ae5ebbbb23ed9474105104240c38b0d32f80116f00b`.
+That exact helper passed all 11 independent RDP endpoint cases with
+OpenSSL 3.2.4, including clipboard, resize, input and cancellation. The same
+archive launched the exact VcXsrv image from a relocated GUI and saved
+ConPTY session. It enforced the cookie and removed the IPv4 listener,
+authority file and runtime snapshot on exit.
+
+The relocated GUI loaded a saved Browser session with an empty PATH and the
+exact Chromium image above. The loopback peer received the page request.
+Normal GUI closure removed the private profile and runtime. The independently
+compiled test runner used the same embedded approval pin and extracted
+runtime. All five `browser_session` tests passed, including input, viewport
+changes, history, HTTP authentication, proxy, TLS rejection and cancellation.
+One earlier run missed a click immediately after a scroll frame. An isolated
+rerun passed. The fixture now waits for Chromium's `scrollend` event to paint
+the same bright-green click target before requiring the original HTTP request.
+The serial token replay observed three AppContainer network processes and 12
+untrusted renderers, all in jobs. It verified three exact network registrations
+during execution and zero surviving processes, profiles or registrations on
+close. The token report SHA-256 was
+`3d7c289e8ae6f02c8b18097d6f81f15742bcd2e37e4c650ac516d94133361393`.
+The two-worker repeat also passed all five tests. The watcher observed three
+network AppContainers and 14 restricted renderers, with zero remaining
+processes, profiles or registrations. Its report SHA-256 was
+`9071076ad3befd445fd511c3be74a91ed40d348786cdcdd40e7a840ece635486`.
+
+The installed compatibility branch passed all five browser tests with the
+same source-built image discovered in a synthetic Windows profile's known
+folder. Both modes used maintained Chromium policies and the product changes
+were exercised with the real runtime on both paths.
+
+`scripts/package-check-startup.py` verified normal relocated startup with an
+empty PATH at 1360 × 880, the adjacent RDP child identity and preservation of
+the isolated legacy Harbor workspace. `tests/windows-package-lifecycle.ps1`
+replayed two fixture-version stamps from the same final archive. Both installed
+GUIs matched the exact hash above. It passed shortcut verification, side-by-side
+installation, duplicate and unsafe-uninstall refusal, exact reinstall,
+workspace and unrelated-file preservation, and uninstall. The independently
+built development upgrade earlier in this report provides the separate genuine
+version-upgrade and encrypted-vault evidence.
 
 ## Windows device components
 
@@ -885,6 +940,13 @@ binaries. The independent locked RDP helper passed all 36 tests. The
 separate Eastern DST replay passed one test on the same runner. The Npcap
 and Iperf opt-in runs below used their actual Windows compatibility providers.
 
+After the AppContainer fix, the local full Windows run at `5c1fc3d` used
+`cargo +1.96.1 test --locked --all-targets --no-fail-fast`. It passed 619 tests,
+zero failed and 36 ignored across 76 binaries. The nine native Windows
+browser transport tests passed separately. The final scroll fixture change
+was replayed against the exact combined package in serial and concurrent
+opt-in runs above.
+
 The real Windows VNC view-only provider passed
 `cargo +1.96.1 test --locked --lib windows_native_view_only_capture_starts_and_releases_listener -- --ignored`.
 A native primary-desktop frame validated before publishing the loopback
@@ -958,19 +1020,24 @@ with an OpenGL 2.0 or later context.
   failures and 23 ignored. The extra opt-in test is the native VNC capture
   case, which passed separately on the supported desktop.
 - The private VcXsrv build, owned start/stop and controlled embedded SSH
-  forwarding passed. The runtime approval pin remains unset while MSVC
-  redistribution notices, installed OpenSSH forwarding, Direct and Indirect
-  desktop workflows, clipboard, keyboard and graphics qualification are open.
+  forwarding passed. Git for Windows OpenSSH authenticated X11. Microsoft
+  Win32 OpenSSH lacks that feature. Direct and native chooser Indirect XDMCP,
+  Unicode clipboard, German keyboard and software Composite passed. Physical
+  GPU, additional-monitor workflows and exact redistribution approval remain
+  open.
 - Foreground terminal and editor text input, clipboard and additional named
   shortcuts need their own desktop observations. The 100/150/200 percent
   scale matrix requires a disposable or dedicated desktop.
-- Full RDP sessions and redirection need a designated endpoint. Windows
-  enumerated a USB serial port and a software PDF queue. Neither was exercised
-  as a physical fixture. Smartcard, physical printer, connected serial/network
-  peers and the remaining interactive Personal 26.6 probes are outstanding.
-- Windows bundled Chromium needs an audited Windows payload and resource
-  pins. Native capture/control, Pageant-backed SSH, and vault recovery and
-  permission workflows retain their separate qualification gates.
+- The real xrdp desktop and independent RDP endpoint cover NLA, mapped drives,
+  clipboard, resizing and cleanup. The local hosted Winspool fixture covers
+  disposable software RAW printing. A dedicated Windows Session Host is
+  needed for its administrative session and remote device behavior. A
+  configured smartcard, physical printer, connected serial and routed
+  network peers remain separate fixtures.
+- The exact private Windows Chromium archive passed the relocated workflow,
+  native token and owned cleanup checks. Windows production artifact approval
+  is open. The Personal 26.6 reference still needs GUI menus, direct cap
+  enforcement, and original interactive import/export observations.
 - The earlier BusyBox-w32 archive mismatch was resolved in the continuation
   above. Both Python 3.10.11 and 3.11.9 independently assembled the approved
   archive from the exact pinned upstream inputs.
