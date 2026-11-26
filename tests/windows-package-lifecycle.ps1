@@ -3,12 +3,16 @@ param(
     [Parameter(Mandatory)][string]$Archive,
     [string]$PreviousArchive,
     [string]$VaultFixture,
-    [string]$SoftwareGlDirectory
+    [string]$SoftwareGlDirectory,
+    [switch]$UsePackageVersions
 )
 
 $ErrorActionPreference = 'Stop'
 $zip = (Resolve-Path -LiteralPath $Archive).Path
 $archives = @($zip, $zip)
+if ($UsePackageVersions -and !$PreviousArchive) {
+    throw 'Supply both independently versioned archives with -UsePackageVersions.'
+}
 if ($PreviousArchive) {
     $archives[0] = (Resolve-Path -LiteralPath $PreviousArchive).Path
 }
@@ -21,6 +25,7 @@ $fixtureName = 'qualification.' + [guid]::NewGuid().ToString('N')
 $shell = New-Object -ComObject WScript.Shell
 $installed = @()
 $appHashes = @()
+$archiveVersions = @()
 $workingData = Join-Path $scratch.FullName 'installed workspace'
 $null = New-Item -ItemType Directory -Path $workingData
 $config = Join-Path $workingData 'workspace.json'
@@ -64,8 +69,15 @@ try {
         if ($root.Count -ne 1) { throw 'Expected a single package root.' }
         $manifestPath = Join-Path $root[0].FullName 'PACKAGE-MANIFEST.json'
         $manifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
-        $manifest.version = "0.0.$revision+$fixtureName"
-        $manifest | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $manifestPath -Encoding utf8
+        if ($UsePackageVersions) {
+            $archiveVersions += [System.Management.Automation.SemanticVersion]$manifest.version
+            if ($revision -eq 2 -and $archiveVersions[1] -le $archiveVersions[0]) {
+                throw 'The second package version must be newer than the first.'
+            }
+        } else {
+            $manifest.version = "0.0.$revision+$fixtureName"
+            $manifest | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $manifestPath -Encoding utf8
+        }
         $version = "$($manifest.version)-$($manifest.architecture)"
         $installPath = Join-Path $programs $version
         $link = Join-Path $menu "TermCraft $version.lnk"

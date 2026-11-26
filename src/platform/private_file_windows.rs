@@ -11,9 +11,9 @@ use windows_sys::Win32::{
     Foundation::*,
     Security::{Authorization::*, *},
     Storage::FileSystem::{
-        BY_HANDLE_FILE_INFORMATION, CREATE_NEW, CreateFileW, FILE_ATTRIBUTE_NORMAL,
-        FILE_FLAG_OPEN_REPARSE_POINT, FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE,
-        GetFileInformationByHandle, READ_CONTROL, WRITE_DAC,
+        BY_HANDLE_FILE_INFORMATION, CREATE_NEW, CreateFileW, DELETE, FILE_ATTRIBUTE_NORMAL,
+        FILE_ATTRIBUTE_REPARSE_POINT, FILE_FLAG_OPEN_REPARSE_POINT, FILE_SHARE_DELETE,
+        FILE_SHARE_READ, FILE_SHARE_WRITE, GetFileInformationByHandle, READ_CONTROL, WRITE_DAC,
     },
     System::Threading::*,
 };
@@ -84,7 +84,7 @@ pub(crate) fn create_new(path: &Path) -> io::Result<File> {
     let handle = unsafe {
         CreateFileW(
             path.as_ptr(),
-            GENERIC_READ | GENERIC_WRITE | READ_CONTROL | WRITE_DAC,
+            GENERIC_READ | GENERIC_WRITE | READ_CONTROL | WRITE_DAC | DELETE,
             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
             &attributes,
             CREATE_NEW,
@@ -96,7 +96,18 @@ pub(crate) fn create_new(path: &Path) -> io::Result<File> {
     unsafe { LocalFree(descriptor) };
     match error {
         Some(error) => Err(error),
-        None => Ok(unsafe { File::from_raw_handle(handle) }),
+        None => {
+            let file = unsafe { File::from_raw_handle(handle) };
+            if let Err(mut error) = secure_file(&file) {
+                if let Err(cleanup) = crate::platform::windows_rename::remove_opened(&file) {
+                    error.push_str(&format!(
+                        " The new private file could not be removed: {cleanup}"
+                    ));
+                }
+                return Err(io::Error::new(io::ErrorKind::PermissionDenied, error));
+            }
+            Ok(file)
+        }
     }
 }
 
@@ -108,8 +119,11 @@ pub(super) fn secure_file(file: &File) -> Result<(), String> {
         }
         let mut info: BY_HANDLE_FILE_INFORMATION = std::mem::zeroed();
         if GetFileInformationByHandle(file.as_raw_handle(), &mut info) == 0
-            || info.nNumberOfLinks != 1
+            || info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT != 0
         {
+            return Err("Private file must be a regular, non-redirected file.".into());
+        }
+        if info.nNumberOfLinks != 1 {
             return Err("Private file must not have hard links.".into());
         }
         let user = current_user().map_err(|_| "Cannot inspect current user.")?;

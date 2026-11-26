@@ -131,7 +131,7 @@ Existing adapters must not be classified as absent solely because endpoints were
 
 ## Completion rule and execution guidance
 
-The [Windows x64 qualification checkpoint](docs/parity-evidence/execution/2026-11-25-windows-native.md) records partial D02, P08 and V05 evidence, including native helper tests, portable GUI relocation, two-build installer lifecycle, real URL activation and native ConPTY with the optional BusyBox-w32 runtime. Platform and original-product acceptance remain open.
+The [Windows x64 qualification checkpoint](docs/parity-evidence/execution/2026-11-25-windows-native.md) records partial D02, P08 and V05 evidence, including clean hosted GUI and helper startup, a local installer replay with two independently versioned development packages, real URL activation and native ConPTY with the optional BusyBox-w32 runtime. Platform and original-product acceptance remain open.
 
 The full plan is approved. Use native workflows, meaningful targeted regressions and the single [durable queue](PARITY_EXECUTION_QUEUE.json). Work by actual dependencies and continue after each passing increment. Historical Superpowers strict-order/stop-after-increment instructions are superseded by the user’s 2026-11-24 execution amendment. Full/host gates are batched at subsystem boundaries.
 

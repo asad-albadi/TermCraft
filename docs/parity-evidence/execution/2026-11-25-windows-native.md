@@ -28,6 +28,14 @@
   `7d16a924201add49616b3a1aee3f942f369836be74747c82f52848c54745c443`.
   The staged inventory SHA-256 is
   `f23f73c1acef9b54ef7d2df3fec50770433e2966e30907828952729a38e2fb25`.
+  Windows Authenticode validated the Microsoft signatures on the three
+  app-local VC143 runtime DLLs at file version `14.44.35211.0`. The exact
+  staged hashes are `0f885b509a685d2bbfa652fed26b5fb31d88fbdab0a978c641d1c7b8aa460aa9`
+  for `msvcp140.dll`, `d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066`
+  for `vcruntime140.dll` and `1f2d41c4aa5db0bc33ebf7b66d72943a817d7ce6cbe880502a9403823633093f`
+  for `vcruntime140_1.dll`. Microsoft lists the VC redist directory under
+  its Visual Studio license conditions. Distribution approval remains open.
+  [Microsoft Visual Studio 2022 REDIST list](https://learn.microsoft.com/visualstudio/releases/2022/redistribution)
   The applied patch normalizes IPv4 and IPv6 addresses before formatting a
   bounded chooser label and checks the list selection before reading it.
   Application-owned XDMCP, layout switching, clipboard and graphical
@@ -84,6 +92,39 @@
   descriptors at creation. Checking an existing file still rejects a
   foreign owner. The startup probe now reports early exit and its log before
   the socket deadline.
+- At `2d548ca`, the full OpenSSL-enabled Windows root replay passed
+  606 tests with zero failures and 26 ignored. The native dispatch and
+  credential vault suites passed five tests each and the registry suite
+  passed 22 with one opt-in case.
+- The ownership-fix build from frozen source snapshot
+  `dc66836098c147383803f0f2dc9bfa64c80a6b9776c2d48cac790d709d87b64e`
+  produced the optional Unix Windows x64 ZIP SHA-256
+  `34c38f750c629e7c4d77745b841601f6effd74706d17203a8f115bc327c8e447`.
+  Its GUI SHA-256 was
+  `500bbd886f3e46bf922794ff4e337da2612d7dfe2820fbca0071deeb26b8f535`.
+  The adjacent helper SHA-256 was
+  `9df84270e6333a3bf24ae28ad9c8ab42ad886d85fd3296ed90aa87184d3130e4`.
+  Relocated startup with the exact helper and software renderer passed, as
+  did the native installer replay with two different build images, all 11
+  packaged-helper RDP endpoint tests and the opt-in ShellExecute/guard case.
+- [Hosted Windows run 45750110857](https://github.com/asad-albadi/TermCraft/actions/runs/45750110857/job/139675574627)
+  passed the package contract (1), IPC suite (5), vault suite (5), relocated
+  GUI at 1024 × 768, adjacent-helper negotiation and installed startup,
+  shortcuts, uninstall refusal, reinstall and cleanup. The hosted unsigned
+  ZIP SHA-256 is
+  `0a6932ac5d88cf0489a2232151afa2908e2aca2d3a1488b7cc212512c6b49c75`.
+  The hosted installer used one build with two synthetic manifest versions.
+- The local installer separately passed with original manifests from
+  `0.1.0` and `0.1.1-qualification.20261126` builds. The newer independent
+  locked build changed the GUI version in a copy of the frozen source
+  and kept the RDP helper lock. Staging at the original long output path
+  had previously failed on the transitive `rfd` license tree with
+  WinError 206. A short internal directory with the original versioned ZIP
+  root fixed the failure at the same output path. The rebuilt version ZIP
+  SHA-256 is `e4b1acbac116ca9772105b88a3852591a50ae973cefbec23a45c0ff28e2bdc7c`.
+  The ordered installer replay preserved the fixture workspace, preferences,
+  encrypted vault and unrelated file, then removed both versions and their
+  Start menu shortcuts.
 
 ## Native build
 
@@ -419,10 +460,10 @@ with an OpenGL 2.0 or later context.
   to the download, so an authorized copy is needed for the original-product
   workflow replay.
 - The local process used an unelevated Windows account and Windows Sandbox
-  was absent. The two-build installer fixture uses synthetic manifest
-  versions. The repository had no published release when queried, so a
-  genuine released-version upgrade and a manual first-login scenario
-  remain open.
+  was absent. The clean hosted run and local development version-upgrade
+  evidence above cover different scenarios. The repository had no published
+  release when queried. A long-lived user upgrading from a previously
+  released package and a manual desktop first-login replay remain open.
 - [Hosted Linux CI](https://github.com/asad-albadi/TermCraft/actions/runs/45692458444)
   reproduced the existing redirected-drive allocation cleanup failure
   tracked separately in [issue #3](https://github.com/asad-albadi/TermCraft/issues/3).

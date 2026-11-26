@@ -542,7 +542,10 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
     suffix = ".exe" if target == "windows" else ""
     with tempfile.TemporaryDirectory(prefix=".package-", dir=output) as temporary:
         temp = Path(temporary)
-        root = temp / ("TermCraft.app" if target == "macos" else basename)
+        archive_root = "TermCraft.app" if target == "macos" else basename
+        # Windows stages deep dependency notices. Keep the versioned archive
+        # name out of those host paths while preserving the ZIP's public layout.
+        root = temp / ("pkg" if target == "windows" else archive_root)
         root.mkdir()
         bindir, resources = macos_bundle(root, version, packaging) if target == "macos" else (root, root)
         bindir.mkdir(exist_ok=True)
@@ -690,7 +693,7 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
             with zipfile.ZipFile(temporary_archive, "w", zipfile.ZIP_DEFLATED) as zipped:
                 for path in sorted(root.rglob("*")):
                     if path.is_file():
-                        zipped.write(path, path.relative_to(temp).as_posix())
+                        zipped.write(path, f"{archive_root}/{path.relative_to(root).as_posix()}")
         # Publish a complete archive without replacing another version or concurrent output.
         if os.name == "nt":
             # Windows rename is atomic and refuses an existing destination.

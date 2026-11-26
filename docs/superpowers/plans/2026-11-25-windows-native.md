@@ -39,7 +39,8 @@
 - [x] Reinstall an exact removed version and confirm modified-file and foreign-file refusal. Reopen the preserved synthetic encrypted vault after uninstall.
 - [x] Install real per-user protocol registrations for a staged executable, test Windows shell routing and disposable workspace dispatch, and verify the uninstall guard before and after cleanup.
 - [x] Stage the pinned BusyBox-w32 archive and exercise its installed shell in native ConPTY.
-- [ ] In an isolated account or equivalent fixture, install two versions, validate Start menu targets, relocate the portable ZIP, exercise owned protocol integration and verify safe uninstall. Test modified file and active integration refusal. Compare workspace, vault and recovery fixture hashes before and after.
+- [x] Replay portable GUI startup and the per-user installer on a clean Windows runner. Separately install two real development package versions with original manifests and verify shortcuts, modified-file refusal, reinstall and encrypted vault preservation.
+- [ ] Replay the upgrade from a previously published version and the interactive fresh-user recovery workflow.
 - [ ] Fix confirmed defects in `packaging/windows/install-per-user.ps1`, the package scripts or the owning Rust module with a regression that fails first. Record package and installed executable hashes and the exercised lifecycle.
 
 ### Task 3: Private X engine and workflows
