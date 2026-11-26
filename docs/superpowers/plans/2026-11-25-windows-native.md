@@ -82,9 +82,9 @@
 - [x] Use `packaging/browser/stage-runtime.py` and `tests/browser_session.rs` to identify and test the bundled runtime. Run native profile isolation, sandbox, resize/input, cancellation and cleanup checks against a private peer.
 - [ ] Exercise locally available services and capture/control, and run `windows_integration`, `ssh_agent` and `session_import` as part of the root suite. Verify Pageant, vault ACLs and recovery, imports, shared definitions, gateways, proxies and reconnects with synthetic data.
 - [x] Verify the supplied Personal 26.6 binary and run the isolated reference terminal and SSH bookmark replays. Compare the same synthetic inputs with the relocated TermCraft package and record the limits of the observations.
-- [ ] Record exact fixture status for physical serial/network/device and original Personal 26.6 comparisons.
+- [x] Record exact fixture status for physical serial/network/device and original Personal 26.6 comparisons.
 
 ### Task 6: Reconcile and verify
 
-- [ ] Commit each verified checkpoint with evidence and relevant changes to `PARITY_EXECUTION_QUEUE.json`, `PARITY_CHECKLIST.md`, `FEATURE_PARITY.md` and Windows documentation. Update [issue #1](https://github.com/asad-albadi/TermCraft/issues/1) after evidence changes its status. Check an issue item only after its full acceptance is demonstrated.
-- [ ] Re-run full affected suites and review the branch against the approved design. Hand off the local branch and enumerate outstanding fixtures or failed gates.
+- [x] Commit verified checkpoints with evidence and reconcile `PARITY_EXECUTION_QUEUE.json`, `PARITY_CHECKLIST.md`, `FEATURE_PARITY.md`, Windows documentation and [issue #1](https://github.com/asad-albadi/TermCraft/issues/1).
+- [x] Re-run the full affected Windows suites and record the verified branch and remaining fixtures and gates in [PR #6](https://github.com/asad-albadi/TermCraft/pull/6).

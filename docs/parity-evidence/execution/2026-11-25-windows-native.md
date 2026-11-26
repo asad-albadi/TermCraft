@@ -947,6 +947,15 @@ browser transport tests passed separately. The final scroll fixture change
 was replayed against the exact combined package in serial and concurrent
 opt-in runs above.
 
+The [hosted Windows run at `5c1fc3d`](https://github.com/asad-albadi/TermCraft/actions/runs/45893475046/job/140161546298)
+reported the same 619 workspace passes, zero failures and 36 ignored. The
+locked RDP helper passed all 36 tests and the separate Eastern DST replay
+passed one. The final local workspace replay at `47f5db2` again reported 619
+passed, zero failed and 36 ignored. The two opt-in BusyBox-w32 tests passed
+drive-path resolution and a real ConPTY terminal with the same FRP-6354
+archive, SHA-256
+`4649824ec37541b1939b0c18805b6475adba268bbbd743525413e033803cf081`.
+
 The real Windows VNC view-only provider passed
 `cargo +1.96.1 test --locked --lib windows_native_view_only_capture_starts_and_releases_listener -- --ignored`.
 A native primary-desktop frame validated before publishing the loopback
