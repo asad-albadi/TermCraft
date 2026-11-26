@@ -441,6 +441,17 @@ impl Browser<'_> {
         self.size = [width, height];
         self.viewport_revision = revision;
         self.shared.frame.lock().unwrap().take();
+        // CDP temporarily changes the emulated view during a capture, then
+        // restores the old view size. Finish that restoration before resizing.
+        if self.screenshot_format == image::ImageFormat::Png {
+            while let Some(capture) = self.capture {
+                let message = self
+                    .pipe
+                    .receive(capture.deadline, &self.shared.cancelled)?
+                    .ok_or("Chromium timed out while finishing the previous preview.")?;
+                self.event(&message)?;
+            }
+        }
         self.call(
             false,
             "Browser.setContentsSize",

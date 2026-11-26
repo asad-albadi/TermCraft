@@ -249,7 +249,9 @@ fn chromium_cancels_site_auth_without_credentials_and_rejects_untrusted_tls() {
             .iter()
             .all(|request| request.header("Authorization").is_none())
     );
-    session.send(Command::Navigate(tls.origin.clone())).unwrap();
+    session
+        .send(Command::Navigate(tls.origin.clone()))
+        .unwrap_or_else(|error| panic!("{error} Engine error: {:?}", session.state().error));
     wait_until(&session, || session.state().error.is_some());
     assert!(
         session

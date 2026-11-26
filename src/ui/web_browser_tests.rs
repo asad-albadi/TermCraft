@@ -157,7 +157,12 @@ fn chromium_fixture_slot() -> Option<std::sync::MutexGuard<'static, ()>> {
             .unwrap();
         return Some(owned_process_fixture_slot());
     }
+    #[cfg(target_os = "linux")]
     let installed = std::path::Path::new("/usr/lib/chromium/chromium").is_file();
+    #[cfg(target_os = "macos")]
+    let installed = harbor_workspace::runtime::RuntimeCatalog::for_current_executable()
+        .and_then(|catalog| catalog.resolve(harbor_workspace::runtime::ToolId::Browser))
+        .is_ok();
     assert!(installed || std::env::var_os("TERMCRAFT_REQUIRE_CHROMIUM").is_none());
     installed.then(owned_process_fixture_slot)
 }
@@ -430,9 +435,11 @@ fn embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_pain
         || {
             render_browser_at(&ctx, tab, small, vec![], None);
             let browser = tab.web_browser.as_ref().unwrap();
+            let state = browser.handle.state();
+            assert!(!state.closed, "{:?}", state.error);
             browser.texture.is_some()
                 && browser.frame_size == browser.viewport
-                && browser.handle.state().title == "Resize fixture"
+                && state.title == "Resize fixture"
         },
         "The small Chromium viewport did not paint",
     );
