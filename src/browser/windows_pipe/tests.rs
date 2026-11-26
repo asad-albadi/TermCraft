@@ -369,3 +369,38 @@ fn browser_profile_has_a_protected_private_acl() {
         );
     }
 }
+
+#[test]
+fn browser_profile_recovers_when_a_runtime_file_share_lock_clears() {
+    use std::os::windows::fs::OpenOptionsExt;
+
+    let owner = OwnerSecurity::new().unwrap();
+    let profile = Profile::new(&owner).unwrap();
+    let path = profile.path.clone();
+    let image = path.join("fixture-runtime.dll");
+    let file = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .share_mode(FILE_SHARE_READ)
+        .open(image)
+        .unwrap();
+    let (begin, started) = std::sync::mpsc::channel();
+    let release = std::thread::spawn(move || {
+        started.recv().unwrap();
+        std::thread::sleep(Duration::from_millis(900));
+        drop(file);
+    });
+
+    begin.send(()).unwrap();
+    drop(profile);
+    let removed = !path.exists();
+    release.join().unwrap();
+    if !removed {
+        // Retain the failure assertion while cleaning this test's private directory.
+        std::fs::remove_dir_all(path).unwrap();
+    }
+    assert!(
+        removed,
+        "owned profile remained after the file share lock cleared"
+    );
+}

@@ -485,7 +485,8 @@ impl Drop for Profile {
     fn drop(&mut self) {
         drop(self.directory.take());
         if self.remove {
-            let until = Instant::now() + Duration::from_millis(400);
+            // Windows may still hold a scanned runtime file after the job exits.
+            let until = Instant::now() + Duration::from_secs(3);
             loop {
                 match std::fs::remove_dir_all(&self.path) {
                     Ok(()) => break,
