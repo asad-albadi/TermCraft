@@ -685,6 +685,10 @@ The 11 generated `generate_bindings.py` commands in `toolchain.ninja` were
 given the upstream `--single_process` flag. All 11 binding actions then
 completed at 10 Ninja jobs. The incremental C++ build resumed with 16 jobs
 after that phase. A complete runtime and private package replay remain open.
+The final Ninja invocation uses 12 workers. The generated `chrome.dll` link
+rule caps ThinLTO at six workers to stay within the host's Windows commit
+limit. The first 657 actions in that invocation completed before the
+remaining actions began waiting for the native browser DLL link.
 
 ## Windows device components
 
@@ -865,8 +869,10 @@ with an OpenGL 2.0 or later context.
   The 2b88d9c locked root run reported 606 passes, zero failures and 19 ignored
   checks. Ten of those ignored cases are the independently executed native RDP
   software fixture. Windows system-local Cron scheduling was tested using the
-  host timezone. The fixed New York DST subprocess fixture still requires a host
-  where that timezone can be selected without changing the user's settings.
+  host timezone. The native Cron suite also passed a real Windows `cmd.exe`
+  job, including durable replay protection after restart, clock jumps and
+  corrupt-store detection. The fixed Eastern DST check runs separately on a
+  disposable hosted Windows runner that restores its previous timezone.
 - The follow-up `5069518` Windows root run reported 606 passes, zero failures
   and 22 ignored. The independent locked RDP helper replay reported 35
   passing tests. Windows browser (5), RDP software endpoint (10), owned X

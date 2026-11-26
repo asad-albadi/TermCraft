@@ -43,12 +43,29 @@ fn wait(mut condition: impl FnMut() -> bool) {
         std::thread::sleep(Duration::from_millis(20));
     }
 }
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 #[test]
 fn real_due_process_once_disable_restart_and_corrupt_preserve() {
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("jobs.json");
+    #[cfg(unix)]
     let j = job(dir.path(), "printf x >> ran");
+    #[cfg(unix)]
+    let marker: &[u8] = b"x";
+    #[cfg(windows)]
+    let (j, marker): (CronJob, &[u8]) = (
+        CronJob {
+            id: "fixture".into(),
+            schedule: "* * * * *".into(),
+            enabled: true,
+            program: PathBuf::from(std::env::var_os("SystemRoot").unwrap())
+                .join("System32/cmd.exe"),
+            arguments: vec!["/D".into(), "/C".into(), "echo x>>ran".into()],
+            directory: dir.path().into(),
+            max_seconds: 5,
+        },
+        b"x\r\n",
+    );
     save_jobs(&path, vec![j.clone()]).unwrap();
     let before = std::fs::read(&path).unwrap();
     let mut bad = j.clone();
@@ -60,20 +77,22 @@ fn real_due_process_once_disable_restart_and_corrupt_preserve() {
     let mut config = CronServiceConfig::new(path.clone());
     config.clock = clock.clone();
     let id = supervisor.start_cron(config.clone()).unwrap();
-    wait(|| dir.path().join("ran").exists());
+    let output = dir.path().join("ran");
+    wait(|| std::fs::read(&output).is_ok_and(|bytes| bytes == marker));
     std::thread::sleep(Duration::from_millis(150));
-    assert_eq!(std::fs::read(dir.path().join("ran")).unwrap(), b"x");
+    assert_eq!(std::fs::read(&output).unwrap(), marker);
     supervisor.stop(id).unwrap();
     wait(|| supervisor.status(id).unwrap().state == crate::services::ServiceState::Stopped);
     let id = supervisor.start_cron(config.clone()).unwrap();
     std::thread::sleep(Duration::from_millis(150));
-    assert_eq!(std::fs::read(dir.path().join("ran")).unwrap(), b"x");
+    assert_eq!(std::fs::read(&output).unwrap(), marker);
     // Jump several minutes: only the current minute runs, no catch-up replay.
     clock.0.fetch_add(600, Ordering::Release);
-    wait(|| std::fs::read(dir.path().join("ran")).unwrap().len() == 2);
+    let twice = marker.repeat(2);
+    wait(|| std::fs::read(&output).is_ok_and(|bytes| bytes == twice));
     clock.0.fetch_sub(120, Ordering::Release);
     std::thread::sleep(Duration::from_millis(150));
-    assert_eq!(std::fs::read(dir.path().join("ran")).unwrap().len(), 2);
+    assert_eq!(std::fs::read(&output).unwrap(), twice);
     assert_eq!(
         supervisor.status(id).unwrap().cron.as_ref().unwrap().jobs[0].next_run,
         Some(1_704_100_260)
@@ -86,7 +105,7 @@ fn real_due_process_once_disable_restart_and_corrupt_preserve() {
     clock.0.fetch_add(600, Ordering::Release);
     let id = supervisor.start_cron(config.clone()).unwrap();
     std::thread::sleep(Duration::from_millis(150));
-    assert_eq!(std::fs::read(dir.path().join("ran")).unwrap().len(), 2);
+    assert_eq!(std::fs::read(&output).unwrap(), twice);
     supervisor.stop(id).unwrap();
     wait(|| supervisor.status(id).unwrap().state == crate::services::ServiceState::Stopped);
     let last = std::fs::read(&path).unwrap();
@@ -182,6 +201,17 @@ fn local_dst_gaps_and_repeated_instants() {
         );
         return;
     }
+    assert_eastern_dst_schedule();
+}
+
+#[cfg(windows)]
+#[test]
+#[ignore = "requires a disposable Windows desktop set to Eastern Standard Time"]
+fn native_windows_local_dst_gaps_and_repeated_instants() {
+    assert_eastern_dst_schedule();
+}
+
+fn assert_eastern_dst_schedule() {
     let repeated = Schedule::parse("30 1 * * *").unwrap();
     assert_eq!(
         repeated.next_in(1_730_611_799, CronTimezone::SystemLocal),
