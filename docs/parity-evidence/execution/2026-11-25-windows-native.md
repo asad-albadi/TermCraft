@@ -662,9 +662,31 @@ Chromium's libgav1 repository. A four-job retry proceeded through the
 owned worktree checkouts, but V8's general ref fetch hit a transfer timeout.
 A shallow fetch of the exact DEPS revision
 `b601a2347f005e8bfadd32f285df97ffba5cf1bd` allowed the exact dependency sync
-and hooks to complete. The candidate build uses the checkout on the local
-data volume and a dedicated SSD output directory. This records source and
-toolchain setup.
+and hooks to complete through `gclient sync -D --no-history --jobs 4`.
+`gn gen` produced 36,971 targets. The SSD output junction crossed Windows
+volumes, which both the depot_tools wrapper and Chromium's Rust standard
+library tooling rejected when resolving relative paths. The build uses the
+same-volume `out/TermCraftNative` directory with
+`autoninja -C out/TermCraftNative -j 12 chrome mini_installer`. The build
+arguments select x64, an unbranded official release, no symbols, PGO phase 0
+and local execution. Successful C++ and Rust compilation confirms the
+same-volume layout. A complete source-built runtime and its private package
+replay remain open.
+
+## Windows device components
+
+The independent native Windows component runs used Rust 1.96.1 and their
+own locked manifests. After `python tests/rdp-native-component/generate.py`,
+`cargo +1.96.1 test --locked --manifest-path tests/rdp-native-component/Cargo.toml`
+passed 26 tests, including actual Windows opened-handle allocation, rename
+and deletion. Its serial control, cancellation and completion tests exercise
+the protocol states without a serial device. The same command with
+`tests/rdp-smartcard-native-component/Cargo.toml` passed four smartcard
+framing and Windows process-argument tests. The printer component built
+the Winspool source and ran zero tests. An actual packaged RDP worker opened
+an isolated nonexistent queue and returned `0xc0000034` before reading a
+print job. A separately dispatched Windows fixture exercises a temporary
+local file-backed queue for RAW bytes and abort behavior.
 
 ## Pageant
 

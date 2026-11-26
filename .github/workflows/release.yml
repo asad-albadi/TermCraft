@@ -14,6 +14,10 @@ on:
         description: Exercise native input on a disposable Windows runner desktop
         type: boolean
         default: false
+      windows_printer_fixture:
+        description: Verify the packaged printer worker with a disposable local file port
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -98,6 +102,17 @@ jobs:
           python scripts/package-check-startup.py $archive[0].FullName --evidence startup-evidence --windows-software-gl $softwareGl
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           ./tests/windows-package-lifecycle.ps1 -Archive $archive[0].FullName -SoftwareGlDirectory $softwareGl
+      - name: Verify packaged Winspool worker with a disposable queue
+        if: runner.os == 'Windows' && inputs.windows_printer_fixture
+        shell: pwsh
+        run: |
+          $archive = @(Get-ChildItem dist -Filter 'TermCraft-*.zip')
+          if ($archive.Count -ne 1) { throw 'Expected exactly one Windows package.' }
+          $root = Join-Path $env:RUNNER_TEMP 'termcraft-print-fixture'
+          Expand-Archive -LiteralPath $archive[0].FullName -DestinationPath $root
+          $helper = @(Get-ChildItem -LiteralPath $root -Recurse -Filter 'termcraft-rdp-engine.exe')
+          if ($helper.Count -ne 1) { throw 'Expected exactly one packaged RDP helper.' }
+          ./tests/windows-printer-fixture.ps1 -Helper $helper[0].FullName
       - if: success()
         shell: bash
         run: |
