@@ -87,7 +87,9 @@ Implementation and platform limits are recorded in the [feature matrix](FEATURE_
 | --- | --- |
 | Linux x86-64 | Strongest implementation and validation coverage. Native Debian 12 core packages and a separate Arch-compatible optional-runtime bundle are qualified within their declared scopes. |
 | Windows x86-64 | The native GUI and adjacent RDP helper have a verified unsigned portable package and per-user installer on a supported desktop. Clean-user graphics and activation, optional runtimes, native engine release approval and broader device and workflow qualification remain open. |
-| macOS | Reviewed source and bundle foundations exist. Native engines, providers, Intel/Apple Silicon delivery and interactive qualification remain unfinished. |
+| macOS — Apple Silicon (arm64) | Current macOS target. Native implementation and qualification are tracked in issue #2. Intel macOS is outside the current support scope. |
+
+Current targets are Linux x86-64, Windows x64 and Apple Silicon macOS (arm64). Intel macOS is excluded at this stage; removing it is a scope decision, not a claim of additional verified coverage. See [support scope](docs/SUPPORT.md).
 
 The full optional Linux bundle and Debian core package have different contents and ABI requirements. The Arch-compatible optional bundle requires its declared runtime, including glibc 2.44; it is not a general Debian package. Debian core omits the optional X/browser/Mosh/Wayland runtime payloads. See [packaging documentation](packaging/README.md) and [current qualification](docs/parity-evidence/execution/2026-11-25-local-completion.md).
 
@@ -176,7 +178,7 @@ Remaining work includes native Windows/macOS engine and provider implementation,
 The first hosted [GitHub CI run](https://github.com/asad-albadi/TermCraft/actions/runs/45636600121) found an RDP helper allocation-cleanup test failure (81 passed, 1 failed). The root cause is not yet established; GitHub CI is not green. This is tracked in the CI/release issue below, separately from the recorded local baseline.
 
 - [Windows native implementation, packaging and qualification — #1](https://github.com/asad-albadi/TermCraft/issues/1)
-- [macOS Apple Silicon and Intel implementation and delivery — #2](https://github.com/asad-albadi/TermCraft/issues/2)
+- [macOS Apple Silicon implementation and delivery — #2](https://github.com/asad-albadi/TermCraft/issues/2)
 - [Desktop CI and GitHub releases, modeled after PixelCraft without Android — #3](https://github.com/asad-albadi/TermCraft/issues/3)
 
 The [parity checklist](PARITY_CHECKLIST.md), [durable queue](PARITY_EXECUTION_QUEUE.json) and [progress log](PARITY_PROGRESS.md) retain the detailed implementation and evidence records.
