@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "partial",
-  "source_revision": "3855f7040679d243cdd03de21a849817417f21a7",
+  "source_revision": "21d54711057a27b47a5f1df5bcab93ca91a06010",
   "host": {"os": "macOS 26.6.2 (25G83)", "architecture": "arm64"},
   "target": {
     "architecture": "arm64",
@@ -21,6 +21,7 @@
     {"path": "TermCraft-0.1.0-macos-aarch64.zip", "sha256": "c591bb1e53ac143540b29703bda69b66e80601a340fe2f5371a829536fada9f4", "source_revision": "15b7971fa4c8a0a513390ee011f0fa7c80b8c4ee", "use": "hosted unsigned core archive"},
     {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "ce4769aea630dee5f9c9cf66ffcac46957f47e144e390897fc00860e0b8e61c7", "source_revision": "bf3916bd555a3844530871ffd2f0c8349e46eea0", "use": "managed XQuartz workspace and explicit clipboard qualification"},
     {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "fa23d6eabc09d50852bb3ef8115d934421368028f22141c5103cca5da7638c82", "source_revision": "3855f7040679d243cdd03de21a849817417f21a7", "use": "updated combined archive with native pasteboard ownership and System CUPS fix"},
+    {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "a5dcb98647758fd7e45e0745d1422c31781f6beb691c78adcc7d187335e06d3c", "source_revision": "21d54711057a27b47a5f1df5bcab93ca91a06010", "use": "windowed geometry, native serial and combined-package qualification"},
     {"path": "TermCraft-XQuartz-private-arm64.zip", "sha256": "8809e99e1df82b7ebba8b72587c932bb2822d6089edc98dbbc839ec74078c83c"}
   ],
   "workflows": [
@@ -33,6 +34,12 @@
     {"name": "Updated bundled Chromium protocol suite on macOS 14.8.7", "result": "passed", "passed": 4, "failed": 0, "ignored": 0, "source_revision": "3855f7040679d243cdd03de21a849817417f21a7"},
     {"name": "Updated Finder Services modern and legacy AppKit dispatch on macOS 14.8.7", "result": "passed", "passed": 2, "failed": 0, "ignored": 0, "source_revision": "3855f7040679d243cdd03de21a849817417f21a7"},
     {"name": "Updated native pasteboard read, write and ownership protection on macOS 14.8.7", "result": "passed", "passed": 1, "failed": 0, "ignored": 0, "source_revision": "3855f7040679d243cdd03de21a849817417f21a7"},
+    {"name": "Apple Silicon final workspace all-target suite", "result": "passed", "passed": 922, "failed": 0, "ignored": 17, "source_revision": "21d54711057a27b47a5f1df5bcab93ca91a06010"},
+    {"name": "Locked native RDP helper and Darwin PTY channel and backend", "result": "passed", "passed": 54, "failed": 0, "ignored": 0, "source_revision": "21d54711057a27b47a5f1df5bcab93ca91a06010"},
+    {"name": "Packaged RDP redirection and desktop gateways against owned endpoints", "result": "passed", "passed": 22, "failed": 0, "ignored": 0, "source_revision": "21d54711057a27b47a5f1df5bcab93ca91a06010"},
+    {"name": "Direct GLX framebuffer readback on Apple M4 and Sonoma CGL software", "result": "passed", "source_revision": "21d54711057a27b47a5f1df5bcab93ca91a06010"},
+    {"name": "Current combined archive relocated startup and live helper on macOS 26.6.2 and 14.8.7", "result": "passed", "source_revision": "21d54711057a27b47a5f1df5bcab93ca91a06010"},
+    {"name": "Packaged XQuartz startup geometry, logical Xinerama layout and owned window resize on Sonoma", "result": "passed", "source_revision": "21d54711057a27b47a5f1df5bcab93ca91a06010"},
     {"name": "Final combined archive Chromium protocol suite on macOS 26.6.2", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
     {"name": "Final combined archive Chromium protocol suite on macOS 14.8.7", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
     {"name": "Final combined archive Chromium integrity, sandbox, cancellation and cleanup", "result": "passed", "passed": 3, "failed": 0, "ignored": 0},
@@ -55,11 +62,9 @@
     {"name": "Independent Debian xdm Direct and Indirect callback replay at 256 descriptors", "result": "passed", "passed": 2, "failed": 0, "ignored": 0}
   ],
   "unavailable": [
-    {"requirement": "Public bundled Chromium", "reason": "The opt-in arm64 fixture uses a sealed snapshot with placeholder credits. Production needs a maintained and source-matched payload with complete notices and reviewed signing."},
     {"requirement": "Visible XDMCP chooser selection", "reason": "The real chooser mapped and the real manager accepted callback-driven selection and display rotation. An operator must exercise the visible choice."},
-    {"requirement": "Broader graphics and monitor coverage", "reason": "Private core drawing and explicit macOS clipboard text transfers passed. Direct GLX needs a compatible Apple-DRI client stack. The windowed runtime keeps host mode changes and indirect GLX disabled."},
+    {"requirement": "Physical GPU presentation and external/Retina display workflows", "reason": "Local direct GLX framebuffer and logical X11 startup geometry passed. Visible presentation, live topology changes and physical display scaling need an operator and physical displays."},
     {"requirement": "Finder context-menu interaction", "reason": "Registered AppKit Services opened literal folders using both pasteboard formats. The visible Finder menu interaction remains manual."},
-    {"requirement": "Public distribution approval", "reason": "Exact XQuartz bytes are approved for the windowed runtime. Release workflow distribution, signing policy and final approval are open."},
     {"requirement": "GPU, external displays, devices, adapter transitions and TCC permissions", "reason": "These require physical fixtures or a human-operated permission session."}
   ]
 }

@@ -320,23 +320,70 @@ to expose the RDP drive allocation assertion reproduced on `main`.
 [Hosted Linux PR job](https://github.com/asad-albadi/TermCraft/actions/runs/45765725145)
 [Hosted main reproducer](https://github.com/asad-albadi/TermCraft/actions/runs/45745650311)
 
+## Direct GLX and windowed geometry
+
+The private server passed a direct GLX framebuffer pixel test with the
+relocated arm64 Mesa client on the Apple M4 and on Sonoma's CGL software
+renderer. The client and all nine libraries were built for macOS 14.0.
+The engine and its release approval inventory are unchanged.
+[Direct GLX evidence](xquartz-build.md#direct-apple-glx-on-apple-silicon)
+
+The macOS Services card reports the authenticated X11 root dimensions and
+logical Xinerama rectangles at startup. The pinned host display reported
+1920×1050 and one logical rectangle. Resize of an owned X11 client window
+emitted `ConfigureNotify` and left the root geometry unchanged. The UI
+labels RandR as a protocol version and exposes no mode setters.
+[Windowed geometry evidence](windowed-monitor.md)
+
+The latest combined qualification archive was built from
+`21d54711057a27b47a5f1df5bcab93ca91a06010` with Rust 1.96.1, Apple SDK
+26.2, and deployment target 14.0. ZIP SHA-256 is
+`a5dcb98647758fd7e45e0745d1422c31781f6beb691c78adcc7d187335e06d3c`.
+Manifest snapshot `fc86903ebba0900500d32a9f1e345d36e51809aa0b672aa59fb8531a8b709a7e`
+matches all 608 source inputs. The 2,139 payload hashes and five literal
+links include only two payload hash changes from `3855f70`, the GUI and
+RDP helper. The pinned runtime trees and approval gates are unchanged.
+`python3 scripts/package-check-startup.py ARCHIVE --evidence DIRECTORY`
+verified relocation, empty-PATH GUI startup and a manifest-matching live
+RDP helper on macOS 26.6.2 and Sonoma 14.8.7. The Sonoma guest had a
+1280×800 configured virtual display for this run. Its authenticated X11
+root was 1280×776, with one matching logical rectangle, and its owned
+client resize/event test passed. Core X11 and the explicit direct GLX
+software-renderer readback passed on that archive.
+
+The locked workspace command `cargo +1.96.1 test --locked --all-targets
+--no-fail-fast` passed 922 tests with zero failures and 17 ignored across
+75 targets. The locked helper suite passed 54 tests. The extracted helper also
+passed the 12-case redirection and 10-case gateway suites against
+owned endpoints. Linux GNU `--tests` and Windows GNU `--lib --bins`
+cross-checks passed. Hosted Linux still reports the existing drive
+allocation assertion with 81 tests passed and one failed.
+[Hosted PR run](https://github.com/asad-albadi/TermCraft/actions/runs/45854265400)
+
+The Sonoma replay also passed the four bundled Chromium cases, strict
+signature verification, both AppKit Services formats, packaged CUPS and
+the native clipboard round trip with ownership protection. The host ran
+owned XDMCP Direct, Indirect and cancel plus embedded SSH/X at 256
+descriptors. A first overlapping run logged two setup timeouts while
+the workspace suite and multiple native probes were active. The same
+archive and tests passed in a serial replay. A subsequent overlapping
+owner/Direct replay and two simultaneous private engine probes passed
+with independent sockets and cleanup. No reliable trigger was isolated.
+Packaging contracts passed 22 cases and skipped 24.
+
 ## Open qualification
 
 The pinned Apple Silicon Chromium is usable for local qualification. Public
-distribution requires a maintained arm64 candidate with complete source-matched
-notices and reviewed release signing. The tested fixture embeds placeholder
-credits. See the [Chromium evidence](chromium-arm64.md).
+Chromium enrollment, notices, signing and delivery are tracked in
+[issue #3](https://github.com/asad-albadi/TermCraft/issues/3).
+[Chromium evidence](chromium-arm64.md)
 
-The private XQuartz profile provides core rendering and private UTF-8 X11
-selection exchange. It reports no active RandR outputs or modes on Sonoma and
-disables indirect GLX and automatic host pasteboard synchronization. Explicit
-UTF-8 clipboard transfers through the managed display passed. Direct GLX
-needs a compatible Apple-DRI client stack for separate qualification.
-Visible Finder Services invocation and visible XDMCP chooser selection
-remain operator checks. Public release automation and distribution
-approval remain separate from this development archive.
+The private XQuartz profile retains explicit UTF-8 transfers and disables
+indirect GLX and automatic host pasteboard synchronization. Visible Finder
+Services invocation and visible XDMCP chooser selection remain operator checks.
 
-Run external-display/Retina scaling and GPU workflows on physical hardware.
+Run visible GPU presentation, external-display/Retina scaling and live
+display changes on physical hardware.
 Exercise physical CUPS printer, PCSC smart-card and serial devices, and real
 adapter transitions. Screen Recording and Accessibility still need
 human-operated grant, denial and revocation, including view-only/control and

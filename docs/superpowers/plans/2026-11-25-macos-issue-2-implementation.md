@@ -160,6 +160,9 @@
 - [x] Stage the pinned local Chromium fixture, verify private browser ownership, and exercise native browser workflows.
 - [x] Expose the managed XQuartz display and verify core pixel readback and explicit UTF-8 transfers with existing native and X11 peers.
 - [x] Qualify a native macOS CUPS queue with the RDP worker and an owned loopback printer.
+- [x] Build the pinned Apple-DRI client and verify direct GLX framebuffer readback in hardware and explicit software rendering contexts.
+- [x] Report authenticated root geometry and logical Xinerama rectangles at startup without changing host displays.
+- [x] Qualify the macOS RDP serial channel and backend against owned PTYs and verify fresh SSH/SFTP reconnect after loss of an owned CONNECT tunnel.
 - [ ] Run visible Finder menu and XDMCP chooser interactions and human-operated permission scenarios.
-- [ ] Qualify direct Apple-DRI, physical displays and physical devices while preserving the existing private windowed profile.
-- [ ] Approve public arm64 software distribution with a maintained Chromium candidate, source-matched third-party notices and the chosen release-signing policy.
+- [ ] Qualify visible GPU presentation, external/Retina displays and physical devices within the existing private windowed profile.
+- [x] Transfer public distribution, maintained Chromium enrollment, notices and release signing to [issue #3](https://github.com/asad-albadi/TermCraft/issues/3).

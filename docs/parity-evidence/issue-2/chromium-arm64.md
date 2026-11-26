@@ -168,6 +168,9 @@ rebuild the browser. [Exact upstream SDK configuration](https://chromium.googles
 
 ## Maintained release intake
 
+Public intake, signing and release delivery are tracked in
+[issue #3](https://github.com/asad-albadi/TermCraft/issues/3).
+
 The notarized Ungoogled Chromium 157.0.8103.78-1.1 arm64 DMG matched
 `bdfe0ee51e47b7ff49c94778c6d9adb08a626dfbd6089570bbbb455410f1a41a`.
 Its nested signature, notarization staple and Gatekeeper assessment passed.
