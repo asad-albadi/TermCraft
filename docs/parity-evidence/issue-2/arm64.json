@@ -18,6 +18,7 @@
     {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "23648b5da2b87e0abc23e2132846c62ea601ad6e9a7d2e8b0b2377490fcf5974", "source_revision": "1bc64f7d37d6803b0839ec03c8ca26902dce3dec", "use": "initial combined package and XDMCP replay"},
     {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "eef3dab197f25fd995826c3c5d036676f69860d54ab4997fdd279226a927824e", "source_revision": "0ff2dbb3dd30b7c2a5f6dde3886aa7d52033b0c3", "use": "combined package with Chromium viewport and renderer fixes"},
     {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "4cc6176ab255e144c90ba0b986bc8e6d825a6629ce6a150397080561b74aa692", "source_revision": "6b76c74145b9597108eb7773214cae9c0495cae5", "use": "qualified local combined archive"},
+    {"path": "TermCraft-0.1.0-macos-aarch64.zip", "sha256": "c591bb1e53ac143540b29703bda69b66e80601a340fe2f5371a829536fada9f4", "source_revision": "15b7971fa4c8a0a513390ee011f0fa7c80b8c4ee", "use": "hosted unsigned core archive"},
     {"path": "TermCraft-XQuartz-private-arm64.zip", "sha256": "8809e99e1df82b7ebba8b72587c932bb2822d6089edc98dbbc839ec74078c83c"}
   ],
   "workflows": [
@@ -26,6 +27,7 @@
     {"name": "Final combined archive Chromium protocol suite on macOS 26.6.2", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
     {"name": "Final combined archive Chromium protocol suite on macOS 14.8.7", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
     {"name": "Final combined archive Chromium integrity, sandbox, cancellation and cleanup", "result": "passed", "passed": 3, "failed": 0, "ignored": 0},
+    {"name": "Hosted macOS 15.8.2 unsigned core archive startup and manifest-matching live RDP helper", "result": "passed"},
     {"name": "Relocated bundled Chromium workspace input and viewport", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
     {"name": "Native locked RDP helper", "result": "passed", "passed": 27, "failed": 0, "ignored": 0},
     {"name": "Installed Chrome native integration", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},

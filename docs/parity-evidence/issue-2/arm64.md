@@ -240,6 +240,21 @@ Ubuntu 24.04. The failing binary has SHA-256
 both main and the PR and requires `GLIBC_2.43`.
 [Hosted Linux job](https://github.com/asad-albadi/TermCraft/actions/runs/45755486304)
 
+## Hosted unsigned core release replay
+
+The arm64 job for source `15b7971fa4c8a0a513390ee011f0fa7c80b8c4ee` ran
+macOS 15.8.2 (24H232), Xcode 16.4 (16F6) and SDK 15.5. The locked RDP suite
+passed 27 tests and the packaging contract passed. The uploaded core ZIP
+`TermCraft-0.1.0-macos-aarch64.zip` had SHA-256
+`c591bb1e53ac143540b29703bda69b66e80601a340fe2f5371a829536fada9f4`.
+Its downloaded bytes matched the runner’s checksum. The relocated startup
+evidence records a 1024×653 frame, live loopback RDP negotiation and a
+manifest-matching helper under an empty PATH. This workflow produces the
+unsigned core archive. The optional Chromium and private XQuartz replay
+used the separately qualified local archive above.
+[Hosted arm64 job](https://github.com/asad-albadi/TermCraft/actions/runs/45755613396/job/139693423728)
+[Uploaded core artifact](https://github.com/asad-albadi/TermCraft/actions/runs/45755613396/artifacts/15088466715)
+
 ## Open qualification
 
 The pinned Apple Silicon Chromium is usable for local qualification. Public
