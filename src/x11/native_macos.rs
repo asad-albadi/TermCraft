@@ -1,7 +1,7 @@
 //! Direct private XQuartz engine; never uses open(1), launchctl, startx or a shell.
 use super::{
-    XDisplayMode, XServerLease, XServerOptions, native_artifact::VerifiedSnapshot, native_policy,
-    native_transport,
+    X11LogicalRect, XDisplayMode, XServerLease, XServerOptions, native_artifact::VerifiedSnapshot,
+    native_policy, native_transport,
 };
 use std::{
     os::{
@@ -54,11 +54,24 @@ pub(super) fn probe_capabilities() -> Result<super::XCapabilities, String> {
             screen.width_in_pixels.into(),
             screen.height_in_pixels.into(),
         ],
-        errors: vec![
-            "Private XQuartz disables indirect GLX and uses macOS display geometry.".into(),
-        ],
+        errors: vec!["Private XQuartz disables indirect GLX.".into()],
         ..Default::default()
     };
+    match connection
+        .get_geometry(screen.root)
+        .map_err(x11rb::errors::ReplyError::from)
+        .and_then(|request| request.reply())
+    {
+        Ok(geometry) if geometry.width > 0 && geometry.height > 0 => {
+            report.dimensions = [geometry.width.into(), geometry.height.into()];
+        }
+        Ok(_) => report.errors.push("X11 root geometry is empty.".into()),
+        Err(error) => report.errors.push(format!("X11 root geometry: {error}")),
+    }
+    match query_xinerama_layout(&connection) {
+        Ok(layout) => report.macos_xinerama_layout = layout,
+        Err(error) => report.errors.push(format!("Xinerama layout: {error}")),
+    }
     match core_pixel_readback(&connection, screen) {
         Ok(()) => report.core_x11_pixels = true,
         Err(error) => report
@@ -78,30 +91,21 @@ pub(super) fn probe_capabilities() -> Result<super::XCapabilities, String> {
                 .push(format!("GLX version query failed: {error}")),
         }
     }
-    if let Ok(request) = randr::query_version(&connection, 1, 5) {
-        match request.reply() {
-            Ok(version) => {
-                report.randr_version = Some(format!(
-                    "{}.{}",
-                    version.major_version, version.minor_version
-                ));
-                match randr::get_screen_resources_current(&connection, screen.root)
-                    .map_err(|error| error.to_string())
-                    .and_then(|request| request.reply().map_err(|error| error.to_string()))
-                {
-                    Ok(resources) if resources.outputs.is_empty() => report
-                        .errors
-                        .push("Cached RandR resources list no outputs.".into()),
-                    Ok(_) => {}
-                    Err(error) => report
-                        .errors
-                        .push(format!("RandR output query failed: {error}")),
-                }
-            }
-            Err(error) => report
-                .errors
-                .push(format!("RandR version query failed: {error}")),
+    // Only report the negotiated version. The cold resource cache isn't
+    // topology and refreshing it can materialize the legacy "default" output.
+    match randr::query_version(&connection, 1, 5)
+        .map_err(x11rb::errors::ReplyError::from)
+        .and_then(|request| request.reply())
+    {
+        Ok(version) => {
+            report.randr_version = Some(format!(
+                "{}.{}",
+                version.major_version, version.minor_version
+            ));
         }
+        Err(error) => report
+            .errors
+            .push(format!("RandR version query failed: {error}")),
     }
     let composite = connection
         .query_extension(b"Composite")
@@ -118,6 +122,46 @@ pub(super) fn probe_capabilities() -> Result<super::XCapabilities, String> {
             .push("Composite is disabled in private XQuartz.".into());
     }
     Ok(report)
+}
+
+fn query_xinerama_layout(
+    connection: &impl x11rb::connection::Connection,
+) -> Result<Option<Vec<X11LogicalRect>>, x11rb::errors::ReplyError> {
+    use x11rb::protocol::xinerama;
+
+    if connection
+        .extension_information(xinerama::X11_EXTENSION_NAME)?
+        .is_none()
+        || xinerama::is_active(connection)?.reply()?.state == 0
+    {
+        return Ok(None);
+    }
+
+    let reply = xinerama::query_screens(connection)?.reply()?;
+    Ok(xinerama_rectangles(&reply.screen_info))
+}
+
+fn xinerama_rectangles(
+    screens: &[x11rb::protocol::xinerama::ScreenInfo],
+) -> Option<Vec<X11LogicalRect>> {
+    if screens.is_empty()
+        || screens
+            .iter()
+            .any(|screen| screen.width == 0 || screen.height == 0)
+    {
+        return None;
+    }
+    Some(
+        screens
+            .iter()
+            .map(|screen| X11LogicalRect {
+                x: screen.x_org,
+                y: screen.y_org,
+                width: screen.width,
+                height: screen.height,
+            })
+            .collect(),
+    )
 }
 
 fn core_pixel_readback(
@@ -349,6 +393,75 @@ pub(super) fn launch_verified(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use x11rb::protocol::xinerama::ScreenInfo;
+
+    #[test]
+    fn xinerama_rectangles_preserve_signed_coordinates_and_order() {
+        let layout = xinerama_rectangles(&[
+            ScreenInfo {
+                x_org: -1280,
+                y_org: 72,
+                width: 1280,
+                height: 800,
+            },
+            ScreenInfo {
+                x_org: 0,
+                y_org: -30,
+                width: 1920,
+                height: 1050,
+            },
+        ]);
+        assert_eq!(
+            layout,
+            Some(vec![
+                X11LogicalRect {
+                    x: -1280,
+                    y: 72,
+                    width: 1280,
+                    height: 800
+                },
+                X11LogicalRect {
+                    x: 0,
+                    y: -30,
+                    width: 1920,
+                    height: 1050
+                },
+            ])
+        );
+    }
+
+    #[test]
+    fn empty_or_invalid_xinerama_layout_is_unavailable() {
+        assert!(xinerama_rectangles(&[]).is_none());
+        let valid = ScreenInfo {
+            x_org: 0,
+            y_org: 0,
+            width: 1920,
+            height: 1050,
+        };
+        let invalid = ScreenInfo { height: 0, ..valid };
+        assert!(xinerama_rectangles(&[valid, invalid]).is_none());
+    }
+
+    #[test]
+    fn private_xquartz_still_rejects_monitor_selection_and_fullscreen() {
+        let options = XServerOptions::default();
+        for options in [
+            XServerOptions {
+                monitor: Some("default".into()),
+                ..options.clone()
+            },
+            XServerOptions {
+                display_mode: XDisplayMode::Fullscreen,
+                ..options
+            },
+        ] {
+            let error = start(Path::new("unstaged"), options, &AtomicBool::new(false))
+                .err()
+                .unwrap();
+            assert!(error.contains("monitor/fullscreen"), "{error}");
+        }
+    }
 
     #[test]
     #[ignore = "requires an explicitly staged local XQuartz candidate and a macOS desktop"]
@@ -374,6 +487,13 @@ mod tests {
         )
         .unwrap();
         assert!(report.dimensions.iter().all(|&value| value > 0));
+        let layout = report
+            .macos_xinerama_layout
+            .as_ref()
+            .expect("the pinned windowed desktop reports its logical Xinerama layout");
+        assert!(!layout.is_empty());
+        assert!(layout.iter().all(|rect| rect.width > 0 && rect.height > 0));
+        verify_owned_window_resize(&lease, report.dimensions);
         assert!(report.core_x11_pixels, "{report:?}");
         assert!(report.composite_version.is_none());
         assert!(!report.rendering_verified());
@@ -392,5 +512,69 @@ mod tests {
             std::io::Error::last_os_error().raw_os_error(),
             Some(libc::ESRCH)
         );
+    }
+
+    fn verify_owned_window_resize(lease: &XServerLease, root_dimensions: [u32; 2]) {
+        use std::os::unix::net::UnixStream;
+        use x11rb::{
+            connection::Connection,
+            protocol::{
+                Event,
+                xproto::{
+                    ConfigureWindowAux, ConnectionExt, CreateWindowAux, EventMask, WindowClass,
+                },
+            },
+        };
+
+        let bytes = zeroize::Zeroizing::new(std::fs::read(&lease.authority_path).unwrap());
+        let cookie = crate::ssh::x11::authority_cookie(&bytes, 0, b"", true).unwrap();
+        let connection = super::super::unix_connection::connect(
+            UnixStream::connect(&lease.display).unwrap(),
+            0,
+            (b"MIT-MAGIC-COOKIE-1".to_vec(), cookie.to_vec()),
+            Arc::new(AtomicBool::new(false)),
+            Instant::now() + Duration::from_secs(3),
+        )
+        .unwrap();
+        let root = connection.setup().roots[0].root;
+        let window = connection.generate_id().unwrap();
+        connection
+            .create_window(
+                0,
+                window,
+                root,
+                40,
+                60,
+                80,
+                64,
+                0,
+                WindowClass::INPUT_OUTPUT,
+                0,
+                &CreateWindowAux::new().event_mask(EventMask::STRUCTURE_NOTIFY),
+            )
+            .unwrap()
+            .check()
+            .unwrap();
+        connection.map_window(window).unwrap().check().unwrap();
+        connection
+            .configure_window(window, &ConfigureWindowAux::new().width(123).height(87))
+            .unwrap()
+            .check()
+            .unwrap();
+        let geometry = connection.get_geometry(window).unwrap().reply().unwrap();
+        assert_eq!((geometry.width, geometry.height), (123, 87));
+        let mut resized = false;
+        while let Some(event) = connection.poll_for_event().unwrap() {
+            if let Event::ConfigureNotify(event) = event {
+                resized |= event.window == window && (event.width, event.height) == (123, 87);
+            }
+        }
+        assert!(resized, "owned window did not receive ConfigureNotify");
+        let geometry = connection.get_geometry(root).unwrap().reply().unwrap();
+        assert_eq!(
+            [u32::from(geometry.width), u32::from(geometry.height)],
+            root_dimensions
+        );
+        connection.destroy_window(window).unwrap().check().unwrap();
     }
 }

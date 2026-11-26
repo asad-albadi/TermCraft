@@ -161,8 +161,8 @@ impl State {
                 let result = manager
                     .start_cancellable(options, &worker_cancelled)
                     .and_then(|mut lease| {
-                        // Probe before clients are released: an active RandR check may
-                        // briefly switch the newly owned display and then restore it.
+                        // Probe before clients are released. Linux briefly switches
+                        // and restores an advertised mode; macOS only observes geometry.
                         let capabilities = match &probe_executable {
                             Some(executable) => XCapabilities::probe_with_executable(
                                 &lease.client_display(),
@@ -173,8 +173,8 @@ impl State {
                                 XCapabilities::probe(&lease.client_display(), &worker_cancelled)
                             }
                         };
-                        // A crashed or timed-out driver may have interrupted a mode
-                        // transition. Discard this fresh display before exposing clients.
+                        // Discard an unqualified lease. On Linux the probe may also
+                        // have been interrupted while switching modes.
                         if let Err(error) = &capabilities {
                             let error = error.clone();
                             report(Event::Capabilities(capabilities));
@@ -614,16 +614,28 @@ impl Workspace {
                                 if report.core_x11_pixels {
                                     ui.label("Core X11 pixel readback verified");
                                 }
+                                #[cfg(target_os = "macos")]
+                                ui.label(format!("GLX: {} · Composite: {}",
+                                    report.glx_version.as_deref().unwrap_or("unavailable"),
+                                    report.composite_version.as_deref().unwrap_or("unavailable")));
+                                #[cfg(not(target_os = "macos"))]
                                 ui.label(format!("GLX: {} · Composite: {} · RandR: {}",
                                     report.glx_version.as_deref().unwrap_or("unavailable"),
                                     report.composite_version.as_deref().unwrap_or("unavailable"),
                                     report.randr_version.as_deref().unwrap_or("unavailable")));
+                                #[cfg(target_os = "macos")]
+                                ui.label("Local direct GLX requires a compatible Apple GLX client library.");
+                                #[cfg(not(target_os = "macos"))]
                                 if let Some(gl) = &report.opengl {
                                     ui.label(format!("{} · {} · pixels {}/{}", gl.renderer,
                                         if gl.software { "software rendering" } else { "driver rendering (hardware unqualified)" },
                                         gl.matched_pixels, gl.sampled_pixels));
                                 } else { ui.label("OpenGL rendering unavailable or unverified"); }
+                                #[cfg(not(target_os = "macos"))]
                                 ui.label(if report.composite_pixels { "Composite redirect/readback verified" } else { "Composite rendering unverified" });
+                                #[cfg(target_os = "macos")]
+                                macos_display_snapshot(ui, report);
+                                #[cfg(not(target_os = "macos"))]
                                 ui.label(format!("Screen {}×{} · resolution change {}", report.dimensions[0], report.dimensions[1], if report.randr_change.is_some() { "verified with event; initial size restored" } else { "unavailable or unverified" }));
                                 for error in &report.errors { ui.colored_label(Color32::from_rgb(200, 120, 50), error); }
                             }
@@ -733,9 +745,110 @@ impl Workspace {
     }
 }
 
+#[cfg(target_os = "macos")]
+fn macos_display_snapshot(ui: &mut Ui, report: &XCapabilities) {
+    let [width, height] = report.dimensions;
+    if width > 0 && height > 0 {
+        ui.label(format!(
+            "Windowed X11 desktop at startup — {width}×{height}"
+        ));
+    } else {
+        ui.label("Windowed X11 desktop at startup — size unavailable");
+    }
+    if let Some(layout) = &report.macos_xinerama_layout {
+        ui.label("X11 layout at startup (logical coordinates)");
+        for rect in layout {
+            ui.label(format!(
+                "{}×{} at ({}, {})",
+                rect.width, rect.height, rect.x, rect.y
+            ));
+        }
+    } else {
+        ui.label("X11 layout unavailable");
+    }
+    if let Some(version) = &report.randr_version {
+        ui.label(format!("RandR {version} advertised"));
+    } else {
+        ui.label("RandR version unavailable");
+    }
+    ui.label("macOS manages displays. Monitor selection, full screen, and resolution changes are not supported by this TermCraft profile.");
+}
+
 #[cfg(all(test, target_os = "macos", target_arch = "aarch64"))]
 mod macos_tests {
     use super::*;
+
+    fn snapshot_labels(report: &XCapabilities) -> Vec<String> {
+        let ctx = Context::default();
+        let mut output = ctx.run_ui(RawInput::default(), |ui| macos_display_snapshot(ui, report));
+        output.textures_delta.clear();
+        output
+            .shapes
+            .iter()
+            .filter_map(|shape| match &shape.shape {
+                egui::epaint::Shape::Text(text) => Some(text.galley.text().to_owned()),
+                _ => None,
+            })
+            .collect()
+    }
+
+    #[test]
+    fn macos_xserver_snapshot_labels_geometry_even_without_a_layout() {
+        let labels = snapshot_labels(&XCapabilities {
+            dimensions: [1920, 1050],
+            randr_version: Some("1.5".into()),
+            ..Default::default()
+        });
+        assert!(
+            labels
+                .iter()
+                .any(|label| label.contains("at startup") && label.contains("1920×1050"))
+        );
+        assert!(
+            labels
+                .iter()
+                .any(|label| label.contains("layout unavailable"))
+        );
+        assert!(
+            labels
+                .iter()
+                .any(|label| label.contains("RandR 1.5") && label.contains("advertised"))
+        );
+        assert!(labels.iter().any(|label| label.contains("Monitor selection") && label.contains("not supported")));
+    }
+
+    #[test]
+    fn macos_xserver_snapshot_renders_logical_rectangles_as_read_only() {
+        let labels = snapshot_labels(&XCapabilities {
+            dimensions: [3200, 1050],
+            macos_xinerama_layout: Some(vec![
+                harbor_workspace::x11::X11LogicalRect {
+                    x: -1280,
+                    y: 72,
+                    width: 1280,
+                    height: 800,
+                },
+                harbor_workspace::x11::X11LogicalRect {
+                    x: 0,
+                    y: 0,
+                    width: 1920,
+                    height: 1050,
+                },
+            ]),
+            ..Default::default()
+        });
+        assert!(
+            labels
+                .iter()
+                .any(|label| label.contains("logical coordinates"))
+        );
+        assert!(
+            labels
+                .iter()
+                .any(|label| label == "1280×800 at (-1280, 72)")
+        );
+        assert!(labels.iter().any(|label| label == "1920×1050 at (0, 0)"));
+    }
 
     #[test]
     fn apple_silicon_workspace_offers_the_private_xserver() {

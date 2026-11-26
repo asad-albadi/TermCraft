@@ -4,6 +4,8 @@ mod capabilities;
 mod engine;
 #[cfg(target_os = "linux")]
 mod native_capabilities;
+#[cfg(target_os = "macos")]
+pub use capabilities::X11LogicalRect;
 pub use capabilities::{OpenGlEvidence, XCapabilities, capability_probe_entry};
 mod forwarding;
 pub mod remote_environment;

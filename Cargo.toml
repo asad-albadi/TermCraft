@@ -61,7 +61,7 @@ objc2-core-graphics = "=0.3.2"
 objc2-core-foundation = "=0.3.2"
 objc2-app-kit = { version = "=0.3.2", default-features = false, features = ["std", "NSPasteboard"] }
 block2 = "=0.6.2"
-x11rb = { version = "=0.13.2", features = ["glx", "randr"] }
+x11rb = { version = "=0.13.2", features = ["glx", "randr", "xinerama"] }
 
 winit = { version = "0.30", default-features = false, features = ["rwh_06", "x11", "wayland"] }
 
