@@ -42,6 +42,32 @@ def receive(peer, wanted):
     assert sender[0] == "127.0.0.1"
     return data[6:], sender
 
+def read_x_reply(stream):
+    head = stream.read(32)
+    assert len(head) == 32 and head[0] == 1, "X server failed a protocol request"
+    size = struct.unpack_from("<I", head, 4)[0] * 4
+    assert size <= 64 * 1024
+    body = stream.read(size)
+    assert len(body) == size
+    return head, body
+
+
+def verify_keyboard_and_extensions(client, stream, setup):
+    assert len(setup) >= 32 and setup[26] <= setup[27]
+    client.sendall(struct.pack("<BBHBB2x", 101, 0, 2, setup[26], 1))
+    header, keysyms = read_x_reply(stream)
+    assert header[1] > 0 and len(keysyms) == 4 * header[1]
+    for name in (b"XKEYBOARD", b"GLX", b"RANDR", b"Composite"):
+        body = name.ljust((len(name) + 3) & ~3, b"\0")
+        client.sendall(struct.pack("<BBHH2x", 98, 0, 2 + len(body) // 4, len(name)) + body)
+        header, _ = read_x_reply(stream)
+        present = header[8] == 1
+        print(f"{name.decode()} extension advertised: {present}")
+        if name == b"XKEYBOARD":
+            assert present
+    print("Native X server returned the requested core keyboard mapping")
+
+
 def run(candidate, evidence, indirect):
     with tempfile.TemporaryDirectory(prefix="TermCraft XDMCP qualification ") as scratch, socket.socket(
         socket.AF_INET, socket.SOCK_DGRAM
@@ -77,7 +103,14 @@ def run(candidate, evidence, indirect):
                     name = b"MIT-MAGIC-COOKIE-1" if key else b""
                     client.sendall(struct.pack("<BBHHHHH", ord("l"), 0, 11, 0, len(name), len(key), 0)
                                    + name.ljust((len(name) + 3) & ~3, b"\0") + key)
-                    assert client.recv(8)[0] == expected
+                    with client.makefile("rb") as stream:
+                        response = stream.read(8)
+                        assert len(response) == 8 and response[0] == expected
+                        if expected:
+                            size = struct.unpack_from("<H", response, 6)[0] * 4
+                            setup = stream.read(size)
+                            assert len(setup) == size
+                            verify_keyboard_and_extensions(client, stream, setup)
             print("Native DirectQuery, Request, Accept and Manage passed; anonymous denied and assigned cookie accepted")
         finally:
             if child.poll() is None:

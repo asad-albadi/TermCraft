@@ -1,0 +1,8 @@
+{
+  "url": "https://github.com/pal1000/mesa-dist-win/releases/download/26.3.1/mesa3d-26.3.1-release-msvc.7z",
+  "sha256": "64e84cf13d67dd354640bf443ed0445e6a83afd06a5729f0750b3744d633b3f1",
+  "files": {
+    "opengl32.dll": "2ae2472a335b400bbc0d16b99981feacb3a7653eb4add6f694ac0e6d6351bbb3",
+    "libgallium_wgl.dll": "8f6a0670aaf73604ea0ad8241af583a4ebc21d8a0c112102fafe2bf7695ef6c4"
+  }
+}

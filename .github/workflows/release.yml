@@ -60,7 +60,7 @@ jobs:
           (cd "$stage" && md5sum --quiet -c DEBIAN/md5sums)
           env PATH= "$stage/opt/termcraft/harbor-workspace" --help
           xvfb-run -a -s '-screen 0 1440x1024x24' bash -c 'python scripts/package-check-startup.py "$1" --display "$DISPLAY" --evidence startup-evidence' _ "${archive[0]}"
-      - if: runner.os != 'Linux' && inputs.native_gui
+      - if: runner.os == 'macOS' && inputs.native_gui
         shell: bash
         run: |
           archive=(dist/TermCraft-*.zip)
@@ -69,9 +69,20 @@ jobs:
       - if: runner.os == 'Windows' && inputs.native_gui
         shell: pwsh
         run: |
+          $fixture = Get-Content tests/windows-software-gl.json -Raw | ConvertFrom-Json
+          $graphics = New-Item -ItemType Directory -Path (Join-Path $env:RUNNER_TEMP 'termcraft-software-gl')
+          $download = Join-Path $graphics.FullName 'mesa.7z'
+          Invoke-WebRequest -Uri $fixture.url -OutFile $download
+          if ((Get-FileHash -LiteralPath $download).Hash -ne $fixture.sha256) { throw 'Mesa fixture checksum mismatch.' }
+          $members = @($fixture.files.PSObject.Properties.Name | ForEach-Object { "x64/$_" })
+          tar.exe -xf $download -C $graphics.FullName @members
+          if ($LASTEXITCODE -ne 0) { throw 'Could not extract the pinned Mesa fixture.' }
+          $softwareGl = Join-Path $graphics.FullName 'x64'
           $archive = @(Get-ChildItem dist -Filter 'TermCraft-*.zip')
           if ($archive.Count -ne 1) { throw 'Expected exactly one Windows package.' }
-          ./tests/windows-package-lifecycle.ps1 -Archive $archive[0].FullName
+          python scripts/package-check-startup.py $archive[0].FullName --evidence startup-evidence --windows-software-gl $softwareGl
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./tests/windows-package-lifecycle.ps1 -Archive $archive[0].FullName -SoftwareGlDirectory $softwareGl
       - if: success()
         shell: bash
         run: |

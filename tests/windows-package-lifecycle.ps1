@@ -2,7 +2,8 @@
 param(
     [Parameter(Mandatory)][string]$Archive,
     [string]$PreviousArchive,
-    [string]$VaultFixture
+    [string]$VaultFixture,
+    [string]$SoftwareGlDirectory
 )
 
 $ErrorActionPreference = 'Stop'
@@ -29,6 +30,12 @@ $userFile = Join-Path $workingData 'unrelated.txt'
 $userHash = (Get-FileHash -LiteralPath $userFile).Hash
 $vaultPath = Join-Path $workingData 'credentials.vault'
 $vaultHash = $null
+$softwareGl = @()
+if ($SoftwareGlDirectory) {
+    $fixture = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'windows-software-gl.json') -Raw | ConvertFrom-Json
+    $softwareGl = @($fixture.files.PSObject.Properties)
+    $SoftwareGlDirectory = (Resolve-Path -LiteralPath $SoftwareGlDirectory).Path
+}
 if ($VaultFixture) {
     Copy-Item -LiteralPath (Resolve-Path -LiteralPath $VaultFixture).Path -Destination $vaultPath
     $vaultHash = (Get-FileHash -LiteralPath $vaultPath).Hash
@@ -80,7 +87,24 @@ try {
         }
         $appHashes += (Get-FileHash -LiteralPath $program).Hash
         $startup = Join-Path $scratch.FullName "installed-startup-$revision.png"
-        & $program --data-dir $workingData --screenshot $startup
+        $added = @()
+        $oldDriver = $env:GALLIUM_DRIVER
+        try {
+            foreach ($entry in $softwareGl) {
+                $inputFile = Join-Path $SoftwareGlDirectory $entry.Name
+                $target = Join-Path $installPath $entry.Name
+                if ((Get-FileHash -LiteralPath $inputFile).Hash -ne $entry.Value) {
+                    throw 'The software GL fixture DLL does not match its checksum.'
+                }
+                [IO.File]::Copy($inputFile, $target, $false)
+                $added += $target
+            }
+            if ($softwareGl.Count) { $env:GALLIUM_DRIVER = 'llvmpipe' }
+            & $program --data-dir $workingData --screenshot $startup
+        } finally {
+            $env:GALLIUM_DRIVER = $oldDriver
+            foreach ($target in $added) { Remove-Item -LiteralPath $target }
+        }
         if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $startup -PathType Leaf) -or
             (Get-Item -LiteralPath $startup).Length -lt 5000) {
             throw 'The installed GUI did not produce its startup screenshot.'

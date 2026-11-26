@@ -91,7 +91,7 @@
       "platform": "windows",
       "architecture": "x86_64",
       "file_name": "busybox-FRP-6354-windows-x86_64.tar.gz",
-      "sha256": "778b85b95d82d510e77703306e2a9d80fa11af43d1048b96338ff351eab5b7b2",
+      "sha256": "4649824ec37541b1939b0c18805b6475adba268bbbd743525413e033803cf081",
       "license": "GPL-2.0-only",
       "license_path": "busybox-w32/LICENSE",
       "binary_url": "https://frippery.org/files/busybox/busybox-w64u-FRP-6354-g5f09fb446.exe",
