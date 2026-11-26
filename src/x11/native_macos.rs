@@ -10,7 +10,7 @@ use std::{
     },
     path::Path,
     process::{Command, Stdio},
-    sync::atomic::AtomicBool,
+    sync::{Arc, atomic::AtomicBool},
     time::{Duration, Instant},
 };
 
@@ -117,20 +117,24 @@ pub(super) fn start(
     if options.monitor.is_some() || options.display_mode != XDisplayMode::Windowed {
         return Err("Private XQuartz monitor/fullscreen mode has not been qualified".into());
     }
-    let pin = native_policy::macos_pin()?;
-    launch(root, flag, pin)
+    launch_verified(snapshot(root, flag)?, flag)
 }
-fn launch(
-    root: &Path,
+
+/// One checked image can back successive processes of the same owned session.
+/// No process is launched against the mutable package tree.
+pub(super) fn snapshot(root: &Path, flag: &AtomicBool) -> Result<Arc<VerifiedSnapshot>, String> {
+    native_transport::cancelled(flag)?;
+    let pin = native_policy::macos_pin()?;
+    VerifiedSnapshot::create_cancellable(&root.join(native_policy::MACOS_RUNTIME), pin.files, flag)
+        .map(Arc::new)
+}
+
+pub(super) fn launch_verified(
+    image: Arc<VerifiedSnapshot>,
     flag: &AtomicBool,
-    pin: &native_policy::NativePin,
 ) -> Result<XServerLease, String> {
     native_transport::cancelled(flag)?;
-    let image = VerifiedSnapshot::create_cancellable(
-        &root.join(native_policy::MACOS_RUNTIME),
-        pin.files,
-        flag,
-    )?;
+    let pin = native_policy::macos_pin()?;
     let runtime = tempfile::Builder::new()
         .prefix("termcraft-x11-")
         .permissions(std::fs::Permissions::from_mode(0o700))

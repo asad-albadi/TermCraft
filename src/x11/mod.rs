@@ -142,7 +142,9 @@ pub struct XServerLease {
     process: engine::OwnedProcess,
     #[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
     _reservation: platform::DisplayReservation,
-    #[cfg(any(windows, target_os = "macos"))]
+    #[cfg(target_os = "macos")]
+    _native_image: Arc<native_artifact::VerifiedSnapshot>,
+    #[cfg(windows)]
     _native_image: native_artifact::VerifiedSnapshot,
     #[cfg(windows)]
     _runtime_guard: std::fs::File,
@@ -194,6 +196,8 @@ mod xdmcp_engine;
 pub mod xdmcp_host;
 #[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
 mod xdmcp_listener;
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+mod xdmcp_macos;
 pub use xdmcp_engine::{LINUX_XEPHYR_ARTIFACT, ManagedXdmcp, XdmcpSession};
 
 #[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]

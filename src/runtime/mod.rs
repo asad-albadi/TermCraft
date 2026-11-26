@@ -183,6 +183,10 @@ impl RuntimeCatalog {
                 },
                 "external browser",
             ),
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            ToolId::Xdmcp => crate::x11::bundled_runtime(&self.resources)
+                .map(|(path, version)| ToolProvider::Bundled { path, version }),
+            #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
             ToolId::Xdmcp => discovery::commands(
                 if cfg!(windows) {
                     &["vcxsrv.exe"]

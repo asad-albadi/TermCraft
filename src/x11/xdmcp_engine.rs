@@ -1,21 +1,40 @@
-//! Owned Linux nested XDMCP engine. Never starts or stops a display manager.
+//! Owned XDMCP session dispatch and Linux nested engine. Never starts or stops a display manager.
 use super::{
     XServerManager,
-    engine::OwnedProcess,
-    xdmcp::{XdmcpConfig, check_cancelled, engine_arguments},
+    xdmcp::{XdmcpConfig, check_cancelled},
 };
 use std::{
-    path::{Path, PathBuf},
     sync::{
         Arc,
         atomic::{AtomicBool, Ordering},
         mpsc::{self, Receiver},
     },
-    time::{Duration, Instant},
+    time::Duration,
 };
 
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+pub use super::xdmcp_macos::Session as XdmcpSession;
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+use super::xdmcp_macos::start;
+#[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
+use super::{engine::OwnedProcess, xdmcp::engine_arguments};
+#[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
+use std::path::{Path, PathBuf};
+#[cfg(target_os = "linux")]
+use std::time::Instant;
+
+fn validate(config: &XdmcpConfig, width: u32, height: u32) -> Result<(), String> {
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    {
+        let _ = (width, height); // Rootless XQuartz uses host geometry.
+        super::xdmcp_macos::preflight(config).map(|_| ())
+    }
+    #[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
+    engine_arguments(config, config.display.unwrap_or(100), width, height).map(|_| ())
+}
 pub const LINUX_XEPHYR_ARTIFACT: &str = "xephyr-21.1.26-arch-x86_64";
 /// Per-session ownership. The child stops before its private credentials are removed.
+#[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
 pub struct XdmcpSession {
     #[cfg(target_os = "linux")]
     clipboard: Option<super::xdmcp_clipboard::Bridge>,
@@ -27,6 +46,7 @@ pub struct XdmcpSession {
     diagnostics: Vec<u8>,
     _runtime: tempfile::TempDir,
 }
+#[cfg(not(all(target_os = "macos", target_arch = "aarch64")))]
 impl XdmcpSession {
     pub fn display(&self) -> &str {
         &self.display
@@ -74,15 +94,32 @@ impl XServerManager {
     ) -> Result<XdmcpSession, String> {
         let root = match &self.installation {
             Some(path) => path.clone(),
-            None => std::env::current_exe()
-                .map_err(|e| e.to_string())?
-                .parent()
-                .ok_or("Cannot locate the TermCraft installation")?
-                .to_path_buf(),
+            None => {
+                crate::runtime::RuntimeCatalog::for_current_executable()?.service_runtime_root()
+            }
         };
         start(&root, config, width, height, cancelled)
     }
 }
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+static MAC_WORKERS: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+struct MacWorker;
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+impl MacWorker {
+    fn start() -> Self {
+        MAC_WORKERS.fetch_add(1, Ordering::AcqRel);
+        Self
+    }
+}
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+impl Drop for MacWorker {
+    fn drop(&mut self) {
+        MAC_WORKERS.fetch_sub(1, Ordering::AcqRel);
+    }
+}
+
 /// Holds the session on its worker, so drop/cancellation never waits on the render thread.
 pub struct ManagedXdmcp {
     cancelled: Arc<AtomicBool>,
@@ -106,7 +143,7 @@ impl ManagedXdmcp {
             None,
         )
     }
-    /// Explicit Connect action: fresh resolution (<=2s) precedes the engine's <=8s startup.
+    /// Explicit Connect action: fresh resolution (<=2s) precedes bounded engine startup.
     /// Persisted endpoint data is accepted only if present in this fresh exact-host/port answer.
     pub fn start_hostname(
         manager: XServerManager,
@@ -126,7 +163,7 @@ impl ManagedXdmcp {
         let mut preflight = config.clone();
         // A placeholder is used only for option/consent validation. It never reaches the engine.
         preflight.selected_endpoint = Some(std::net::SocketAddr::from(([127, 0, 0, 1], port)));
-        engine_arguments(&preflight, preflight.display.unwrap_or(100), width, height)?;
+        validate(&preflight, width, height)?;
         Self::start_inner(
             manager,
             config,
@@ -147,16 +184,20 @@ impl ManagedXdmcp {
     ) -> Result<Self, String> {
         // Validate numeric configurations before allocating a worker.
         if host.is_none() {
-            engine_arguments(&config, config.display.unwrap_or(100), width, height)?;
+            validate(&config, width, height)?;
         }
         let cancelled = Arc::new(AtomicBool::new(false));
         let stop = cancelled.clone();
         let finished = Arc::new(AtomicBool::new(false));
         let done = finished.clone();
         let (sender, status) = mpsc::sync_channel(2);
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        let worker = MacWorker::start();
         std::thread::Builder::new()
             .name("termcraft-xdmcp-session".into())
             .spawn(move || {
+                #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                let _worker = worker;
                 let prepared = match host {
                     Some(request)=>super::xdmcp_host::resolve_for_connection(request,&stop)
                         .and_then(|addresses| {
@@ -203,6 +244,20 @@ impl ManagedXdmcp {
             finished,
         })
     }
+    /// After cancelling or dropping all handles, drain workers at application
+    /// exit. Tab close only signals cancellation and never blocks a frame.
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    pub fn wait_for_shutdown(timeout: Duration) -> bool {
+        let deadline = std::time::Instant::now() + timeout;
+        while MAC_WORKERS.load(Ordering::Acquire) != 0 {
+            if std::time::Instant::now() >= deadline {
+                return false;
+            }
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        true
+    }
+
     pub fn cancel(&self) {
         self.cancelled.store(true, Ordering::Relaxed)
     }
@@ -556,7 +611,10 @@ pub(super) fn connect_ready_socket(
     }
 }
 
-#[cfg(not(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu")))]
+#[cfg(not(any(
+    all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"),
+    all(target_os = "macos", target_arch = "aarch64")
+)))]
 fn start(_: &Path, _: XdmcpConfig, _: u32, _: u32, _: &AtomicBool) -> Result<XdmcpSession, String> {
     Err("The owned native XDMCP engine has not passed its platform qualification. Installed-client fallback is not automatic".into())
 }

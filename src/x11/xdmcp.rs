@@ -41,9 +41,9 @@ pub struct XdmcpConfig {
     pub clipboard_display: Option<String>,
     /// Optional selected Xauthority; otherwise read the inherited authority without modifying it.
     pub clipboard_authority: Option<std::path::PathBuf>,
-    /// Address advertised to the manager, NOT a restriction on the X11 listener.
+    /// Address advertised to the manager. Only the macOS engine also uses it as the bind address.
     pub advertise_address: Option<Ipv4Addr>,
-    /// Explicit permission for the upstream engine to listen on all X11 TCP interfaces.
+    /// Explicit permission for inbound X11 TCP (all interfaces on Linux, one address on macOS).
     pub allow_network_listener: bool,
     /// Explicit broadcast network choice. Never inferred from host/interface enumeration.
     pub discovery_network: Option<BroadcastNetwork>,

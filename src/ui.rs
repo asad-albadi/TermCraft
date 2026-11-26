@@ -2555,6 +2555,19 @@ impl eframe::App for Workspace {
             }
             harbor_workspace::browser::wait_for_shutdown();
         }
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        {
+            for tab in &mut self.tabs {
+                drop(tab.xdmcp.take());
+            }
+            if !harbor_workspace::x11::ManagedXdmcp::wait_for_shutdown(
+                std::time::Duration::from_secs(3),
+            ) {
+                eprintln!(
+                    "An owned XDMCP worker did not finish within the application shutdown window"
+                );
+            }
+        }
         self.xserver.shutdown();
     }
 

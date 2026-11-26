@@ -44,3 +44,27 @@ tests/support/run_xserver_isolated.sh /path/to/application-folder \
 ```
 
 The fixture replaces the compositor's Xwayland executable inside the namespace with the pinned payload. The test inspects the application worker's actual executable path separately. [Implementation evidence](../../docs/parity-evidence/X01/implementation.md) records the verified cases.
+
+### Apple Silicon Direct and Indirect XDMCP
+
+Bundle the existing private arm64 XQuartz tree with
+`scripts/package-release.py --xquartz-runtime CANDIDATE`. The same compiled
+inventory is used for managed X11 forwarding and XDMCP. TermCraft never runs
+the installed XQuartz or changes its preferences, launch services or listeners.
+
+In an XDMCP session, choose a Direct or Indirect IPv4 manager and explicitly
+enable the session's TCP listener. If no local address is specified, TermCraft
+uses the IPv4 route to the manager. The listener binds only that address at
+TCP port 6000 plus the display number. Automatic allocation tries displays
+100–199. Broadcast is discovery-only. The XQuartz process remains Unix-only,
+and the TCP endpoint accepts only the negotiated manager's IP and
+MIT-MAGIC-COOKIE-1 before passing traffic to that private process.
+
+Use this on a trusted isolated network. Neither the manager nor the TCP
+traffic is cryptographically authenticated or encrypted against a network
+observer. Indirect mode explicitly allows a forwarded manager to reply.
+TermCraft supports one chooser handoff, with a fresh XQuartz process and
+X11 cookie after the original manager closes its first connection. This
+path uses XQuartz native windows and host geometry/keyboard. Monitor and
+fullscreen overrides, layout overrides, IPv6, and host clipboard sharing
+are not part of this mode.
