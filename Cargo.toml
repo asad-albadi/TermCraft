@@ -67,7 +67,7 @@ clipboard-win = { path = "vendor/clipboard-win" }
 widestring = "=1.2.1"
 cap-std = "=4.0.3"
 cap-fs-ext = "=4.0.3"
-windows-sys = { version = "0.61", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Console", "Win32_System_Registry", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_Services", "Win32_System_IO", "Win32_Security", "Win32_Security_Authorization", "Win32_Devices_Communication", "Win32_NetworkManagement_IpHelper", "Win32_Networking_WinSock", "Win32_Storage_FileSystem", "Win32_Graphics_Gdi", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_WindowsAndMessaging", "Win32_System_StationsAndDesktops", "Win32_System_DataExchange", "Win32_System_Memory"] }
+windows-sys = { version = "0.61", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Console", "Win32_System_Registry", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_Services", "Win32_System_IO", "Win32_Security", "Win32_Security_Authorization", "Win32_Security_Isolation", "Win32_Devices_Communication", "Win32_NetworkManagement_IpHelper", "Win32_Networking_WinSock", "Win32_Storage_FileSystem", "Win32_Graphics_Gdi", "Win32_UI_Input_KeyboardAndMouse", "Win32_UI_WindowsAndMessaging", "Win32_System_StationsAndDesktops", "Win32_System_DataExchange", "Win32_System_Memory"] }
 
 [target.'cfg(all(windows, target_arch = "x86_64"))'.dependencies]
 x11rb = { version = "=0.13.2", features = ["composite", "glx", "randr"] }

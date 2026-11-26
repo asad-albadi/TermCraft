@@ -715,6 +715,20 @@ browser transport tests passed, including inspection of the runtime file's
 inherited access and the profile-data file's single owner ACE.
 [Chromium Windows installer capability code](https://chromium.googlesource.com/chromium/src/+/0cefb18236a23db1ebb6b2bc040fbbaf8cbe759e/chrome/installer/setup/configure_app_container_sandbox.cc).
 
+The capability fix restored navigation and let all five browser tests pass,
+but process-token evidence showed the network utility had fallen back to a
+non-AppContainer token. A separate Chromium launch on a fresh image path
+recorded `NetworkSandboxLaunchFailed.ErrorCode` 44, Chromium's AppContainer
+creation error. Creating the standard `AppData/Local` and `AppData/Roaming`
+folders under the isolated `USERPROFILE` allowed a fresh image to launch its
+network utility with `TokenIsAppContainer = 1`. `DeleteAppContainerProfile`
+returned `S_OK` for that exact test moniker. The Windows lookup confirmed the
+registry registration was gone, and the isolated package directory was still
+available for normal private-tree removal. TermCraft now creates that private
+layout and scopes deregistration to the executable path of its verified
+bundled snapshot.
+[Chromium AppContainer creation](https://chromium.googlesource.com/chromium/src/+/0cefb18236a23db1ebb6b2bc040fbbaf8cbe759e/sandbox/win/src/app_container_base.cc).
+
 ## Windows device components
 
 The independent native Windows component runs used Rust 1.96.1 and their

@@ -371,6 +371,19 @@ fn browser_profile_has_a_protected_private_acl() {
 }
 
 #[test]
+fn browser_environment_creates_private_windows_appdata_folders() {
+    let owner = OwnerSecurity::new().unwrap();
+    let profile = Profile::new(&owner).unwrap();
+    let variables = environment(&profile.path).unwrap();
+    for (key, folder) in [("APPDATA", "Roaming"), ("LOCALAPPDATA", "Local")] {
+        let directory = profile.path.join("AppData").join(folder);
+        assert!(directory.is_dir());
+        assert!(variables.contains(&(key, directory.into_os_string())));
+    }
+    assert!(variables.contains(&("USERPROFILE", profile.path.as_os_str().to_owned())));
+}
+
+#[test]
 fn browser_runtime_inherits_only_chromium_install_read_access() {
     const ACCESS_ALLOWED_ACE_TYPE: u8 = 0;
     let owner = OwnerSecurity::new().unwrap();

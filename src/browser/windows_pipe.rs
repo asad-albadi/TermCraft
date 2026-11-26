@@ -16,9 +16,10 @@ use std::{
 };
 
 use serde_json::Value;
+use sha1::{Digest, Sha1};
 use windows_sys::Win32::{
     Foundation::*,
-    Security::{Authorization::*, *},
+    Security::{Authorization::*, Isolation::DeleteAppContainerProfile, *},
     Storage::FileSystem::*,
     System::{
         IO::*, JobObjects::*, Pipes::*, SystemInformation::GetSystemWindowsDirectoryW, Threading::*,
@@ -52,7 +53,7 @@ impl Pipe {
         let catalog = RuntimeCatalog::for_current_executable()?;
         let security =
             OwnerSecurity::new().map_err(|_| "Could not secure the private browser profile.")?;
-        let profile =
+        let mut profile =
             Profile::new(&security).map_err(|_| "Could not create a private browser profile.")?;
         let chromium = match runtime {
             super::Runtime::SystemChromium => {
@@ -62,7 +63,9 @@ impl Pipe {
                 let directory = profile
                     .create_runtime_directory()
                     .map_err(|_| "Could not secure the private browser runtime.")?;
-                catalog.stage_bundled_browser(&directory, cancel)?
+                let image = catalog.stage_bundled_browser(&directory, cancel)?;
+                profile.bundled_image = Some(image.clone());
+                image
             }
         };
         let (writer, browser_reader) = pipe_pair(false, &security).map_err(|_| CONNECTION_ERROR)?;
@@ -436,6 +439,7 @@ impl Drop for OwnerSecurity {
 struct Profile {
     path: PathBuf,
     directory: Option<OwnedHandle>,
+    bundled_image: Option<PathBuf>,
     remove: bool,
 }
 
@@ -463,6 +467,7 @@ impl Profile {
         let mut profile = Self {
             path,
             directory: None,
+            bundled_image: None,
             remove: true,
         };
         let directory = unsafe {
@@ -512,6 +517,11 @@ impl Profile {
 
 impl Drop for Profile {
     fn drop(&mut self) {
+        if self.remove
+            && let Some(image) = &self.bundled_image
+        {
+            remove_chromium_app_containers(&self.path, image);
+        }
         drop(self.directory.take());
         if self.remove {
             // Windows may still hold a scanned runtime file after the job exits.
@@ -526,6 +536,23 @@ impl Drop for Profile {
                     Err(_) => break,
                 }
             }
+        }
+    }
+}
+
+fn remove_chromium_app_containers(profile: &Path, image: &Path) {
+    // Chromium names its utility AppContainers using the exact executable path.
+    let suffix: String = Sha1::digest(image.to_string_lossy().as_bytes())
+        .iter()
+        .map(|byte| format!("{byte:02X}"))
+        .collect();
+    let packages = profile.join("AppData/Local/Packages");
+    for kind in ["net", "cdm", "odm", "prnc", "pxy", "wnn", "xr"] {
+        let name = format!("cr.sb.{kind}{suffix}");
+        if packages.join(&name).is_dir()
+            && let Ok(name) = wide(OsStr::new(&name))
+        {
+            unsafe { DeleteAppContainerProfile(name.as_ptr()) };
         }
     }
 }
@@ -720,7 +747,14 @@ fn environment(profile: &Path) -> io::Result<Vec<(&'static str, OsString)>> {
         ("WINDIR", root.as_os_str().to_owned()),
         ("PATH", root.join("System32").into_os_string()),
     ];
-    for key in ["APPDATA", "LOCALAPPDATA", "TEMP", "TMP", "USERPROFILE"] {
+    // The Windows shell resolves these known folders under USERPROFILE when
+    // Chromium creates a new AppContainer. Keep them inside the owned profile.
+    for (key, folder) in [("APPDATA", "Roaming"), ("LOCALAPPDATA", "Local")] {
+        let path = profile.join("AppData").join(folder);
+        std::fs::create_dir_all(&path)?;
+        environment.push((key, path.into_os_string()));
+    }
+    for key in ["TEMP", "TMP", "USERPROFILE"] {
         environment.push((key, profile.as_os_str().to_owned()));
     }
     Ok(environment)

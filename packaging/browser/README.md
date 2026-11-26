@@ -44,9 +44,11 @@ named imports for each pinned native image. The installed browser compatibility
 workflow uses a separate explicit provider.
 
 TermCraft grants the Chromium installer capabilities read and execute access
-to the verified runtime snapshot. The profile and DevTools pipes retain their
-owner-only access. This allows Chromium's native AppContainer processes to
-start with their usual sandbox policies.
+to the verified runtime snapshot. The profile root and DevTools pipes retain
+owner-only access. The profile contains private Windows AppData folders for
+Chromium to create its AppContainer store. After the process job drains,
+TermCraft removes AppContainer registrations tied to its bundled snapshot
+and deletes the private tree.
 
 ### Linux x86_64
 
