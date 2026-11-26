@@ -23,6 +23,8 @@ pub struct OpenGlEvidence {
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct XCapabilities {
+    #[serde(default)]
+    pub core_x11_pixels: bool,
     pub glx_version: Option<String>,
     pub opengl: Option<OpenGlEvidence>,
     pub composite_version: Option<String>,

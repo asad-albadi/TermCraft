@@ -308,8 +308,8 @@ pub(super) fn session_settings(ui: &mut Ui, session: &mut Session) {
     }
     ui.label("X display");
     ui.horizontal_wrapped(|ui| {
-        let owned_supported = Workspace::default_x11_source() == XDisplaySource::Owned
-            && (local || session.ssh_engine == SshEngine::Embedded);
+        let owned_supported =
+            owned_x11_supported() && (local || session.ssh_engine == SshEngine::Embedded);
         ui.add_enabled_ui(owned_supported, |ui| {
             ui.selectable_value(&mut session.x11_source, XDisplaySource::Owned, "TermCraft");
         });
@@ -324,6 +324,17 @@ pub(super) fn session_settings(ui: &mut Ui, session: &mut Session) {
         });
         ui.end_row();
     }
+}
+
+fn owned_x11_supported() -> bool {
+    cfg!(any(
+        all(
+            target_os = "linux",
+            target_arch = "x86_64",
+            target_env = "gnu"
+        ),
+        all(target_os = "macos", target_arch = "aarch64")
+    ))
 }
 
 impl Workspace {
@@ -413,17 +424,16 @@ impl Workspace {
     pub(super) fn xserver_card(&mut self, ui: &mut Ui) {
         surface(ui).show(ui, |ui| {
             ui.label(RichText::new("X11 server").size(18.).strong());
-            if !cfg!(all(
-                target_os = "linux",
-                target_arch = "x86_64",
-                target_env = "gnu"
-            )) {
+            if !owned_x11_supported() {
                 ui.label("A managed X11 server is unavailable on this platform.");
                 return;
             }
-            ui.label(
-                RichText::new("Open a private X display in your Wayland session. Its clipboard is shared between apps on that display.").color(muted(ui)),
-            );
+            let description = if cfg!(target_os = "macos") {
+                "Open an authenticated private XQuartz display in native windows."
+            } else {
+                "Open a private X display in your Wayland session. Its clipboard is shared between apps on that display."
+            };
+            ui.label(RichText::new(description).color(muted(ui)));
             let state = &mut self.xserver;
             if let Some(worker) = &state.worker {
                 if worker.stopping() {
@@ -439,6 +449,9 @@ impl Workspace {
                     if let Some(capabilities) = &state.capabilities {
                         match capabilities {
                             Ok(report) => {
+                                if report.core_x11_pixels {
+                                    ui.label("Core X11 pixel readback verified");
+                                }
                                 ui.label(format!("GLX: {} · Composite: {} · RandR: {}",
                                     report.glx_version.as_deref().unwrap_or("unavailable"),
                                     report.composite_version.as_deref().unwrap_or("unavailable"),
@@ -485,6 +498,9 @@ impl Workspace {
                 return;
             }
 
+            if cfg!(target_os = "macos") {
+                ui.label("Windowed display. macOS chooses the monitor.");
+            } else {
             ui.horizontal(|ui| {
                 ui.label("Display mode");
                 ComboBox::from_id_salt("xserver_display_mode")
@@ -506,6 +522,7 @@ impl Workspace {
                     });
             });
             ui.label(RichText::new("The compositor chooses the monitor.").color(muted(ui)));
+            }
             ui.horizontal(|ui| {
                 if ui.button("Choose bundle folder").clicked()
                     && let Some(root) = rfd::FileDialog::new().pick_folder()
@@ -526,6 +543,23 @@ impl Workspace {
                 ui.colored_label(ui.visuals().error_fg_color, error);
             }
         });
+    }
+}
+
+#[cfg(all(test, target_os = "macos", target_arch = "aarch64"))]
+mod macos_tests {
+    use super::*;
+
+    #[test]
+    fn apple_silicon_workspace_offers_the_private_xserver() {
+        let (ctx, _root, mut workspace) = crate::ui::terminal_review_tests::owned_workspace();
+        let mut output = ctx.run_ui(RawInput::default(), |ui| workspace.xserver_card(ui));
+        output.textures_delta.clear();
+        assert!(output.shapes.iter().any(|shape| {
+            matches!(&shape.shape, egui::epaint::Shape::Text(text)
+                if text.galley.text() == "Start X server")
+        }));
+        assert_eq!(Workspace::default_x11_source(), XDisplaySource::System);
     }
 }
 

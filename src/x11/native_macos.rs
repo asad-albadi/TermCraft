@@ -14,8 +14,8 @@ use std::{
     time::{Duration, Instant},
 };
 
-/// Read-only inspection of the authenticated display. The owning probe parent
-/// bounds the subprocess lifetime.
+/// Inspect the authenticated display and draw into a scratch pixmap. The
+/// owning probe parent bounds the subprocess lifetime.
 pub(super) fn probe_capabilities() -> Result<super::XCapabilities, String> {
     use std::io::Read;
     use std::os::unix::net::UnixStream;
@@ -51,9 +51,13 @@ pub(super) fn probe_capabilities() -> Result<super::XCapabilities, String> {
     let screen = &connection.setup().roots[0];
     let mut report = super::XCapabilities {
         dimensions: [screen.width_in_pixels.into(), screen.height_in_pixels.into()],
-        errors: vec!["OpenGL pixel readback and RandR mode switching are unavailable in the private XQuartz probe.".into()],
+        errors: vec!["Private XQuartz disables indirect GLX and uses macOS display geometry.".into()],
         ..Default::default()
     };
+    match core_pixel_readback(&connection, screen) {
+        Ok(()) => report.core_x11_pixels = true,
+        Err(error) => report.errors.push(format!("Core X11 pixel readback: {error}")),
+    }
     if let Ok(request) = glx::query_version(&connection, 1, 4) {
         match request.reply() {
             Ok(version) => {
@@ -74,6 +78,16 @@ pub(super) fn probe_capabilities() -> Result<super::XCapabilities, String> {
                     "{}.{}",
                     version.major_version, version.minor_version
                 ));
+                match randr::get_screen_resources_current(&connection, screen.root)
+                    .map_err(|error| error.to_string())
+                    .and_then(|request| request.reply().map_err(|error| error.to_string()))
+                {
+                    Ok(resources) if resources.outputs.is_empty() => report
+                        .errors
+                        .push("RandR reports no outputs for the private windowed display.".into()),
+                    Ok(_) => {}
+                    Err(error) => report.errors.push(format!("RandR output query failed: {error}")),
+                }
             }
             Err(error) => report
                 .errors
@@ -95,6 +109,66 @@ pub(super) fn probe_capabilities() -> Result<super::XCapabilities, String> {
             .push("Composite is disabled in private XQuartz.".into());
     }
     Ok(report)
+}
+
+fn core_pixel_readback(
+    connection: &x11rb::rust_connection::RustConnection,
+    screen: &x11rb::protocol::xproto::Screen,
+) -> Result<(), String> {
+    use x11rb::{
+        connection::Connection,
+        protocol::xproto::{
+            ChangeGCAux, ConnectionExt, CreateGCAux, ImageFormat, ImageOrder, Rectangle,
+        },
+    };
+
+    let check = || -> Result<[u32; 2], Box<dyn std::error::Error>> {
+        let canvas = connection.generate_id()?;
+        let gc = connection.generate_id()?;
+        connection
+            .create_pixmap(screen.root_depth, canvas, screen.root, 2, 1)?
+            .check()?;
+        connection
+            .create_gc(gc, canvas, &CreateGCAux::new().foreground(screen.white_pixel))?
+            .check()?;
+        connection
+            .poly_fill_rectangle(canvas, gc, &[Rectangle { x: 0, y: 0, width: 2, height: 1 }])?
+            .check()?;
+        connection
+            .change_gc(gc, &ChangeGCAux::new().foreground(screen.black_pixel))?
+            .check()?;
+        connection
+            .poly_fill_rectangle(canvas, gc, &[Rectangle { x: 1, y: 0, width: 1, height: 1 }])?
+            .check()?;
+        let image = connection
+            .get_image(ImageFormat::Z_PIXMAP, canvas, 0, 0, 2, 1, u32::MAX)?
+            .reply()?;
+        let setup = connection.setup();
+        let format = setup.pixmap_formats.iter().find(|format| format.depth == image.depth);
+        if !format.is_some_and(|format| format.bits_per_pixel == 32) || image.data.len() != 8 {
+            return Err("Unexpected private XQuartz pixel format".into());
+        }
+        let bits = u32::from(image.depth);
+        if !(1..=32).contains(&bits) {
+            return Err("Unexpected private XQuartz pixel depth".into());
+        }
+        let mask = u32::MAX >> (32 - bits);
+        let pixel = |offset| {
+            let bytes = image.data[offset..offset + 4].try_into().unwrap();
+            let value = if setup.image_byte_order == ImageOrder::LSB_FIRST {
+                u32::from_le_bytes(bytes)
+            } else {
+                u32::from_be_bytes(bytes)
+            };
+            value & mask
+        };
+        Ok([pixel(0), pixel(4)])
+    };
+    let pixels = check().map_err(|error| error.to_string())?;
+    if pixels != [screen.white_pixel, screen.black_pixel] || pixels[0] == pixels[1] {
+        return Err("Readback did not match the two drawn colors".into());
+    }
+    Ok(())
 }
 
 pub(super) fn bundled_runtime(root: &Path) -> Result<(std::path::PathBuf, String), String> {
@@ -266,6 +340,7 @@ mod tests {
         )
         .unwrap();
         assert!(report.dimensions.iter().all(|&value| value > 0));
+        assert!(report.core_x11_pixels, "{report:?}");
         assert!(report.composite_version.is_none());
         assert!(!report.rendering_verified());
         assert!(report.randr_change.is_none());
