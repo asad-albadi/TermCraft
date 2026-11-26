@@ -258,33 +258,40 @@ class Windows:
                 api(self.kernel, "GlobalUnlock", w.BOOL, w.HANDLE)(handle)
 
 
-def owns_loopback_listener(pid, address, port):
+def tcp_listener_rows(family, layout):
     ip_helper = c.WinDLL("iphlpapi", use_last_error=True)
     query = api(ip_helper, "GetExtendedTcpTable", w.DWORD, c.c_void_p,
                 c.POINTER(w.DWORD), w.BOOL, w.ULONG, c.c_int, w.ULONG)
     size = w.DWORD()
-    query(None, c.byref(size), False, socket.AF_INET, 3, 0)
+    query(None, c.byref(size), False, family, 3, 0)
     for _ in range(3):
         if not 4 <= size.value <= 4 * 1024 * 1024:
             raise RuntimeError("Invalid Windows TCP ownership table size")
         table = c.create_string_buffer(size.value)
-        status = query(table, c.byref(size), False, socket.AF_INET, 3, 0)
+        status = query(table, c.byref(size), False, family, 3, 0)
         if status == 122:  # ERROR_INSUFFICIENT_BUFFER
             continue
         if status:
             raise OSError(f"GetExtendedTcpTable failed: Win32 {status}")
         (rows,) = struct.unpack_from("<I", table)
-        if 4 + rows * 24 > size.value:
+        end = 4 + rows * layout.size
+        if end > size.value:
             raise RuntimeError("Invalid Windows TCP ownership table row count")
-        listeners = [
-            (socket.inet_ntoa(struct.pack("<I", local_ip)), socket.ntohs(local_port & 0xFFFF))
-            for _, local_ip, local_port, _, _, owner in struct.iter_unpack("<6I", table.raw[4:4 + rows * 24])
-            if owner == pid
-        ]
-        if listeners and listeners != [(address, port)]:
-            raise RuntimeError("VcXsrv did not bind exactly the selected loopback listener")
-        return bool(listeners)
+        return layout.iter_unpack(table.raw[4:end])
     raise RuntimeError("Windows TCP ownership table repeatedly changed")
+
+
+def owns_loopback_listener(pid, address, port):
+    if any(row[-1] == pid for row in tcp_listener_rows(socket.AF_INET6, struct.Struct("<16sII16sIIII"))):
+        raise RuntimeError("VcXsrv opened an unexpected IPv6 listener")
+    listeners = [
+        (socket.inet_ntoa(struct.pack("<I", local_ip)), socket.ntohs(local_port & 0xFFFF))
+        for _, local_ip, local_port, _, _, owner in tcp_listener_rows(socket.AF_INET, struct.Struct("<6I"))
+        if owner == pid
+    ]
+    if listeners and listeners != [(address, port)]:
+        raise RuntimeError("VcXsrv did not bind exactly the selected loopback listener")
+    return bool(listeners)
 
 
 def accept_owned_listener(win, process, wait, address, port, cookie, isolated):
