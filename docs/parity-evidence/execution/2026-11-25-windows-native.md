@@ -710,6 +710,20 @@ agent forwarding remains open.
 
 ## Native desktop capture and hosted Windows build
 
+The managed Telnet Windows regression uses an independently compiled native
+console fixture on a loopback listener. It observed the explicit failed-login
+reply without a shell marker, then authenticated with a synthetic password.
+The ConPTY program received and echoed a test line. `Stop` signaled the exact
+opened process handle and released the listening endpoint. An initial
+fixture read through EOF failed with WinSock 10054 after the server rejected
+the login. The test now reads the full protocol rejection marker, as the
+existing Unix test does, and checks process/listener shutdown independently.
+With Git for Windows OpenSSL 3.2.4 on `PATH`,
+`cargo +1.96.1 test --locked --all-targets --no-fail-fast` reported 616 passed,
+zero failed and 32 ignored across 76 test binaries. A first run from a fresh
+shell could not locate `openssl` and failed the two VeNCrypt cases. The
+targeted replay and the complete rerun passed with the installed fixture.
+
 The real Windows VNC view-only provider passed
 `cargo +1.96.1 test --locked --lib windows_native_view_only_capture_starts_and_releases_listener -- --ignored`.
 A native primary-desktop frame validated before publishing the loopback
