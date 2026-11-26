@@ -670,8 +670,12 @@ same-volume `out/TermCraftNative` directory with
 `autoninja -C out/TermCraftNative -j 12 chrome mini_installer`. The build
 arguments select x64, an unbranded official release, no symbols, PGO phase 0
 and local execution. Successful C++ and Rust compilation confirms the
-same-volume layout. A complete source-built runtime and its private package
-replay remain open.
+same-volume layout. With 12 workers, the build stopped after 5,635 completed
+actions when Windows exhausted its commit allowance and could no longer
+launch `clang-cl.exe`. The 12,337 MiB page file recorded 11,733 MiB peak use.
+The incremental retry reuses that output with
+`autoninja -C out/TermCraftNative -j 6 chrome mini_installer`. A complete
+source-built runtime and its private package replay remain open.
 
 ## Windows device components
 
@@ -805,3 +809,9 @@ with an OpenGL 2.0 or later context.
   passed `cargo +1.96.1 test --locked --all-targets --no-fail-fast` with
   615 passed, zero failed and 32 ignored. The independently locked RDP
   helper reported 36 passed, zero failed and zero ignored.
+- [The clean hosted Windows package job at `b05cbf9`](https://github.com/asad-albadi/TermCraft/actions/runs/45859047462/job/140044950528)
+  passed the relocated GUI and adjacent helper negotiation at 1024 × 768
+  with an empty `PATH` and an isolated Harbor workspace. The per-user replay
+  launched both installed fixture versions and removed them. The published
+  unsigned test artifact SHA-256 was
+  `53fd13be0aba43fb4227637b882f901dbaafe22a7b3a37a0476b6aecc2ae7ebf`.
