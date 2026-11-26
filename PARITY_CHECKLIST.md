@@ -131,7 +131,9 @@ Existing adapters must not be classified as absent solely because endpoints were
 
 ## Completion rule and execution guidance
 
-The Windows x64 checkpoint records partial D02, P08 and V05 evidence. Hosted CI passed 615 workspace tests and 36 independent helper tests, with 32 workspace checks ignored in that run. Native package observations include clean GUI and helper startup, a local upgrade with two independently versioned development packages, real URL activation, BusyBox-w32 through ConPTY, and live theme, split and detach workflows at one desktop scale. Remaining platform and original-product acceptance stays open. [Windows evidence](docs/parity-evidence/execution/2026-11-25-windows-native.md)
+The Windows x64 checkpoint records partial D02, P08 and V05 evidence. Hosted CI passed 616 workspace tests and 36 independent helper tests, with 32 workspace checks ignored in that run. Native package observations include clean GUI and helper startup, a local upgrade with two independently versioned development packages, real URL activation, BusyBox-w32 through ConPTY, and live theme, split and detach workflows at one desktop scale. Remaining platform and original-product acceptance stays open. [Windows evidence](docs/parity-evidence/execution/2026-11-25-windows-native.md)
+
+The supplied Personal 26.6 build 5560 passed a native local terminal replay and connected to the same loopback SSH fixture as the relocated TermCraft package. TermCraft's production importer preserved the synthetic bookmark fields. Original menu behavior, edition cap enforcement and broader paired workflows remain open. [Personal 26.6 Windows evidence](docs/parity-evidence/execution/2026-11-25-windows-native.md#personal-266-reference-replay)
 
 The full plan is approved. Use native workflows, meaningful targeted regressions and the single [durable queue](PARITY_EXECUTION_QUEUE.json). Work by actual dependencies and continue after each passing increment. Historical Superpowers strict-order/stop-after-increment instructions are superseded by the user’s 2026-11-24 execution amendment. Full/host gates are batched at subsystem boundaries.
 

@@ -75,6 +75,7 @@
 - [x] Authenticate to native primary-display capture with view-only VNC, receive one raw pixel over loopback without recording it, then verify client and listener teardown.
 - [ ] Use `packaging/browser/stage-runtime.py` and `tests/browser_session.rs` to identify and test the bundled runtime. Run native profile isolation, sandbox, resize/input, cancellation and cleanup checks against a private peer.
 - [ ] Exercise locally available services and capture/control, and run `windows_integration`, `ssh_agent` and `session_import` as part of the root suite. Verify Pageant, vault ACLs and recovery, imports, shared definitions, gateways, proxies and reconnects with synthetic data.
+- [x] Verify the supplied Personal 26.6 binary and run the isolated reference terminal and SSH bookmark replays. Compare the same synthetic inputs with the relocated TermCraft package and record the limits of the observations.
 - [ ] Record exact fixture status for physical serial/network/device and original Personal 26.6 comparisons.
 
 ### Task 6: Reconcile and verify
