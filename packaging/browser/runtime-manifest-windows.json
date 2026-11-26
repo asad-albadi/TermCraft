@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "platform": "windows",
+  "architecture": "x86_64",
+  "root": "browser/windows-x86_64",
+  "executable": "chrome.exe",
+  "version": "158.0.8127.88",
+  "source_commit": "0cefb18236a23db1ebb6b2bc040fbbaf8cbe759e",
+  "approved": false,
+  "files": []
+}

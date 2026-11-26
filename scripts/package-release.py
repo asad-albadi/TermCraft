@@ -451,11 +451,18 @@ def stage_unix(source, destination, cache, target, arch):
     return json.loads(inventory.read_text())
 
 
-def stage_browser(source, resources, inputs, target, arch):
-    manifest = regular_source(source, Path("packaging/browser/runtime-manifest.json"))
+def browser_runtime_manifest(source, target, arch):
+    name = "runtime-manifest-windows.json" if target == "windows" else "runtime-manifest.json"
+    manifest = regular_source(source, Path("packaging/browser") / name)
     info = json.loads(manifest.read_text())
-    if (target, arch) != (info["platform"], info["architecture"]):
+    if ((target, arch) != (info["platform"], info["architecture"])
+            or (target == "windows" and info.get("approved") is not True)):
         raise ValueError("No qualified bundled Chromium payload for this platform.")
+    return manifest, info
+
+
+def stage_browser(source, resources, inputs, target, arch):
+    manifest, info = browser_runtime_manifest(source, target, arch)
     stage = regular_source(source, Path("packaging/browser/stage-runtime.py"))
     subprocess.run([sys.executable, "-I", "-B", stage, manifest, resources,
                     inputs.resolve(strict=True)], check=True)
@@ -465,6 +472,11 @@ def stage_browser(source, resources, inputs, target, arch):
             continue
         relative = Path(info["root"]) / item["path"]
         path = regular_source(resources, relative)
+        if target == "windows":
+            if binary_arch(path, target) != arch:
+                raise ValueError(f"Browser image architecture differs from the package: {relative}")
+            libraries[relative.as_posix()] = native_libraries(path, target)
+            continue
         if ".so" not in path.name:
             libraries[relative.as_posix()] = native_libraries(path, target, resources / info["root"] / "libraries")
             continue
@@ -514,8 +526,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         raise ValueError("The pinned Mosh payload targets the Linux x86_64 Arch runtime ABI.")
     if unix_cache is not None and (target, arch) not in (("linux", "x86_64"), ("windows", "x86_64")):
         raise ValueError("Unix payload supports Linux and Windows x86_64 only.")
-    if browser_inputs is not None and (target, arch) != ("linux", "x86_64"):
-        raise ValueError("No qualified bundled Chromium payload for this platform.")
+    if browser_inputs is not None:
+        browser_runtime_manifest(source, target, arch)
     if wayland_helper_binary is not None:
         if target != "linux" or binary_arch(wayland_helper_binary, target) != arch:
             raise ValueError("The optional Wayland helper requires the same native Linux architecture as the app.")
@@ -721,7 +733,7 @@ def main():
     parser.add_argument("--mosh-dependencies", type=Path, help="Offline cache of pinned Perl/OpenSSH/native dependency archives, source and recipes.")
     parser.add_argument("--unix-cache", type=Path,
                         help="Bundle target-matching pinned Unix archives from an offline upstream hash cache (Linux/Windows x86_64).")
-    parser.add_argument("--browser-inputs", type=Path, help="Offline pinned Chromium archive, signature and third-party notices directory (Linux x86_64).")
+    parser.add_argument("--browser-inputs", type=Path, help="Offline inputs for the approved platform-specific Chromium archive.")
     args = parser.parse_args()
     if bool(args.app_binary) != bool(args.helper_binary):
         parser.error("Supply both prebuilt binaries or omit both to build a native release.")

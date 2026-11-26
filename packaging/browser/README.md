@@ -31,6 +31,19 @@ standard unprivileged namespace sandbox. There is no unsafe launch fallback.
 
 ## Offline staging
 
+### Windows x64
+
+`runtime-manifest-windows.json` records the pinned Chromium source and the
+current approval state. The Windows product and release package both require
+approval in that repository manifest. The Windows staging input, once approved,
+is a native Chromium ZIP with the exact pinned SHA-256. Its regular files must
+match the approved inventory by path, size and SHA-256, including
+`THIRD-PARTY-NOTICES.html`. Packaging verifies the PE architecture and records
+named imports for each pinned native image. The installed browser compatibility
+workflow uses a separate explicit provider.
+
+### Linux x86_64
+
 Supply this explicit directory to `scripts/package-release.py --browser-inputs`:
 
 - The exact Chromium archive named in the manifest and its detached `.sig`.
