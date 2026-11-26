@@ -684,11 +684,36 @@ initial C++ batches. A later run with 16 Ninja jobs hit Python 3.11.9
 The 11 generated `generate_bindings.py` commands in `toolchain.ninja` were
 given the upstream `--single_process` flag. All 11 binding actions then
 completed at 10 Ninja jobs. The incremental C++ build resumed with 16 jobs
-after that phase. A complete runtime and private package replay remain open.
-The final Ninja invocation uses 12 workers. The generated `chrome.dll` link
-rule caps ThinLTO at six workers to stay within the host's Windows commit
-limit. The first 657 actions in that invocation completed before the
-remaining actions began waiting for the native browser DLL link.
+after that phase. The final `ninja -C out/TermCraftNinja -j 12 chrome mini_installer`
+invocation completed all 890 remaining actions. Its generated `chrome.dll`
+link rule capped ThinLTO at six workers to stay within the host's Windows
+commit limit. `chrome.exe` identifies as Chromium `158.0.8127.88`. The
+upstream 7-Zip installer archive contained the expected versioned Chrome-bin
+tree. The private ZIP uses that tree plus the upstream license and generated
+third-party credits. The resulting inventory verified 248 files, with x64 PE
+headers on each `.exe` and `.dll`.
+
+| Output | SHA-256 |
+| --- | --- |
+| `chrome.exe` | `9cc28a7850b2bcbb40202bfe21eecb3c8c0d39ea8bf9e883db22b1a3239f7bda` |
+| `chrome.dll` | `e4bb7d68b6e81b0a88672ec15cc7df1272cd530844cdddacc5b92fcb38385584` |
+| `chrome.7z` | `22f5ad4f93684d38277ee756ed4b223b11446283cf4bb60760c4f2c8b7ef3901` |
+| `mini_installer.exe` | `bd7db3d8a415bb178af33b24cac2a73d0d57c9589f4ef2f3a9b51db7195d2536` |
+| `THIRD-PARTY-NOTICES.html` | `44832a0cf338d2be9efe72f3a982c8cc5d9ce764a4aabd8e63320b3d7ba7dadf` |
+| Private Chromium ZIP | `3d6d1dcac74a59fc8d17b477bb385fcde646aac077566ca3f76ccf765bc844c4` |
+
+The first combined private ZIP started its relocated GUI with an empty PATH
+and passed all 11 independent software RDP endpoint tests. All three live
+browser fixture tests stalled at `about:blank`. An isolated launch of the
+same Chromium executable reached the broker but logged Windows access denied
+for the network AppContainer's executable check. A controlled repeat with
+the two upstream install-file capabilities granted read and execute access
+on the runtime tree loaded the loopback page and returned the expected DOM.
+TermCraft now applies the same grants to its verified runtime child only.
+The profile and DevTools pipes still use an owner-only DACL. The eight Windows
+browser transport tests passed, including inspection of the runtime file's
+inherited access and the profile-data file's single owner ACE.
+[Chromium Windows installer capability code](https://chromium.googlesource.com/chromium/src/+/0cefb18236a23db1ebb6b2bc040fbbaf8cbe759e/chrome/installer/setup/configure_app_container_sandbox.cc).
 
 ## Windows device components
 
@@ -840,6 +865,12 @@ targeted replay and the complete rerun passed with the installed fixture.
 independently reported the same 616 passed, zero failed and 32 ignored. The
 locked helper reported 36 passed, zero failed and zero ignored.
 
+The [hosted Windows run at `7e7a773`](https://github.com/asad-albadi/TermCraft/actions/runs/45887746416/job/140142597365)
+passed 617 workspace tests, zero failed and 36 ignored across 76 test
+binaries. The independent locked RDP helper passed all 36 tests. The
+separate Eastern DST replay passed one test on the same runner. The Npcap
+and Iperf opt-in runs below used their actual Windows compatibility providers.
+
 The real Windows VNC view-only provider passed
 `cargo +1.96.1 test --locked --lib windows_native_view_only_capture_starts_and_releases_listener -- --ignored`.
 A native primary-desktop frame validated before publishing the loopback
@@ -899,8 +930,9 @@ with an OpenGL 2.0 or later context.
   software fixture. Windows system-local Cron scheduling was tested using the
   host timezone. The native Cron suite also passed a real Windows `cmd.exe`
   job, including durable replay protection after restart, clock jumps and
-  corrupt-store detection. The fixed Eastern DST check runs separately on a
-  disposable hosted Windows runner that restores its previous timezone.
+  corrupt-store detection. The fixed Eastern DST check passed separately on a
+  disposable hosted Windows runner, which restored its previous timezone.
+  [Hosted Cron run](https://github.com/asad-albadi/TermCraft/actions/runs/45886665675/job/140138949029).
 - The follow-up `5069518` Windows root run reported 606 passes, zero failures
   and 22 ignored. The independent locked RDP helper replay reported 35
   passing tests. Windows browser (5), RDP software endpoint (10), owned X

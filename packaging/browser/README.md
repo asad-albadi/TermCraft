@@ -43,6 +43,11 @@ match the approved inventory by path, size and SHA-256, including
 named imports for each pinned native image. The installed browser compatibility
 workflow uses a separate explicit provider.
 
+TermCraft grants the Chromium installer capabilities read and execute access
+to the verified runtime snapshot. The profile and DevTools pipes retain their
+owner-only access. This allows Chromium's native AppContainer processes to
+start with their usual sandbox policies.
+
 ### Linux x86_64
 
 Supply this explicit directory to `scripts/package-release.py --browser-inputs`:

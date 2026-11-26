@@ -59,7 +59,10 @@ impl Pipe {
                 catalog.resolve(ToolId::SystemChromium)?.executable()?
             }
             super::Runtime::BundledChromium => {
-                catalog.stage_bundled_browser(&profile.path.join("runtime"), cancel)?
+                let directory = profile
+                    .create_runtime_directory()
+                    .map_err(|_| "Could not secure the private browser runtime.")?;
+                catalog.stage_bundled_browser(&directory, cancel)?
             }
         };
         let (writer, browser_reader) = pipe_pair(false, &security).map_err(|_| CONNECTION_ERROR)?;
@@ -353,10 +356,20 @@ fn handle(raw: HANDLE) -> io::Result<OwnedHandle> {
     Ok(unsafe { OwnedHandle::from_raw_handle(raw) })
 }
 
+// Chromium's installer grants these capabilities access to its install files.
+const CHROMIUM_INSTALL_CAPABILITIES: [&str; 2] = [
+    "S-1-15-3-1024-3424233489-972189580-2057154623-747635277-1604371224-316187997-3786583170-1043257646",
+    "S-1-15-3-1024-2302894289-466761758-1166120688-1039016420-2430351297-4240214049-4028510897-3317428798",
+];
+
 struct OwnerSecurity(PSECURITY_DESCRIPTOR);
 
 impl OwnerSecurity {
     fn new() -> io::Result<Self> {
+        Self::with_runtime_readers(&[])
+    }
+
+    fn with_runtime_readers(readers: &[&str]) -> io::Result<Self> {
         unsafe {
             let mut token = null_mut();
             if OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &mut token) == 0 {
@@ -385,7 +398,12 @@ impl OwnerSecurity {
             let mut sddl: Vec<u16> = "D:P(A;OICI;FA;;;".encode_utf16().collect();
             sddl.extend_from_slice(std::slice::from_raw_parts(sid, len));
             LocalFree(sid.cast());
-            sddl.extend([')' as u16, 0]);
+            sddl.push(')' as u16);
+            for reader in readers {
+                // FRFX is FILE_GENERIC_READ | FILE_GENERIC_EXECUTE.
+                sddl.extend(format!("(A;OICI;FRFX;;;{reader})").encode_utf16());
+            }
+            sddl.push(0);
             let mut descriptor = null_mut();
             if ConvertStringSecurityDescriptorToSecurityDescriptorW(
                 sddl.as_ptr(),
@@ -422,6 +440,17 @@ struct Profile {
 }
 
 impl Profile {
+    fn create_runtime_directory(&self) -> io::Result<PathBuf> {
+        let path = self.path.join("runtime");
+        let name = wide(path.as_os_str())?;
+        let security = OwnerSecurity::with_runtime_readers(&CHROMIUM_INSTALL_CAPABILITIES)?;
+        let attributes = security.non_inheritable_attributes();
+        if unsafe { CreateDirectoryW(name.as_ptr(), &attributes) } == 0 {
+            return Err(io::Error::last_os_error());
+        }
+        Ok(path)
+    }
+
     fn new(security: &OwnerSecurity) -> io::Result<Self> {
         const FILE_PERSISTENT_ACLS: u32 = 8;
         let root = super::native_windows::local_app_data()?;

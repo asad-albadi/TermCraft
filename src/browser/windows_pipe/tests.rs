@@ -371,6 +371,58 @@ fn browser_profile_has_a_protected_private_acl() {
 }
 
 #[test]
+fn browser_runtime_inherits_only_chromium_install_read_access() {
+    const ACCESS_ALLOWED_ACE_TYPE: u8 = 0;
+    let owner = OwnerSecurity::new().unwrap();
+    let profile = Profile::new(&owner).unwrap();
+    let runtime = profile.create_runtime_directory().unwrap();
+    let image = runtime.join("fixture.dll");
+    std::fs::write(&image, b"fixture").unwrap();
+    let private = profile.path.join("settings");
+    std::fs::write(&private, b"fixture").unwrap();
+
+    for (path, count) in [(&runtime, 3), (&image, 3), (&private, 1)] {
+        let name = wide(path.as_os_str()).unwrap();
+        unsafe {
+            let mut acl = null_mut();
+            let mut descriptor = null_mut();
+            assert_eq!(
+                GetNamedSecurityInfoW(
+                    name.as_ptr(),
+                    SE_FILE_OBJECT,
+                    DACL_SECURITY_INFORMATION,
+                    null_mut(),
+                    null_mut(),
+                    &mut acl,
+                    null_mut(),
+                    &mut descriptor,
+                ),
+                ERROR_SUCCESS
+            );
+            let _descriptor = OwnerSecurity(descriptor);
+            assert!(!acl.is_null());
+            assert_eq!((*acl).AceCount, count);
+            if count == 1 {
+                continue;
+            }
+            for (index, capability) in CHROMIUM_INSTALL_CAPABILITIES.iter().enumerate() {
+                let mut actual = null_mut();
+                assert_ne!(GetAce(acl, index as u32 + 1, &mut actual), 0);
+                let ace = &*actual.cast::<ACCESS_ALLOWED_ACE>();
+                assert_eq!(ace.Header.AceType, ACCESS_ALLOWED_ACE_TYPE);
+                assert_eq!(ace.Mask, FILE_GENERIC_READ | FILE_GENERIC_EXECUTE);
+                let sid = wide(OsStr::new(capability)).unwrap();
+                let mut expected = null_mut();
+                assert_ne!(ConvertStringSidToSidW(sid.as_ptr(), &mut expected), 0);
+                let equal = EqualSid((&raw const ace.SidStart).cast_mut().cast(), expected);
+                LocalFree(expected.cast());
+                assert_ne!(equal, 0);
+            }
+        }
+    }
+}
+
+#[test]
 fn browser_profile_recovers_when_a_runtime_file_share_lock_clears() {
     use std::os::windows::fs::OpenOptionsExt;
 
