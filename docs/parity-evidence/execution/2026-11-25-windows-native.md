@@ -172,6 +172,14 @@
   Win32-OpenSSH 9.5p2 and the publisher's isolated 10.4p1 preview both
   reported no xauth data despite a direct xauth lookup succeeding. Neither
   passed authenticated forwarding in this fixture.
+- The Windows XDMCP profile now accepts a single keyboard layout from the
+  verified private XKB catalog and a numbered Windows monitor in fullscreen
+  mode. The owned Direct fixture selected German, observed `z` at the
+  X keycode for the top-row Y/Z key, and verified the X screen dimensions
+  matched the first monitor's Win32 work area. The fullscreen path selects
+  GDI and does not request a hardware display mode change. Cross-monitor
+  focus, hotplug and native presentation still need the corresponding
+  hardware and an unlocked desktop.
 - `cargo +1.96.1 test --locked --test windows_conpty` passed both tests.
   The native child wrote the main console, entered the alternate buffer,
   accepted input and received a resize from 80 × 25 to 100 × 32. TermCraft's

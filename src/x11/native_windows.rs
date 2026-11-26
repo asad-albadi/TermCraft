@@ -5,6 +5,7 @@ use super::{
     XDisplayMode, XServerLease, XServerOptions,
     native_artifact::{VerifiedSnapshot, protect_directory},
     native_policy, native_transport,
+    xdmcp::windows_monitor,
 };
 use std::{
     ffi::OsString,
@@ -29,15 +30,12 @@ pub(super) fn start(
     if options.artifact_id != native_policy::WINDOWS_ARTIFACT {
         return Err("Unsupported packaged Windows X server artifact".into());
     }
-    if options.monitor.is_some() {
-        return Err(
-            "Explicit monitor selection is not yet qualified for the private Windows X server"
-                .into(),
-        );
-    }
+    let fullscreen = options.display_mode == XDisplayMode::Fullscreen;
+    let monitor = windows_monitor(options.monitor.as_deref(), fullscreen)?;
     let pin = native_policy::windows_pin()?;
     let request = DisplayRequest {
-        fullscreen: options.display_mode == XDisplayMode::Fullscreen,
+        fullscreen,
+        screen: monitor.map(|monitor| format!("@{monitor}")),
         ..DisplayRequest::local()
     };
     launch(root, request, flag, pin)
@@ -61,6 +59,9 @@ struct DisplayRequest {
     address: Ipv4Addr,
     display: Option<u16>,
     fullscreen: bool,
+    screen: Option<String>,
+    #[cfg(target_arch = "x86_64")]
+    keyboard: String,
     extra: Vec<OsString>,
 }
 
@@ -70,6 +71,9 @@ impl DisplayRequest {
             address: Ipv4Addr::LOCALHOST,
             display: None,
             fullscreen: false,
+            screen: None,
+            #[cfg(target_arch = "x86_64")]
+            keyboard: String::new(),
             extra: Vec::new(),
         }
     }
@@ -77,6 +81,7 @@ impl DisplayRequest {
     #[cfg(target_arch = "x86_64")]
     fn xdmcp(config: &XdmcpConfig, width: u32, height: u32) -> Result<Self, String> {
         let (manager, address) = windows_network(config, width, height)?;
+        let monitor = windows_monitor(config.monitor.as_deref(), config.fullscreen)?;
         let query = if config.mode == QueryMode::Indirect {
             "-indirect"
         } else {
@@ -86,10 +91,12 @@ impl DisplayRequest {
             address,
             display: config.display,
             fullscreen: config.fullscreen,
+            screen: Some(monitor.map_or_else(
+                || format!("{width}x{height}"),
+                |monitor| format!("@{monitor}"),
+            )),
+            keyboard: config.keyboard.clone(),
             extra: vec![
-                "-screen".into(),
-                "0".into(),
-                format!("{width}x{height}").into(),
                 "-from".into(),
                 address.to_string().into(),
                 "-port".into(),
@@ -156,7 +163,31 @@ fn launch(
     arguments.push("-logfile".into());
     arguments.push(runtime.path().join("server.log").into_os_string());
     if request.fullscreen {
-        arguments.push("-fullscreen".into());
+        // Shadow GDI displays a fullscreen window without changing the host
+        // monitor's display mode through exclusive DirectDraw.
+        arguments.extend(["-fullscreen".into(), "-engine".into(), "1".into()]);
+    }
+    if let Some(screen) = request.screen {
+        arguments.extend(["-screen".into(), "0".into(), screen.into()]);
+    }
+    #[cfg(target_arch = "x86_64")]
+    if !request.keyboard.is_empty() {
+        let catalog = std::fs::read_to_string(image.root().join("xkbdata/rules/base.lst"))
+            .map_err(|error| {
+                format!("Cannot read the private Windows XKB layout catalog: {error}")
+            })?;
+        if !super::xdmcp::registered_layout(&catalog, &request.keyboard) {
+            return Err(format!(
+                "XKB keyboard layout '{}' is absent from the private Windows XKB catalog",
+                request.keyboard
+            ));
+        }
+        arguments.extend([
+            "-xkbrules".into(),
+            "base".into(),
+            "-xkblayout".into(),
+            request.keyboard.into(),
+        ]);
     }
     arguments.extend(request.extra);
     let mut environment = vec![
@@ -493,7 +524,25 @@ mod candidate_qualification {
     #[cfg(target_arch = "x86_64")]
     #[ignore = "requires the private Windows XDMCP candidate and its review inventory"]
     fn private_xdmcp_binds_only_the_requested_interface_and_accepts_the_manager() {
-        use std::net::UdpSocket;
+        use std::net::{TcpStream, UdpSocket};
+        use windows_sys::{
+            Win32::{
+                Foundation::{LPARAM, RECT},
+                Graphics::Gdi::{EnumDisplayMonitors, GetMonitorInfoW, HDC, HMONITOR, MONITORINFO},
+            },
+            core::BOOL,
+        };
+        use x11rb::rust_connection::{DefaultStream, RustConnection};
+
+        unsafe extern "system" fn first_monitor(
+            monitor: HMONITOR,
+            _dc: HDC,
+            _rect: *mut RECT,
+            data: LPARAM,
+        ) -> BOOL {
+            unsafe { GetMonitorInfoW(monitor, data as *mut MONITORINFO) };
+            0
+        }
 
         fn receive(peer: &UdpSocket, opcode: u8) -> (Vec<u8>, SocketAddr) {
             let mut packet = [0; 1024];
@@ -515,12 +564,29 @@ mod candidate_qualification {
         }
 
         let interface = Ipv4Addr::new(127, 0, 0, 2);
+        let mut monitor = MONITORINFO {
+            cbSize: size_of::<MONITORINFO>() as u32,
+            ..Default::default()
+        };
+        unsafe {
+            EnumDisplayMonitors(
+                std::ptr::null_mut(),
+                std::ptr::null(),
+                Some(first_monitor),
+                std::ptr::addr_of_mut!(monitor) as LPARAM,
+            );
+        }
+        let work_area = monitor.rcWork;
+        assert!(work_area.right > work_area.left && work_area.bottom > work_area.top);
         let peer = UdpSocket::bind((interface, 0)).unwrap();
         peer.set_read_timeout(Some(Duration::from_secs(5))).unwrap();
         let config = XdmcpConfig {
             selected_endpoint: Some(peer.local_addr().unwrap()),
             advertise_address: Some(interface),
             allow_network_listener: true,
+            keyboard: "de".into(),
+            fullscreen: true,
+            monitor: Some("1".into()),
             ..Default::default()
         };
         let lease = fixture_lease(DisplayRequest::xdmcp(&config, 800, 600).unwrap());
@@ -547,7 +613,30 @@ mod candidate_qualification {
         assert_eq!(&manage[..4], &17u32.to_be_bytes());
         assert_eq!(&manage[4..6], &display.to_be_bytes());
         assert!(!native_transport::setup_owned_tcp(address, None, &flag).unwrap());
-        assert!(native_transport::setup_owned_tcp(address, Some(&cookie), &flag).unwrap());
+        let stream = TcpStream::connect_timeout(&address, Duration::from_secs(3)).unwrap();
+        stream
+            .set_read_timeout(Some(Duration::from_secs(3)))
+            .unwrap();
+        let (stream, _) = DefaultStream::from_tcp_stream(stream).unwrap();
+        let x = RustConnection::connect_to_stream_with_auth_info(
+            stream,
+            0,
+            b"MIT-MAGIC-COOKIE-1".to_vec(),
+            cookie.to_vec(),
+        )
+        .unwrap();
+        let screen = &x.setup().roots[0];
+        assert_eq!(
+            i32::from(screen.width_in_pixels),
+            work_area.right - work_area.left
+        );
+        assert_eq!(
+            i32::from(screen.height_in_pixels),
+            work_area.bottom - work_area.top
+        );
+        // VcXsrv's PC keycode 29 is the top-row Y/Z key.
+        let mapping = x.get_keyboard_mapping(29, 1).unwrap().reply().unwrap();
+        assert_eq!(mapping.keysyms.first(), Some(&u32::from(b'z')));
         lease.stop_owned().unwrap();
         assert!(!owns_listener(pid, address).unwrap());
     }

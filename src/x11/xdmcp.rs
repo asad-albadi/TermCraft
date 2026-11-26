@@ -293,7 +293,7 @@ impl Drop for Discovery {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", all(windows, target_arch = "x86_64")))]
 fn valid_layout_id(id: &str) -> bool {
     (1..=32).contains(&id.len())
         && id.as_bytes()[0].is_ascii_lowercase()
@@ -302,7 +302,7 @@ fn valid_layout_id(id: &str) -> bool {
             .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit())
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", all(windows, target_arch = "x86_64")))]
 pub(super) fn registered_layout(catalog: &str, id: &str) -> bool {
     catalog
         .lines()
@@ -331,11 +331,9 @@ pub(super) fn windows_options(config: &XdmcpConfig, width: u32, height: u32) -> 
     {
         return Err("Choose display 1–59535 and desktop dimensions 200–8192".into());
     }
-    if config.monitor.is_some() {
-        return Err("Monitor selection is unavailable for the private Windows XDMCP engine".into());
-    }
-    if !config.keyboard.is_empty() {
-        return Err("Session keyboard layouts are unavailable for the private Windows XDMCP engine; clear the layout to inherit the host keyboard".into());
+    windows_monitor(config.monitor.as_deref(), config.fullscreen)?;
+    if !config.keyboard.is_empty() && !valid_layout_id(&config.keyboard) {
+        return Err("Enter one XKB keyboard layout ID (for example us, de, or fr), or clear it to inherit the host keyboard".into());
     }
     if config.clipboard != ClipboardPolicy::Disabled {
         return Err("Clipboard sharing is unavailable for the private Windows XDMCP engine".into());
@@ -346,6 +344,25 @@ pub(super) fn windows_options(config: &XdmcpConfig, width: u32, height: u32) -> 
         return Err("Choose a local unicast IPv4 address to advertise to the XDMCP manager".into());
     }
     Ok(())
+}
+
+#[cfg(windows)]
+pub(super) fn windows_monitor(
+    monitor: Option<&str>,
+    fullscreen: bool,
+) -> Result<Option<u16>, String> {
+    let Some(monitor) = monitor else {
+        return Ok(None);
+    };
+    if !fullscreen {
+        return Err("Monitor selection requires full screen mode".into());
+    }
+    monitor
+        .parse::<u16>()
+        .ok()
+        .filter(|value| *value > 0 && monitor.bytes().all(|byte| byte.is_ascii_digit()))
+        .map(Some)
+        .ok_or_else(|| "Choose a Windows monitor number starting at 1".into())
 }
 
 /// Validate the resolved endpoint. The provider must reserve the returned local address before launch.
@@ -571,13 +588,19 @@ mod tests {
                 .unwrap_err()
                 .contains("Monitor")
         );
+        config.monitor = Some("1".into());
+        assert!(windows_network(&config, 800, 600).is_err());
+        config.fullscreen = true;
+        assert!(windows_network(&config, 800, 600).is_ok());
         config.monitor = None;
-        config.keyboard = "us".into();
+        config.keyboard = "de,us".into();
         assert!(
             windows_network(&config, 800, 600)
                 .unwrap_err()
                 .contains("keyboard")
         );
+        config.keyboard = "de".into();
+        assert!(windows_network(&config, 800, 600).is_ok());
         config.keyboard.clear();
         config.clipboard = ClipboardPolicy::Bidirectional;
         assert!(

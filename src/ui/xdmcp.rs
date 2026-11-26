@@ -319,8 +319,13 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     ui.horizontal(|ui| {
         ui.label("Monitor output");
         let mut monitor = s.xdmcp_options.monitor.clone().unwrap_or_default();
+        let monitor_hint = if cfg!(all(windows, target_arch = "x86_64")) {
+            "Default; e.g. 1"
+        } else {
+            "Default; e.g. HDMI-1"
+        };
         if ui
-            .add(TextEdit::singleline(&mut monitor).hint_text("Default; e.g. HDMI-1"))
+            .add(TextEdit::singleline(&mut monitor).hint_text(monitor_hint))
             .changed()
         {
             s.xdmcp_options.monitor = if monitor.is_empty() {
