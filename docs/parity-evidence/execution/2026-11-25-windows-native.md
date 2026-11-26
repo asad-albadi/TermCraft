@@ -217,6 +217,32 @@
   token. An elevated fixture child provided the required station access.
   On the alternate loopback address the original candidate timed out while
   its clipboard worker attempted to connect to the hard-coded `127.0.0.1`.
+- At `178ab9a`, the clipboard worker used the configured listener address.
+  The rebuilt exact candidate SHA-256 was
+  `c43b5165f3e1d3472b16addf27c70cfeabbab19103ae4f4c0123f8ad9555bd14`.
+  Its 5,131-file review inventory SHA-256 was
+  `421cf4177fbc44bf834e05801796754614a8131db7b06ab4b5692e908e7236be`.
+  The isolated Windows replay `tests/windows_x_clipboard.py --address 127.0.0.2 --xdmcp`
+  reached MANAGE, rejected anonymous X11, and transferred exact Unicode
+  text both ways after manager-cookie authentication. The listener closed
+  with its job. Binary-cookie, Direct and Indirect chooser tests also passed
+  with the same inventory. Repeated authenticated capability probes returned
+  GLX 1.4, RANDR 1.6 and actual Composite 0.4 redirected pixels with the
+  2050 × 815 screen size preserved. An earlier concurrent graphics probe
+  exited before producing evidence. The repeat established the software
+  observation with runtime probe SHA-256
+  `5e3a524cb45c16760e97dd236498eacc1657c624746dab7f05026889043a992b`.
+- The native build now requests OpenSSL's `build_libs` target. The hosted
+  VS 2022 replay showed the upstream app/test targets competing for
+  `app.pdb` despite `/FS`. A fresh local build using the library-only target
+  produced and inventoried the complete Windows X dependency closure.
+  [Hosted failing build](https://github.com/asad-albadi/TermCraft/actions/runs/45849624730/job/140012285137)
+- Windows release packaging accepts a private X runtime only from the same
+  exact repository file inventory compiled into the shipped app. Synthetic
+  packaging tests showed exact archive staging, rejection of added or altered
+  files, Windows aliases/reparse points and prebuilt app requests. The real
+  candidate was rejected before build under the repository's empty shipping
+  inventory. The installed gate remains closed pending exact artifact approval.
 - The clean candidate's three app-local Microsoft VC143 CRT files came
   from the installed x64 `Microsoft.VC143.CRT` redistribution directory.
   All three matched the hashes, file version and valid Authenticode
@@ -274,6 +300,14 @@
   teardown. Control and clipboard were disabled for this replay. Windows
   providers for an individual window, a secondary monitor and a virtual
   display are still absent.
+- The opt-in hosted native input replay passed at `0e95220`. It used only
+  an owned edit window on a disposable GitHub-hosted Windows desktop,
+  checked foreground/focus/hit-testing before each synthetic input, and
+  observed the Unicode character and both mouse button transitions through
+  the native provider. The earlier attempt on a switched desktop returned
+  Win32 `ERROR_ACCESS_DENIED` from input. The successful replay used the
+  active hosted desktop and the same provider and input assertions.
+  [Hosted VNC input job](https://github.com/asad-albadi/TermCraft/actions/runs/45855316702/job/140032028905)
 
 ## Native build
 
@@ -548,6 +582,16 @@ Chrome for Testing archive above and reported five integration tests passed.
 It exercised Unicode input, resize and scrolling, TLS, proxy authentication
 and cancellation. The branch's Windows approval remains disabled while the
 source-built Chromium candidate is qualified.
+Two additional concurrent sessions passed and each removed its private
+runtime and profile. Observed broker tokens were medium integrity and
+renderer samples were at untrusted integrity inside jobs. The sampled
+processes reported zero for `TokenIsAppContainer`. A separate focused
+replay under competing builds timed out during startup. Diagnostics observed
+Win32 sharing violations during cleanup after job termination. A deterministic
+Windows file-share regression failed with the original timeout and passed
+after extending the bounded cleanup retry on the worker. Browser library
+tests then reported 21 passed and two ignored. One older synthetic profile
+remained after automatic review rejected a separate manual removal.
 
 The upstream Chromium tag `158.0.8127.88` resolved to
 `0cefb18236a23db1ebb6b2bc040fbbaf8cbe759e`. Its checked-out `DEPS` SHA-256

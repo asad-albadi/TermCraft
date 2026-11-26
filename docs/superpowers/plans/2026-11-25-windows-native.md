@@ -51,6 +51,7 @@
 - [x] Exercise native Direct and Indirect XDMCP to an isolated peer through MANAGE and cookie-authenticated X setup. Select the peer in the candidate's Win32 chooser for Indirect.
 - [x] Verify the owned Windows XDMCP listener on an explicit second loopback address and run authenticated Git for Windows X forwarding.
 - [x] Verify a German keyboard map, monitor 1 fullscreen geometry and authenticated software Composite pixel readback on the native candidate. Record live GLX and RANDR versions separately.
+- [x] Exchange Unicode text through the native clipboard in both directions on a private Windows window station and retain the alternate-address regression for the owned provider.
 - [ ] Follow the native README for the private build. Inventory runtime files, fonts, XKB, source and notices.
 - [ ] Exercise owned-job/PID cleanup, occupied-display refusal, cookie checks and readiness, then SSH forwarding, Direct/Indirect XDMCP, clipboard, keyboard and monitor/graphics workflows with appropriate peers. Record any unavailable extensions and dependencies.
 - [ ] Update `packaging/x11/native/source-contract.json` only after the exact staged output passes qualification and inventory review.
@@ -59,11 +60,13 @@
 
 - [ ] Run `workspace_layout`, `workspace_windows` and `rdp_options` integration tests as part of the root suite. On the actual desktop exercise ConPTY shells, full-screen program, Unicode/input, splits, detach/reattach, shortcuts, themes and 100/150/200 percent scaling.
 - [x] Exchange Unicode clipboard text in both directions through the packaged helper against the independent TLS/NLA endpoint.
+- [x] Exercise both mapped drive reads, writable creation, handle-relative rename and read-only refusal in a real xrdp desktop via the independently locked NLA release helper. Verify helper, FUSE and listener cleanup.
 - [ ] Execute RDP helper and applicable native component tests. Exercise clipboard, drive handles, admin/fullscreen and device redirection with a controlled RDP endpoint. Record software fixture results and physical-device observations independently.
 
 ### Task 5: Browser, services and credentials
 
 - [x] Replay installed Chromium compatibility against independent Windows loopback fixtures after fixing isolated startup and viewport/input handling.
+- [x] Stage the exact Chromium ZIP inventory and replay native browser sessions through a private compile-time test pin, including TLS, proxy, Unicode, resize and cleanup.
 - [x] Exercise add/list/remove with the standalone Pageant process and a synthetic key. Verify ownership and cleanup.
 - [x] Authenticate to native primary-display capture with view-only VNC, receive one raw pixel over loopback without recording it, then verify client and listener teardown.
 - [ ] Use `packaging/browser/stage-runtime.py` and `tests/browser_session.rs` to identify and test the bundled runtime. Run native profile isolation, sandbox, resize/input, cancellation and cleanup checks against a private peer.

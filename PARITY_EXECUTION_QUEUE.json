@@ -341,7 +341,7 @@
       ],
       "dependency": "",
       "remaining": "Reviewed native printer/smartcard, Linux RXCHAR/BREAK/ERR events and per-open statistics, Windows per-open statistics and bounded native serial owners are merged. Exact general POSIX COMMSTATUS/properties/modem events and opened-object rename/delete remain explicit platform/architecture limitations; native Windows/macOS/device/original qualification remains.",
-      "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; actual RDP native/admin/drive/device/clipboard/security/original interoperability remains unverified. Publication follow-up: hosted CI run45636600121 reports81helper tests passed/1failed in drive_allocation_is_released_on_last_remote_close_and_disconnect. Root cause unconfirmed; no green hosted CI claim.",
+      "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; Windows x64 passed independent Unicode clipboard and real release-helper NLA mapped-drive reads, writes, handle-relative rename and read-only refusal. Wider native admin, physical device, security and original interoperability remain open. Publication follow-up: hosted CI run45636600121 reports81helper tests passed/1failed in drive_allocation_is_released_on_last_remote_close_and_disconnect. Root cause unconfirmed; no green hosted CI claim.",
       "evidence": [
         "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/D02/providers/host-full.log",
@@ -433,7 +433,7 @@
         "F01"
       ],
       "dependency": "Qualified native Windows/macOS owned engines from X01 and interactive SSH/X authentication, clipboard and display workflows on those systems.",
-      "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. A real owned Windows candidate mapped a window through embedded SSH and separately authenticated through Git for Windows OpenSSH with private xauth. Win32-OpenSSH compatibility, Windows clipboard, native shipping and original qualification remain open.",
+      "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. A real owned Windows candidate mapped a window through embedded SSH and separately authenticated through Git for Windows OpenSSH with private xauth. Private Windows XDMCP clipboard passed on a separate loopback address. Microsoft Win32 OpenSSH compatibility, native shipping and original qualification remain open.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -466,7 +466,7 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS engines and original Personal26.6 workflow access. Linux genuine-package chooser/clipboard/keyboard/cancel checks already pass.",
-      "remaining": "Linux direct/indirect discovery, hostname, clipboard, keyboard and cleanup workflows are implemented and genuine-package qualified after the reviewed reset fix. Windows application source routes Direct and Indirect through the owned candidate. A controlled Windows peer completed MANAGE and proved binary cookie setup, one selected keyboard layout and first-monitor fullscreen geometry. Windows host clipboard, routed-network and release approval, native macOS and original comparison remain.",
+      "remaining": "Linux direct/indirect discovery, hostname, clipboard, keyboard and cleanup workflows are implemented and genuine-package qualified after the reviewed reset fix. Windows application source routes Direct and Indirect through the owned candidate. A controlled Windows peer completed MANAGE and proved binary cookie setup, one selected keyboard layout and first-monitor fullscreen geometry. Authenticated Windows Direct XDMCP exchanged Unicode clipboard on a private station at a separate loopback address. Routed-network and release approval, native macOS and original comparison remain.",
       "validation_remaining": "Genuine source22bb/full398d traced and untraced strict-auth chooser/clipboard/keyboard/cancel checks passed. The Windows development application and native candidate have separate approval-gate and protocol evidence. The full native Windows/macOS and original workflow matrices remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
