@@ -7,6 +7,7 @@ slices, relocated install names, bundled resources, and complete dependency
 closure. The private XQuartz builder additionally rejects `/opt/X11` and
 records `NATIVE-BUILD.json`.
 
-Source tests and the builder contract are not a compiled-artifact qualification.
-`macos_pin()` remains closed until both arm64 and x86_64 outputs have been
-produced, inspected, and exercised through the authenticated X11 lifecycle.
+`macos_pin()` approves the exact arm64 inventory for authenticated private
+windowed X11. Package staging and runtime startup both check hashes before
+using the staged tree. Distribution, the macOS 14 runtime replay, active
+graphics and XDMCP have open evidence requirements.

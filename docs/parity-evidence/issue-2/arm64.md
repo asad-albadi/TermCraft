@@ -2,8 +2,8 @@
 
 The host ran macOS 26.6.2 (25G83) on arm64 with macOS SDK 26.2 from Command
 Line Tools, Apple clang 17.0.0 (clang-1700.6.3.2), and Rust 1.96.1.
-The package was built with `MACOSX_DEPLOYMENT_TARGET=14.0`. The SDK and
-deployment setting establish a build target. macOS 14 runtime remains untested.
+The package was built with `MACOSX_DEPLOYMENT_TARGET=14.0`. The newer package
+below was also exercised on macOS 14.8.7.
 
 ## Core package
 
@@ -72,15 +72,92 @@ when recognizing symlinks. HTTP streams set bounded blocking I/O before
 sending responses. Bash 3.2 prompt hooks encode signed bytes as unsigned
 octets. Tests still cover byte filenames on filesystems that accept them.
 
+## Arm64 package with private XQuartz
+
+Source commit `c7dc7b7331c5743f63f8f285f9110aefaebc7e31` includes current
+`main` at `cf7ee4d2f1373f18302a0f083bf3d4a3860b42f6`. The same SDK,
+compiler, Rust and lockfile hashes listed above were used.
+
+| Item | SHA-256 |
+| --- | --- |
+| `TermCraft-0.1.0-macos-aarch64-xquartz.zip` | `2241340fdf4d3d2aca0a8bdb3bc8bb7d3e1c57fb155c841c568de7b6a74edea8` |
+| Frozen source inputs | `5e11caa8f31e3db7dc5da86502a6be0401481346a573ad13c0c7ddb4e96afa2c` |
+| Rust GUI | `2adc3642f12e08c8a30f854c903afb8e5aa561acfd04f126951be7e8168de9dc` |
+| RDP helper | `467908158f4adeba4ffd7f9f50ebcad2ec4ba6f0e6ec760a0822588ef83c6ffa` |
+| Objective-C launcher | `9522fbc2b3f2007b32ff7f6d55982ce036643b1941f3efacbc294abd32c0c792` |
+| Compiled XQuartz inventory | `0fd1bb3ffd162962691d4b7c0b6283b53e448b6a50a51c502c86074b5317f171` |
+
+`MACOSX_DEPLOYMENT_TARGET=14.0 python3 scripts/package-release.py --output DIST --build-root BUILD --xquartz-runtime CANDIDATE`
+built the GUI and independently locked RDP helper. The packager checked every
+file against the compiled inventory and verified the staged XQuartz bundle and
+Mach-O signatures. The app contains 1,800 hashed payload files, including 818
+private XQuartz files. `xcrun vtool -show-build` reported 14.0 for the GUI,
+helper and launcher. All 14 XQuartz Mach-O outputs report the same floor.
+`python3 scripts/package-check-startup.py ARCHIVE --evidence DIRECTORY`
+verified the relocated archive with an empty PATH, a 1360×880 GUI frame, a
+live manifest-matching RDP helper and receipt of its initial RDP negotiation.
+
+The packaged production XQuartz owner and managed SSH/X tests both passed
+with a 256-file-descriptor limit. The previous snapshot held 818 read handles
+and failed with `EMFILE` at Finder's limit. The Windows snapshot keeps its
+write/delete-denying handles. The Unix snapshot releases each file handle after
+verification and checks for cancellation between files. The low-limit replay
+observed pre-cancellation, a new process group and cleanup of the socket,
+authority, process and snapshot. The app's probe returned 1920×1050, GLX 1.4
+and RandR 1.5. Core X11 pixmap readback returned the drawn white and black
+pixels, and two authenticated X11 clients exchanged a UTF-8 selection.
+The SSH fixture negotiated X11 setup and answered GetInputFocus over the same
+authenticated login. Host clipboard synchronization, GLX readback and RandR
+mode transitions remain unqualified.
+
+A fresh, host-only Tart 2.42.0 guest ran Apple Silicon macOS 14.8.7 (23J520).
+The guest image was `ghcr.io/cirruslabs/macos-sonoma-vanilla` at
+`sha256:7ea0d508380b63f13c94ee72cd22ca3dd9ec5cdf4a5ae14b2ae2ce6a6603fba6`.
+The ZIP matched the digest above before extraction. The same startup verifier
+checked every file and observed a 1024×653 GUI frame plus live loopback RDP
+negotiation with a manifest-matching helper. The 256-descriptor XQuartz
+software probe read the expected pixels from a 1024×744 X display and
+transferred the private UTF-8 selection. The wire probe rejected anonymous
+and incorrect-cookie setup, accepted the owned cookie and verified cleanup.
+This covers runtime startup on the tested macOS 14 patch level, with physical
+devices and permission-mediated workflows tracked separately.
+
+The arm64 rerun used `cargo +1.96.1 test --locked --all-targets --no-fail-fast`
+with four test threads. It reported 911 passed, zero failed and 11 ignored
+across 74 targets. The extra ignored case is the managed SSH/X test, which
+passed separately against the verified package. The locked RDP helper passed
+27 tests. With installed Fish 4.9.3, `shell_directory --include-ignored`
+passed nine tests across Bash, Zsh and Fish. Installed Chrome and the native
+terminal-program runs passed four and three tests respectively.
+
+The Linux RDP failure
+`devices_tests::drive_allocation_is_released_on_last_remote_close_and_disconnect`
+was reproduced at `devices_tests.rs:589` on the original base and current
+`main`, each with 81 passes and the same leaked-allocation assertion. The PR
+run matched both baselines. [Original base run](https://github.com/asad-albadi/TermCraft/actions/runs/45638076373)
+[Current main run](https://github.com/asad-albadi/TermCraft/actions/runs/45745650311)
+[PR branch run](https://github.com/asad-albadi/TermCraft/actions/runs/45747731405)
+
+Windows x64 GNU cross-checking found a PR-added Unix mode helper compiled
+outside its platform guard. The checked raw-mode conversion now runs only on
+Unix and preserves type bits. `cargo +1.96.1 check --locked --target x86_64-pc-windows-gnu --lib --bins`
+passed. Adding `--all-targets` finds the same existing test-only import
+error in `src/ui/layout.rs:255` on the branch and a clean archive of current
+`main`. That test imports Unix-only fixture functions on Windows.
+
 ## Open qualification
 
-The approved core package scope and installed-browser observations are
-separate from a distributable bundled Chromium payload. Native XQuartz
-candidate details are in [the private-engine ledger](xquartz-build.md).
-The combined XQuartz trust gate remains closed. Intel builds and packages,
-actual Finder Services activation and a version-changing upgrade, Direct and
-Indirect XDMCP on native endpoints, and installed clean-machine checks on
-macOS 14 remain open. Physical printer, smart-card and serial devices, real
-adapter transitions, external displays/GPU rendering, and Screen Recording
-and Accessibility consent, denial and revocation require additional fixtures
-or operator evidence.
+The remaining Apple Silicon software work includes bundled Chromium with a
+pinned native source and signed resource tree, Direct and Indirect XDMCP with
+a native session-owned network and authentication path, and full Finder Services
+activation. The AppKit provider passed literal folder and mixed-selection
+checks. The programmatic Services invocation returned false and actual Finder
+menu activation remains unverified. XQuartz deliberately disables upstream
+host pasteboard sync, so X11 selection tests cover only the private display.
+Public distribution approval and release automation replay remain open.
+
+Run external-display/Retina scaling and GPU workflows on physical hardware.
+Exercise physical CUPS printer, PCSC smart-card and serial devices, and real
+adapter transitions. Screen Recording and Accessibility still need
+human-operated grant, denial and revocation, including view-only/control and
+held-input release on Stop.

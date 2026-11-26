@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-11-25-macos-issue-2-design.md`
 
+**Current scope:** Apple Silicon only. See [native arm64 evidence](../../parity-evidence/issue-2/arm64.md) for software and interactive checks that remain open.
+
 ## Global Constraints
 
 - Do not mark native macOS support complete from Linux tests, source checks, cross-compilation, or synthetic GUI evidence.
@@ -72,13 +74,13 @@
 - Create: `tests/xquartz_macos_contract.py`
 - Create: `docs/parity-evidence/issue-2/xquartz-build.md`
 
-**Interfaces:** The builder outputs a fresh staged `macos-universal-private1` tree; the Rust provider consumes only its pinned executable, resources, dependencies, and authority-safe inherited socket behavior.
+**Interfaces:** The packager stages the exact approved tree in `Contents/Resources/x11/macos-arm64-private1`. The Rust provider consumes pinned executable, resource and dependency bytes and passes an authenticated inherited socket to the engine.
 
 - [x] **Step 1:** Add failing offline contract tests for source checksum validation, required configure flags, no `meson install`, no `/opt/X11`, private bundle-id prefix, relocation, and complete arm64/x86_64 closure.
 - [x] **Step 2:** Run them against the current script and confirm the missing protections/output contract.
 - [x] **Step 3:** Implement the smallest script and manifest changes needed to prepare, relocate, sign, inventory, and hash the staged tree without executing upstream installers.
-- [x] **Step 4:** On the available native host, run the bounded contract checks and preserve unavailable native-builder/Intel evidence as open.
-- [ ] **Step 5:** Enable `macos_pin()` only when the exact staged artifact satisfies the acceptance contract; otherwise retain the gate and record the reason.
+- [x] **Step 4:** Build and run the relocated pinned Apple Silicon engine under the native process owner.
+- [x] **Step 5:** Enable `macos_pin()` for the exact authenticated windowed arm64 inventory. Track active graphics, clipboard and XDMCP separately.
 - [x] **Step 6:** Commit the private macOS XQuartz packaging contract (`a92bdd9`, `1aecbd1`, `c357238`, `43d8850`).
 
 ### Task 4: `.app` Packaging and Desktop Lifecycle

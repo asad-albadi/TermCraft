@@ -19,7 +19,7 @@ The following issue #2 acceptance evidence is still open:
 - real capture and input control using the permission-controlled desktop;
 - bundled Chromium and its resource/signature and sandbox qualification;
 - CUPS printer, PCSC smart-card, and physical serial-device workflows;
-- Intel and optional macOS native dependency delivery.
+- Verification of optional macOS native dependency delivery in release automation.
 
 The focused source tests establish bounded ownership and error contracts only;
 they do not qualify those external providers.

@@ -44,13 +44,16 @@ same manifest digest, executed its immutable snapshot, checked pre-cancel,
 verified the dedicated process group, and observed the child, authority,
 socket and snapshot gone after dropping the lease.
 
-Replay with `python3 packaging/x11/native/probe-macos.py CANDIDATE EVIDENCE`.
-For the Rust test, stage the candidate at
-`$TERMCRAFT_TEST_XQUARTZ_ROOT/x11/macos-universal-private1`, set
-`TERMCRAFT_TEST_XQUARTZ_MANIFEST_SHA256` to the digest above, then run
-`cargo +1.96.1 test --locked --lib local_candidate_uses_verified_snapshot_and_cleans_up -- --ignored`.
+Replay the wire checks with
+`python3 packaging/x11/native/probe-macos.py CANDIDATE EVIDENCE`.
+For the production gate, build the package with
+`scripts/package-release.py --xquartz-runtime CANDIDATE`, relocate the app
+and set `TERMCRAFT_TEST_XQUARTZ_ROOT` to its `Contents/Resources` directory.
+Run `cargo +1.96.1 test --locked --lib local_candidate_uses_verified_snapshot_and_cleans_up -- --ignored --nocapture`
+and `cargo +1.96.1 test --locked --test ssh_authentication managed_ssh_forwards_to_packaged_xquartz -- --ignored`.
 
-The combined `macos_pin()` gate remains closed. Intel, runtime confirmation
-on the minimum OS, redistribution notice review, native SSH/X and XDMCP,
-clipboard and actual graphics are open. Advertised extensions do not establish
-rendering or monitor behavior.
+`macos_pin()` now approves the exact private windowed arm64 inventory
+`0fd1bb3ffd162962691d4b7c0b6283b53e448b6a50a51c502c86074b5317f171`.
+The source-built runtime does not start or register the user's XQuartz.
+Minimum-OS confirmation, release distribution, XDMCP, native clipboard
+interoperability and measured graphics remain open.

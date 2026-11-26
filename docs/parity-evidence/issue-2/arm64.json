@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "partial",
-  "source_revision": "ebe40a693d8740329b33f33309c0a422cec6cb9d",
+  "source_revision": "c7dc7b7331c5743f63f8f285f9110aefaebc7e31",
   "host": {"os": "macOS 26.6.2 (25G83)", "architecture": "arm64"},
   "target": {
     "architecture": "arm64",
@@ -11,22 +11,27 @@
   },
   "lockfiles": ["Cargo.lock", "engines/rdp/Cargo.lock", "docs/parity-evidence/rdp-prototype/Cargo.lock"],
   "artifacts": [
-    {"path": "TermCraft-0.1.0-macos-aarch64.zip", "sha256": "0d760eb3df93c7ddc255a16d2885925e4a02f704f9d0b196762a3b595322ba2b"},
+    {"path": "TermCraft-0.1.0-macos-aarch64.zip", "sha256": "0d760eb3df93c7ddc255a16d2885925e4a02f704f9d0b196762a3b595322ba2b", "source_revision": "ebe40a693d8740329b33f33309c0a422cec6cb9d"},
+    {"path": "TermCraft-0.1.0-macos-aarch64-xquartz.zip", "sha256": "2241340fdf4d3d2aca0a8bdb3bc8bb7d3e1c57fb155c841c568de7b6a74edea8"},
+    {"path": "TermCraft-0.1.1-macos-aarch64-xquartz.zip", "sha256": "3f114af3ce928a1100617e4cf61b7cc6ceb260d9db05c73e3563ffb910a270b3", "source_revision": "fe4fa0c115ea56a4469ebcf59a26d201791d27d3", "use": "version upgrade fixture"},
     {"path": "TermCraft-XQuartz-private-arm64.zip", "sha256": "8809e99e1df82b7ebba8b72587c932bb2822d6089edc98dbbc839ec74078c83c"}
   ],
   "workflows": [
-    {"name": "Native workspace all-target suite", "result": "passed", "passed": 911, "failed": 0, "ignored": 10},
+    {"name": "Native workspace all-target suite", "result": "passed", "passed": 911, "failed": 0, "ignored": 11},
     {"name": "Native locked RDP helper", "result": "passed", "passed": 27, "failed": 0, "ignored": 0},
     {"name": "Installed Chrome native integration", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
     {"name": "PCSC transport software fixtures and native file/device component", "result": "passed", "passed": 24, "failed": 0, "ignored": 0},
-    {"name": "Relocated core application startup and packaged RDP helper identity", "result": "passed"},
-    {"name": "Native registration, same-version replacement, relocation, file and URL events", "result": "passed"},
-    {"name": "Private XQuartz cookie and Rust owner lifecycle", "result": "passed"}
+    {"name": "Relocated application startup and live packaged RDP helper on macOS 26.6.2 and 14.8.7", "result": "passed"},
+    {"name": "Native registration, same-version replacement, 0.1.0 to 0.1.1 upgrade, relocation, removal, file and URL events", "result": "passed"},
+    {"name": "Private XQuartz cookie, owned process lifecycle and SSH/X under the 256 descriptor limit", "result": "passed"},
+    {"name": "Core X11 pixmap readback and private-display UTF-8 clipboard on macOS 26.6.2 and 14.8.7", "result": "passed"},
+    {"name": "Bash, Zsh and Fish integration", "result": "passed", "passed": 9, "failed": 0, "ignored": 0},
+    {"name": "Native terminal programs", "result": "passed", "passed": 3, "failed": 0, "ignored": 0}
   ],
   "unavailable": [
-    {"requirement": "Intel and macOS 14 runtime", "reason": "The measured host was arm64 on macOS 26.6.2."},
-    {"requirement": "Bundled Chromium and combined approved XQuartz payload", "reason": "Installed Chrome was exercised. The arm64 XQuartz candidate has an unapproved local inventory; Intel, complete native workflows and redistribution review remain open."},
-    {"requirement": "Native SSH/X, Direct/Indirect XDMCP, Finder Services and version-changing upgrade", "reason": "Local probes covered the engine owner, explicit file and URL events, and replacement of builds with the same version. These workflows need separate evidence."},
+    {"requirement": "Bundled Chromium", "reason": "Installed Chrome passed. The native bundled provider needs an audited source-built and signed resource inventory."},
+    {"requirement": "Direct/Indirect XDMCP, active graphics, host clipboard and Finder Services menu", "reason": "XQuartz windowed authentication and SSH/X passed; XDMCP requires a native session engine, and full graphics and host clipboard need separate observations. The AppKit service handler passed its tests, while NSPerformService returned false from the CLI harness."},
+    {"requirement": "Public distribution approval", "reason": "Exact XQuartz bytes are approved for the windowed runtime. Release workflow distribution, signing policy and final approval are open."},
     {"requirement": "GPU, external displays, devices, adapter transitions and TCC permissions", "reason": "These require physical fixtures or a human-operated permission session."}
   ]
 }
