@@ -1,6 +1,17 @@
 # Private native X server candidates
 
-These source-backed providers remain **unqualified and unavailable**. There is no approved private executable checksum. `native_policy.rs` fails before a process or authority file is created. A local JSON file cannot change that trust decision. Upstream native binaries were downloaded and hashed, then examined with LLVM tools without executing them. Full input URLs, source/archive/patch checksums, native toolchain requirements and missing evidence are in `source-contract.json`; actual PE and Mach-O imports are in `upstream-dependencies.json`. The source archives remain in the private work area for offline builds. Licenses copied from the exact sources are retained in `licenses/`; their presence does not close the documented MSVC and complete XQuartz dependency redistribution gaps.
+Apple Silicon macOS can run the exact private windowed XQuartz tree pinned in
+`macos-arm64.sha256`. The hash check covers the executable, dylibs, fonts, XKB,
+bundle resources and corresponding source. The private Windows runtime
+remains unavailable. A local JSON file cannot change these compiled trust
+decisions. `source-contract.json` tracks inputs, toolchains and open evidence.
+`upstream-dependencies.json` records the original PE and Mach-O inspection.
+
+Pass the verified candidate directory to the macOS packager using
+`scripts/package-release.py --xquartz-runtime CANDIDATE --output DIST`. The
+packager copies only pinned files and verifies the staged signatures. A local
+package can exercise the runtime without changing the user's XQuartz
+installation. Public distribution approval is tracked separately.
 
 Prepare either source tree with the pinned **local** source archive:
 
@@ -38,4 +49,7 @@ Relocate every non-system Mach-O dependency and install name to app-relative `@l
 
 The direct-entry source patch bypasses Mach registration/startx/shell startup, requires our inherited listening AF_UNIX descriptor, disables all engine-created listeners/locks, and adopts it with `ListenOnOpenFD(fd, 0)` so Xauthority remains mandatory. The stock handoff uses `noxauth=1` and is unsuitable. XKB output stays inside the private runtime; default plist lookup is app-relative and authentication overrides are volatile Objective-C `NSUserDefaults` values. The provider starts a new owned process group; macOS `waitid(WNOWAIT)` preserves its identity until owned helpers are terminated and the leader reaped. The prebound socket lives only in the private directory. Existing displays, launch services, XQuartz preference domains and shell startup files are untouched.
 
-Composite remains explicitly disabled as in XQuartz 2.8.6's upstream known-bug policy. No extension or renderer support is inferred from strings. Existing X03 active qualification still rejects unsupported native platforms; enabling a private runtime requires native X03 implementation/evidence as well as the actual build pins.
+Composite remains explicitly disabled under the upstream XQuartz 2.8.6 policy.
+The authenticated read-only macOS probe measures the screen dimensions and can
+query GLX and RandR versions. OpenGL readback, monitor selection and active
+mode changes remain outside the approved windowed scope.

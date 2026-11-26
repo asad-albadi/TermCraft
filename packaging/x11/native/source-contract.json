@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "qualification": "unqualified source-engineered native providers; no approved private executable or dependency inventory pin yet",
+  "qualification": "Apple Silicon macOS windowed XQuartz approved for the exact pinned inventory; Windows runtime remains unqualified",
   "redistribution_approved": false,
   "windows": {
     "artifact_id": "vcxsrv-21.1.16.1-termcraft-private1-windows-x86_64",

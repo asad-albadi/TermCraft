@@ -5,9 +5,11 @@ use std::{
     fs::{File, OpenOptions},
     io::{Read, Write},
     path::{Component, Path},
+    sync::atomic::AtomicBool,
 };
 
 pub struct VerifiedSnapshot {
+    #[cfg(windows)]
     _held: Vec<File>,
     #[cfg(windows)]
     _directory: File,
@@ -15,6 +17,15 @@ pub struct VerifiedSnapshot {
 }
 impl VerifiedSnapshot {
     pub fn create(root: &Path, files: &[(&str, &str)]) -> Result<Self, String> {
+        Self::create_cancellable(root, files, &AtomicBool::new(false))
+    }
+
+    pub fn create_cancellable(
+        root: &Path,
+        files: &[(&str, &str)],
+        cancelled: &AtomicBool,
+    ) -> Result<Self, String> {
+        super::native_transport::cancelled(cancelled)?;
         if files.is_empty() {
             return Err("Native engine pin has no files".into());
         }
@@ -28,9 +39,11 @@ impl VerifiedSnapshot {
         let directory = builder.tempdir().map_err(|e| e.to_string())?;
         #[cfg(windows)]
         let directory_handle = protect_directory(directory.path())?;
+        #[cfg(windows)]
         let mut held = Vec::new();
         let mut total = 0usize;
         for &(relative, expected) in files {
+            super::native_transport::cancelled(cancelled)?;
             if relative.is_empty()
                 || relative.contains(['\\', ':'])
                 || relative
@@ -79,10 +92,14 @@ impl VerifiedSnapshot {
             out.write_all(&bytes).map_err(|e| e.to_string())?;
             out.sync_all().map_err(|e| e.to_string())?;
             drop(out);
-            // Retain handles to the snapshot, never the original package path.
+            // Windows uses open handles to deny write/delete sharing. The
+            // private Unix directory needs no per-file handles after staging.
+            #[cfg(windows)]
             held.push(open_verified_input(&destination)?);
         }
+        super::native_transport::cancelled(cancelled)?;
         Ok(Self {
+            #[cfg(windows)]
             _held: held,
             #[cfg(windows)]
             _directory: directory_handle,

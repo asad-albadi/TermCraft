@@ -126,7 +126,11 @@ fn launch(
     pin: &native_policy::NativePin,
 ) -> Result<XServerLease, String> {
     native_transport::cancelled(flag)?;
-    let image = VerifiedSnapshot::create(&root.join(native_policy::MACOS_RUNTIME), pin.files)?;
+    let image = VerifiedSnapshot::create_cancellable(
+        &root.join(native_policy::MACOS_RUNTIME),
+        pin.files,
+        flag,
+    )?;
     let runtime = tempfile::Builder::new()
         .prefix("termcraft-x11-")
         .permissions(std::fs::Permissions::from_mode(0o700))
