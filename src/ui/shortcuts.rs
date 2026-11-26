@@ -47,30 +47,46 @@ mod tests {
         frame(&ctx, &mut w, vec![]);
         ctx.memory_mut(|m| m.request_focus(Id::new(("terminal-input", id))));
         let prefs = w.store.preferences.clone();
-        let mut output = ctx.run_ui(
-            RawInput {
-                screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1100., 750.))),
-                events: vec![
-                    Event::Key {
-                        key: Key::V,
-                        physical_key: None,
-                        pressed: true,
-                        repeat: false,
-                        modifiers: Modifiers {
-                            ctrl: true,
-                            shift: true,
-                            ..Default::default()
-                        },
-                    },
-                    Event::Paste("owned payload".into()),
-                ],
+        let macos = cfg!(target_os = "macos");
+        let shortcut = |pressed| Event::Key {
+            key: Key::V,
+            physical_key: None,
+            pressed,
+            repeat: false,
+            modifiers: Modifiers {
+                ctrl: !macos,
+                shift: !macos,
+                mac_cmd: macos,
+                command: true,
                 ..Default::default()
             },
-            |ui| {
-                super::super::pages::terminal_view(ui, &mut w.tabs[0], &prefs);
-            },
+        };
+        let draw = |tab: &mut TerminalTab, events| {
+            let mut output = ctx.run_ui(
+                RawInput {
+                    screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1100., 750.))),
+                    events,
+                    ..Default::default()
+                },
+                |ui| {
+                    super::super::pages::terminal_view(ui, tab, &prefs);
+                },
+            );
+            output.textures_delta.clear();
+        };
+        draw(&mut w.tabs[0], vec![shortcut(true)]);
+        assert!(
+            std::mem::take(&mut w.tabs[0].clipboard_request),
+            "the paste shortcut alone must request a clipboard read"
         );
-        output.textures_delta.clear();
+        draw(
+            &mut w.tabs[0],
+            vec![
+                shortcut(false),
+                shortcut(true),
+                Event::Paste("owned payload".into()),
+            ],
+        );
         assert!(
             !w.tabs[0].clipboard_request,
             "native paste already carries the bytes; do not read the clipboard again"
