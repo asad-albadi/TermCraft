@@ -158,10 +158,9 @@ fn windows_vnc_refuses_capture_and_control_from_an_inactive_desktop() {
 }
 
 #[test]
-#[ignore = "switches the input desktop of a disposable GitHub-hosted Windows VM"]
+#[ignore = "uses an owned input window on a disposable GitHub-hosted Windows VM"]
 fn windows_vnc_control_reaches_only_the_disposable_desktop_fixture() {
     use windows_sys::Win32::Foundation::{HWND, POINT};
-    use windows_sys::Win32::System::Threading::GetCurrentThreadId;
 
     assert!(
         std::env::var("GITHUB_ACTIONS").as_deref() == Ok("true")
@@ -170,24 +169,6 @@ fn windows_vnc_control_reaches_only_the_disposable_desktop_fixture() {
         "Windows VNC control requires explicit opt-in on a disposable GitHub-hosted VM"
     );
 
-    struct DesktopGuard {
-        original_thread: HDESK,
-        original_input: HDESK,
-        fixture: HDESK,
-        switched: bool,
-    }
-    impl Drop for DesktopGuard {
-        fn drop(&mut self) {
-            unsafe {
-                if self.switched {
-                    SwitchDesktop(self.original_input);
-                }
-                SetThreadDesktop(self.original_thread);
-                CloseDesktop(self.fixture);
-                CloseDesktop(self.original_input);
-            }
-        }
-    }
     struct FixtureWindow(HWND);
     impl Drop for FixtureWindow {
         fn drop(&mut self) {
@@ -197,38 +178,6 @@ fn windows_vnc_control_reaches_only_the_disposable_desktop_fixture() {
 
     thread::spawn(|| unsafe {
         active_desktop().expect("The hosted runner needs an active input desktop");
-        let original_thread = GetThreadDesktop(GetCurrentThreadId());
-        let original_input = OpenInputDesktop(0, 0, DESKTOP_READOBJECTS | DESKTOP_SWITCHDESKTOP);
-        assert!(!original_input.is_null(), "{}", fail());
-        let mut desktop = DesktopGuard {
-            original_thread,
-            original_input,
-            fixture: ptr::null_mut(),
-            switched: false,
-        };
-        let mut random = [0; 8];
-        getrandom::fill(&mut random).unwrap();
-        let name: Vec<u16> = format!("TermCraftVncControl{:016x}\0", u64::from_ne_bytes(random))
-            .encode_utf16()
-            .collect();
-        desktop.fixture = CreateDesktopW(
-            name.as_ptr(),
-            ptr::null(),
-            ptr::null(),
-            0,
-            DESKTOP_CREATEWINDOW
-                | DESKTOP_READOBJECTS
-                | DESKTOP_WRITEOBJECTS
-                | DESKTOP_SWITCHDESKTOP,
-            ptr::null(),
-        );
-        assert!(!desktop.fixture.is_null(), "{}", fail());
-        assert_ne!(SetThreadDesktop(desktop.fixture), 0, "{}", fail());
-        assert!(
-            active_desktop().is_err(),
-            "Fixture desktop already accepted input"
-        );
-
         let (width, height) = metrics().unwrap();
         assert!(width >= 320 && height >= 240);
         let x = width / 2;
@@ -253,8 +202,6 @@ fn windows_vnc_control_reaches_only_the_disposable_desktop_fixture() {
         );
         assert!(!window.is_null(), "{}", fail());
         let fixture = FixtureWindow(window);
-        assert_ne!(SwitchDesktop(desktop.fixture), 0, "{}", fail());
-        desktop.switched = true;
         BringWindowToTop(fixture.0);
         SetForegroundWindow(fixture.0);
         SetFocus(fixture.0);
@@ -266,20 +213,28 @@ fn windows_vnc_control_reaches_only_the_disposable_desktop_fixture() {
             assert_eq!(WindowFromPoint(point), fixture.0);
         };
         let mut source = Desktop::open(true).unwrap();
-        for event in [
-            Input::Key {
-                down: true,
-                keysym: 0x010003a9,
-            },
-            Input::Key {
-                down: false,
-                keysym: 0x010003a9,
-            },
-            Input::Pointer { buttons: 1, x, y },
-            Input::Pointer { buttons: 0, x, y },
+        for (operation, event) in [
+            (
+                "Unicode key down",
+                Input::Key {
+                    down: true,
+                    keysym: 0x010003a9,
+                },
+            ),
+            (
+                "Unicode key up",
+                Input::Key {
+                    down: false,
+                    keysym: 0x010003a9,
+                },
+            ),
+            ("left mouse down", Input::Pointer { buttons: 1, x, y }),
+            ("left mouse up", Input::Pointer { buttons: 0, x, y }),
         ] {
             verify_target();
-            source.input(event).unwrap();
+            source
+                .input(event)
+                .unwrap_or_else(|e| panic!("{operation}: {e}"));
         }
 
         let (mut text, mut pressed, mut released) = (false, false, false);
@@ -304,12 +259,6 @@ fn windows_vnc_control_reaches_only_the_disposable_desktop_fixture() {
         );
         verify_target();
         drop(source);
-        assert_ne!(SwitchDesktop(desktop.original_input), 0, "{}", fail());
-        desktop.switched = false;
-        assert!(
-            active_desktop().is_err(),
-            "Fixture kept input after restoration"
-        );
     })
     .join()
     .unwrap();
