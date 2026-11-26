@@ -470,6 +470,18 @@ bytes and it unlocked after both installs and the reinstall were removed.
   explicit Light and Dark repainted the main window, and Ctrl+Shift+B hid
   the sidebar. Normal window close persisted Dark and the hidden sidebar in
   the private workspace. This used the current native desktop scale.
+- On the active Windows RDP desktop, the relocated Unix-runtime ZIP
+  `59c240c031ca54fc3a98f9dd2593926db5617bf9446b0046914f2ef2560a0c53`
+  used an isolated local-data directory and the pinned Mesa software renderer.
+  Live mouse selection switched System to Light, Dark and back to System.
+  Ctrl+Shift+T opened two local PowerShell ConPTY sessions. The mouse-driven
+  split showed both live prompts. Detach created a distinct native HWND,
+  fullscreen grew the detached window from 962 × 672 to 2066 × 902, and
+  Restore returned it to 962 × 672. Reattach closed the child HWND and
+  returned the live tab to the split. The normal close prompt listed both
+  sessions. Confirming it removed the GUI, both shells and their console
+  hosts. The isolated workspace retained System appearance and Columns layout.
+  This replay used one desktop scale and exercised the new-tab shortcut.
 - Ten opt-in native RDP integration cases passed against the separately locked
   IronRDP software endpoint with OpenSSL fixture certificates. They cover
   rendering, resize, pointer, cursor, authentication/trust prompts, carrier
@@ -714,8 +726,9 @@ with an OpenGL 2.0 or later context.
   forwarding passed. The runtime approval pin remains unset while MSVC
   redistribution notices, installed OpenSSH forwarding, Direct and Indirect
   desktop workflows, clipboard, keyboard and graphics qualification are open.
-- Terminal GUI input, full-screen programs, detached workflows, themes and the
-  100/150/200 percent scaling matrix require their own desktop observations.
+- Foreground terminal and editor text input, clipboard and additional named
+  shortcuts need their own desktop observations. The 100/150/200 percent
+  scale matrix requires a disposable or dedicated desktop.
 - Full RDP sessions and redirection need a designated endpoint. Windows
   enumerated a USB serial port and a software PDF queue. Neither was exercised
   as a physical fixture. Smartcard, physical printer, connected serial/network
