@@ -1034,5 +1034,21 @@
       "hosted_helper_failed": 1,
       "cause": "Unconfirmed; D02 investigation is actionable again. Prior local qualification is retained as historical evidence."
     }
+  },
+  "supported_platform_scope": {
+    "linux": [
+      "x86_64"
+    ],
+    "windows": [
+      "x86_64"
+    ],
+    "macos": [
+      "arm64"
+    ],
+    "excluded_for_current_stage": [
+      "macOS x86_64 / Intel"
+    ],
+    "instruction": "Intel macOS is not a required artifact, native workflow or approval blocker. Preserve arm64 qualification gates and historical evidence; do not count scope removal as a passing test or new implementation checkpoint.",
+    "reference": "docs/SUPPORT.md"
   }
 }
