@@ -226,7 +226,10 @@
   reached MANAGE, rejected anonymous X11, and transferred exact Unicode
   text both ways after manager-cookie authentication. The listener closed
   with its job. Binary-cookie, Direct and Indirect chooser tests also passed
-  with the same inventory. Repeated authenticated capability probes returned
+  with the same inventory. The combined elevated `--xdmcp --indirect` replay
+  selected the private manager in the native chooser and passed both
+  clipboard directions after manager-cookie authentication on `127.0.0.2`.
+  Repeated authenticated capability probes returned
   GLX 1.4, RANDR 1.6 and actual Composite 0.4 redirected pixels with the
   2050 × 815 screen size preserved. An earlier concurrent graphics probe
   exited before producing evidence. The repeat established the software
@@ -248,7 +251,26 @@
   families revealed a second `::1` listener when the launch specified the
   generic `tcp` transport. The Windows launch now explicitly selects `inet`
   and fails closed if the owned PID has an IPv6 listener. The earlier wire
-  fixtures examined IPv4 ownership only.
+  fixtures examined IPv4 ownership only. Native XDMCP arguments re-enable
+  the generic TCP group, so the listener restrictions are applied after
+  those arguments. The app-owned alternate-address XDMCP replay passed
+  with both IP families checked.
+- A private-pin portable package with SHA-256
+  `358722315eec43fa22a11e460f59023f95376ee1df7a6cb68569543f65990ba1`
+  launched a saved owned-X session from the relocated GUI through ConPTY.
+  The observed child matched the exact VcXsrv image above, opened one IPv4
+  loopback listener, rejected anonymous X11, and accepted its private cookie.
+  Normal exit removed the listener, executable snapshot and Xauthority.
+  The private qualification source used the candidate's complete pinned
+  inventory. The production source retains the empty shipping inventory.
+- The clean hosted Windows VS 2022 fixture built a separate unpublished
+  5,131-file candidate using Windows SDK 10.0.26100.0, MSVC 14.44.35207 and
+  the pinned tool and package downloads. The VcXsrv executable SHA-256 was
+  `549ea1a341633e6207390d240ce2f026dd3d69c58f2bac311c04e79e70b6781f` and
+  the inventory SHA-256 was
+  `14f1636b6c939199f1e3b15ade1da7ef86ee9908e3c10ce325ccf2acfddfc64c`.
+  The wire tests and isolated Direct XDMCP clipboard replay on `127.0.0.2`
+  passed. [Hosted native X verification](https://github.com/asad-albadi/TermCraft/actions/runs/45856050487/job/140034603334)
 - The clean candidate's three app-local Microsoft VC143 CRT files came
   from the installed x64 `Microsoft.VC143.CRT` redistribution directory.
   All three matched the hashes, file version and valid Authenticode

@@ -23,7 +23,7 @@ import tempfile
 import threading
 import time
 
-from windows_xdmcp_candidate import candidate_environment, digest, field, packet, x11_setup
+from windows_xdmcp_candidate import candidate_environment, choose_indirect_host, digest, field, packet, x11_setup
 
 
 WHEELS = {
@@ -314,7 +314,7 @@ def accept_owned_listener(win, process, wait, address, port, cookie, isolated):
     raise RuntimeError("Timed out verifying the owned VcXsrv listener and window on the private desktop; see server.log")
 
 
-def authorize_xdmcp(peer, address, display_number):
+def authorize_xdmcp(peer, address, display_number, chooser_pid=None):
     def receive(kind):
         payload, sender = peer.recvfrom(8192)
         if sender[0] != address or len(payload) < 6:
@@ -324,8 +324,10 @@ def authorize_xdmcp(peer, address, display_number):
             raise RuntimeError(f"Unexpected XDMCP fixture packet: {header}, expected opcode {kind}")
         return payload[6:], sender
 
-    _, endpoint = receive(2)
+    _, endpoint = receive(3 if chooser_pid is not None else 2)
     peer.sendto(packet(5, field(b"") + field(b"fixture.test") + field(b"ready")), endpoint)
+    if chooser_pid is not None:
+        choose_indirect_host(chooser_pid)
     request, sender = receive(7)
     if sender != endpoint or request[:2] != struct.pack(">H", display_number):
         raise RuntimeError("XDMCP Request did not identify the owned display")
@@ -434,11 +436,14 @@ def main():
     parser.add_argument("--wheel-directory", type=Path, required=True)
     parser.add_argument("--evidence", type=Path, required=True)
     parser.add_argument("--address", choices=("127.0.0.1", "127.0.0.2"), default="127.0.0.1")
-    parser.add_argument("--xdmcp", action="store_true", help="negotiate a real Direct XDMCP session on the private display")
+    parser.add_argument("--xdmcp", action="store_true", help="negotiate a real XDMCP session on the private display")
+    parser.add_argument("--indirect", action="store_true", help="select the isolated XDMCP fixture through the native chooser")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
     if os.name != "nt":
         parser.error("This fixture requires Windows")
+    if args.indirect and not args.xdmcp:
+        parser.error("The native chooser requires --xdmcp")
     if not args.worker:
         # Keep even a blocked native delayed render or X11 call bounded. The
         # worker's owned job closes if the worker has to be terminated.
@@ -484,21 +489,23 @@ def main():
         if peer is not None:
             peer.bind((args.address, 0))
             peer.settimeout(8)
-            arguments.extend(["-from", args.address, "-port", str(peer.getsockname()[1]), "-query", args.address])
+            arguments.extend(["-from", args.address, "-port", str(peer.getsockname()[1]),
+                              "-indirect" if args.indirect else "-query", args.address])
         arguments.extend(["-listen", "inet", "-nolisten", "inet6", "-nolisten", "hyperv"])
         with win.server(arguments, candidate, environment, *isolated[:2]) as (process, wait):
             accept_owned_listener(win, process, wait, args.address, port, cookie, isolated)
+            mode = "Indirect" if args.indirect else "Direct"
             if peer is not None:
-                cookie = authorize_xdmcp(peer, args.address, display_number)
+                cookie = authorize_xdmcp(peer, args.address, display_number, process.pid if args.indirect else None)
                 auth = Path(scratch) / "ManagerAuthority"
                 write_authority(auth, args.address, display_number, cookie)
                 with socket.create_connection((args.address, port), 2) as client, client.makefile("rb") as stream:
                     if x11_setup(client, stream, b"")[0] != 0:
                         raise RuntimeError("The managed display accepted a connection without its cookie")
-                print("Direct XDMCP reached Manage and rejected anonymous X11", flush=True)
+                print(f"{mode} XDMCP reached Manage and rejected anonymous X11", flush=True)
             exchange_clipboard(win, isolated, args.address, display_number, auth)
             if peer is not None:
-                print("Direct XDMCP with the manager-assigned cookie and isolated Unicode clipboard passed", flush=True)
+                print(f"{mode} XDMCP with the manager-assigned cookie and isolated Unicode clipboard passed", flush=True)
         if owns_loopback_listener(process.pid, args.address, port):
             raise RuntimeError("VcXsrv loopback listener survived its owned job")
 
