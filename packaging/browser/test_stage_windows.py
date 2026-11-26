@@ -2,7 +2,10 @@
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unittest
 import zipfile
@@ -30,6 +33,18 @@ class WindowsBrowserStaging(unittest.TestCase):
             package.browser_runtime_manifest(repo, "windows", "x86_64")
         _, linux = package.browser_runtime_manifest(repo, "linux", "x86_64")
         self.assertEqual(linux["root"], "browser/linux-x86_64")
+
+    @unittest.skipUnless(os.name == 'nt', 'requires the native Windows release entry point')
+    def test_windows_bundle_requires_building_the_matching_app(self):
+        script = HERE.parents[1] / 'scripts/package-release.py'
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / 'out'
+            reply = subprocess.run([sys.executable, script, '--platform', 'windows', '--app-binary',
+                'app.exe', '--helper-binary', 'helper.exe', '--browser-inputs', tmp, '--output', output],
+                capture_output=True, text=True, timeout=5)
+            self.assertNotEqual(reply.returncode, 0)
+            self.assertIn('requires a native build from the approval source', reply.stderr)
+            self.assertFalse(output.exists())
 
     def test_pinned_zip_and_notice_inventory_publish_atomically(self):
         with tempfile.TemporaryDirectory() as tmp:

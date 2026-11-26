@@ -35,7 +35,8 @@ standard unprivileged namespace sandbox. There is no unsafe launch fallback.
 
 `runtime-manifest-windows.json` records the pinned Chromium source and the
 current approval state. The Windows product and release package both require
-approval in that repository manifest. The Windows staging input, once approved,
+approval in that repository manifest. The release entry point builds the app
+from that same source when including the optional runtime. The staging input, once approved,
 is a native Chromium ZIP with the exact pinned SHA-256. Its regular files must
 match the approved inventory by path, size and SHA-256, including
 `THIRD-PARTY-NOTICES.html`. Packaging verifies the PE architecture and records

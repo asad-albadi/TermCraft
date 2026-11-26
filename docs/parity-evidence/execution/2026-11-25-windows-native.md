@@ -263,6 +263,11 @@
   Normal exit removed the listener, executable snapshot and Xauthority.
   The private qualification source used the candidate's complete pinned
   inventory. The production source retains the empty shipping inventory.
+- The same private-pin X ZIP passed GUI startup and adjacent helper
+  negotiation after relocation. The per-user installer replay stamped two
+  fixture versions from that ZIP, launched both installed versions, and
+  uninstalled both. The separately built 0.1.0 and 0.1.1 qualification
+  packages above provide the genuine development version-upgrade evidence.
 - The clean hosted Windows VS 2022 fixture built a separate unpublished
   5,131-file candidate using Windows SDK 10.0.26100.0, MSVC 14.44.35207 and
   the pinned tool and package downloads. The VcXsrv executable SHA-256 was
@@ -761,3 +766,7 @@ with an OpenGL 2.0 or later context.
   (48 passed, one failed and 15 ignored). The Linux clipboard source and its
   fixture match current main byte-for-byte. Both jobs retained the independent
   Linux RDP helper allocation failure.
+- [Hosted Windows CI at `b05cbf9`](https://github.com/asad-albadi/TermCraft/actions/runs/45859007401/job/140044804239)
+  passed `cargo +1.96.1 test --locked --all-targets --no-fail-fast` with
+  615 passed, zero failed and 32 ignored. The independently locked RDP
+  helper reported 36 passed, zero failed and zero ignored.

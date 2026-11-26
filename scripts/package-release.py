@@ -616,6 +616,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
     if unix_cache is not None and (target, arch) not in (("linux", "x86_64"), ("windows", "x86_64")):
         raise ValueError("Unix payload supports Linux and Windows x86_64 only.")
     if browser_inputs is not None:
+        if target == "windows" and build_inputs is None:
+            raise ValueError("The Windows Chromium payload requires a native build from the approval source.")
         browser_runtime_manifest(source, target, arch)
     if windows_x11_runtime is not None:
         if (target, arch) != ("windows", "x86_64") or build_inputs is None:
@@ -846,6 +848,8 @@ def main():
         parser.error("Choose a supported platform.")
     if args.platform != NATIVE:
         parser.error("Run the packager on the target operating system.")
+    if args.platform == "windows" and args.browser_inputs and args.app_binary:
+        parser.error("The Windows Chromium payload requires a native build from the approval source.")
     if args.xwayland_archive and args.platform != "linux":
         parser.error("--xwayland-archive is available for Linux x86_64 only.")
     if args.xephyr_archive and args.platform != "linux":
@@ -866,6 +870,8 @@ def main():
     else:
         mosh_inputs = None
     try:
+        if args.platform == "windows" and args.browser_inputs:
+            browser_runtime_manifest(ROOT, args.platform, "x86_64")
         if args.windows_x11_runtime is not None:
             # Refuse an unapproved input before the native build. Staging still
             # reads the authoritative inventory from the exact frozen source.
