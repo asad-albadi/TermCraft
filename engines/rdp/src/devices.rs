@@ -225,6 +225,11 @@ impl Drives {
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
                 Err(e) => return Err(status(e)),
             };
+            #[cfg(windows)]
+            if existing.is_none() && disposition == 1 && access == 0x00100080 && options == 0 {
+                // xrdp's FUSE lookup requires STATUS_NO_SUCH_FILE before it can create the file.
+                return Err(0xc000000f);
+            }
             if existing
                 .as_ref()
                 .is_some_and(|m| !m.is_file() && !m.is_dir())

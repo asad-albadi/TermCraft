@@ -80,6 +80,25 @@ fn redirected_drive_reads_writes_and_retires_real_handles() {
     let p = b.process(&request(1, file, 11, 3, 0, &body)).unwrap();
     assert_ne!(value(&p, 12), 0);
 }
+#[cfg(windows)]
+#[test]
+fn windows_redirected_drive_reports_missing_metadata_lookup_before_create() {
+    let root = tempfile::tempdir().unwrap();
+    let mut drives = backend(root.path(), false);
+    let path = "\\new-file.txt\0";
+    let lookup = open(&mut drives, path, 0x00100080, 1);
+    assert_eq!(value(&lookup, 12), 0xc000000f);
+    assert_eq!(value(&lookup, 16), 0);
+    assert!(!root.path().join("new-file.txt").exists());
+
+    let ordinary_open = open(&mut drives, path, 0x80000000, 1);
+    assert_eq!(value(&ordinary_open, 12), 0xc0000034);
+    let create_response = drives
+        .process(&request(1, 0, 8, 0, 0, &create(path, 0x0016019f, 2, 0x44)))
+        .unwrap();
+    assert_eq!(value(&create_response, 12), 0);
+    assert!(root.path().join("new-file.txt").is_file());
+}
 #[test]
 fn redirected_read_only_drive_blocks_mutations_and_escape() {
     let root = tempfile::tempdir().unwrap();
