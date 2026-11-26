@@ -124,6 +124,25 @@ pub fn setup_unix(
     cookie: Option<&[u8; 16]>,
     flag: &AtomicBool,
 ) -> Result<bool, String> {
+    let mut stream = connect_unix(path, flag)?;
+    stream
+        .set_nonblocking(false)
+        .and_then(|()| stream.set_read_timeout(Some(Duration::from_millis(25))))
+        .and_then(|()| stream.set_write_timeout(Some(Duration::from_millis(25))))
+        .map_err(|e| e.to_string())?;
+    exchange(
+        &mut stream,
+        cookie,
+        Instant::now() + Duration::from_millis(150),
+        flag,
+    )
+}
+
+#[cfg(any(target_os = "macos", all(test, unix)))]
+pub(super) fn connect_unix(
+    path: &Path,
+    flag: &AtomicBool,
+) -> Result<std::os::unix::net::UnixStream, String> {
     use std::os::fd::{AsRawFd, FromRawFd};
     use std::os::unix::net::UnixStream;
     cancelled(flag)?;
@@ -146,7 +165,10 @@ pub fn setup_unix(
     if raw < 0 {
         return Err(std::io::Error::last_os_error().to_string());
     }
-    let mut stream = unsafe { UnixStream::from_raw_fd(raw) };
+    let stream = unsafe { UnixStream::from_raw_fd(raw) };
+    if unsafe { libc::fcntl(raw, libc::F_SETFD, libc::FD_CLOEXEC) } < 0 {
+        return Err(std::io::Error::last_os_error().to_string());
+    }
     stream.set_nonblocking(true).map_err(|e| e.to_string())?;
     if unsafe { libc::connect(raw, (&address as *const libc::sockaddr_un).cast(), length) } < 0 {
         let error = std::io::Error::last_os_error();
@@ -178,17 +200,7 @@ pub fn setup_unix(
         }
     }
     cancelled(flag)?;
-    stream
-        .set_nonblocking(false)
-        .and_then(|()| stream.set_read_timeout(Some(Duration::from_millis(25))))
-        .and_then(|()| stream.set_write_timeout(Some(Duration::from_millis(25))))
-        .map_err(|e| e.to_string())?;
-    exchange(
-        &mut stream,
-        cookie,
-        Instant::now() + Duration::from_millis(150),
-        flag,
-    )
+    Ok(stream)
 }
 
 #[cfg(test)]

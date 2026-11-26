@@ -21,7 +21,7 @@ impl Drop for Finished {
         self.0.store(false, Ordering::Release);
     }
 }
-fn read_os_text() -> Result<String, String> {
+pub(super) fn read_os_text() -> Result<String, String> {
     #[cfg(target_os = "linux")]
     if std::env::var_os("WAYLAND_DISPLAY").is_some() {
         match read_wayland_text() {

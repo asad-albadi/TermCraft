@@ -20,17 +20,35 @@ pub(super) struct State {
     pending: Vec<u64>,
     error: Option<String>,
     capabilities: Option<Result<XCapabilities, String>>,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    clipboard_pending: bool,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    clipboard_status: Option<String>,
 }
 
 enum Event {
     Capabilities(Result<XCapabilities, String>),
     Ready(XClientDisplay),
     Ended(Result<(), String>),
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    Clipboard(Result<Option<String>, String>),
+}
+
+enum Request {
+    Stop,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    Clipboard(ClipboardDirection),
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+enum ClipboardDirection {
+    ToX11,
+    ToMac,
 }
 
 struct Worker {
     events: Receiver<Event>,
-    stop: SyncSender<()>,
+    requests: SyncSender<Request>,
     cancelled: Arc<AtomicBool>,
     thread: Option<JoinHandle<()>>,
 }
@@ -38,7 +56,7 @@ struct Worker {
 impl Worker {
     fn request_stop(&self) {
         self.cancelled.store(true, Ordering::Relaxed);
-        let _ = self.stop.try_send(());
+        let _ = self.requests.try_send(Request::Stop);
     }
 
     fn stopping(&self) -> bool {
@@ -75,12 +93,17 @@ impl State {
         let probe_executable = self.probe_executable.clone();
         let options = self.options.clone();
         let (sender, events) = mpsc::sync_channel(3);
-        let (stop, stop_requested) = mpsc::sync_channel(1);
+        let (requests, requested) = mpsc::sync_channel(1);
         let cancelled = Arc::new(AtomicBool::new(false));
         let worker_cancelled = Arc::clone(&cancelled);
         let ctx = ctx.clone();
         self.error = None;
         self.capabilities = None;
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        {
+            self.clipboard_pending = false;
+            self.clipboard_status = None;
+        }
         match std::thread::Builder::new()
             .name("termcraft-xserver".into())
             .spawn(move || {
@@ -120,16 +143,49 @@ impl State {
                         {
                             return lease.stop_owned();
                         }
+                        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                        let mut clipboard: Option<
+                            harbor_workspace::x11::MacosClipboard,
+                        > = None;
                         loop {
                             use mpsc::RecvTimeoutError;
 
-                            match stop_requested.recv_timeout(Duration::from_millis(250)) {
-                                Ok(()) | Err(RecvTimeoutError::Disconnected) => {
+                            if worker_cancelled.load(Ordering::Relaxed) {
+                                return lease.stop_owned();
+                            }
+                            let interval = Duration::from_millis(250);
+                            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                            let interval = if clipboard.is_some() {
+                                Duration::from_millis(25)
+                            } else {
+                                interval
+                            };
+                            match requested.recv_timeout(interval) {
+                                Ok(Request::Stop) | Err(RecvTimeoutError::Disconnected) => {
                                     return lease.stop_owned();
+                                }
+                                #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                                Ok(Request::Clipboard(direction)) => {
+                                    let result = transfer_clipboard(
+                                        &mut clipboard,
+                                        direction,
+                                        &lease,
+                                        &worker_cancelled,
+                                    );
+                                    if !worker_cancelled.load(Ordering::Relaxed) {
+                                        let _ = sender.try_send(Event::Clipboard(result));
+                                        ctx.request_repaint();
+                                    }
                                 }
                                 Err(RecvTimeoutError::Timeout) => {
                                     if !lease.is_running()? {
                                         return Err("The packaged X server exited".into());
+                                    }
+                                    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                                    if let Some(bridge) = &mut clipboard
+                                        && bridge.poll().is_err()
+                                    {
+                                        clipboard = None;
                                     }
                                 }
                             }
@@ -140,7 +196,7 @@ impl State {
             Ok(thread) => {
                 self.worker = Some(Worker {
                     events,
-                    stop,
+                    requests,
                     cancelled,
                     thread: Some(thread),
                 });
@@ -156,6 +212,22 @@ impl State {
             match worker.events.try_recv() {
                 Ok(Event::Capabilities(report)) => self.capabilities = Some(report),
                 Ok(Event::Ready(display)) => self.display = Some(display),
+                #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                Ok(Event::Clipboard(result)) => {
+                    self.clipboard_pending = false;
+                    if !worker.stopping() {
+                        self.clipboard_status = Some(match result {
+                            Ok(Some(text)) => {
+                                if let Some(ctx) = &self.context {
+                                    ctx.copy_text(text);
+                                }
+                                "Copied X11 text to macOS.".into()
+                            }
+                            Ok(None) => "Copied macOS text to X11.".into(),
+                            Err(error) => error,
+                        });
+                    }
+                }
                 Ok(Event::Ended(result)) => {
                     self.error = if worker.stopping() {
                         let cancelled = (!self.pending.is_empty())
@@ -170,6 +242,11 @@ impl State {
                     };
                     self.display = None;
                     self.worker = None;
+                    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                    {
+                        self.clipboard_pending = false;
+                        self.clipboard_status = None;
+                    }
                 }
                 Err(TryRecvError::Empty) => return,
                 Err(TryRecvError::Disconnected) => {
@@ -234,6 +311,34 @@ impl State {
                 let _ = thread.join();
             }
         }
+    }
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn transfer_clipboard(
+    clipboard: &mut Option<harbor_workspace::x11::MacosClipboard>,
+    direction: ClipboardDirection,
+    lease: &harbor_workspace::x11::XServerLease,
+    cancelled: &Arc<AtomicBool>,
+) -> Result<Option<String>, String> {
+    use harbor_workspace::x11::MacosClipboard;
+    if cancelled.load(Ordering::Relaxed) {
+        return Err("The private X display is stopping.".into());
+    }
+    if clipboard.is_none() {
+        *clipboard = Some(MacosClipboard::open(
+            lease.client_display(),
+            cancelled.clone(),
+        )?);
+    }
+    let clipboard = clipboard.as_mut().unwrap();
+    match direction {
+        ClipboardDirection::ToX11 => {
+            let text = super::clipboard::read_os_text()?;
+            clipboard.write_text(text)?;
+            Ok(None)
+        }
+        ClipboardDirection::ToMac => clipboard.read_text().map(Some),
     }
 }
 
@@ -486,6 +591,27 @@ impl Workspace {
                             display.display()
                         ));
                     }
+                    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                    {
+                        ui.horizontal_wrapped(|ui| {
+                            for (label, direction) in [
+                                ("Copy macOS text to X11", ClipboardDirection::ToX11),
+                                ("Copy X11 text to macOS", ClipboardDirection::ToMac),
+                            ] {
+                                if ui.add_enabled(!state.clipboard_pending, egui::Button::new(label))
+                                    .on_hover_text("Transfer UTF-8 clipboard text once, up to 64 KiB.")
+                                    .clicked()
+                                {
+                                    state.clipboard_pending = worker.requests
+                                        .try_send(Request::Clipboard(direction)).is_ok();
+                                    state.clipboard_status = None;
+                                }
+                            }
+                        });
+                        if let Some(status) = &state.clipboard_status {
+                            ui.small(status);
+                        }
+                    }
                     if ui.button("Stop X server").clicked() {
                         worker.request_stop();
                     }
@@ -560,6 +686,95 @@ mod macos_tests {
                 if text.galley.text() == "Start X server")
         }));
         assert_eq!(Workspace::default_x11_source(), XDisplaySource::System);
+    }
+
+    #[test]
+    #[ignore = "changes the general pasteboard; run only in the disposable macOS GUI fixture"]
+    fn private_xserver_worker_transfers_the_native_pasteboard_on_request() {
+        use harbor_workspace::x11::MacosClipboard;
+        assert_eq!(
+            std::env::var("TERMCRAFT_TEST_DISPOSABLE_PASTEBOARD").as_deref(),
+            Ok("1")
+        );
+        let root = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_XQUARTZ_ROOT").unwrap());
+        let (ctx, _root, mut workspace) = crate::ui::terminal_review_tests::owned_workspace();
+        let state = &mut workspace.xserver;
+        state.probe_executable = Some(root.with_file_name("MacOS").join("harbor-workspace"));
+        state.bundle_root = Some(root);
+        state.start(&ctx);
+        let deadline = Instant::now() + Duration::from_secs(30);
+        let display = loop {
+            state.poll();
+            if let Some(display) = state.display.clone() {
+                break display;
+            }
+            assert!(state.error.is_none(), "{:?}", state.error);
+            assert!(Instant::now() < deadline, "Private XQuartz did not start");
+            std::thread::sleep(Duration::from_millis(15));
+        };
+        let capabilities = state.capabilities.as_ref().unwrap().as_ref().unwrap();
+        assert!(capabilities.core_x11_pixels);
+        let mut peer = MacosClipboard::open(display, Arc::new(AtomicBool::new(false))).unwrap();
+        assert!(peer.read_text().unwrap_err().contains("empty"));
+
+        let mac_text = "native Sonoma clipboard café\n✓";
+        arboard::Clipboard::new()
+            .unwrap()
+            .set_text(mac_text)
+            .unwrap();
+        request(state, ClipboardDirection::ToX11);
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while state.clipboard_pending {
+            state.poll();
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(15));
+        }
+        assert_eq!(
+            state.clipboard_status.as_deref(),
+            Some("Copied macOS text to X11.")
+        );
+        assert_eq!(peer.read_text().unwrap(), mac_text);
+
+        let x11_text = "private X11 clipboard 漢字\n🦀";
+        peer.write_text(x11_text.into()).unwrap();
+        assert_eq!(
+            arboard::Clipboard::new().unwrap().get_text().unwrap(),
+            mac_text
+        );
+        request(state, ClipboardDirection::ToMac);
+        let deadline = Instant::now() + Duration::from_secs(5);
+        let text = loop {
+            peer.poll().unwrap();
+            let mut output = ctx.run_ui(RawInput::default(), |_| state.poll());
+            output.textures_delta.clear();
+            if let Some(egui::OutputCommand::CopyText(text)) = output
+                .platform_output
+                .commands
+                .into_iter()
+                .find(|command| matches!(command, egui::OutputCommand::CopyText(_)))
+            {
+                break text;
+            }
+            assert!(Instant::now() < deadline, "{:?}", state.clipboard_status);
+            std::thread::sleep(Duration::from_millis(15));
+        };
+        assert_eq!(text, x11_text);
+        state.shutdown();
+        assert!(peer.read_text().is_err());
+    }
+
+    fn request(state: &mut State, direction: ClipboardDirection) {
+        assert!(!state.clipboard_pending);
+        assert!(
+            state
+                .worker
+                .as_ref()
+                .unwrap()
+                .requests
+                .try_send(Request::Clipboard(direction))
+                .is_ok()
+        );
+        state.clipboard_pending = true;
     }
 }
 

@@ -8,10 +8,14 @@ pub use capabilities::{OpenGlEvidence, XCapabilities, capability_probe_entry};
 mod forwarding;
 pub mod remote_environment;
 pub use forwarding::{XClientDisplay, XDisplaySource, XForwardingLease, XTrustMode};
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+mod macos_clipboard;
 #[cfg(any(windows, target_os = "macos", test))]
 mod native_artifact;
 #[cfg(target_os = "macos")]
 mod native_macos;
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+pub use macos_clipboard::MacosClipboard;
 #[cfg(any(windows, target_os = "macos"))]
 mod native_policy;
 #[cfg(any(windows, target_os = "macos", test))]
@@ -21,6 +25,8 @@ mod native_windows;
 #[cfg(windows)]
 mod native_windows_process;
 mod platform;
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+mod unix_connection;
 pub(crate) use platform::bundled_runtime;
 
 use std::path::{Path, PathBuf};

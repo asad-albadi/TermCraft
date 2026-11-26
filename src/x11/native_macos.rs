@@ -50,13 +50,20 @@ pub(super) fn probe_capabilities() -> Result<super::XCapabilities, String> {
     .map_err(|error| error.to_string())?;
     let screen = &connection.setup().roots[0];
     let mut report = super::XCapabilities {
-        dimensions: [screen.width_in_pixels.into(), screen.height_in_pixels.into()],
-        errors: vec!["Private XQuartz disables indirect GLX and uses macOS display geometry.".into()],
+        dimensions: [
+            screen.width_in_pixels.into(),
+            screen.height_in_pixels.into(),
+        ],
+        errors: vec![
+            "Private XQuartz disables indirect GLX and uses macOS display geometry.".into(),
+        ],
         ..Default::default()
     };
     match core_pixel_readback(&connection, screen) {
         Ok(()) => report.core_x11_pixels = true,
-        Err(error) => report.errors.push(format!("Core X11 pixel readback: {error}")),
+        Err(error) => report
+            .errors
+            .push(format!("Core X11 pixel readback: {error}")),
     }
     if let Ok(request) = glx::query_version(&connection, 1, 4) {
         match request.reply() {
@@ -84,9 +91,11 @@ pub(super) fn probe_capabilities() -> Result<super::XCapabilities, String> {
                 {
                     Ok(resources) if resources.outputs.is_empty() => report
                         .errors
-                        .push("RandR reports no outputs for the private windowed display.".into()),
+                        .push("Cached RandR resources list no outputs.".into()),
                     Ok(_) => {}
-                    Err(error) => report.errors.push(format!("RandR output query failed: {error}")),
+                    Err(error) => report
+                        .errors
+                        .push(format!("RandR output query failed: {error}")),
                 }
             }
             Err(error) => report
@@ -129,22 +138,47 @@ fn core_pixel_readback(
             .create_pixmap(screen.root_depth, canvas, screen.root, 2, 1)?
             .check()?;
         connection
-            .create_gc(gc, canvas, &CreateGCAux::new().foreground(screen.white_pixel))?
+            .create_gc(
+                gc,
+                canvas,
+                &CreateGCAux::new().foreground(screen.white_pixel),
+            )?
             .check()?;
         connection
-            .poly_fill_rectangle(canvas, gc, &[Rectangle { x: 0, y: 0, width: 2, height: 1 }])?
+            .poly_fill_rectangle(
+                canvas,
+                gc,
+                &[Rectangle {
+                    x: 0,
+                    y: 0,
+                    width: 2,
+                    height: 1,
+                }],
+            )?
             .check()?;
         connection
             .change_gc(gc, &ChangeGCAux::new().foreground(screen.black_pixel))?
             .check()?;
         connection
-            .poly_fill_rectangle(canvas, gc, &[Rectangle { x: 1, y: 0, width: 1, height: 1 }])?
+            .poly_fill_rectangle(
+                canvas,
+                gc,
+                &[Rectangle {
+                    x: 1,
+                    y: 0,
+                    width: 1,
+                    height: 1,
+                }],
+            )?
             .check()?;
         let image = connection
             .get_image(ImageFormat::Z_PIXMAP, canvas, 0, 0, 2, 1, u32::MAX)?
             .reply()?;
         let setup = connection.setup();
-        let format = setup.pixmap_formats.iter().find(|format| format.depth == image.depth);
+        let format = setup
+            .pixmap_formats
+            .iter()
+            .find(|format| format.depth == image.depth);
         if !format.is_some_and(|format| format.bits_per_pixel == 32) || image.data.len() != 8 {
             return Err("Unexpected private XQuartz pixel format".into());
         }
