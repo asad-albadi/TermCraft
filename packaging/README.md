@@ -91,7 +91,8 @@ system SDK come from the build machine.
 
 The CI workflow runs the Rust and packaging tests. The manually dispatched
 release workflow builds unsigned archive candidates for Linux x86-64,
-Windows x86-64, and both macOS architectures. Linux startup uses a virtual
+Windows x86-64, and Apple Silicon macOS (arm64). Intel macOS is outside the
+current support scope and is not a required build, artifact or approval gate. Linux startup uses a virtual
 X11 display. Windows and macOS GUI checks require a runner with an available
 desktop session. The workflow retains run artifacts and startup evidence.
 Signing, notarization, and publication are separate release actions.

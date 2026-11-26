@@ -6,6 +6,8 @@ Updated: 2026-11-25.
 
 ## Current checkpoint
 
+**Current platform scope:** Linux x86-64, Windows x64 and Apple Silicon macOS (arm64). Intel macOS is no longer a required target or release blocker. Native arm64 software and hardware/manual qualification still apply; historical Intel references are not current requirements. See [support scope](docs/SUPPORT.md). Checkpoint count remains46/60.
+
 Latest qualified implementation source **32e512ae85fe16dd44d9b775060a0bd1ac70de345ddcf862a221e0f861db74ad**, source commit **7b04c58**. The local branch `parity-implementation` now tracks GitHub `origin/main` at [asad-albadi/TermCraft](https://github.com/asad-albadi/TermCraft).
 
 **Publication follow-up:** Windows work is tracked in [#1](https://github.com/asad-albadi/TermCraft/issues/1), macOS in [#2](https://github.com/asad-albadi/TermCraft/issues/2), and desktop CI/releases in [#3](https://github.com/asad-albadi/TermCraft/issues/3). The first hosted CI run failed one RDP allocation-cleanup test (81 helper tests passed, 1 failed); root cause is unconfirmed and tracked in #3. The recorded local qualification below predates that hosted failure and does not establish green GitHub CI. README/license/privacy publication changes do not change the recorded production packaging-source digest.

@@ -6,6 +6,8 @@ This began as the 2026-11-23 gap inventory. Current reviewed implementation and 
 
 Execution status and evidence: [PARITY_PROGRESS.md](PARITY_PROGRESS.md).
 
+Current platform scope: Linux x86-64, Windows x64 and Apple Silicon macOS (arm64). Intel macOS is excluded at this stage; remaining macOS requirements apply to arm64. See [support scope](docs/SUPPORT.md). This scope reduction does not itself advance the 46/60 implementation count.
+
 Current local qualification(2026-11-25): source32e512;986tests pass,0fail,73ignored. Current genuine Linux full and Debian12 core/revision3 builds,37actual GUI client checks and125source-bound server checks are qualified within their documented scopes. [Local closure and exact remaining dependencies](docs/parity-evidence/execution/2026-11-25-local-completion.md). The14 remaining implementation checkpoints include native/equipment/original requirements and documented POSIX architecture limits. After publication, the first hosted CI run also exposed an RDP allocation-cleanup failure; D02 investigation is actionable again and tracked in [issue #3](https://github.com/asad-albadi/TermCraft/issues/3).
 
 ## How to read this checklist
