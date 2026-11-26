@@ -3,6 +3,10 @@ name = "harbor-workspace"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+# Native QA only. The default release build must not enroll an unqualified browser.
+macos-chromium-qualification = []
+
 [dependencies]
 zip = { version = "=9.8.2", default-features = false, features = ["deflate-flate2"] }
 lzma-rs = "=0.3.0"

@@ -41,6 +41,12 @@ fn chromium_available() -> bool {
 #[cfg(target_os = "macos")]
 fn chromium_available() -> bool {
     use harbor_workspace::runtime::{RuntimeCatalog, ToolId};
+    if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
+        RuntimeCatalog::for_current_executable()
+            .and_then(|catalog| catalog.resolve(ToolId::BundledChromium))
+            .expect("Native qualification requires the exact staged bundled Chromium");
+        return true;
+    }
     let available = RuntimeCatalog::for_current_executable()
         .and_then(|catalog| catalog.resolve(ToolId::Browser))
         .is_ok();

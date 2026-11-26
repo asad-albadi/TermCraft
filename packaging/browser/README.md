@@ -83,7 +83,8 @@ python3 scripts/package-release.py --macos-browser-fixture /path/to/inputs --out
 The stager checks the archive SHA-256, preserves the framework links, ad-hoc
 seals the native app, verifies its signature and compares its complete file
 and link inventory. The resulting ZIP has a `chromium-qualification` suffix
-and a `qualification` manifest profile. It is for local software
+and a `qualification` manifest profile. The packager enables the opt-in
+`macos-chromium-qualification` Cargo feature for this build. It is for local software
 qualification. Public redistribution requires its own approved notices and
 signing policy.
 

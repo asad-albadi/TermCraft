@@ -1,7 +1,17 @@
 //! Explicit provider selection for TermCraft sessions and native tools.
 mod browser_bundle;
 mod discovery;
-#[cfg(test)]
+#[cfg(all(
+    test,
+    any(
+        target_os = "linux",
+        all(
+            target_os = "macos",
+            target_arch = "aarch64",
+            feature = "macos-chromium-qualification"
+        )
+    )
+))]
 pub(crate) use browser_bundle::VERIFIED_CHUNKS;
 mod manifest;
 #[cfg(target_os = "linux")]
