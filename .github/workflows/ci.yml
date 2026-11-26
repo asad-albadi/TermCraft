@@ -23,8 +23,10 @@ jobs:
       - run: rustup update stable && rustup default stable && rustup component add rustfmt
       - run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbcommon-dev libwayland-dev libegl1-mesa-dev libgl1-mesa-dev libpcap-dev
       - run: cargo fmt --all --check
-      - run: cargo test --locked --manifest-path engines/rdp/Cargo.toml
-      - run: cargo test --locked --no-fail-fast
+      - id: linux_rdp
+        run: cargo test --locked --manifest-path engines/rdp/Cargo.toml
+      - if: ${{ !cancelled() && (success() || steps.linux_rdp.conclusion == 'failure') }}
+        run: cargo test --locked --no-fail-fast
 
   regression-windows-x64:
     runs-on: windows-2025
