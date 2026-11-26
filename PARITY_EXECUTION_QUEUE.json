@@ -943,7 +943,7 @@
       "requires": [],
       "dependency": "Native desktop, endpoint and device fixtures for remaining Windows/macOS qualification.",
       "remaining": "Complete interactive Windows desktop, clean-account, device redirection, providers and macOS qualification.",
-      "validation_remaining": "Windows x64 native build, packaged launch, ConPTY, workspace IPC and controlled protocol fixtures have partial evidence. The full regression suite and broader desktop, provider and original workflows remain open.",
+      "validation_remaining": "Hosted Windows x64 CI passed 615 workspace tests with 32 ignored and 36 locked helper tests. The actual relocated GUI passed live themes, new-terminal shortcut, split, detach, native fullscreen and restore, reattach and process teardown at one scale. Additional input, DPI, provider, hardware and original workflows remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/execution/2026-11-25-windows-native.md"

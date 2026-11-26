@@ -702,8 +702,11 @@ one test. It checked ownership of the fixture window by the launched PID,
 then added, listed and removed a synthetic key in an initially empty agent.
 A follow-up replay verified a Pageant signature over synthetic SSH signing
 data and proved the same connection refused signing after key removal. The
-fixture process and window were removed after cleanup. Real-account agent
-forwarding remains open.
+embedded SSH connection then authenticated to a loopback peer that accepted
+only the verified synthetic key. The same peer rejected the connection in
+Disabled mode and after removing the Pageant key. The test closed its SSH
+listener and removed the owned Pageant process and window. Real-account
+agent forwarding remains open.
 
 ## Native desktop capture and hosted Windows build
 
