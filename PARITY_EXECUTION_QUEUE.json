@@ -697,15 +697,16 @@
       ],
       "dependency": "",
       "remaining": "",
-      "validation_remaining": "Native Windows/macOS managed service and packaged Iperf providers plus original server behavior remain unverified; tested source-built Iperf payload is Linux x86_64/glibc2.44 only.",
+      "validation_remaining": "Explicit Windows Iperf2/3 compatibility passed TCP, UDP and listener cleanup. Native packaged Iperf outside Linux, macOS service evidence and original server behavior remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/B03/implementation.md",
         "docs/parity-evidence/B03/review-fixes.md",
         "docs/parity-evidence/B03/ui-credentials-review.md",
-        "docs/parity-evidence/parallel-integration-platform-services/result.json"
+        "docs/parity-evidence/parallel-integration-platform-services/result.json",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
       ],
-      "next_action": "Retain reviewed SSH/SFTP/Iperf service integration; collect native provider/original interoperability evidence."
+      "next_action": "Collect native packaged Iperf, macOS service and original interoperability evidence."
     },
     {
       "id": "B04",

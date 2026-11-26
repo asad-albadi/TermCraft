@@ -296,8 +296,32 @@ async fn ssh_opt_in_shell_uses_current_account_and_stops() {
     assert!(String::from_utf8_lossy(&output).contains("owned-ssh-shell"));
     stop(&supervisor, id);
 }
-#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+#[cfg(any(all(target_os = "linux", target_arch = "x86_64"), windows))]
+fn iperf_fixture(catalog: &RuntimeCatalog, tool: ToolId) -> ToolProvider {
+    #[cfg(target_os = "linux")]
+    {
+        let provider = catalog
+            .resolve(tool)
+            .expect("stage the pinned Iperf fixtures");
+        assert!(matches!(provider, ToolProvider::Bundled { .. }));
+        provider
+    }
+    #[cfg(windows)]
+    {
+        let provider = catalog
+            .resolve_installed_iperf(tool)
+            .expect("put the two Windows Iperf compatibility fixtures on the test PATH");
+        assert!(matches!(provider, ToolProvider::System { .. }));
+        provider
+    }
+}
+
+#[cfg(any(all(target_os = "linux", target_arch = "x86_64"), windows))]
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires Windows Iperf2 and Iperf3 compatibility fixtures"
+)]
 fn iperf_version_and_bind_are_applied() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     let catalog = RuntimeCatalog::new(root);
@@ -306,16 +330,14 @@ fn iperf_version_and_bind_are_applied() {
         (IperfVersion::Two, ToolId::Iperf),
         (IperfVersion::Three, ToolId::Iperf3),
     ] {
-        let provider = catalog
-            .resolve(tool)
-            .expect("qualified runtime must be staged for this evidence test");
-        assert!(matches!(provider, ToolProvider::Bundled { .. }));
+        let provider = iperf_fixture(&catalog, tool);
         let path = provider.executable().unwrap();
         let socket = TcpListener::bind(("127.0.0.1", 0)).unwrap();
         let address = socket.local_addr().unwrap();
         drop(socket);
         let mut config = IperfServiceConfig::local(version, root.into());
         config.bind = address;
+        config.allow_installed_provider = cfg!(windows);
         let id = supervisor.start_iperf(config).unwrap();
         assert_eq!(supervisor.status(id).unwrap().address, Some(address));
         let out = std::process::Command::new(path)
@@ -410,8 +432,12 @@ fn openssh_sftp_client_interoperates_with_owned_provider() {
     stop(&supervisor, id);
 }
 
-#[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+#[cfg(any(all(target_os = "linux", target_arch = "x86_64"), windows))]
 #[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires Windows Iperf2 and Iperf3 compatibility fixtures"
+)]
 fn iperf_udp_clients_reach_selected_version() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     let supervisor = ServiceSupervisor::default();
@@ -426,9 +452,10 @@ fn iperf_udp_clients_reach_selected_version() {
         let mut config = IperfServiceConfig::local(version, root.into());
         config.bind = address;
         config.udp = version == IperfVersion::Two;
+        config.allow_installed_provider = cfg!(windows);
         let id = supervisor.start_iperf(config).unwrap();
         let output =
-            std::process::Command::new(catalog.resolve(tool).unwrap().executable().unwrap())
+            std::process::Command::new(iperf_fixture(&catalog, tool).executable().unwrap())
                 .args([
                     "-c",
                     "127.0.0.1",
@@ -449,6 +476,11 @@ fn iperf_udp_clients_reach_selected_version() {
         );
         assert!(String::from_utf8_lossy(&output.stdout).contains("bits/sec"));
         stop(&supervisor, id);
+        if version == IperfVersion::Two {
+            assert!(std::net::UdpSocket::bind(address).is_ok());
+        } else {
+            assert!(TcpListener::bind(address).is_ok());
+        }
     }
 }
 #[test]

@@ -860,6 +860,22 @@ and that truncation, packet/byte/time limits, cancellation and collision-safe
 file publication worked. Existing capture driver and service settings were
 preserved. A routed adapter and peer remain separate acceptance fixtures.
 
+Windows managed Iperf compatibility passed TCP and UDP for both versions
+over owned IPv4 loopback ports and verified that each listener could be
+rebound after stopping its foreground process. The independent invocation
+`cargo +1.96.1 test --locked --test service_adapters iperf_ -- --include-ignored --test-threads=1`
+reported three passed, zero failed and zero ignored, including fail-closed
+startup when the bundled provider was absent. The test child PATH included
+the publisher's Windows Iperf 2.2.1 executable with SHA-256
+`96ddcf44d769c2a043faaf458b4d8703d968fde9bda68b0b8f540218f7f822fc`
+and signed MSYS2 `iperf3` package `3.22-2`, with executable SHA-256
+`b733b9d0d2aa8e4c4092f8e47d438e1240b6e65c04eb7e313824d90a01203330`.
+These were private compatibility executables selected explicitly. Windows
+packaging has no approved Iperf payload. ESnet lists Windows as outside its
+official Iperf3 support. [Iperf2 publisher](https://sourceforge.net/projects/iperf2/files/),
+[MSYS2 package](https://packages.msys2.org/packages/iperf3?variant=x86_64),
+[ESnet support scope](https://software.es.net/iperf/faq.html).
+
 [The clean Windows 2025 runner](https://github.com/asad-albadi/TermCraft/actions/runs/45692468865/job/139481228493)
 passed the package contract suite and built the unsigned ZIP
 `606ff9ab626e1e6bb4018c2f32cb2c3759670638e961d5098baa48d229a574f3`.
