@@ -10,6 +10,10 @@ on:
         description: Build an unpublished Windows x64 X11 candidate and exercise its private desktop
         type: boolean
         default: false
+      windows_vnc_fixture:
+        description: Exercise native input on a disposable Windows runner desktop
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -53,6 +57,11 @@ jobs:
       - run: cargo test --locked --test package_manifest
       - if: runner.os == 'Windows'
         run: cargo test --locked --test cli_dispatch --test credential_vault
+      - name: Verify native input on the disposable Windows desktop
+        if: runner.os == 'Windows' && inputs.windows_vnc_fixture
+        env:
+          TERMCRAFT_VNC_DISPOSABLE_CONTROL: "1"
+        run: cargo test --locked --lib windows_vnc_control_reaches_only_the_disposable_desktop_fixture -- --ignored --nocapture
       - run: python scripts/package-release.py --output dist
       - if: runner.os == 'Linux'
         shell: bash

@@ -156,3 +156,161 @@ fn windows_vnc_refuses_capture_and_control_from_an_inactive_desktop() {
     .join()
     .unwrap();
 }
+
+#[test]
+#[ignore = "switches the input desktop of a disposable GitHub-hosted Windows VM"]
+fn windows_vnc_control_reaches_only_the_disposable_desktop_fixture() {
+    use windows_sys::Win32::Foundation::{HWND, POINT};
+    use windows_sys::Win32::System::Threading::GetCurrentThreadId;
+
+    assert!(
+        std::env::var("GITHUB_ACTIONS").as_deref() == Ok("true")
+            && std::env::var("RUNNER_ENVIRONMENT").as_deref() == Ok("github-hosted")
+            && std::env::var("TERMCRAFT_VNC_DISPOSABLE_CONTROL").as_deref() == Ok("1"),
+        "Windows VNC control requires explicit opt-in on a disposable GitHub-hosted VM"
+    );
+
+    struct DesktopGuard {
+        original_thread: HDESK,
+        original_input: HDESK,
+        fixture: HDESK,
+        switched: bool,
+    }
+    impl Drop for DesktopGuard {
+        fn drop(&mut self) {
+            unsafe {
+                if self.switched {
+                    SwitchDesktop(self.original_input);
+                }
+                SetThreadDesktop(self.original_thread);
+                CloseDesktop(self.fixture);
+                CloseDesktop(self.original_input);
+            }
+        }
+    }
+    struct FixtureWindow(HWND);
+    impl Drop for FixtureWindow {
+        fn drop(&mut self) {
+            unsafe { DestroyWindow(self.0) };
+        }
+    }
+
+    thread::spawn(|| unsafe {
+        active_desktop().expect("The hosted runner needs an active input desktop");
+        let original_thread = GetThreadDesktop(GetCurrentThreadId());
+        let original_input = OpenInputDesktop(0, 0, DESKTOP_READOBJECTS | DESKTOP_SWITCHDESKTOP);
+        assert!(!original_input.is_null(), "{}", fail());
+        let mut desktop = DesktopGuard {
+            original_thread,
+            original_input,
+            fixture: ptr::null_mut(),
+            switched: false,
+        };
+        let mut random = [0; 8];
+        getrandom::fill(&mut random).unwrap();
+        let name: Vec<u16> = format!("TermCraftVncControl{:016x}\0", u64::from_ne_bytes(random))
+            .encode_utf16()
+            .collect();
+        desktop.fixture = CreateDesktopW(
+            name.as_ptr(),
+            ptr::null(),
+            ptr::null(),
+            0,
+            DESKTOP_CREATEWINDOW
+                | DESKTOP_READOBJECTS
+                | DESKTOP_WRITEOBJECTS
+                | DESKTOP_SWITCHDESKTOP,
+            ptr::null(),
+        );
+        assert!(!desktop.fixture.is_null(), "{}", fail());
+        assert_ne!(SetThreadDesktop(desktop.fixture), 0, "{}", fail());
+        assert!(
+            active_desktop().is_err(),
+            "Fixture desktop already accepted input"
+        );
+
+        let (width, height) = metrics().unwrap();
+        assert!(width >= 320 && height >= 240);
+        let x = width / 2;
+        let y = height / 2;
+        let point = POINT {
+            x: i32::from(x),
+            y: i32::from(y),
+        };
+        let window = CreateWindowExW(
+            0,
+            windows_sys::w!("EDIT"),
+            ptr::null(),
+            WS_POPUP | WS_VISIBLE | WS_BORDER,
+            point.x - 80,
+            point.y - 40,
+            160,
+            80,
+            ptr::null_mut(),
+            ptr::null_mut(),
+            ptr::null_mut(),
+            ptr::null(),
+        );
+        assert!(!window.is_null(), "{}", fail());
+        let fixture = FixtureWindow(window);
+        assert_ne!(SwitchDesktop(desktop.fixture), 0, "{}", fail());
+        desktop.switched = true;
+        BringWindowToTop(fixture.0);
+        SetForegroundWindow(fixture.0);
+        SetFocus(fixture.0);
+
+        let verify_target = || {
+            active_desktop().unwrap();
+            assert_eq!(GetForegroundWindow(), fixture.0);
+            assert_eq!(GetFocus(), fixture.0);
+            assert_eq!(WindowFromPoint(point), fixture.0);
+        };
+        let mut source = Desktop::open(true).unwrap();
+        for event in [
+            Input::Key {
+                down: true,
+                keysym: 0x010003a9,
+            },
+            Input::Key {
+                down: false,
+                keysym: 0x010003a9,
+            },
+            Input::Pointer { buttons: 1, x, y },
+            Input::Pointer { buttons: 0, x, y },
+        ] {
+            verify_target();
+            source.input(event).unwrap();
+        }
+
+        let (mut text, mut pressed, mut released) = (false, false, false);
+        let deadline = Instant::now() + Duration::from_secs(3);
+        while !(text && pressed && released) && Instant::now() < deadline {
+            let mut message = MSG::default();
+            while PeekMessageW(&mut message, fixture.0, 0, 0, PM_REMOVE) != 0 {
+                match message.message {
+                    WM_CHAR => text |= message.wParam == '\u{3a9}' as usize,
+                    WM_LBUTTONDOWN => pressed = true,
+                    WM_LBUTTONUP => released = true,
+                    _ => {}
+                }
+                TranslateMessage(&message);
+                DispatchMessageW(&message);
+            }
+            thread::sleep(Duration::from_millis(10));
+        }
+        assert!(
+            (text && pressed && released),
+            "Fixture events: {text}/{pressed}/{released}"
+        );
+        verify_target();
+        drop(source);
+        assert_ne!(SwitchDesktop(desktop.original_input), 0, "{}", fail());
+        desktop.switched = false;
+        assert!(
+            active_desktop().is_err(),
+            "Fixture kept input after restoration"
+        );
+    })
+    .join()
+    .unwrap();
+}
