@@ -19,7 +19,7 @@ class DebianPackage(unittest.TestCase):
         debian = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(debian)
         with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
+            root = Path(temporary).resolve()
             archive = root / "TermCraft-portable.tar.gz"
             files = {"harbor-workspace": b"app", "termcraft-rdp-engine": b"helper",
                      "CREDITS.md": b"credits", "assets/termcraft-logo.png": b"logo"}

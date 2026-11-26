@@ -24,7 +24,7 @@ class PortableArchive(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
-        self.root = Path(self.temporary.name)
+        self.root = Path(self.temporary.name).resolve()
         self.archive = self.root / 'fixture.tar.gz'
         self.debian = load('package-debian')
         self.startup = load('package-check-startup')
