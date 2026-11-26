@@ -697,6 +697,12 @@ print job. The first hosted Windows spool fixture surfaced a PrintManagement
 cleanup failure for its path-named local port. The replacement uses a temporary
 named queue with a RAW port to an owned loopback listener. It checks the
 actual bytes, abort behavior and spooler cleanup without a physical device.
+The first RAW replay was interrupted by a hosted runner write error. Its
+targeted rerun reached print setup and reproduced PrintManagement's invalid
+parameter error with explicit SNMP index zero. An independent native local
+port replay reproduced that error and showed that omitting the parameter
+creates a disabled-SNMP loopback port with the exact requested port number.
+The hosted fixture now checks those reported settings before creating its queue.
 
 ## Personal 26.6 reference replay
 

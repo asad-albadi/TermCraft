@@ -47,12 +47,16 @@ $spoolerWasRunning = (Get-Service Spooler).Status -eq 'Running'
 try {
     $listener.Start()
     if (!$spoolerWasRunning) { Start-Service Spooler }
+    Add-PrinterPort -Name $queue -PrinterHostAddress 127.0.0.1 -PortNumber $listener.LocalEndpoint.Port
+    $createdPort = $true
+    $rawPort = Get-PrinterPort -Name $queue
+    if ($rawPort.PrinterHostAddress -ne '127.0.0.1' -or $rawPort.PortNumber -ne $listener.LocalEndpoint.Port -or $rawPort.SNMPEnabled) {
+        throw 'The disposable RAW port did not retain its loopback settings.'
+    }
     if (!(Get-PrinterDriver -Name $driver -ErrorAction SilentlyContinue)) {
         Add-PrinterDriver -Name $driver
         $createdDriver = $true
     }
-    Add-PrinterPort -Name $queue -PrinterHostAddress 127.0.0.1 -PortNumber $listener.LocalEndpoint.Port -SNMP 0
-    $createdPort = $true
     Add-Printer -Name $queue -DriverName $driver -PortName $queue
     $createdQueue = $true
 
