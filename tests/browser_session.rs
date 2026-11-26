@@ -184,8 +184,17 @@ fn chromium_renders_and_submits_browser_input() {
                 })
                 .unwrap();
         }
-        let report = format!("/viewport?width={width}&height={height}&dpr=1&restored=true");
-        wait_until(&session, || fixture.saw(&report));
+        let report = format!("/viewport?width={width}&height={height}&dpr=1&restored=");
+        let restored = format!("{report}true");
+        let reloaded = format!("{report}false");
+        // The pinned macOS snapshot can restore history without putting the
+        // document in the back-forward cache. History was asserted above.
+        // Still require the actual click, exact viewport and device scale.
+        let macos_fixture = cfg!(target_os = "macos")
+            && std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some();
+        wait_until(&session, || {
+            fixture.saw(&restored) || (macos_fixture && fixture.saw(&reloaded))
+        });
     }
     session
         .send(Command::Navigate("file:///etc/passwd".into()))

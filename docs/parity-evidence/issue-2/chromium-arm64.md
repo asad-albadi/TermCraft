@@ -43,8 +43,8 @@ packager still do not enroll Chromium for macOS.
 ## Offline packaging contract
 
 Run `python3 -I -B packaging/browser/stage-macos.py "$resources" "$inputs"`
-on native Apple Silicon. The input directory contains only the required exact
-`chrome-mac.zip` input. The stager copies and hashes that file before reading
+on native Apple Silicon. The only required input file is the exact
+`chrome-mac.zip`. The stager copies and hashes that file before reading
 it, then publishes a new `$resources/browser/macos-aarch64` with
 `Chromium.app`, `BROWSER-MANIFEST.json` and `LICENSE`. It keeps original
 archive extraction and generated ad-hoc signatures separate from the trust pin
@@ -93,6 +93,27 @@ profile. The ordinary crash reporting flags and
 real home. The exact Chromium source initializes Crashpad on macOS regardless
 of that switch and honors `BREAKPAD_DUMP_LOCATION` for the database.
 [Exact crash reporter source](https://chromium.googlesource.com/chromium/src/+/2de5612046d43b6f874320ba0e5357146cb225c5/chrome/app/chrome_crash_reporter_client.cc)
+
+The relocated native tests confirmed that the exact links survive snapshot
+creation, the snapshot still passes strict verification, and changed links
+and same-length file mutations fail closed. Closing during verification is
+chunk-cancellable. A renderer returned Seatbelt status 1 while the browser
+returned 0. Closing the tested browser removed all nine observed owned browser
+processes, including the private Crashpad handlers, as well as the profile and
+snapshot. A peer Chromium session stayed responsive.
+
+The pinned snapshot reported a successful bottom-right click at 300×200 and
+DPR 1 after history navigation, with `pageshow.persisted=false`. The same test
+still requires the history transitions, frame pixels, matching viewport and
+actual browser input for both dimensions. It does not require a back-forward
+cache hit from this snapshot. The installed-browser and Linux expectations
+are unchanged.
+
+The relocated render, text submission, history and both resize/click checks
+passed when run in isolation with the final binary. A combined workflow run
+passed settings, site authentication/TLS and proxy consent but timed out
+waiting for one resized frame. Report this as a repeatability gap, not a
+blanket pass for the combined run.
 
 ## Remaining distribution blockers
 
