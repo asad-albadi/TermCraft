@@ -132,7 +132,7 @@ def x11_setup(client, stream, key):
     return response
 
 
-def binary_authority(candidate, evidence):
+def binary_authority(candidate, evidence, probe_executable=None):
     with tempfile.TemporaryDirectory(prefix="TermCraft authority qualification ") as scratch:
         with socket.socket() as reservation:
             reservation.bind(("127.0.0.1", 0))
@@ -159,6 +159,20 @@ def binary_authority(candidate, evidence):
             with socket.create_connection(("127.0.0.1", port), 3) as client, client.makefile("rb") as stream:
                 assert x11_setup(client, stream, b"")[0] == 0, "Cookie-free X setup accepted"
             print("Private Windows X accepted the binary authority cookie and required authentication")
+            if probe_executable is not None:
+                env = candidate_environment(candidate, scratch)
+                env.update({"DISPLAY": f"127.0.0.1:{display}", "XAUTHORITY": str(auth)})
+                probe = subprocess.run(
+                    [probe_executable, "--termcraft-x11-capability-probe"],
+                    cwd=scratch, env=env, capture_output=True, check=True, timeout=12,
+                )
+                report = json.loads(probe.stdout)
+                assert report["glx_version"] and report["randr_version"]
+                assert report["composite_version"] and report["composite_pixels"]
+                assert report["opengl"] is None and report["randr_change"] is None
+                assert report["initial_mode_restored"] and min(report["dimensions"]) > 0
+                report["probe_executable_sha256"] = digest(probe_executable)
+                (evidence / "native-capabilities.json").write_text(json.dumps(report, indent=2) + "\n")
         finally:
             if child.poll() is None:
                 child.terminate()
@@ -219,13 +233,15 @@ def main():
     parser.add_argument("--candidate", type=Path, required=True)
     parser.add_argument("--inventory", type=Path, required=True)
     parser.add_argument("--evidence", type=Path, required=True)
+    parser.add_argument("--capability-probe", type=Path, help="Run the TermCraft native probe against the private display.")
     args = parser.parse_args()
     if os.name != "nt":
         parser.error("The private VcXsrv qualification peer requires Windows.")
     candidate = args.candidate.resolve(strict=True)
     verify_candidate(candidate, args.inventory)
     args.evidence.mkdir(parents=True, exist_ok=False)
-    binary_authority(candidate, args.evidence)
+    probe = args.capability_probe.resolve(strict=True) if args.capability_probe else None
+    binary_authority(candidate, args.evidence, probe)
     run(candidate, args.evidence, False)
     run(candidate, args.evidence, True)
 

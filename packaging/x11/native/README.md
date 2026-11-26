@@ -28,7 +28,7 @@ perl.exe ../Configure VC-WIN64A --release
 jom.exe /J 4
 Pop-Location
 Push-Location pthreads
-nmake.exe VC-static EXTRAVERSION=64
+nmake.exe VC-static EXTRAVERSION=
 Pop-Location
 msbuild tools/mhmake/mhmakevc10.sln -t:Build -p:Configuration=Release -p:Platform=x64 -m:2
 tools/mhmake/Release64/mhmake.exe -P4 -C xorg-server MAKESERVER=1
@@ -39,6 +39,12 @@ Make NASM, Jom, Strawberry Perl, WinFlexBison, Python with lxml, Mako, PyYAML, M
 Stage the server, `xorg-server/obj64/servrelease/vcxsrv.exe`, with the matching DLLs, fonts, xkbcomp and XKB data from the same build. The upstream x64 NSIS recipe lists the runtime files. Record exact PE imports, file hashes, toolchain versions, compiler options, corresponding source, the TermCraft patch and the MSVC redistribution notices before approving a payload.
 
 Use `stage-private-windows.ps1` with the prepared source directory, an empty candidate destination and the x64 VC143 CRT directory. Save its JSON output outside the candidate directory. The qualification test expects the staged directory at `x11/windows-x86_64-private1` beneath `TERMCRAFT_TEST_WINDOWS_X11_ROOT` and the JSON report at `TERMCRAFT_TEST_WINDOWS_X11_INVENTORY`.
+
+To exercise the private Windows capability probe with the authenticated
+wire fixture, pass a native TermCraft executable as
+`tests/windows_xdmcp_candidate.py --capability-probe`. The JSON report records
+the executable digest, live extension versions and actual Composite pixels.
+The probe leaves the screen mode and indirect GLX policy unchanged.
 
 The transport patch changes listener binds to IPv4/IPv6 loopback, configures checked SO_EXCLUSIVEADDRUSE on Windows, and rejects a missing explicit display or displayfd scanning. The Windows SDK expands SO_EXCLUSIVEADDRUSE through SO_REUSEADDR, so the patch keeps the header's constant defined and excludes its reuse branch on Windows. The Rust provider reserves exactly one OS-selected loopback port, creates a suspended process with no inherited handles, assigns it to a kill-on-close job, releases the reservation, resumes, checks IP Helper ownership of the exact listener and requires anonymous rejection plus cookie-authenticated setup. A collision fails without scanning or altering the competing server. Snapshot PE/DLL handles deny write/delete sharing for the entire lease. The old upstream checksum is never an approval for this changed output.
 

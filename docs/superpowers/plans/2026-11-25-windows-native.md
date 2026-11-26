@@ -49,7 +49,8 @@
 - [x] Build the private VcXsrv release executable and stage adjacent DLLs, font and XKB resources. Confirm a real native candidate binds loopback, refuses occupied displays and invalid cookies, and removes its listener on exit.
 - [x] Exercise embedded SSH X11 forwarding and cookie rejection against the locally built private engine using the owned provider test.
 - [x] Exercise native Direct and Indirect XDMCP to an isolated peer through MANAGE and cookie-authenticated X setup. Select the peer in the candidate's Win32 chooser for Indirect.
-- [x] Query the native private X server's core keyboard mapping and extension advertisements over the authenticated connection.
+- [x] Verify the owned Windows XDMCP listener on an explicit second loopback address and run authenticated Git for Windows X forwarding.
+- [x] Verify a German keyboard map, monitor 1 fullscreen geometry and authenticated software Composite pixel readback on the native candidate. Record live GLX and RANDR versions separately.
 - [ ] Follow the native README for the private build. Inventory runtime files, fonts, XKB, source and notices.
 - [ ] Exercise owned-job/PID cleanup, occupied-display refusal, cookie checks and readiness, then SSH forwarding, Direct/Indirect XDMCP, clipboard, keyboard and monitor/graphics workflows with appropriate peers. Record any unavailable extensions and dependencies.
 - [ ] Update `packaging/x11/native/source-contract.json` only after the exact staged output passes qualification and inventory review.

@@ -189,6 +189,26 @@
   GDI and does not request a hardware display mode change. Cross-monitor
   focus, hotplug and native presentation still need the corresponding
   hardware and an unlocked desktop.
+- The Windows x64 capability child used the current-contract VcXsrv
+  inventory, a dedicated loopback display and a verified binary cookie.
+  It reported GLX 1.4, Composite 0.4 and RANDR 1.6. The Composite probe
+  copied a redirected named pixmap and checked white and black pixel
+  readback with the server's exact image stride. The 1926 × 815 root
+  geometry matched before and after the probe. No OpenGL context or
+  RANDR mode change was observed. The actual probe executable SHA-256
+  was `a728ed6125a872a916bc00c0c32bc2baf0cd227a3950dfae7ba908bb7c2a91fd`.
+  The opt-in Rust fixture also checked rejection of a hostname alias
+  and missing explicit Xauthority.
+- The clean `build-private-windows.ps1` replay used MSVC 14.44.35207,
+  Windows SDK 10.0.26100.0 and Python 3.11.9. It staged 5,131 files,
+  including 4,529 font files and 324 XKB files. `dumpbin /DEPENDENTS`
+  checked 20 PE files and found 36 distinct import names with zero missing
+  dependencies. An authenticated `ListFonts` request returned all 128
+  requested `-misc-fixed-*` names. The executable SHA-256 was
+  `4a5c74581db89809d31ecd5dc2b4a8d9cbca8a194cdca04207245d74cd63f4ba`,
+  and the candidate inventory SHA-256 was
+  `c6f30b64d1a19587117b3be9ebbe4122b900f380e1ff75b46c4216330358a073`.
+  The candidate passed the binary-cookie and Direct/Indirect wire checks.
 - `cargo +1.96.1 test --locked --test windows_conpty` passed both tests.
   The native child wrote the main console, entered the alternate buffer,
   accepted input and received a resize from 80 × 25 to 100 × 32. TermCraft's
@@ -201,6 +221,13 @@
   The regression failed with exit code 1 before the fix and then passed
   through ConPTY, writing the expected output to a path with spaces. The
   complete Windows ConPTY target passed all three tests.
+- A package built from `git archive 3a7e42f` replayed the ordinary
+  `--session` and `--command` GUI path without `--data-dir`. It ran the
+  saved legacy local session, wrote the marker in the saved working
+  directory and preserved the isolated preferences, vault and recovery
+  fixture. The relocated package also passed adjacent-helper startup
+  from the default Harbor workspace. The unsigned optional Unix ZIP
+  SHA-256 was `59c240c031ca54fc3a98f9dd2593926db5617bf9446b0046914f2ef2560a0c53`.
 - Windows VNC scope is GDI capture of the active primary desktop.
   `cargo +1.96.1 test --locked --lib services::vnc -- --test-threads=1`
   reported 20 passed and 4 ignored. The opt-in native inactive-desktop test
