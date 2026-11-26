@@ -498,8 +498,49 @@ def stage_browser(source, resources, inputs, target, arch):
     return info, libraries
 
 
+def stage_xquartz(source, resources, candidate):
+    inventory = regular_source(source, Path("packaging/x11/native/macos-arm64.sha256"))
+    contract = json.loads(regular_source(source, Path("packaging/x11/native/source-contract.json")).read_text())["macos"]
+    if sha256(inventory) != contract["runtime_inventory_sha256"]:
+        raise ValueError("XQuartz inventory does not match the source contract.")
+    relative_root = Path("x11/macos-arm64-private1")
+    destination = resources / relative_root
+    executable = Path("XQuartz.app/Contents/MacOS/X11.bin")
+    xkbcomp = Path("opt/X11/bin/xkbcomp")
+    for line in inventory.read_text().splitlines():
+        expected, name = line.split("  ", 1)
+        relative = Path(name)
+        if relative.is_absolute() or ".." in relative.parts or relative.as_posix() != name:
+            raise ValueError(f"Invalid XQuartz inventory path: {name}")
+        staged = destination / relative
+        staged.parent.mkdir(parents=True, exist_ok=True)
+        with staged.open("xb") as output, regular_source(candidate, relative).open("rb") as input_file:
+            shutil.copyfileobj(input_file, output)
+        if sha256(staged) != expected:
+            raise ValueError(f"XQuartz checksum mismatch: {name}")
+        if relative in (executable, xkbcomp) or relative.suffix == ".dylib":
+            staged.chmod(0o755)
+    dependencies = json.loads((destination / "DEPENDENCIES.json").read_text())
+    for relative in (executable, xkbcomp):
+        if binary_arch(destination / relative, "macos") != "aarch64":
+            raise ValueError(f"XQuartz executable is not arm64: {relative}")
+    capture("codesign", "--verify", "--strict", destination / "XQuartz.app")
+    for name in dependencies:
+        capture("codesign", "--verify", "--strict", destination / name)
+    if sha256(destination / executable) != contract["private_executable_sha256"]:
+        raise ValueError("XQuartz executable does not match the source contract.")
+    return {
+        "artifact_id": contract["artifact_id"],
+        "entry_point": (relative_root / executable).as_posix(),
+        "sha256": contract["private_executable_sha256"],
+        "inventory_sha256": contract["runtime_inventory_sha256"],
+        "dependencies": (relative_root / "DEPENDENCIES.json").as_posix(),
+        "source": (relative_root / "CORRESPONDING-SOURCE").as_posix(),
+    }
+
+
 def package_release(target, output, app_binary, helper_binary, build_inputs=None, source=ROOT,
-                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None, xephyr_archive=None, wayland_helper_binary=None):
+                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None, xephyr_archive=None, wayland_helper_binary=None, xquartz_runtime=None):
     packaging = source / "packaging"
     binaries = [app_binary.resolve(strict=True), helper_binary.resolve(strict=True)]
     if binaries[0].samefile(binaries[1]):
@@ -517,6 +558,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         raise ValueError("The pinned Xwayland payload targets the Linux x86_64 Arch runtime ABI.")
     if xephyr_archive is not None and (target, arch) != ("linux", "x86_64"):
         raise ValueError("The pinned Xephyr payload targets the Linux x86_64 Arch runtime ABI.")
+    if xquartz_runtime is not None and (target, arch) != ("macos", "aarch64"):
+        raise ValueError("The approved private XQuartz payload requires Apple Silicon macOS.")
     if iperf_runtime is not None and (target, arch) != ("linux", "x86_64"):
         raise ValueError("The qualified Iperf payload targets Linux x86_64 only.")
     if mosh_inputs is not None and (target, arch) != ("linux", "x86_64"):
@@ -535,6 +578,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         basename += "-arch-xwayland"
     if xephyr_archive is not None:
         basename += "-xdmcp"
+    if xquartz_runtime is not None:
+        basename += "-xquartz"
     if mosh_inputs is not None:
         basename += "-mosh" if xwayland_archive is not None else "-arch-mosh"
     if unix_cache is not None:
@@ -644,6 +689,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         runtime["optional_native_providers"] = runtime["optional_native_providers"][target]
         runtime["linked_libraries"] = linked
         runtime["artifact_declarations"] = "RUNTIME-MANIFEST.json"
+        if xquartz_runtime is not None:
+            runtime["managed_xquartz"] = stage_xquartz(source, resources, xquartz_runtime)
         if wayland is not None:
             runtime["managed_wayland_sharing"] = wayland
         runtime["managed_vnc_browser"] = vnc_browser
@@ -718,6 +765,7 @@ def main():
                         help="Bundle the pinned Arch x86_64 Xwayland package (Linux only).")
     parser.add_argument("--wayland-helper-binary", type=Path, help="Optionally bundle an explicitly built native Linux PipeWire helper; ordinary app startup does not require PipeWire.")
     parser.add_argument("--xephyr-archive", type=Path, help="Bundle the pinned owned Linux x86_64 Xephyr XDMCP engine (explicit session network policy still required).")
+    parser.add_argument("--xquartz-runtime", type=Path, help="Bundle the exact approved private XQuartz tree for Apple Silicon macOS.")
     parser.add_argument("--iperf-runtime", type=Path, help="Root of the pinned Linux x86_64 Iperf runtime payload.")
     parser.add_argument("--mosh-archive", type=Path, help="Pinned Arch Linux x86_64 Mosh binary package.")
     parser.add_argument("--mosh-source", type=Path, help="Pinned corresponding upstream Mosh source archive.")
@@ -739,6 +787,8 @@ def main():
         parser.error("--xwayland-archive is available for Linux x86_64 only.")
     if args.xephyr_archive and args.platform != "linux":
         parser.error("--xephyr-archive is available for Linux x86_64 only.")
+    if args.xquartz_runtime and args.platform != "macos":
+        parser.error("--xquartz-runtime is available for Apple Silicon macOS only.")
     if args.unix_cache is not None and args.platform not in ("linux", "windows"):
         parser.error("--unix-cache supports Linux and Windows x86_64 only.")
     if args.wayland_helper_binary is not None and args.platform != "linux":
@@ -754,7 +804,7 @@ def main():
     try:
         if args.app_binary:
             archive = package_release(args.platform, args.output.resolve(), args.app_binary, args.helper_binary,
-                                      xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary)
+                                      xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary, xquartz_runtime=args.xquartz_runtime)
         else:
             build_root = args.build_root.resolve() if args.build_root else ROOT / "target"
             source, inputs = freeze_sources(ROOT, build_root / "package-sources")
@@ -763,7 +813,7 @@ def main():
                 print(f"Building source snapshot {source.name}", flush=True)
                 app, helper = release_build(source, build_root, settings)
                 archive = package_release(args.platform, args.output.resolve(), app, helper, inputs, source, settings,
-                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary)
+                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary, xquartz_runtime=args.xquartz_runtime)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f"Packaging failed: {error}\n")
     print(f"{sha256(archive)}  {archive}")

@@ -26,7 +26,7 @@
     ]
   },
   "macos": {
-    "artifact_id": "xquartz-2.8.6-termcraft-private1-macos-universal",
+    "artifact_id": "xquartz-2.8.6-termcraft-private1-macos-arm64",
     "upstream_archive_sha256": "9ac35a505095bfbd3009c3b4772f0c6421e2f79c4210ab908459270d1c447909",
     "distribution_source_url": "https://codeload.github.com/XQuartz/XQuartz/tar.gz/db446ed66b76f386b815e8b095beb56aa368424a",
     "distribution_source_sha256": "d534c1dbb9736e044eff8beaa895fa90dd05a3fc987dd9d0dddb6b4400c6e12b",
@@ -56,20 +56,18 @@
       "src/xorg/font/alias": "ebeee85f070dc12197ad98d1c849786f8e3be124"
     },
     "patch_sha256": "901aaa59e77b566388d4728d63ec3afa4bafba9b92445962676d6d958ecf8d2e",
-    "private_executable_sha256": null,
+    "private_executable_sha256": "30cff793431ef36178d9814eeb13024331c2acc28c7daf608ce575fd3a9893cd",
+    "runtime_inventory_sha256": "0fd1bb3ffd162962691d4b7c0b6283b53e448b6a50a51c502c86074b5317f171",
     "native_build_inputs": [
       "macOS SDK/Xcode clang and Objective-C/AppKit/CoreFoundation",
       "meson/ninja/pkg-config/bison/flex/mig",
       "complete pinned XQuartz component dependencies and matching headers/pkg-config data",
       "private app-relative Mach-O dylib relocation",
-      "codesign for both x86_64 and arm64"
+      "ad-hoc codesign for arm64"
     ],
     "blocking_evidence": [
-      "no relocated signed private native build",
-      "full source/license closure for all upstream binary dependencies remains unreviewed",
       "upstream Composite explicitly disabled due known bug 1409; not overridden",
-      "native authenticated inherited-listener/no-global-lock tests unavailable",
-      "X03 native graphics probe unavailable on macOS"
+      "X03 measured native graphics qualification remains open"
     ]
   }
 }

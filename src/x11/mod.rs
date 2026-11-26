@@ -101,11 +101,9 @@ impl XServerManager {
     ) -> Result<XServerLease, String> {
         let root = match &self.installation {
             Some(root) => root.clone(),
-            None => std::env::current_exe()
-                .map_err(|error| format!("Could not locate the TermCraft installation: {error}"))?
-                .parent()
-                .ok_or("Could not find the TermCraft resource directory")?
-                .to_path_buf(),
+            None => {
+                crate::runtime::RuntimeCatalog::for_current_executable()?.service_runtime_root()
+            }
         };
         platform::start(&root, options, cancelled)
     }

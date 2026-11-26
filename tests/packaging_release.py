@@ -284,6 +284,19 @@ class PublicationBoundary(unittest.TestCase):
 
 
 class NativePackageLayout(unittest.TestCase):
+    def test_macos_xquartz_staging_rejects_changed_source_bytes(self):
+        package = module_at("package_release", SCRIPT)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            candidate = root / "candidate"
+            inventory = ROOT / "packaging/x11/native/macos-arm64.sha256"
+            first = inventory.read_text().splitlines()[0].split("  ", 1)[1]
+            changed = candidate / first
+            changed.parent.mkdir(parents=True)
+            changed.write_bytes(b"changed source archive")
+            with self.assertRaisesRegex(ValueError, "XQuartz checksum mismatch"):
+                package.stage_xquartz(ROOT, root / "resources", candidate)
+
     def test_macos_build_metadata_records_sdk_and_deployment_target(self):
         package = module_at("package_release", SCRIPT)
         with patch.object(package, "capture", side_effect=["15.5\n", "Apple clang version 17.0.0\n"]), \

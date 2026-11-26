@@ -13,9 +13,93 @@ use std::{
     sync::atomic::AtomicBool,
     time::{Duration, Instant},
 };
+
+/// Read-only inspection of the authenticated display. The owning probe parent
+/// bounds the subprocess lifetime.
+pub(super) fn probe_capabilities() -> Result<super::XCapabilities, String> {
+    use std::io::Read;
+    use std::os::unix::net::UnixStream;
+    use x11rb::{
+        connection::Connection,
+        protocol::{glx, randr, xproto::ConnectionExt},
+        rust_connection::{DefaultStream, RustConnection},
+    };
+
+    let display = std::env::var_os("DISPLAY").ok_or("Missing private XQuartz display")?;
+    let path = Path::new(&display);
+    if !path.is_absolute() {
+        return Err("Expected a private XQuartz socket path".into());
+    }
+    let authority = std::env::var_os("XAUTHORITY").ok_or("Missing private XQuartz authority")?;
+    let mut bytes = zeroize::Zeroizing::new(Vec::new());
+    std::fs::File::open(authority)
+        .and_then(|file| file.take(1025).read_to_end(&mut bytes))
+        .map_err(|error| error.to_string())?;
+    if bytes.len() > 1024 {
+        return Err("Private XQuartz authority is oversized".into());
+    }
+    let cookie = crate::ssh::x11::authority_cookie(&bytes, 0, b"", true)?;
+    let socket = UnixStream::connect(path).map_err(|error| error.to_string())?;
+    let (stream, _) = DefaultStream::from_unix_stream(socket).map_err(|error| error.to_string())?;
+    let connection = RustConnection::connect_to_stream_with_auth_info(
+        stream,
+        0,
+        b"MIT-MAGIC-COOKIE-1".to_vec(),
+        cookie.to_vec(),
+    )
+    .map_err(|error| error.to_string())?;
+    let screen = &connection.setup().roots[0];
+    let mut report = super::XCapabilities {
+        dimensions: [screen.width_in_pixels.into(), screen.height_in_pixels.into()],
+        errors: vec!["OpenGL pixel readback and RandR mode switching are unavailable in the private XQuartz probe.".into()],
+        ..Default::default()
+    };
+    if let Ok(request) = glx::query_version(&connection, 1, 4) {
+        match request.reply() {
+            Ok(version) => {
+                report.glx_version = Some(format!(
+                    "{}.{}",
+                    version.major_version, version.minor_version
+                ));
+            }
+            Err(error) => report
+                .errors
+                .push(format!("GLX version query failed: {error}")),
+        }
+    }
+    if let Ok(request) = randr::query_version(&connection, 1, 5) {
+        match request.reply() {
+            Ok(version) => {
+                report.randr_version = Some(format!(
+                    "{}.{}",
+                    version.major_version, version.minor_version
+                ));
+            }
+            Err(error) => report
+                .errors
+                .push(format!("RandR version query failed: {error}")),
+        }
+    }
+    let composite = connection
+        .query_extension(b"Composite")
+        .map_err(|error| error.to_string())?
+        .reply()
+        .map_err(|error| error.to_string())?;
+    if composite.present {
+        report
+            .errors
+            .push("Composite is advertised by this display and remains unqualified.".into());
+    } else {
+        report
+            .errors
+            .push("Composite is disabled in private XQuartz.".into());
+    }
+    Ok(report)
+}
+
 pub(super) fn bundled_runtime(root: &Path) -> Result<(std::path::PathBuf, String), String> {
     let pin = native_policy::macos_pin()?;
-    let package = root.join("x11/macos-universal-private1");
+    let package = root.join(native_policy::MACOS_RUNTIME);
     let _verified = VerifiedSnapshot::create(&package, pin.files)?;
     Ok((package.join(pin.executable), pin.version.into()))
 }
@@ -25,7 +109,9 @@ pub(super) fn start(
     flag: &AtomicBool,
 ) -> Result<XServerLease, String> {
     native_transport::cancelled(flag)?;
-    if options.artifact_id != native_policy::MACOS_ARTIFACT {
+    if options.artifact_id != native_policy::MACOS_ARTIFACT
+        && options.artifact_id != "xquartz-2.8.6-termcraft-private1-macos-universal"
+    {
         return Err("Unsupported packaged macOS X server artifact".into());
     }
     if options.monitor.is_some() || options.display_mode != XDisplayMode::Windowed {
@@ -40,7 +126,7 @@ fn launch(
     pin: &native_policy::NativePin,
 ) -> Result<XServerLease, String> {
     native_transport::cancelled(flag)?;
-    let image = VerifiedSnapshot::create(&root.join("x11/macos-universal-private1"), pin.files)?;
+    let image = VerifiedSnapshot::create(&root.join(native_policy::MACOS_RUNTIME), pin.files)?;
     let runtime = tempfile::Builder::new()
         .prefix("termcraft-x11-")
         .permissions(std::fs::Permissions::from_mode(0o700))
@@ -147,7 +233,6 @@ fn launch(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use sha2::{Digest, Sha256};
 
     #[test]
     #[ignore = "requires an explicitly staged local XQuartz candidate and a macOS desktop"]
@@ -156,38 +241,27 @@ mod tests {
             std::env::var_os("TERMCRAFT_TEST_XQUARTZ_ROOT")
                 .expect("set the explicit fixture resource root"),
         );
-        let candidate = root.join("x11/macos-universal-private1");
-        let manifest_path = candidate.join("NATIVE-BUILD.json");
-        let bytes = std::fs::read(manifest_path).unwrap();
-        let expected = std::env::var("TERMCRAFT_TEST_XQUARTZ_MANIFEST_SHA256").unwrap();
-        let digest: String = Sha256::digest(&bytes)
-            .iter()
-            .map(|byte| format!("{byte:02x}"))
-            .collect();
-        assert_eq!(digest, expected);
-        let manifest: &'static serde_json::Value =
-            Box::leak(Box::new(serde_json::from_slice(&bytes).unwrap()));
-        let files = manifest["files"]
-            .as_object()
-            .unwrap()
-            .iter()
-            .map(|(path, hash)| (path.as_str(), hash.as_str().unwrap()))
-            .collect::<Vec<_>>();
-        // Fixture-only pins have no path to the compiled runtime policy.
-        let pin = native_policy::NativePin {
-            files: Box::leak(files.into_boxed_slice()),
-            executable: "XQuartz.app/Contents/MacOS/X11.bin",
-            version: "local qualification fixture",
-        };
-        assert!(native_policy::macos_pin().is_err());
+        let options = XServerOptions::default();
         let cancelled = AtomicBool::new(true);
         assert!(
-            launch(&root, &cancelled, &pin)
+            start(&root, options.clone(), &cancelled)
                 .err()
                 .unwrap()
                 .contains("cancel")
         );
-        let lease = launch(&root, &AtomicBool::new(false), &pin).unwrap();
+        let lease = start(&root, options, &AtomicBool::new(false)).unwrap();
+        let executable = root.with_file_name("MacOS").join("harbor-workspace");
+        let report = super::super::XCapabilities::probe_with_executable(
+            &lease.client_display(),
+            &executable,
+            &AtomicBool::new(false),
+        )
+        .unwrap();
+        assert!(report.dimensions.iter().all(|&value| value > 0));
+        assert!(report.composite_version.is_none());
+        assert!(!report.rendering_verified());
+        assert!(report.randr_change.is_none());
+        eprintln!("Private XQuartz capability report: {report:?}");
         let pid = lease.process.id().unwrap() as libc::pid_t;
         assert_eq!(unsafe { libc::getpgid(pid) }, pid);
         let display = std::path::PathBuf::from(&lease.display);

@@ -155,10 +155,42 @@ fn x11_cookie_forwarding_shares_the_authenticated_connection() {
     let mut config = server.config();
     config.session.x11 = true;
     let mut handle = ConnectionHandle::connect(config).expect("Embedded X11 must be available");
+    verify_forwarded_connection(&server, &mut handle, None);
+}
+
+#[cfg(target_os = "macos")]
+#[test]
+#[ignore = "requires an explicitly staged Apple Silicon package and a macOS desktop"]
+fn managed_ssh_forwards_to_packaged_xquartz() {
+    use harbor_workspace::x11::{XDisplaySource, XServerManager, XServerOptions};
+    let package = std::env::var_os("TERMCRAFT_TEST_XQUARTZ_ROOT")
+        .expect("set the explicit fixture resource root");
+    let lease = XServerManager::for_installation(package.into())
+        .start(XServerOptions::default())
+        .unwrap();
+    let server = AuthServer::start(Mode::NativeX11);
+    let mut config = server.config();
+    config.session.x11 = true;
+    config.session.x11_source = XDisplaySource::Owned;
+    let mut handle = ConnectionHandle::connect_with_managed_x11(config).unwrap();
+    verify_forwarded_connection(&server, &mut handle, Some(lease.client_display()));
+    let socket = std::path::PathBuf::from(lease.display());
+    lease.stop_owned().unwrap();
+    assert!(!socket.exists());
+}
+
+fn verify_forwarded_connection(
+    server: &AuthServer,
+    handle: &mut ConnectionHandle,
+    mut managed_display: Option<harbor_workspace::x11::XClientDisplay>,
+) {
     let deadline = Instant::now() + Duration::from_secs(6);
     while Instant::now() < deadline && !server.x11_verified() {
         for event in handle.poll() {
             match event {
+                ConnectionEvent::NeedsXDisplay { .. } => {
+                    handle.supply_x_display(Ok(managed_display.take().unwrap()));
+                }
                 ConnectionEvent::Challenge { id, host_key, .. } => {
                     assert!(!host_key);
                     handle
@@ -180,4 +212,9 @@ fn x11_cookie_forwarding_shares_the_authenticated_connection() {
     assert!(server.x11_verified());
     assert_eq!(server.count(), 1);
     handle.cancel();
+    let deadline = Instant::now() + Duration::from_secs(3);
+    while !handle.is_finished() && Instant::now() < deadline {
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    assert!(handle.is_finished());
 }
