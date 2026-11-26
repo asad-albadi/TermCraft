@@ -848,6 +848,18 @@ authentication, and observed listener removal after stopping the managed
 service. The test retained no screenshots and sent no desktop pixels,
 clipboard data or input to the connection.
 
+The installed signed Npcap 1.79 provider loaded from `System32/Npcap`.
+The `wpcap.dll` SHA-256 was
+`1ae0d3234720f671b6a58bf5d1ff77d7060697abccaea1c39b12359035b92833`.
+`cargo +1.96.1 test --locked --test packet_capture -- --include-ignored --test-threads=1`
+passed three tests. The live case passed five additional consecutive
+replays on `\Device\NPF_Loopback` using a filter restricted to the two
+owned IPv4 UDP endpoints and their ephemeral ports. It verified that the
+excluded datagram was absent, the selected payload and DLT_NULL were exact,
+and that truncation, packet/byte/time limits, cancellation and collision-safe
+file publication worked. Existing capture driver and service settings were
+preserved. A routed adapter and peer remain separate acceptance fixtures.
+
 [The clean Windows 2025 runner](https://github.com/asad-albadi/TermCraft/actions/runs/45692468865/job/139481228493)
 passed the package contract suite and built the unsigned ZIP
 `606ff9ab626e1e6bb4018c2f32cb2c3759670638e961d5098baa48d229a574f3`.

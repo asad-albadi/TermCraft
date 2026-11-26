@@ -616,13 +616,14 @@
       "requires": [],
       "dependency": "",
       "remaining": "",
-      "validation_remaining": "Collect native Windows/Npcap and macOS capture/permissions, deployed-tool and original workflow evidence; Linux namespace capture is fixture evidence only.",
+      "validation_remaining": "Linux namespace and native Windows Npcap loopback fixtures passed. Collect Windows routed-adapter and macOS capture/permissions, deployed-tool and original workflow evidence.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/P07/review.md",
-        "docs/parity-evidence/parallel-integration-ftp-tools/README.md"
+        "docs/parity-evidence/parallel-integration-ftp-tools/README.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
       ],
-      "next_action": "Collect native Windows/Npcap and macOS capture/permissions, deployed-tool and original workflow evidence; Linux namespace capture is fixture evidence only."
+      "next_action": "Collect Windows routed-adapter and macOS capture/permissions, deployed-tool and original workflow evidence."
     },
     {
       "id": "P08",
