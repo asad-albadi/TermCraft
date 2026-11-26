@@ -9,5 +9,6 @@ records `NATIVE-BUILD.json`.
 
 `macos_pin()` approves the exact arm64 inventory for authenticated private
 windowed X11. Package staging and runtime startup both check hashes before
-using the staged tree. Distribution, the macOS 14 runtime replay, active
-graphics and XDMCP have open evidence requirements.
+using the staged tree. Startup and the private X11 lifecycle were replayed on
+macOS 14.8.7. Distribution, active graphics and XDMCP have open evidence
+requirements.

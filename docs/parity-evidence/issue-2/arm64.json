@@ -13,6 +13,7 @@
   "artifacts": [
     {"path": "TermCraft-0.1.0-macos-aarch64.zip", "sha256": "0d760eb3df93c7ddc255a16d2885925e4a02f704f9d0b196762a3b595322ba2b", "source_revision": "ebe40a693d8740329b33f33309c0a422cec6cb9d"},
     {"path": "TermCraft-0.1.0-macos-aarch64-xquartz.zip", "sha256": "2241340fdf4d3d2aca0a8bdb3bc8bb7d3e1c57fb155c841c568de7b6a74edea8"},
+    {"path": "TermCraft-0.1.0-macos-aarch64-xquartz.zip", "sha256": "eb5ef97d63cc01cc64537d794171bd383611f74ba0455a7690b45e3486a3c4f8", "source_revision": "788439b3d10127ded70be134bf316071212b40e5"},
     {"path": "TermCraft-0.1.1-macos-aarch64-xquartz.zip", "sha256": "3f114af3ce928a1100617e4cf61b7cc6ceb260d9db05c73e3563ffb910a270b3", "source_revision": "fe4fa0c115ea56a4469ebcf59a26d201791d27d3", "use": "version upgrade fixture"},
     {"path": "TermCraft-XQuartz-private-arm64.zip", "sha256": "8809e99e1df82b7ebba8b72587c932bb2822d6089edc98dbbc839ec74078c83c"}
   ],
@@ -26,6 +27,7 @@
     {"name": "Private XQuartz cookie, owned process lifecycle and SSH/X under the 256 descriptor limit", "result": "passed"},
     {"name": "Core X11 pixmap readback and private-display UTF-8 clipboard on macOS 26.6.2 and 14.8.7", "result": "passed"},
     {"name": "Bash, Zsh and Fish integration", "result": "passed", "passed": 9, "failed": 0, "ignored": 0},
+    {"name": "Signed upstream Dropbear fixture, pinned-key shell and literal SFTP round trip", "result": "passed", "passed": 1, "failed": 0, "ignored": 0},
     {"name": "Native terminal programs", "result": "passed", "passed": 3, "failed": 0, "ignored": 0}
   ],
   "unavailable": [

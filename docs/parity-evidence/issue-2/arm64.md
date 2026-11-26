@@ -122,6 +122,19 @@ and incorrect-cookie setup, accepted the owned cookie and verified cleanup.
 This covers runtime startup on the tested macOS 14 patch level, with physical
 devices and permission-mediated workflows tracked separately.
 
+The branch rebuild from `788439b3d10127ded70be134bf316071212b40e5`
+produced ZIP SHA-256
+`eb5ef97d63cc01cc64537d794171bd383611f74ba0455a7690b45e3486a3c4f8`,
+frozen inputs
+`0ec0abe3eac66b668f7be17a099a4443ef25d8b0950a975af7c3c163c6d2406c`
+and GUI executable
+`5351578ec1c0d1b22133a47ec33f167437669750aa631ec590560c3d177018e6`.
+The launcher, RDP helper and XQuartz inventory hashes matched the previous
+package. The startup verifier passed on the host and guest, including live
+RDP negotiation and the packaged helper identity. The guest frame was
+1024×656. The host XQuartz-owner and managed SSH/X tests also passed against
+this ZIP under the 256-descriptor limit.
+
 The arm64 rerun used `cargo +1.96.1 test --locked --all-targets --no-fail-fast`
 with four test threads. It reported 911 passed, zero failed and 11 ignored
 across 74 targets. The extra ignored case is the managed SSH/X test, which
@@ -129,6 +142,17 @@ passed separately against the verified package. The locked RDP helper passed
 27 tests. With installed Fish 4.9.3, `shell_directory --include-ignored`
 passed nine tests across Bash, Zsh and Fish. Installed Chrome and the native
 terminal-program runs passed four and three tests respectively.
+
+The full suite returned the same counts after the portable mode fix in
+`ea9f46280823ad8a09f0c9182a74b15c2f566ea2`.
+
+The native Dropbear 2026.94 fixture passed key verification, shell I/O and
+a 90,000-byte SFTP round trip with a literal filename over one authenticated
+connection. `scripts/prepare-dropbear-interop.sh` checked the upstream SHA-256
+and pinned OpenPGP fingerprint before building. Darwin lacks `setresgid`.
+The fixture build uses Dropbear's session-child user switch and omits Unix
+socket forwarding. The signing-key import now uses a short private directory
+to fit Darwin's socket path limit.
 
 The Linux RDP failure
 `devices_tests::drive_allocation_is_released_on_last_remote_close_and_disconnect`
@@ -155,6 +179,14 @@ checks. The programmatic Services invocation returned false and actual Finder
 menu activation remains unverified. XQuartz deliberately disables upstream
 host pasteboard sync, so X11 selection tests cover only the private display.
 Public distribution approval and release automation replay remain open.
+
+The official Chromium Mac_Arm snapshot at build 1755275 was inspected.
+Its archive SHA-256 was
+`994053eadf27c3d03558b81ad67ec7bbed4943f6b7dd0cce75408cb23bfe70fc`.
+Chromium 160.0.8185.0 was arm64 and its framework used relative symlinks.
+`codesign --verify --deep --strict` rejected the app because its resource
+seal was incomplete. The bundled provider remains gated pending a complete
+signed artifact and a stager that preserves its verified framework links.
 
 Run external-display/Retina scaling and GPU workflows on physical hardware.
 Exercise physical CUPS printer, PCSC smart-card and serial devices, and real

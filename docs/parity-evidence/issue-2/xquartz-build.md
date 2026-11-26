@@ -55,5 +55,6 @@ and `cargo +1.96.1 test --locked --test ssh_authentication managed_ssh_forwards_
 `macos_pin()` now approves the exact private windowed arm64 inventory
 `0fd1bb3ffd162962691d4b7c0b6283b53e448b6a50a51c502c86074b5317f171`.
 The source-built runtime does not start or register the user's XQuartz.
-Minimum-OS confirmation, release distribution, XDMCP, native clipboard
-interoperability and measured graphics remain open.
+The packaged runtime passed authentication, core pixel readback and private
+clipboard exchange on macOS 26.6.2 and 14.8.7. Release distribution, XDMCP,
+host clipboard interoperability and active GLX/RandR testing remain open.
