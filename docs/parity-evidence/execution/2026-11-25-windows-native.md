@@ -243,6 +243,12 @@
   files, Windows aliases/reparse points and prebuilt app requests. The real
   candidate was rejected before build under the repository's empty shipping
   inventory. The installed gate remains closed pending exact artifact approval.
+- The optional X package's normal GUI/ConPTY launch started the exact
+  private image and enforced the cookie. Enumerating both Windows TCP
+  families revealed a second `::1` listener when the launch specified the
+  generic `tcp` transport. The Windows launch now explicitly selects `inet`
+  and fails closed if the owned PID has an IPv6 listener. The earlier wire
+  fixtures examined IPv4 ownership only.
 - The clean candidate's three app-local Microsoft VC143 CRT files came
   from the installed x64 `Microsoft.VC143.CRT` redistribution directory.
   All three matched the hashes, file version and valid Authenticode
@@ -593,6 +599,19 @@ after extending the bounded cleanup retry on the worker. Browser library
 tests then reported 21 passed and two ignored. One older synthetic profile
 remained after automatic review rejected a separate manual removal.
 
+The unpublished native package used the exact publisher credits HTML
+recovered from Chrome for Testing `resources.pak` resource 41091. The credits
+SHA-256 was `44832a0cf338d2be9efe72f3a982c8cc5d9ce764a4aabd8e63320b3d7ba7dadf`.
+The Windows ZIP SHA-256 was
+`5a828b1fffd7fe865accb5faa63b2ba7437494df60fde0eb8d1aa2dec242d030`.
+The real relocated GUI opened the saved browser session on a disposable
+workspace and reached the isolated HTTP origin. The running browser image
+came from a newly copied private profile runtime and matched the packaged
+digest `bd953b9f1a09345577cfd4039ede666ad5a2c47d86e5a5bf8ce6c3eb108bf1d9`.
+The fixture used the disposable workspace's explicit no-confirmation close
+preference. Closing the GUI exited normally and removed the runtime and
+profile. Production packaging retains the unapproved browser pin.
+
 The upstream Chromium tag `158.0.8127.88` resolved to
 `0cefb18236a23db1ebb6b2bc040fbbaf8cbe759e`. Its checked-out `DEPS` SHA-256
 was `db3d3a3f508dd4210446814aa977d6ef9e4a046194b04a94ad6a0d3ea5f39017`
@@ -601,7 +620,12 @@ side-by-side VS 2026 Build Tools installation completed at 18.11.12405.450
 with MSVC 14.52.37025. Windows SDK and x64 debugging tools installed at
 10.0.28000.2270. An initial source dependency fetch returned HTTP 429 from
 Chromium's libgav1 repository. A four-job retry proceeded through the
-owned worktree checkouts. This records source and toolchain setup.
+owned worktree checkouts, but V8's general ref fetch hit a transfer timeout.
+A shallow fetch of the exact DEPS revision
+`b601a2347f005e8bfadd32f285df97ffba5cf1bd` allowed the exact dependency sync
+and hooks to complete. The candidate build uses the checkout on the local
+data volume and a dedicated SSD output directory. This records source and
+toolchain setup.
 
 ## Pageant
 
@@ -709,3 +733,9 @@ with an OpenGL 2.0 or later context.
   seven passed, zero failed and nine ignored. The earlier exploratory Linux
   workspace replay also failed SSH fixtures at the unchanged hard-coded
   `/usr/bin/sshd` path. That replay lacked the fixture executable there.
+- With the wider XDMCP filter at `178ab9a`, the [Linux push job](https://github.com/asad-albadi/TermCraft/actions/runs/45856050380/job/140034595717)
+  passed 49 XDMCP tests and ignored 15. The [same-commit PR job](https://github.com/asad-albadi/TermCraft/actions/runs/45856062150/job/140034636195)
+  hit `UnexpectedEof` in the Linux clipboard recovery deadline fixture
+  (48 passed, one failed and 15 ignored). The Linux clipboard source and its
+  fixture match current main byte-for-byte. Both jobs retained the independent
+  Linux RDP helper allocation failure.

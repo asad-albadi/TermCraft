@@ -111,10 +111,12 @@ def choose_indirect_host(pid):
     raise AssertionError("The candidate did not present an owned XDMCP chooser with the fixture host")
 
 
+IPV4_ONLY = ["-listen", "inet", "-nolisten", "inet6", "-nolisten", "hyperv"]
+
+
 def candidate_args(candidate, display, log):
     return [candidate / "vcxsrv.exe", f":{display}", "-noreset", "-silent-dup-error",
-            "-nolisten", "inet6", "-nolisten", "hyperv", "-nopn", "-iglx", "-noclipboard",
-            "-logfile", log]
+            "-nopn", "-iglx", "-noclipboard", "-logfile", log]
 
 
 def candidate_environment(candidate, scratch):
@@ -143,7 +145,7 @@ def binary_authority(candidate, evidence, probe_executable=None):
         cookie = b"\x1a\r\n" + secrets.token_bytes(13)
         auth.write_bytes(struct.pack(">H", 65535) + field(b"") + field(str(display).encode())
                          + field(b"MIT-MAGIC-COOKIE-1") + field(cookie))
-        args = candidate_args(candidate, display, log) + ["-auth", auth, "-listen", "tcp"]
+        args = candidate_args(candidate, display, log) + ["-auth", auth] + IPV4_ONLY
         child = subprocess.Popen(args, cwd=candidate, env=candidate_environment(candidate, scratch))
         try:
             deadline = time.monotonic() + 8
@@ -193,7 +195,7 @@ def run(candidate, evidence, indirect):
         log = Path(scratch) / "server.log"
         args = candidate_args(candidate, display, log) + [
             "-from", "127.0.0.1", "-port", str(peer.getsockname()[1]),
-            "-indirect" if indirect else "-query", "127.0.0.1"]
+            "-indirect" if indirect else "-query", "127.0.0.1"] + IPV4_ONLY
         child = subprocess.Popen(args, cwd=candidate, env=candidate_environment(candidate, scratch))
         try:
             _, sender = receive(peer, 3 if indirect else 2)

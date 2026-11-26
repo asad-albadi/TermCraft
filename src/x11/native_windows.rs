@@ -14,7 +14,10 @@ use std::{
     sync::atomic::AtomicBool,
     time::{Duration, Instant},
 };
-use windows_sys::Win32::{NetworkManagement::IpHelper::*, Networking::WinSock::AF_INET};
+use windows_sys::Win32::{
+    NetworkManagement::IpHelper::*,
+    Networking::WinSock::{AF_INET, AF_INET6},
+};
 pub(super) fn bundled_runtime(root: &Path) -> Result<(std::path::PathBuf, String), String> {
     let pin = native_policy::windows_pin()?;
     let package = root.join("x11/windows-x86_64-private1");
@@ -148,13 +151,7 @@ fn launch(
         format!(":{display}"),
         "-noreset".into(),
         "-silent-dup-error".into(),
-        "-nolisten".into(),
-        "inet6".into(),
-        "-nolisten".into(),
-        "hyperv".into(),
         "-nopn".into(),
-        "-listen".into(),
-        "tcp".into(),
         "-iglx".into(),
         "-auth".into(),
     ]
@@ -197,6 +194,15 @@ fn launch(
         ]);
     }
     arguments.extend(request.extra);
+    // XDMCP options re-enable the generic TCP transports as they are parsed.
+    arguments.extend([
+        "-listen".into(),
+        "inet".into(),
+        "-nolisten".into(),
+        "inet6".into(),
+        "-nolisten".into(),
+        "hyperv".into(),
+    ]);
     let mut environment = vec![
         ("PATH".into(), image.root().as_os_str().into()),
         ("TEMP".into(), runtime.path().as_os_str().into()),
@@ -266,17 +272,14 @@ fn launch(
     })
 }
 
-fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
-    let SocketAddr::V4(expected) = address else {
-        return Err("The private Windows X listener requires an IPv4 address".into());
-    };
+fn tcp_listener_table(family: u32) -> Result<Vec<u64>, String> {
     let mut size = 0;
     unsafe {
         GetExtendedTcpTable(
             std::ptr::null_mut(),
             &mut size,
             0,
-            AF_INET as u32,
+            family,
             TCP_TABLE_OWNER_PID_LISTENER,
             0,
         );
@@ -291,7 +294,7 @@ fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
                 storage.as_mut_ptr().cast(),
                 &mut size,
                 0,
-                AF_INET as u32,
+                family,
                 TCP_TABLE_OWNER_PID_LISTENER,
                 0,
             )
@@ -304,32 +307,55 @@ fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
                 "Cannot prove native X listener ownership: {result}"
             ));
         }
-        let table = storage.as_ptr().cast::<MIB_TCPTABLE_OWNER_PID>();
-        let count = unsafe { (*table).dwNumEntries } as usize;
-        if count > (storage.len() * 8 - 4) / size_of::<MIB_TCPROW_OWNER_PID>() {
-            return Err("Invalid native listener ownership table".into());
-        }
-        let rows = unsafe {
-            std::slice::from_raw_parts(
-                std::ptr::addr_of!((*table).table).cast::<MIB_TCPROW_OWNER_PID>(),
-                count,
-            )
-        };
-        let mut found = false;
-        for row in rows.iter().filter(|row| row.dwOwningPid == pid) {
-            if row.dwLocalAddr != u32::from_ne_bytes(expected.ip().octets())
-                || u16::from_be(row.dwLocalPort as u16) != address.port()
-            {
-                return Err(
-                    "Private X engine opened a listener outside its reserved address and port"
-                        .into(),
-                );
-            }
-            found = true;
-        }
-        return Ok(found);
+        return Ok(storage);
     }
     Err("Native listener ownership table kept changing".into())
+}
+
+fn owns_listener(pid: u32, address: SocketAddr) -> Result<bool, String> {
+    let SocketAddr::V4(expected) = address else {
+        return Err("The private Windows X listener requires an IPv4 address".into());
+    };
+    let v6 = tcp_listener_table(AF_INET6 as u32)?;
+    let table = v6.as_ptr().cast::<MIB_TCP6TABLE_OWNER_PID>();
+    let count = unsafe { (*table).dwNumEntries } as usize;
+    if count > (v6.len() * 8 - 4) / size_of::<MIB_TCP6ROW_OWNER_PID>() {
+        return Err("Invalid native IPv6 listener ownership table".into());
+    }
+    let rows = unsafe {
+        std::slice::from_raw_parts(
+            std::ptr::addr_of!((*table).table).cast::<MIB_TCP6ROW_OWNER_PID>(),
+            count,
+        )
+    };
+    if rows.iter().any(|row| row.dwOwningPid == pid) {
+        return Err("Private Windows X opened an unexpected IPv6 listener".into());
+    }
+
+    let v4 = tcp_listener_table(AF_INET as u32)?;
+    let table = v4.as_ptr().cast::<MIB_TCPTABLE_OWNER_PID>();
+    let count = unsafe { (*table).dwNumEntries } as usize;
+    if count > (v4.len() * 8 - 4) / size_of::<MIB_TCPROW_OWNER_PID>() {
+        return Err("Invalid native IPv4 listener ownership table".into());
+    }
+    let rows = unsafe {
+        std::slice::from_raw_parts(
+            std::ptr::addr_of!((*table).table).cast::<MIB_TCPROW_OWNER_PID>(),
+            count,
+        )
+    };
+    let mut found = false;
+    for row in rows.iter().filter(|row| row.dwOwningPid == pid) {
+        if row.dwLocalAddr != u32::from_ne_bytes(expected.ip().octets())
+            || u16::from_be(row.dwLocalPort as u16) != address.port()
+        {
+            return Err(
+                "Private X engine opened a listener outside its reserved address and port".into(),
+            );
+        }
+        found = true;
+    }
+    Ok(found)
 }
 
 #[cfg(test)]

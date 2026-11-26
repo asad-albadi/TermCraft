@@ -476,7 +476,7 @@ def main():
         cookie = secrets.token_bytes(16)
         write_authority(auth, args.address, display_number, cookie)
         arguments = [candidate / "vcxsrv.exe", f":{display_number}", "-screen", "0", "640x480", "-noreset",
-                     "-silent-dup-error", "-nolisten", "inet6", "-nolisten", "hyperv", "-nopn", "-iglx", "-listen", "tcp",
+                     "-silent-dup-error", "-nopn", "-iglx",
                      "-auth", auth, "-logfile", evidence / "server.log", "-clipboard", "-noprimary"]
         environment = candidate_environment(candidate, scratch)
         if args.address != "127.0.0.1":
@@ -485,6 +485,7 @@ def main():
             peer.bind((args.address, 0))
             peer.settimeout(8)
             arguments.extend(["-from", args.address, "-port", str(peer.getsockname()[1]), "-query", args.address])
+        arguments.extend(["-listen", "inet", "-nolisten", "inet6", "-nolisten", "hyperv"])
         with win.server(arguments, candidate, environment, *isolated[:2]) as (process, wait):
             accept_owned_listener(win, process, wait, args.address, port, cookie, isolated)
             if peer is not None:
