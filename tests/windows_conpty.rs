@@ -62,6 +62,38 @@ fn powershell_round_trips_unicode_after_conpty_resize() {
 }
 
 #[test]
+fn cmd_runs_a_quoted_output_path_through_conpty() {
+    let temporary = tempfile::tempdir().unwrap();
+    let cmd = PathBuf::from(std::env::var_os("SystemRoot").unwrap()).join("System32/cmd.exe");
+    let output_file = temporary.path().join("legacy command output.txt");
+    let command = "echo TERMCRAFT_COMMAND>\"legacy command output.txt\"";
+    let mut process = Process::spawn(
+        cmd.to_str().unwrap(),
+        &["/D".into(), "/C".into(), command.into()],
+        Some(temporary.path()),
+        80,
+        25,
+    )
+    .unwrap();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while !process.exited && Instant::now() < deadline {
+        process.poll();
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    let output: Vec<_> = process.rx.try_iter().flatten().collect();
+    assert_eq!(
+        process.exit_message,
+        "Process ended with code 0",
+        "cmd output: {}",
+        String::from_utf8_lossy(&output)
+    );
+    assert_eq!(
+        std::fs::read_to_string(output_file).unwrap().trim(),
+        "TERMCRAFT_COMMAND"
+    );
+}
+
+#[test]
 fn native_console_program_restores_primary_screen_after_fullscreen_resize() {
     use harbor_workspace::terminal::Screen;
     use std::io::{self, Write};

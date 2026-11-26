@@ -194,6 +194,13 @@
   accepted input and received a resize from 80 × 25 to 100 × 32. TermCraft's
   terminal parser consumed the real ConPTY output and observed the original
   primary screen after the alternate buffer closed.
+- The default Harbor replay also exposed a `cmd.exe /D /C` launch defect.
+  Quoting the switches as regular Windows argv and passing a forward slash
+  in the executable path interfered with cmd's own parser. The native
+  command path now uses `/D /S /C` and preserves the script's internal quotes.
+  The regression failed with exit code 1 before the fix and then passed
+  through ConPTY, writing the expected output to a path with spaces. The
+  complete Windows ConPTY target passed all three tests.
 - Windows VNC scope is GDI capture of the active primary desktop.
   `cargo +1.96.1 test --locked --lib services::vnc -- --test-threads=1`
   reported 20 passed and 4 ignored. The opt-in native inactive-desktop test
