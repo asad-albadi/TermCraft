@@ -722,6 +722,15 @@ rebuilt debug worker SHA-256 was
 `1a0d12f1329f64458d73876f8d53e317538f3d9b4a9b973dcf18e429307723f7`.
 Its actual printer-worker INIT acknowledged the same PDF queue with status
 zero. This was a readiness check. It submitted no print job to that queue.
+The [hosted release replay](https://github.com/asad-albadi/TermCraft/actions/runs/45876074916/job/140103362925)
+used the packaged helper SHA-256
+`3919b6dc18f19e700c8c6d94e2152b38053cb7cf28e2c10a98b2dea0965e80db`.
+The independent loopback receiver matched the complete RAW payload. Abort
+left no queued job and opened no connection. The disposable queue was
+removed, but the hosted PrintManagement provider refused to remove its TCP
+port. The fixture now checks the specific endpoint and uses the native
+TCP/IP port CIM provider. Native local creation and removal passed through
+that provider. The complete hosted lifecycle replay remains open.
 
 ## Personal 26.6 reference replay
 

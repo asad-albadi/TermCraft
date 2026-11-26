@@ -43,14 +43,16 @@ $driver = 'Generic / Text Only'
 $queue = 'TermCraft-Print-' + [guid]::NewGuid().ToString('N')
 $listener = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
 $createdPort = $createdQueue = $createdDriver = $false
+$portNumber = $null
 $spoolerWasRunning = (Get-Service Spooler).Status -eq 'Running'
 try {
     $listener.Start()
+    $portNumber = $listener.LocalEndpoint.Port
     if (!$spoolerWasRunning) { Start-Service Spooler }
-    Add-PrinterPort -Name $queue -PrinterHostAddress 127.0.0.1 -PortNumber $listener.LocalEndpoint.Port
+    Add-PrinterPort -Name $queue -PrinterHostAddress 127.0.0.1 -PortNumber $portNumber
     $createdPort = $true
     $rawPort = Get-PrinterPort -Name $queue
-    if ($rawPort.PrinterHostAddress -ne '127.0.0.1' -or $rawPort.PortNumber -ne $listener.LocalEndpoint.Port -or $rawPort.SNMPEnabled) {
+    if ($rawPort.PrinterHostAddress -ne '127.0.0.1' -or $rawPort.PortNumber -ne $portNumber -or $rawPort.SNMPEnabled) {
         throw 'The disposable RAW port did not retain its loopback settings.'
     }
     if (!(Get-PrinterDriver -Name $driver -ErrorAction SilentlyContinue)) {
@@ -96,13 +98,17 @@ try {
     if ($createdQueue) { Remove-Printer -Name $queue }
     if ($createdPort) {
         $cleanup = [Diagnostics.Stopwatch]::StartNew()
-        while (Get-PrinterPort -Name $queue -ErrorAction SilentlyContinue) {
+        while ($ownedPort = Get-CimInstance -ClassName Win32_TCPIPPrinterPort -Filter "Name='$queue'") {
+            if ($ownedPort.HostAddress -ne '127.0.0.1' -or $ownedPort.PortNumber -ne $portNumber) {
+                throw 'The fixture port name now identifies a different endpoint.'
+            }
+            if ($cleanup.Elapsed.TotalSeconds -gt 15) { throw 'Fixture printer port remains.' }
             try {
-                Remove-PrinterPort -Name $queue
+                Remove-CimInstance -InputObject $ownedPort
             } catch {
                 if ($cleanup.Elapsed.TotalSeconds -gt 15) { throw }
-                Start-Sleep -Milliseconds 200
             }
+            Start-Sleep -Milliseconds 200
         }
     }
     if ($createdDriver) { Remove-PrinterDriver -Name $driver -ErrorAction Continue }
@@ -110,3 +116,4 @@ try {
     if (Get-PrinterPort -Name $queue -ErrorAction SilentlyContinue) { throw 'Fixture printer port remains.' }
     if (!$spoolerWasRunning -and (Get-Service Spooler).Status -eq 'Running') { Stop-Service Spooler }
 }
+Write-Output 'The disposable printer queue and loopback port were removed.'
