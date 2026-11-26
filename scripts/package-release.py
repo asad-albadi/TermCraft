@@ -194,14 +194,17 @@ def cargo_invocation(state):
     return {"cwd": cwd, "env": {**variables, "CARGO_HOME": str(home), "CARGO_BUILD_JOBS": "2"}}
 
 
-def release_build(source, build_root, cargo_settings=None):
+def release_build(source, build_root, cargo_settings=None, macos_browser_fixture=False):
     if cargo_settings is None:
         cargo_settings = cargo_invocation(build_root)
     offline = ["--offline"] if os.environ.get("TERMCRAFT_OFFLINE") == "1" else []
     target_dirs = (build_root / "package-app", build_root / "package-helper")
     for manifest, target_dir in reversed(tuple(zip(PACKAGES, target_dirs, strict=True))):
+        features = ["--features", "macos-chromium-qualification"] if (
+            macos_browser_fixture and manifest == PACKAGES[0]
+        ) else []
         subprocess.run(
-            ["cargo", "build", "--release", "--locked", *offline,
+            ["cargo", "build", "--release", "--locked", *offline, *features,
              "--manifest-path", source / manifest, "--target-dir", target_dir],
             check=True, **cargo_settings,
         )
@@ -764,6 +767,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         }
         if macos_browser_fixture is not None:
             manifest["profile"] = "qualification"
+            if build_inputs is not None:
+                manifest["build"]["gui_features"] = ["macos-chromium-qualification"]
         links = {p.relative_to(root).as_posix(): os.readlink(p)
                  for p in sorted(root.rglob("*")) if p.is_symlink()}
         if links:
@@ -850,7 +855,9 @@ def main():
             with build_lock(build_root):
                 settings = cargo_invocation(build_root)
                 print(f"Building source snapshot {source.name}", flush=True)
-                app, helper = release_build(source, build_root, settings)
+                app, helper = release_build(
+                    source, build_root, settings, macos_browser_fixture=args.macos_browser_fixture is not None,
+                )
                 archive = package_release(args.platform, args.output.resolve(), app, helper, inputs, source, settings,
                                           xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary, xquartz_runtime=args.xquartz_runtime,
                                           macos_browser_fixture=args.macos_browser_fixture)
