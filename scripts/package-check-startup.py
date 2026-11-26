@@ -127,8 +127,11 @@ def windows_rdp_child(parent_pid, helper, expected_digest, software_gl=False):
 
 
 def rdp_session_probe(executable, helper, helper_digest, isolated, environment, evidence, software_gl=False):
-    workspace = isolated / "RDP test workspace"
-    workspace.mkdir()
+    host = platform.system()
+    windows_workspace = host == "Windows"
+    workspace = (Path(environment["LOCALAPPDATA"]) / "Harbor" if windows_workspace
+                 else isolated / "RDP test workspace")
+    workspace.mkdir(parents=True)
     config = workspace / "workspace.json"
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
         listener.bind(("127.0.0.1", 0))
@@ -140,9 +143,13 @@ def rdp_session_probe(executable, helper, helper_digest, isolated, environment, 
         }
         preferences = {"font_size": 19.0}
         config.write_text(json.dumps({"sessions": [profile], "preferences": preferences}))
+        args = [executable]
+        if not windows_workspace:
+            args.extend(["--data-dir", workspace])
+        args.extend(["--session", "package-rdp-test"])
         with (evidence / "rdp-session.log").open("xb") as log:
             app = subprocess.Popen(
-                [executable, "--data-dir", workspace, "--session", "package-rdp-test"],
+                args,
                 cwd=isolated, env=environment, stdin=subprocess.DEVNULL,
                 stdout=log, stderr=subprocess.STDOUT,
             )
@@ -164,7 +171,6 @@ def rdp_session_probe(executable, helper, helper_digest, isolated, environment, 
                         header = incoming.read(4)
                         if len(header) != 4 or header[:2] != b"\x03\x00":
                             raise ValueError("Packaged RDP session did not send a TPKT header.")
-                        host = platform.system()
                         if host == "Windows":
                             windows_rdp_child(app.pid, helper, helper_digest, software_gl)
                         elif host == "Linux":
@@ -274,6 +280,9 @@ def smoke(archive, evidence, display, software_gl=None):
             "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
             "screen_size": size, "rdp_helper_wire_version": 1,
             "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
+            "rdp_workspace": (
+                "isolated LOCALAPPDATA/Harbor default" if host == "windows" else "explicit isolated workspace"
+            ),
             "rdp_helper_child_location_verified": host in ("linux", "windows"),
             "windows_software_gl_fixture": windows_software_gl_files() if software_gl else None,
         }, indent=2) + "\n")

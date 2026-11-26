@@ -107,6 +107,15 @@
   Relocated startup with the exact helper and software renderer passed, as
   did the native installer replay with two different build images, all 11
   packaged-helper RDP endpoint tests and the opt-in ShellExecute/guard case.
+- The packaged RDP startup probe also replayed with no `--data-dir` on
+  Windows. The executable resolved a saved session from its default
+  `LOCALAPPDATA\Harbor` workspace inside a disposable profile, launched the
+  exact adjacent helper, and preserved the workspace session and preferences.
+  The test used the same optional Unix ZIP and the pinned software renderer.
+- [Windows regression job 45766796748](https://github.com/asad-albadi/TermCraft/actions/runs/45766796748/job/139729522934)
+  passed the independently locked RDP helper suite (35 passed) and the
+  full default application suite (610 passed, zero failed, 30 ignored) on
+  branch revision `9a49917`.
 - [Hosted Windows run 45750110857](https://github.com/asad-albadi/TermCraft/actions/runs/45750110857/job/139675574627)
   passed the package contract (1), IPC suite (5), vault suite (5), relocated
   GUI at 1024 × 768, adjacent-helper negotiation and installed startup,
