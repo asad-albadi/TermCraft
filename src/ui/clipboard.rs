@@ -15,7 +15,7 @@ pub(super) struct Pending {
     pub targets: Vec<u64>,
     rx: Receiver<Result<String, String>>,
 }
-struct Finished(Arc<AtomicBool>);
+pub(super) struct Finished(pub(super) Arc<AtomicBool>);
 impl Drop for Finished {
     fn drop(&mut self) {
         self.0.store(false, Ordering::Release);

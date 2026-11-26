@@ -39,7 +39,11 @@ pub struct MacosClipboard {
     clipboard: Atom,
     utf8: Atom,
     targets: Atom,
+    timestamp: Atom,
+    multiple: Atom,
+    atom_pair: Atom,
     property: Atom,
+    selection_time: Timestamp,
     text: Option<Zeroizing<String>>,
 }
 
@@ -84,7 +88,11 @@ impl MacosClipboard {
             clipboard: atom(b"CLIPBOARD")?,
             utf8: atom(b"UTF8_STRING")?,
             targets: atom(b"TARGETS")?,
+            timestamp: atom(b"TIMESTAMP")?,
+            multiple: atom(b"MULTIPLE")?,
+            atom_pair: atom(b"ATOM_PAIR")?,
             property: atom(b"TERMCRAFT_CLIPBOARD")?,
+            selection_time: x11rb::CURRENT_TIME,
             connection,
             display,
             cancelled,
@@ -97,16 +105,59 @@ impl MacosClipboard {
         let text = Zeroizing::new(text);
         validate_text(text.as_bytes())?;
         self.poll()?;
+        // Separate owner windows bind delayed requests to their publication.
+        let owner = window(&self.connection)?;
+        let result = self.publish(owner);
+        if result.is_err() {
+            let _ = self.connection.destroy_window(owner);
+            let _ = self.connection.flush();
+        }
+        self.selection_time = result?;
+        let previous = std::mem::replace(&mut self.owner, owner);
+        self.text = Some(text);
+        let _ = self.connection.destroy_window(previous);
+        self.connection.flush().map_err(error)
+    }
+
+    fn publish(&mut self, owner: Window) -> Result<Timestamp, String> {
         self.connection
-            .set_selection_owner(self.owner, self.clipboard, x11rb::CURRENT_TIME)
+            .change_property8(
+                PropMode::REPLACE,
+                owner,
+                self.property,
+                AtomEnum::INTEGER,
+                &[0],
+            )
             .map_err(error)?
             .check()
             .map_err(error)?;
-        if self.selection_owner()? != self.owner {
-            return Err("Could not take ownership of the private X11 clipboard.".into());
+        let deadline = Instant::now() + READ_TIMEOUT;
+        while Instant::now() < deadline && !self.cancelled.load(Ordering::Relaxed) {
+            unix_connection::renew(&self.connection);
+            let Some(event) = self.connection.poll_for_event().map_err(error)? else {
+                std::thread::sleep(Duration::from_millis(10));
+                continue;
+            };
+            if let Event::PropertyNotify(notice) = event
+                && notice.window == owner
+                && notice.atom == self.property
+                && notice.state == Property::NEW_VALUE
+                && notice.response_type & 0x80 == 0
+            {
+                self.connection
+                    .set_selection_owner(owner, self.clipboard, notice.time)
+                    .map_err(error)?
+                    .check()
+                    .map_err(error)?;
+                return if self.selection_owner()? == owner {
+                    Ok(notice.time)
+                } else {
+                    Err("Could not take ownership of the private X11 clipboard.".into())
+                };
+            }
+            self.selection_event(event)?;
         }
-        self.text = Some(text);
-        Ok(())
+        Err("The private X11 clipboard ownership request expired or was cancelled.".into())
     }
 
     pub fn read_text(&mut self) -> Result<String, String> {
@@ -215,47 +266,107 @@ impl MacosClipboard {
                     self.text = None;
                 }
             }
-            Event::SelectionRequest(request) if request.owner == self.owner => {
+            Event::SelectionRequest(request) => {
+                let older = request.time != x11rb::CURRENT_TIME
+                    && (request.time.wrapping_sub(self.selection_time) as i32) < 0;
+                if request.owner != self.owner || request.selection != self.clipboard || older {
+                    return self.notify(request, x11rb::NONE);
+                }
                 let property = if request.property == x11rb::NONE {
                     request.target
                 } else {
                     request.property
                 };
-                let conn = &self.connection;
-                let reply = match self.text.as_ref() {
-                    Some(text)
-                        if request.selection == self.clipboard && request.target == self.utf8 =>
-                    {
-                        conn.change_property8(
-                            PropMode::REPLACE,
-                            request.requestor,
-                            property,
-                            self.utf8,
-                            text.as_bytes(),
-                        )
-                    }
-                    Some(_)
-                        if request.selection == self.clipboard
-                            && request.target == self.targets =>
-                    {
-                        conn.change_property32(
-                            PropMode::REPLACE,
-                            request.requestor,
-                            property,
-                            AtomEnum::ATOM,
-                            &[self.targets, self.utf8],
-                        )
-                    }
-                    _ => {
-                        return self.notify(request, x11rb::NONE);
-                    }
+                let accepted = if request.target == self.multiple {
+                    request.property != x11rb::NONE
+                        && self.write_multiple(request.requestor, property)?
+                } else {
+                    self.write_target(request.requestor, property, request.target)?
                 };
-                let accepted = reply.map_err(error)?.check().is_ok();
                 self.notify(request, if accepted { property } else { x11rb::NONE })?;
             }
             _ => {}
         }
         Ok(())
+    }
+
+    fn write_target(
+        &self,
+        requestor: Window,
+        property: Atom,
+        target: Atom,
+    ) -> Result<bool, String> {
+        let Some(text) = &self.text else {
+            return Ok(false);
+        };
+        let conn = &self.connection;
+        let sent = if target == self.utf8 {
+            conn.change_property8(
+                PropMode::REPLACE,
+                requestor,
+                property,
+                self.utf8,
+                text.as_bytes(),
+            )
+        } else if target == self.targets {
+            conn.change_property32(
+                PropMode::REPLACE,
+                requestor,
+                property,
+                AtomEnum::ATOM,
+                &[self.targets, self.timestamp, self.multiple, self.utf8],
+            )
+        } else if target == self.timestamp {
+            conn.change_property32(
+                PropMode::REPLACE,
+                requestor,
+                property,
+                AtomEnum::INTEGER,
+                &[self.selection_time],
+            )
+        } else {
+            return Ok(false);
+        };
+        Ok(sent.map_err(error)?.check().is_ok())
+    }
+
+    fn write_multiple(&self, requestor: Window, property: Atom) -> Result<bool, String> {
+        let reply = self
+            .connection
+            .get_property(false, requestor, property, self.atom_pair, 0, 128)
+            .map_err(error)?
+            .reply();
+        let Ok(reply) = reply else {
+            return Ok(false);
+        };
+        if reply.type_ != self.atom_pair || reply.bytes_after != 0 || reply.value_len % 2 != 0 {
+            return Ok(false);
+        }
+        let Some(values) = reply.value32() else {
+            return Ok(false);
+        };
+        let mut pairs: Vec<_> = values.collect();
+        for pair in pairs.chunks_exact_mut(2) {
+            let target_property = pair[1];
+            if target_property == x11rb::NONE
+                || target_property == property
+                || !self.write_target(requestor, target_property, pair[0])?
+            {
+                pair[1] = x11rb::NONE;
+            }
+        }
+        Ok(self
+            .connection
+            .change_property32(
+                PropMode::REPLACE,
+                requestor,
+                property,
+                self.atom_pair,
+                &pairs,
+            )
+            .map_err(error)?
+            .check()
+            .is_ok())
     }
 
     fn notify(&self, request: SelectionRequestEvent, property: Atom) -> Result<(), String> {
@@ -294,7 +405,7 @@ fn window(connection: &unix_connection::Conn) -> Result<Window, String> {
             0,
             WindowClass::INPUT_ONLY,
             0,
-            &CreateWindowAux::new(),
+            &CreateWindowAux::new().event_mask(EventMask::PROPERTY_CHANGE),
         )
         .map_err(error)?
         .check()
@@ -329,6 +440,24 @@ mod tests {
         let mut second = MacosClipboard::open(display, cancelled).unwrap();
         assert!(first.read_text().unwrap_err().contains("empty"));
         transfer(&mut first, &mut second, "mac → X11 café\n✓");
+        let previous = first.owner;
+        first.write_text("replacement".into()).unwrap();
+        assert_ne!(previous, first.owner);
+        unix_connection::renew(&second.connection);
+        first
+            .selection_event(Event::SelectionRequest(SelectionRequestEvent {
+                response_type: SELECTION_REQUEST_EVENT,
+                sequence: 0,
+                time: x11rb::CURRENT_TIME,
+                owner: previous,
+                requestor: second.owner,
+                selection: first.clipboard,
+                target: first.utf8,
+                property: second.property,
+            }))
+            .unwrap();
+        assert_eq!(notification(&mut first, &second).property, x11rb::NONE);
+        check_multiple(&mut first, &second, "replacement");
         transfer(&mut second, &mut first, "X11 → mac 漢字\n🦀");
         assert!(
             first.text.is_none(),
@@ -352,5 +481,81 @@ mod tests {
             }
             assert_eq!(read.join().unwrap().unwrap(), text);
         });
+    }
+
+    fn notification(owner: &mut MacosClipboard, peer: &MacosClipboard) -> SelectionNotifyEvent {
+        let deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            owner.poll().unwrap();
+            unix_connection::renew(&peer.connection);
+            if let Some(Event::SelectionNotify(notice)) = peer.connection.poll_for_event().unwrap()
+            {
+                return notice;
+            }
+            assert!(
+                Instant::now() < deadline,
+                "X11 did not deliver the selection result"
+            );
+            std::thread::sleep(Duration::from_millis(5));
+        }
+    }
+
+    fn check_multiple(owner: &mut MacosClipboard, peer: &MacosClipboard, text: &str) {
+        unix_connection::renew(&peer.connection);
+        let pairs = [
+            peer.timestamp,
+            peer.timestamp,
+            peer.utf8,
+            peer.utf8,
+            AtomEnum::PRIMARY.into(),
+            peer.targets,
+        ];
+        peer.connection
+            .change_property32(
+                PropMode::REPLACE,
+                peer.owner,
+                peer.property,
+                peer.atom_pair,
+                &pairs,
+            )
+            .unwrap()
+            .check()
+            .unwrap();
+        peer.connection
+            .convert_selection(
+                peer.owner,
+                peer.clipboard,
+                peer.multiple,
+                peer.property,
+                x11rb::CURRENT_TIME,
+            )
+            .unwrap()
+            .check()
+            .unwrap();
+        assert_eq!(notification(owner, peer).property, peer.property);
+        let property = |name, kind, units| {
+            peer.connection
+                .get_property(false, peer.owner, name, kind, 0, units)
+                .unwrap()
+                .reply()
+                .unwrap()
+        };
+        let mut converted = pairs;
+        converted[5] = x11rb::NONE;
+        assert_eq!(
+            property(peer.property, peer.atom_pair, 6)
+                .value32()
+                .unwrap()
+                .collect::<Vec<_>>(),
+            converted
+        );
+        assert_eq!(
+            property(peer.timestamp, AtomEnum::INTEGER.into(), 1)
+                .value32()
+                .unwrap()
+                .next(),
+            Some(owner.selection_time)
+        );
+        assert_eq!(property(peer.utf8, peer.utf8, 64).value, text.as_bytes());
     }
 }

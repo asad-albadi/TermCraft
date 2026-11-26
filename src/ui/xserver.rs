@@ -24,6 +24,8 @@ pub(super) struct State {
     clipboard_pending: bool,
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
     clipboard_status: Option<String>,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    clipboard_reader: Arc<AtomicBool>,
 }
 
 enum Event {
@@ -31,19 +33,25 @@ enum Event {
     Ready(XClientDisplay),
     Ended(Result<(), String>),
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-    Clipboard(Result<Option<String>, String>),
+    Clipboard(Result<Option<(isize, String)>, String>),
 }
 
 enum Request {
     Stop,
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-    Clipboard(ClipboardDirection),
+    Clipboard(ClipboardJob),
 }
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 enum ClipboardDirection {
     ToX11,
     ToMac,
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+enum ClipboardJob {
+    Write(Result<String, String>),
+    Read(isize),
 }
 
 struct Worker {
@@ -61,6 +69,44 @@ impl Worker {
 
     fn stopping(&self) -> bool {
         self.cancelled.load(Ordering::Relaxed)
+    }
+
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    fn request_clipboard(
+        &self,
+        direction: ClipboardDirection,
+        reader: &Arc<AtomicBool>,
+    ) -> Result<(), String> {
+        match direction {
+            ClipboardDirection::ToMac => {
+                let revision = objc2_app_kit::NSPasteboard::generalPasteboard().changeCount();
+                self.requests
+                    .try_send(Request::Clipboard(ClipboardJob::Read(revision)))
+                    .map_err(|_| "The private X11 clipboard is busy.".into())
+            }
+            ClipboardDirection::ToX11 => {
+                if reader.swap(true, Ordering::AcqRel) {
+                    return Err("The macOS pasteboard is still supplying text.".into());
+                }
+                let finished = super::clipboard::Finished(reader.clone());
+                let requests = self.requests.clone();
+                let cancelled = self.cancelled.clone();
+                std::thread::Builder::new()
+                    .name("termcraft-x11-pasteboard".into())
+                    .spawn(move || {
+                        let _finished = finished;
+                        if !cancelled.load(Ordering::Relaxed) {
+                            let text = super::clipboard::read_os_text();
+                            if !cancelled.load(Ordering::Relaxed) {
+                                let _ = requests
+                                    .try_send(Request::Clipboard(ClipboardJob::Write(text)));
+                            }
+                        }
+                    })
+                    .map(|_| ())
+                    .map_err(|error| format!("Could not read the macOS pasteboard: {error}"))
+            }
+        }
     }
 }
 
@@ -165,10 +211,10 @@ impl State {
                                     return lease.stop_owned();
                                 }
                                 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-                                Ok(Request::Clipboard(direction)) => {
+                                Ok(Request::Clipboard(job)) => {
                                     let result = transfer_clipboard(
                                         &mut clipboard,
-                                        direction,
+                                        job,
                                         &lease,
                                         &worker_cancelled,
                                     );
@@ -217,12 +263,9 @@ impl State {
                     self.clipboard_pending = false;
                     if !worker.stopping() {
                         self.clipboard_status = Some(match result {
-                            Ok(Some(text)) => {
-                                if let Some(ctx) = &self.context {
-                                    ctx.copy_text(text);
-                                }
-                                "Copied X11 text to macOS.".into()
-                            }
+                            Ok(Some((revision, text))) => write_macos_pasteboard(revision, &text)
+                                .map(|()| "Copied X11 text to macOS.".into())
+                                .unwrap_or_else(|error| error),
                             Ok(None) => "Copied macOS text to X11.".into(),
                             Err(error) => error,
                         });
@@ -315,12 +358,27 @@ impl State {
 }
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn write_macos_pasteboard(revision: isize, text: &str) -> Result<(), String> {
+    use objc2_app_kit::{NSPasteboard, NSPasteboardTypeString};
+    let text = objc2_foundation::NSString::from_str(text);
+    let pasteboard = NSPasteboard::generalPasteboard();
+    if pasteboard.changeCount() != revision {
+        return Err("The macOS pasteboard changed. Copy from X11 again to replace it.".into());
+    }
+    pasteboard.clearContents();
+    if !pasteboard.setString_forType(&text, unsafe { NSPasteboardTypeString }) {
+        return Err("Could not write the macOS pasteboard.".into());
+    }
+    Ok(())
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn transfer_clipboard(
     clipboard: &mut Option<harbor_workspace::x11::MacosClipboard>,
-    direction: ClipboardDirection,
+    job: ClipboardJob,
     lease: &harbor_workspace::x11::XServerLease,
     cancelled: &Arc<AtomicBool>,
-) -> Result<Option<String>, String> {
+) -> Result<Option<(isize, String)>, String> {
     use harbor_workspace::x11::MacosClipboard;
     if cancelled.load(Ordering::Relaxed) {
         return Err("The private X display is stopping.".into());
@@ -332,13 +390,12 @@ fn transfer_clipboard(
         )?);
     }
     let clipboard = clipboard.as_mut().unwrap();
-    match direction {
-        ClipboardDirection::ToX11 => {
-            let text = super::clipboard::read_os_text()?;
-            clipboard.write_text(text)?;
+    match job {
+        ClipboardJob::Write(text) => {
+            clipboard.write_text(text?)?;
             Ok(None)
         }
-        ClipboardDirection::ToMac => clipboard.read_text().map(Some),
+        ClipboardJob::Read(revision) => clipboard.read_text().map(|text| Some((revision, text))),
     }
 }
 
@@ -602,9 +659,13 @@ impl Workspace {
                                     .on_hover_text("Transfer UTF-8 clipboard text once, up to 64 KiB.")
                                     .clicked()
                                 {
-                                    state.clipboard_pending = worker.requests
-                                        .try_send(Request::Clipboard(direction)).is_ok();
-                                    state.clipboard_status = None;
+                                    match worker.request_clipboard(direction, &state.clipboard_reader) {
+                                        Ok(()) => {
+                                            state.clipboard_pending = true;
+                                            state.clipboard_status = None;
+                                        }
+                                        Err(error) => state.clipboard_status = Some(error),
+                                    }
                                 }
                             }
                         });
@@ -742,23 +803,31 @@ mod macos_tests {
             mac_text
         );
         request(state, ClipboardDirection::ToMac);
-        let deadline = Instant::now() + Duration::from_secs(5);
-        let text = loop {
-            peer.poll().unwrap();
-            let mut output = ctx.run_ui(RawInput::default(), |_| state.poll());
-            output.textures_delta.clear();
-            if let Some(egui::OutputCommand::CopyText(text)) = output
-                .platform_output
-                .commands
-                .into_iter()
-                .find(|command| matches!(command, egui::OutputCommand::CopyText(_)))
-            {
-                break text;
-            }
-            assert!(Instant::now() < deadline, "{:?}", state.clipboard_status);
-            std::thread::sleep(Duration::from_millis(15));
-        };
-        assert_eq!(text, x11_text);
+        finish_copy(state, &mut peer);
+        assert_eq!(
+            arboard::Clipboard::new().unwrap().get_text().unwrap(),
+            x11_text
+        );
+
+        peer.write_text("old X11 copy".into()).unwrap();
+        request(state, ClipboardDirection::ToMac);
+        // The peer will only reply after the new native clipboard item exists.
+        arboard::Clipboard::new()
+            .unwrap()
+            .set_text("later macOS copy")
+            .unwrap();
+        finish_copy(state, &mut peer);
+        assert!(
+            state
+                .clipboard_status
+                .as_deref()
+                .unwrap()
+                .contains("pasteboard changed")
+        );
+        assert_eq!(
+            arboard::Clipboard::new().unwrap().get_text().unwrap(),
+            "later macOS copy"
+        );
         state.shutdown();
         assert!(peer.read_text().is_err());
     }
@@ -770,11 +839,20 @@ mod macos_tests {
                 .worker
                 .as_ref()
                 .unwrap()
-                .requests
-                .try_send(Request::Clipboard(direction))
+                .request_clipboard(direction, &state.clipboard_reader)
                 .is_ok()
         );
         state.clipboard_pending = true;
+    }
+
+    fn finish_copy(state: &mut State, peer: &mut harbor_workspace::x11::MacosClipboard) {
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while state.clipboard_pending {
+            peer.poll().unwrap();
+            state.poll();
+            assert!(Instant::now() < deadline, "{:?}", state.clipboard_status);
+            std::thread::sleep(Duration::from_millis(15));
+        }
     }
 }
 
