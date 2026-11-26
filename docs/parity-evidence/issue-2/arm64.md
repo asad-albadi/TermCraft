@@ -255,6 +255,71 @@ used the separately qualified local archive above.
 [Hosted arm64 job](https://github.com/asad-albadi/TermCraft/actions/runs/45755613396/job/139693423728)
 [Uploaded core artifact](https://github.com/asad-albadi/TermCraft/actions/runs/45755613396/artifacts/15088466715)
 
+## Managed XQuartz display and clipboard replay
+
+The combined archive built from
+`bf3916bd555a3844530871ffd2f0c8349e46eea0` (snapshot
+`6fba56c1876dcfc23ff3a0bd359e0c8311dc7b18330fcafda1ce7837d6a17db9`)
+has SHA-256 `ce4769aea630dee5f9c9cf66ffcac46957f47e144e390897fc00860e0b8e61c7`.
+It passed relocation and manifest-matching live RDP startup on macOS 26.6.2
+and 14.8.7. Rust 1.96.1, Apple SDK 26.2 and deployment target 14.0 were used.
+
+The native capability child verified scratch pixmap readback before publishing
+the display. A live owned peer exchanged UTF-8 selections in both directions,
+verified ownership release and rejected invalid text and data over 64 KiB.
+The disposable Sonoma session exercised the actual workspace worker at a
+256-descriptor limit. It read the native pasteboard on an explicit request,
+supplied the text to a private X11 peer, and emitted the app copy command
+with the exact peer text on request. The X11 selection change alone left the
+native pasteboard unchanged. Stopping the workspace display retired the
+clipboard connection. These controls belong to the managed X server.
+See the [XQuartz ledger](xquartz-build.md) and [provider replay](providers.md).
+
+The follow-up at `8391d41` assigns a fresh X11 selection owner and timestamp
+to each copy. The live peer checks ICCCM `TIMESTAMP` and `MULTIPLE` replies
+and rejects a request for a superseded owner. A disposable Sonoma GUI
+session verified actual reads and writes to the AppKit general pasteboard,
+including a delayed X11 reply that left a newer native clipboard value
+intact. Native source reads use a single background worker, while Stop and
+quit can cancel the X11 owner independently.
+
+The updated archive from `3855f7040679d243cdd03de21a849817417f21a7` includes
+the System CUPS fix. Its SHA-256 is
+`fa23d6eabc09d50852bb3ef8115d934421368028f22141c5103cca5da7638c82`.
+Snapshot `33a45a9afcde4774ba83427f48970569950b02a36b77b1d079c4d3ecfea25e3e`
+matched all 607 Git source inputs. The package lists 2,139 hashed files and
+five link targets. Its only payload hash change from the `8391d41` archive
+(`1fa61e41ef2f0f1e190ea4fc27a164d2b90b42f41b0e25ec8ca94304f6448776`)
+is the RDP helper. The new build used the same Rust 1.96.1, SDK 26.2 and
+deployment target 14.0. The default qualification profile and native runtime
+approval gates were retained.
+
+`python3 scripts/package-check-startup.py ARCHIVE --evidence DIRECTORY`
+passed every archive digest and link plus relocated GUI and manifest-matching
+live RDP startup on macOS 26.6.2 and Sonoma 14.8.7. The final Sonoma run
+passed strict nested Chromium signature verification and the four bundled
+browser protocol cases, opened both literal Finder folders through AppKit,
+and spooled the known 78-byte job through the packaged helper. The owned
+Direct, Indirect and silent-manager cancellation XDMCP tests also passed
+with this archive at 256 descriptors on the host.
+
+At `3855f70`, `cargo +1.96.1 test --locked --all-targets --no-fail-fast`
+passed 917 tests, failed zero and ignored 17 across 75 targets. The run used
+the separately built RDP evaluation peer and helper, Python fixture packages,
+`RUST_TEST_THREADS=4` and a short owned `TMPDIR`. The locked standalone RDP
+helper suite passed 28 tests with zero failures or ignored cases.
+
+An initial `25602a1` all-target run hit a Cron fixture race. The test waits
+for the shell-redirection file to exist and can read it before the shell
+writes the PID. The observed parse error was `ParseIntError { kind: Empty }`.
+`src/services/cron/tests.rs` is byte-identical to `main` at `cf7ee4d`; the
+same full command passed on replay. Linux x86-64 GNU `cargo +1.96.1 check
+--locked --target x86_64-unknown-linux-gnu --tests` also passed with the Zig
+cross C compiler. Windows GNU `--lib --bins` passed. Hosted Linux continues
+to expose the RDP drive allocation assertion reproduced on `main`.
+[Hosted Linux PR job](https://github.com/asad-albadi/TermCraft/actions/runs/45765725145)
+[Hosted main reproducer](https://github.com/asad-albadi/TermCraft/actions/runs/45745650311)
+
 ## Open qualification
 
 The pinned Apple Silicon Chromium is usable for local qualification. Public
@@ -264,10 +329,11 @@ credits. See the [Chromium evidence](chromium-arm64.md).
 
 The private XQuartz profile provides core rendering and private UTF-8 X11
 selection exchange. It reports no active RandR outputs or modes on Sonoma and
-disables indirect GLX and host pasteboard synchronization. Broader host
-clipboard and graphics behavior needs separate implementation and
-qualification. Visible Finder Services invocation and visible XDMCP chooser
-selection remain operator checks. Public release automation and distribution
+disables indirect GLX and automatic host pasteboard synchronization. Explicit
+UTF-8 clipboard transfers through the managed display passed. Direct GLX
+needs a compatible Apple-DRI client stack for separate qualification.
+Visible Finder Services invocation and visible XDMCP chooser selection
+remain operator checks. Public release automation and distribution
 approval remain separate from this development archive.
 
 Run external-display/Retina scaling and GPU workflows on physical hardware.

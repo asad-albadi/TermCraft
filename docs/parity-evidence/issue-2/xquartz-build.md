@@ -67,3 +67,20 @@ creation with `BadValue`, consistent with the private launcher disabling
 indirect GLX. The approved windowed profile provides core X11 rendering and
 private X11 selection exchange. External monitor and GPU workflows are
 tracked separately.
+
+## Workspace display and graphics follow-up
+
+The Apple Silicon Services page now offers **Start X server**. Local sessions
+and embedded SSH can select the private TermCraft display explicitly. The
+session default remains compatible with earlier macOS profiles. The managed
+display supports native XQuartz windows and macOS chooses their geometry.
+
+The production capability child creates a 2×1 scratch pixmap, draws both
+screen colors, and reports success only when the decoded pixels match.
+The authenticated run observed 1920×1050, core readback success, GLX 1.4,
+RandR 1.5 and an empty cached RandR output list. The exact engine advertises
+Apple-DRI, while the packaged runtime has no Mesa client library for importing
+an Apple-DRI surface. Direct GLX needs that separate client stack to qualify.
+The legacy mode setters can capture and change host displays, so this
+windowed profile exposes no configuration through them. Indirect GLX and
+Composite remain disabled.

@@ -158,6 +158,8 @@
 - [x] Verify registered AppKit Services and both folder pasteboard formats in the relocated arm64 package.
 - [x] Verify native windowed Direct and Indirect XDMCP with owned peers and Debian xdm.
 - [x] Stage the pinned local Chromium fixture, verify private browser ownership, and exercise native browser workflows.
+- [x] Expose the managed XQuartz display and verify core pixel readback and explicit UTF-8 transfers with existing native and X11 peers.
+- [x] Qualify a native macOS CUPS queue with the RDP worker and an owned loopback printer.
 - [ ] Run visible Finder menu and XDMCP chooser interactions and human-operated permission scenarios.
-- [ ] Qualify additional graphics and host pasteboard capabilities within the private profile and complete physical device checks.
+- [ ] Qualify direct Apple-DRI, physical displays and physical devices while preserving the existing private windowed profile.
 - [ ] Approve public arm64 software distribution with a maintained Chromium candidate, source-matched third-party notices and the chosen release-signing policy.

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "partial",
-  "source_revision": "6b76c74145b9597108eb7773214cae9c0495cae5",
+  "source_revision": "3855f7040679d243cdd03de21a849817417f21a7",
   "host": {"os": "macOS 26.6.2 (25G83)", "architecture": "arm64"},
   "target": {
     "architecture": "arm64",
@@ -19,11 +19,20 @@
     {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "eef3dab197f25fd995826c3c5d036676f69860d54ab4997fdd279226a927824e", "source_revision": "0ff2dbb3dd30b7c2a5f6dde3886aa7d52033b0c3", "use": "combined package with Chromium viewport and renderer fixes"},
     {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "4cc6176ab255e144c90ba0b986bc8e6d825a6629ce6a150397080561b74aa692", "source_revision": "6b76c74145b9597108eb7773214cae9c0495cae5", "use": "qualified local combined archive"},
     {"path": "TermCraft-0.1.0-macos-aarch64.zip", "sha256": "c591bb1e53ac143540b29703bda69b66e80601a340fe2f5371a829536fada9f4", "source_revision": "15b7971fa4c8a0a513390ee011f0fa7c80b8c4ee", "use": "hosted unsigned core archive"},
+    {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "ce4769aea630dee5f9c9cf66ffcac46957f47e144e390897fc00860e0b8e61c7", "source_revision": "bf3916bd555a3844530871ffd2f0c8349e46eea0", "use": "managed XQuartz workspace and explicit clipboard qualification"},
+    {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "fa23d6eabc09d50852bb3ef8115d934421368028f22141c5103cca5da7638c82", "source_revision": "3855f7040679d243cdd03de21a849817417f21a7", "use": "updated combined archive with native pasteboard ownership and System CUPS fix"},
     {"path": "TermCraft-XQuartz-private-arm64.zip", "sha256": "8809e99e1df82b7ebba8b72587c932bb2822d6089edc98dbbc839ec74078c83c"}
   ],
   "workflows": [
     {"name": "Native workspace all-target suite", "result": "passed", "passed": 911, "failed": 0, "ignored": 11},
     {"name": "Final Apple Silicon workspace all-target suite", "result": "passed", "passed": 915, "failed": 0, "ignored": 15, "source_revision": "15b7971fa4c8a0a513390ee011f0fa7c80b8c4ee"},
+    {"name": "Apple Silicon workspace all-target suite with System CUPS fix", "result": "passed", "passed": 917, "failed": 0, "ignored": 17, "source_revision": "3855f7040679d243cdd03de21a849817417f21a7"},
+    {"name": "Locked native RDP helper with System CUPS namespace fix", "result": "passed", "passed": 28, "failed": 0, "ignored": 0, "source_revision": "3855f7040679d243cdd03de21a849817417f21a7"},
+    {"name": "Packaged native printer worker and real System CUPS queue with a loopback printer on macOS 14.8.7", "result": "passed", "passed": 1, "failed": 0, "ignored": 0, "source_revision": "3855f7040679d243cdd03de21a849817417f21a7"},
+    {"name": "Updated combined archive relocated startup and manifest-matching RDP on macOS 26.6.2 and 14.8.7", "result": "passed", "source_revision": "3855f7040679d243cdd03de21a849817417f21a7"},
+    {"name": "Updated bundled Chromium protocol suite on macOS 14.8.7", "result": "passed", "passed": 4, "failed": 0, "ignored": 0, "source_revision": "3855f7040679d243cdd03de21a849817417f21a7"},
+    {"name": "Updated Finder Services modern and legacy AppKit dispatch on macOS 14.8.7", "result": "passed", "passed": 2, "failed": 0, "ignored": 0, "source_revision": "3855f7040679d243cdd03de21a849817417f21a7"},
+    {"name": "Updated native pasteboard read, write and ownership protection on macOS 14.8.7", "result": "passed", "passed": 1, "failed": 0, "ignored": 0, "source_revision": "3855f7040679d243cdd03de21a849817417f21a7"},
     {"name": "Final combined archive Chromium protocol suite on macOS 26.6.2", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
     {"name": "Final combined archive Chromium protocol suite on macOS 14.8.7", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
     {"name": "Final combined archive Chromium integrity, sandbox, cancellation and cleanup", "result": "passed", "passed": 3, "failed": 0, "ignored": 0},
@@ -41,12 +50,14 @@
     {"name": "Native terminal programs", "result": "passed", "passed": 3, "failed": 0, "ignored": 0},
     {"name": "AppKit registered folder Services from modern and legacy pasteboards on macOS 14.8.7", "result": "passed", "passed": 2, "failed": 0, "ignored": 0},
     {"name": "Owned Apple Silicon XDMCP integration against the relocated combined archive", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
+    {"name": "Managed XQuartz workspace native pasteboard input and private X11 copy output on macOS 14.8.7", "result": "passed", "passed": 1, "failed": 0, "ignored": 0},
+    {"name": "Focused terminal, credential, agent, gateway, shared-source and import workflows on macOS 26.6.2", "result": "passed", "passed": 150, "failed": 0, "ignored": 1, "source_revision": "730349f3da77303ee5708331ffadee3407b52770"},
     {"name": "Independent Debian xdm Direct and Indirect callback replay at 256 descriptors", "result": "passed", "passed": 2, "failed": 0, "ignored": 0}
   ],
   "unavailable": [
     {"requirement": "Public bundled Chromium", "reason": "The opt-in arm64 fixture uses a sealed snapshot with placeholder credits. Production needs a maintained and source-matched payload with complete notices and reviewed signing."},
     {"requirement": "Visible XDMCP chooser selection", "reason": "The real chooser mapped and the real manager accepted callback-driven selection and display rotation. An operator must exercise the visible choice."},
-    {"requirement": "Active graphics and host pasteboard interoperability", "reason": "The pinned windowed profile exposes no active RandR modes in the Sonoma guest and disables indirect GLX and host pasteboard sync. Private core rendering and X11 selections passed."},
+    {"requirement": "Broader graphics and monitor coverage", "reason": "Private core drawing and explicit macOS clipboard text transfers passed. Direct GLX needs a compatible Apple-DRI client stack. The windowed runtime keeps host mode changes and indirect GLX disabled."},
     {"requirement": "Finder context-menu interaction", "reason": "Registered AppKit Services opened literal folders using both pasteboard formats. The visible Finder menu interaction remains manual."},
     {"requirement": "Public distribution approval", "reason": "Exact XQuartz bytes are approved for the windowed runtime. Release workflow distribution, signing policy and final approval are open."},
     {"requirement": "GPU, external displays, devices, adapter transitions and TCC permissions", "reason": "These require physical fixtures or a human-operated permission session."}

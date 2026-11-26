@@ -341,7 +341,7 @@
       ],
       "dependency": "",
       "remaining": "Reviewed native printer/smartcard, Linux RXCHAR/BREAK/ERR events and per-open statistics, Windows per-open statistics and bounded native serial owners are merged. Exact general POSIX COMMSTATUS/properties/modem events and opened-object rename/delete remain explicit platform/architecture limitations; native Windows/macOS/device/original qualification remains.",
-      "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; actual RDP native/admin/drive/device/clipboard/security/original interoperability remains unverified. Publication follow-up: hosted CI run45636600121 reports81helper tests passed/1failed in drive_allocation_is_released_on_last_remote_close_and_disconnect. Root cause unconfirmed; no green hosted CI claim.",
+      "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass. The Apple Silicon printer worker spooled an owned System CUPS job to a loopback printer. Physical devices and wider native/original RDP interoperability remain unverified. Hosted CI run45636600121 reports81helper tests passed/1failed in drive_allocation_is_released_on_last_remote_close_and_disconnect.",
       "evidence": [
         "docs/parity-evidence/D02/providers/host-full.log",
         "docs/parity-evidence/execution/d02-engine-green.log",
@@ -434,7 +434,7 @@
         "F01"
       ],
       "dependency": "Qualified native Windows/macOS owned engines from X01 and interactive SSH/X authentication, clipboard and display workflows on those systems.",
-      "remaining": "Linux and Apple Silicon passed on-demand owned X startup and per-session SSH authorization. The arm64 test forwarded authenticated requests on the same SSH login to the packaged XQuartz server. Native Windows, clipboard interoperability, visual workflows and original qualification remain open.",
+      "remaining": "Linux and Apple Silicon passed on-demand owned X startup and per-session SSH authorization. The arm64 test forwarded authenticated requests on the same SSH login to the packaged XQuartz server. The separate managed XQuartz workspace display passed explicit macOS/X11 clipboard text transfer. Native Windows, visual workflows and original qualification remain open.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -452,7 +452,7 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS graphics hosts and physical GPU/monitor fixtures; configured headless Linux graphics coverage is retained.",
-      "remaining": "Linux GLX rendering, Composite readback and RandR change/restoration passed with the extracted release engine. Apple Silicon reports authenticated windowed XQuartz dimensions and GLX/RandR versions. Apple Silicon core pixel readback passed. The pinned windowed profile reported no active RandR outputs/modes on Sonoma and declined indirect GLX; Windows, physical GPU/monitor coverage and original comparison remain pending.",
+      "remaining": "Linux GLX rendering, Composite readback and RandR change/restoration passed with the extracted release engine. Apple Silicon reports authenticated windowed XQuartz dimensions and GLX/RandR versions. Apple Silicon core pixel readback passed. Sonoma returned an empty cached RandR output list. The pinned package disables indirect GLX, and direct GLX qualification needs a compatible client stack. Windows, physical GPU/monitor coverage and original comparison remain pending.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",

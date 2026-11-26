@@ -165,3 +165,27 @@ shared package and qualify the supported OS baseline. Do not enable
 The only local SDK was 26.2. This exact revision pins 27.0 for the official
 arm64 SDK and 26.5 for the universal fallback. This run did not independently
 rebuild the browser. [Exact upstream SDK configuration](https://chromium.googlesource.com/chromium/src/+/2de5612046d43b6f874320ba0e5357146cb225c5/build/config/mac/mac_sdk.gni)
+
+## Maintained release intake
+
+The notarized Ungoogled Chromium 157.0.8103.78-1.1 arm64 DMG matched
+`bdfe0ee51e47b7ff49c94778c6d9adb08a626dfbd6089570bbbb455410f1a41a`.
+Its nested signature, notarization staple and Gatekeeper assessment passed.
+The signed resources contained 489 embedded notice entries. The extracted
+credits SHA-256 was
+`611fceda8bbd49332a4b471faeb0a7605fbcad05bb76bcb1d118efed0a4adde6`.
+The public recipe at `84768e74` also enables proprietary codecs. This release
+precedes the November 23 stable security update 158.0.8127.88/.89, and the
+macOS release feed had no matching arm64 build at the time of the check.
+[Candidate release](https://github.com/ungoogled-software/ungoogled-chromium-macos/releases/tag/157.0.8103.78-1.1)
+[Stable security update](https://chromereleases.googleblog.com/2026/11/stable-channel-update-for-desktop_01734282054.html)
+
+A first-party build can start from stable revision
+`1de57fa19722fa6d6841d4f596c394d015580656`. It needs its pinned macOS SDK,
+source and dependency tree, an unbranded arm64 build with reviewed codec
+flags, and `generate_about_credits=true`. Audit the generated notices against
+the packaged dependency graph and the credits in the resulting browser.
+Developer ID and notarization belong to the final production release
+identity. This host has no valid Developer ID signing identity.
+[Stable source](https://chromium.googlesource.com/chromium/src/+/1de57fa19722fa6d6841d4f596c394d015580656)
+[macOS build instructions](https://chromium.googlesource.com/chromium/src/+/refs/tags/158.0.8127.88/docs/mac_build_instructions.md)
