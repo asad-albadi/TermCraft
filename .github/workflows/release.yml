@@ -115,7 +115,7 @@ jobs:
 
   windows-x-fixture:
     if: inputs.windows_x_fixture
-    runs-on: windows-2025
+    runs-on: windows-2022
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
