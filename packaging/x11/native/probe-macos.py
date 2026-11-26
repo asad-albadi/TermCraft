@@ -55,8 +55,10 @@ def setup(path, cookie=None, query_extensions=False):
             return status == 1
 
 
-def probe(root, evidence):
+def probe(root, evidence, glx_client=None, allow_software_glx=False):
     root = root.resolve(strict=True)
+    if glx_client is not None:
+        glx_client = glx_client.resolve(strict=True)
     binary = root / "XQuartz.app/Contents/MacOS/X11.bin"
     evidence.mkdir(parents=True, exist_ok=False)
     with tempfile.TemporaryDirectory(prefix="tc-xq-", dir="/private/tmp") as temporary:
@@ -105,6 +107,13 @@ def probe(root, evidence):
                     raise ValueError("Unexpected private XQuartz extension set")
                 if os.getpgid(child.pid) != child.pid:
                     raise ValueError("XQuartz did not retain its dedicated process group")
+                if glx_client is not None:
+                    glx_env = dict(env, LIBGL_ALLOW_SOFTWARE="1") if allow_software_glx else env
+                    with (evidence / "glx.log").open("xb") as glx_log:
+                        subprocess.run(
+                            [glx_client], cwd=home, env=glx_env, check=True, timeout=10,
+                            stdin=subprocess.DEVNULL, stdout=glx_log, stderr=glx_log,
+                        )
             finally:
                 try:
                     os.killpg(child.pid, signal.SIGTERM)
@@ -124,6 +133,9 @@ def probe(root, evidence):
     if home.exists():
         raise ValueError("Private XQuartz workspace was not removed")
     result["private_runtime_removed"] = True
+    if glx_client is not None:
+        result["direct_glx_client_sha256"] = hashlib.sha256(glx_client.read_bytes()).hexdigest()
+        result["software_glx_allowed"] = allow_software_glx
     (evidence / "verification.json").write_text(json.dumps(result, indent=2) + "\n")
 
 
@@ -131,5 +143,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("candidate", type=Path)
     parser.add_argument("evidence", type=Path)
+    parser.add_argument("--glx-client", type=Path, help="built direct-glx-macos.c probe")
+    parser.add_argument("--allow-software-glx", action="store_true", help="allow Mesa's CGL software renderer")
     args = parser.parse_args()
-    probe(args.candidate, args.evidence)
+    if args.allow_software_glx and args.glx_client is None:
+        parser.error("--allow-software-glx requires --glx-client")
+    probe(args.candidate, args.evidence, args.glx_client, args.allow_software_glx)

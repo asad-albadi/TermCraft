@@ -55,11 +55,15 @@ def dependency_path(name, image, search):
     return path
 
 
-def relocate(root, arch):
-    executable = root / "XQuartz.app/Contents/MacOS/X11.bin"
-    compiler = root / "opt/X11/bin/xkbcomp"
+def relocate(root, arch, glx_probe=False):
+    entries = ["XQuartz.app/Contents/MacOS/X11.bin", "opt/X11/bin/xkbcomp"]
     libraries = root / "opt/X11/lib"
-    queue = deque([(executable, executable), (compiler, compiler)])
+    if glx_probe:
+        if (root / "XQuartz.app").exists() or (root / "NATIVE-BUILD.json").exists():
+            raise ValueError("Use a separate root for the GLX qualification client")
+        entries = ["opt/X11/bin/direct-glx-macos"]
+        libraries.mkdir(parents=True, exist_ok=True)
+    queue = deque((root / entry, root / entry) for entry in entries)
     staged = {}
     inventory = {}
     required = {"arm64", "x86_64"} if arch == "universal" else {arch}
@@ -114,5 +118,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", type=Path)
     parser.add_argument("arch", choices=["arm64", "x86_64", "universal"])
+    parser.add_argument("--glx-probe", action="store_true", help="stage a separate GLX qualification client")
     args = parser.parse_args()
-    relocate(args.root.resolve(), args.arch)
+    relocate(args.root.resolve(), args.arch, args.glx_probe)

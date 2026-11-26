@@ -45,11 +45,43 @@ installer hooks request root ownership. The builder skips these hooks and
 stages the built files directly. To collect bounded desktop evidence, run
 `python3 packaging/x11/native/probe-macos.py CANDIDATE EVIDENCE_DIRECTORY`.
 
-Relocate every non-system Mach-O dependency and install name to app-relative `@loader_path`/`@executable_path` paths, verify both architecture slices contain no `/opt/X11` references, and sign leaf dylibs/frameworks followed by the private app. Snapshot and pin the final signed tree including resources and code-signature files. The current `/opt/X11` release payload cannot substitute for that output. No relocated/signed native build or native build execution exists in this evidence.
+Relocate every non-system Mach-O dependency and install name to app-relative `@loader_path` paths, verify the arm64 slice and dependency closure, and sign leaf dylibs/frameworks followed by the private app. Snapshot and pin the final signed tree including resources and code-signature files. The approved profile uses the exact inventory from this private build.
 
 The direct-entry source patch bypasses Mach registration/startx/shell startup, requires our inherited listening AF_UNIX descriptor, disables all engine-created listeners/locks, and adopts it with `ListenOnOpenFD(fd, 0)` so Xauthority remains mandatory. The stock handoff uses `noxauth=1` and is unsuitable. XKB output stays inside the private runtime; default plist lookup is app-relative and authentication overrides are volatile Objective-C `NSUserDefaults` values. The provider starts a new owned process group; macOS `waitid(WNOWAIT)` preserves its identity until owned helpers are terminated and the leader reaped. The prebound socket lives only in the private directory. Existing displays, launch services, XQuartz preference domains and shell startup files are untouched.
 
 Composite remains explicitly disabled under the upstream XQuartz 2.8.6 policy.
-The authenticated read-only macOS probe measures the screen dimensions and can
-query GLX and RandR versions. OpenGL readback, monitor selection and active
-mode changes remain outside the approved windowed scope.
+The authenticated macOS probe reads X11 geometry and GLX and RandR protocol
+versions. The windowed profile leaves display mode and monitor selection to
+macOS.
+
+### Direct GLX qualification client
+
+Use the source tree extracted from the pinned candidate's Mesa archive and
+the pinned private X.Org prefix. The separate fixture records direct
+framebuffer readback without changing the engine inventory. Use the Python
+3.11/Mako environment described above with Meson, Ninja and Bison on `PATH`.
+
+```sh
+export SDKROOT="$(xcrun --show-sdk-path)" MACOSX_DEPLOYMENT_TARGET=14.0
+export PKG_CONFIG_LIBDIR="$DEPS/lib/pkgconfig:$DEPS/share/pkgconfig"
+meson setup "$BUILD" "$MESA_SOURCE" --buildtype=release --prefix="$MESA_PREFIX" \
+  --wrap-mode=nodownload -Dc_std=c11 -Dosmesa=true -Dllvm=disabled \
+  -Dvalgrind=disabled -Dzstd=disabled -Dc_args="-I$DEPS/include" \
+  -Dcpp_args="-I$DEPS/include"
+meson compile -C "$BUILD" -j 2
+meson install -C "$BUILD" --no-rebuild
+mkdir -p "$FIXTURE/opt/X11/bin"
+xcrun clang -arch arm64 -Wl,-headerpad_max_install_names -Wall -Wextra -Werror \
+  -isystem "$MESA_PREFIX/include" -isystem "$DEPS/include" \
+  -L"$MESA_PREFIX/lib" -L"$DEPS/lib" packaging/x11/native/direct-glx-macos.c \
+  -lGL -lX11 -o "$FIXTURE/opt/X11/bin/direct-glx-macos"
+python3 packaging/x11/native/relocate-macos.py "$FIXTURE" arm64 --glx-probe
+ditto "$FIXTURE" "$RELOCATED_FIXTURE"
+python3 packaging/x11/native/probe-macos.py "$CANDIDATE" "$EVIDENCE" \
+  --glx-client "$RELOCATED_FIXTURE/opt/X11/bin/direct-glx-macos"
+```
+
+Use `--allow-software-glx` for a guest without a compatible accelerated CGL
+pixel format. Check `glx.log` for the actual renderer. The same owned socket,
+cookie and cleanup checks apply on both paths. See the
+[graphics evidence](../../../docs/parity-evidence/issue-2/xquartz-build.md#direct-apple-glx-on-apple-silicon).
