@@ -128,7 +128,7 @@ impl InstanceBroker {
                     use interprocess::os::windows::{
                         local_socket::ListenerOptionsExt, security_descriptor::SecurityDescriptor,
                     };
-                    let descriptor = crate::platform::private_file::user_owned_descriptor("GA")
+                    let descriptor = crate::platform::private_file::user_owned_descriptor("", "GA")
                         .map_err(ioerr)?;
                     options.security_descriptor(
                         SecurityDescriptor::deserialize(&descriptor).map_err(ioerr)?,

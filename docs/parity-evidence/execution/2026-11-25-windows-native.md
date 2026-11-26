@@ -125,6 +125,41 @@
   The ordered installer replay preserved the fixture workspace, preferences,
   encrypted vault and unrelated file, then removed both versions and their
   Start menu shortcuts.
+- In another native X replay, a candidate startup failed the app's anonymous
+  readiness check. The pinned server read binary Xauthority records in CRT
+  text mode, which can truncate or translate bytes, and retained a host-based
+  fallback when parsing failed. The private source now reads binary and
+  requires protocol authentication on its Windows listeners. The exact source
+  patch SHA-256 is
+  `a5f68d6b08b143dea46eab205fee173aa3cf29db595245424d15c4b0eaa9f740`.
+  The replacement server SHA-256 is
+  `12fa366d4774c6ca01dca4f82af4d2c5cfe11c40ab79e4d325c647adafbeae45`,
+  with candidate inventory SHA-256
+  `2aca7f738620d8d67428abfc8345aea6123330b7a4bdf43fc8e1f83278639e52`.
+  The offline source recipe re-applied the exact patch. The native probe
+  accepted a valid cookie containing control-Z and CR/LF, rejected a
+  cookie-free request, and passed both Direct and Indirect XDMCP again.
+  The owned Rust provider replay also passed one test on this exact
+  inventory, including an authenticated X window through embedded SSH, PID
+  ownership and removal of the listener and private runtime. The Windows
+  snapshot and runtime directories use explicit current-user ownership.
+  [Microsoft CRT stream modes](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/fopen-wfopen)
+- `cargo +1.96.1 test --locked --test windows_conpty` passed both tests.
+  The native child wrote the main console, entered the alternate buffer,
+  accepted input and received a resize from 80 × 25 to 100 × 32. TermCraft's
+  terminal parser consumed the real ConPTY output and observed the original
+  primary screen after the alternate buffer closed.
+- Windows VNC scope is GDI capture of the active primary desktop.
+  `cargo +1.96.1 test --locked --lib services::vnc -- --test-threads=1`
+  reported 20 passed and 4 ignored. The opt-in native inactive-desktop test
+  passed separately, confirming the provider denied startup, capture and
+  control on a private desktop that never received foreground input.
+  The new authenticated one-pixel loopback probe compiled. It and the
+  previous native greeting probe stopped before opening a listener because
+  the host reported the interactive Windows session as disconnected. A
+  disposable unlocked session is needed for the positive pixel/control
+  replay. Windows providers for an individual window, a secondary monitor
+  and a virtual display are still absent.
 
 ## Native build
 
@@ -379,6 +414,14 @@ AppContainer, and the per-session profile directories were gone after exit.
 This records the observed installed compatibility sandbox. A Windows
 redistributable browser payload still needs a separate license/resource
 audit, artifact pins, and the same startup and sandbox probes.
+
+An inspected Windows x64 Ungoogled Chromium 158.0.8127.36-1.1 archive
+matched the publisher's SHA-256
+`bc78b9590881f8ca99aca29288d1b347ffdd689ca8a57384bb0bc113ef687b6b`.
+The recipe commit was verified on GitHub. The ZIP had no detached signature,
+artifact attestation or included component notices. Windows identified
+`chrome.exe` and 13 other PE files as unsigned. This was a static provenance
+assessment. [Publisher release](https://github.com/ungoogled-software/ungoogled-chromium-windows/releases/tag/158.0.8127.36-1.1).
 
 ## Pageant
 

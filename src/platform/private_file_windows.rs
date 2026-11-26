@@ -36,7 +36,7 @@ fn current_user() -> io::Result<Vec<usize>> {
     }
 }
 
-pub(crate) fn user_owned_descriptor(access: &str) -> io::Result<U16CString> {
+pub(crate) fn user_owned_descriptor(inheritance: &str, access: &str) -> io::Result<U16CString> {
     let user = current_user()?;
     let mut sid_string = null_mut();
     // TokenUser points into the aligned buffer returned by GetTokenInformation.
@@ -46,7 +46,7 @@ pub(crate) fn user_owned_descriptor(access: &str) -> io::Result<U16CString> {
     }
     let owner = unsafe { U16CStr::from_ptr_str(sid_string) }.to_string_lossy();
     unsafe { LocalFree(sid_string.cast()) };
-    U16CString::from_str(format!("O:{owner}D:P(A;;{access};;;OW)"))
+    U16CString::from_str(format!("O:{owner}D:P(A;{inheritance};{access};;;OW)"))
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
 }
 
@@ -61,7 +61,7 @@ pub(crate) fn create_new(path: &Path) -> io::Result<File> {
     // The canonical parent supplies a verbatim path for long Windows paths.
     let path = U16CString::from_os_str(std::fs::canonicalize(parent)?.join(name).as_os_str())
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidInput, error))?;
-    let sddl = user_owned_descriptor("FA")?;
+    let sddl = user_owned_descriptor("", "FA")?;
     let mut descriptor = null_mut();
     if unsafe {
         ConvertStringSecurityDescriptorToSecurityDescriptorW(

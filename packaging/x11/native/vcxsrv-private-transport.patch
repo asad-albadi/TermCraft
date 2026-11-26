@@ -171,3 +171,52 @@
 @@ -179 +183 @@
 -  PostMessage (g_hDlgAbout, WM_NEXTDLGCTL, (WPARAM)GetDlgItem (g_hDlgHosts, IDOK), TRUE);
 +  PostMessage (g_hDlgHosts, WM_NEXTDLGCTL, (WPARAM)GetDlgItem (g_hDlgHosts, IDOK), TRUE);
+--- a/xorg-server/os/auth.c
++++ b/xorg-server/os/auth.c
+@@ -114,7 +114,8 @@
+         return 0;
+
+     errno = 0;
+-    f = Fopen(authorization_file, "r");
++    /* Xauthority contains binary cookies, including bytes such as 0x1a. */
++    f = Fopen(authorization_file, "rb");
+     if (!f) {
+         LogMessageVerb(X_ERROR, 0,
+                        "Failed to open authorization file \"%s\": %s\n",
+--- a/xorg-server/os/connection.c
++++ b/xorg-server/os/connection.c
+@@ -563,18 +563,25 @@
+     priv = (OsCommPtr) client->osPrivate;
+     trans_conn = priv->trans_conn;
+
++#ifndef _WIN32
+     /* Allow any client to connect without authorization on a launchd socket,
+        because it is securely created -- this prevents a race condition on launch */
+     if (trans_conn->flags & TRANS_NOXAUTH) {
+         auth_id = (XID) 0L;
+     }
+-    else {
++    else
++#endif
++    {
+         auth_id =
+             CheckAuthorization(proto_n, auth_proto, string_n, auth_string,
+                                client, &reason);
+     }
+
+     if (auth_id == (XID) ~0L) {
++#ifdef _WIN32
++        /* The private Windows transport requires an authenticated cookie. */
++        return reason ? reason : "Client is not authorized to connect to Server";
++#else
+         if (_XSERVTransGetPeerAddr(trans_conn, &family, &fromlen, &from) != -1) {
+             if (InvalidHost((struct sockaddr *) from, fromlen, client))
+                 AuthAudit(client, FALSE, (struct sockaddr *) from,
+@@ -600,6 +607,7 @@
+             else
+                 return "Client is not authorized to connect to Server";
+         }
++#endif
+     }
+ #ifdef XSERVER_DTRACE
+     else if ((auditTrailLevel > 1) || XSERVER_CLIENT_AUTH_ENABLED())

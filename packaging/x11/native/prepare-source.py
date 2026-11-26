@@ -22,7 +22,8 @@ def prepare(platform, archive, destination):
     if destination.exists() or destination.is_symlink():raise FileExistsError('Source destination already exists')
     expected,patch=SOURCES[platform]
     patch_path = ROOT / patch
-    patch_digest = checksum(patch_path)
+    patch_data = patch_path.read_bytes()
+    patch_digest = hashlib.sha256(patch_data).hexdigest()
     contract = json.loads((ROOT / 'source-contract.json').read_text())
     if patch_digest != contract[platform]['patch_sha256']:
         raise ValueError('Pinned native patch checksum mismatch')
@@ -38,10 +39,9 @@ def prepare(platform, archive, destination):
         entries=list(tree.iterdir())
         if len(entries)!=1 or not entries[0].is_dir():raise ValueError('Unexpected pinned native source root')
         source=entries[0]
-        with patch_path.open('rb') as change:
-            subprocess.run(['patch','--batch','--forward','-p1'],cwd=source,stdin=change,check=True)
+        subprocess.run(['patch','--batch','--forward','-p1'],cwd=source,input=patch_data,check=True)
         (source/'CORRESPONDING-SOURCE.tar.gz').write_bytes(data)
-        shutil.copy2(patch_path,source/patch)
+        (source/patch).write_bytes(patch_data)
         manifest={'schema':1,'platform':platform,'status':'unqualified private source candidate; never a runnable release',
                   'source_archive_sha256':expected,'patch_sha256':patch_digest,
                   'files':{str(p.relative_to(source)):checksum(p) for p in sorted(source.rglob('*')) if p.is_file() and not p.is_symlink()}}

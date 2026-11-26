@@ -60,3 +60,79 @@ fn powershell_round_trips_unicode_after_conpty_resize() {
     }
     assert!(process.exited, "owned PowerShell did not exit");
 }
+
+#[test]
+fn native_console_program_restores_primary_screen_after_fullscreen_resize() {
+    use harbor_workspace::terminal::Screen;
+    use std::io::{self, Write};
+    use windows_sys::Win32::System::Console::{
+        ENABLE_VIRTUAL_TERMINAL_PROCESSING, GetConsoleMode, GetStdHandle, STD_OUTPUT_HANDLE,
+        SetConsoleMode,
+    };
+
+    const CHILD: &str = "TERMCRAFT_TEST_CONPTY_FULLSCREEN_CHILD";
+    const TEST: &str = "native_console_program_restores_primary_screen_after_fullscreen_resize";
+    if std::env::var_os(CHILD).is_some() {
+        let output = unsafe { GetStdHandle(STD_OUTPUT_HANDLE) };
+        let mut mode = 0;
+        assert_ne!(unsafe { GetConsoleMode(output, &mut mode) }, 0);
+        assert_ne!(
+            unsafe { SetConsoleMode(output, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING) },
+            0
+        );
+        let mut stdout = io::stdout().lock();
+        stdout.write_all(b"TC_PRIMARY\r\n").unwrap();
+        stdout.flush().unwrap();
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).unwrap();
+        assert_eq!(input.trim(), "enter");
+        stdout.write_all(b"\x1b[?1049hTC_FULLSCREEN\r\n").unwrap();
+        stdout.flush().unwrap();
+        input.clear();
+        io::stdin().read_line(&mut input).unwrap();
+        assert_eq!(input.trim(), "leave");
+        stdout.write_all(b"\x1b[?1049lTC_RESTORED\r\n").unwrap();
+        stdout.flush().unwrap();
+        return;
+    }
+
+    fn wait_for_screen(process: &Process, screen: &mut Screen, marker: &str) {
+        let deadline = Instant::now() + Duration::from_secs(12);
+        while !screen.plain().contains(marker) {
+            let remaining = deadline.saturating_duration_since(Instant::now());
+            let chunk = process.rx.recv_timeout(remaining).unwrap_or_else(|error| {
+                panic!(
+                    "ConPTY did not show {marker:?}: {error}; screen={}",
+                    screen.plain()
+                )
+            });
+            screen.feed(&chunk);
+        }
+    }
+
+    let temporary = tempfile::tempdir().unwrap();
+    let executable = std::env::current_exe().unwrap();
+    let mut process = Process::spawn_with_environment(
+        executable.to_str().unwrap(),
+        &["--exact".into(), TEST.into(), "--nocapture".into()],
+        Some(temporary.path()),
+        80,
+        25,
+        &[(CHILD.into(), "1".into())],
+    )
+    .unwrap();
+    let mut screen = Screen::new(80, 25, 100);
+    wait_for_screen(&process, &mut screen, "TC_PRIMARY");
+    assert!(!screen.is_alternate());
+    process.write(b"enter\r").unwrap();
+    wait_for_screen(&process, &mut screen, "TC_FULLSCREEN");
+    assert!(screen.is_alternate());
+    assert!(!screen.plain().contains("TC_PRIMARY"));
+    process.resize(100, 32);
+    screen.resize(100, 32);
+    process.write(b"leave\r").unwrap();
+    wait_for_screen(&process, &mut screen, "TC_RESTORED");
+    assert!(!screen.is_alternate());
+    assert!(screen.plain().contains("TC_PRIMARY"));
+    assert!(!screen.plain().contains("TC_FULLSCREEN"));
+}

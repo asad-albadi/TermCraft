@@ -111,6 +111,62 @@ def choose_indirect_host(pid):
     raise AssertionError("The candidate did not present an owned XDMCP chooser with the fixture host")
 
 
+def candidate_args(candidate, display, log):
+    return [candidate / "vcxsrv.exe", f":{display}", "-noreset", "-silent-dup-error",
+            "-nolisten", "inet6", "-nolisten", "hyperv", "-nopn", "-iglx", "-noclipboard",
+            "-logfile", log]
+
+
+def candidate_environment(candidate, scratch):
+    env = {k: os.environ[k] for k in ("SystemRoot", "WINDIR") if k in os.environ}
+    env.update({"PATH": str(candidate), "TEMP": scratch, "TMP": scratch, "HOME": scratch})
+    return env
+
+
+def x11_setup(client, stream, key):
+    name = b"MIT-MAGIC-COOKIE-1" if key else b""
+    client.sendall(struct.pack("<BBHHHHH", ord("l"), 0, 11, 0, len(name), len(key), 0)
+                   + name.ljust((len(name) + 3) & ~3, b"\0") + key)
+    response = stream.read(8)
+    assert len(response) == 8
+    return response
+
+
+def binary_authority(candidate, evidence):
+    with tempfile.TemporaryDirectory(prefix="TermCraft authority qualification ") as scratch:
+        with socket.socket() as reservation:
+            reservation.bind(("127.0.0.1", 0))
+            port = reservation.getsockname()[1]
+        display = port - 6000
+        auth = Path(scratch) / "Xauthority"
+        log = Path(scratch) / "server.log"
+        cookie = b"\x1a\r\n" + secrets.token_bytes(13)
+        auth.write_bytes(struct.pack(">H", 65535) + field(b"") + field(str(display).encode())
+                         + field(b"MIT-MAGIC-COOKIE-1") + field(cookie))
+        args = candidate_args(candidate, display, log) + ["-auth", auth, "-listen", "tcp"]
+        child = subprocess.Popen(args, cwd=candidate, env=candidate_environment(candidate, scratch))
+        try:
+            deadline = time.monotonic() + 8
+            while True:
+                assert child.poll() is None and time.monotonic() < deadline, "Private X startup failed"
+                try:
+                    client = socket.create_connection(("127.0.0.1", port), 0.25)
+                    break
+                except (ConnectionRefusedError, TimeoutError):
+                    time.sleep(0.025)
+            with client, client.makefile("rb") as stream:
+                assert x11_setup(client, stream, cookie)[0] == 1, "Binary authority cookie rejected"
+            with socket.create_connection(("127.0.0.1", port), 3) as client, client.makefile("rb") as stream:
+                assert x11_setup(client, stream, b"")[0] == 0, "Cookie-free X setup accepted"
+            print("Private Windows X accepted the binary authority cookie and required authentication")
+        finally:
+            if child.poll() is None:
+                child.terminate()
+                child.wait(5)
+            if log.exists():
+                (evidence / "native-authority.log").write_bytes(log.read_bytes())
+
+
 def run(candidate, evidence, indirect):
     with tempfile.TemporaryDirectory(prefix="TermCraft XDMCP qualification ") as scratch, socket.socket(
         socket.AF_INET, socket.SOCK_DGRAM
@@ -121,13 +177,10 @@ def run(candidate, evidence, indirect):
             candidate_port.bind(("127.0.0.1", 0))
             display = candidate_port.getsockname()[1] - 6000
         log = Path(scratch) / "server.log"
-        args = [candidate / "vcxsrv.exe", f":{display}", "-noreset", "-silent-dup-error",
-                "-nolisten", "inet6", "-nolisten", "hyperv", "-nopn", "-iglx", "-noclipboard",
-                "-logfile", log, "-from", "127.0.0.1", "-port", str(peer.getsockname()[1]),
-                "-indirect" if indirect else "-query", "127.0.0.1"]
-        env = {k: os.environ[k] for k in ("SystemRoot", "WINDIR") if k in os.environ}
-        env.update({"PATH": str(candidate), "TEMP": scratch, "TMP": scratch, "HOME": scratch})
-        child = subprocess.Popen(args, cwd=candidate, env=env)
+        args = candidate_args(candidate, display, log) + [
+            "-from", "127.0.0.1", "-port", str(peer.getsockname()[1]),
+            "-indirect" if indirect else "-query", "127.0.0.1"]
+        child = subprocess.Popen(args, cwd=candidate, env=candidate_environment(candidate, scratch))
         try:
             _, sender = receive(peer, 3 if indirect else 2)
             peer.sendto(packet(5, field(b"") + field(b"fixture.test") + field(b"fixture willing")), sender)
@@ -142,12 +195,9 @@ def run(candidate, evidence, indirect):
             assert struct.unpack(">IH", managed[:6]) == (17, display)
             for key, expected in [(b"", 0), (cookie, 1)]:
                 with socket.create_connection(("127.0.0.1", display + 6000), 3) as client:
-                    name = b"MIT-MAGIC-COOKIE-1" if key else b""
-                    client.sendall(struct.pack("<BBHHHHH", ord("l"), 0, 11, 0, len(name), len(key), 0)
-                                   + name.ljust((len(name) + 3) & ~3, b"\0") + key)
                     with client.makefile("rb") as stream:
-                        response = stream.read(8)
-                        assert len(response) == 8 and response[0] == expected
+                        response = x11_setup(client, stream, key)
+                        assert response[0] == expected
                         if expected:
                             size = struct.unpack_from("<H", response, 6)[0] * 4
                             setup = stream.read(size)
@@ -175,6 +225,7 @@ def main():
     candidate = args.candidate.resolve(strict=True)
     verify_candidate(candidate, args.inventory)
     args.evidence.mkdir(parents=True, exist_ok=False)
+    binary_authority(candidate, args.evidence)
     run(candidate, args.evidence, False)
     run(candidate, args.evidence, True)
 
