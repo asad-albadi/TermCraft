@@ -725,12 +725,29 @@ zero. This was a readiness check. It submitted no print job to that queue.
 The [hosted release replay](https://github.com/asad-albadi/TermCraft/actions/runs/45876074916/job/140103362925)
 used the packaged helper SHA-256
 `3919b6dc18f19e700c8c6d94e2152b38053cb7cf28e2c10a98b2dea0965e80db`.
+Its unsigned ZIP SHA-256 was
+`af855b76db9511f173f1aa4039e6f1702cc459d4252d146363843743f3a669d4`.
+The downloaded artifact matched the hosted 1024 × 768 GUI startup evidence
+and adjacent helper negotiation. Both installer fixture versions ran and
+uninstalled. A separate local replay of that exact extracted helper with
+`cargo +1.96.1 test --locked --test rdp_session -- --include-ignored` passed
+all 11 independent software endpoint tests, including Unicode clipboard,
+input and resize, certificate decisions, cancellation and transport cleanup.
 The independent loopback receiver matched the complete RAW payload. Abort
 left no queued job and opened no connection. The disposable queue was
 removed, but the hosted PrintManagement provider refused to remove its TCP
 port. The fixture now checks the specific endpoint and uses the native
 TCP/IP port CIM provider. Native local creation and removal passed through
-that provider. The complete hosted lifecycle replay remains open.
+that provider. The [clean hosted replay](https://github.com/asad-albadi/TermCraft/actions/runs/45878884583/job/140112857801)
+then passed RAW bytes, abort, queue removal and TCP port removal. The helper
+SHA-256 was `d6e51543309d91a3f9127cd9e290383100c9bdfd0e55dcd0b78c8fe7217c4e5e`
+and the Windows ZIP SHA-256 was
+`7519192fb1ba4b1654bbebb18616968508c82b0280d43d1f62fcaf01fa202120`.
+The hosted VM retained its temporary inbox Generic / Text Only driver when
+PrintManagement refused driver removal. The job verified that the queue and
+port were gone before the VM was discarded. This proves the local Windows
+spooler behavior. An actual RDP server's printer redirection and physical
+printer output remain separate checks.
 
 ## Personal 26.6 reference replay
 
