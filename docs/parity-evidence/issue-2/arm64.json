@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "partial",
-  "source_revision": "c7dc7b7331c5743f63f8f285f9110aefaebc7e31",
+  "source_revision": "6b76c74145b9597108eb7773214cae9c0495cae5",
   "host": {"os": "macOS 26.6.2 (25G83)", "architecture": "arm64"},
   "target": {
     "architecture": "arm64",
@@ -15,10 +15,18 @@
     {"path": "TermCraft-0.1.0-macos-aarch64-xquartz.zip", "sha256": "2241340fdf4d3d2aca0a8bdb3bc8bb7d3e1c57fb155c841c568de7b6a74edea8"},
     {"path": "TermCraft-0.1.0-macos-aarch64-xquartz.zip", "sha256": "eb5ef97d63cc01cc64537d794171bd383611f74ba0455a7690b45e3486a3c4f8", "source_revision": "788439b3d10127ded70be134bf316071212b40e5"},
     {"path": "TermCraft-0.1.1-macos-aarch64-xquartz.zip", "sha256": "3f114af3ce928a1100617e4cf61b7cc6ceb260d9db05c73e3563ffb910a270b3", "source_revision": "fe4fa0c115ea56a4469ebcf59a26d201791d27d3", "use": "version upgrade fixture"},
+    {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "23648b5da2b87e0abc23e2132846c62ea601ad6e9a7d2e8b0b2377490fcf5974", "source_revision": "1bc64f7d37d6803b0839ec03c8ca26902dce3dec", "use": "initial combined package and XDMCP replay"},
+    {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "eef3dab197f25fd995826c3c5d036676f69860d54ab4997fdd279226a927824e", "source_revision": "0ff2dbb3dd30b7c2a5f6dde3886aa7d52033b0c3", "use": "combined package with Chromium viewport and renderer fixes"},
+    {"path": "TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip", "sha256": "4cc6176ab255e144c90ba0b986bc8e6d825a6629ce6a150397080561b74aa692", "source_revision": "6b76c74145b9597108eb7773214cae9c0495cae5", "use": "qualified local combined archive"},
     {"path": "TermCraft-XQuartz-private-arm64.zip", "sha256": "8809e99e1df82b7ebba8b72587c932bb2822d6089edc98dbbc839ec74078c83c"}
   ],
   "workflows": [
     {"name": "Native workspace all-target suite", "result": "passed", "passed": 911, "failed": 0, "ignored": 11},
+    {"name": "Final Apple Silicon workspace all-target suite", "result": "passed", "passed": 915, "failed": 0, "ignored": 15, "source_revision": "15b7971fa4c8a0a513390ee011f0fa7c80b8c4ee"},
+    {"name": "Final combined archive Chromium protocol suite on macOS 26.6.2", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
+    {"name": "Final combined archive Chromium protocol suite on macOS 14.8.7", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
+    {"name": "Final combined archive Chromium integrity, sandbox, cancellation and cleanup", "result": "passed", "passed": 3, "failed": 0, "ignored": 0},
+    {"name": "Relocated bundled Chromium workspace input and viewport", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
     {"name": "Native locked RDP helper", "result": "passed", "passed": 27, "failed": 0, "ignored": 0},
     {"name": "Installed Chrome native integration", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
     {"name": "PCSC transport software fixtures and native file/device component", "result": "passed", "passed": 24, "failed": 0, "ignored": 0},
@@ -29,11 +37,14 @@
     {"name": "Bash, Zsh and Fish integration", "result": "passed", "passed": 9, "failed": 0, "ignored": 0},
     {"name": "Signed upstream Dropbear fixture, pinned-key shell and literal SFTP round trip", "result": "passed", "passed": 1, "failed": 0, "ignored": 0},
     {"name": "Native terminal programs", "result": "passed", "passed": 3, "failed": 0, "ignored": 0},
-    {"name": "AppKit registered folder Services from modern and legacy pasteboards on macOS 14.8.7", "result": "passed", "passed": 2, "failed": 0, "ignored": 0}
+    {"name": "AppKit registered folder Services from modern and legacy pasteboards on macOS 14.8.7", "result": "passed", "passed": 2, "failed": 0, "ignored": 0},
+    {"name": "Owned Apple Silicon XDMCP integration against the relocated combined archive", "result": "passed", "passed": 4, "failed": 0, "ignored": 0},
+    {"name": "Independent Debian xdm Direct and Indirect callback replay at 256 descriptors", "result": "passed", "passed": 2, "failed": 0, "ignored": 0}
   ],
   "unavailable": [
-    {"requirement": "Bundled Chromium", "reason": "Installed Chrome passed. The native bundled provider needs an audited source-built and signed resource inventory."},
-    {"requirement": "Direct/Indirect XDMCP, active graphics and host clipboard", "reason": "XQuartz windowed authentication and SSH/X passed; XDMCP requires a native session engine, and full graphics and host clipboard need separate observations."},
+    {"requirement": "Public bundled Chromium", "reason": "The opt-in arm64 fixture uses a sealed snapshot with placeholder credits. Production needs a maintained and source-matched payload with complete notices and reviewed signing."},
+    {"requirement": "Visible XDMCP chooser selection", "reason": "The real chooser mapped and the real manager accepted callback-driven selection and display rotation. An operator must exercise the visible choice."},
+    {"requirement": "Active graphics and host pasteboard interoperability", "reason": "The pinned windowed profile exposes no active RandR modes in the Sonoma guest and disables indirect GLX and host pasteboard sync. Private core rendering and X11 selections passed."},
     {"requirement": "Finder context-menu interaction", "reason": "Registered AppKit Services opened literal folders using both pasteboard formats. The visible Finder menu interaction remains manual."},
     {"requirement": "Public distribution approval", "reason": "Exact XQuartz bytes are approved for the windowed runtime. Release workflow distribution, signing policy and final approval are open."},
     {"requirement": "GPU, external displays, devices, adapter transitions and TCC permissions", "reason": "These require physical fixtures or a human-operated permission session."}

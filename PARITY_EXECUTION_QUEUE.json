@@ -452,7 +452,7 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS graphics hosts and physical GPU/monitor fixtures; configured headless Linux graphics coverage is retained.",
-      "remaining": "Linux GLX rendering, Composite readback and RandR change/restoration passed with the extracted release engine. Apple Silicon reports authenticated windowed XQuartz dimensions and GLX/RandR versions. Active macOS readback and mode changes, Windows, physical GPU/monitor coverage and original comparison remain pending.",
+      "remaining": "Linux GLX rendering, Composite readback and RandR change/restoration passed with the extracted release engine. Apple Silicon reports authenticated windowed XQuartz dimensions and GLX/RandR versions. Apple Silicon core pixel readback passed. The pinned windowed profile reported no active RandR outputs/modes on Sonoma and declined indirect GLX; Windows, physical GPU/monitor coverage and original comparison remain pending.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -468,16 +468,17 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS engines and original Personal26.6 workflow access. Linux genuine-package chooser/clipboard/keyboard/cancel checks already pass.",
-      "remaining": "Linux direct/indirect discovery, hostname, clipboard, keyboard and cleanup workflows are implemented and genuine-package qualified after the reviewed reset fix. Native Windows/macOS engine implementation/runtime qualification and original comparison remain.",
-      "validation_remaining": "Genuine source22bb/full398d traced and untraced strict-auth chooser/clipboard/keyboard/cancel checks passed. Current32 source retains identical XDMCP paths and native engine; native Windows/macOS and original workflows remain unverified.",
+      "dependency": "Native Windows engine and original Personal26.6 workflow access. Linux genuine-package chooser/clipboard/keyboard/cancel checks already pass. The approved Apple Silicon windowed profile retains separate geometry and host clipboard limits.",
+      "remaining": "Linux direct/indirect discovery, hostname, clipboard, keyboard and cleanup workflows are implemented and genuine-package qualified after the reviewed reset fix. Apple Silicon windowed Direct and Indirect passed against actual Debian xdm, including chooser callback handoff and cleanup. Windows and original comparison remain.",
+      "validation_remaining": "Genuine source22bb/full398d traced and untraced strict-auth chooser/clipboard/keyboard/cancel checks passed. Apple Silicon visible chooser selection is pending. Windows and original workflows remain unverified.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/X04/hostnames/root-integration.json",
         "docs/parity-evidence/X04/clipboard-lifecycle/root-integration.json",
         "docs/parity-evidence/X04/keyboard-chooser/root-integration.json",
         "target/agent-work/current-packaged-xdmcp/reliability-boundary/owner-handoff.md",
-        "docs/parity-evidence/parallel-integration-post-xdmcp-reset-fix/result.json"
+        "docs/parity-evidence/parallel-integration-post-xdmcp-reset-fix/result.json",
+        "docs/parity-evidence/issue-2/xdmcp-macos.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
       "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
@@ -736,7 +737,7 @@
       ],
       "dependency": "",
       "remaining": "",
-      "validation_remaining": "Native arm64 bookmark URL/file events, registration, relocation, version-changing upgrade and removal passed. Finder Services, Linux desktop variants and original comparisons remain open.",
+      "validation_remaining": "Native arm64 bookmark URL/file events, registration, relocation, version-changing upgrade and removal passed. Modern and legacy AppKit Services passed. The visible Finder menu, Linux desktop variants and original comparisons remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/B05/implementation.md",
@@ -769,9 +770,9 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS packaged Chromium runtimes and interactive profile, input and lifecycle qualification.",
-      "remaining": "Reviewed embedded Chromium and private process/pipe source backends are present for Linux, Windows and macOS. Genuine source22bb Linux bundle passes actual normal-app navigation/input/resize/PTY and five nested sandboxed renderer checks with clean cleanup. Native Windows/macOS browser packaging and interactive provider qualification remain.",
-      "validation_remaining": "Native Windows/Linux/macOS and original runtime comparisons remain pending; static exact-target and official scope evidence established.",
+      "dependency": "Native Windows packaged Chromium runtime and a maintained Apple Silicon release candidate with complete notices and approved signing.",
+      "remaining": "Reviewed embedded Chromium and private process/pipe source backends are present for Linux, Windows and macOS. Genuine source22bb Linux bundle passes actual normal-app navigation/input/resize/PTY and five nested sandboxed renderer checks with clean cleanup. The opt-in relocated Apple Silicon fixture passed live browser workflows, renderer sandbox and cleanup. Native Windows and production Apple Silicon browser packaging remain.",
+      "validation_remaining": "The final signed production Apple Silicon archive, native Windows and original runtime comparisons remain pending.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/original-scope/README.md",
@@ -780,7 +781,8 @@
         "docs/parity-evidence/parallel-integration-reviewed/result.json",
         "docs/parity-evidence/E01/macos/README.md",
         "docs/parity-evidence/E01/windows/README.md",
-        "docs/parity-evidence/E01/resize-macos-review.md"
+        "docs/parity-evidence/E01/resize-macos-review.md",
+        "docs/parity-evidence/issue-2/chromium-arm64.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },

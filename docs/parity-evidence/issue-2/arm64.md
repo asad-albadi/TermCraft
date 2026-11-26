@@ -169,23 +169,91 @@ passed. Adding `--all-targets` finds the same existing test-only import
 error in `src/ui/layout.rs:255` on the branch and a clean archive of current
 `main`. That test imports Unix-only fixture functions on Windows.
 
+## Combined Apple Silicon qualification archive
+
+`python3 scripts/package-release.py --build-root BUILD --output DIST
+--xquartz-runtime XQUARTZ --macos-browser-fixture CHROMIUM_INPUTS` built the
+locked GUI and independent RDP helper from source
+`6b76c74145b9597108eb7773214cae9c0495cae5`. Build inputs used Rust 1.96.1,
+SDK 26.2 and `MACOSX_DEPLOYMENT_TARGET=14.0`. The package manifest records
+source snapshot `d23cf96605376b967c22dd281ef0b81f3d3f1f44e41d00f8f86481861321af3f`
+and the opt-in GUI feature. The combined archive contains 2,139 hashed files
+and five literal framework links. SHA-256 of
+`TermCraft-0.1.0-macos-aarch64-xquartz-chromium-qualification.zip` is
+`4cc6176ab255e144c90ba0b986bc8e6d825a6629ce6a150397080561b74aa692`.
+Its unpacked Chromium app passed `codesign --verify --deep --strict` and
+used its local ad-hoc resource seal. The package profile is `qualification`.
+
+The earlier integrated archive from
+`1bc64f7d37d6803b0839ec03c8ca26902dce3dec` had SHA-256
+`23648b5da2b87e0abc23e2132846c62ea601ad6e9a7d2e8b0b2377490fcf5974`.
+`python3 scripts/package-check-startup.py ARCHIVE --evidence DIRECTORY`
+verified every file and link with relocated startup and live RDP negotiation
+on macOS 26.6.2 and Apple Silicon Sonoma 14.8.7. The rebuilt archive replay
+also verified the relocated GUI and live manifest-matching helper on both
+versions. Comparing the initial and final archive inventories found only
+`harbor-workspace` changed. The five symlink texts, RDP helper, launcher,
+Chromium and private XQuartz runtime bytes all matched. Both rebuilt archive
+browser protocol runs passed 4/4. Finder Services on Sonoma dispatched both
+pasteboard formats to the literal terminal working directories and unregistered
+the fixture. `vtool -show-build` confirmed arm64 and a 14.0 minimum for the GUI,
+RDP helper and launcher. The bundled Chromium executable is arm64 with minimum
+13.0 and SDK 27.0.
+
+The native `macos_xdmcp` harness passed four owned-peer checks at the
+256-descriptor limit against the relocated combined package. Two separate
+real Debian xdm tests passed at the same limit. Direct opened an authenticated
+session at `:184`. Indirect authenticated at `:185`, handed off through the
+real Debian chooser callback, and rotated the display to a fresh XQuartz
+process. The runtime removed the listener, authority and owned process.
+See the [XDMCP ledger](xdmcp-macos.md).
+
+AppKit Services registration, dispatch for both pasteboard formats, literal
+folder terminal working directories and unregistration passed with the
+combined archive on macOS 14.8.7. See [application lifecycle](app-lifecycle.md).
+
+The default workspace command used the separately locked owned RDP
+peer and runtime through `TERMCRAFT_V03_RDP_FIXTURE` and
+`TERMCRAFT_V03_RDP_ENGINE`. A fixture had decoded an SFTP command through
+a fixed-width terminal text dump. A long temporary path wrapped the hex
+output. Capturing the raw PTY command in an owned file now checks every
+byte and passed with the long path. A later run filled the internal
+filesystem while creating short `/private/tmp` SSH fixtures. Moving the
+generated RDP build cache to the external test volume recovered 2.5 GiB
+with links at the original cache paths. The SCP and services boundary
+replays passed 20/20 and 16/16 after recovery. The final
+`cargo +1.96.1 test --locked --all-targets --no-fail-fast` run reported
+915 passed, zero failed and 15 ignored across 75 targets at source
+`15b7971fa4c8a0a513390ee011f0fa7c80b8c4ee`. The package tests ran 22
+cases and skipped 24. The hosted macOS failures reproduced with Python
+fixtures under the OS-provided symlinked `/var` temp root. Resolving only
+the owned fixture roots passed on the default macOS temporary location,
+including the extractor’s symlink rejection cases. The Windows GNU library and executable cross-check
+also passed. `cargo +1.96.1 check --locked --target
+x86_64-unknown-linux-gnu --lib --bins` passed with a Zig cross C compiler
+after `folder_archive::unix` switched to rustix’s `RawMode`.
+The default macOS packaging contract passed after its fixture path fix.
+The layout test also checks that prebuilt macOS inputs do not claim a build
+SDK. A hosted Linux run reproduced the pre-existing iperf2 ABI mismatch on
+Ubuntu 24.04. The failing binary has SHA-256
+`570328443a3fbeb426dba301e2c892b3026645c2d7b3da8bc2fea9688978a834` on
+both main and the PR and requires `GLIBC_2.43`.
+[Hosted Linux job](https://github.com/asad-albadi/TermCraft/actions/runs/45755486304)
+
 ## Open qualification
 
-The remaining Apple Silicon software work includes bundled Chromium with a
-pinned native source and signed resource tree, Direct and Indirect XDMCP with
-a native session-owned network and authentication path. AppKit Services
-registration and dispatch passed on macOS 14.8.7 for modern and legacy
-folder payloads. The Finder menu interaction remains a manual check. XQuartz deliberately disables upstream
-host pasteboard sync, so X11 selection tests cover only the private display.
-Public distribution approval and release automation replay remain open.
+The pinned Apple Silicon Chromium is usable for local qualification. Public
+distribution requires a maintained arm64 candidate with complete source-matched
+notices and reviewed release signing. The tested fixture embeds placeholder
+credits. See the [Chromium evidence](chromium-arm64.md).
 
-The official Chromium Mac_Arm snapshot at build 1755275 was inspected.
-Its archive SHA-256 was
-`994053eadf27c3d03558b81ad67ec7bbed4943f6b7dd0cce75408cb23bfe70fc`.
-Chromium 160.0.8185.0 was arm64 and its framework used relative symlinks.
-`codesign --verify --deep --strict` rejected the app because its resource
-seal was incomplete. The bundled provider remains gated pending a complete
-signed artifact and a stager that preserves its verified framework links.
+The private XQuartz profile provides core rendering and private UTF-8 X11
+selection exchange. It reports no active RandR outputs or modes on Sonoma and
+disables indirect GLX and host pasteboard synchronization. Broader host
+clipboard and graphics behavior needs separate implementation and
+qualification. Visible Finder Services invocation and visible XDMCP chooser
+selection remain operator checks. Public release automation and distribution
+approval remain separate from this development archive.
 
 Run external-display/Retina scaling and GPU workflows on physical hardware.
 Exercise physical CUPS printer, PCSC smart-card and serial devices, and real

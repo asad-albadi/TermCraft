@@ -56,8 +56,9 @@ and `cargo +1.96.1 test --locked --test ssh_authentication managed_ssh_forwards_
 `0fd1bb3ffd162962691d4b7c0b6283b53e448b6a50a51c502c86074b5317f171`.
 The source-built runtime does not start or register the user's XQuartz.
 The packaged runtime passed authentication, core pixel readback and private
-clipboard exchange on macOS 26.6.2 and 14.8.7. Release distribution, XDMCP,
-and host clipboard interoperability remain open.
+clipboard exchange on macOS 26.6.2 and 14.8.7. Native Direct and Indirect XDMCP also passed against an owned Debian xdm.
+See [XDMCP evidence](xdmcp-macos.md). Release distribution and host clipboard
+interoperability remain open.
 
 On a fresh Sonoma guest, the windowed package exposed no RandR outputs,
 CRTCs, or modes. Its legacy screen-info response could not be decoded by

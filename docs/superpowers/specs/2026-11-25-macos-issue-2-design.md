@@ -2,11 +2,11 @@
 
 ## Intent
 
-Issue #2 completes TermCraft's macOS implementation and delivery path for Apple Silicon and Intel. The goal is a relocatable, app-owned workspace whose advertised macOS features are backed by native builds and evidence, while unsupported workflows remain explicit and gated.
+Issue #2 completes TermCraft's macOS implementation and delivery path for Apple Silicon. Intel macOS is outside the current support scope. The goal is a relocatable, app-owned workspace whose advertised macOS features are backed by native builds and evidence, while unsupported workflows remain explicit and gated.
 
 ## Goals
 
-- Build and package the GUI, locked RDP helper, browser payload, native providers, and private XQuartz runtime for arm64 and x86_64.
+- Build and package the GUI, locked RDP helper, browser payload, native providers, and private XQuartz runtime for arm64.
 - Preserve the existing provider boundaries, trust gates, cancellation ownership, permission checks, and user-data separation.
 - Make `.app` relocation, Finder/URL/Services events, registration/unregistration, upgrade/removal, and helper/resource adjacency testable.
 - Record exact sources, architectures, SDK/toolchain inputs, hashes, runtime dependencies, and native qualification results.
@@ -38,7 +38,7 @@ Issue #2 completes TermCraft's macOS implementation and delivery path for Apple 
 2. Private XQuartz source preparation, relocation, signing, and trust-pin integration.
 3. App packaging, Finder/URL/Services lifecycle, relocation, and user-data preservation.
 4. Native browser, RDP/device, screen capture/control, clipboard, and permission qualification seams.
-5. Native arm64 execution plus Intel/physical/original evidence capture where available.
+5. Native arm64 execution plus physical and original-version evidence capture where available.
 6. Final parity documentation, issue checklist synchronization, and release-artifact handoff.
 
 ## Completion rule

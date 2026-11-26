@@ -96,12 +96,21 @@ cargo +1.96.1 test --locked --test macos_xdmcp \
   `30cff793431ef36178d9814eeb13024331c2acc28c7daf608ce575fd3a9893cd`
   and the compiler inventory remains
   `0fd1bb3ffd162962691d4b7c0b6283b53e448b6a50a51c502c86074b5317f171`.
-- The owner of the Debian ARM Tart fixture reported that real xdm 1.1.11
-  Direct authenticated and mapped xlogin at `192.168.64.1:174` from manager
-  `192.168.64.2:177`. The guest's Xsetup marker and the Mac cleanup assertions
-  passed. With UDP 1177 the independent primary also authenticated and mapped
-  its Indirect chooser. The pinned XQuartz does not advertise XTEST, so the
-  chooser automation used by the Linux Xephyr test cannot select a target on
-  this engine as-is.
+- An owned Debian 13 arm64 Tart VM ran Debian xdm `1:1.1.11-6.1` as an
+  independent manager. Direct authenticated at `192.168.64.1:174` via
+  `192.168.64.2:177` and mapped xlogin. The guest's Xsetup marker and
+  the Mac cleanup assertions passed.
+- A separate Indirect manager on UDP 1177 authenticated and mapped stock
+  xdm's chooser. The private XQuartz profile exposes no XTEST support, so a
+  separate deterministic replay used an owned chooser callback in the guest
+  to select the same VM's manager on the standard UDP 177 port. At display
+  `:181` the real xdm authenticated again after TermCraft rotated from
+  XQuartz PID 27705 to 27714. Xsetup and the harness confirmed authenticated
+  setup. Both the listener and authority were removed, the owned XQuartz
+  exited, and the test passed. Visible chooser selection is a separate
+  operator check.
+
+The consolidated archive replay also passed the four isolated loopback cases
+and both actual xdm modes at 256 descriptors. See [arm64 evidence](arm64.md).
 
 Protocol reference [X.Org XDMCP specification](https://xorg.freedesktop.org/releases/X11R7.6/doc/libXdmcp/xdmcp.html).

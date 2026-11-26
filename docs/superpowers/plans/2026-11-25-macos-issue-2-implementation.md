@@ -26,7 +26,7 @@
 - A package replacement/removal must preserve settings, vault, recovery data, and unrelated handlers.
 - A malformed, wrong-architecture, unsigned, unrelocated, or incomplete native artifact must remain rejected.
 - Permission denial/revocation and cancellation must not leak capture callbacks, held input, processes, sockets, or authority files.
-- Intel-only, physical-device, GPU/monitor, and original-runtime requirements must remain explicitly open when not evidenced.
+- Physical-device, GPU/monitor, and original-runtime requirements stay open until evidenced.
 
 ---
 
@@ -125,7 +125,6 @@
 **Files:**
 - Modify: `packaging/macos` build/release scripts as required by Tasks 2–5
 - Create: `docs/parity-evidence/issue-2/arm64.md`
-- Create: `docs/parity-evidence/issue-2/x86_64.md` when an Intel runner is available
 - Modify: `PARITY_CHECKLIST.md`
 - Modify: `PARITY_EXECUTION_QUEUE.json`
 - Modify: `FEATURE_PARITY.md`
@@ -155,4 +154,10 @@
 - [x] Reproduce and repair actionable all-target failures, then run the workspace, RDP, native device, PCSC fixture and installed Chrome suites.
 - [x] Exercise native registration, same-version replacement, file and URL events, and preservation of settings, an encrypted vault and recovery files.
 - [x] Build and probe a source-backed XQuartz candidate with authenticated private transport through the actual Rust owner.
-- [ ] Finish native payload approval and remaining Finder Services, versioned upgrade, graphics, XDMCP, Intel and physical permission evidence. The runtime approval gate requires evidence beyond individual arm64 probes.
+- [x] Verify a version-changing upgrade, relocation and removal with isolated user data.
+- [x] Verify registered AppKit Services and both folder pasteboard formats in the relocated arm64 package.
+- [x] Verify native windowed Direct and Indirect XDMCP with owned peers and Debian xdm.
+- [x] Stage the pinned local Chromium fixture, verify private browser ownership, and exercise native browser workflows.
+- [ ] Run visible Finder menu and XDMCP chooser interactions and human-operated permission scenarios.
+- [ ] Qualify additional graphics and host pasteboard capabilities within the private profile and complete physical device checks.
+- [ ] Approve public arm64 software distribution with a maintained Chromium candidate, source-matched third-party notices and the chosen release-signing policy.

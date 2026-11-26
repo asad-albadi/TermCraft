@@ -109,11 +109,29 @@ actual browser input for both dimensions. It does not require a back-forward
 cache hit from this snapshot. The installed-browser and Linux expectations
 are unchanged.
 
-The relocated render, text submission, history and both resize/click checks
-passed when run in isolation with the final binary. A combined workflow run
-passed settings, site authentication/TLS and proxy consent but timed out
-waiting for one resized frame. Report this as a repeatability gap, not a
-blanket pass for the combined run.
+The older workspace harness reproduced a persistent mismatch after rapid
+viewport changes: the UI requested 346×138 and Chromium supplied 331×124.
+Chromium temporarily changes emulated view geometry when taking a screenshot
+and restores its previous size on completion. The fixture now drains a pending
+screenshot to its existing deadline before applying a new viewport or
+sending pointer coordinates. A capture
+retired during navigation can expire without closing the session. Polling
+navigation history also retries when the CDP page handler reports that a
+renderer is temporarily inactive during a navigation.
+[Exact Chromium page handler](https://chromium.googlesource.com/chromium/src/+/2de5612046d43b6f874320ba0e5357146cb225c5/content/browser/devtools/protocol/page_handler.cc)
+
+The native protocol harness passed four cases on both macOS 26.6.2 and
+14.8.7 using the relocated fixture. The suite requires frame pixels, correct
+viewport revisions, both viewport dimensions, pointer and text delivery,
+history navigation, proxy/site authentication policy and TLS rejection.
+The opt-in workspace tests exercise the same owned Chromium runtime through
+TermCraft's actual tab UI. Four passed after synchronizing pointer commands
+with screenshot restoration. The resize fixture disables caching of its
+repeated gesture observations so every request reaches the owned server.
+Run the integrity mutation probes and the workspace tests against separate
+extractions. The mutation probe deliberately replaces a staged file and a
+framework link before restoring them. One overlapping run correctly
+rejected the altered fixture.
 
 ## Remaining distribution blockers
 
