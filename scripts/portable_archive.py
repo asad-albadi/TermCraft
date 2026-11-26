@@ -1,7 +1,8 @@
-"""Strict, transactional portable TAR extraction on Python 3.11 and later.
+"""Strict, transactional portable archive extraction on Python 3.11 and later.
 
 Release TARs contain only directories and regular files. Never delegate pathname
-or member-type decisions to version-dependent tarfile extraction defaults.
+or member-type decisions to version-dependent extraction defaults. Only the
+Apple Silicon Chromium app can contain relative framework links in a ZIP.
 """
 import os
 from pathlib import Path, PurePosixPath
@@ -9,6 +10,80 @@ import shutil
 import stat
 import tarfile
 import tempfile
+import zipfile
+
+
+MACOS_CHROMIUM = PurePosixPath(
+    "TermCraft.app/Contents/Resources/browser/macos-aarch64/Chromium.app"
+)
+
+
+def _zip_path(name):
+    path = PurePosixPath(name)
+    if (not name or path.as_posix() != name or path.is_absolute() or path == PurePosixPath(".")
+            or ".." in path.parts or any(ch in name for ch in ("\\", ":", "\0"))):
+        raise ValueError(f"Invalid ZIP path: {name}")
+    return path
+
+
+def extract_zip(archive, directory):
+    """Extract regular leaves before making the confined Chromium framework links."""
+    destination = Path(os.path.abspath(directory))
+    _directory_path(destination)
+    if destination.exists() and any(destination.iterdir()):
+        raise ValueError("Extraction directory must be empty.")
+    with zipfile.ZipFile(archive) as bundle:
+        files = {}
+        links = {}
+        directories = set()
+        seen = set()
+        for member in bundle.infolist():
+            name = member.orig_filename
+            path = _zip_path(name.removesuffix("/") if member.is_dir() else name)
+            if path in seen:
+                raise ValueError(f"Duplicate ZIP member: {name}")
+            seen.add(path)
+            mode = member.external_attr >> 16
+            if member.is_dir():
+                if stat.S_IFMT(mode) not in (0, stat.S_IFDIR):
+                    raise ValueError(f"Invalid ZIP directory: {name}")
+                directories.add(path)
+            elif stat.S_ISREG(mode):
+                files[path] = member
+            elif (stat.S_ISLNK(mode) and path != MACOS_CHROMIUM
+                    and path.is_relative_to(MACOS_CHROMIUM) and member.file_size <= 1024):
+                links[path] = _zip_path(bundle.read(member).decode("utf-8"))
+            else:
+                raise ValueError(f"Unexpected ZIP member type: {name}")
+        leaves = files.keys() | links.keys()
+        for path in seen:
+            if any(parent in leaves for parent in path.parents):
+                raise ValueError(f"ZIP member has a file or link ancestor: {path}")
+
+        with tempfile.TemporaryDirectory(prefix=".portable-extract-", dir=destination.parent) as temporary:
+            staged = Path(temporary) / "payload"
+            staged.mkdir(mode=0o755)
+            for path in sorted(directories):
+                (staged / path).mkdir(parents=True, exist_ok=True)
+            for path, member in files.items():
+                target = staged / path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                with bundle.open(member) as reader, target.open("xb") as writer:
+                    shutil.copyfileobj(reader, writer)
+                target.chmod(((member.external_attr >> 16) & 0o755) | 0o600)
+            for path, value in links.items():
+                target = staged / path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.symlink_to(value)
+            for path in links:
+                try:
+                    resolved = (staged / path).resolve(strict=True)
+                except (OSError, RuntimeError) as error:
+                    raise ValueError(f"Invalid Chromium bundle link: {path}") from error
+                if not resolved.is_relative_to((staged / MACOS_CHROMIUM).resolve(strict=True)):
+                    raise ValueError(f"Chromium bundle link escapes its app: {path}")
+            _directory_path(destination)
+            os.replace(staged, destination)
 
 
 def _directory_path(path):

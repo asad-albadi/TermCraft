@@ -12,6 +12,7 @@ import platform
 import plistlib
 import re
 import shutil
+import stat
 import struct
 import subprocess
 import sys
@@ -401,6 +402,19 @@ def archive_permissions(member):
     return member
 
 
+def write_zip(root, archive):
+    with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as zipped:
+        for path in sorted(root.rglob("*")):
+            member = path.relative_to(root.parent).as_posix()
+            if path.is_symlink():
+                entry = zipfile.ZipInfo(member)
+                entry.create_system = 3
+                entry.external_attr = (stat.S_IFLNK | 0o777) << 16
+                zipped.writestr(entry, os.readlink(path).encode("utf-8"))
+            elif path.is_file():
+                zipped.write(path, member)
+
+
 def stage_xwayland(source, destination, archive):
     relative = Path("packaging/x11")
     package_manifest = regular_source(source, relative / "manifest.json")
@@ -498,6 +512,15 @@ def stage_browser(source, resources, inputs, target, arch):
     return info, libraries
 
 
+def stage_macos_browser_fixture(source, resources, inputs):
+    stage = regular_source(source, Path("packaging/browser/stage-macos.py"))
+    subprocess.run([sys.executable, "-I", "-B", stage, resources, inputs.resolve(strict=True)], check=True)
+    inventory = Path("browser/macos-aarch64/BROWSER-MANIFEST.json")
+    info = json.loads(regular_source(resources, inventory).read_text())
+    fields = ("root", "executable", "version", "qualification", "archive_sha256", "source_revision")
+    return {**{key: info[key] for key in fields}, "manifest": inventory.as_posix()}
+
+
 def stage_xquartz(source, resources, candidate):
     inventory = regular_source(source, Path("packaging/x11/native/macos-arm64.sha256"))
     contract = json.loads(regular_source(source, Path("packaging/x11/native/source-contract.json")).read_text())["macos"]
@@ -540,7 +563,8 @@ def stage_xquartz(source, resources, candidate):
 
 
 def package_release(target, output, app_binary, helper_binary, build_inputs=None, source=ROOT,
-                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None, xephyr_archive=None, wayland_helper_binary=None, xquartz_runtime=None):
+                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None, xephyr_archive=None, wayland_helper_binary=None, xquartz_runtime=None,
+                    macos_browser_fixture=None):
     packaging = source / "packaging"
     binaries = [app_binary.resolve(strict=True), helper_binary.resolve(strict=True)]
     if binaries[0].samefile(binaries[1]):
@@ -568,6 +592,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         raise ValueError("Unix payload supports Linux and Windows x86_64 only.")
     if browser_inputs is not None and (target, arch) != ("linux", "x86_64"):
         raise ValueError("No qualified bundled Chromium payload for this platform.")
+    if macos_browser_fixture is not None and (target, arch) != ("macos", "aarch64"):
+        raise ValueError("The Chromium qualification fixture requires Apple Silicon macOS.")
     if wayland_helper_binary is not None:
         if target != "linux" or binary_arch(wayland_helper_binary, target) != arch:
             raise ValueError("The optional Wayland helper requires the same native Linux architecture as the app.")
@@ -586,6 +612,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         basename += "-unix"
     if browser_inputs is not None:
         basename += "-chromium"
+    if macos_browser_fixture is not None:
+        basename += "-chromium-qualification"
     if wayland_helper_binary is not None:
         basename += "-wayland-sharing"
     name = f"{basename}.tar.gz" if target == "linux" else f"{basename}.zip"
@@ -660,6 +688,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         if browser_inputs is not None:
             browser, browser_libraries = stage_browser(source, resources, browser_inputs, target, arch)
             linked.update(browser_libraries)
+        if macos_browser_fixture is not None:
+            browser = stage_macos_browser_fixture(source, resources, macos_browser_fixture)
         unix = stage_unix(source, resources, unix_cache, target, arch) if unix_cache is not None else None
         vnc_browser = stage_vnc_browser(source, resources)
         copy_release_assets(source, resources / "assets")
@@ -729,8 +759,15 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
             "licenses": {"project": None, "credits": (resources / "CREDITS.md").relative_to(root).as_posix(),
                          "crate_notice_paths_relative_to": resources.relative_to(root).as_posix(),
                          "crates": notices},
-            "files": {p.relative_to(root).as_posix(): sha256(p) for p in sorted(root.rglob("*")) if p.is_file()},
+            "files": {p.relative_to(root).as_posix(): sha256(p) for p in sorted(root.rglob("*"))
+                      if not p.is_symlink() and p.is_file()},
         }
+        if macos_browser_fixture is not None:
+            manifest["profile"] = "qualification"
+        links = {p.relative_to(root).as_posix(): os.readlink(p)
+                 for p in sorted(root.rglob("*")) if p.is_symlink()}
+        if links:
+            manifest["symlinks"] = links
         if target == "macos":
             manifest["build"]["macos"] = macos_build_metadata(arch)
         if wayland is not None:
@@ -741,10 +778,7 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
             with tarfile.open(temporary_archive, "w:gz") as tar:
                 tar.add(root, arcname=root.name, filter=archive_permissions)
         else:
-            with zipfile.ZipFile(temporary_archive, "w", zipfile.ZIP_DEFLATED) as zipped:
-                for path in sorted(root.rglob("*")):
-                    if path.is_file():
-                        zipped.write(path, path.relative_to(temp).as_posix())
+            write_zip(root, temporary_archive)
         # Publish a complete archive without replacing another version or concurrent output.
         if os.name == "nt":
             # Windows rename is atomic and refuses an existing destination.
@@ -774,6 +808,8 @@ def main():
     parser.add_argument("--unix-cache", type=Path,
                         help="Bundle target-matching pinned Unix archives from an offline upstream hash cache (Linux/Windows x86_64).")
     parser.add_argument("--browser-inputs", type=Path, help="Offline pinned Chromium archive, signature and third-party notices directory (Linux x86_64).")
+    parser.add_argument("--macos-browser-fixture", type=Path,
+                        help="Offline directory containing the pinned Apple Silicon test snapshot. Creates a qualification archive for local testing.")
     args = parser.parse_args()
     if bool(args.app_binary) != bool(args.helper_binary):
         parser.error("Supply both prebuilt binaries or omit both to build a native release.")
@@ -789,6 +825,8 @@ def main():
         parser.error("--xephyr-archive is available for Linux x86_64 only.")
     if args.xquartz_runtime and args.platform != "macos":
         parser.error("--xquartz-runtime is available for Apple Silicon macOS only.")
+    if args.macos_browser_fixture and args.platform != "macos":
+        parser.error("--macos-browser-fixture is available for Apple Silicon macOS only.")
     if args.unix_cache is not None and args.platform not in ("linux", "windows"):
         parser.error("--unix-cache supports Linux and Windows x86_64 only.")
     if args.wayland_helper_binary is not None and args.platform != "linux":
@@ -804,7 +842,8 @@ def main():
     try:
         if args.app_binary:
             archive = package_release(args.platform, args.output.resolve(), args.app_binary, args.helper_binary,
-                                      xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary, xquartz_runtime=args.xquartz_runtime)
+                                      xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary, xquartz_runtime=args.xquartz_runtime,
+                                      macos_browser_fixture=args.macos_browser_fixture)
         else:
             build_root = args.build_root.resolve() if args.build_root else ROOT / "target"
             source, inputs = freeze_sources(ROOT, build_root / "package-sources")
@@ -813,7 +852,8 @@ def main():
                 print(f"Building source snapshot {source.name}", flush=True)
                 app, helper = release_build(source, build_root, settings)
                 archive = package_release(args.platform, args.output.resolve(), app, helper, inputs, source, settings,
-                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary, xquartz_runtime=args.xquartz_runtime)
+                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary, xquartz_runtime=args.xquartz_runtime,
+                                          macos_browser_fixture=args.macos_browser_fixture)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f"Packaging failed: {error}\n")
     print(f"{sha256(archive)}  {archive}")

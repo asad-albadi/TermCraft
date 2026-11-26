@@ -4,6 +4,7 @@ import os
 import plistlib
 from pathlib import Path
 import shutil
+import stat
 import struct
 import subprocess
 import sys
@@ -284,6 +285,50 @@ class PublicationBoundary(unittest.TestCase):
 
 
 class NativePackageLayout(unittest.TestCase):
+    @unittest.skipUnless(os.name == "posix", "requires POSIX symbolic link semantics")
+    def test_macos_chromium_zip_preserves_framework_links(self):
+        package = module_at("package_release", SCRIPT)
+        smoke = module_at("package_check_startup", ROOT / "scripts/package-check-startup.py")
+        prefix = Path("TermCraft.app/Contents/Resources/browser/macos-aarch64/Chromium.app")
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary).resolve()
+            source = base / "source"
+            framework = source / prefix / "Framework.framework"
+            (framework / "Versions/1").mkdir(parents=True)
+            (framework / "Versions/1/executable").write_bytes(b"framework")
+            (framework / "Versions/Current").symlink_to("1")
+            (framework / "executable").symlink_to("Versions/Current/executable")
+            archive = base / "package.zip"
+            package.write_zip(source / "TermCraft.app", archive)
+            unpacked = base / "unpacked"
+            smoke.extract(archive, unpacked)
+            relocated = unpacked / prefix / framework.name
+            self.assertEqual(os.readlink(relocated / "Versions/Current"), "1")
+            self.assertEqual((relocated / "executable").read_bytes(), b"framework")
+
+            for name, target, child in (
+                ("../../escape", "1", None),
+                ("Versions/Current", "../1", None),
+                ("Versions/Current", "1", "Versions/Current/file"),
+                ("Versions/Current", "Current", None),
+            ):
+                with self.subTest(name=name, target=target, child=child):
+                    bad = base / "invalid.zip"
+                    link = zipfile.ZipInfo((prefix / framework.name / name).as_posix())
+                    link.create_system = 3
+                    link.external_attr = (stat.S_IFLNK | 0o777) << 16
+                    with zipfile.ZipFile(bad, "w") as written:
+                        written.writestr(link, target)
+                        if child:
+                            regular = zipfile.ZipInfo((prefix / framework.name / child).as_posix())
+                            regular.create_system = 3
+                            regular.external_attr = (stat.S_IFREG | 0o644) << 16
+                            written.writestr(regular, b"unsafe")
+                    rejected = base / "rejected"
+                    with self.assertRaises(ValueError):
+                        smoke.extract(bad, rejected)
+                    self.assertFalse(rejected.exists())
+
     def test_macos_xquartz_staging_rejects_changed_source_bytes(self):
         package = module_at("package_release", SCRIPT)
         with tempfile.TemporaryDirectory() as temporary:

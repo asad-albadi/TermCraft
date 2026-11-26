@@ -5,14 +5,11 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import platform
 import socket
-import stat
 import subprocess
-import tarfile
 import tempfile
-import zipfile
 
 
 # Load from this script's directory even when imported by file-location fixtures.
@@ -22,25 +19,14 @@ _archive_spec = importlib.util.spec_from_file_location(
 _archive_module = importlib.util.module_from_spec(_archive_spec)
 _archive_spec.loader.exec_module(_archive_module)
 extract_tar = _archive_module.extract_tar
+extract_zip = _archive_module.extract_zip
 
 
 def extract(archive, directory):
     if archive.name.endswith(".tar.gz"):
         extract_tar(archive, directory)
     else:
-        with zipfile.ZipFile(archive) as bundle:
-            seen = set()
-            for member in bundle.infolist():
-                name = PurePosixPath(member.filename)
-                if name.is_absolute() or ".." in name.parts or "\\" in member.filename or ":" in member.filename or name in seen:
-                    raise ValueError(f"Invalid archive member: {member.filename}")
-                seen.add(name)
-                mode = member.external_attr >> 16
-                if not (stat.S_ISREG(mode) or member.is_dir()):
-                    raise ValueError(f"Unexpected archive member type: {member.filename}")
-                extracted = Path(bundle.extract(member, directory))
-                if not member.is_dir():
-                    extracted.chmod(mode & 0o777)
+        extract_zip(archive, directory)
 
 
 def sha256(path):
@@ -55,10 +41,14 @@ def verify(root, manifest_path):
         raise ValueError("The startup check must run on the package's native platform.")
     actual = {
         path.relative_to(root).as_posix(): sha256(path)
-        for path in root.rglob("*") if path.is_file() and path != manifest_path
+        for path in root.rglob("*") if not path.is_symlink() and path.is_file() and path != manifest_path
     }
     if actual != manifest["files"]:
         raise ValueError("Package files differ from the manifest.")
+    links = {path.relative_to(root).as_posix(): os.readlink(path)
+             for path in root.rglob("*") if path.is_symlink()}
+    if links != manifest.get("symlinks", {}):
+        raise ValueError("Package links differ from the manifest.")
     return host, manifest
 
 

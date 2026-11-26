@@ -57,4 +57,12 @@ and `cargo +1.96.1 test --locked --test ssh_authentication managed_ssh_forwards_
 The source-built runtime does not start or register the user's XQuartz.
 The packaged runtime passed authentication, core pixel readback and private
 clipboard exchange on macOS 26.6.2 and 14.8.7. Release distribution, XDMCP,
-host clipboard interoperability and active GLX/RandR testing remain open.
+and host clipboard interoperability remain open.
+
+On a fresh Sonoma guest, the windowed package exposed no RandR outputs,
+CRTCs, or modes. Its legacy screen-info response could not be decoded by
+`x11rb`. GLX listed 32 visuals and rejected every attempted indirect context
+creation with `BadValue`, consistent with the private launcher disabling
+indirect GLX. The approved windowed profile provides core X11 rendering and
+private X11 selection exchange. External monitor and GPU workflows are
+tracked separately.
