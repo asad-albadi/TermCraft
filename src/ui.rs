@@ -3268,7 +3268,16 @@ mod gui_tests {
         let ctx = Context::default();
         let root = tempfile::tempdir().unwrap();
         let mut w = Workspace::new_context(&ctx, None, root.path().to_owned());
-        let program = "import os,tty\ntty.setraw(0)\nos.write(1,b'READY')\ndata=os.read(0,4096)\nos.write(1,b'CAP:'+data.hex().encode())\nos.read(0,1)";
+        let capture = root.path().join("captured-sftp-command");
+        let program = r#"import os,sys,tty
+tty.setraw(0)
+os.write(1,b'READY')
+command = sys.stdin.buffer.readline()
+with open(sys.argv[1] + '.pending', 'wb') as output:
+    output.write(command)
+os.replace(sys.argv[1] + '.pending', sys.argv[1])
+os.read(0,1)
+"#;
         w.start_with_launch(
             Session {
                 protocol: "SFTP".into(),
@@ -3281,7 +3290,11 @@ mod gui_tests {
             Some(connection::Launch {
                 rdp_profile: None,
                 program: "/usr/bin/python3".into(),
-                args: vec!["-c".into(), program.into()],
+                args: vec![
+                    "-c".into(),
+                    program.into(),
+                    capture.to_str().unwrap().into(),
+                ],
                 directory: None,
             }),
         );
@@ -3298,16 +3311,13 @@ mod gui_tests {
         command.push(b'\n');
         w.tabs[0].send_generated_command(&command);
         let deadline = Instant::now() + Duration::from_secs(2);
-        while !w.tabs[0].screen.plain().contains("CAP:") {
-            w.tabs[0].poll();
-            assert!(Instant::now() < deadline);
+        while !capture.is_file() {
+            assert!(Instant::now() < deadline, "No SFTP command reached the PTY");
             std::thread::sleep(Duration::from_millis(5));
         }
-        assert!(
-            w.tabs[0].screen.plain().contains("636166c3a92e747874"),
-            "{}",
-            w.tabs[0].screen.plain()
-        );
+        let received = fs::read(capture).unwrap();
+        assert!(received.ends_with(b"caf\xc3\xa9.txt\"\n"));
+        assert_eq!(received, command);
     }
     #[cfg(unix)]
     #[test]
