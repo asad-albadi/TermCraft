@@ -162,7 +162,8 @@ try {
         Push-Location 'openssl/release64'
         try {
             Invoke-BuildTool $programs['perl.exe'] @('../Configure', 'VC-WIN64A', '--release')
-            Invoke-BuildTool $programs['jom.exe'] @('/J', "$Jobs")
+            # VcXsrv needs the library outputs. App and demo targets share app.pdb.
+            Invoke-BuildTool $programs['jom.exe'] @('/J', "$Jobs", 'build_libs')
         } finally { Pop-Location }
         Push-Location 'pthreads'
         try {

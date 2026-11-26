@@ -6,7 +6,7 @@ wheel files in a private directory. This script never switches the desktop.
 """
 
 import argparse
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 import csv
 import ctypes as c
 from ctypes import wintypes as w
@@ -23,7 +23,7 @@ import tempfile
 import threading
 import time
 
-from windows_xdmcp_candidate import candidate_environment, digest, field, x11_setup
+from windows_xdmcp_candidate import candidate_environment, digest, field, packet, x11_setup
 
 
 WHEELS = {
@@ -97,6 +97,26 @@ class Windows:
         station, desktop = self.current()
         if station_name.casefold() == "winsta0" or self.object_name(station) != station_name or self.object_name(desktop) != desktop_name:
             raise RuntimeError("Clipboard test is outside its private station and desktop")
+
+    def owns_desktop_window(self, station_name, desktop_name, desktop, process_id):
+        self.check_isolated(station_name, desktop_name)
+        window_process = api(self.user, "GetWindowThreadProcessId", w.DWORD, w.HWND, c.POINTER(w.DWORD))
+        callback = c.WINFUNCTYPE(w.BOOL, w.HWND, w.LPARAM)
+        found = False
+
+        @callback
+        def check(window, unused):
+            nonlocal found
+            owner = w.DWORD()
+            if window_process(window, c.byref(owner)) and owner.value == process_id:
+                found = True
+            return True
+
+        enumerate_windows = api(self.user, "EnumDesktopWindows", w.BOOL, w.HANDLE, callback, w.LPARAM)
+        c.set_last_error(0)
+        if not enumerate_windows(desktop, check, 0) and c.get_last_error():
+            require(False, "EnumDesktopWindows (private desktop)")
+        return found
 
     @contextmanager
     def private_desktop(self):
@@ -238,7 +258,7 @@ class Windows:
                 api(self.kernel, "GlobalUnlock", w.BOOL, w.HANDLE)(handle)
 
 
-def owns_loopback_listener(pid, port):
+def owns_loopback_listener(pid, address, port):
     ip_helper = c.WinDLL("iphlpapi", use_last_error=True)
     query = api(ip_helper, "GetExtendedTcpTable", w.DWORD, c.c_void_p,
                 c.POINTER(w.DWORD), w.BOOL, w.ULONG, c.c_int, w.ULONG)
@@ -261,45 +281,74 @@ def owns_loopback_listener(pid, port):
             for _, local_ip, local_port, _, _, owner in struct.iter_unpack("<6I", table.raw[4:4 + rows * 24])
             if owner == pid
         ]
-        if listeners and listeners != [("127.0.0.1", port)]:
+        if listeners and listeners != [(address, port)]:
             raise RuntimeError("VcXsrv did not bind exactly the selected loopback listener")
         return bool(listeners)
     raise RuntimeError("Windows TCP ownership table repeatedly changed")
 
 
-def accept_owned_listener(win, process, wait, port, cookie, isolated):
+def accept_owned_listener(win, process, wait, address, port, cookie, isolated):
     deadline = time.monotonic() + 8
     while time.monotonic() < deadline:
         if wait(process.process, 0) != 0x102:
             raise RuntimeError("VcXsrv exited before opening its private X11 listener; see server.log")
-        if not owns_loopback_listener(process.pid, port):
+        if not owns_loopback_listener(process.pid, address, port):
             time.sleep(0.025)
             continue
-        get_desktop = api(win.user, "GetThreadDesktop", w.HANDLE, w.DWORD)
-        child_desktop = require(get_desktop(process.tid), "GetThreadDesktop (VcXsrv)")
-        if win.object_name(child_desktop) != isolated[1]:
-            raise RuntimeError("VcXsrv is not on the designated private desktop")
+        if not win.owns_desktop_window(*isolated, process.pid):
+            time.sleep(0.025)
+            continue
         try:
-            client = socket.create_connection(("127.0.0.1", port), 0.25)
+            with socket.create_connection((address, port), 0.25) as client, client.makefile("rb") as stream:
+                # VcXsrv can expose the listening socket before X protocol dispatch begins.
+                client.settimeout(max(0.05, min(2, deadline - time.monotonic())))
+                if x11_setup(client, stream, cookie)[0] != 1:
+                    raise RuntimeError("The private server rejected the generated Xauthority cookie")
         except (ConnectionRefusedError, TimeoutError):
             time.sleep(0.025)
             continue
-        with client, client.makefile("rb") as stream:
-            if x11_setup(client, stream, cookie)[0] != 1:
-                raise RuntimeError("The private server rejected the generated Xauthority cookie")
-        with socket.create_connection(("127.0.0.1", port), 1) as client, client.makefile("rb") as stream:
+        with socket.create_connection((address, port), 2) as client, client.makefile("rb") as stream:
             if x11_setup(client, stream, b"")[0] != 0:
                 raise RuntimeError("The private server accepted a connection without its cookie")
         return
-    raise RuntimeError("Timed out waiting for VcXsrv on the private desktop; see server.log")
+    raise RuntimeError("Timed out verifying the owned VcXsrv listener and window on the private desktop; see server.log")
 
 
-def exchange_clipboard(win, isolated, display_number, authority):
+def authorize_xdmcp(peer, address, display_number):
+    def receive(kind):
+        payload, sender = peer.recvfrom(8192)
+        if sender[0] != address or len(payload) < 6:
+            raise RuntimeError("Unexpected XDMCP fixture sender or truncated packet")
+        header = struct.unpack_from(">HHH", payload)
+        if header != (1, kind, len(payload) - 6):
+            raise RuntimeError(f"Unexpected XDMCP fixture packet: {header}, expected opcode {kind}")
+        return payload[6:], sender
+
+    _, endpoint = receive(2)
+    peer.sendto(packet(5, field(b"") + field(b"fixture.test") + field(b"ready")), endpoint)
+    request, sender = receive(7)
+    if sender != endpoint or request[:2] != struct.pack(">H", display_number):
+        raise RuntimeError("XDMCP Request did not identify the owned display")
+    cookie = secrets.token_bytes(16)
+    accepted = struct.pack(">I", 17) + field(b"") + field(b"") + field(b"MIT-MAGIC-COOKIE-1") + field(cookie)
+    peer.sendto(packet(8, accepted), endpoint)
+    manage, sender = receive(10)
+    if sender != endpoint or manage[:6] != struct.pack(">IH", 17, display_number):
+        raise RuntimeError("XDMCP Manage did not identify the fixture's assigned session")
+    return cookie
+
+
+def write_authority(path, address, display_number, cookie):
+    path.write_bytes(struct.pack(">H", 0) + field(socket.inet_aton(address)) + field(str(display_number).encode())
+                     + field(b"MIT-MAGIC-COOKIE-1") + field(cookie))
+
+
+def exchange_clipboard(win, isolated, address, display_number, authority):
     from Xlib import X, Xatom, display, protocol
 
     station_name, desktop_name, desktop = isolated
     os.environ["XAUTHORITY"] = str(authority)
-    connection = display.Display(f"tcp/127.0.0.1:{display_number}")
+    connection = display.Display(f"tcp/{address}:{display_number}")
     window = connection.screen().root.create_window(0, 0, 1, 1, 0, X.CopyFromParent)
     clipboard, utf8, targets, prop = (connection.intern_atom(name) for name in
                                      ("CLIPBOARD", "UTF8_STRING", "TARGETS", "TERMCRAFT_TEST_CLIPBOARD"))
@@ -347,7 +396,7 @@ def exchange_clipboard(win, isolated, display_number, authority):
         if error := outcome.get_nowait():
             raise error
         reader.join(timeout=1)
-        print("X CLIPBOARD → isolated Windows CF_UNICODETEXT passed", flush=True)
+        print("X CLIPBOARD to isolated Windows CF_UNICODETEXT passed", flush=True)
 
         with win.clipboard_window(station_name, desktop_name) as owner:
             win.write_text(station_name, desktop_name, owner, NATIVE_TEXT)
@@ -369,7 +418,7 @@ def exchange_clipboard(win, isolated, display_number, authority):
                         value = window.get_full_property(prop, utf8)
                         if not value or value.value.decode("utf-8") != NATIVE_TEXT:
                             raise RuntimeError("Private Windows text did not match the X UTF8_STRING reply")
-                        print("Isolated Windows CF_UNICODETEXT → X CLIPBOARD passed", flush=True)
+                        print("Isolated Windows CF_UNICODETEXT to X CLIPBOARD passed", flush=True)
                         return
                 time.sleep(0.025)
             raise RuntimeError("Timed out reading private Windows clipboard text over X11")
@@ -384,6 +433,8 @@ def main():
     parser.add_argument("--inventory-sha256", required=True)
     parser.add_argument("--wheel-directory", type=Path, required=True)
     parser.add_argument("--evidence", type=Path, required=True)
+    parser.add_argument("--address", choices=("127.0.0.1", "127.0.0.2"), default="127.0.0.1")
+    parser.add_argument("--xdmcp", action="store_true", help="negotiate a real Direct XDMCP session on the private display")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
     if os.name != "nt":
@@ -413,24 +464,41 @@ def main():
     evidence.mkdir(parents=True, exist_ok=False)
     print(f"VcXsrv SHA-256 {actual['vcxsrv.exe']}; inventory verified for {len(actual)} files", flush=True)
     win = Windows()
-    with win.private_desktop() as isolated, tempfile.TemporaryDirectory(prefix="TermCraft clipboard fixture ") as scratch:
+    manager = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) if args.xdmcp else nullcontext()
+    with manager as peer, win.private_desktop() as isolated, tempfile.TemporaryDirectory(prefix="TermCraft clipboard fixture ") as scratch:
         with socket.socket() as reservation:
-            reservation.bind(("127.0.0.1", 0))
+            reservation.bind((args.address, 0))
             port = reservation.getsockname()[1]
         display_number = port - 6000
         if not 1 <= display_number <= 59535:
             parser.error("Windows did not reserve a valid X11 display port")
         auth = Path(scratch) / "Xauthority"
         cookie = secrets.token_bytes(16)
-        auth.write_bytes(struct.pack(">H", 0) + field(socket.inet_aton("127.0.0.1")) + field(str(display_number).encode())
-                         + field(b"MIT-MAGIC-COOKIE-1") + field(cookie))
+        write_authority(auth, args.address, display_number, cookie)
         arguments = [candidate / "vcxsrv.exe", f":{display_number}", "-screen", "0", "640x480", "-noreset",
                      "-silent-dup-error", "-nolisten", "inet6", "-nolisten", "hyperv", "-nopn", "-iglx", "-listen", "tcp",
                      "-auth", auth, "-logfile", evidence / "server.log", "-clipboard", "-noprimary"]
-        with win.server(arguments, candidate, candidate_environment(candidate, scratch), *isolated[:2]) as (process, wait):
-            accept_owned_listener(win, process, wait, port, cookie, isolated)
-            exchange_clipboard(win, isolated, display_number, auth)
-        if owns_loopback_listener(process.pid, port):
+        environment = candidate_environment(candidate, scratch)
+        if args.address != "127.0.0.1":
+            environment["TERMCRAFT_X11_LISTEN_IPV4"] = args.address
+        if peer is not None:
+            peer.bind((args.address, 0))
+            peer.settimeout(8)
+            arguments.extend(["-from", args.address, "-port", str(peer.getsockname()[1]), "-query", args.address])
+        with win.server(arguments, candidate, environment, *isolated[:2]) as (process, wait):
+            accept_owned_listener(win, process, wait, args.address, port, cookie, isolated)
+            if peer is not None:
+                cookie = authorize_xdmcp(peer, args.address, display_number)
+                auth = Path(scratch) / "ManagerAuthority"
+                write_authority(auth, args.address, display_number, cookie)
+                with socket.create_connection((args.address, port), 2) as client, client.makefile("rb") as stream:
+                    if x11_setup(client, stream, b"")[0] != 0:
+                        raise RuntimeError("The managed display accepted a connection without its cookie")
+                print("Direct XDMCP reached Manage and rejected anonymous X11", flush=True)
+            exchange_clipboard(win, isolated, args.address, display_number, auth)
+            if peer is not None:
+                print("Direct XDMCP with the manager-assigned cookie and isolated Unicode clipboard passed", flush=True)
+        if owns_loopback_listener(process.pid, args.address, port):
             raise RuntimeError("VcXsrv loopback listener survived its owned job")
 
 

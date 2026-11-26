@@ -245,5 +245,5 @@ jobs:
           $candidate = Join-Path $work 'build/x11/windows-x86_64-private1'
           $inventory = Join-Path $work 'build/candidate-inventory.json'
           $digest = (Get-FileHash -LiteralPath $inventory -Algorithm SHA256).Hash.ToLowerInvariant()
-          & $python tests/windows_x_clipboard.py --candidate $candidate --inventory $inventory --inventory-sha256 $digest --wheel-directory (Join-Path $work 'wheels') --evidence (Join-Path $work 'clipboard-evidence')
+          & $python tests/windows_x_clipboard.py --candidate $candidate --inventory $inventory --inventory-sha256 $digest --wheel-directory (Join-Path $work 'wheels') --evidence (Join-Path $work 'clipboard-evidence') --address 127.0.0.2 --xdmcp
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

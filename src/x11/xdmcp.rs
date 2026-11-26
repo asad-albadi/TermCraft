@@ -26,6 +26,7 @@ pub enum ClipboardPolicy {
     #[default]
     Disabled,
     Bidirectional,
+    WindowsBidirectional,
 }
 #[derive(Clone, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
@@ -335,8 +336,11 @@ pub(super) fn windows_options(config: &XdmcpConfig, width: u32, height: u32) -> 
     if !config.keyboard.is_empty() && !valid_layout_id(&config.keyboard) {
         return Err("Enter one XKB keyboard layout ID (for example us, de, or fr), or clear it to inherit the host keyboard".into());
     }
-    if config.clipboard != ClipboardPolicy::Disabled {
-        return Err("Clipboard sharing is unavailable for the private Windows XDMCP engine".into());
+    if config.clipboard == ClipboardPolicy::Bidirectional
+        || (config.clipboard == ClipboardPolicy::WindowsBidirectional
+            && (config.clipboard_display.is_some() || config.clipboard_authority.is_some()))
+    {
+        return Err("Clipboard sharing with a parent X11 display requires the Linux engine. Select Windows clipboard explicitly for this session.".into());
     }
     if config.advertise_address.is_some_and(|address| {
         address.is_unspecified() || address.is_multicast() || address.is_broadcast()
@@ -416,6 +420,9 @@ pub fn engine_arguments(
     }
     if config.display.is_some_and(|chosen| chosen != display) {
         return Err("Conflicting XDMCP display selection".into());
+    }
+    if config.clipboard == ClipboardPolicy::WindowsBidirectional {
+        return Err("The Windows clipboard setting requires the private Windows engine".into());
     }
     if config.clipboard == ClipboardPolicy::Bidirectional {
         #[cfg(target_os = "linux")]
@@ -608,6 +615,10 @@ mod tests {
                 .unwrap_err()
                 .contains("Clipboard")
         );
+        config.clipboard = serde_json::from_str("\"windows_bidirectional\"").unwrap();
+        assert!(windows_network(&config, 800, 600).is_ok());
+        config.clipboard_display = Some(":0".into());
+        assert!(windows_network(&config, 800, 600).is_err());
     }
     #[test]
     fn nondefault_port_is_used_and_only_correlated_willing_is_admitted() {
@@ -790,6 +801,12 @@ mod tests {
             config.clipboard_display = Some("remote:0".into());
             assert!(engine_arguments(&config, 120, 800, 600).is_err());
         }
+        config.clipboard = ClipboardPolicy::WindowsBidirectional;
+        assert!(
+            engine_arguments(&config, 120, 800, 600)
+                .unwrap_err()
+                .contains("Windows clipboard")
+        );
         config.clipboard = ClipboardPolicy::Disabled;
         assert!(engine_arguments(&config, 120, 800, 600).is_ok());
     }

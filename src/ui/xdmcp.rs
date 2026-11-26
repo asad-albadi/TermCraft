@@ -345,7 +345,12 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
         }
     });
     ui.horizontal(|ui| {
-        ui.label("Parent X11 text clipboard");
+        let windows = cfg!(all(windows, target_arch = "x86_64"));
+        ui.label(if windows {
+            "Windows text clipboard"
+        } else {
+            "Parent X11 text clipboard"
+        });
         ui.selectable_value(
             &mut s.xdmcp_options.clipboard,
             ClipboardPolicy::Disabled,
@@ -357,12 +362,29 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             ClipboardPolicy::Bidirectional,
             "Bidirectional text",
         );
-        #[cfg(not(target_os = "linux"))]
+        #[cfg(all(windows, target_arch = "x86_64"))]
+        if ui
+            .selectable_value(
+                &mut s.xdmcp_options.clipboard,
+                ClipboardPolicy::WindowsBidirectional,
+                "Bidirectional text",
+            )
+            .changed()
+        {
+            s.xdmcp_options.clipboard_display = None;
+            s.xdmcp_options.clipboard_authority = None;
+        }
+        #[cfg(not(any(target_os = "linux", all(windows, target_arch = "x86_64"))))]
         ui.add_enabled(
             false,
             egui::Button::new("Bidirectional (unavailable for this engine)"),
         );
     });
+    #[cfg(all(windows, target_arch = "x86_64"))]
+    if s.xdmcp_options.clipboard == ClipboardPolicy::WindowsBidirectional {
+        ui.small("Shares Windows clipboard text in both directions with this XDMCP desktop.");
+    }
+    #[cfg(target_os = "linux")]
     if s.xdmcp_options.clipboard == ClipboardPolicy::Bidirectional {
         ui.horizontal(|ui| {
             ui.label("Selected local parent X11 display");

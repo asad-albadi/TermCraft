@@ -1,6 +1,6 @@
 //! Private Windows provider. The unpatched upstream executable is never accepted.
 #[cfg(target_arch = "x86_64")]
-use super::xdmcp::{QueryMode, XdmcpConfig, windows_network};
+use super::xdmcp::{ClipboardPolicy, QueryMode, XdmcpConfig, windows_network};
 use super::{
     XDisplayMode, XServerLease, XServerOptions,
     native_artifact::{VerifiedSnapshot, protect_directory},
@@ -59,6 +59,7 @@ struct DisplayRequest {
     address: Ipv4Addr,
     display: Option<u16>,
     fullscreen: bool,
+    clipboard: bool,
     screen: Option<String>,
     #[cfg(target_arch = "x86_64")]
     keyboard: String,
@@ -71,6 +72,7 @@ impl DisplayRequest {
             address: Ipv4Addr::LOCALHOST,
             display: None,
             fullscreen: false,
+            clipboard: false,
             screen: None,
             #[cfg(target_arch = "x86_64")]
             keyboard: String::new(),
@@ -91,6 +93,7 @@ impl DisplayRequest {
             address,
             display: config.display,
             fullscreen: config.fullscreen,
+            clipboard: config.clipboard == ClipboardPolicy::WindowsBidirectional,
             screen: Some(monitor.map_or_else(
                 || format!("{width}x{height}"),
                 |monitor| format!("@{monitor}"),
@@ -153,7 +156,6 @@ fn launch(
         "-listen".into(),
         "tcp".into(),
         "-iglx".into(),
-        "-noclipboard".into(),
         "-auth".into(),
     ]
     .into_iter()
@@ -162,6 +164,11 @@ fn launch(
     arguments.push(authority_path.as_os_str().into());
     arguments.push("-logfile".into());
     arguments.push(runtime.path().join("server.log").into_os_string());
+    if request.clipboard {
+        arguments.extend(["-clipboard".into(), "-noprimary".into()]);
+    } else {
+        arguments.push("-noclipboard".into());
+    }
     if request.fullscreen {
         // Shadow GDI displays a fullscreen window without changing the host
         // monitor's display mode through exclusive DirectDraw.

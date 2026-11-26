@@ -28,7 +28,7 @@ jobs:
       - run: cargo test --locked --no-fail-fast
       - name: Verify shared XDMCP when the independent RDP suite fails
         if: ${{ !cancelled() && steps.linux_rdp.conclusion == 'failure' }}
-        run: cargo test --locked --lib x11::xdmcp_engine::tests
+        run: cargo test --locked --lib x11::xdmcp
 
   regression-windows-x64:
     runs-on: windows-2025
