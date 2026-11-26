@@ -13,6 +13,7 @@ import stat
 import subprocess
 import tarfile
 import tempfile
+import time
 import zipfile
 
 
@@ -132,7 +133,7 @@ def rdp_session_probe(executable, helper, helper_digest, isolated, environment, 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
         listener.bind(("127.0.0.1", 0))
         listener.listen(1)
-        listener.settimeout(30)
+        listener.settimeout(0.25)
         profile = {
             "id": "package-rdp-test", "name": "Packaged helper startup", "protocol": "RDP",
             "host": "127.0.0.1", "user": "package-test", "port": listener.getsockname()[1],
@@ -146,7 +147,17 @@ def rdp_session_probe(executable, helper, helper_digest, isolated, environment, 
                 stdout=log, stderr=subprocess.STDOUT,
             )
             try:
-                connection, _ = listener.accept()
+                deadline = time.monotonic() + 30
+                while True:
+                    try:
+                        connection, _ = listener.accept()
+                        break
+                    except socket.timeout:
+                        if app.poll() is not None:
+                            details = (evidence / "rdp-session.log").read_text(errors="replace").strip()
+                            raise ValueError(f"Packaged GUI exited before RDP negotiation ({app.returncode}): {details}")
+                        if time.monotonic() >= deadline:
+                            raise TimeoutError("Packaged GUI did not start RDP negotiation within 30 seconds.")
                 with connection:
                     connection.settimeout(10)
                     with connection.makefile("rb") as incoming:

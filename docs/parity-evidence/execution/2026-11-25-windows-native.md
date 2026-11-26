@@ -59,6 +59,31 @@
   Unicode clipboard text in both directions using a private clipboard
   fixture. The replay also covered resize, input, certificate decisions,
   cancellation and transport cleanup.
+- The Windows root suite at `98160ab` reported 606 passes, zero failures and
+  26 ignored tests using `cargo +1.96.1 test --locked --all-targets --no-fail-fast`.
+  The shell exposed OpenSSL 3.2.4 from Git for Windows. A first run without
+  that directory on PATH reported four absent-executable errors in the VNC
+  TLS certificate fixtures. All four passed on the full replay with OpenSSL
+  available. The independently locked helper replay reported 35 passes.
+- The isolated Windows vault fixture created, wrote and reopened a synthetic
+  credential. Windows `Get-Acl` confirmed that the vault and the vault lock
+  both had the current user as owner, inheritance disabled and one explicit
+  `OWNER RIGHTS` FullControl entry. The test did not use a personal vault.
+- The packaged GUI rendered three isolated workspaces using `--data-dir`
+  and `--screenshot`, with saved System, Light and Dark preferences. Windows
+  reported `AppsUseLightTheme=0`. The 1360 × 880 captures had the same
+  background RGB `(19,25,23)` for System and Dark. Light rendered
+  `(251,253,252)` at the same location. The test read the OS preference and
+  left it unchanged. Live settings changes and DPI remain open.
+- [Windows hosted run 45747315026](https://github.com/asad-albadi/TermCraft/actions/runs/45747315026/job/139666404323)
+  built the unsigned x64 ZIP, verified help and the adjacent helper handshake
+  and produced a native GUI screenshot using the pinned renderer. Normal
+  startup exited before RDP negotiation with `Private file belongs to another
+  user` when opening the new workspace dispatcher. New private files and the
+  IPC pipe now specify the actual account as owner in their security
+  descriptors at creation. Checking an existing file still rejects a
+  foreign owner. The startup probe now reports early exit and its log before
+  the socket deadline.
 
 ## Native build
 
@@ -394,8 +419,10 @@ with an OpenGL 2.0 or later context.
   to the download, so an authorized copy is needed for the original-product
   workflow replay.
 - The local process used an unelevated Windows account and Windows Sandbox
-  was absent. Current-account package observations do not establish
-  first-login, fresh-user or real release-to-release installation behavior.
+  was absent. The two-build installer fixture uses synthetic manifest
+  versions. The repository had no published release when queried, so a
+  genuine released-version upgrade and a manual first-login scenario
+  remain open.
 - [Hosted Linux CI](https://github.com/asad-albadi/TermCraft/actions/runs/45692458444)
   reproduced the existing redirected-drive allocation cleanup failure
   tracked separately in [issue #3](https://github.com/asad-albadi/TermCraft/issues/3).
