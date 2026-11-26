@@ -415,15 +415,18 @@ fn embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_pain
         </style>
         <button id="left" onpointerdown="report('down-left', event)" onclick="report('left', event)">Left</button>
         <button id="right" onclick="report('right', event)"
-          onpointerdown="this.setPointerCapture(event.pointerId); fetch('/held')"
-          ongotpointercapture="fetch('/captured')"
-          onlostpointercapture="fetch('/lost?buttons=' + event.buttons)"
-          onpointerup="fetch('/released?buttons=' + event.buttons)">Right</button>
+          onpointerdown="this.setPointerCapture(event.pointerId); send('/held')"
+          ongotpointercapture="send('/captured')"
+          onlostpointercapture="send('/lost?buttons=' + event.buttons)"
+          onpointerup="send('/released?buttons=' + event.buttons)">Right</button>
         <script>
-          function report(side, event) {
-            fetch("/click?side=" + side + "&x=" + event.clientX + "&width=" + innerWidth);
+          function send(path) {
+            fetch(path, {cache: "no-store"});
           }
-          addEventListener("resize", () => fetch("/size?width=" + innerWidth));
+          function report(side, event) {
+            send("/click?side=" + side + "&x=" + event.clientX + "&width=" + innerWidth);
+          }
+          addEventListener("resize", () => send("/size?width=" + innerWidth));
         </script>"#,
         )
     });

@@ -466,13 +466,9 @@ impl Browser<'_> {
         Ok(())
     }
 
-    fn resize(&mut self, size: [u32; 2], revision: u64) -> Result<(), String> {
-        let [width, height] = bounded_size(size);
-        self.size = [width, height];
-        self.viewport_revision = revision;
-        self.shared.frame.lock().unwrap().take();
-        // CDP temporarily changes the emulated view during a capture, then
-        // restores the old view size. Finish that restoration before resizing.
+    fn finish_macos_capture(&mut self) -> Result<(), String> {
+        // CDP temporarily changes the emulated view while capturing. Wait
+        // for restoration before changing its size or sending coordinates.
         if self.screenshot_format == image::ImageFormat::Png {
             while let Some(capture) = self.capture {
                 let Some(message) = self
@@ -487,6 +483,15 @@ impl Browser<'_> {
                 self.event(&message)?;
             }
         }
+        Ok(())
+    }
+
+    fn resize(&mut self, size: [u32; 2], revision: u64) -> Result<(), String> {
+        let [width, height] = bounded_size(size);
+        self.size = [width, height];
+        self.viewport_revision = revision;
+        self.shared.frame.lock().unwrap().take();
+        self.finish_macos_capture()?;
         self.call(
             false,
             "Browser.setContentsSize",
@@ -608,6 +613,7 @@ impl Browser<'_> {
         y: f64,
         click_count: u8,
     ) -> Result<(), String> {
+        self.finish_macos_capture()?;
         let mask = match button {
             "left" => 1,
             "right" => 2,
@@ -662,6 +668,7 @@ impl Browser<'_> {
                 self.pointer("mouseMoved", "none", -1., -1., 0)?;
             }
             Command::Wheel { x, y, dx, dy } => {
+                self.finish_macos_capture()?;
                 self.issue(
                     true,
                     "Input.dispatchMouseEvent",
