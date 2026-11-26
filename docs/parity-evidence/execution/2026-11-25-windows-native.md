@@ -13,21 +13,52 @@
   (2 passed).
 - The opt-in `packaged_windows_registration_dispatches_and_guards_uninstall`
   test installed real per-user handlers pointing to the staged executable.
-  Windows shell routing rejected a malformed TermCraft URL before opening a
-  workspace. The registered entry point then delivered a valid bookmark to
-  an isolated IPC receiver. The packaged uninstaller guard refused removal
+  An isolated child supplied its own LOCALAPPDATA. Windows shell routing
+  rejected a malformed TermCraft URL and delivered a valid bookmark to the
+  child fixture's IPC receiver. The packaged uninstaller guard refused removal
   while the handlers existed and passed after the fixture removed them.
-- The rebuilt private X candidate returned a real core keyboard mapping
-  and advertised XKEYBOARD, GLX, RANDR and Composite to an authenticated
-  client. These are protocol observations. Physical presentation, keyboard
-  layout switching, clipboard bridging and the Indirect chooser remain open.
+- The rebuilt private X candidate completed Direct and Indirect XDMCP with
+  a controlled loopback peer. The Indirect case selected the peer through
+  the candidate's own Win32 chooser. Both modes completed REQUEST, ACCEPT
+  and MANAGE, refused anonymous X setup, accepted the assigned cookie,
+  returned the core keyboard mapping for `a` and advertised XKEYBOARD,
+  GLX, RANDR and Composite. The owned provider test independently passed
+  job, listener and embedded SSH forwarding cleanup (1 passed). The exact
+  candidate `vcxsrv.exe` SHA-256 is
+  `7d16a924201add49616b3a1aee3f942f369836be74747c82f52848c54745c443`.
+  The staged inventory SHA-256 is
+  `f23f73c1acef9b54ef7d2df3fec50770433e2966e30907828952729a38e2fb25`.
+  The applied patch normalizes IPv4 and IPv6 addresses before formatting a
+  bounded chooser label and checks the list selection before reading it.
+  Application-owned XDMCP, layout switching, clipboard and graphical
+  presentation are still separate qualification steps.
 - The software-rendering fixture used [Mesa for Windows 26.3.1](https://github.com/pal1000/mesa-dist-win/releases/tag/26.3.1).
   The Windows release workflow checks the archive and the two extracted DLLs
   against pinned SHA-256 fingerprints. Local relocated startup observed the
   app load both fixture DLLs and reach the exact packaged RDP helper. The
   installed GUI test also passed with the same fixture. It removed the two
-  temporary DLLs before checking uninstall. The release archive contains
-  neither fixture DLL.
+  temporary DLLs before checking uninstall. Both DLL copies are checked
+  against their pins before startup. The release archive contains neither
+  fixture DLL.
+- The optional Unix ZIP was built from frozen source snapshot
+  `65e3297ee0cf653bcbd28b70634afdb1a344551fe85d317b482ee518cf9c98ff`
+  using `python scripts/package-release.py --platform windows --build-root
+  target/windows-qualification/build --unix-cache target/p05-cache --output
+  target/windows-qualification/continuation-unix` under Developer PowerShell.
+  Its SHA-256 is
+  `0cd6a13cff8cb585ec7e424e1764bc66c2715fce7bf7f19aef41e31db5de1b93`.
+  The relocated, empty-PATH GUI used the exact adjacent helper
+  `e835cb0559d6a9984616cdd8e7d3d289b21a1e545328a30fe516720101d86429`.
+  The installer exercised two independently built GUI images
+  `de7c1fc4bdc9f6ee07dd1e0f71d53d6b1ba7c6233dde574881583bc19ef55299`
+  and `ffaef7c7093f46f078ea019869979a557a2283a7b57ccbf9638668c792840a61`
+  and preserved an isolated workspace, encrypted vault and unrelated file.
+- The exact helper from that ZIP passed
+  `cargo +1.96.1 test --locked --test rdp_session -- --include-ignored`
+  (11 passed). The independent TLS/NLA endpoint and the helper exchanged
+  Unicode clipboard text in both directions using a private clipboard
+  fixture. The replay also covered resize, input, certificate decisions,
+  cancellation and transport cleanup.
 
 ## Native build
 
@@ -352,15 +383,9 @@ with an OpenGL 2.0 or later context.
 - Windows bundled Chromium needs an audited Windows payload and resource
   pins. Native capture/control, Pageant-backed SSH, and vault recovery and
   permission workflows retain their separate qualification gates.
-- The optional BusyBox-w32 inputs passed the upstream binary, source and license
-  checksum checks. Python 3.10.11 and 3.11.9 both produced assembly SHA-256
-  `4649824ec37541b1939b0c18805b6475adba268bbbd743525413e033803cf081`
-  against the existing archive pin
-  `778b85b95d82d510e77703306e2a9d80fa11af43d1048b96338ff351eab5b7b2`.
-  Staging rejected the result. The current release omits this optional payload.
-  The exact upstream UTF-8 `ash.exe` independently read a scratch file through
-  a Windows drive path containing spaces. The packaged Unix installer probe
-  remains gated by the archive fingerprint.
+- The earlier BusyBox-w32 archive mismatch was resolved in the continuation
+  above. Both Python 3.10.11 and 3.11.9 independently assembled the approved
+  archive from the exact pinned upstream inputs.
 - The publisher lists the portable Home Edition 26.6 and distinguishes Home
   from Professional Customizer in its [edition comparison](https://mobaxterm.mobatek.net/download.html)
   and [version listing](https://mobaxterm.mobatek.net/download-home-edition.html).
@@ -380,3 +405,10 @@ with an OpenGL 2.0 or later context.
   package contract because the pinned Linux iperf2 binary requires
   `GLIBC_2.43` and the Ubuntu 24.04 runner did not provide it. This was
   observed in the Linux job before archive publication.
+- The continuation's [Linux release job](https://github.com/asad-albadi/TermCraft/actions/runs/45747315026/job/139666403527)
+  reproduced the same iperf2 ABI failure. The [macOS arm64 job](https://github.com/asad-albadi/TermCraft/actions/runs/45747315026/job/139666404631)
+  failed with four Rust mode-type mismatches in Unix remote-file transfer.
+  Both source files and the dependency lock match main `cf7ee4d`
+  byte-for-byte. [CI on main](https://github.com/asad-albadi/TermCraft/actions/runs/45745650311)
+  and [CI on the branch](https://github.com/asad-albadi/TermCraft/actions/runs/45747710710)
+  independently reproduced the Linux allocation cleanup failure.

@@ -227,6 +227,8 @@ def smoke(archive, evidence, display, software_gl=None):
                 if target.exists() or sha256(source) != digest:
                     raise ValueError(f"Cannot stage verified software GL fixture: {name}")
                 shutil.copyfile(source, target)
+                if sha256(target) != digest:
+                    raise ValueError(f"Staged software GL fixture changed: {name}")
             environment["GALLIUM_DRIVER"] = "llvmpipe"
         for name, program, args in (
             ("help", executable, ["--help"]),

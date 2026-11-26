@@ -28,6 +28,47 @@ fn authenticate(session: &DesktopSession, id: u64) {
         })
         .unwrap();
 }
+
+#[cfg(windows)]
+#[test]
+#[ignore = "requires the native RDP software endpoint and OpenSSL"]
+fn rdp_windows_clipboard_round_trips_unicode_without_host_clipboard() {
+    use harbor_workspace::desktop::rdp_options::ClipboardPolicy;
+
+    let server = rdp_server::Server::start();
+    let mut config = server.config(8110);
+    config.session.rdp_options.clipboard = ClipboardPolicy::Bidirectional;
+    let mut session = DesktopSession::connect(config).unwrap();
+    until(&mut session, |session, event| match event {
+        DesktopEvent::Authentication { id, .. } => {
+            authenticate(session, id);
+            false
+        }
+        DesktopEvent::Clipboard { text } => text == "Remote clipboard 🐧",
+        DesktopEvent::Disconnected { message } => panic!("{message}"),
+        _ => false,
+    });
+    let text = "Windows clipboard café 日本";
+    session
+        .send(DesktopInput::Clipboard { text: text.into() })
+        .unwrap();
+    let expected = format!("clipboard:{text}");
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while !server.observations().contains(&expected) {
+        assert!(
+            Instant::now() < deadline,
+            "server did not receive the offered text"
+        );
+        for event in session.poll() {
+            if let DesktopEvent::Disconnected { message } = event {
+                panic!("{message}");
+            }
+        }
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    session.close();
+}
+
 #[test]
 #[cfg_attr(
     windows,

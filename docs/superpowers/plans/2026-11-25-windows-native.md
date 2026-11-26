@@ -47,7 +47,7 @@
 - [x] Verify exact Windows source and patch using `packaging/x11/native/prepare-source.py`.
 - [x] Build the private VcXsrv release executable and stage adjacent DLLs, font and XKB resources. Confirm a real native candidate binds loopback, refuses occupied displays and invalid cookies, and removes its listener on exit.
 - [x] Exercise embedded SSH X11 forwarding and cookie rejection against the locally built private engine using the owned provider test.
-- [x] Exercise native Direct XDMCP to an isolated peer through MANAGE and cookie-authenticated X setup. Verify IndirectQuery and WILLING independently.
+- [x] Exercise native Direct and Indirect XDMCP to an isolated peer through MANAGE and cookie-authenticated X setup. Select the peer in the candidate's Win32 chooser for Indirect.
 - [x] Query the native private X server's core keyboard mapping and extension advertisements over the authenticated connection.
 - [ ] Follow the native README for the private build. Inventory runtime files, fonts, XKB, source and notices.
 - [ ] Exercise owned-job/PID cleanup, occupied-display refusal, cookie checks and readiness, then SSH forwarding, Direct/Indirect XDMCP, clipboard, keyboard and monitor/graphics workflows with appropriate peers. Record any unavailable extensions and dependencies.
@@ -56,6 +56,7 @@
 ### Task 4: Interactive terminal and native RDP
 
 - [ ] Run `workspace_layout`, `workspace_windows` and `rdp_options` integration tests as part of the root suite. On the actual desktop exercise ConPTY shells, full-screen program, Unicode/input, splits, detach/reattach, shortcuts, themes and 100/150/200 percent scaling.
+- [x] Exchange Unicode clipboard text in both directions through the packaged helper against the independent TLS/NLA endpoint.
 - [ ] Execute RDP helper and applicable native component tests. Exercise clipboard, drive handles, admin/fullscreen and device redirection with a controlled RDP endpoint. Record software fixture results and physical-device observations independently.
 
 ### Task 5: Browser, services and credentials

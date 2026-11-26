@@ -108,3 +108,66 @@
 @@ -188 +221 @@
 -        if (fclose(out) == 0 && system(buf) >= 0)
 +        if (fclose(out) == 0 && RunWindowsXkbComp(xkbbindir, xkbbindirsep, buf))
+--- a/xorg-server/os/xdmcp.c
++++ b/xorg-server/os/xdmcp.c
+@@ -743,0 +744,3 @@
++  if (HostIdx < 0 || HostIdx >= g_NrHosts)
++    return;
++
+@@ -764 +767,3 @@
+-  char szHostName[200];
++  char szHostName[128];
++  char address[INET6_ADDRSTRLEN];
++  const void *address_bytes;
+@@ -767,5 +772,4 @@
+-  if (hostname->length!=0)
+-  {
+-    memcpy(szHostName,hostname->data,hostname->length);
+-    szHostName[hostname->length]=0;
+-  }
++  if (from->sa_family == AF_INET && fromlen >= (int) sizeof(struct sockaddr_in))
++    address_bytes = &((const struct sockaddr_in *)from)->sin_addr;
++  else if (from->sa_family == AF_INET6 && fromlen >= (int) sizeof(struct sockaddr_in6))
++    address_bytes = &((const struct sockaddr_in6 *)from)->sin6_addr;
+@@ -773,19 +777,11 @@
+-    strcpy(szHostName,"????");
+-  strcat(szHostName," - ");
+-  switch(from->sa_family)
+-  {
+-    case AF_INET:
+-    {
+-      struct sockaddr_in *addr_in = (struct sockaddr_in *)from;
+-      inet_ntop(AF_INET, &(addr_in->sin_addr), szHostName+strlen(szHostName), INET_ADDRSTRLEN);
+-      break;
+-    }
+-    case AF_INET6:
+-    {
+-      struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *)free;
+-      inet_ntop(AF_INET6, &(addr_in6->sin6_addr), szHostName+strlen(szHostName), INET6_ADDRSTRLEN);
+-      break;
+-    }
+-    default:
+-      break;
+-  }
++    return;
++  if (!inet_ntop(from->sa_family, address_bytes, address, sizeof(address)))
++    return;
++
++  int name_limit = sizeof(szHostName) - strlen(address) - sizeof(" - ");
++  int name_length = hostname->length < name_limit ? hostname->length : name_limit;
++  if (name_length > 0)
++    snprintf(szHostName, sizeof(szHostName), "%.*s - %s", name_length,
++             (const char *)hostname->data, address);
++  else
++    snprintf(szHostName, sizeof(szHostName), "???? - %s", address);
+--- a/xorg-server/hw/xwin/xdmcphostselect.c
++++ b/xorg-server/hw/xwin/xdmcphostselect.c
+@@ -15,0 +16 @@
++  LRESULT length = SendDlgItemMessage(g_hDlgHosts, IDC_HOSTLIST, LB_GETTEXTLEN, (WPARAM)Index, 0);
+@@ -16,0 +18,3 @@
++
++  if (length == LB_ERR || length >= sizeof(HostToConnect) || HostIndex == LB_ERR)
++    return;
+@@ -179 +183 @@
+-  PostMessage (g_hDlgAbout, WM_NEXTDLGCTL, (WPARAM)GetDlgItem (g_hDlgHosts, IDOK), TRUE);
++  PostMessage (g_hDlgHosts, WM_NEXTDLGCTL, (WPARAM)GetDlgItem (g_hDlgHosts, IDOK), TRUE);

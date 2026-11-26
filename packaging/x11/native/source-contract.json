@@ -8,7 +8,7 @@
     "upstream_archive_sha256": "dea6c7d67d3d15b4ed45c87b63a83c88f4aceaaef5425630f0e97a0bad70d620",
     "source_archive_url": "https://codeload.github.com/marchaesen/vcxsrv/tar.gz/b1c7712a2584b263f44fa24e8c493f4f59c472ea",
     "source_archive_sha256": "a73b30db3eb6b60efd181a1cd7fa39bc6df8f0d4c973d6c8416a856b0bf55b28",
-    "patch_sha256": "5a474ac9381b2dd6b9ff887bb133fcd58713d47efc13e7b0040fa6b669de202b",
+    "patch_sha256": "57b20c11837d0b9b7ff8007abe3773c1ba0301062f0db9db310977b09dd34f71",
     "private_executable_sha256": null,
     "native_build_inputs": [
       "Windows x86_64",
@@ -19,10 +19,9 @@
       "NSIS only for upstream installer packaging, never execute installers"
     ],
     "blocking_evidence": [
-      "native private build and signed/output dependency inventory absent",
-      "native owned-job/readiness/authority/port-collision tests unavailable",
+      "distribution inventory and compiled executable approval remain pending",
       "MSVC runtime redistribution notices not present in upstream extracted payload",
-      "X03 active graphics probe unavailable on Windows"
+      "application XDMCP integration, host clipboard and active graphics qualification remain open"
     ]
   },
   "macos": {

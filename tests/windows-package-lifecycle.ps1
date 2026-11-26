@@ -98,6 +98,9 @@ try {
                 }
                 [IO.File]::Copy($inputFile, $target, $false)
                 $added += $target
+                if ((Get-FileHash -LiteralPath $target).Hash -ne $entry.Value) {
+                    throw 'The staged software GL fixture DLL does not match its checksum.'
+                }
             }
             if ($softwareGl.Count) { $env:GALLIUM_DRIVER = 'llvmpipe' }
             & $program --data-dir $workingData --screenshot $startup

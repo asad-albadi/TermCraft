@@ -1,6 +1,8 @@
 """Probe a privately built VcXsrv candidate against an isolated XDMCP peer."""
 
 import argparse
+import ctypes
+from ctypes import wintypes
 import hashlib
 import json
 from pathlib import Path
@@ -10,6 +12,7 @@ import socket
 import struct
 import subprocess
 import tempfile
+import time
 
 def field(data):
     return struct.pack(">H", len(data)) + data
@@ -54,9 +57,11 @@ def read_x_reply(stream):
 
 def verify_keyboard_and_extensions(client, stream, setup):
     assert len(setup) >= 32 and setup[26] <= setup[27]
-    client.sendall(struct.pack("<BBHBB2x", 101, 0, 2, setup[26], 1))
+    count = setup[27] - setup[26] + 1
+    client.sendall(struct.pack("<BBHBB2x", 101, 0, 2, setup[26], count))
     header, keysyms = read_x_reply(stream)
-    assert header[1] > 0 and len(keysyms) == 4 * header[1]
+    assert header[1] > 0 and len(keysyms) == 4 * header[1] * count
+    assert ord("a") in {code for (code,) in struct.iter_unpack("<I", keysyms)}
     for name in (b"XKEYBOARD", b"GLX", b"RANDR", b"Composite"):
         body = name.ljust((len(name) + 3) & ~3, b"\0")
         client.sendall(struct.pack("<BBHH2x", 98, 0, 2 + len(body) // 4, len(name)) + body)
@@ -66,6 +71,44 @@ def verify_keyboard_and_extensions(client, stream, setup):
         if name == b"XKEYBOARD":
             assert present
     print("Native X server returned the requested core keyboard mapping")
+
+
+def choose_indirect_host(pid):
+    """Message only the chooser owned by this candidate PID."""
+    user = ctypes.WinDLL("user32", use_last_error=True)
+    user.FindWindowExW.argtypes = (wintypes.HWND, wintypes.HWND, wintypes.LPCWSTR, wintypes.LPCWSTR)
+    user.FindWindowExW.restype = wintypes.HWND
+    user.GetWindowThreadProcessId.argtypes = (wintypes.HWND, ctypes.POINTER(wintypes.DWORD))
+    user.GetDlgItem.argtypes = (wintypes.HWND, ctypes.c_int)
+    user.GetDlgItem.restype = wintypes.HWND
+    user.SendMessageTimeoutW.argtypes = (
+        wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM,
+        wintypes.UINT, wintypes.UINT, ctypes.POINTER(ctypes.c_size_t),
+    )
+    user.SendMessageTimeoutW.restype = wintypes.LPARAM
+    user.PostMessageW.argtypes = (wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
+
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline:
+        chooser = None
+        while chooser := user.FindWindowExW(None, chooser, "#32770", "Select host to connect to"):
+            owner = wintypes.DWORD()
+            user.GetWindowThreadProcessId(chooser, ctypes.byref(owner))
+            if owner.value != pid:
+                continue
+            hosts = user.GetDlgItem(chooser, 100)  # IDC_HOSTLIST
+            count = ctypes.c_size_t()
+            if hosts and user.SendMessageTimeoutW(hosts, 0x018B, 0, 0, 2, 500, ctypes.byref(count)):
+                if count.value == 0:
+                    break
+                assert count.value == 1, "Unexpected host in the private chooser"
+                selection = ctypes.c_size_t()
+                assert user.SendMessageTimeoutW(hosts, 0x0186, 0, 0, 2, 500, ctypes.byref(selection))
+                assert selection.value == 0
+                assert user.PostMessageW(chooser, 0x0111, 1, 0)  # WM_COMMAND / IDOK
+                return
+        time.sleep(0.05)
+    raise AssertionError("The candidate did not present an owned XDMCP chooser with the fixture host")
 
 
 def run(candidate, evidence, indirect):
@@ -89,8 +132,7 @@ def run(candidate, evidence, indirect):
             _, sender = receive(peer, 3 if indirect else 2)
             peer.sendto(packet(5, field(b"") + field(b"fixture.test") + field(b"fixture willing")), sender)
             if indirect:
-                print("Native IndirectQuery arrived on the isolated manager; WILLING returned")
-                return
+                choose_indirect_host(child.pid)
             request, sender = receive(peer, 7)
             assert struct.unpack(">H", request[:2])[0] == display
             cookie = secrets.token_bytes(16)
@@ -111,7 +153,8 @@ def run(candidate, evidence, indirect):
                             setup = stream.read(size)
                             assert len(setup) == size
                             verify_keyboard_and_extensions(client, stream, setup)
-            print("Native DirectQuery, Request, Accept and Manage passed; anonymous denied and assigned cookie accepted")
+            mode = "IndirectQuery and native chooser" if indirect else "DirectQuery"
+            print(f"Native {mode}, Request, Accept and Manage passed; anonymous denied and assigned cookie accepted")
         finally:
             if child.poll() is None:
                 child.terminate()

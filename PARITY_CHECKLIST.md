@@ -80,7 +80,7 @@ External launch adapters exist. Integration and options remain incomplete. [Remo
 
 **Current implementation:** Linux owns and manages its bundled X server, authorization, display and per-session SSH forwarding. Native Windows/macOS engines and their runtime validation remain open. See [progress](PARITY_PROGRESS.md).
 
-Windows x64 has a locally built private VcXsrv candidate with adjacent DLLs, fonts and XKB data. A controlled native probe verified occupied-display refusal, loopback socket ownership, cookie authentication and listener removal. An independent SSH fixture mapped a real forwarded X window. Loopback XDMCP discovery was independently exercised. Distribution approval and installed-client SSH, XDMCP, clipboard, keyboard and graphics workflows remain open. [Windows evidence](docs/parity-evidence/execution/2026-11-25-windows-native.md).
+Windows x64 has a locally built private VcXsrv candidate with adjacent DLLs, fonts and XKB data. A controlled native probe verified occupied-display refusal, loopback socket ownership, cookie authentication and listener removal. An independent SSH fixture mapped a real forwarded X window. Native Direct and Indirect XDMCP completed through MANAGE, including selection in the native chooser and authenticated X setup with a controlled peer. Distribution approval, installed-client SSH, app-owned XDMCP, clipboard, layout switching and graphics workflows remain open. [Windows evidence](docs/parity-evidence/execution/2026-11-25-windows-native.md).
 
 ## P2 — Protocols, tools, and packaging
 
@@ -131,7 +131,7 @@ Existing adapters must not be classified as absent solely because endpoints were
 
 ## Completion rule and execution guidance
 
-The [Windows x64 qualification checkpoint](docs/parity-evidence/execution/2026-11-25-windows-native.md) records partial D02, P08 and V05 evidence, including native helper tests, packaged GUI startup and controlled per-user install/uninstall. Platform and original-product acceptance remain open.
+The [Windows x64 qualification checkpoint](docs/parity-evidence/execution/2026-11-25-windows-native.md) records partial D02, P08 and V05 evidence, including native helper tests, portable GUI relocation, two-build installer lifecycle, real URL activation and native ConPTY with the optional BusyBox-w32 runtime. Platform and original-product acceptance remain open.
 
 The full plan is approved. Use native workflows, meaningful targeted regressions and the single [durable queue](PARITY_EXECUTION_QUEUE.json). Work by actual dependencies and continue after each passing increment. Historical Superpowers strict-order/stop-after-increment instructions are superseded by the user’s 2026-11-24 execution amendment. Full/host gates are batched at subsystem boundaries.
 

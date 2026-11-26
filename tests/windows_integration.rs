@@ -93,14 +93,40 @@ fn packaged_windows_registration_dispatches_and_guards_uninstall() {
     use std::{path::PathBuf, process::Command, sync::atomic::AtomicBool, time::Duration};
     use windows_sys::Win32::{
         Foundation::{CloseHandle, WAIT_OBJECT_0},
-        System::Threading::{GetExitCodeProcess, WaitForSingleObject},
+        System::Threading::{
+            GetExitCodeProcess, QueryFullProcessImageNameW, TerminateProcess, WaitForSingleObject,
+        },
         UI::Shell::{
-            SEE_MASK_FLAG_NO_UI, SEE_MASK_NOCLOSEPROCESS, SHELLEXECUTEINFOW, ShellExecuteExW,
+            SEE_MASK_FLAG_NO_UI, SEE_MASK_NOASYNC, SEE_MASK_NOCLOSEPROCESS, SHELLEXECUTEINFOW,
+            ShellExecuteExW,
         },
     };
 
     let executable = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_ACTIVATION_EXE").unwrap());
     assert!(executable.is_absolute() && executable.is_file());
+    let expected_image = std::fs::canonicalize(&executable).unwrap();
+    let fixture_variable = "TERMCRAFT_TEST_ACTIVATION_LOCALAPPDATA";
+    let Some(private_data) = std::env::var_os(fixture_variable) else {
+        let private = tempfile::tempdir().unwrap();
+        let status = Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "packaged_windows_registration_dispatches_and_guards_uninstall",
+                "--ignored",
+            ])
+            .env("LOCALAPPDATA", private.path())
+            .env(fixture_variable, private.path())
+            .status()
+            .unwrap();
+        assert!(status.success());
+        return;
+    };
+    assert_eq!(std::env::var_os("LOCALAPPDATA"), Some(private_data.clone()));
+    let Binding::Primary(mut workspace) =
+        InstanceBroker::bind(&PathBuf::from(private_data).join("Harbor")).unwrap()
+    else {
+        panic!("private activation workspace was occupied")
+    };
     let integration = WindowsIntegration::new(executable.to_str().unwrap()).unwrap();
     let cancel = AtomicBool::new(false);
     assert!(
@@ -126,45 +152,43 @@ fn packaged_windows_registration_dispatches_and_guards_uninstall() {
     };
     assert_eq!(guard(), Some(3));
 
-    // Route a deliberately invalid URL through the real Windows shell. It must
-    // reach the registered parser and exit before opening any workspace.
-    let invalid: Vec<u16> = "termcraft://invalid-qualification-request\0"
-        .encode_utf16()
-        .collect();
-    let mut launch = SHELLEXECUTEINFOW {
-        cbSize: std::mem::size_of::<SHELLEXECUTEINFOW>() as u32,
-        fMask: SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI,
-        lpFile: invalid.as_ptr(),
-        ..Default::default()
+    let shell_exit = |url: &str| {
+        let target: Vec<u16> = url.encode_utf16().chain([0]).collect();
+        let mut launch = SHELLEXECUTEINFOW {
+            cbSize: std::mem::size_of::<SHELLEXECUTEINFOW>() as u32,
+            fMask: SEE_MASK_NOASYNC | SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI,
+            lpFile: target.as_ptr(),
+            ..Default::default()
+        };
+        let launched = unsafe { ShellExecuteExW(&mut launch) };
+        assert_ne!(launched, 0, "{}", std::io::Error::last_os_error());
+        assert!(!launch.hProcess.is_null());
+        let mut exit = 0;
+        let completed = unsafe {
+            let result = WaitForSingleObject(launch.hProcess, 8000) == WAIT_OBJECT_0;
+            if !result {
+                let mut name = [0u16; 4096];
+                let mut length = name.len() as u32;
+                if QueryFullProcessImageNameW(launch.hProcess, 0, name.as_mut_ptr(), &mut length)
+                    != 0
+                    && std::fs::canonicalize(String::from_utf16_lossy(&name[..length as usize]))
+                        .ok()
+                        .as_ref()
+                        == Some(&expected_image)
+                {
+                    TerminateProcess(launch.hProcess, 1);
+                    WaitForSingleObject(launch.hProcess, 2000);
+                }
+            }
+            let read = result && GetExitCodeProcess(launch.hProcess, &mut exit) != 0;
+            CloseHandle(launch.hProcess);
+            read
+        };
+        assert!(completed);
+        exit
     };
-    let launched = unsafe { ShellExecuteExW(&mut launch) };
-    assert_ne!(launched, 0, "{}", std::io::Error::last_os_error());
-    assert!(!launch.hProcess.is_null());
-    let mut exit = 0;
-    let completed = unsafe {
-        let result = WaitForSingleObject(launch.hProcess, 8000) == WAIT_OBJECT_0
-            && GetExitCodeProcess(launch.hProcess, &mut exit) != 0;
-        CloseHandle(launch.hProcess);
-        result
-    };
-    assert!(completed);
-    assert_eq!(exit, 2);
-
-    let local = tempfile::tempdir().unwrap();
-    let Binding::Primary(mut workspace) =
-        InstanceBroker::bind(&local.path().join("Harbor")).unwrap()
-    else {
-        panic!("private activation workspace was occupied")
-    };
-    let result = Command::new(&executable)
-        .env("LOCALAPPDATA", local.path())
-        .args([
-            "--windows-activation-url",
-            "termcraft://session/qualification-fixture",
-        ])
-        .output()
-        .unwrap();
-    assert!(result.status.success());
+    assert_eq!(shell_exit("termcraft://invalid-qualification-request"), 2);
+    assert_eq!(shell_exit("termcraft://session/qualification-fixture"), 0);
     let request = workspace.recv_timeout(Duration::from_secs(4)).unwrap();
     assert!(
         matches!(request.action, CliAction::OpenSession { id, .. } if id == "qualification-fixture")
