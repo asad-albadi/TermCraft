@@ -698,6 +698,58 @@ cleanup failure for its path-named local port. The replacement uses a temporary
 named queue with a RAW port to an owned loopback listener. It checks the
 actual bytes, abort behavior and spooler cleanup without a physical device.
 
+## Personal 26.6 reference replay
+
+The supplied installer reported MSI ProductVersion `26.6.0.5560` and a
+valid Mobatek Authenticode signature. The MSI SHA-256 was
+`34bc581f393b13f46ecb918d8736b954e0d205615cf8f67738211f1bd0cd5629`.
+The adjacent installer DAT SHA-256 was
+`944ef34be91c782cc9383b03e1dbab7b5dcc02600e796c7d26fb263af7323d2a`.
+Windows SDK `MsiDb.exe -x MobaXterm.cab` and `expand.exe -F:*` recovered
+the signed executable without installing the MSI. The executable SHA-256
+`e9a66144b3a1c4d32f8062b1eb34e26e9ed5298106abf1982b4654ab107f13a5`
+matches the [previous Personal 26.6 scope analysis](../original-scope/README.md).
+The real build identified itself in the runtime log as 26.6 build 5560 and
+selected portable mode from the extracted folder. The adjacent CygUtils
+plugins came directly from the supplied DAT. Without those plugins the
+launcher initialized the terminal UI but could not load `cygwin1.dll`.
+
+- The launches used `-noX`, private `-i` files and disposable process directories.
+  With an otherwise empty configuration the original selected the Windows
+  dark theme, used MobaFont, and produced an INI with
+  `PasswordsInRegistry=0`. The Windows known-folder API still resolved the
+  account's Documents location. The terminal and session artifacts were
+  created only in the scratch folder.
+- Direct `-exec` and `-exitwhendone` launched a native MoTTY local terminal,
+  verified a TTY, reported 24 × 80 rows/columns at the default 96 DPI and
+  wrote the expected marker. Requested original shell UI DPI values 144
+  and 192 were logged, and both runs wrote the marker with 25 × 80
+  terminal geometry. The embedded terminal helper reported 96 DPI on all
+  three runs. Windows display scaling stayed constant during the original
+  app's override tests. The relocated TermCraft
+  package ran its own `--new-tab --command --exit-when-done` path, wrote the
+  same logical marker and exited normally. Both products used synthetic data.
+- A synthetic root SSH bookmark used loopback port 56041. The actual
+  Personal executable loaded it through `-bookmark`, and the independent
+  listener received `SSH-2.0-MoTTY_Release_0.85`. The byte-exact INI SHA-256 was
+  `5d1ea3a325c56e53cda2f49b2cb2ce94144fee686dc14c6f6df5a44e53e2c84d`.
+  TermCraft's native import parser preserved the protocol, label, host,
+  port and username with no key or credential. Its relocated GUI launched
+  the saved import by stable ID, sent `SSH-2.0-russh_0.65.4` to the same
+  test endpoint and exited normally after the peer closed before authentication.
+  The original displayed its connection-failure state. The owned original
+  process and the remaining owned MoTTY child were stopped explicitly and
+  the replay left no owned reference processes or listeners.
+- The publisher lists Home caps of 12 sessions, two SSH tunnels, four macros
+  and 360 seconds for TFTP, NFS and Cron. Actual cap enforcement, original
+  menus and the original GUI import/export dialogs remain unobserved. The
+  desktop tool did not enumerate the reference window even after the
+  application logged successful activation. TermCraft's matching file picker
+  was observed, and the import above ran the production parser directly.
+  The broader E04, E05 and V07 interactive comparisons stay open.
+  [Command-line reference](https://mobaxterm.mobatek.net/documentation.html)
+  · [Home edition limits](https://mobaxterm.mobatek.net/download.html)
+
 ## Pageant
 
 The standalone Windows x64 Pageant 0.85 binary matched the publisher's
@@ -784,7 +836,7 @@ with an OpenGL 2.0 or later context.
 - Full RDP sessions and redirection need a designated endpoint. Windows
   enumerated a USB serial port and a software PDF queue. Neither was exercised
   as a physical fixture. Smartcard, physical printer, connected serial/network
-  peers and the original Personal 26.6 installation are outstanding.
+  peers and the remaining interactive Personal 26.6 probes are outstanding.
 - Windows bundled Chromium needs an audited Windows payload and resource
   pins. Native capture/control, Pageant-backed SSH, and vault recovery and
   permission workflows retain their separate qualification gates.
@@ -794,10 +846,7 @@ with an OpenGL 2.0 or later context.
 - The publisher lists the portable Home Edition 26.6 and distinguishes Home
   from Professional Customizer in its [edition comparison](https://mobaxterm.mobatek.net/download.html)
   and [version listing](https://mobaxterm.mobatek.net/download-home-edition.html).
-  This is publisher documentation. The supplied original executable was
-  unavailable for this local run. The publisher attaches license acceptance
-  to the download, so an authorized copy is needed for the original-product
-  workflow replay.
+  Runtime evidence for the supplied Personal 26.6 binary is recorded above.
 - The local process used an unelevated Windows account and Windows Sandbox
   was absent. The clean hosted run and local development version-upgrade
   evidence above cover different scenarios. The repository had no published
