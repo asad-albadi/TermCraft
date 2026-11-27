@@ -104,11 +104,29 @@ class AppImageTests(unittest.TestCase):
             self.assertEqual(cached.read_bytes(), b"wrong archive")
             cached.unlink()
 
+            import errno
+            import os
+            staged = {}
+            create_temp = tempfile.mkstemp
+
+            def record_temp(*args, **kwargs):
+                fd, path = create_temp(*args, **kwargs)
+                staged[Path(path)] = (fd, os.fstat(fd))
+                return fd, path
+
             def wrong_download(command):
-                Path(command[command.index("-o") + 1]).write_bytes(b"wrong archive")
+                path = Path(command[command.index("-o") + 1])
+                self.assertIn(path, staged)
+                fd, initial = staged[path]
+                with self.assertRaises(OSError) as closed:
+                    os.fstat(fd)
+                self.assertEqual(closed.exception.errno, errno.EBADF)
+                self.assertTrue(os.path.samestat(initial, path.stat()))
+                path.write_bytes(b"wrong archive")
                 return subprocess.CompletedProcess(command, 0)
 
-            with mock.patch.object(fetcher.subprocess, "run", side_effect=wrong_download):
+            with (mock.patch.object(fetcher.tempfile, "mkstemp", side_effect=record_temp),
+                  mock.patch.object(fetcher.subprocess, "run", side_effect=wrong_download)):
                 with self.assertRaises(ValueError) as failure:
                     fetcher.fetch(work, (pin, name, url))
             self.assertIn(url, str(failure.exception))

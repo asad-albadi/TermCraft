@@ -27,7 +27,11 @@ def fetch(directory, row):
     if target.exists():
         verify(target, "local cache")
         return
-    with tempfile.NamedTemporaryFile(dir=directory) as temporary:
+    fd, name_on_disk = tempfile.mkstemp(dir=directory)
+    temporary = Path(name_on_disk)
+    try:
+        # Keep the exclusively created file in place, but let curl reopen it on Windows.
+        os.close(fd)
         # Canonical mirrors retain many of these identical source files.
         locations = [url]
         if url.startswith("https://snapshot.ubuntu.com/") and "/pool/" in url:
@@ -35,13 +39,15 @@ def fetch(directory, row):
         for location in locations:
             result = subprocess.run(["curl", "--proto", "=https", "--proto-redir", "=https", "-fsSL",
                                      "--connect-timeout", "20", "--max-time", "900", "--retry", "3",
-                                     "-o", temporary.name, location])
+                                     "-o", temporary, location])
             if result.returncode == 0:
                 break
         else:
             raise ValueError("Unable to fetch " + name)
-        verify(Path(temporary.name), location)
-        os.link(temporary.name, target)
+        verify(temporary, location)
+        os.link(temporary, target)
+    finally:
+        temporary.unlink()
 
 
 def main():
