@@ -499,6 +499,8 @@ pub struct Preferences {
     pub confirm_session_close: bool,
     pub scrollback: usize,
     pub appearance: Appearance,
+    pub reduced_motion: bool,
+    pub high_contrast: bool,
     pub shell: String,
     pub downloads: String,
     pub sidebar_visible: bool,
@@ -524,6 +526,8 @@ impl Default for Preferences {
             confirm_session_close: true,
             scrollback: 360000,
             appearance: Appearance::System,
+            reduced_motion: false,
+            high_contrast: false,
             shell: String::new(),
             downloads: home_dir().to_string_lossy().into(),
         }

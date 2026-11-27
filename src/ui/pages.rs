@@ -1350,7 +1350,28 @@ impl Workspace {
                 &self.store.preferences,
             ));
         }
-        ScrollArea::vertical().show(ui,|ui|{surface(ui).show(ui,|ui|{ui.label(RichText::new("Terminal").size(18.).strong());Grid::new("prefs").num_columns(2).spacing([24.,17.]).show(ui,|ui|{ui.label("Scrollback lines");ui.add(DragValue::new(&mut self.store.preferences.scrollback).range(100..=360000));ui.end_row();ui.label("History memory");ui.label("128 MiB per terminal; older lines expire when either limit is reached");ui.end_row();ui.label("SSH keepalive interval");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.keepalive_secs).range(1..=86400).suffix("s"));ui.end_row();ui.label("SSH connect timeout");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.connect_timeout_secs).range(1..=3600).suffix("s"));ui.end_row();ui.label("Appearance");self.appearance_picker(ui);ui.end_row();field(ui,"Default shell executable",&mut self.store.preferences.shell,"Use the system default");field(ui,"Download folder",&mut self.store.preferences.downloads,"Folder path");});if primary(ui,"Save preferences").clicked(){self.persist();}});ui.add_space(17.);
+        ScrollArea::vertical().show(ui,|ui|{
+            surface(ui).show(ui, |ui| {
+                ui.heading(RichText::new("Appearance").size(20.));
+                ui.horizontal_wrapped(|ui| {
+                    ui.label("Theme");
+                    self.appearance_picker(ui);
+                });
+                let reduced_motion = ui.checkbox(
+                    &mut self.store.preferences.reduced_motion,
+                    "Reduce interface motion",
+                );
+                let high_contrast = ui.checkbox(
+                    &mut self.store.preferences.high_contrast,
+                    "Increase interface contrast",
+                );
+                if reduced_motion.changed() || high_contrast.changed() {
+                    self.apply_appearance(ui.ctx());
+                    self.persist();
+                }
+            });
+            ui.add_space(8.);
+            surface(ui).show(ui,|ui|{ui.label(RichText::new("Terminal").size(18.).strong());Grid::new("prefs").num_columns(2).spacing([24.,17.]).show(ui,|ui|{ui.label("Scrollback lines");ui.add(DragValue::new(&mut self.store.preferences.scrollback).range(100..=360000));ui.end_row();ui.label("History memory");ui.label("128 MiB per terminal; older lines expire when either limit is reached");ui.end_row();ui.label("SSH keepalive interval");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.keepalive_secs).range(1..=86400).suffix("s"));ui.end_row();ui.label("SSH connect timeout");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.connect_timeout_secs).range(1..=3600).suffix("s"));ui.end_row();field(ui,"Default shell executable",&mut self.store.preferences.shell,"Use the system default");field(ui,"Download folder",&mut self.store.preferences.downloads,"Folder path");});if primary(ui,"Save preferences").clicked(){self.persist();}});ui.add_space(17.);
    surface(ui).show(ui,|ui|{ui.label(RichText::new("Sessions and backups").size(18.).strong());ui.label(RichText::new("Session settings, folders, tunnels and macros are stored locally. Exported backups contain hostnames and key-file paths, but no passwords.").color(muted(ui)));ui.horizontal(|ui|{
     if ui.button("Export workspace").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("termcraft-workspace.json").save_file(){match self.store.save(&p){Ok(())=>self.message("Workspace exported"),Err(e)=>self.message(e)}}}
     if ui.button("Import workspace").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Workspace JSON",&["json"]).pick_file(){match Store::load_bounded(&p, 16 * 1024 * 1024).and_then(|mut imported| { let mut macros = self.store.macros.clone(); macros.append(&mut imported.macros); super::macro_events::validate_library(&macros)?; imported.macros = macros; Ok(imported) }) { Ok(imported) => { self.store.sessions.extend(imported.sessions.into_iter().map(|mut session| {session.id=harbor_workspace::model::new_session_id();session})); self.store.tunnels.extend(imported.tunnels.into_iter().take(5_usize.saturating_sub(self.store.tunnels.len()))); self.store.macros = imported.macros; self.persist(); }, Err(error) => self.message(error) }}}
@@ -1995,17 +2016,12 @@ fn terminal_layout_profile(
     (job, backgrounds)
 }
 fn field(ui: &mut Ui, label: &str, value: &mut String, hint: &str) {
-    ui.label(label);
-    ui.add(
-        TextEdit::singleline(value)
-            .hint_text(hint)
-            .desired_width(390.),
-    );
+    super::fluent::field(ui, label, value, hint, 390.);
     ui.end_row();
 }
 pub(super) fn page_heading(ui: &mut Ui, title: &str, description: &str) {
     ui.add_space(20.);
-    ui.label(RichText::new(title).size(27.).strong());
+    ui.label(RichText::new(title).size(super::fluent::PAGE_TITLE).strong());
     ui.label(RichText::new(description).color(muted(ui)));
     ui.add_space(20.);
 }

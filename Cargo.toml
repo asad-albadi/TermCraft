@@ -18,7 +18,7 @@ des = { version = "=0.9.0", features = ["zeroize"] }
 rustls = { version = "=0.23.46", default-features = false, features = ["ring", "std", "tls12"] }
 rustls-platform-verifier = "=0.7.1"
 tokio-rustls = { version = "=0.26.6", default-features = false, features = ["ring", "tls12"] }
-eframe = { version = "0.36.2", default-features = false, features = ["glow", "x11", "wayland", "default_fonts"] }
+eframe = { version = "0.36.2", default-features = false, features = ["accesskit", "glow", "x11", "wayland", "default_fonts"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg"] }

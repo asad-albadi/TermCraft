@@ -22,6 +22,7 @@ mod credential_tests;
 mod credentials;
 mod desktop;
 mod desktop_gateway;
+mod fluent;
 mod ftp;
 mod ftp_settings;
 mod games;
@@ -63,6 +64,8 @@ mod web_browser;
 mod windows;
 mod xdmcp;
 mod xserver;
+use fluent::{primary, surface};
+
 fn accent(ui: &Ui) -> Color32 {
     ui.visuals().hyperlink_color
 }
@@ -725,91 +728,17 @@ impl Workspace {
             vec!["interface".into()],
         );
         ctx.set_fonts(fonts);
-        for theme in [Theme::Light, Theme::Dark] {
-            let mut style = (*ctx.style_of(theme)).clone();
-            let dark = theme == Theme::Dark;
-            style.visuals = if dark {
-                Visuals::dark()
-            } else {
-                Visuals::light()
-            };
-            let accent = if dark {
-                Color32::from_rgb(52, 211, 153)
-            } else {
-                Color32::from_rgb(0, 120, 87)
-            };
-            let fill = if dark {
-                Color32::from_rgb(19, 25, 23)
-            } else {
-                Color32::from_rgb(251, 253, 252)
-            };
-            style.visuals.override_text_color = Some(if dark {
-                Color32::from_rgb(234, 242, 237)
-            } else {
-                Color32::from_rgb(24, 39, 32)
-            });
-            style.visuals.panel_fill = fill;
-            style.visuals.window_fill = if dark {
-                Color32::from_rgb(27, 35, 31)
-            } else {
-                Color32::from_rgb(239, 245, 242)
-            };
-            style.visuals.extreme_bg_color = fill;
-            style.visuals.window_corner_radius = CornerRadius::same(8);
-            style.visuals.hyperlink_color = accent;
-            style.visuals.weak_text_color = Some(if dark {
-                Color32::from_rgb(180, 180, 180)
-            } else {
-                Color32::from_rgb(96, 96, 96)
-            });
-            style.visuals.selection.bg_fill = if dark {
-                Color32::from_rgb(22, 78, 59)
-            } else {
-                Color32::from_rgb(204, 238, 223)
-            };
-            style.visuals.selection.stroke = Stroke::new(
-                1.,
-                if dark {
-                    Color32::WHITE
-                } else {
-                    Color32::from_rgb(0, 64, 46)
-                },
-            );
-            for widget in [
-                &mut style.visuals.widgets.inactive,
-                &mut style.visuals.widgets.hovered,
-                &mut style.visuals.widgets.active,
-            ] {
-                widget.corner_radius = CornerRadius::same(4);
-            }
-            style.visuals.widgets.active.bg_stroke = Stroke::new(1., accent);
-            style.visuals.widgets.active.bg_fill = style.visuals.selection.bg_fill;
-            style.visuals.widgets.hovered.bg_stroke = Stroke::new(1., accent);
-            style.visuals.widgets.hovered.bg_fill = if dark {
-                Color32::from_rgb(35, 55, 45)
-            } else {
-                Color32::from_rgb(224, 239, 231)
-            };
-            style.spacing.item_spacing = vec2(8., 8.);
-            style.spacing.button_padding = vec2(10., 6.);
-            style.spacing.interact_size.y = 30.;
-            style
-                .text_styles
-                .insert(TextStyle::Body, FontId::proportional(14.));
-            style
-                .text_styles
-                .insert(TextStyle::Button, FontId::proportional(14.));
-            style
-                .text_styles
-                .insert(TextStyle::Heading, FontId::proportional(24.));
-            ctx.set_style_of(theme, style);
-        }
         let store_path = data_dir.join("workspace.json");
         let (store, store_ok, status) = match Store::load(&store_path) {
             Ok(s) => (s, true, "Ready".into()),
             Err(e) => (Store::default(), false, e),
         };
         ctx.set_theme(theme_preference(store.preferences.appearance));
+        fluent::setup(
+            ctx,
+            store.preferences.reduced_motion,
+            store.preferences.high_contrast,
+        );
         Self {
             logo,
             desktop_theme: None,
@@ -1842,6 +1771,11 @@ impl Workspace {
         let desktop = self.desktop_theme.as_mut().and_then(|theme| theme.poll());
         ctx.options_mut(|options| options.fallback_theme = desktop.unwrap_or(Theme::Light));
         ctx.set_theme(theme_preference(self.store.preferences.appearance));
+        fluent::setup(
+            ctx,
+            self.store.preferences.reduced_motion,
+            self.store.preferences.high_contrast,
+        );
         if ctx.theme() != previous {
             ctx.request_repaint();
         }
@@ -2324,25 +2258,6 @@ fn workspace_tab(
     response
         .widget_info(|| WidgetInfo::selected(WidgetType::SelectableLabel, true, selected, title));
     (response.on_hover_text(title), closed)
-}
-fn primary(ui: &mut Ui, label: &str) -> Response {
-    ui.add(
-        Button::new(RichText::new(label).color(if ui.visuals().dark_mode {
-            Color32::from_rgb(6, 34, 24)
-        } else {
-            Color32::WHITE
-        }))
-        .fill(accent(ui))
-        .stroke(Stroke::NONE)
-        .corner_radius(6),
-    )
-}
-fn surface(ui: &Ui) -> Frame {
-    Frame::new()
-        .fill(content(ui))
-        .stroke(Stroke::new(1., line(ui)))
-        .corner_radius(9)
-        .inner_margin(17)
 }
 fn dot(ui: &mut Ui, color: Color32) {
     let (r, _) = ui.allocate_exact_size(vec2(7., 7.), Sense::hover());
@@ -3165,6 +3080,56 @@ mod gui_tests {
             output.textures_delta.clear();
         }
     }
+    #[test]
+    fn older_workspaces_keep_appearance_and_round_trip_accessibility_settings() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("workspace.json");
+        fs::write(
+            &path,
+            r#"{"preferences":{"appearance":"Dark","sidebar_width":244.0}}"#,
+        )
+        .unwrap();
+        let mut store = Store::load(&path).unwrap();
+        assert_eq!(store.preferences.appearance, Appearance::Dark);
+        assert_eq!(store.preferences.sidebar_width, 244.);
+        assert!(!store.preferences.reduced_motion);
+        assert!(!store.preferences.high_contrast);
+
+        store.preferences.reduced_motion = true;
+        store.preferences.high_contrast = true;
+        store.save(&path).unwrap();
+        let ctx = Context::default();
+        let mut workspace = Workspace::new_context(&ctx, None, directory.path().to_owned());
+        assert_eq!(workspace.store.preferences.appearance, Appearance::Dark);
+        assert_eq!(workspace.store.preferences.sidebar_width, 244.);
+        assert!(workspace.store.preferences.reduced_motion);
+        assert!(workspace.store.preferences.high_contrast);
+
+        workspace.store.preferences.appearance = Appearance::System;
+        for system in [Theme::Light, Theme::Dark] {
+            ctx.run_ui(
+                RawInput {
+                    system_theme: Some(system),
+                    ..Default::default()
+                },
+                |ui| {
+                    workspace.apply_appearance(ui.ctx());
+                    let style = ctx.style_of(ctx.theme());
+                    assert_eq!(ctx.theme(), system);
+                    assert_eq!(style.animation_time, 0.);
+                    let expected = if system == Theme::Dark {
+                        Color32::BLACK
+                    } else {
+                        Color32::WHITE
+                    };
+                    assert_eq!(style.visuals.panel_fill, expected);
+                },
+            )
+            .textures_delta
+            .clear();
+        }
+    }
+
     #[test]
     fn system_appearance_without_native_theme_defaults_to_light() {
         let ctx = Context::default();
