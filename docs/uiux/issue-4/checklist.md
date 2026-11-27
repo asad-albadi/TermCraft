@@ -2,7 +2,7 @@
 
 Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over Fluent 2. The boxes in the component sections record software disposition. Each corresponding route, retained behavior and level of evidence appears in the [validation record](validation.md). The verification section tracks independent gates. Human acceptance is outstanding. Feature parity remains 46/60.
 
-**Human review rejected the current build on 2026-11-27.** The previous checks below record technical work on that build, not acceptance. [Correction checklist](human-review-correction.md) is active: simplify session creation and terminal/sidebar controls, provide help on demand, fix viewport scrollbars and organize settings/games/detached layouts. These items must be reviewed again before a new human-check build is offered.
+**Human review rejected the current build on 2026-11-27.** The previous checks below record technical work on that build, not acceptance. [Correction checklist](human-review-correction.md) is active: simplify session creation and terminal/sidebar controls, provide help on demand, fix viewport scrollbars and organize settings/games/detached layouts. The corrective implementation and scoped independent review are now recorded in that checklist; current-source platform CI and owner acceptance remain open.
 
 **Merge hold:** keep PR #8 open until the owner completes full human checks and explicitly approves merging.
 
@@ -15,6 +15,7 @@ Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over 
 | 2. Shell/navigation/tabs/splits | Independently reviewed at `b77581a` | Seventeen actual-source component tests, strict remote-pane loading/ready probe and app type check passed; dedicated name/theme bar removed |
 | 3. Dialogs and protocol forms | Independently reviewed through acc3132 | Twenty-five focused production UI/PTY/protocol cases, eight shared components and actual SSH/Local native previews; readable aligned fields, accessible labels, scoped input ownership and safe recovery workflows |
 | 4. Specialist pages and web shell | Independently reviewed through 8f4e0ac | Forty-two focused production tests, actual Chromium appearance checks, native previews; folder/file-type icons in local, SSH/SFTP and FTP explorers |
+| Human-review correction | Source `72db3f4`, reviewed guidance fix `8c50a01` | 74 focused cases plus seven overlapping covering cases; native normal/ultrawide/compact/detached captures; independent review approved. Current-source CI and owner acceptance pending |
 | 5. Integrated visual/interaction verification | Local evidence collected | [Validation record](validation.md), [original screenshots](captures/manifest.json) and [baseline](before/manifest.json). Hosted and human gates below |
 
 A checked component has a recorded change or retention decision. Consult the validation record for the distinction between source inspection, actual production interaction and native pixels.
@@ -26,7 +27,7 @@ A checked component has a recorded change or retention decision. Consult the val
 - [x] Typography, control heights, field spacing and surface insets
 - [x] Primary/secondary actions: rest, hover, held press, focus and disabled
 - [x] Reduced motion and high-contrast settings
-- [ ] Scroll indicators, track hover, thumb drag and content clearance
+- [x] Scroll indicators, track hover, thumb drag and content clearance
 - [x] Icon family/stroke/alignment, accessible names and tooltips
 - [x] Explorer icons distinguish folders and common file types consistently in local, SSH/SFTP and FTP listings; unknown files have a clear fallback
 
@@ -34,11 +35,11 @@ A checked component has a recorded change or retention decision. Consult the val
 
 - [x] Title/menu/command bars and overflow
 - [x] Navigation rail: selected, hover, pressed, focus and short heights
-- [ ] Quick connect and saved-session search/tree
-- [ ] Shared-source and folder/group rows
+- [x] Quick connect and saved-session search/tree
+- [x] Shared-source and folder/group rows
 - [x] Tabs: selection, title truncation, close hit, focus and context menus
-- [ ] Split pane commands, drag handles and close controls
-- [ ] Detached window chrome and saved geometry
+- [x] Split pane commands, drag handles and close controls
+- [x] Detached window chrome and saved geometry
 - [x] Home, status messages and full-value access
 
 ## Session and protocol forms
@@ -56,7 +57,7 @@ A checked component has a recorded change or retention decision. Consult the val
 - [x] Mosh options
 - [x] Browser/runtime/proxy options
 - [x] XDMCP discovery and X server options
-- [ ] Session identity, advanced disclosure, validation and pinned footer
+- [x] Session identity, advanced disclosure, validation and pinned footer
 - [x] Startup macro and inherited terminal settings
 
 ## Dialogs, managers and confirmations

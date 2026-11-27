@@ -13,11 +13,11 @@ C3 Page layout: vertical scrollbar at right edge of its own full-width viewport,
 
 ## Status
 
-- [ ] Simplify session creation and contextual help.
-- [ ] Compact terminal, sidebar and detached controls.
-- [ ] Correct full viewport scrolling, settings and games layouts.
-- [ ] Inspect real native previews at normal, ultrawide and compact sizes.
-- [ ] Pass focused regression checks and independent review.
+- [x] Simplify session creation and contextual help.
+- [x] Compact terminal, sidebar and detached controls.
+- [x] Correct full viewport scrolling, settings and games layouts.
+- [x] Inspect real native previews at normal, ultrawide and compact sizes.
+- [x] Pass focused regression checks and independent review.
 - [ ] Produce updated human-check builds.
 - [ ] Owner completes human checks; merging remains prohibited.
 
@@ -25,6 +25,10 @@ C3 Page layout: vertical scrollbar at right edge of its own full-width viewport,
 
 Correction source: `72db3f4078af03cca728a1853387165875a20dc2`. [Eight original captures and source/binary identity](captures/human-correction/manifest.json) record the actual running development UI at Full HD, ultrawide, compact and detached sizes. These use a source-verified cached library with prior native-adapter dependencies. They are not packaged-build, physical hardware, screen-reader or owner acceptance evidence. The prior c2 packages do not contain these corrections.
 
-The controller directly inspected the simple SSH/RDP pages, full-width scroll viewport, categorized settings, compact terminal, detached controls and centered games catalog. During that inspection, the first games layout and clipped compact RDP port were returned and corrected. Independent review and current-source hosted CI remain pending.
+The controller directly inspected the simple SSH/RDP pages, full-width scroll viewport, categorized settings, compact terminal, detached controls and centered games catalog. During that inspection, the first games layout and clipped compact RDP port were returned and corrected. Independent review approved the correction and the final legacy-protocol guidance fix. The source `72db3f4` passed 74 focused cases; the six-line wording correction `8c50a01` passed seven covering cases. These case sets overlap. Current-source hosted CI and updated distribution packages remain pending.
 
 ![Simple RDP form at 640×480](captures/human-correction/session-rdp-dark-compact.png)
+
+## Current review-ready Linux preview
+
+Source `8c50a010f8aeb96cfc03ff2e5d6fc672b40241ff` incorporates the independent review's final wording correction. The local native development executable is `target/issue-4/specialist-probe/termcraft-human-review-ready`, SHA-256 `79e0988509923ef4809e0cc7e82d054077fd6174be451d8bc732289c907363bb`. This is a UI review preview with the development dependency limits above; it is not a replacement for current-source platform CI or distribution qualification. PR #8 remains draft and unmerged. Owner acceptance is still open.
