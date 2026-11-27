@@ -8,6 +8,53 @@ use harbor_workspace::{
     ssh::{ChallengeAnswer, ConnectionCommand, TrustDecision},
 };
 use zeroize::Zeroizing;
+
+fn navigation_button(ui: &mut Ui, enabled: bool, kind: &str, label: &str) -> Response {
+    let response = ui.add_enabled(
+        enabled,
+        Button::new("").min_size(Vec2::splat(fluent::CONTROL_HEIGHT)),
+    );
+    let center = response.rect.center();
+    let stroke = Stroke::new(
+        1.6,
+        if response.enabled() {
+            ink(ui)
+        } else {
+            muted(ui)
+        },
+    );
+    let line = |a: Vec2, b: Vec2| {
+        ui.painter().line_segment([center + a, center + b], stroke);
+    };
+    match kind {
+        "parent" => {
+            line(vec2(0., 6.), vec2(0., -6.));
+            line(vec2(-4., -2.), vec2(0., -6.));
+            line(vec2(0., -6.), vec2(4., -2.));
+        }
+        "go" => {
+            line(vec2(-6., 0.), vec2(6., 0.));
+            line(vec2(2., -4.), vec2(6., 0.));
+            line(vec2(6., 0.), vec2(2., 4.));
+        }
+        _ => {
+            let points = (0..24)
+                .map(|n| {
+                    let angle =
+                        -std::f32::consts::FRAC_PI_2 + n as f32 / 23. * std::f32::consts::PI * 1.5;
+                    center + vec2(angle.cos(), angle.sin()) * 6.
+                })
+                .collect();
+            ui.painter()
+                .add(egui::epaint::PathShape::line(points, stroke));
+            line(vec2(-9., 4.), vec2(-6., 0.));
+            line(vec2(-6., 0.), vec2(-3., 4.));
+        }
+    }
+    response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, response.enabled(), label));
+    response.fluent_hint(label)
+}
+
 fn upload_operation(
     local: PathBuf,
     directory: &RemotePath,
@@ -94,6 +141,7 @@ pub(super) struct TransferUi {
     form: Option<FileActionForm>,
     overwrite: bool,
     local_download: Option<PathBuf>,
+    address_path: Option<RemotePath>,
     local_path_text: String,
     local_picker: Option<std::sync::mpsc::Receiver<Option<PathBuf>>>,
     picker: Option<std::sync::mpsc::Receiver<Option<Result<TransferOperation, String>>>>,
@@ -165,14 +213,7 @@ impl TransferUi {
             policy: self.policy(),
         })
     }
-    fn local_drop_zone(
-        &mut self,
-        ui: &mut Ui,
-        connection: u64,
-        ready: bool,
-        ssh: Option<&mut harbor_workspace::ssh::ConnectionHandle>,
-    ) {
-        ui.separator();
+    fn local_download_settings(&mut self, ui: &mut Ui) {
         ui.label("Local download folder");
         ui.horizontal_wrapped(|ui| {
             if ui
@@ -200,14 +241,34 @@ impl TransferUi {
                 });
             }
         });
-        let (_, payload) = ui.dnd_drop_zone::<RemoteDragPayload, _>(
-            Frame::new()
-                .inner_margin(8)
-                .stroke(Stroke::new(1., line(ui))),
-            |ui| {
-                ui.label("Drop a remote entry here to download into this local folder.");
-            },
-        );
+    }
+    fn local_drop_zone(
+        &mut self,
+        ui: &mut Ui,
+        connection: u64,
+        ready: bool,
+        ssh: Option<&mut harbor_workspace::ssh::ConnectionHandle>,
+    ) {
+        ui.separator();
+        let (_, payload) =
+            ui.dnd_drop_zone::<RemoteDragPayload, _>(Frame::new().inner_margin(2), |ui| {
+                ui.horizontal(|ui| {
+                    ui.menu_button("Downloads", |ui| self.local_download_settings(ui))
+                        .response
+                        .fluent_hint("Choose the local folder used for drag-and-drop downloads");
+                    let destination = self.local_download.as_ref().map_or_else(
+                        || "Choose a download folder first".to_owned(),
+                        |path| {
+                            format!(
+                                "Drop a remote file here to download into {}",
+                                path.display()
+                            )
+                        },
+                    );
+                    ui.label(RichText::new("Drop here").color(muted(ui)))
+                        .fluent_hint(destination);
+                });
+            });
         if let Some(payload) = payload {
             let result = if ready {
                 self.download_drop_operation(&payload, connection)
@@ -285,7 +346,7 @@ impl TransferUi {
         ready: bool,
         capabilities: harbor_workspace::remote_files::capabilities::RemoteCapabilities,
     ) {
-        ui.horizontal_wrapped(|ui| {
+        ui.menu_button("Upload", |ui| {
             for folder in [false, true] {
                 if ui
                     .add_enabled(
@@ -318,85 +379,88 @@ impl TransferUi {
                     });
                 }
             }
-            let selected_file = self.selected.as_ref().is_some_and(|e| {
-                e.kind == EntryKind::File
-                    || (e.kind == EntryKind::Directory && capabilities.download_folders)
+        });
+        let selected_file = self.selected.as_ref().is_some_and(|e| {
+            e.kind == EntryKind::File
+                || (e.kind == EntryKind::Directory && capabilities.download_folders)
+        });
+        if ui
+            .add_enabled(
+                ready && capabilities.download_files && selected_file && self.picker.is_none(),
+                Button::new("Download…"),
+            )
+            .clicked()
+        {
+            let (tx, rx) = std::sync::mpsc::channel();
+            self.picker = Some(rx);
+            let selected = self.selected.as_ref().unwrap();
+            let operation = self.download_operation(PathBuf::new()).unwrap();
+            let name = selected.display_name.clone();
+            std::thread::spawn(move || {
+                let result = rfd::FileDialog::new()
+                    .set_file_name(name)
+                    .save_file()
+                    .map(|local| {
+                        let TransferOperation::Download { remote, policy, .. } = operation else {
+                            unreachable!()
+                        };
+                        Ok(TransferOperation::Download {
+                            remote,
+                            local,
+                            policy,
+                        })
+                    });
+                let _ = tx.send(result);
             });
-            if ui
-                .add_enabled(
-                    ready && capabilities.download_files && selected_file && self.picker.is_none(),
-                    Button::new("Download…"),
-                )
-                .clicked()
-            {
-                let (tx, rx) = std::sync::mpsc::channel();
-                self.picker = Some(rx);
-                let selected = self.selected.as_ref().unwrap();
-                let operation = self.download_operation(PathBuf::new()).unwrap();
-                let name = selected.display_name.clone();
-                std::thread::spawn(move || {
-                    let result =
-                        rfd::FileDialog::new()
-                            .set_file_name(name)
-                            .save_file()
-                            .map(|local| {
-                                let TransferOperation::Download { remote, policy, .. } = operation
-                                else {
-                                    unreachable!()
-                                };
-                                Ok(TransferOperation::Download {
-                                    remote,
-                                    local,
-                                    policy,
-                                })
-                            });
-                    let _ = tx.send(result);
-                });
-            }
-        });
-        ui.horizontal_wrapped(|ui| {
-            if ui
-                .add_enabled(
-                    ready && capabilities.mutate_entries,
-                    Button::new("New folder…"),
-                )
-                .clicked()
-            {
-                self.form = Some(FileActionForm::NewFolder {
-                    parent: path.clone(),
-                    name: String::new(),
-                });
-            }
-            if ui
-                .add_enabled(
-                    ready && capabilities.mutate_entries && self.selected.is_some(),
-                    Button::new("Rename…"),
-                )
-                .clicked()
-            {
-                let selected = self.selected.as_ref().unwrap();
-                self.form = Some(FileActionForm::Rename {
-                    source: selected.path.clone(),
-                    name: String::new(),
-                });
-            }
-            if ui
-                .add_enabled(
-                    ready && capabilities.mutate_entries && self.selected.is_some(),
-                    Button::new("Delete…"),
-                )
-                .clicked()
-            {
-                self.form = Some(FileActionForm::Delete {
-                    target: self.selected.as_ref().unwrap().path.clone(),
-                    directory: self.selected.as_ref().unwrap().kind == EntryKind::Directory,
-                    include_contents: false,
-                });
-            }
-        });
-        ui.checkbox(&mut self.overwrite,"Replace existing destination files").fluent_hint("Off by default. Conflicting files are preserved until you explicitly choose replacement and retry.");
-        if let Some(error) = &self.error {
-            ui.colored_label(ui.visuals().error_fg_color, error);
+        }
+    }
+    fn entry_actions(
+        &mut self,
+        ui: &mut Ui,
+        path: &RemotePath,
+        ready: bool,
+        capabilities: harbor_workspace::remote_files::capabilities::RemoteCapabilities,
+    ) {
+        if ui
+            .add_enabled(
+                ready && capabilities.mutate_entries,
+                Button::new("New folder…"),
+            )
+            .clicked()
+        {
+            ui.close();
+            self.form = Some(FileActionForm::NewFolder {
+                parent: path.clone(),
+                name: String::new(),
+            });
+        }
+        if ui
+            .add_enabled(
+                ready && capabilities.mutate_entries && self.selected.is_some(),
+                Button::new("Rename…"),
+            )
+            .clicked()
+        {
+            ui.close();
+            let selected = self.selected.as_ref().unwrap();
+            self.form = Some(FileActionForm::Rename {
+                source: selected.path.clone(),
+                name: String::new(),
+            });
+        }
+        if ui
+            .add_enabled(
+                ready && capabilities.mutate_entries && self.selected.is_some(),
+                Button::new("Delete…"),
+            )
+            .clicked()
+        {
+            ui.close();
+            self.form = Some(FileActionForm::Delete {
+                target: self.selected.as_ref().unwrap().path.clone(),
+                directory: self.selected.as_ref().unwrap().kind == EntryKind::Directory,
+                include_contents: false,
+            });
         }
     }
     fn dropped_files(
@@ -552,11 +616,6 @@ impl TransferUi {
         if self.events.is_empty() {
             return;
         }
-        ui.separator();
-        ui.label(crate::ui::fluent::emphasized(
-            ui.ctx(),
-            RichText::new("Transfers"),
-        ));
         ScrollArea::vertical()
             .id_salt("remote-transfer-jobs")
             .max_height(140.)
@@ -712,35 +771,6 @@ impl TerminalTab {
             }});
             if ui.button("Copy cleanup command").clicked(){ui.ctx().copy_text("__termcraft_osc7_remove".to_owned());}
         });
-        let mut go = false;
-        ui.horizontal_wrapped(|ui| {
-            let response = ui.add_enabled(
-                self.ssh_connected,
-                crate::ui::fluent::singleline(&mut self.remote_path)
-                    .hint_text("/remote/folder")
-                    .desired_width(150.),
-            );
-            if response.lost_focus() && ui.input_mut(|i| i.consume_key(Modifiers::NONE, Key::Enter))
-            {
-                go = true;
-            }
-            go |= ui
-                .add_enabled(
-                    self.ssh_connected && !self.remote_path.is_empty(),
-                    Button::new("Go"),
-                )
-                .clicked();
-        });
-        if go {
-            if self.remote_path.starts_with('/') {
-                match RemotePath::from_bytes(self.remote_path.as_bytes().to_vec()) {
-                    Ok(path) => self.navigate_remote(path),
-                    Err(error) => self.error = error,
-                }
-            } else {
-                self.error = "Enter an absolute remote folder path.".into();
-            }
-        }
     }
     pub(super) fn navigate_remote(&mut self, path: RemotePath) {
         self.transfer_ui.selected = None;
@@ -826,106 +856,98 @@ impl Workspace {
             .max_size(480.)
             .frame(Frame::new().fill(mist(ui)).inner_margin(10))
             .show(ui, |ui| {
-                ScrollArea::vertical()
-                    .id_salt(("remote-pane-body", id))
-                    .show(ui, |ui| {
-                        let tab = &mut self.tabs[self.active];
-                        ui.horizontal_wrapped(|ui| {
-                            ui.label(crate::ui::fluent::emphasized(
-                                ui.ctx(),
-                                RichText::new("Remote files"),
-                            ));
-                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                                if ui
-                                    .small_button("×")
-                                    .fluent_hint("Hide remote files")
-                                    .clicked()
-                                {
-                                    tab.browser.as_mut().unwrap().visible = false;
-                                }
-                            });
-                        });
-                        ui.label(
-                            RichText::new(format!(
-                                "{} · Embedded {}",
-                                tab.session.host,
-                                tab.session.remote_backend.label()
-                            ))
-                            .size(11.)
-                            .color(muted(ui)),
-                        );
-                        if authentication_ui(ui, tab) {
-                            return;
+                let tab = &mut self.tabs[self.active];
+                ui.horizontal(|ui| {
+                    ui.strong("Remote files").fluent_hint(format!("{} · Embedded {}", tab.session.host, tab.session.remote_backend.label()));
+                    ui.small(tab.session.remote_backend.label());
+                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                        if ui.small_button("×").fluent_hint("Hide remote files").clicked() {
+                            tab.browser.as_mut().unwrap().visible = false;
                         }
-                        if !tab.ssh_connected {
-                            ui.label(&tab.connection_status);
+                    });
+                });
+                if tab.auth.is_some() {
+                    ScrollArea::vertical().id_salt(("remote-auth",id))
+                        .max_height(ui.available_height())
+                        .show(ui, |ui| authentication_ui(ui,tab));
+                    return;
+                }
+                if !tab.ssh_connected { ui.label(&tab.connection_status); }
+                let browser = tab.browser.as_ref().unwrap();
+                let ready = tab.ssh_connected && !browser.loading && browser.error.is_none();
+                let path = browser.path.clone();
+                if !browser.loading && tab.transfer_ui.address_path.as_ref() != Some(&path) {
+                    tab.remote_path = String::from_utf8(path.as_bytes().to_vec()).unwrap_or_default();
+                    tab.transfer_ui.address_path = Some(path.clone());
+                }
+                let mut navigate = None;
+                let mut go = false;
+                ui.horizontal(|ui| {
+                    if navigation_button(ui,tab.ssh_connected,"parent","Parent folder").clicked() { navigate = Some(path.parent()); }
+                    let response = ui.add_enabled(tab.ssh_connected,
+                        crate::ui::fluent::singleline(&mut tab.remote_path)
+                            .id(Id::new(("remote-address",id)))
+                            .hint_text(path.display()).desired_width((ui.available_width()-40.).max(40.)));
+                    let response = response.fluent_hint(format!("Current folder: {}\nEnter an absolute path and press Enter",path.display()));
+                    go = response.lost_focus() && ui.input_mut(|i| i.consume_key(Modifiers::NONE,Key::Enter));
+                    let edited = !tab.remote_path.is_empty() && tab.remote_path.as_bytes() != path.as_bytes();
+                    if navigation_button(ui,tab.ssh_connected,if edited { "go" } else { "refresh" },
+                        if edited { "Open folder" } else { "Refresh folder" }).clicked() {
+                        if edited { go = true; } else { navigate = Some(path.clone()); }
+                    }
+                });
+                if go {
+                    if tab.remote_path.starts_with('/') {
+                        match RemotePath::from_bytes(tab.remote_path.as_bytes().to_vec()) {
+                            Ok(path) => navigate = Some(path), Err(error) => tab.error = error,
                         }
-                        ui.small(tab.session.remote_backend.label());
-                        tab.shell_follow_controls(ui);
-                        let browser = tab.browser.as_ref().unwrap();
-                        ui.add_space(8.);
-                        ui.add(
-                            Label::new(RichText::new(browser.path.display()).monospace().size(12.))
-                                .truncate(),
-                        )
-                        .fluent_hint(browser.path.display());
-                        let mut navigate = None;
-                        ui.horizontal_wrapped(|ui| {
-                            if ui
-                                .add_enabled(tab.ssh_connected, Button::new("↑ Parent"))
-                                .clicked()
-                            {
-                                navigate = Some(browser.path.parent());
-                            }
-                            if ui
-                                .add_enabled(tab.ssh_connected, Button::new("Refresh"))
-                                .clicked()
-                            {
-                                navigate = Some(browser.path.clone());
-                            }
-                            if browser.loading {
-                                ui.spinner();
-                            }
-                        });
-                        if let Some(error) = &browser.error {
-                            ui.colored_label(ui.visuals().error_fg_color, error);
-                        }
-                        tab.transfer_ui.actions(
-                            ui,
-                            &browser.path,
-                            tab.ssh_connected && !browser.loading && browser.error.is_none(),
-                            tab.transfer_ui.effective_capabilities(),
-                        );
-                        let upload_zone = Frame::new()
-                            .inner_margin(8)
-                            .stroke(Stroke::new(1., line(ui)))
-                            .show(ui, |ui| {
-                                ui.label(
-                                    if tab.transfer_ui.effective_capabilities().upload_folders {
-                                        "Drop local files or folders here to upload."
-                                    } else {
-                                        "Drop local files here to upload. Folders require SFTP."
-                                    },
-                                )
-                            });
-                        tab.transfer_ui.dropped_files(
-                            ui,
-                            &browser.path,
-                            tab.ssh_connected && !browser.loading && browser.error.is_none(),
-                            tab.ssh.as_mut(),
-                            &upload_zone.response,
-                        );
-                        tab.transfer_ui.local_drop_zone(
-                            ui,
-                            id,
-                            tab.ssh_connected && !browser.loading && browser.error.is_none(),
-                            tab.ssh.as_mut(),
-                        );
-                        tab.transfer_ui.jobs(ui, tab.ssh.as_ref());
+                    } else { tab.error = "Enter an absolute remote folder path.".into(); }
+                }
+                let capabilities = tab.transfer_ui.effective_capabilities();
+                ui.horizontal_wrapped(|ui| {
+                    ui.spacing_mut().button_padding.x = 8.;
+                    tab.transfer_ui.actions(ui,&path,ready,capabilities);
+                    ui.menu_button("More", |ui| {
+                        tab.transfer_ui.entry_actions(ui,&path,ready,capabilities);
                         ui.separator();
-                        ScrollArea::vertical()
+                        ui.menu_button("Shell integration", |ui| tab.shell_follow_controls(ui));
+                        ui.menu_button("Transfer settings", |ui| {
+                            ui.checkbox(&mut tab.transfer_ui.overwrite,"Replace existing destination files")
+                                .fluent_hint("Off by default. Conflicting files are preserved until you explicitly choose replacement and retry.");
+                            tab.transfer_ui.local_download_settings(ui);
+                        });
+                        ui.menu_button("Help", |ui| {
+                            ui.set_max_width(260.);
+                            ui.label("Double-click a folder to open it, or a file to edit it. Right-click an entry for file actions.");
+                            ui.label("Drop local files onto the file list to upload. Drop a remote entry onto Downloads to save it in the chosen local folder.");
+                            ui.label("Use Shell integration to follow the terminal folder or copy setup for your remote shell.");
+                        });
+                    });
+                });
+                if tab.transfer_ui.overwrite {
+                    ui.checkbox(&mut tab.transfer_ui.overwrite,"Replace existing files")
+                        .fluent_hint("Replacement is enabled for transfers. Uncheck to preserve conflicting destination files.");
+                }
+                if let Some(error) = &tab.transfer_ui.error {
+                    ui.colored_label(ui.visuals().error_fg_color,error);
+                }
+                let browser = tab.browser.as_ref().unwrap();
+                if browser.loading { ui.horizontal(|ui| { ui.spinner(); ui.label("Loading files…"); }); }
+                if let Some(error) = &browser.error { ui.colored_label(ui.visuals().error_fg_color,error); }
+                if !tab.transfer_ui.events.is_empty() {
+                    let active = tab.transfer_ui.events.iter().filter(|e|e.outcome.is_none()).count();
+                    let attention = tab.transfer_ui.events.iter().any(|e|!matches!(e.outcome,Some(TransferOutcome::Completed)));
+                    let issues = tab.transfer_ui.events.iter().filter(|e| e.outcome.is_some() && !matches!(e.outcome,Some(TransferOutcome::Completed))).count();
+                    egui::CollapsingHeader::new(format!("Transfers · {active} active · {issues} notices"))
+                        .id_salt(("remote-transfers",id)).default_open(attention)
+                        .open((active > 0).then_some(true))
+                        .show(ui, |ui| tab.transfer_ui.jobs(ui,tab.ssh.as_ref()));
+                }
+                ui.separator();
+                let listing = ScrollArea::vertical()
                             .id_salt(("remote-entries", id))
-                            .max_height(300.)
+                            .auto_shrink([false,false])
+                            .max_height((ui.available_height()-56.).max(32.))
                             .min_scrolled_height(32.)
                             .show(ui, |ui| {
                                 for entry in &browser.entries {
@@ -958,6 +980,12 @@ impl Workspace {
                                     if response.clicked() {
                                         tab.transfer_ui.selected = Some(entry.clone());
                                     }
+                                    if ready {
+                                        response.context_menu(|ui| {
+                                            tab.transfer_ui.selected = Some(entry.clone());
+                                            tab.transfer_ui.entry_actions(ui,&path,ready,capabilities);
+                                        });
+                                    }
                                     if response.double_clicked()
                                         && entry.kind == EntryKind::File
                                         && tab.transfer_ui.effective_capabilities().edit
@@ -982,10 +1010,10 @@ impl Workspace {
                                     );
                                 }
                             });
-                        if let Some(path) = navigate {
-                            tab.navigate_remote(path);
-                        }
-                    });
+                let drop_target = ui.interact(listing.inner_rect,ui.id().with("upload-list"),Sense::hover());
+                tab.transfer_ui.dropped_files(ui,&path,ready,tab.ssh.as_mut(),&drop_target);
+                tab.transfer_ui.local_drop_zone(ui,id,ready,tab.ssh.as_mut());
+                if let Some(path) = navigate { tab.navigate_remote(path); }
             });
         if let Some(path) = edit_remote {
             self.open_remote_editor(id, path);
@@ -1082,6 +1110,316 @@ mod auth_tests {
 }
 #[cfg(test)]
 mod transfer_tests {
+    #[test]
+    fn narrow_terminal_moves_commands_into_reachable_overflow() {
+        use crate::ui::{gui_tests::shell_text_position, terminal_review_tests::owned_workspace};
+        let (ctx, _root, mut workspace) = owned_workspace();
+        workspace.start(Session {
+            host: "127.0.0.1".into(),
+            port: 1,
+            ..Default::default()
+        });
+        drop(workspace.tabs[0].ssh.take());
+        let draw = |workspace: &mut Workspace, events| {
+            super::super::gui_tests::shell_frame(&ctx, vec2(260., 640.), 1., events, |ui| {
+                workspace.terminals(ui)
+            })
+        };
+        fn labels(output: &egui::FullOutput) -> String {
+            fn add(shape: &egui::epaint::Shape, text: &mut String) {
+                match shape {
+                    egui::epaint::Shape::Text(t) => {
+                        text.push_str(t.galley.text());
+                        text.push('\n');
+                    }
+                    egui::epaint::Shape::Vec(v) => {
+                        for s in v {
+                            add(s, text);
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            let mut text = String::new();
+            for s in &output.shapes {
+                add(&s.shape, &mut text);
+            }
+            text
+        }
+        draw(&mut workspace, vec![]);
+        let output = draw(&mut workspace, vec![]);
+        let text = labels(&output);
+        assert!(
+            !text
+                .lines()
+                .any(|label| label == "Find" || label == "Reconnect"),
+            "Commands crowd a narrow terminal: {text}"
+        );
+        let more = shell_text_position(&output, "More");
+        for pressed in [true, false] {
+            draw(
+                &mut workspace,
+                vec![
+                    Event::PointerMoved(more),
+                    Event::PointerButton {
+                        pos: more,
+                        button: PointerButton::Primary,
+                        pressed,
+                        modifiers: Modifiers::NONE,
+                    },
+                ],
+            );
+        }
+        let output = draw(&mut workspace, vec![]);
+        let text = labels(&output);
+        assert!(text.contains("Reconnect"));
+        let find = shell_text_position(&output, "Find");
+        for pressed in [true, false] {
+            draw(
+                &mut workspace,
+                vec![
+                    Event::PointerMoved(find),
+                    Event::PointerButton {
+                        pos: find,
+                        button: PointerButton::Primary,
+                        pressed,
+                        modifiers: Modifiers::NONE,
+                    },
+                ],
+            );
+        }
+        assert!(
+            workspace.tabs[0].search_open,
+            "Overflow Find must open terminal search"
+        );
+    }
+    #[test]
+    fn remote_path_mouse_go_preserves_draft_and_validates_before_navigation() {
+        use crate::ui::terminal_review_tests::owned_workspace;
+        let (ctx, _root, mut workspace) = owned_workspace();
+        workspace.start(Session {
+            host: "127.0.0.1".into(),
+            port: 1,
+            ..Default::default()
+        });
+        let tab = &mut workspace.tabs[0];
+        drop(tab.ssh.take());
+        tab.ssh_connected = true;
+        let browser = tab.browser.as_mut().unwrap();
+        browser.loading = false;
+        browser.error = None;
+        tab.transfer_ui.address_path = Some(browser.path.clone());
+        tab.remote_path = "relative-draft".into();
+        let field_id = Id::new(("remote-address", tab.id));
+        let draw = |workspace: &mut Workspace, events| {
+            super::super::gui_tests::shell_frame(&ctx, vec2(1360., 760.), 1., events, |ui| {
+                workspace.render(ui)
+            })
+        };
+        draw(&mut workspace, vec![]);
+        draw(&mut workspace, vec![]);
+        let field = ctx
+            .read_response(field_id)
+            .expect("Address field has a stable identity");
+        let button = field.rect.right_center() + vec2(24., 0.);
+        for pressed in [true, false] {
+            draw(
+                &mut workspace,
+                vec![
+                    Event::PointerMoved(button),
+                    Event::PointerButton {
+                        pos: button,
+                        button: PointerButton::Primary,
+                        pressed,
+                        modifiers: Modifiers::NONE,
+                    },
+                ],
+            );
+        }
+        assert_eq!(workspace.tabs[0].remote_path, "relative-draft");
+        assert_eq!(
+            workspace.tabs[0].error,
+            "Enter an absolute remote folder path."
+        );
+        assert!(!workspace.tabs[0].browser.as_ref().unwrap().loading);
+    }
+    #[test]
+    fn remote_row_menu_uses_its_own_target_and_keeps_mutations_confirmed() {
+        use crate::ui::{gui_tests::shell_text_position, terminal_review_tests::owned_workspace};
+        let (ctx, _root, mut workspace) = owned_workspace();
+        workspace.start(Session {
+            host: "127.0.0.1".into(),
+            port: 1,
+            ..Default::default()
+        });
+        let tab = &mut workspace.tabs[0];
+        drop(tab.ssh.take());
+        tab.ssh_connected = true;
+        let browser = tab.browser.as_mut().unwrap();
+        browser.loading = false;
+        browser.error = None;
+        let entries: Vec<_> = ["previous-target", "clicked-target"]
+            .into_iter()
+            .map(|name| RemoteEntry {
+                path: RemotePath::from_bytes(format!("/{name}").into_bytes()).unwrap(),
+                display_name: name.into(),
+                kind: EntryKind::File,
+                size: Some(1),
+            })
+            .collect();
+        tab.transfer_ui.selected = Some(entries[0].clone());
+        browser.entries = entries.clone();
+        let draw = |workspace: &mut Workspace, events| {
+            super::super::gui_tests::shell_frame(&ctx, vec2(1360., 760.), 1., events, |ui| {
+                workspace.render(ui)
+            })
+        };
+        draw(&mut workspace, vec![]);
+        let output = draw(&mut workspace, vec![]);
+        let target = shell_text_position(&output, "clicked-target");
+        for pressed in [true, false] {
+            draw(
+                &mut workspace,
+                vec![
+                    Event::PointerMoved(target),
+                    Event::PointerButton {
+                        pos: target,
+                        button: PointerButton::Secondary,
+                        pressed,
+                        modifiers: Modifiers::NONE,
+                    },
+                ],
+            );
+        }
+        let output = draw(&mut workspace, vec![]);
+        let delete = shell_text_position(&output, "Delete…");
+        for pressed in [true, false] {
+            draw(
+                &mut workspace,
+                vec![
+                    Event::PointerMoved(delete),
+                    Event::PointerButton {
+                        pos: delete,
+                        button: PointerButton::Primary,
+                        pressed,
+                        modifiers: Modifiers::NONE,
+                    },
+                ],
+            );
+        }
+        let form = workspace.tabs[0]
+            .transfer_ui
+            .form
+            .as_ref()
+            .expect("Deletion must open a confirmation");
+        assert!(
+            matches!(form,FileActionForm::Delete { target, include_contents: false, .. } if target == &entries[1].path)
+        );
+        assert!(!workspace.tabs[0].transfer_ui.overwrite);
+    }
+    #[test]
+    fn remote_pane_prioritizes_listing_and_keeps_options_on_demand() {
+        use crate::ui::{gui_tests::shell_text_position, terminal_review_tests::owned_workspace};
+        for height in [640., 1000.] {
+            let (ctx, _root, mut workspace) = owned_workspace();
+            workspace.start(Session {
+                host: "127.0.0.1".into(),
+                port: 1,
+                ..Default::default()
+            });
+            let tab = &mut workspace.tabs[0];
+            drop(tab.ssh.take());
+            tab.ssh_connected = true;
+            let browser = tab.browser.as_mut().unwrap();
+            browser.loading = false;
+            browser.error = None;
+            browser.entries = (0..40)
+                .map(|n| RemoteEntry {
+                    path: RemotePath::from_bytes(format!("/entry-{n:02}").into_bytes()).unwrap(),
+                    display_name: format!("entry-{n:02}"),
+                    kind: EntryKind::Directory,
+                    size: None,
+                })
+                .collect();
+            let mut output = None;
+            for _ in 0..3 {
+                let mut frame = ctx.run_ui(
+                    RawInput {
+                        screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1360., height))),
+                        ..Default::default()
+                    },
+                    |ui| workspace.render(ui),
+                );
+                frame.textures_delta.clear();
+                output = Some(frame);
+            }
+            let output = output.unwrap();
+            let panel_id = Id::new(("remote-files", workspace.tabs[0].id));
+            let initial_width = egui::containers::panel::PanelState::load(&ctx, panel_id)
+                .unwrap()
+                .size()
+                .x;
+            for _ in 0..20 {
+                let mut frame = ctx.run_ui(
+                    RawInput {
+                        screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1360., height))),
+                        ..Default::default()
+                    },
+                    |ui| workspace.render(ui),
+                );
+                frame.textures_delta.clear();
+            }
+            let idle_width = egui::containers::panel::PanelState::load(&ctx, panel_id)
+                .unwrap()
+                .size()
+                .x;
+            assert!(
+                (idle_width - initial_width).abs() < 1.,
+                "Idle pane expanded from {initial_width} to {idle_width}"
+            );
+            let first = shell_text_position(&output, "entry-00");
+            assert!(first.y < 330., "File listing starts too low: {first:?}");
+            let row = if height == 640. {
+                "entry-05"
+            } else {
+                "entry-13"
+            };
+            let last = shell_text_position(&output, row);
+            assert!(
+                last.y < height - 50.,
+                "Available listing space was not used: {last:?}"
+            );
+            fn collect(shape: &egui::epaint::Shape, text: &mut String) {
+                match shape {
+                    egui::epaint::Shape::Text(t) => {
+                        text.push_str(t.galley.text());
+                        text.push('\n');
+                    }
+                    egui::epaint::Shape::Vec(v) => {
+                        for s in v {
+                            collect(s, text);
+                        }
+                    }
+                    _ => {}
+                }
+            }
+            let mut text = String::new();
+            for shape in &output.shapes {
+                collect(&shape.shape, &mut text);
+            }
+            for hidden in [
+                "Manual navigation",
+                "Follow shell directory changes",
+                "Replace existing destination files",
+                "Drop local files or folders here to upload.",
+            ] {
+                assert!(
+                    !text.contains(hidden),
+                    "Advanced guidance consumes listing space: {hidden}"
+                );
+            }
+        }
+    }
     #[test]
     fn scp_remote_directory_drop_is_rejected_before_submission() {
         use harbor_workspace::remote_files::capabilities::RemoteBackendKind;

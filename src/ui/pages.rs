@@ -726,13 +726,29 @@ impl Workspace {
         let mut log = false;
         let mut copy = false;
         let mut clear = false;
+        let compact_commands = ui.available_width() < 400.;
         ui.horizontal(|ui| {
             let index=self.active;
             let t=&self.tabs[index];
             dot(ui,if t.running(){ accent(ui) } else { muted(ui) });
-            ui.label(if t.terminal_starting(){ "Starting" } else if t.running(){ "Connected" } else { "Disconnected" });
+            let status = if t.terminal_starting(){ "Starting" } else if t.running(){ "Connected" } else { "Disconnected" };
+            if compact_commands {
+                ui.add_sized([(ui.available_width()-84.).max(20.),fluent::CONTROL_HEIGHT],Label::new(status).truncate())
+                    .fluent_hint(status);
+            } else { ui.label(status); }
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 ui.menu_button("More", |ui| {
+                    if compact_commands {
+                        let t=&mut self.tabs[index];
+                        if t.session.protocol != "Browser" && ui.button("Find").clicked() {
+                            t.search_open = !t.search_open;
+                            ui.close();
+                        }
+                        if t.terminal_starting() {
+                            if ui.button("Cancel startup").clicked() { cancel_startup=true; ui.close(); }
+                        } else if ui.button("Reconnect").clicked() { reconnect=true; ui.close(); }
+                        ui.separator();
+                    }
                     self.layout_picker(ui);
                     layout_toggle=ui.button("Toggle split").clicked();
                     let t=&mut self.tabs[index];
@@ -764,14 +780,16 @@ impl Workspace {
                     }
                     duplicate = ui.button("Duplicate session").clicked();
                 });
-                let t=&mut self.tabs[index];
-                if t.terminal_starting() {
-                    cancel_startup = ui.button("Cancel startup").clicked();
-                } else {
-                    reconnect = ui.button("Reconnect").clicked();
-                }
-                if t.session.protocol != "Browser" && ui.button("Find").clicked() {
-                    t.search_open = !t.search_open;
+                if !compact_commands {
+                    let t=&mut self.tabs[index];
+                    if t.terminal_starting() {
+                        cancel_startup = ui.button("Cancel startup").clicked();
+                    } else {
+                        reconnect = ui.button("Reconnect").clicked();
+                    }
+                    if t.session.protocol != "Browser" && ui.button("Find").clicked() {
+                        t.search_open = !t.search_open;
+                    }
                 }
 
             });

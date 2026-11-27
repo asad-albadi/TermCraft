@@ -101,3 +101,15 @@ Keep these unchecked until the owner has inspected the running app. Automated or
 - [ ] Light, Dark and System: controls, text, focus, hover and selection remain readable; explorer icons distinguish folders and file types.
 - [ ] Keyboard and safety: navigate the new-session form, dismiss nested dialogs and cancel closing active work without losing the session or draft.
 - [ ] Owner explicitly approves merging PR #8 after completing the checks.
+
+## Second human review: file-pane refinement
+
+The owner approved the session create/edit dialogs and identified remaining panel clutter, with the connected SSH/SFTP browser as the concrete example. Preserve those approved dialogs. This is a continuation of the existing approved compact-controls/contextual-help design, not a new subsystem or redesign.
+
+- [x] Reproduce the problem in a shorter real UI frame: file rows are pushed out by always-visible settings.
+- [x] Compact navigation and primary transfer actions; place shell setup, transfer preferences and guidance on demand.
+- [x] Give the file listing the remaining panel height; keep its scrollbar at the right edge.
+- [x] Verify pointer-driven row actions, raw-path targeting, capability gates, retained confirmations, path validation and narrow terminal overflow.
+- [ ] Inspect the final native pane layout and qualify the distribution.
+- [ ] Produce a current qualified Linux build and complete platform regressions.
+- [ ] Owner reviews the refined panes; merge hold remains.
