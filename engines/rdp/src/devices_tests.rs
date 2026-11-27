@@ -1101,15 +1101,16 @@ pub(crate) mod serial {
         assert_eq!(&completions(&mut channel, 1)[0][20..], settings);
         let mut transfer = vec![0; 32];
         transfer[..4].copy_from_slice(&4u32.to_le_bytes());
+        let before_read = Instant::now();
         send(&mut channel, handle, 4, 3, &transfer);
         master.write_all(b"ab").unwrap();
-        std::thread::sleep(Duration::from_millis(10));
-        assert!(
-            channel.poll().unwrap().is_empty(),
-            "partial read must wait for the configured interval"
-        );
+        // The worker runs independently. A sleeping observer can resume after
+        // the interval has correctly expired, so inspect positive completion
+        // and elapsed time instead of assuming an upper bound on sleep(10ms).
         let partial = completions(&mut channel, 1).pop().unwrap();
+        assert_eq!(value(&partial, 12), 0);
         assert_eq!(&partial[20..], b"ab");
+        assert!(before_read.elapsed() >= Duration::from_millis(25));
         let immediate: Vec<u8> = [u32::MAX, 0, 0, 0, 0]
             .into_iter()
             .flat_map(u32::to_le_bytes)

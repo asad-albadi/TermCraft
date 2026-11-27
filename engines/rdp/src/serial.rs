@@ -327,6 +327,28 @@ impl Pending {
         self.timeouts[0] == u32::MAX && self.timeouts[1] == u32::MAX
     }
 
+    // Keep deadline decisions separate from native I/O. Both read timeout modes
+    // return the bytes already received without touching the descriptor again.
+    fn complete_expired(&mut self, now: Instant) -> Option<Result<Vec<u8>, u32>> {
+        let interval_expired = self.last_byte.is_some_and(|last| {
+            self.timeouts[0] != 0
+                && self.timeouts[0] != u32::MAX
+                && now.duration_since(last) >= Duration::from_millis(self.timeouts[0] as u64)
+        });
+        if self.deadline.is_some_and(|deadline| now >= deadline) || interval_expired {
+            Some(match &mut self.transfer {
+                Transfer::Read(buffer) => {
+                    buffer.truncate(self.received);
+                    Ok(length_data(std::mem::take(buffer)))
+                }
+                Transfer::Write { written, .. } if *written != 0 => Ok(write_count(*written)),
+                Transfer::Write { .. } => Err(IO_TIMEOUT),
+            })
+        } else {
+            None
+        }
+    }
+
     fn try_io(&mut self, handle: &mut Handle) -> Option<Result<Vec<u8>, u32>> {
         let now = Instant::now();
         if !self.started {
@@ -346,20 +368,8 @@ impl Pending {
                 .saturating_add(constant as u64);
             self.deadline = (milliseconds != 0).then(|| now + Duration::from_millis(milliseconds));
         }
-        let interval_expired = self.last_byte.is_some_and(|last| {
-            self.timeouts[0] != 0
-                && self.timeouts[0] != u32::MAX
-                && now.duration_since(last) >= Duration::from_millis(self.timeouts[0] as u64)
-        });
-        if self.deadline.is_some_and(|deadline| now >= deadline) || interval_expired {
-            return Some(match &mut self.transfer {
-                Transfer::Read(buffer) => {
-                    buffer.truncate(self.received);
-                    Ok(length_data(std::mem::take(buffer)))
-                }
-                Transfer::Write { written, .. } if *written != 0 => Ok(write_count(*written)),
-                Transfer::Write { .. } => Err(IO_TIMEOUT),
-            });
+        if let Some(result) = self.complete_expired(now) {
+            return Some(result);
         }
         let immediate = self.immediate();
         let first_byte = self.first_byte_mode();
@@ -1196,6 +1206,74 @@ mod tests {
         assert_eq!(pending.try_io(&mut handle), Some(Ok(vec![0; 4])));
         handle.file.read_exact(&mut bytes).unwrap();
         assert_eq!(&bytes, b"kept");
+    }
+
+    #[test]
+    fn partial_serial_reads_complete_at_interval_and_total_timeout_boundaries() {
+        let (mut master, slave, _) = pty();
+        let mut attributes = get_attributes(&slave).unwrap();
+        unsafe { libc::cfmakeraw(&mut attributes) };
+        set_attributes(&slave, &attributes).unwrap();
+        let mut handle = Handle {
+            id: 1,
+            file: slave,
+            reads: true,
+            writes: true,
+            original: None,
+            original_modem: None,
+            modem_changed: false,
+            flow_changed: false,
+            break_changed: false,
+            events: Events::default(),
+            stats_baseline: None,
+            timeouts: [25, 0, 250, 0, 250],
+        };
+        let mut pending = Pending {
+            request: Vec::new(),
+            device: 1,
+            handle: 1,
+            transfer: Transfer::Read(vec![0; 4]),
+            deadline: None,
+            started: false,
+            cancelled: false,
+            received: 0,
+            last_byte: None,
+            timeouts: handle.timeouts,
+        };
+        master.write_all(b"ab").unwrap();
+        let limit = Instant::now() + Duration::from_secs(2);
+        while pending.received != 2 {
+            assert!(pending.try_io(&mut handle).is_none());
+            assert!(
+                Instant::now() < limit,
+                "partial bytes did not reach the PTY"
+            );
+            std::thread::yield_now();
+        }
+        let last_byte = pending.last_byte.unwrap();
+        // Exercise exact instants, independent of the test thread's scheduling.
+        pending.deadline = Some(last_byte + Duration::from_millis(250));
+        assert_eq!(
+            pending.complete_expired(last_byte + Duration::from_millis(24)),
+            None
+        );
+        assert_eq!(pending.received, 2);
+        assert_eq!(
+            pending.complete_expired(last_byte + Duration::from_millis(25)),
+            Some(Ok(length_data(b"ab".to_vec())))
+        );
+
+        // Disabling the inter-byte interval leaves the total timeout in force.
+        pending.transfer = Transfer::Read(b"ab\0\0".to_vec());
+        pending.timeouts[0] = 0;
+        assert_eq!(
+            pending.complete_expired(last_byte + Duration::from_millis(249)),
+            None
+        );
+        assert_eq!(
+            pending.complete_expired(last_byte + Duration::from_millis(250)),
+            Some(Ok(length_data(b"ab".to_vec())))
+        );
     }
 
     #[test]

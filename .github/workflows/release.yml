@@ -49,7 +49,19 @@ jobs:
       - shell: bash
         run: rustup toolchain install 1.96.1 --profile minimal && rustup default 1.96.1
       - if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y binutils libx11-dev libxkbcommon-dev libwayland-dev libegl1-mesa-dev libgl1-mesa-dev libgl1-mesa-dri xvfb xauth
+        name: Install Linux package and startup prerequisites
+        shell: bash
+        run: |
+          # These dependencies use signed Ubuntu sources; unrelated vendor
+          # repository failures must not prevent native package qualification.
+          termcraft_apt_sources=$(mktemp -d)
+          trap 'rm -rf -- "$termcraft_apt_sources"' EXIT
+          cp /etc/apt/sources.list.d/ubuntu.sources "$termcraft_apt_sources/ubuntu.sources"
+          termcraft_apt_options=(-o Dir::Etc::sourcelist=/dev/null -o "Dir::Etc::sourceparts=$termcraft_apt_sources")
+          sudo apt-get "${termcraft_apt_options[@]}" update
+          sudo apt-get "${termcraft_apt_options[@]}" install -y \
+            binutils libx11-dev libxkbcommon-dev libxkbcommon-x11-0 \
+            libwayland-dev libegl1-mesa-dev libgl1-mesa-dev libgl1-mesa-dri xvfb xauth
       - if: runner.os == 'Windows'
         shell: pwsh
         run: |
