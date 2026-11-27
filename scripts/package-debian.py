@@ -22,6 +22,7 @@ extract_tar = _archive_module.extract_tar
 
 ROOT = Path(__file__).resolve().parents[1]
 ARCHITECTURES = {"x86_64": "amd64", "aarch64": "arm64"}
+POLICY_DOCUMENTS = {"LICENSE": "copyright", "PRIVACY.md": "PRIVACY.md", "CREDITS.md": "CREDITS.md"}
 GRAPHICS = (
     "libegl1", "libgl1", "libwayland-client0", "libwayland-cursor0", "libwayland-egl1",
     "libxkbcommon0", "libxkbcommon-x11-0", "libx11-6", "libx11-xcb1", "libxcb1",
@@ -61,6 +62,12 @@ def extract_portable(archive, path):
         raise ValueError("Portable archive files differ from the manifest.")
     if not {"harbor-workspace", "termcraft-rdp-engine"}.issubset(hashes):
         raise ValueError("Portable archive lacks its program or RDP helper.")
+    for name in POLICY_DOCUMENTS:
+        if hashes.get(name) != file_digest(ROOT / name):
+            raise ValueError(f"Portable archive lacks or has a modified project policy: {name}")
+    licenses = manifest.get("licenses", {})
+    if licenses.get("project") != "LICENSE" or licenses.get("credits") != "CREDITS.md":
+        raise ValueError("Portable archive declares incorrect project license or credits paths.")
     return root, manifest
 
 
@@ -139,12 +146,20 @@ def package_debian(archive, output, debian_revision=None):
         for relative, source in (
             ("applications/org.termcraft.TermCraft.desktop", ROOT / "packaging/debian/org.termcraft.TermCraft.desktop"),
             ("pixmaps/termcraft.png", library / "assets/termcraft-logo.png"),
-            ("doc/termcraft/copyright", library / "CREDITS.md"),
+            *((f"doc/termcraft/{document}", library / name)
+              for name, document in POLICY_DOCUMENTS.items()),
         ):
             target = system / "usr/share" / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
         document_dir = system / "usr/share/doc/termcraft"
+        staged_hashes = {item.relative_to(system).as_posix(): file_digest(item)
+                         for item in sorted(system.rglob("*")) if item.is_file() and not item.is_symlink()}
+        for name, document in POLICY_DOCUMENTS.items():
+            expected = manifest["files"][name]
+            if (staged_hashes.get(f"opt/termcraft/{name}") != expected
+                    or staged_hashes.get(f"usr/share/doc/termcraft/{document}") != expected):
+                raise ValueError(f"Staged Debian project policy checksum mismatch: {name}")
         (document_dir / "debian-package-manifest.json").write_text(json.dumps({
             "portable_archive_sha256": file_digest(archive),
             "builder_sha256": file_digest(Path(__file__)),
@@ -152,6 +167,8 @@ def package_debian(archive, output, debian_revision=None):
             "version": version,
             "desktop_entry_sha256": file_digest(system / "usr/share/applications/org.termcraft.TermCraft.desktop"),
             "launcher": {"usr/bin/termcraft": "/opt/termcraft/harbor-workspace"},
+            # The control md5sums also covers this manifest itself.
+            "files": staged_hashes,
         }, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         control = work / "metadata"
         control.mkdir()

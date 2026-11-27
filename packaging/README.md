@@ -9,7 +9,10 @@ existing archive intact. The package contains the application, the adjacent
 headless RDP engine, artwork, font notices, crate notices, and a manifest with
 binary hashes and build input hashes, alongside both lockfiles. Crate metadata
 identifies upstream sources where published archives do not include notice text.
-The Windows ZIP includes and hashes the project MIT license and privacy policy.
+The Linux, Windows and Apple Silicon macOS archives include the project's MIT
+license, privacy policy, and credits byte-for-byte, with SHA-256 hashes in
+`PACKAGE-MANIFEST.json`. On macOS these files and the install guide are in
+`TermCraft.app/Contents/Resources`. The archives are unsigned.
 
 macOS release manifests also record the native architecture, Xcode SDK version,
 deployment-target policy, and compiler identity. A package without those fields
@@ -81,6 +84,10 @@ entry and icon. Its Depends field records the required glibc symbol baseline
 and graphics libraries. Build the portable archive on the oldest Debian-family
 system you intend to support. Install or remove with the distro's package manager
 on that system. Workspace settings stay in their existing per-user directories.
+Use the wrapper from the same source revision as the portable archive. Debian
+documentation under `/usr/share/doc/termcraft` includes the complete MIT text
+in `copyright`, alongside `PRIVACY.md` and `CREDITS.md`. Component notices
+remain in the packaged payload.
 
 ```sh
 python3 scripts/package-debian.py dist/TermCraft-0.1.0-linux-x86_64.tar.gz --output dist

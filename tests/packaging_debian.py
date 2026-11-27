@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import io
 import json
@@ -22,7 +23,10 @@ class DebianPackage(unittest.TestCase):
             root = Path(temporary).resolve()
             archive = root / "TermCraft-portable.tar.gz"
             files = {"harbor-workspace": b"app", "termcraft-rdp-engine": b"helper",
-                     "CREDITS.md": b"credits", "assets/termcraft-logo.png": b"logo"}
+                     "assets/termcraft-logo.png": b"logo",
+                     "licenses/component/NOTICE": b"component terms"}
+            policies = {name: (ROOT / name).read_bytes() for name in ("LICENSE", "PRIVACY.md", "CREDITS.md")}
+            files.update(policies)
             manifest = {
                 "platform": "linux", "architecture": "x86_64", "profile": "release",
                 "version": "0.1.0", "runtime": {"linked_libraries": {
@@ -31,6 +35,7 @@ class DebianPackage(unittest.TestCase):
                     "termcraft-rdp-engine": {"libraries": ["libc.so.6"],
                                              "highest_required_glibc_symbol_version": "2.34"},
                 }},
+                "licenses": {"project": "LICENSE", "credits": "CREDITS.md"},
                 "files": {name: debian.digest(data) for name, data in files.items()},
             }
             files["PACKAGE-MANIFEST.json"] = json.dumps(manifest).encode()
@@ -39,6 +44,29 @@ class DebianPackage(unittest.TestCase):
                     member = tarfile.TarInfo(f"TermCraft/{name}")
                     member.size = len(data)
                     bundle.addfile(member, io.BytesIO(data))
+            for label, changed, overrides in (
+                ("missing", "PRIVACY.md", {}),
+                ("forged-inventory", "LICENSE", {"LICENSE": b"altered license"}),
+                ("wrong-license-path", None, {}),
+            ):
+                with self.subTest(label=label):
+                    payload = {name: data for name, data in files.items()
+                               if name not in (changed, "PACKAGE-MANIFEST.json")}
+                    payload.update(overrides)
+                    altered = {**manifest, "files": {name: debian.digest(data) for name, data in payload.items()}}
+                    if label == "wrong-license-path":
+                        altered["licenses"] = {"project": "CREDITS.md", "credits": "CREDITS.md"}
+                    payload["PACKAGE-MANIFEST.json"] = json.dumps(altered).encode()
+                    malformed = root / (label + ".tar.gz")
+                    with tarfile.open(malformed, "w:gz") as bundle:
+                        for name, data in payload.items():
+                            member = tarfile.TarInfo(f"TermCraft/{name}")
+                            member.size = len(data)
+                            bundle.addfile(member, io.BytesIO(data))
+                    output = root / (label + "-out")
+                    with self.assertRaisesRegex(ValueError, changed or "license"):
+                        debian.package_debian(malformed, output)
+                    self.assertEqual(list(output.glob("*.deb")), [])
             package = debian.package_debian(archive, root / "out")
             revised = debian.package_debian(archive, root / "revised", debian_revision="1")
             self.assertEqual(revised.name, "termcraft_0.1.0-1_amd64.deb")
@@ -97,10 +125,25 @@ class DebianPackage(unittest.TestCase):
                 self.assertIn("libc6 (>= 2.43)", fields)
                 self.assertIn("libgcc-s1", fields)
                 self.assertNotIn("preinst", control.getnames())
+                md5sums = {path: digest for digest, path in
+                           (line.split("  ", 1) for line in control.extractfile("./md5sums").read().decode().splitlines())}
             with tarfile.open(fileobj=io.BytesIO(ar["data.tar.gz"])) as data:
                 self.assertEqual(data.extractfile("./opt/termcraft/termcraft-rdp-engine").read(), b"helper")
                 self.assertEqual(data.getmember("./opt/termcraft/harbor-workspace").mode, 0o755)
                 self.assertEqual(data.getmember("./usr/bin/termcraft").linkname, "/opt/termcraft/harbor-workspace")
+                doc = "usr/share/doc/termcraft/"
+                for name, destination in (("LICENSE", "copyright"), ("PRIVACY.md", "PRIVACY.md"),
+                                          ("CREDITS.md", "CREDITS.md")):
+                    self.assertEqual(data.extractfile("./" + doc + destination).read(), policies[name])
+                    self.assertEqual(data.extractfile("./opt/termcraft/" + name).read(), policies[name])
+                self.assertEqual(data.extractfile("./opt/termcraft/licenses/component/NOTICE").read(), b"component terms")
+                installed = {member.name.removeprefix("./"): data.extractfile(member).read()
+                             for member in data.getmembers() if member.isfile()}
+                self.assertEqual(md5sums, {path: hashlib.md5(contents).hexdigest()
+                                          for path, contents in installed.items()})
+                inventory = json.loads(installed.pop(doc + "debian-package-manifest.json"))
+                self.assertEqual(inventory["files"], {path: hashlib.sha256(contents).hexdigest()
+                                                      for path, contents in installed.items()})
                 desktop = data.extractfile("./usr/share/applications/org.termcraft.TermCraft.desktop").read()
                 self.assertIn(b"Exec=/usr/bin/termcraft", desktop)
                 self.assertFalse(any("workspace.json" in name or "home/" in name for name in data.getnames()))

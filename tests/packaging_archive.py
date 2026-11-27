@@ -54,8 +54,10 @@ class PortableArchive(unittest.TestCase):
 
     def test_valid_payload_and_special_modes(self):
         files = {'harbor-workspace': b'app', 'termcraft-rdp-engine': b'helper'}
-        manifest = {'platform': 'linux', 'profile': 'release', 'files': {
-            name: hashlib.sha256(data).hexdigest() for name, data in files.items()}}
+        files.update({name: (ROOT / name).read_bytes() for name in ('LICENSE', 'PRIVACY.md', 'CREDITS.md')})
+        manifest = {'platform': 'linux', 'profile': 'release',
+                    'licenses': {'project': 'LICENSE', 'credits': 'CREDITS.md'},
+                    'files': {name: hashlib.sha256(data).hexdigest() for name, data in files.items()}}
         files['PACKAGE-MANIFEST.json'] = json.dumps(manifest).encode()
         self.write([('TermCraft', tarfile.DIRTYPE, b'', 0o7777)] + [
             ('TermCraft/' + name, tarfile.REGTYPE, data, 0o7777) for name, data in files.items()])

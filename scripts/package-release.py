@@ -23,6 +23,8 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGES = (Path("Cargo.toml"), Path("engines/rdp/Cargo.toml"))
+PROJECT_POLICIES = tuple(Path(name) for name in ("LICENSE", "PRIVACY.md", "CREDITS.md"))
+MACOS_GUIDE = Path("packaging/macos/README.txt")
 ASSETS = tuple(Path("assets") / name for name in (
     "Interface.ttf", "Terminal.ttf", "Interface-LICENSE", "Terminal-LICENSE",
     "termcraft-mascot.png", "termcraft-logo.png",
@@ -99,7 +101,7 @@ def source_inputs(root):
     paths = [
         *PACKAGES, *(p.with_name("Cargo.lock") for p in PACKAGES),
         Path("engines/wayland/Cargo.toml"), Path("engines/wayland/Cargo.lock"),
-        Path("CREDITS.md"), Path("FEATURE_PARITY.md"), Path("LICENSE"), Path("PRIVACY.md"),
+        *PROJECT_POLICIES, Path("FEATURE_PARITY.md"),
         Path("scripts/package-release.py"), Path("scripts/package-debian.py"),
         Path("scripts/package-check-startup.py"), Path("scripts/portable_archive.py"),
         Path("scripts/build-release.sh"), *ASSETS,
@@ -710,6 +712,13 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
             raise ValueError("The optional Wayland helper requires the same native Linux architecture as the app.")
         if any(wayland_helper_binary.samefile(binary) for binary in binaries):
             raise ValueError("The Wayland helper must be distinct from the app and RDP helper.")
+    policy_paths = (*PROJECT_POLICIES, MACOS_GUIDE) if target == "macos" else PROJECT_POLICIES
+    policies = {path: regular_source(source, path) for path in policy_paths}
+    policy_hashes = {path: sha256(file) for path, file in policies.items()}
+    if build_inputs is not None:
+        for path, expected in policy_hashes.items():
+            if build_inputs.get(path.as_posix()) != expected:
+                raise ValueError(f"Frozen release policy checksum mismatch: {path}")
     basename = f"TermCraft-{version}-{target}-{arch}"
     if xwayland_archive is not None:
         basename += "-arch-xwayland"
@@ -813,10 +822,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         unix = stage_unix(source, resources, unix_cache, target, arch) if unix_cache is not None else None
         vnc_browser = stage_vnc_browser(source, resources)
         copy_release_assets(source, resources / "assets")
-        shutil.copyfile(source / "CREDITS.md", resources / "CREDITS.md")
-        if target == "windows":
-            for name in ("LICENSE", "PRIVACY.md"):
-                shutil.copyfile(regular_source(source, Path(name)), resources / name)
+        for path, file in policies.items():
+            shutil.copyfile(file, resources / path.name)
         for cargo in PACKAGES:
             relative = cargo.with_name("Cargo.lock")
             destination = resources / "build-source" / relative
@@ -866,6 +873,12 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         notices = cargo_notices(resources, arch, target, source, cargo_settings,
                                 (Path("engines/wayland/Cargo.toml"),) if wayland is not None else ())
         inputs = source_inputs(source)
+        files = {p.relative_to(root).as_posix(): sha256(p) for p in sorted(root.rglob("*"))
+                 if not p.is_symlink() and p.is_file()}
+        for path, expected in policy_hashes.items():
+            staged = (resources / path.name).relative_to(root).as_posix()
+            if inputs.get(path.as_posix()) != expected or files.get(staged) != expected:
+                raise ValueError(f"Release policy checksum mismatch: {path}")
         if build_inputs is not None and inputs != build_inputs:
             raise ValueError("Frozen source snapshot changed during the release build.")
         manifest = {
@@ -881,12 +894,11 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
                 "cargo": capture("cargo", "--version", **cargo_settings).strip() if build_inputs is not None else None,
                 "rustc": capture("rustc", "--version", **cargo_settings).strip() if build_inputs is not None else None,
             },
-            "licenses": {"project": "LICENSE" if target == "windows" else None,
+            "licenses": {"project": (resources / "LICENSE").relative_to(root).as_posix(),
                          "credits": (resources / "CREDITS.md").relative_to(root).as_posix(),
                          "crate_notice_paths_relative_to": resources.relative_to(root).as_posix(),
                          "crates": notices},
-            "files": {p.relative_to(root).as_posix(): sha256(p) for p in sorted(root.rglob("*"))
-                      if not p.is_symlink() and p.is_file()},
+            "files": files,
         }
         if macos_browser_fixture is not None:
             manifest["profile"] = "qualification"
