@@ -1,0 +1,20 @@
+{
+  "captured_on": "2026-11-27",
+  "platform": "Linux x86-64",
+  "source_commit": "6571b95a0489f350680c969b75617a0377254cd4",
+  "workflow_run": 45974136835,
+  "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
+  "archive_sha256": "8d1d3a88e68cb7a9bfb351d977c3888f77fefbdbf5670c8d8cf7332aab02533f",
+  "width": 1920,
+  "height": 1080,
+  "scope": "Real app UI; isolated demo bookmarks; software-rendered X11; no remote connections",
+  "screenshots": {
+    "files-light.png": "9ff3d749af3c037207e44fb1b412c1698ffee7f08c83d36936651bf913a26a69",
+    "servers-light.png": "ae7112dbe13d8c742b95dba6a9ca39d45f5460e36bffd812b0cde9c6300da26b",
+    "settings-light.png": "28cd8f115f106e21bcbbf67fbaea3da3ae9e3b93a73965762617b4818c6a97c3",
+    "terminal-dark.png": "53917b06f6359158a32b9006a25aeec2f80a207ccd268f2a4441896153adf739",
+    "tools-dark.png": "9750c4941b85bb5488b533cb92848105b6a739594f48cef183ebdac95ff45fd3",
+    "workspace-dark.png": "2d53458fd27ac82fe389b54891785f1ec8e861aa8f1eb47fd4b3ff1a51680b0b",
+    "workspace-light.png": "ad46ce8e44135ce030c0efaade88c35c8917b907cda932fcf755bb16b989c744"
+  }
+}

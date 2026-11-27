@@ -13,6 +13,8 @@
 <p align="center">
   <img alt="Built with Rust" src="https://img.shields.io/badge/built_with-Rust-b7410e?style=flat-square&amp;logo=rust">
   <img alt="Platform: Linux" src="https://img.shields.io/badge/platform-Linux-00a884?style=flat-square&amp;logo=linux&amp;logoColor=white">
+  <img alt="Platform: Windows x64" src="https://img.shields.io/badge/platform-Windows-00a884?style=flat-square&amp;logo=windows&amp;logoColor=white">
+  <img alt="Platform: macOS Apple Silicon" src="https://img.shields.io/badge/platform-macOS-00a884?style=flat-square&amp;logo=apple&amp;logoColor=white">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-3a3a3a?style=flat-square"></a>
   <img alt="Status: early alpha" src="https://img.shields.io/badge/status-early%20alpha-d69e2e?style=flat-square">
 </p>
@@ -31,15 +33,13 @@
 </p>
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="shots/termcraft-dark.png">
-    <img src="shots/now.png" alt="TermCraft's penguin-branded desktop workspace with emerald accents, a session sidebar, quick connect and terminal tabs" width="100%">
-  </picture>
+  <a href="shots/termcraft-mockup.png"><img src="shots/termcraft-mockup.png" alt="TermCraft emerald presentation with the real dark terminal and light session workspace" width="100%"></a>
   <br>
-  <sub>TermCraft in light and dark appearances. System mode follows the desktop preference.</sub>
+  <sub>Actual Linux app captures with example sessions. Linux, Windows x64 and Apple Silicon macOS are the current targets.</sub>
 </p>
 
 <p align="center">
+  <a href="#screenshots">Screenshots</a> ·
   <a href="#features">Features</a> ·
   <a href="#get-started">Get started</a> ·
   <a href="docs/USAGE.md">User guide</a> ·
@@ -49,6 +49,27 @@
   <a href="#license-and-credits">License and credits</a> ·
   <a href="PRIVACY.md">Privacy policy</a>
 </p>
+
+## Screenshots
+
+Click any image to open the original **1920 × 1080** capture. These are real Linux captures of the current app, using an isolated demo workspace; saved remote connections are examples. Platform support and remaining qualification limits are listed below.
+
+| Light workspace | Dark workspace |
+| --- | --- |
+| [![Light session workspace](shots/full-hd/workspace-light.png)](shots/full-hd/workspace-light.png) | [![Dark session workspace](shots/full-hd/workspace-dark.png)](shots/full-hd/workspace-dark.png) |
+| **Local terminal** | **Files** |
+| [![Running local terminal in dark mode](shots/full-hd/terminal-dark.png)](shots/full-hd/terminal-dark.png) | [![Local file browser in light mode](shots/full-hd/files-light.png)](shots/full-hd/files-light.png) |
+| **Tools** | **Settings** |
+| [![Network tools and runtime providers](shots/full-hd/tools-dark.png)](shots/full-hd/tools-dark.png) | [![Workspace settings in light mode](shots/full-hd/settings-light.png)](shots/full-hd/settings-light.png) |
+
+<details>
+  <summary>Servers</summary>
+
+[![Local sharing and server controls](shots/full-hd/servers-light.png)](shots/full-hd/servers-light.png)
+
+</details>
+
+[Capture details and mockup source](shots/README.md).
 
 ## Features
 
