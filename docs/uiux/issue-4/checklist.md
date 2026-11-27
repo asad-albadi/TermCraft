@@ -2,7 +2,7 @@
 
 Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over Fluent 2. The boxes in the component sections record software disposition. Each corresponding route, retained behavior and level of evidence appears in the [validation record](validation.md). The verification section tracks independent gates. Human acceptance is outstanding. Feature parity remains 46/60.
 
-**Human review rejected the current build on 2026-11-27.** The previous checks below record technical work on that build, not acceptance. [Correction checklist](human-review-correction.md) is active: simplify session creation and terminal/sidebar controls, provide help on demand, fix viewport scrollbars and organize settings/games/detached layouts. The corrective implementation and scoped independent review are now recorded in that checklist; current-source platform CI and owner acceptance remain open.
+**Human review rejected the current build on 2026-11-27.** The previous checks below record technical work on that build, not acceptance. [Correction checklist](human-review-correction.md) is active: simplify session creation and terminal/sidebar controls, provide help on demand, fix viewport scrollbars and organize settings/games/detached layouts. The corrected implementation, scoped independent review and final three-platform CI/package checks are recorded in that checklist. Owner acceptance remains open.
 
 **Merge hold:** keep PR #8 open until the owner completes full human checks and explicitly approves merging.
 
@@ -15,7 +15,7 @@ Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over 
 | 2. Shell/navigation/tabs/splits | Independently reviewed at `b77581a` | Seventeen actual-source component tests, strict remote-pane loading/ready probe and app type check passed; dedicated name/theme bar removed |
 | 3. Dialogs and protocol forms | Independently reviewed through acc3132 | Twenty-five focused production UI/PTY/protocol cases, eight shared components and actual SSH/Local native previews; readable aligned fields, accessible labels, scoped input ownership and safe recovery workflows |
 | 4. Specialist pages and web shell | Independently reviewed through 8f4e0ac | Forty-two focused production tests, actual Chromium appearance checks, native previews; folder/file-type icons in local, SSH/SFTP and FTP explorers |
-| Human-review correction | Source `72db3f4`, reviewed guidance fix `8c50a01` | 74 focused cases plus seven overlapping covering cases; native normal/ultrawide/compact/detached captures; independent review approved. Full CI additionally caught the shared read-only heading; `6e58b3c` restores it and passes nine covering cases. Current-source CI and owner acceptance pending |
+| Human-review correction | Source `72db3f4`, reviewed guidance fix `8c50a01` | 74 focused cases plus seven overlapping covering cases; native normal/ultrawide/compact/detached captures; independent review approved. Full CI additionally caught the shared read-only heading; `6e58b3c` restores it and passes nine covering cases. Final source `df5dbb8` passed all three native CI lanes and package jobs; [build identities](human-builds.json). Owner acceptance pending |
 | 5. Integrated visual/interaction verification | Local evidence collected | [Validation record](validation.md), [original screenshots](captures/manifest.json) and [baseline](before/manifest.json). Hosted and human gates below |
 
 A checked component has a recorded change or retention decision. Consult the validation record for the distinction between source inspection, actual production interaction and native pixels.
@@ -115,7 +115,7 @@ A checked component has a recorded change or retention decision. Consult the val
 - [ ] Human checks — owner explicitly required before merge
 
 
-### Current-source checks
+### Earlier implementation checks (`c2dded6`)
 
 The integrated Linux suite on `c2dded6` passed 61 production cases. The separate shared-component suite passed all ten cases. It used the existing pre-adapter graphics dependencies. The native screenshots cover the three theme selections and three real window scales on an isolated X11 display. The browser checks exercised the actual app-owned noVNC assets in Chromium. See the [capture manifest](captures/manifest.json) and [validation record](validation.md) for exact scope.
 
@@ -124,3 +124,15 @@ The integrated Linux suite on `c2dded6` passed 61 production cases. The separate
 The detached-client correction includes a real native-child regression and [Light](captures/detached-light-100.png) and [Dark](captures/detached-dark-100.png) evidence at 360×260. The History label measured 15.23:1 and 15.62:1 respectively, up from 1.35:1 in the original System/Light capture.
 
 - [x] Packaged Linux visual checks and [full-HD gallery](../../../shots/README.md), including detached contrast, session form and filename glyph fallback.
+
+### Final correction checks (`df5dbb8`)
+
+- [x] Final correction source passed Linux x86-64, Windows x64 and Apple Silicon macOS CI.
+- [x] Separate unsigned-build regression matrix passed on all three platforms.
+- [x] All three native core package startup/lifecycle jobs passed; downloaded payloads match their source and SHA-256 inventories.
+- [x] Linux AppImage, corresponding-source, X11, native Wayland and Debian/per-user lifecycle checks passed.
+- [x] Combined three-platform package inventory passed; publication was skipped.
+- [x] Local Linux launcher points to the exact verified final core package; earlier runtime directories remain intact.
+- [ ] Owner completes the [corrected-build review](human-review-correction.md#owner-review-of-the-corrected-build) and explicitly approves merging PR #8.
+
+See [exact build identities](human-builds.json) and [final correction evidence](human-review-correction.md#final-automated-platform-checks). The one Mac vault-wait timeout, its unchanged-source successful rerun and the independent successful package regression are recorded there. This UI correction does not increase the recorded 46/60 feature-parity count.

@@ -11,6 +11,31 @@ C1 Session creation: default simple essentials first, protocol chooser with exis
 C2 Main workspace: terminal gets one compact action row; move always-visible profile/highlight/split-layout/history diagnostics into appropriate More/settings popup. MultiExec only when activated, retain explicit targets/safety. Preserve pane identity/focus with less decoration for sole pane. Sidebar quickconnect/search/tree, one empty state, shared sources manager and keyboard instructions in overflow/help rather than permanent text blocks.
 C3 Page layout: vertical scrollbar at right edge of its own full-width viewport, dedicated gutter with no content overlap. Readable content cap INSIDE full-width viewport, not enclosing ScrollArea natural-width shrink. Settings category navigation/equal-width organization and concise help. Games fills whole client background, responsive launcher grid rather than narrow 13-button column. Detached window compact reattach/overflow actions, native title for identity, history hidden by default. No changes to game logic, dirty guards, terminal renderer, identifiers, trust, credential storage.
 
+
+## Final automated platform checks
+
+Source `df5dbb8` passed [native CI on all three platforms](https://github.com/asad-albadi/TermCraft/actions/runs/46049020536). The [unsigned candidate workflow](https://github.com/asad-albadi/TermCraft/actions/runs/46049050604) separately passed all three regression lanes and all three native package jobs. The downloaded Linux, Windows x64 and Apple Silicon macOS distribution files match their candidate source IDs and SHA-256 inventories; [human-builds.json](human-builds.json) records those exact identities. The [combined inventory check](https://github.com/asad-albadi/TermCraft/actions/runs/46049050604/job/140691982468) passed, and publication was skipped. These are unsigned core builds, not new production optional-provider bundles.
+
+The first standalone Mac attempt timed out at the original 20-second asynchronous vault-unlock wait, before the added nested-dialog assertions. Both the separate package-workflow regression and the isolated failed-job rerun passed on unchanged source, including that case. The failed attempt remains recorded; no timeout was widened and no security assertion was removed.
+
+No release or tag was created. PR #8 remains draft, open and unmerged. Owner visual, physical-device and assistive-technology acceptance is still outstanding.
+
+## Latest qualified Linux build
+
+The final Linux candidate is source `df5dbb8e260e84aca2e25d7ae19c112233cab97f`, produced by [package job 140678056174](https://github.com/asad-albadi/TermCraft/actions/runs/46049050604/job/140678056174). Core startup on X11 and native Wayland, Debian/per-user lifecycle, the AppImage and corresponding-source checks passed. All four distribution hashes, 643 Git source inputs and 1,097 extracted package files were independently verified after downloading [artifact 15225052570](https://github.com/asad-albadi/TermCraft/actions/runs/46049050604/artifacts/15225052570).
+
+- Core archive SHA-256: `b54927c430c2afb602f8215051511894419010a9870b766c79a81cda581e932d`.
+- Executable SHA-256: `ab2b02c1628a565bb0b1235197a06c2710527777a8210e8a42b366850891be46`.
+- AppImage SHA-256: `755edc4ff76b7195c68a1f787ebf06dd4f1cb175cefec82dae372616937b4703`.
+
+Close older TermCraft instances, then run the local launcher below. It opens the verified native archive, preserving the previous runtime directories and avoiding the separately documented host-specific AppImage Wayland compatibility problem.
+
+```bash
+"/home/asad/.codex/worktrees/termcraft-issue-3/app/target/issue-4/run-latest-linux"
+```
+
+The fourteen current gallery/correction images retain their actual `f599000` core identity. That source includes the same final UI; the Linux candidate above additionally contains the packaging inventory and test portability repairs. The screenshots have not been relabeled as captures of another binary.
+
 ## Status
 
 - [x] Simplify session creation and contextual help.
@@ -18,14 +43,14 @@ C3 Page layout: vertical scrollbar at right edge of its own full-width viewport,
 - [x] Correct full viewport scrolling, settings and games layouts.
 - [x] Inspect real native previews at normal, ultrawide and compact sizes.
 - [x] Pass focused regression checks and independent review.
-- [ ] Produce updated human-check builds.
+- [x] Produce updated human-check builds for Linux, Windows x64 and Apple Silicon macOS.
 - [ ] Owner completes human checks; merging remains prohibited.
 
-## Current native development previews
+## Historical native development previews
 
 Correction source: `72db3f4078af03cca728a1853387165875a20dc2`. [Eight original captures and source/binary identity](captures/human-correction/manifest.json) record the actual running development UI at Full HD, ultrawide, compact and detached sizes. These use a source-verified cached library with prior native-adapter dependencies. They are not packaged-build, physical hardware, screen-reader or owner acceptance evidence. The prior c2 packages do not contain these corrections.
 
-The controller directly inspected the simple SSH/RDP pages, full-width scroll viewport, categorized settings, compact terminal, detached controls and centered games catalog. During that inspection, the first games layout and clipped compact RDP port were returned and corrected. Independent review approved the correction and the final legacy-protocol guidance fix. The source `72db3f4` passed 74 focused cases; the six-line wording correction `8c50a01` passed seven covering cases. These case sets overlap. Current-source hosted CI and updated distribution packages remain pending.
+The controller directly inspected the simple SSH/RDP pages, full-width scroll viewport, categorized settings, compact terminal, detached controls and centered games catalog. During that inspection, the first games layout and clipped compact RDP port were returned and corrected. Independent review approved the correction and the final legacy-protocol guidance fix. The source `72db3f4` passed 74 focused cases; the six-line wording correction `8c50a01` passed seven covering cases. These case sets overlap. At that checkpoint, current-source hosted CI and updated distribution packages were pending; see the latest qualification above.
 
 ![Simple RDP form at 640×480](captures/human-correction/session-rdp-dark-compact.png)
 
@@ -53,7 +78,7 @@ Native inspection of the core preview found no visible thumb-hover change. Corre
 
 The AppImage builder's obsolete Alpine dependency pin is repaired at `c601692`: the exact pin now matches the live official `libffi=3.8.2-r0` provider. The original failure was reproduced against the pinned base image; the updated full builder and offline exact-version checks passed. All six AppImage contract methods passed, with the finished-artifact class correctly skipped until an AppImage and source sidecar exist. Scoped independent review approved the pin update. Fresh full CI and unsigned packages will verify the final source together; no release or merge is authorized.
 
-The verified earlier Linux core can be opened locally with `target/issue-4/run-latest-linux` after closing the older application instance. It contains the decluttered forms and screens and passed a separate startup screenshot on the owner's Wayland host without an environment workaround. The current final package build adds the last scrollbar feedback adjustment and packaging repair.
+The earlier Linux core contained the decluttered forms and screens and passed a separate startup screenshot on the owner's Wayland host without an environment workaround. The launcher now targets the qualified Linux candidate above, including the final scrollbar feedback adjustment and packaging repairs. The earlier host screenshot remains evidence for its original binary only.
 
 ## Complete AppImage source-inventory repair
 
@@ -64,3 +89,15 @@ A complete local AppImage and matching source archive were built and verified us
 The added pin/inventory guard now compares canonical LF declaration text so Windows CRLF checkouts do not create false mismatches. The exact failing Windows digest was reproduced locally with a temporary CRLF checkout, then both LF and CRLF cases passed. Corresponding-source and runtime file checks remain raw-byte strict. The full eleven produced-image/contract tests passed again after this portability repair.
 
 [Current final-UI core captures](captures/final-linux-core/manifest.json) and the README gallery now record the actual f599000 core, including visible hover and held scrollbar feedback. These fourteen images preserve their diagnostic-core provenance, source and hashes, while the latest hosted package run remains separately tracked.
+
+## Owner review of the corrected build
+
+Keep these unchecked until the owner has inspected the running app. Automated or developer visual checks cannot approve these items.
+
+- [ ] New SSH/RDP session: the initial page shows the essential connection fields; advanced, network, terminal and bookmark options are easy to find, and switching sections keeps entered values.
+- [ ] Scroll long forms and pages: the scrollbar stays at the right edge of its viewport, clears the content and visibly responds to hover and drag. Resize the window and repeat.
+- [ ] Terminal and sidebar: everyday actions remain easy to reach, with profile/history/layout settings and longer guidance available on demand.
+- [ ] Settings, games and detached terminal: spacing, navigation, backgrounds and action placement feel consistent at normal and smaller sizes.
+- [ ] Light, Dark and System: controls, text, focus, hover and selection remain readable; explorer icons distinguish folders and file types.
+- [ ] Keyboard and safety: navigate the new-session form, dismiss nested dialogs and cancel closing active work without losing the session or draft.
+- [ ] Owner explicitly approves merging PR #8 after completing the checks.

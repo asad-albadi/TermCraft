@@ -136,3 +136,11 @@ The rejected c2 UI is superseded by the correction documented in [human-review-c
 
 
 Final delta: `106bce9` adds visible thumb hover/drag feedback inside a fixed 14-DIP gutter, verified by actual egui input/paint and native pixels at both desktop widths and both motion settings. `c601692` repairs the exact Alpine builder dependency pin using the live signed repository provider; the rebuilt container and contract checks passed. Both scoped reviews approved these bounded fixes. Full current-source CI and native packages remain the final automated gate before owner human acceptance.
+
+## Final correction qualification
+
+The corrected source `df5dbb8e260e84aca2e25d7ae19c112233cab97f` passed [three-platform CI](https://github.com/asad-albadi/TermCraft/actions/runs/46049020536). All three separate regression lanes and all three unsigned core package jobs passed in [the final candidate workflow](https://github.com/asad-albadi/TermCraft/actions/runs/46049050604). The downloaded distribution payloads match their source IDs and SHA-256 inventories, recorded in [human-builds.json](human-builds.json). The combined inventory job `140691982468` passed and publication was skipped. Linux additionally matched all 643 source inputs and 1,097 extracted files, with startup, Wayland and lifecycle evidence bound to the same archive hash.
+
+The original standalone Mac attempt failed the existing 20-second asynchronous vault-unlock wait before the new nested-dialog assertions. Its isolated failed-job rerun and the independent package regression both passed on the same source. The first failure is not erased or attributed to an unproven cause; no production change or relaxed security assertion was used to obtain the rerun.
+
+The current fourteen full-adapter gallery/correction originals retain the actual f599000 core provenance and include the final scrollbar interaction. The final df5dbb8 candidate adds the packaging-inventory and cross-platform test repairs; those source changes do not relabel earlier screenshots. The remaining scope and owner checks are in [human-review-correction.md](human-review-correction.md). PR #8 remains draft and unmerged; no release or tag is authorized.
