@@ -133,3 +133,6 @@ The native file and directory pickers, OS permission prompts, window decorations
 ## Human-review correction platform verification
 
 The rejected c2 UI is superseded by the correction documented in [human-review-correction.md](human-review-correction.md). Full CI 46037789416 passed all three native jobs at `9c6f10c` (production/UI source `6e58b3c`). The duplicate Linux package regression passed 275 application UI cases but exposed the pre-existing scheduler snapshot race, addressed solely in the test fixture at `abd621e` with all original bounds preserved. Its scoped review and 30-repeat check passed; current-head full CI and native package completion are tracked separately. Published correction development captures retain their recorded source/binary identities and limitations.
+
+
+Final delta: `106bce9` adds visible thumb hover/drag feedback inside a fixed 14-DIP gutter, verified by actual egui input/paint and native pixels at both desktop widths and both motion settings. `c601692` repairs the exact Alpine builder dependency pin using the live signed repository provider; the rebuilt container and contract checks passed. Both scoped reviews approved these bounded fixes. Full current-source CI and native packages remain the final automated gate before owner human acceptance.
