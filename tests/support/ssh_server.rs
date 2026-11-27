@@ -6,13 +6,13 @@ use std::{
     process::{Child, Command, Stdio},
     time::{Duration, Instant},
 };
-
+// OpenSSH installs in sbin on Ubuntu/macOS and bin on Arch. Use an
+// installed absolute path: sshd rejects a relative argv[0] during re-exec.
 fn sshd_path() -> &'static str {
-    if cfg!(target_os = "macos") {
-        "/usr/sbin/sshd"
-    } else {
-        "/usr/bin/sshd"
-    }
+    ["/usr/sbin/sshd", "/usr/bin/sshd"]
+        .into_iter()
+        .find(|path| std::path::Path::new(path).is_file())
+        .expect("Install the OpenSSH server fixture (/usr/sbin/sshd or /usr/bin/sshd)")
 }
 
 // A live socket protects selection; a logical claim protects the interval after
