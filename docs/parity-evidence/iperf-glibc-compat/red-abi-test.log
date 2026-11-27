@@ -1,0 +1,21 @@
+FF
+======================================================================
+FAIL: test_engines_keep_the_debian12_glibc_baseline (__main__.IperfStaging.test_engines_keep_the_debian12_glibc_baseline) (tool='iperf2')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/work/tests/packaging_iperf.py", line 42, in test_engines_keep_the_debian12_glibc_baseline
+    self.assertLessEqual(max(required), (2, 36), f'{tool} exceeds the Debian 12 glibc baseline')
+AssertionError: (2, 43) not less than or equal to (2, 36) : iperf2 exceeds the Debian 12 glibc baseline
+
+======================================================================
+FAIL: test_engines_keep_the_debian12_glibc_baseline (__main__.IperfStaging.test_engines_keep_the_debian12_glibc_baseline) (tool='iperf3')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/work/tests/packaging_iperf.py", line 42, in test_engines_keep_the_debian12_glibc_baseline
+    self.assertLessEqual(max(required), (2, 36), f'{tool} exceeds the Debian 12 glibc baseline')
+AssertionError: (2, 38) not less than or equal to (2, 36) : iperf3 exceeds the Debian 12 glibc baseline
+
+----------------------------------------------------------------------
+Ran 1 test in 0.007s
+
+FAILED (failures=2)
