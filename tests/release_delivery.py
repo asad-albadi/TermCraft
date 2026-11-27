@@ -139,7 +139,8 @@ class ReleaseDelivery(unittest.TestCase):
         self.debian_name = f"termcraft_{self.version}_amd64.deb"
 
     def platform_bundle(self, platform, *, profile="release", blank=False, optional=False,
-                        wrong_file=False, wrong_helper=False, mismatched_startup=False, notice_forgery=None):
+                        wrong_file=False, wrong_helper=False, mismatched_startup=False, notice_forgery=None,
+                        macos_toolchain_extra=None):
         arch = "aarch64" if platform == "macos" else "x86_64"
         basename = f"TermCraft-{self.version}-{platform}-{arch}"
         case = Path(tempfile.mkdtemp(dir=self.work))
@@ -227,6 +228,8 @@ class ReleaseDelivery(unittest.TestCase):
         }
         if platform == "macos":
             build["macos"] = {"architecture": "aarch64", "deployment_target": "14.0", "compiler": "Apple clang", "sdk_version": "15.0"}
+            if macos_toolchain_extra:
+                build["macos"].update(macos_toolchain_extra)
         write_json(resources / "PACKAGE-MANIFEST.json", dict(
             schema_version=1, application="TermCraft", version=self.version, profile=profile,
             rdp_helper_version=self.rdp_version, platform=platform, architecture=arch, signing="unsigned",
@@ -601,6 +604,61 @@ class ReleaseDelivery(unittest.TestCase):
         write_json(inventory, value)
         with self.assertRaisesRegex(ValueError, "launch record"):
             self.release.assemble(self.root, self.source, self.version, candidates, self.work / "rejected")
+
+    def test_lifecycle_launch_records_require_exact_exit_and_screenshot_types(self):
+        case, _ = self.platform_bundle("windows")
+        evidence = case / "lifecycle-evidence"
+        record = evidence / "windows-install-baseline-workspace-launch.json"
+        original = json.loads(record.read_text())
+        for field, swapped in (("exit_code", False), ("screenshot_preexisting", 0)):
+            with self.subTest(field=field):
+                write_json(record, {**original, field: swapped})
+                output = case / f"rejected-{field}"
+                with self.assertRaisesRegex(ValueError, "launch record"):
+                    self.release.stage_candidate(self.root, self.source, self.version, "windows", case / "dist",
+                                                 case / "startup-evidence", output, evidence)
+                self.assertFalse(output.exists())
+
+    def test_only_public_native_evidence_is_staged_and_assembled(self):
+        case, _ = self.platform_bundle("linux")
+        marker = "not-for-release-fixture-diagnostic"
+        directories = ("startup-evidence", "lifecycle-evidence", "wayland-evidence",
+                       "appimage-x11-evidence", "appimage-wayland-evidence")
+        for name in directories:
+            path = case / name / "verification.json"
+            value = json.loads(path.read_text())
+            value["extra_diagnostic"] = marker
+            if name == "lifecycle-evidence":
+                value["stages"][0]["extra_diagnostic"] = marker
+                value["stages"][0]["paths"]["extra_diagnostic"] = marker
+                value["debian"]["baseline"]["extra_diagnostic"] = marker
+            if "wayland" in name:
+                value["weston"]["extra_diagnostic"] = marker
+            write_json(path, value)
+
+        candidate = case / "candidate-linux-amd64"
+        self.release.stage_candidate(self.root, self.source, self.version, "linux", case / "dist",
+                                     case / "startup-evidence", candidate, case / "lifecycle-evidence",
+                                     case / "wayland-evidence")
+        for name in directories:
+            self.assertIn(marker, (candidate / name / "verification.json").read_text())
+        candidates = [candidate, self.candidate("windows")[0], self.candidate("macos")[0]]
+        output = self.work / "assembled"
+        self.release.assemble(self.root, self.source, self.version, candidates, output)
+        for inventory in (candidate / "candidate.json", output / "release-inventory.json"):
+            with self.subTest(inventory=inventory.name):
+                raw = inventory.read_text()
+                self.assertNotIn(marker, raw)
+                self.assertNotIn("extra_diagnostic", raw)
+                for name in directories:
+                    self.assertIn(digest(candidate / name / "verification.json"), raw)
+
+    def test_macos_toolchain_inventory_excludes_unknown_fields(self):
+        marker = "private-macos-toolchain-diagnostic"
+        candidate, _ = self.candidate("macos", macos_toolchain_extra={"extra_diagnostic": marker})
+        raw = (candidate / "candidate.json").read_text()
+        self.assertNotIn(marker, raw)
+        self.assertEqual(json.loads(raw)["package_manifest"]["build"]["macos"]["compiler"], "Apple clang")
 
     def test_candidate_rejects_unverified_policies_noncore_and_false_startup(self):
         for changes, message in [

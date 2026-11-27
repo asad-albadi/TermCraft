@@ -208,7 +208,9 @@ fn scan_detects_either_pattern_in_nested_sidecars_across_chunks() {
     fs::write(&sidecar, b"unrelated data").unwrap();
     assert!(!contains_plaintext(root.path(), patterns));
     for pattern in patterns {
-        let mut bytes = vec![b'X'; 65530];
+        // The first read can hold 65,536 bytes plus 63 bytes of overlap.
+        // Split this pattern evenly across that 65,599-byte boundary.
+        let mut bytes = vec![b'X'; 65_599 - pattern.len() / 2];
         bytes.extend_from_slice(pattern);
         fs::write(&sidecar, bytes).unwrap();
         assert!(contains_plaintext(root.path(), patterns));

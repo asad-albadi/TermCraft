@@ -306,7 +306,7 @@ def verify_portable(root, archive, platform, versions, inputs, work):
         value = build["macos"]
         require(value["architecture"] == "aarch64" and value["deployment_target"] == "14.0"
                 and value["compiler"].strip() and value["sdk_version"].strip(), "Invalid macOS toolchain identity")
-        identity["macos"] = value
+        identity["macos"] = {key: value[key] for key in ("architecture", "deployment_target", "compiler", "sdk_version")}
     expected_notices = expected_dependency_notices(root, platform, work)
     core_layout(root, package, files, links, manifest, platform, versions, expected_notices)
     return {"name": manifest_path.relative_to(package).as_posix(),
@@ -393,9 +393,10 @@ def verify_startup(root, directory, archive, digest, platform, expected_backend=
     entries = regular_entries(directory)
     require(set(entries) == STARTUP_FILES, "Startup evidence is incomplete or has unexpected files")
     observed = read_json(entries["verification.json"])
+    backend = expected_backend or ("X11" if platform == "linux" else platform)
     require(observed["archive"] == archive and observed["archive_sha256"] == digest
             and observed["manifest_schema"] == 1 and observed["platform"] == platform
-            and observed["display_backend"] == (expected_backend or ("X11" if platform == "linux" else platform))
+            and observed["display_backend"] == backend
             and observed["start_environment"] == "relocated package, empty PATH, isolated workspace, existing native display"
             and observed["rdp_helper_wire_version"] == 1 and observed["rdp_helper_child_location_verified"] is True
             and observed["rdp_session"] == "Received initial RDP negotiation on a loopback-only fixture; workspace preserved"
@@ -404,14 +405,20 @@ def verify_startup(root, directory, archive, digest, platform, expected_backend=
             "Startup observations do not match this archive, platform and helper checks")
     expected_gl = read_json(root / "tests/windows-software-gl.json")["files"] if platform == "windows" else None
     require(observed["windows_software_gl_fixture"] == expected_gl, "Unexpected startup graphics fixture")
-    require(png_observation(entries["startup.png"]) == observed["screen_size"], "Startup screenshot size mismatch")
+    screen_size = png_observation(entries["startup.png"])
+    require(screen_size == observed["screen_size"], "Startup screenshot size mismatch")
     packet = entries["rdp-helper.log"].read_bytes()
     end = 5 + int.from_bytes(packet[1:5], "big")
     require(len(packet) >= end and packet[:1] == b"\x01" and end > 5
             and json.loads(packet[5:end]) == {"Ready": {"version": 1}},
             "Startup RDP helper handshake is missing or invalid")
     require(b"TermCraft remote workspace" in entries["help.log"].read_bytes(), "Missing packaged CLI startup result")
-    return {"observation": observed, "files": {name: sha256(path) for name, path in entries.items()}}
+    # Raw observations are private input for backend-specific checks only. The
+    # inventory gets an explicit summary plus hashes of the original evidence.
+    summary = {"archive": archive, "archive_sha256": digest, "platform": platform,
+               "display_backend": backend, "screen_size": screen_size,
+               "rdp_helper_wire_version": 1, "rdp_helper_child_location_verified": True}
+    return observed, {"observation": summary, "files": {name: sha256(path) for name, path in entries.items()}}
 
 
 FIXTURE_FILES = {
@@ -613,7 +620,10 @@ def verify_native_evidence(root, lifecycle, wayland, platform, source, version, 
                     observed_launch = read_json(entries[record])
                 except ValueError as error:
                     raise ValueError(f"Invalid lifecycle launch record: {stem}") from error
-                require(observed_launch == {
+                require(isinstance(observed_launch, dict)
+                        and type(observed_launch.get("exit_code")) is int
+                        and type(observed_launch.get("screenshot_preexisting")) is bool
+                        and observed_launch == {
                     "stage": name, "role": role,
                     "executable": stage["executable"], "executable_sha256": launched["app_sha256"],
                     "argv": [*stage["launcher"], "--data-dir", str(fixture_root / workspace_name),
@@ -623,17 +633,24 @@ def verify_native_evidence(root, lifecycle, wayland, platform, source, version, 
                 }, f"Lifecycle launch record does not bind executable, workspace and new screenshot: {stem}")
     require(set(entries) == expected_files, "Lifecycle evidence files are incomplete or excessive")
     verify_lifecycle_operations(platform, {stage["stage"]: stage for stage in value["stages"]}, roles, manifest)
-    result = {"lifecycle": {"observation": value, "files": {name: sha256(path) for name, path in entries.items()}}}
+    summary = {"schema": 2, "source_sha": source, "platform": platform, "architecture": TARGETS[platform][0],
+               "version": version, "archive_sha256": artifacts[portable],
+               "fixture_source_sha256": value["fixture_source_sha256"],
+               "roles": {role: {key: info[key] for key in ("version", "archive_sha256", "snapshot_sha256",
+                                                          "manifest_sha256", "app_sha256")} for role, info in roles.items()},
+               "stages": [{"stage": name, "role": role, "startup_verified": starts,
+                           "fixture_preserved": True} for name, role, starts in specs]}
+    result = {"lifecycle": {"observation": summary, "files": {name: sha256(path) for name, path in entries.items()}}}
     if platform == "linux":
         require(wayland is not None and wayland.is_dir(), "Native Wayland evidence is required")
-        check = verify_startup(root, wayland, portable, artifacts[portable], platform, expected_backend="Wayland")
-        verify_wayland(check, wayland, source)
+        observed, check = verify_startup(root, wayland, portable, artifacts[portable], platform, expected_backend="Wayland")
+        verify_wayland(observed, wayland, source)
+        check["observation"]["actual_weston_connection_verified"] = True
         result["wayland"] = check
     return result
 
 
-def verify_wayland(check, wayland, source):
-    obs = check["observation"]
+def verify_wayland(obs, wayland, source):
     weston = obs["weston"]
     socket = weston["socket"]
     trace = (wayland / "startup.log").read_bytes()
@@ -652,10 +669,11 @@ def verify_appimage_evidence(root, directory, source, entries, portable, version
     checks = {}
     for backend in ("X11", "Wayland"):
         location = directory / f"appimage-{backend.lower()}-evidence"
-        check = verify_startup(root, location, name, sha256(entries[name]), "linux", expected_backend=backend)
+        observed, check = verify_startup(root, location, name, sha256(entries[name]), "linux", expected_backend=backend)
         if backend == "Wayland":
-            verify_wayland(check, location, source)
-        obs = check["observation"]["appimage"]
+            verify_wayland(observed, location, source)
+            check["observation"]["actual_weston_connection_verified"] = True
+        obs = observed["appimage"]
         mapped = obs["mapped_private_libraries"]
         require(isinstance(mapped, list) and all(isinstance(lib, str) for lib in mapped)
                 and mapped == sorted(set(mapped)) and set(mapped) <= set(info["libraries"])
@@ -689,6 +707,11 @@ def verify_appimage_evidence(root, directory, source, entries, portable, version
                         "negotiation_sha256": hashlib.sha256(packet).hexdigest(),
                         "runtime_reaped_and_clean": True, "concurrent_extractions": overlap} and obs["runtime_reaped_and_clean"] is True,
                 "AppImage launch evidence differs from the inspected outer image, source, GUI or helper")
+        check["observation"]["appimage"] = {
+            "mode": "extract-and-run", "mapped_private_libraries": mapped,
+            "negotiation_sha256": hashlib.sha256(packet).hexdigest(),
+            "runtime_reaped_and_clean": True, "private_concurrent_extractions_verified": True,
+        }
         checks[backend] = check
     return {"manifest": info, "startup": checks}
 
@@ -720,7 +743,7 @@ def verify_candidate(root, source, version, platform, dist, startup, inputs, lif
                                                             manifest, work / "appimage")
         else:
             debian = None
-    observation = verify_startup(root, startup, portable, artifacts[portable], platform)
+    _, observation = verify_startup(root, startup, portable, artifacts[portable], platform)
     native = verify_native_evidence(root, lifecycle, wayland, platform, source, version, artifacts, manifest, inputs)
     return {"schema": 1, "source_sha": source, "version": version, "package_versions": versions,
             "scope": SCOPE, "platform": platform, "architecture": TARGETS[platform][0],
@@ -776,6 +799,7 @@ def assemble(root, source, version, candidates, output, regression=None):
         inventory[platform] = (value, directory)
     require(set(inventory) == set(TARGETS), "Expected exactly one inventory for each platform")
     artifacts = {}
+    checked_platforms = {}
     inputs = PACKAGER.source_inputs(root)
     for platform, (value, directory) in sorted(inventory.items()):
         require(value["source_sha"] == source and value["version"] == version, "Candidate release source or version mismatch")
@@ -787,6 +811,7 @@ def assemble(root, source, version, candidates, output, regression=None):
                                    directory / "startup-evidence", inputs, directory / "lifecycle-evidence",
                                    directory / "wayland-evidence" if platform == "linux" else None)
         require(value == checked, f"Downloaded {platform} candidate inventory does not match its content")
+        checked_platforms[platform] = checked
         for name, digest in checked["artifacts"].items():
             require(SAFE_NAME.fullmatch(name) and name not in artifacts, f"Unsafe or duplicate release asset: {name}")
             artifacts[name] = digest
@@ -813,7 +838,7 @@ def assemble(root, source, version, candidates, output, regression=None):
                    "credits": "CREDITS.md", "privacy": "PRIVACY.md",
                    "rdp_source": "engines/rdp", "wayland_source": "engines/wayland",
                    "notice": "Dependency locks and build-input hashes are not a plugin or dependency source bundle."},
-        "artifacts": artifacts, "platforms": {platform: value for platform, (value, _) in inventory.items()},
+        "artifacts": artifacts, "platforms": checked_platforms,
         "checks_passed": ["three-platform-candidate-validation", *PENDING_GATES,
                           *(["three-platform-regression"] if regression_ok else [])],
         "regression": regression,
