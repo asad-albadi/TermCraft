@@ -4,6 +4,44 @@ mod tests {
     use super::*;
     use crate::ui::terminal_review_tests::{captured, owned_workspace, raw_terminal};
     #[test]
+    fn detached_minimum_keeps_rename_and_window_actions_reachable() {
+        use crate::ui::gui_tests::{shell_frame, shell_pointer, shell_text_position};
+        let (ctx, _root, mut workspace) = owned_workspace();
+        let id = raw_terminal(&mut workspace, "narrow-detached");
+        workspace.detach_terminal(id);
+        let window = workspace.windows.window(id);
+        let size = vec2(360., 260.);
+        let mut actions = Vec::new();
+        let mut draw = |ui: &mut Ui| {
+            workspace.detached_commands(ui, ViewportClass::Immediate, window, id, &mut actions);
+        };
+        shell_frame(&ctx, size, 2., vec![], &mut draw);
+        let output = shell_frame(&ctx, size, 2., vec![], &mut draw);
+        let screen = Rect::from_min_size(Pos2::ZERO, size);
+        for label in ["Reattach", "Close window…", "Fullscreen", "Rename…"] {
+            assert!(screen.contains(shell_text_position(&output, label)));
+        }
+        let rename = shell_text_position(&output, "Rename…");
+        shell_frame(
+            &ctx,
+            size,
+            2.,
+            vec![Event::PointerMoved(rename), shell_pointer(rename, true)],
+            &mut draw,
+        );
+        shell_frame(
+            &ctx,
+            size,
+            2.,
+            vec![shell_pointer(rename, false)],
+            &mut draw,
+        );
+        assert_eq!(workspace.title_editor, Some((id, String::new())));
+        assert_eq!(workspace.windows.window(id), window);
+        assert!(actions.is_empty());
+    }
+
+    #[test]
     fn real_transport_survives_detach_paint_rename_and_reattach_once() {
         let (ctx, _root, mut w) = owned_workspace();
         let id = raw_terminal(&mut w, "original");
@@ -190,6 +228,44 @@ impl Workspace {
             self.title_editor = Some((id, text));
         }
     }
+    fn detached_commands(
+        &mut self,
+        ui: &mut Ui,
+        class: ViewportClass,
+        window: u64,
+        active: u64,
+        actions: &mut Vec<(u64, bool)>,
+    ) {
+        ui.horizontal_wrapped(|ui| {
+            if ui.button("Reattach").clicked() {
+                actions.push((active, false));
+            }
+            if ui.button("Close window…").clicked() {
+                self.window_close_prompt.insert(window);
+            }
+            if class != ViewportClass::EmbeddedWindow {
+                let label = if self.windows.fullscreen(window) {
+                    "Restore window"
+                } else {
+                    "Fullscreen"
+                };
+                if ui
+                    .button(label)
+                    .on_hover_text(self.shortcut_hint(Action::Fullscreen, label))
+                    .clicked()
+                {
+                    self.toggle_window_fullscreen(ui.ctx(), window);
+                }
+            }
+            if ui.button("Rename…").clicked() {
+                self.title_editor = Some((
+                    active,
+                    self.windows.override_title(active).unwrap_or("").to_owned(),
+                ));
+            }
+        });
+    }
+
     pub(super) fn detached_windows(&mut self, ctx: &Context) {
         self.restore_window_geometry(ctx, ROOT);
         let prefs = self.store.preferences.clone();
@@ -215,7 +291,7 @@ impl Workspace {
                 if self.games_frame(ui) {
                     if self.window_close_prompt.contains(&window) {
                         ui.label("Reattach these terminals, or close the selected session? Active sessions and remote edits require confirmation in the main window.");
-                        ui.horizontal(|ui| {
+                        ui.horizontal_wrapped(|ui| {
                             if ui.button("Reattach all").clicked() { actions.extend(ids.iter().map(|id| (*id, false))); self.window_close_prompt.remove(&window); }
                             if ui.button("Close selected session").clicked() { actions.push((active, true)); self.window_close_prompt.remove(&window); }
                             if ui.button("Cancel").clicked() { self.window_close_prompt.remove(&window); }
@@ -226,20 +302,24 @@ impl Workspace {
                 if self.import_applying(){ui.disable();}
                 self.handle_shortcuts(&child_ctx, window);
                 self.restore_window_geometry(&child_ctx, window);
-                ui.horizontal(|ui| {
-                    for id in &ids {
-                        if ui.selectable_label(active == *id, self.terminal_tab_label(*id)).clicked() { self.window_active.insert(window, *id); }
-                    }
-                });
-                ui.horizontal(|ui| {
-                    if ui.button("Reattach").clicked() { actions.push((active, false)); }
-                    if ui.button("Close window…").clicked() { self.window_close_prompt.insert(window); }
-                    if class != ViewportClass::EmbeddedWindow && ui.button(if self.windows.fullscreen(window) {"Restore window"} else {"Fullscreen"}).clicked() { self.toggle_window_fullscreen(&child_ctx, window); }
-                    if ui.button("Rename…").clicked() { self.title_editor = Some((active, self.windows.override_title(active).unwrap_or("").to_owned())); }
-                });
+                ScrollArea::horizontal()
+                    .id_salt(("detached-tabs", window))
+                    .auto_shrink([false, true])
+                    .show(ui, |ui| ui.horizontal(|ui| {
+                        for id in &ids {
+                            let running = self.tabs.iter().find(|tab| tab.id == *id).map(TerminalTab::running);
+                            let (response, _) = workspace_tab(
+                                ui, &self.terminal_tab_label(*id), active == *id, running, false, *id,
+                            );
+                            if response.clicked() {
+                                self.window_active.insert(window, *id);
+                            }
+                        }
+                    }));
+                self.detached_commands(ui, class, window, active, &mut actions);
                 if self.window_close_prompt.contains(&window) {
                     ui.label("Reattach these terminals, or close the selected session? Active sessions and remote edits require confirmation in the main window.");
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         if ui.button("Reattach all").clicked() { actions.extend(ids.iter().map(|id| (*id, false))); self.window_close_prompt.remove(&window); }
                         if ui.button("Close selected session").clicked() { actions.push((active, true)); self.window_close_prompt.remove(&window); }
                         if ui.button("Cancel").clicked() { self.window_close_prompt.remove(&window); }

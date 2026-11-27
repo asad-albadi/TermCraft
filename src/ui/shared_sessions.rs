@@ -1125,7 +1125,7 @@ impl Workspace {
 impl Workspace {
     pub(super) fn shared_session_tree(&mut self, ui: &mut Ui) {
         ui.separator();
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label(RichText::new("Read-only shared sources").strong());
             if ui.small_button("Manage…").clicked() {
                 self.shared_sources.manager = true;
@@ -1147,7 +1147,7 @@ impl Workspace {
                         ui.add(Label::new(&r.error).truncate())
                             .on_hover_text(&r.error);
                     }
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         if ui
                             .add_enabled(r.job.is_none(), Button::new("Refresh"))
                             .clicked()
@@ -1189,36 +1189,34 @@ impl Workspace {
                         ScrollArea::vertical()
                             .id_salt(("shared-rows", &cfg.id))
                             .max_height(240.)
-                            .show_rows(ui, 26., r.rows.len(), |ui, range| {
+                            .show_rows(ui, fluent::CONTROL_HEIGHT, r.rows.len(), |ui, range| {
                                 for row in range {
                                     let entry = &snapshot.entries[r.rows[row]];
                                     ui.push_id((&cfg.id, &entry.id), |ui| {
-                                        let label = ui
-                                            .add(
-                                                Label::new(entry.session.title())
-                                                    .truncate()
-                                                    .sense(Sense::click()),
-                                            )
-                                            .on_hover_text(format!(
-                                                "Read-only · {} · {}:{} · {}",
-                                                entry.session.protocol,
-                                                entry.session.host,
-                                                entry.session.port,
-                                                entry.session.folder
-                                            ));
-                                        if label.double_clicked() {
+                                        let detail = format!(
+                                            "Read-only · {} · {}:{} · {}",
+                                            entry.session.protocol,
+                                            entry.session.host,
+                                            entry.session.port,
+                                            entry.session.folder,
+                                        );
+                                        let (row, activate) = super::saved_session_row(
+                                            ui,
+                                            &entry.id,
+                                            &entry.session.title(),
+                                            &detail,
+                                        );
+                                        if activate {
                                             actions.push((cfg.id.clone(), entry.id.clone(), 2));
                                         }
-                                        label.context_menu(|ui| {
+                                        super::context_actions(&row, |ui, focus_first| {
                                             ui.label("Read-only source definition");
-                                            if ui
-                                                .button(if entry.requires_review {
-                                                    "Review and connect…"
-                                                } else {
-                                                    "Connect"
-                                                })
-                                                .clicked()
-                                            {
+                                            let connect = if entry.requires_review {
+                                                "Review and connect…"
+                                            } else {
+                                                "Connect"
+                                            };
+                                            if super::context_item(ui, connect, focus_first) {
                                                 actions.push((cfg.id.clone(), entry.id.clone(), 2));
                                                 ui.close();
                                             }

@@ -64,7 +64,8 @@ mod web_browser;
 mod windows;
 mod xdmcp;
 mod xserver;
-use fluent::{primary, surface};
+use fluent::{ControlKind, primary, surface};
+use harbor_workspace::workspace::shortcuts::Action;
 
 fn accent(ui: &Ui) -> Color32 {
     ui.visuals().hyperlink_color
@@ -644,6 +645,7 @@ pub struct Workspace {
     managed_vnc: managed_vnc::ManagedVnc,
     status: String,
     status_time: Instant,
+    status_error: bool,
     quick_host: String,
     quick_protocol: String,
     layout_state: harbor_workspace::workspace::layout::LayoutState,
@@ -808,6 +810,7 @@ impl Workspace {
             managed_vnc: Default::default(),
             status,
             status_time: Instant::now(),
+            status_error: !store_ok,
             quick_host: String::new(),
             quick_protocol: "SSH".into(),
             layout_state: harbor_workspace::workspace::layout::LayoutState::default(),
@@ -840,6 +843,11 @@ impl Workspace {
     fn message(&mut self, s: impl Into<String>) {
         self.status = s.into();
         self.status_time = Instant::now();
+        self.status_error = false;
+    }
+    fn error_message(&mut self, message: impl Into<String>) {
+        self.message(message);
+        self.status_error = true;
     }
     fn persist(&mut self) {
         if self.import_applying() {
@@ -855,7 +863,7 @@ impl Workspace {
         self.shared_sources.dirty = true;
         match self.store.save(&self.store_path) {
             Ok(()) => self.message("Workspace saved"),
-            Err(e) => self.message(format!("Could not save workspace: {e}")),
+            Err(e) => self.error_message(format!("Could not save workspace: {e}")),
         }
     }
     fn open_session_form(&mut self, session: Session) {
@@ -1105,7 +1113,7 @@ impl Workspace {
             }
         }
         if !tab.error.is_empty() {
-            self.message(tab.error.clone());
+            self.error_message(tab.error.clone());
         }
         tab.resize_transport();
         self.tabs.push(tab);
@@ -1230,6 +1238,18 @@ impl Workspace {
             name: "Local terminal".into(),
             ..Default::default()
         })
+    }
+    fn shortcut_hint(&self, action: Action, label: &str) -> String {
+        self.store
+            .preferences
+            .shortcuts
+            .bindings
+            .iter()
+            .find(|binding| binding.action == action)
+            .map_or_else(
+                || label.to_owned(),
+                |binding| format!("{label} ({})", binding.chord.label()),
+            )
     }
     fn top(&mut self, root: &mut Ui) {
         Panel::top("title")
@@ -1381,8 +1401,9 @@ impl Workspace {
                             "https://mobaxterm.mobatek.net/documentation.html",
                         );
                         ui.label("Create a Session to connect to a remote host.");
-                        ui.label("Double-click a saved session to reconnect.");
-                        ui.label("Ctrl+N: new session · Ctrl+Shift+T: local terminal");
+                        ui.label("Double-click a saved session or focus it and press Enter.");
+                        ui.label(self.shortcut_hint(Action::NewSession, "New session"));
+                        ui.label(self.shortcut_hint(Action::NewTerminal, "New local terminal"));
                         ui.separator();
                         ui.label("System clients provide remote protocols and X11.");
                     });
@@ -1396,31 +1417,49 @@ impl Workspace {
                     .inner_margin(Margin::symmetric(8, 5)),
             )
             .show(root, |ui| {
-                ui.horizontal(|ui| {
-                    ui.spacing_mut().item_spacing.x = 2.;
-                    if tool_button(ui, "desktop", "Session")
-                        .on_hover_text("New session (Ctrl+N)")
-                        .clicked()
+                ui.horizontal_wrapped(|ui| {
+                    ui.spacing_mut().item_spacing = vec2(4., 4.);
+                    if tool_button(
+                        ui,
+                        "desktop",
+                        "Session",
+                        &self.shortcut_hint(Action::NewSession, "New session"),
+                        None,
+                    )
+                    .clicked()
                     {
                         self.new_session("SSH");
                     }
-                    if tool_button(ui, "desktop", "Servers").clicked() {
+                    if tool_button(ui, "desktop", "Servers", "Servers", None).clicked() {
                         self.page = Page::Servers;
                     }
-                    if tool_button(ui, "tools", "Tools").clicked() {
+                    if tool_button(ui, "tools", "Tools", "Tools", None).clicked() {
                         self.page = Page::Tools;
                     }
-                    if tool_button(ui, "games", "Games").clicked() {
+                    if tool_button(ui, "games", "Games", "Games", None).clicked() {
                         self.games.play.open();
                     }
-                    if tool_button(ui, "folder", "Sessions").clicked() {
-                        self.store.preferences.sidebar_visible =
-                            !self.store.preferences.sidebar_visible;
+                    let sidebar = self.store.preferences.sidebar_visible;
+                    if tool_button(
+                        ui,
+                        "folder",
+                        "Sessions",
+                        &self.shortcut_hint(
+                            Action::ToggleSidebar,
+                            if sidebar {
+                                "Hide sessions sidebar"
+                            } else {
+                                "Show sessions sidebar"
+                            },
+                        ),
+                        Some(sidebar),
+                    )
+                    .clicked()
+                    {
+                        self.store.preferences.sidebar_visible = !sidebar;
                         self.persist();
                     }
-                    ui.separator();
-                    if tool_button(ui, "terminal", "Split")
-                        .on_hover_text("Toggle split terminals")
+                    if tool_button(ui, "terminal", "Split", "Toggle split terminals", None)
                         .clicked()
                     {
                         self.toggle_layout();
@@ -1428,44 +1467,57 @@ impl Workspace {
                             self.page = Page::Terminal;
                         }
                     }
-                    if tool_button(ui, "terminal", "MultiExec")
-                        .on_hover_text(if self.broadcast {
-                            "MultiExec enabled — click to disable"
+                    if tool_button(
+                        ui,
+                        "terminal",
+                        "MultiExec",
+                        if self.broadcast {
+                            "Turn MultiExec off"
                         } else {
                             "Choose MultiExec targets"
-                        })
-                        .clicked()
+                        },
+                        Some(self.broadcast),
+                    )
+                    .clicked()
                     {
                         self.set_broadcast_enabled(!self.broadcast);
                     }
-                    if tool_button(ui, "link", "Tunneling").clicked() {
+                    if tool_button(ui, "link", "Tunneling", "SSH tunneling", None).clicked() {
                         self.page = Page::Tunnels;
                     }
                     ui.add_enabled_ui(false, |ui| {
-                        tool_button(ui, "folder", "Packages")
-                            .on_hover_text("Package management is not available in this build");
+                        tool_button(
+                            ui,
+                            "folder",
+                            "Packages",
+                            "Package management is unavailable in this build",
+                            None,
+                        );
                     });
-                    if tool_button(ui, "settings", "Settings").clicked() {
+                    if tool_button(ui, "settings", "Settings", "Settings", None).clicked() {
                         self.page = Page::Settings;
                     }
-                    let help = tool_button(ui, "help", "Help");
+                    let help = tool_button(ui, "help", "Help", "Help and keyboard shortcuts", None);
                     egui::Popup::menu(&help).show(|ui| {
                         ui.label(RichText::new("Keyboard shortcuts").strong());
-                        ui.label("Ctrl+N — new session");
-                        ui.label("Ctrl+Shift+T — local terminal");
-                        ui.label("Double-click a saved session to connect.");
+                        ui.label(self.shortcut_hint(Action::NewSession, "New session"));
+                        ui.label(self.shortcut_hint(Action::NewTerminal, "New local terminal"));
+                        ui.label("Double-click a saved session or focus it and press Enter.");
                     });
-                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        if tool_button(ui, "exit", "Exit").clicked() {
-                            ui.ctx().send_viewport_cmd(ViewportCommand::Close);
-                        }
-                        if tool_button(ui, "desktop", "X server")
-                            .on_hover_text("Configure the system X server")
-                            .clicked()
-                        {
-                            self.page = Page::Servers;
-                        }
-                    });
+                    if tool_button(
+                        ui,
+                        "desktop",
+                        "X server",
+                        "Configure the system X server",
+                        None,
+                    )
+                    .clicked()
+                    {
+                        self.page = Page::Servers;
+                    }
+                    if tool_button(ui, "exit", "Exit", "Exit TermCraft", None).clicked() {
+                        ui.ctx().send_viewport_cmd(ViewportCommand::Close);
+                    }
                 });
             });
         Panel::bottom("status")
@@ -1476,31 +1528,50 @@ impl Workspace {
             )
             .show(root, |ui| {
                 ui.horizontal(|ui| {
-                    dot(ui, Color32::from_rgb(20, 150, 106));
-                    let text =
-                        if self.status_time.elapsed() > Duration::from_secs(12) && self.store_ok {
-                            "Ready"
+                    let palette = fluent::palette(ui);
+                    let error = self.status_error || !self.store_ok;
+                    let text = if !error && self.status_time.elapsed() > Duration::from_secs(12) {
+                        "Ready"
+                    } else {
+                        &self.status
+                    };
+                    dot(
+                        ui,
+                        if error {
+                            palette.error
                         } else {
-                            &self.status
-                        };
-                    ui.add(Label::new(RichText::new(text).size(11.).color(muted(ui))).truncate());
+                            palette.secondary_text
+                        },
+                    );
+                    let summary = format!(
+                        "{} connections    •    {} saved sessions",
+                        self.tabs.iter().filter(|t| t.running()).count(),
+                        self.store.sessions.len()
+                    );
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                         ui.label(
-                            RichText::new(format!(
-                                "{} connections    •    {} saved sessions",
-                                self.tabs.iter().filter(|t| t.running()).count(),
-                                self.store.sessions.len()
-                            ))
-                            .size(11.)
-                            .color(muted(ui)),
+                            RichText::new(summary)
+                                .size(12.)
+                                .color(palette.secondary_text),
                         );
+                        ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
+                            ui.add(
+                                Label::new(RichText::new(text).size(12.).color(if error {
+                                    palette.error
+                                } else {
+                                    palette.secondary_text
+                                }))
+                                .truncate(),
+                            )
+                            .on_hover_text(text);
+                        });
                     });
                 });
             });
     }
     fn sidebar(&mut self, root: &mut Ui) {
         Panel::left("navigation-rail")
-            .exact_size(38.)
+            .exact_size(48.)
             .resizable(false)
             .frame(
                 Frame::new()
@@ -1508,50 +1579,58 @@ impl Workspace {
                     .inner_margin(Margin::symmetric(3, 9)),
             )
             .show(root, |ui| {
-                for (kind, label, page) in [
-                    ("folder", "Sessions", Page::Home),
-                    ("tools", "Tools", Page::Tools),
-                    ("folder", "Local files", Page::Files),
-                    ("macro", "Macros", Page::Macros),
-                ] {
-                    let (r, response) = ui.allocate_exact_size(vec2(32., 36.), Sense::click());
-                    if self.page == page || response.hovered() {
-                        ui.painter()
-                            .rect_filled(r, 4., ui.visuals().selection.bg_fill);
-                    }
-                    if self.page == page {
-                        ui.painter().rect_filled(
-                            Rect::from_min_size(r.min + vec2(0., 10.), vec2(3., 16.)),
-                            2.,
-                            accent(ui),
-                        );
-                    }
-                    draw_icon(
-                        ui.painter(),
-                        Rect::from_center_size(r.center(), vec2(18., 18.)),
-                        kind,
-                        if self.page == page {
-                            accent(ui)
-                        } else {
-                            muted(ui)
-                        },
-                    );
-                    response.widget_info(|| {
-                        WidgetInfo::selected(
-                            WidgetType::SelectableLabel,
-                            ui.is_enabled(),
-                            self.page == page,
-                            label,
-                        )
-                    });
-                    if response.on_hover_text(label).clicked() {
-                        self.page = page;
-                        if page == Page::Home && !self.store.preferences.sidebar_visible {
-                            self.store.preferences.sidebar_visible = true;
-                            self.persist();
+                ScrollArea::vertical()
+                    .id_salt("navigation-items")
+                    .show(ui, |ui| {
+                        for (kind, label, page) in [
+                            ("folder", "Sessions", Page::Home),
+                            ("tools", "Tools", Page::Tools),
+                            ("files", "Local files", Page::Files),
+                            ("macro", "Macros", Page::Macros),
+                        ] {
+                            let selected = self.page == page;
+                            let (rect, response) =
+                                ui.allocate_exact_size(vec2(32., 36.), Sense::click());
+                            let foreground = fluent::paint_control(
+                                ui,
+                                &response,
+                                rect,
+                                selected,
+                                ControlKind::Standard,
+                            );
+                            if selected {
+                                ui.painter().rect_filled(
+                                    Rect::from_min_size(rect.min + vec2(1., 10.), vec2(3., 16.)),
+                                    1.,
+                                    accent(ui),
+                                );
+                            }
+                            draw_icon(
+                                ui.painter(),
+                                Rect::from_center_size(rect.center(), vec2(18., 18.)),
+                                kind,
+                                foreground,
+                            );
+                            response.widget_info(|| {
+                                WidgetInfo::selected(
+                                    WidgetType::SelectableLabel,
+                                    response.enabled(),
+                                    selected,
+                                    label,
+                                )
+                            });
+                            if response.gained_focus() {
+                                response.scroll_to_me(None);
+                            }
+                            if response.on_hover_text(label).clicked() {
+                                self.page = page;
+                                if page == Page::Home && !self.store.preferences.sidebar_visible {
+                                    self.store.preferences.sidebar_visible = true;
+                                    self.persist();
+                                }
+                            }
                         }
-                    }
-                }
+                    });
             });
         if !self.store.preferences.sidebar_visible {
             return;
@@ -1574,187 +1653,10 @@ impl Workspace {
                     .inner_margin(Margin::symmetric(10, 12)),
             )
             .show(root, |ui| {
-                ui.label(RichText::new("Quick connect").size(12.).color(muted(ui)));
-                let host = ui.add_sized(
-                    [ui.available_width(), 30.],
-                    TextEdit::singleline(&mut self.quick_host).hint_text("Host or IP address"),
-                );
-                let enter = host.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
-                ui.horizontal(|ui| {
-                    ComboBox::from_id_salt("quick_protocol")
-                        .width(95.)
-                        .selected_text(&self.quick_protocol)
-                        .show_ui(ui, |ui| {
-                            for protocol in ["SSH", "Telnet", "SFTP", "FTP"] {
-                                ui.selectable_value(
-                                    &mut self.quick_protocol,
-                                    protocol.into(),
-                                    protocol,
-                                );
-                            }
-                        });
-                    if ui.button("Connect").clicked() || enter {
-                        let session = Session {
-                            host: self.quick_host.trim().into(),
-                            protocol: self.quick_protocol.clone(),
-                            port: protocol_port(&self.quick_protocol),
-                            ..Default::default()
-                        };
-                        if connection::launch(&session, &self.store.preferences).is_ok() {
-                            self.start(session);
-                        } else {
-                            self.new_session(&self.quick_protocol.clone());
-                            self.open_session_form(session);
-                        }
-                    }
-                });
-                ui.add_space(10.);
-                ui.separator();
-                ui.add_space(5.);
-                ui.horizontal(|ui| {
-                    ui.label(RichText::new("Sessions").strong().size(15.));
-                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        if ui
-                            .small_button("+")
-                            .on_hover_text("Add a saved session")
-                            .clicked()
-                        {
-                            self.new_session("SSH");
-                        }
-                    });
-                });
-                ui.add_space(3.);
-                ui.add(
-                    TextEdit::singleline(&mut self.session_search)
-                        .hint_text("Search sessions")
-                        .desired_width(f32::INFINITY),
-                );
-                ui.add_space(8.);
-                let mut launch = None;
-                let mut launch_folder = None;
-                let mut shortcut = None;
-                let mut edit = None;
-                let mut remove = None;
-                let mut duplicate = None;
                 ScrollArea::vertical()
                     .id_salt("sessions")
-                    .max_height((ui.available_height() - 80.).max(150.))
-                    .show(ui, |ui| {
-                        let mut folders = self
-                            .store
-                            .sessions
-                            .iter()
-                            .map(|s| s.folder.clone())
-                            .collect::<Vec<_>>();
-                        folders.sort();
-                        folders.dedup();
-                        if folders.is_empty() {
-                            ui.add_space(12.);
-                            ui.horizontal(|ui| {
-                                icon(ui, "folder", 16., muted(ui));
-                                ui.label(RichText::new("My sessions").color(muted(ui)).size(13.));
-                            });
-                            ui.add_space(10.);
-                            ui.label(
-                                RichText::new("Your saved connections\nwill appear here.")
-                                    .size(12.)
-                                    .color(muted(ui)),
-                            );
-                            ui.add_space(9.);
-                            if ui.link("Create your first session").clicked() {
-                                self.new_session("SSH");
-                            }
-                        }
-                        for folder in folders {
-                            let header = CollapsingHeader::new(RichText::new(&folder).size(13.).strong())
-                                .default_open(true)
-                                .show(ui, |ui| {
-                                    for (i, s) in self.store.sessions.iter().enumerate() {
-                                        if s.folder != folder
-                                            || !format!("{} {} {}", s.name, s.host, s.protocol)
-                                                .to_lowercase()
-                                                .contains(&self.session_search.to_lowercase())
-                                        {
-                                            continue;
-                                        }
-                                        let r = ui.add_sized(
-                                            [ui.available_width(), 32.],
-                                            Button::new(RichText::new(s.title()).size(13.))
-                                                .frame(false),
-                                        );
-                                        if r.double_clicked() {
-                                            launch = Some(s.clone());
-                                        }
-                                        r.on_hover_text(format!(
-                                            "{}  {}:{}\nDouble-click to connect",
-                                            s.protocol, s.host, s.port
-                                        ))
-                                        .context_menu(
-                                            |ui| {
-                                                if ui.button("Connect").clicked() {
-                                                    launch = Some(s.clone());
-                                                    ui.close();
-                                                }
-                                                if s.protocol == "SSH"
-                                                    && ui
-                                                        .button("Open SFTP with these settings")
-                                                        .clicked()
-                                                {
-                                                    launch = s.sftp_session().ok();
-                                                    ui.close();
-                                                }
-                                                if ui.button("Create launch shortcut…").clicked() {
-                                                    shortcut = Some((harbor_workspace::platform::shortcuts::ShortcutTarget::Session(s.id.clone()), s.title()));
-                                                    ui.close();
-                                                }
-                                                if ui.button("Edit").clicked() {
-                                                    edit = Some(i);
-                                                    ui.close();
-                                                }
-                                                if ui.button("Duplicate").clicked() {
-                                                    duplicate = Some(i);
-                                                    ui.close();
-                                                }
-                                                if ui.button("Remove saved session").clicked() {
-                                                    remove = Some(i);
-                                                    ui.close();
-                                                }
-                                            },
-                                        );
-                                    }
-                                });
-                            header.header_response.context_menu(|ui| {
-                                if ui.button("Launch folder and subfolders").clicked() {launch_folder=Some(folder.clone()); ui.close();}
-                                if ui.button("Create group launch shortcut…").clicked() {shortcut=Some((harbor_workspace::platform::shortcuts::ShortcutTarget::Group(folder.clone()),folder.clone()));ui.close();}
-                            });
-                        }
-                        self.shared_session_tree(ui);
-                    });
-                if let Some(s) = launch {
-                    self.start(s);
-                }
-                if let Some(folder)=launch_folder {self.launch_saved_group(&folder);}
-                if let Some((target,name))=shortcut {self.create_launch_shortcut(target,name,ui.ctx());}
-                if let Some(i) = edit {
-                    self.open_session_form(self.store.sessions[i].clone());
-                    self.editing = Some(i);
-                    self.form_error.clear();
-                }
-                if let Some(i) = duplicate {
-                    self.duplicate_saved_session(i);
-                }
-                if let Some(i) = remove {
-                    self.store.sessions.remove(i);
-                    self.persist();
-                }
-                ui.with_layout(Layout::bottom_up(Align::LEFT), |ui| {
-                    ui.label(
-                        RichText::new("Double-click a session to connect")
-                            .size(11.)
-                            .color(muted(ui)),
-                    );
-                    ui.separator();
-                });
+                    .auto_shrink([false, false])
+                    .show(ui, |ui| self.sidebar_contents(ui));
             });
         let new_width = panel.response.rect.width();
         // egui 0.36 uses a separate response for this panel's resize handle.
@@ -1765,6 +1667,188 @@ impl Workspace {
             self.store.preferences.sidebar_width = new_width;
             self.persist();
         }
+    }
+    fn sidebar_contents(&mut self, ui: &mut Ui) {
+        let label = ui.label(RichText::new("Quick connect").size(12.).color(muted(ui)));
+        let host = ui
+            .add_sized(
+                [ui.available_width(), 30.],
+                TextEdit::singleline(&mut self.quick_host).hint_text("Host or IP address"),
+            )
+            .labelled_by(label.id);
+        let enter = host.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
+        ui.horizontal_wrapped(|ui| {
+            ComboBox::from_id_salt("quick_protocol")
+                .width(76.)
+                .selected_text(&self.quick_protocol)
+                .show_ui(ui, |ui| {
+                    for protocol in ["SSH", "Telnet", "SFTP", "FTP"] {
+                        ui.selectable_value(&mut self.quick_protocol, protocol.into(), protocol);
+                    }
+                });
+            if ui.button("Connect").clicked() || enter {
+                let session = Session {
+                    host: self.quick_host.trim().into(),
+                    protocol: self.quick_protocol.clone(),
+                    port: protocol_port(&self.quick_protocol),
+                    ..Default::default()
+                };
+                if connection::launch(&session, &self.store.preferences).is_ok() {
+                    self.start(session);
+                } else {
+                    self.new_session(&self.quick_protocol.clone());
+                    self.open_session_form(session);
+                }
+            }
+        });
+        ui.add_space(10.);
+        ui.separator();
+        ui.add_space(5.);
+        ui.horizontal(|ui| {
+            ui.label(RichText::new("Sessions").strong().size(15.));
+            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                let hint = self.shortcut_hint(Action::NewSession, "Add a saved session");
+                if shell_button(ui, "+", &hint).clicked() {
+                    self.new_session("SSH");
+                }
+            });
+        });
+        ui.add_space(3.);
+        let search_label = ui.small("Search sessions");
+        ui.add(
+            TextEdit::singleline(&mut self.session_search)
+                .hint_text("Name, host or protocol")
+                .desired_width(f32::INFINITY),
+        )
+        .labelled_by(search_label.id);
+        ui.add_space(8.);
+        let mut launch = None;
+        let mut launch_folder = None;
+        let mut shortcut = None;
+        let mut edit = None;
+        let mut remove = None;
+        let mut duplicate = None;
+        let query = self.session_search.to_lowercase();
+        let mut folders = std::collections::BTreeMap::<&str, Vec<usize>>::new();
+        for (index, session) in self.store.sessions.iter().enumerate() {
+            if format!("{} {} {}", session.name, session.host, session.protocol)
+                .to_lowercase()
+                .contains(&query)
+            {
+                folders.entry(&session.folder).or_default().push(index);
+            }
+        }
+        let mut create_first = false;
+        if self.store.sessions.is_empty() {
+            ui.add_space(12.);
+            ui.horizontal(|ui| {
+                icon(ui, "folder", 16., muted(ui));
+                ui.label(RichText::new("My sessions").color(muted(ui)).size(13.));
+            });
+            ui.add_space(10.);
+            ui.label(
+                RichText::new("Your saved connections\nwill appear here.")
+                    .size(12.)
+                    .color(muted(ui)),
+            );
+            ui.add_space(9.);
+            if ui.link("Create your first session").clicked() {
+                create_first = true;
+            }
+        } else if folders.is_empty() {
+            ui.small("No saved sessions match your search.");
+        }
+        for (folder, indices) in folders {
+            let header = CollapsingHeader::new(RichText::new(folder).size(13.).strong())
+                .default_open(true)
+                .show(ui, |ui| {
+                    for i in indices {
+                        let session = &self.store.sessions[i];
+                        let title = session.title();
+                        let detail =
+                            format!("{} · {}:{}", session.protocol, session.host, session.port);
+                        let (row, activate) = saved_session_row(ui, &session.id, &title, &detail);
+                        if activate {
+                            launch = Some(session.clone());
+                        }
+                        context_actions(&row, |ui, focus_first| {
+                            if context_item(ui, "Connect", focus_first) {
+                                launch = Some(session.clone());
+                                ui.close();
+                            }
+                            if session.protocol == "SSH"
+                                && ui.button("Open SFTP with these settings").clicked()
+                            {
+                                launch = session.sftp_session().ok();
+                                ui.close();
+                            }
+                            if ui.button("Create launch shortcut…").clicked() {
+                                shortcut = Some((
+                                    harbor_workspace::platform::shortcuts::ShortcutTarget::Session(
+                                        session.id.clone(),
+                                    ),
+                                    session.title(),
+                                ));
+                                ui.close();
+                            }
+                            if ui.button("Edit").clicked() {
+                                edit = Some(i);
+                                ui.close();
+                            }
+                            if ui.button("Duplicate").clicked() {
+                                duplicate = Some(i);
+                                ui.close();
+                            }
+                            if ui.button("Remove saved session").clicked() {
+                                remove = Some(i);
+                                ui.close();
+                            }
+                        });
+                    }
+                });
+            context_actions(&header.header_response, |ui, focus_first| {
+                if context_item(ui, "Launch folder and subfolders", focus_first) {
+                    launch_folder = Some(folder.to_owned());
+                    ui.close();
+                }
+                if ui.button("Create group launch shortcut…").clicked() {
+                    shortcut = Some((
+                        harbor_workspace::platform::shortcuts::ShortcutTarget::Group(
+                            folder.to_owned(),
+                        ),
+                        folder.to_owned(),
+                    ));
+                    ui.close();
+                }
+            });
+        }
+        if create_first {
+            self.new_session("SSH");
+        }
+        self.shared_session_tree(ui);
+        if let Some(s) = launch {
+            self.start(s);
+        }
+        if let Some(folder) = launch_folder {
+            self.launch_saved_group(&folder);
+        }
+        if let Some((target, name)) = shortcut {
+            self.create_launch_shortcut(target, name, ui.ctx());
+        }
+        if let Some(i) = edit {
+            self.open_session_form(self.store.sessions[i].clone());
+            self.editing = Some(i);
+            self.form_error.clear();
+        }
+        if let Some(i) = duplicate {
+            self.duplicate_saved_session(i);
+        }
+        if let Some(i) = remove {
+            self.store.sessions.remove(i);
+            self.persist();
+        }
+        ui.separator();
+        ui.small("Double-click a session or focus it and press Enter. Shift+F10 opens actions.");
     }
     fn apply_appearance(&mut self, ctx: &Context) {
         let previous = ctx.theme();
@@ -1867,8 +1951,8 @@ impl Workspace {
                                     true,
                                     t.id,
                                 );
-                                response.context_menu(|ui| {
-                                    if ui.button("Rename tab…").clicked() {
+                                context_actions(&response, |ui, focus_first| {
+                                    if context_item(ui, "Rename tab…", focus_first) {
                                         action = Some((t.id, 0));
                                         ui.close();
                                     }
@@ -1900,11 +1984,9 @@ impl Workspace {
                                     }
                                 }
                             }
-                            if ui
-                                .add(Button::new("+").frame(false).min_size(vec2(32., 34.)))
-                                .on_hover_text("New local terminal")
-                                .clicked()
-                            {
+                            let hint =
+                                self.shortcut_hint(Action::NewTerminal, "New local terminal");
+                            if shell_button(ui, "+", &hint).clicked() {
                                 self.local();
                             }
                             if let Some((id, kind)) = action {
@@ -2158,142 +2240,255 @@ fn workspace_tab(
     closable: bool,
     id: u64,
 ) -> (Response, bool) {
-    let font = FontId::proportional(13.);
-    let galley = ui
+    let font = FontId::proportional(14.);
+    let title_width = ui
         .painter()
-        .layout_no_wrap(title.into(), font.clone(), ink(ui));
-    let width = (galley.size().x + if closable { 64. } else { 30. }).clamp(76., 240.);
+        .layout_no_wrap(title.into(), font, ink(ui))
+        .size()
+        .x;
+    let leading = if running.is_some() { 26. } else { 12. };
+    let trailing = if closable { 38. } else { 12. };
+    let width = (title_width + leading + trailing).clamp(76., 240.);
     let (rect, response) = ui.allocate_exact_size(vec2(width, 38.), Sense::click());
-    let close_rect =
-        Rect::from_center_size(pos2(rect.right() - 18., rect.center().y), vec2(24., 24.));
-    let close = if closable {
-        Some(ui.interact(close_rect, ui.id().with(("close-tab", id)), Sense::click()))
-    } else {
-        None
-    };
-    let fill = if selected {
-        content(ui)
-    } else if response.hovered() {
-        ui.visuals().widgets.hovered.bg_fill
-    } else {
-        mist(ui)
-    };
-    ui.painter().rect_filled(
-        rect,
-        CornerRadius {
-            nw: 7,
-            ne: 7,
-            sw: 0,
-            se: 0,
-        },
-        fill,
+    let close_rect = Rect::from_center_size(
+        pos2(rect.right() - 18., rect.center().y),
+        Vec2::splat(fluent::CONTROL_HEIGHT),
     );
+    let close =
+        closable.then(|| ui.interact(close_rect, ui.id().with(("close-tab", id)), Sense::click()));
+    let foreground = fluent::paint_control(ui, &response, rect, selected, ControlKind::Standard);
     if selected {
         ui.painter().line_segment(
             [
-                rect.left_top() + vec2(8., 1.),
-                rect.right_top() + vec2(-8., 1.),
+                rect.left_top() + vec2(4., 2.),
+                rect.right_top() + vec2(-4., 2.),
             ],
             Stroke::new(2., accent(ui)),
         );
     }
-    if response.has_focus() {
-        ui.painter().rect_stroke(
-            rect.shrink(3.),
-            4.,
-            Stroke::new(1., accent(ui)),
-            StrokeKind::Inside,
-        );
-    }
-    let text_left = if let Some(running) = running {
+    if let Some(running) = running {
+        let palette = fluent::palette(ui);
         ui.painter().circle_filled(
             pos2(rect.left() + 14., rect.center().y),
             3.,
             if running {
-                Color32::from_rgb(20, 165, 115)
+                palette.success
             } else {
-                muted(ui)
+                palette.secondary_text
             },
         );
-        rect.left() + 26.
-    } else {
-        rect.left() + 14.
-    };
-    let text_right = if closable {
-        close_rect.left() - 4.
-    } else {
-        rect.right() - 10.
-    };
-    ui.painter()
-        .with_clip_rect(Rect::from_min_max(
-            pos2(text_left, rect.top()),
-            pos2(text_right, rect.bottom()),
-        ))
-        .text(
-            pos2(text_left, rect.center().y),
-            Align2::LEFT_CENTER,
-            title,
-            font,
-            if selected { ink(ui) } else { muted(ui) },
-        );
-    let mut closed = false;
-    if let Some(close) = close {
-        if close.hovered() {
-            ui.painter()
-                .rect_filled(close_rect, 4., ui.visuals().widgets.hovered.bg_fill);
-        }
-        let c = close_rect.center();
-        for (a, b) in [
-            (vec2(-3., -3.), vec2(3., 3.)),
-            (vec2(-3., 3.), vec2(3., -3.)),
-        ] {
-            ui.painter()
-                .line_segment([c + a, c + b], Stroke::new(1.3, muted(ui)));
-        }
-        close.widget_info(|| {
-            WidgetInfo::labeled(WidgetType::Button, true, format!("Close {title}"))
-        });
-        closed = close.on_hover_text(format!("Close {title}")).clicked();
     }
-    response
-        .widget_info(|| WidgetInfo::selected(WidgetType::SelectableLabel, true, selected, title));
-    (response.on_hover_text(title), closed)
+    paint_ellipsized(
+        ui,
+        rect.left_center() + vec2(leading, 0.),
+        width - leading - trailing,
+        title,
+        foreground,
+    );
+    let label = match running {
+        Some(true) => format!("{title} · Running"),
+        Some(false) => format!("{title} · Stopped"),
+        None => title.to_owned(),
+    };
+    response.widget_info(|| {
+        WidgetInfo::selected(
+            WidgetType::SelectableLabel,
+            response.enabled(),
+            selected,
+            &label,
+        )
+    });
+    if response.gained_focus() {
+        response.scroll_to_me(None);
+    }
+    let closed = close.is_some_and(|close| paint_close(ui, close, title).clicked());
+    (response.on_hover_text(label), closed)
 }
+
+fn paint_ellipsized(ui: &Ui, left_center: Pos2, width: f32, text: &str, foreground: Color32) {
+    let mut job = egui::text::LayoutJob::simple_singleline(
+        text.replace(['\r', '\n'], " "),
+        FontId::proportional(14.),
+        foreground,
+    );
+    job.wrap.max_width = width.max(0.);
+    job.wrap.max_rows = 1;
+    job.wrap.break_anywhere = true;
+    let galley = ui.painter().layout_job(job);
+    let pos = left_center - vec2(0., galley.size().y / 2.);
+    ui.painter().galley(pos, galley, foreground);
+}
+
+fn paint_close(ui: &Ui, response: Response, title: &str) -> Response {
+    let rect = response.rect;
+    let foreground = fluent::paint_control(ui, &response, rect, false, ControlKind::Standard);
+    let center = rect.center();
+    for (a, b) in [
+        (vec2(-4., -4.), vec2(4., 4.)),
+        (vec2(-4., 4.), vec2(4., -4.)),
+    ] {
+        ui.painter()
+            .line_segment([center + a, center + b], Stroke::new(1.5, foreground));
+    }
+    let label = format!("Close {title}");
+    response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, response.enabled(), &label));
+    if response.gained_focus() {
+        response.scroll_to_me(None);
+    }
+    response.on_hover_text(label)
+}
+
+fn saved_session_row(
+    ui: &mut Ui,
+    id: impl egui::AsIdSalt,
+    title: &str,
+    detail: &str,
+) -> (Response, bool) {
+    let (rect, _) = ui.allocate_exact_size(
+        vec2(ui.available_width(), fluent::CONTROL_HEIGHT),
+        Sense::hover(),
+    );
+    let response = ui.interact(rect, ui.id().with(("saved-session", id)), Sense::click());
+    if response.clicked_by(PointerButton::Primary) {
+        response.request_focus();
+    }
+    if response.gained_focus() {
+        response.scroll_to_me(None);
+    }
+    let foreground = fluent::paint_control(ui, &response, rect, false, ControlKind::Standard);
+    paint_ellipsized(
+        ui,
+        rect.left_center() + vec2(8., 0.),
+        rect.width() - 16.,
+        title,
+        foreground,
+    );
+    response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, response.enabled(), title));
+    let activate = response.double_clicked()
+        || (response.clicked() && !response.clicked_by(PointerButton::Primary));
+    (
+        response.on_hover_text(format!(
+            "{detail}\nDouble-click or press Enter to connect. Shift+F10 opens actions."
+        )),
+        activate,
+    )
+}
+
+fn context_actions(response: &Response, contents: impl FnOnce(&mut Ui, bool)) {
+    let keyboard = response.enabled()
+        && response.has_focus()
+        && response
+            .ctx
+            .input_mut(|input| input.consume_key(Modifiers::SHIFT, Key::F10));
+    let state = if keyboard || response.secondary_clicked() {
+        Some(egui::SetOpenCommand::Bool(true))
+    } else if response.clicked() {
+        Some(egui::SetOpenCommand::Bool(false))
+    } else {
+        None
+    };
+    let popup = Popup::menu(response).open_memory(state);
+    let id = popup.get_id();
+    let focus_id = id.with("keyboard-focus");
+    let context = &response.ctx;
+    if keyboard {
+        context.data_mut(|data| data.insert_temp(focus_id, true));
+    }
+    let shown = popup.show(|ui| {
+        let focus_first = ui.is_visible()
+            && context.data_mut(|data| {
+                let pending = data.get_temp::<bool>(focus_id).unwrap_or_default();
+                if pending {
+                    data.insert_temp(focus_id, false);
+                }
+                pending
+            });
+        contents(ui, focus_first);
+    });
+    if shown.is_some_and(|popup| popup.response.should_close()) {
+        let from_keyboard = context.data_mut(|data| data.remove_temp::<bool>(focus_id).is_some());
+        if from_keyboard && !context.input(|input| input.pointer.any_click()) {
+            response.request_focus();
+        }
+    } else if !Popup::is_id_open(context, id) {
+        context.data_mut(|data| data.remove::<bool>(focus_id));
+    }
+}
+
+fn context_item(ui: &mut Ui, label: &str, focus: bool) -> bool {
+    let button = ui.button(label);
+    if focus {
+        button.request_focus();
+    }
+    button.clicked()
+}
+
 fn dot(ui: &mut Ui, color: Color32) {
     let (r, _) = ui.allocate_exact_size(vec2(7., 7.), Sense::hover());
     ui.painter().circle_filled(r.center(), 3., color);
 }
-fn tool_button(ui: &mut Ui, kind: &str, label: &str) -> Response {
-    let (r, response) = ui.allocate_exact_size(vec2(56., 54.), Sense::click());
-    if response.hovered() || response.has_focus() {
-        ui.painter()
-            .rect_filled(r, 4., ui.visuals().widgets.hovered.bg_fill);
-        ui.painter()
-            .rect_stroke(r, 4., Stroke::new(1., line(ui)), StrokeKind::Inside);
+fn shell_button(ui: &mut Ui, symbol: &str, label: &str) -> Response {
+    let response = ui.add(Button::new(symbol).min_size(Vec2::splat(fluent::CONTROL_HEIGHT)));
+    response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, response.enabled(), label));
+    response.on_hover_text(label)
+}
+fn tool_button(
+    ui: &mut Ui,
+    kind: &str,
+    label: &str,
+    hint: &str,
+    selected: Option<bool>,
+) -> Response {
+    let font = FontId::proportional(12.);
+    let width = (ui
+        .painter()
+        .layout_no_wrap(label.into(), font.clone(), ink(ui))
+        .size()
+        .x
+        + 16.)
+        .max(56.);
+    let (rect, response) = ui.allocate_exact_size(vec2(width, 56.), Sense::click());
+    let foreground = fluent::paint_control(
+        ui,
+        &response,
+        rect,
+        selected.unwrap_or(false),
+        ControlKind::Standard,
+    );
+    let foreground = if response.enabled() {
+        foreground
+    } else {
+        fluent::palette(ui).secondary_text
+    };
+    if let Some(selected) = selected {
+        response.widget_info(|| {
+            WidgetInfo::selected(WidgetType::Checkbox, response.enabled(), selected, hint)
+        });
+        if selected && response.enabled() {
+            let mark = Rect::from_center_size(rect.center_bottom() - vec2(0., 3.), vec2(18., 2.));
+            ui.painter().rect_filled(mark, 1., accent(ui));
+        }
+    } else {
+        response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, response.enabled(), hint));
     }
-    response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, ui.is_enabled(), label));
     draw_icon(
         ui.painter(),
-        Rect::from_center_size(r.center_top() + vec2(0., 18.), vec2(23., 23.)),
+        Rect::from_center_size(rect.center_top() + vec2(0., 18.), vec2(23., 23.)),
         kind,
-        if ui.is_enabled() {
-            accent(ui)
-        } else {
-            Color32::from_gray(160)
-        },
+        foreground,
     );
     ui.painter().text(
-        r.center_bottom() - vec2(0., 9.),
+        rect.center_bottom() - vec2(0., 13.),
         Align2::CENTER_CENTER,
         label,
-        FontId::proportional(10.5),
-        if ui.is_enabled() {
-            ink(ui)
-        } else {
-            Color32::from_gray(160)
-        },
+        font,
+        foreground,
     );
-    response
+    if response.enabled() {
+        response.on_hover_text(hint)
+    } else {
+        response.on_disabled_hover_text(hint)
+    }
 }
 fn icon(ui: &mut Ui, kind: &str, size: f32, color: Color32) {
     let (r, _) = ui.allocate_exact_size(vec2(size, size), Sense::hover());
@@ -2360,6 +2555,16 @@ fn draw_icon(p: &Painter, r: Rect, kind: &str, color: Color32) {
                 q(2., 7.),
             ];
             p.add(PathShape::closed_line(pts, stroke));
+        }
+        "files" => {
+            p.add(PathShape::closed_line(
+                vec![q(5., 2.), q(14., 2.), q(20., 8.), q(20., 22.), q(5., 22.)],
+                stroke,
+            ));
+            line((14., 2.), (14., 8.));
+            line((14., 8.), (20., 8.));
+            line((8., 12.), (17., 12.));
+            line((8., 16.), (17., 16.));
         }
         "desktop" => {
             p.rect_stroke(
@@ -2717,6 +2922,324 @@ mod gui_tests {
         );
         output.textures_delta.clear();
     }
+    pub(super) fn shell_frame(
+        ctx: &Context,
+        size: Vec2,
+        pixels_per_point: f32,
+        events: Vec<Event>,
+        draw: impl FnMut(&mut Ui),
+    ) -> FullOutput {
+        let mut input = RawInput {
+            screen_rect: Some(Rect::from_min_size(Pos2::ZERO, size)),
+            events,
+            ..Default::default()
+        };
+        input
+            .viewports
+            .get_mut(&ViewportId::ROOT)
+            .unwrap()
+            .native_pixels_per_point = Some(pixels_per_point);
+        let mut output = ctx.run_ui(input, draw);
+        output.textures_delta.clear();
+        output
+    }
+
+    pub(super) fn shell_text_position(output: &FullOutput, text: &str) -> Pos2 {
+        fn find(shape: &egui::Shape, text: &str) -> Option<Pos2> {
+            match shape {
+                egui::Shape::Text(label) if label.galley.job.text == text => {
+                    Some(label.pos + label.galley.rect.center().to_vec2())
+                }
+                egui::Shape::Vec(shapes) => shapes.iter().find_map(|shape| find(shape, text)),
+                _ => None,
+            }
+        }
+        output
+            .shapes
+            .iter()
+            .find_map(|shape| {
+                find(&shape.shape, text).filter(|position| shape.clip_rect.contains(*position))
+            })
+            .unwrap_or_else(|| panic!("could not find painted text: {text}"))
+    }
+
+    #[test]
+    fn commands_wrap_without_losing_exit_or_x_server_at_main_minimum() {
+        for scale in [1., 1.5, 2.] {
+            let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
+            let size = vec2(640., 480.);
+            let mut draw = |ui: &mut Ui| workspace.top(ui);
+            shell_frame(&ctx, size, scale, vec![], &mut draw);
+            let output = shell_frame(&ctx, size, scale, vec![], &mut draw);
+            assert_eq!(output.pixels_per_point, scale);
+            let screen = Rect::from_min_size(Pos2::ZERO, size);
+            let labels = [
+                "Session",
+                "Servers",
+                "Tools",
+                "Games",
+                "Sessions",
+                "Split",
+                "MultiExec",
+                "Tunneling",
+                "Packages",
+                "Settings",
+                "Help",
+                "X server",
+                "Exit",
+            ];
+            for label in labels {
+                let position = shell_text_position(&output, label);
+                assert!(
+                    screen.contains(position),
+                    "{label} is outside the viewport at {scale}x: {position:?}"
+                );
+            }
+            let position = shell_text_position(&output, "Exit");
+            let first = shell_text_position(&output, "Session");
+            assert!(
+                position.y > first.y + 20.,
+                "command tiles did not wrap at {scale}x"
+            );
+            shell_frame(
+                &ctx,
+                size,
+                scale,
+                vec![Event::PointerMoved(position), shell_pointer(position, true)],
+                &mut draw,
+            );
+            let output = shell_frame(
+                &ctx,
+                size,
+                scale,
+                vec![shell_pointer(position, false)],
+                &mut draw,
+            );
+            assert!(
+                output.viewport_output[&ViewportId::ROOT]
+                    .commands
+                    .contains(&ViewportCommand::Close)
+            );
+        }
+    }
+
+    pub(super) fn shell_pointer(pos: Pos2, pressed: bool) -> Event {
+        Event::PointerButton {
+            pos,
+            button: PointerButton::Primary,
+            pressed,
+            modifiers: Modifiers::NONE,
+        }
+    }
+
+    fn shell_key(key: Key, modifiers: Modifiers) -> Event {
+        Event::Key {
+            key,
+            physical_key: None,
+            pressed: true,
+            repeat: false,
+            modifiers,
+        }
+    }
+
+    #[test]
+    fn command_tile_paints_pointer_focus_disabled_and_latched_states() {
+        let ctx = Context::default();
+        fluent::setup(&ctx, true, false);
+        let mut latched = false;
+        let mut enabled = true;
+        let size = vec2(320., 240.);
+        let mut rect = Rect::NOTHING;
+        let mut id = Id::NULL;
+        let mut paint = |events, latched, enabled| {
+            let mut clicked = false;
+            let output = shell_frame(&ctx, size, 1., events, |ui| {
+                let response = ui
+                    .add_enabled_ui(enabled, |ui| {
+                        tool_button(
+                            ui,
+                            "folder",
+                            "Sessions",
+                            "Toggle saved sessions",
+                            Some(latched),
+                        )
+                    })
+                    .inner;
+                id = response.id;
+                rect = response.rect;
+                clicked = response.clicked();
+            });
+            let painted: Vec<_> = output
+                .shapes
+                .iter()
+                .filter_map(|clipped| match &clipped.shape {
+                    egui::Shape::Rect(shape)
+                        if shape.rect == rect || shape.rect == rect.shrink(2.) =>
+                    {
+                        Some((shape.fill, shape.stroke.color))
+                    }
+                    _ => None,
+                })
+                .collect();
+            (rect.center(), id, painted, clicked)
+        };
+        let (center, _, rest, _) = paint(vec![], latched, enabled);
+        let (_, _, hover, clicked) = paint(vec![Event::PointerMoved(center)], latched, enabled);
+        assert_ne!(rest[0].0, hover[0].0);
+        assert!(!clicked);
+        let (_, _, down, clicked) = paint(vec![shell_pointer(center, true)], latched, enabled);
+        assert_ne!(hover[0].0, down[0].0);
+        assert!(!clicked);
+        let (_, id, _, clicked) = paint(vec![shell_pointer(center, false)], latched, enabled);
+        assert!(clicked);
+        latched = clicked;
+        ctx.memory_mut(|memory| memory.request_focus(id));
+        let (_, _, focused, _) = paint(
+            vec![Event::PointerMoved(pos2(300., 200.))],
+            latched,
+            enabled,
+        );
+        assert_ne!(focused[0].0, rest[0].0);
+        assert!(
+            focused.len() > 1,
+            "focus outline is distinct from selection"
+        );
+        ctx.memory_mut(|memory| memory.surrender_focus(id));
+        let (_, _, selected, _) = paint(vec![], latched, enabled);
+        assert_eq!(selected[0], focused[0]);
+        assert_eq!(
+            selected.len(),
+            1,
+            "focus outline cleared while selection remained"
+        );
+        enabled = false;
+        let (_, _, disabled, clicked) = paint(
+            vec![Event::PointerMoved(center), shell_pointer(center, true)],
+            latched,
+            enabled,
+        );
+        let (_, _, disabled_release, released) =
+            paint(vec![shell_pointer(center, false)], latched, enabled);
+        assert_ne!(disabled[0], rest[0], "disabled tile is visibly distinct");
+        assert_eq!(disabled_release, disabled);
+        assert!(!clicked && !released);
+    }
+
+    #[test]
+    fn saved_row_tab_enter_and_pointer_double_click_are_separate_activations() {
+        for by_keyboard in [false, true] {
+            let ctx = Context::default();
+            let size = vec2(360., 240.);
+            let mut count = 0;
+            let mut draw = |events| {
+                shell_frame(&ctx, size, 1., events, |ui| {
+                    let (_, activate) = saved_session_row(ui, "owned", "Test session", "Local");
+                    count += usize::from(activate);
+                })
+            };
+            let output = draw(vec![]);
+            let pos = shell_text_position(&output, "Test session");
+            draw(vec![Event::PointerMoved(pos)]);
+            if by_keyboard {
+                draw(vec![shell_key(Key::Tab, Modifiers::NONE)]);
+                draw(vec![shell_key(Key::Enter, Modifiers::NONE)]);
+            } else {
+                for pressed in [true, false, true, false] {
+                    draw(vec![shell_pointer(pos, pressed)]);
+                }
+            }
+            assert_eq!(
+                count, 1,
+                "session activation count; by keyboard = {by_keyboard}"
+            );
+        }
+    }
+
+    #[test]
+    fn long_tab_title_is_elided_without_covering_the_close_target() {
+        let ctx = Context::default();
+        let title = "My remote session ".repeat(30);
+        let mut tab = Rect::NOTHING;
+        let output = shell_frame(&ctx, vec2(640., 480.), 2., vec![], |ui| {
+            let (response, _) = workspace_tab(ui, &title, true, Some(true), true, 1);
+            tab = response.rect;
+        });
+        let text = output
+            .shapes
+            .iter()
+            .find_map(|clipped| match &clipped.shape {
+                egui::Shape::Text(text) if text.galley.job.text == title => Some(text),
+                _ => None,
+            })
+            .expect("the full title remains associated with the painted tab");
+        assert!(text.galley.elided);
+        assert!(text.pos.x + text.galley.size().x <= tab.right() - 34.);
+    }
+
+    #[test]
+    fn saved_session_row_context_menu_is_reachable_with_keyboard() {
+        let ctx = Context::default();
+        fluent::setup(&ctx, true, false);
+        let mut id = Id::NULL;
+        let mut activated = false;
+        let mut edit = false;
+        let mut render = |events| {
+            shell_frame(&ctx, vec2(420., 250.), 1., events, |ui| {
+                let (row, launch) = saved_session_row(ui, "owned", "Owned local session", "Local");
+                id = row.id;
+                activated |= launch;
+                context_actions(&row, |ui, focus_first| {
+                    if context_item(ui, "Edit session", focus_first) {
+                        edit = true;
+                        ui.close();
+                    }
+                });
+            });
+            id
+        };
+        let id = render(vec![]);
+        ctx.memory_mut(|memory| memory.request_focus(id));
+        render(vec![shell_key(Key::F10, Modifiers::SHIFT)]);
+        assert!(Popup::is_id_open(&ctx, id.with("popup")));
+        render(vec![]);
+        render(vec![shell_key(Key::Enter, Modifiers::NONE)]);
+        assert!(edit);
+        assert!(
+            !activated,
+            "using menu actions must never connect the session"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn saved_session_focus_activates_only_with_keyboard_or_double_click() {
+        let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
+        workspace.store.preferences.sidebar_visible = true;
+        workspace.store.sessions.push(Session {
+            name: "Owned test shell".into(),
+            protocol: "Local".into(),
+            command: "/bin/sh".into(),
+            folder: "Local tests".into(),
+            ..Default::default()
+        });
+        let size = vec2(640., 480.);
+        let draw = |workspace: &mut Workspace, events| {
+            shell_frame(&ctx, size, 1., events, |ui| workspace.sidebar(ui))
+        };
+        draw(&mut workspace, vec![]);
+        let output = draw(&mut workspace, vec![]);
+        let position = shell_text_position(&output, "Owned test shell");
+        draw(&mut workspace, vec![Event::PointerMoved(position)]);
+        assert!(workspace.tabs.is_empty());
+        for pressed in [true, false] {
+            draw(&mut workspace, vec![shell_pointer(position, pressed)]);
+        }
+        assert!(workspace.tabs.is_empty());
+        draw(&mut workspace, vec![shell_key(Key::Enter, Modifiers::NONE)]);
+        assert_eq!(workspace.tabs.len(), 1);
+        assert!(workspace.tabs[0].process.is_some());
+    }
+
     #[test]
     fn only_a_completed_sidebar_edge_drag_persists_its_outer_width() {
         let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
@@ -2736,8 +3259,9 @@ mod gui_tests {
             modifiers: Modifiers::NONE,
         };
         frame(&ctx, &mut workspace, vec![]);
+        frame(&ctx, &mut workspace, vec![]);
         let initial = panel_rect();
-        assert!(initial.width() > 190.5);
+        assert!(initial.width() >= 190.);
         let elsewhere = pos2(1358., 878.);
         for events in [
             vec![Event::PointerMoved(elsewhere)],

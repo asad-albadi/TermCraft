@@ -85,7 +85,7 @@ fn main() -> eframe::Result {
     };
     let mut viewport = eframe::egui::ViewportBuilder::default()
         .with_inner_size([1360., 880.])
-        .with_min_inner_size([920., 620.])
+        .with_min_inner_size([640., 480.])
         .with_title("TermCraft — Remote workspace")
         .with_app_id("termcraft")
         .with_icon(window_icon);
