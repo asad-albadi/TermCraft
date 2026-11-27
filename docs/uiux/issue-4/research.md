@@ -47,3 +47,7 @@ The owner explicitly specified **Windows 11, not Windows 10**. The preference fo
 ### Typography implementation check
 
 [Microsoft's Windows 11 typography reference](https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/typography) distinguishes regular body text and semibold titles, and recommends open-source [Selawik](https://github.com/microsoft/Selawik) for cross-platform use without redistributing Segoe UI. Local inspection found that egui0.36.2's `RichText::strong()` changes text color only, and TermCraft's current embedded interface face is Liberation Sans Regular. The specialist refinement batch must supply real font-weight hierarchy with appropriate licensed faces, preserve terminal font choices and document platform fallbacks.
+
+### Command actions in dialog footers
+
+The current [Microsoft buttons guidance](https://learn.microsoft.com/en-us/windows/apps/design/controls/buttons) recommends a 120px minimum for short command labels and responsive resizing, wrapping or stacking for longer labels. A single safe dialog close action is right-aligned. [ContentDialog guidance](https://learn.microsoft.com/en-us/windows/apps/develop/ui/controls/dialogs-and-flyouts/dialogs) places the primary action leftmost, optional secondary action in the middle and safe close action rightmost. Apply these roles to app-owned dialog footers while retaining operation-specific safe defaults and input guards; navigation/command-bar tiles and inline icon actions are separate roles.

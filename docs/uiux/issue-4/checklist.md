@@ -12,8 +12,8 @@ Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over 
 | 1. Shared foundation | Independently reviewed throughca444ba | Windows 11 geometry correction approved; six current component tests and one actual-model disk round-trip passed; native integration pending |
 | 2. Shell/navigation/tabs/splits | Independently reviewed atb77581a | Seventeen actual-source component tests, strict remote-pane loading/ready probe and app type check passed; dedicated name/theme bar removed |
 | 3. Dialogs and protocol forms | Independently reviewed through acc3132 | Twenty-five focused production UI/PTY/protocol cases, eight shared components and actual SSH/Local native previews; readable aligned fields, accessible labels, scoped input ownership and safe recovery workflows |
-| 4. Specialist pages and web shell | In progress | Complete source inventory in screen-audit.md |
-| 5. Integrated visual/interaction verification | Pending | Before captures in before/; no human/native-only acceptance claimed |
+| 4. Specialist pages and web shell | Independently reviewed through 8f4e0ac | Forty-two focused production tests, actual Chromium appearance checks, native previews; folder/file-type icons in local, SSH/SFTP and FTP explorers |
+| 5. Integrated visual/interaction verification | In progress | Before captures in before/; no human/native-only acceptance claimed |
 
 The detailed boxes below are acceptance tracking for the integrated interface; a completed implementation batch does not mark unexecuted native checks as passed.
 
@@ -26,6 +26,7 @@ The detailed boxes below are acceptance tracking for the integrated interface; a
 - [ ] Reduced motion and high-contrast settings
 - [ ] Scroll indicators, track hover, thumb drag and content clearance
 - [ ] Icon family/stroke/alignment, accessible names and tooltips
+- [ ] Explorer icons distinguish folders and common file types consistently in local, SSH/SFTP and FTP listings; unknown files have a clear fallback
 
 ## Shell and navigation
 
@@ -113,3 +114,13 @@ The detailed boxes below are acceptance tracking for the integrated interface; a
 ### Dialog batch verification
 
 The dialog batch is independently approved through `acc3132`. Focused tests exercise all 13 protocol forms at normal/compact widths and scale, pinned actions, production accessible field names, safe key/vault nesting, dirty mixed SSH/FTP decisions, unrelated-terminal input, save failure and XDMCP close-frame network isolation with a positive control. Native Linux development previews confirmed readable, aligned SSH and Local form rows. These local checks used cached pre-adapter dependencies; full current distribution checks and human acceptance remain pending. The previous hosted run46003044432 failed two old XDMCP coordinate fixtures on all three platforms; the actual Cancel/Escape replacements pass focused checks, but a fresh full run is required.
+
+### Native matrix after the dialog batch
+
+[Hosted run 46010039731](https://github.com/asad-albadi/TermCraft/actions/runs/46010039731), source `eb439c9`, passed Linux x86-64, Windows x64 and Apple Silicon macOS. The previous two XDMCP fixture failures are resolved without dropping the close-frame network and stale-generation guards. This qualifies the foundation/shell/dialog revision; the subsequent specialist-page batch still requires review and a fresh matrix. Native screen-reader and owner visual acceptance are separate checks.
+
+### Specialist pages and explorer icons
+
+The specialist batch is independently approved through `8f4e0ac`. The combined correction passed 42 focused production tests, including real FTP virtual-row scrolling/selection, readable game labels and validation, actual service-field accessible names, remote focus after a listing reorders, and file-type icon geometry, labels and metadata clearance across all three explorers. New icons use the existing drawing style and available filename/kind metadata. They do not read file content, resolve links or add network requests. The final native matrix and integrated acceptance remain pending.
+
+A mixed-language private filename fixture exposed a pre-existing Arabic/CJK glyph fallback limit. The final verification batch will assess existing fallback coverage and record script/shaping limits explicitly; filename geometry tests alone do not qualify glyph coverage.

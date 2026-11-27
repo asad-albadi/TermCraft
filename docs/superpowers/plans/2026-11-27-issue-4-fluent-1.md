@@ -59,11 +59,11 @@ Files: every actual Window/Modal listed in docs/uiux/issue-4/dialog-audit.md, es
 
 Files: audited page/protocol/service/remote/game modules; assets/vnc-browser/index.html, viewer.css, viewer.js only app-owned chrome.
 
-- [ ] Fix local files clipping/keyboard metadata, Tools scrolling, form sizing/wrapping, headings and semantic statuses across remaining surfaces.
-- [ ] Clarify global/session/tab appearance inheritance and clipboard behavior without changing protocol defaults.
-- [ ] Normalize remote files selection/transfer controls, browser/desktop/FTP/editor chrome and service/package/plugin reviews.
-- [ ] Fix game shared chrome/contrast/responsive controls while preserving board logic and idle privacy; Fluent 1 noVNC controls with accessibility/theme/motion fallbacks.
-- [ ] Meaningful existing and covering interaction regressions, commit and independent review.
+- [x] Fix local files clipping/keyboard metadata, Tools scrolling, form sizing/wrapping, headings and semantic statuses across remaining surfaces.
+- [x] Clarify global/session/tab appearance inheritance and clipboard behavior without changing protocol defaults.
+- [x] Normalize remote files selection/transfer controls, browser/desktop/FTP/editor chrome and service/package/plugin reviews.
+- [x] Fix game shared chrome/contrast/responsive controls while preserving board logic and idle privacy; Fluent 1 noVNC controls with accessibility/theme/motion fallbacks.
+- [x] Meaningful existing and covering interaction regressions, commit and independent review.
 
 ## Task 5 — Complete inventory, native visual checks and integration
 
