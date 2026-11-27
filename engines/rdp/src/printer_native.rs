@@ -43,7 +43,7 @@ static LIVE: AtomicUsize = AtomicUsize::new(0);
 struct Permit;
 impl Permit {
     fn acquire() -> Result<Self, String> {
-        LIVE.try_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+        LIVE.fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
             (n < LIMIT).then_some(n + 1)
         })
         .map_err(|_| "Too many native printer workers")?;

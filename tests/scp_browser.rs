@@ -1141,7 +1141,18 @@ fn scp_folder_policies_raw_names_and_modes_survive_round_trip() {
     let remote = server.root.join("policy-remote");
     let local = server.root.join("policy-local");
     std::fs::create_dir_all(source.join("child")).unwrap();
-    let raw = std::ffi::OsString::from_vec(b"raw-\xff-name".to_vec());
+    let raw_bytes = b"raw-\xff-name";
+    let raw = std::ffi::OsString::from_vec(raw_bytes.to_vec());
+    #[cfg(target_os = "macos")]
+    let raw = match std::fs::File::create_new(source.join("child").join(&raw)) {
+        Ok(_) => raw,
+        Err(error) if error.raw_os_error() == Some(libc::EILSEQ) => {
+            // APFS rejects invalid UTF-8 before SCP sees it. Exercise the
+            // full transfer and permission assertions with a Unicode name.
+            std::ffi::OsString::from("raw-é-name")
+        }
+        Err(error) => panic!("could not probe raw-name fixture support: {error}"),
+    };
     std::fs::write(source.join("child").join(&raw), b"content").unwrap();
     for (path, mode) in [
         (source.clone(), 0o751),

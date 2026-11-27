@@ -42,7 +42,7 @@ pub struct XdmcpConfig {
     pub clipboard_display: Option<String>,
     /// Optional selected Xauthority; otherwise read the inherited authority without modifying it.
     pub clipboard_authority: Option<std::path::PathBuf>,
-    /// Address advertised to the manager. The private Windows engine also binds to this address.
+    /// Address advertised to the manager. The private Windows and macOS engines also bind to this address.
     pub advertise_address: Option<Ipv4Addr>,
     /// Explicit permission for this session's unencrypted XDMCP and X11 TCP listener.
     pub allow_network_listener: bool,

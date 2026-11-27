@@ -91,9 +91,8 @@ fn embedded_child_cannot_close_a_different_focused_window() {
                 pressed: true,
                 repeat: false,
                 modifiers: Modifiers {
-                    ctrl: true,
                     shift: true,
-                    ..Default::default()
+                    ..Modifiers::COMMAND
                 },
             }],
             ..Default::default()
@@ -210,9 +209,8 @@ fn detached_find_query_is_edited_in_child_instead_of_sent_to_shell() {
             pressed: true,
             repeat: false,
             modifiers: Modifiers {
-                ctrl: true,
                 shift: true,
-                ..Default::default()
+                ..Modifiers::COMMAND
             },
         }],
     );

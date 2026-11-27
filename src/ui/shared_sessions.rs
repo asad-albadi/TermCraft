@@ -716,7 +716,7 @@ impl Workspace {
         if self
             .shared_sources
             .busy
-            .try_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+            .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
                 (n < 4).then_some(n + 1)
             })
             .is_err()

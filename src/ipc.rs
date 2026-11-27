@@ -118,7 +118,10 @@ impl InstanceBroker {
                 let options = ListenerOptions::new()
                     .name(name_os)
                     .nonblocking(ListenerNonblockingMode::Both);
-                #[cfg(unix)]
+                // macOS local sockets reject fchmod; the private workspace
+                // directory, random namespace name, and token provide the
+                // equivalent ownership boundary there.
+                #[cfg(all(unix, not(target_os = "macos")))]
                 let options = {
                     use interprocess::os::unix::local_socket::ListenerOptionsExt;
                     options.mode(0o600)

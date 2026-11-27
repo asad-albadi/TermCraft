@@ -4,6 +4,7 @@ import os
 import plistlib
 from pathlib import Path
 import shutil
+import stat
 import struct
 import subprocess
 import sys
@@ -420,6 +421,77 @@ class PublicationBoundary(unittest.TestCase):
 
 
 class NativePackageLayout(unittest.TestCase):
+    @unittest.skipUnless(os.name == "posix", "requires POSIX symbolic link semantics")
+    def test_macos_chromium_zip_preserves_framework_links(self):
+        package = module_at("package_release", SCRIPT)
+        smoke = module_at("package_check_startup", ROOT / "scripts/package-check-startup.py")
+        prefix = Path("TermCraft.app/Contents/Resources/browser/macos-aarch64/Chromium.app")
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary).resolve()
+            source = base / "source"
+            framework = source / prefix / "Framework.framework"
+            (framework / "Versions/1").mkdir(parents=True)
+            (framework / "Versions/1/executable").write_bytes(b"framework")
+            (framework / "Versions/Current").symlink_to("1")
+            (framework / "executable").symlink_to("Versions/Current/executable")
+            archive = base / "package.zip"
+            package.write_zip(source / "TermCraft.app", archive)
+            unpacked = base / "unpacked"
+            smoke.extract(archive, unpacked)
+            relocated = unpacked / prefix / framework.name
+            self.assertEqual(os.readlink(relocated / "Versions/Current"), "1")
+            self.assertEqual((relocated / "executable").read_bytes(), b"framework")
+
+            for name, target, child in (
+                ("../../escape", "1", None),
+                ("Versions/Current", "../1", None),
+                ("Versions/Current", "1", "Versions/Current/file"),
+                ("Versions/Current", "Current", None),
+            ):
+                with self.subTest(name=name, target=target, child=child):
+                    bad = base / "invalid.zip"
+                    link = zipfile.ZipInfo((prefix / framework.name / name).as_posix())
+                    link.create_system = 3
+                    link.external_attr = (stat.S_IFLNK | 0o777) << 16
+                    with zipfile.ZipFile(bad, "w") as written:
+                        written.writestr(link, target)
+                        if child:
+                            regular = zipfile.ZipInfo((prefix / framework.name / child).as_posix())
+                            regular.create_system = 3
+                            regular.external_attr = (stat.S_IFREG | 0o644) << 16
+                            written.writestr(regular, b"unsafe")
+                    rejected = base / "rejected"
+                    with self.assertRaises(ValueError):
+                        smoke.extract(bad, rejected)
+                    self.assertFalse(rejected.exists())
+
+    def test_macos_xquartz_staging_rejects_changed_source_bytes(self):
+        package = module_at("package_release", SCRIPT)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            candidate = root / "candidate"
+            inventory = ROOT / "packaging/x11/native/macos-arm64.sha256"
+            first = inventory.read_text().splitlines()[0].split("  ", 1)[1]
+            changed = candidate / first
+            changed.parent.mkdir(parents=True)
+            changed.write_bytes(b"changed source archive")
+            with self.assertRaisesRegex(ValueError, "XQuartz checksum mismatch"):
+                package.stage_xquartz(ROOT, root / "resources", candidate)
+
+    def test_macos_build_metadata_records_sdk_and_deployment_target(self):
+        package = module_at("package_release", SCRIPT)
+        with patch.object(package, "capture", side_effect=["15.5\n", "Apple clang version 17.0.0\n"]), \
+             patch.dict(os.environ, {"MACOSX_DEPLOYMENT_TARGET": "14.0"}, clear=False):
+            self.assertEqual(
+                package.macos_build_metadata("aarch64"),
+                {
+                    "sdk_version": "15.5",
+                    "deployment_target": "14.0",
+                    "compiler": "Apple clang version 17.0.0",
+                    "architecture": "aarch64",
+                },
+            )
+
     def test_windows_zip_and_macos_bundle_keep_helper_beside_app(self):
         try:
             __import__("PIL")
@@ -442,6 +514,7 @@ class NativePackageLayout(unittest.TestCase):
                     path.write_bytes(macho + b"fixture launcher")
                     path.chmod(0o755)
                 with (patch.object(package, "build_macos_launcher", side_effect=fixture_launcher),
+                      patch.object(package, "macos_build_metadata", side_effect=AssertionError("unverified inputs have no build SDK")),
                       patch.object(package, "cargo_notices", return_value=[]),
                       patch.object(package, "native_libraries", return_value={"libraries": []})):
                     archive = package.package_release(target, base / "out", app, helper)
@@ -457,6 +530,8 @@ class NativePackageLayout(unittest.TestCase):
                         for name in (entry, engine):
                             self.assertEqual((bundle.getinfo(name).external_attr >> 16) & 0o777, 0o755)
                     if target == "macos":
+                        manifest = json.loads(bundle.read("TermCraft.app/Contents/Resources/PACKAGE-MANIFEST.json"))
+                        self.assertNotIn("macos", manifest["build"])
                         plist = plistlib.loads(bundle.read("TermCraft.app/Contents/Info.plist"))
                         self.assertEqual(plist["CFBundleExecutable"], "termcraft-desktop-launcher")
                         self.assertIn("TermCraft.app/Contents/MacOS/termcraft-desktop-launcher", names)

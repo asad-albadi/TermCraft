@@ -309,33 +309,53 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             ui.add(DragValue::new(display).range(1..=59535));
         }
     });
-    ui.horizontal(|ui| {
-        ui.label("Desktop size");
-        ui.add(DragValue::new(&mut s.width).range(200..=8192));
-        ui.label("×");
-        ui.add(DragValue::new(&mut s.height).range(200..=8192));
-        ui.checkbox(&mut s.xdmcp_options.fullscreen, "Full screen");
-    });
-    ui.horizontal(|ui| {
-        ui.label("Monitor output");
-        let mut monitor = s.xdmcp_options.monitor.clone().unwrap_or_default();
-        let monitor_hint = if cfg!(all(windows, target_arch = "x86_64")) {
-            "Default; e.g. 1"
-        } else {
-            "Default; e.g. HDMI-1"
-        };
-        if ui
-            .add(TextEdit::singleline(&mut monitor).hint_text(monitor_hint))
-            .changed()
+    let native_macos = cfg!(all(target_os = "macos", target_arch = "aarch64"));
+    if native_macos {
+        ui.small("Private XQuartz shows native windows using host geometry and keyboard. Full screen, monitor selection, layout overrides and host clipboard sharing are unavailable.");
+        let options = &mut s.xdmcp_options;
+        if (options.fullscreen
+            || options.monitor.is_some()
+            || !options.keyboard.is_empty()
+            || options.clipboard != ClipboardPolicy::Disabled
+            || options.clipboard_display.is_some()
+            || options.clipboard_authority.is_some())
+            && ui.button("Clear unsupported XDMCP options").clicked()
         {
-            s.xdmcp_options.monitor = if monitor.is_empty() {
-                None
-            } else {
-                Some(monitor)
-            }
+            options.fullscreen = false;
+            options.monitor = None;
+            options.keyboard.clear();
+            options.clipboard = ClipboardPolicy::Disabled;
+            options.clipboard_display = None;
+            options.clipboard_authority = None;
         }
-    });
-    ui.horizontal(|ui| {
+    } else {
+        ui.horizontal(|ui| {
+            ui.label("Desktop size");
+            ui.add(DragValue::new(&mut s.width).range(200..=8192));
+            ui.label("×");
+            ui.add(DragValue::new(&mut s.height).range(200..=8192));
+            ui.checkbox(&mut s.xdmcp_options.fullscreen, "Full screen");
+        });
+        ui.horizontal(|ui| {
+            ui.label("Monitor output");
+            let mut monitor = s.xdmcp_options.monitor.clone().unwrap_or_default();
+            let monitor_hint = if cfg!(all(windows, target_arch = "x86_64")) {
+                "Default; e.g. 1"
+            } else {
+                "Default; e.g. HDMI-1"
+            };
+            if ui
+                .add(TextEdit::singleline(&mut monitor).hint_text(monitor_hint))
+                .changed()
+            {
+                s.xdmcp_options.monitor = if monitor.is_empty() {
+                    None
+                } else {
+                    Some(monitor)
+                }
+            }
+        });
+        ui.horizontal(|ui| {
         ui.label("Session keyboard");
         let keyboard = &mut s.xdmcp_options.keyboard;
         ui.add(TextEdit::singleline(keyboard).hint_text("Host keyboard").desired_width(120.0))
@@ -344,73 +364,74 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             keyboard.clear();
         }
     });
-    ui.horizontal(|ui| {
-        let windows = cfg!(all(windows, target_arch = "x86_64"));
-        ui.label(if windows {
-            "Windows text clipboard"
-        } else {
-            "Parent X11 text clipboard"
-        });
-        ui.selectable_value(
-            &mut s.xdmcp_options.clipboard,
-            ClipboardPolicy::Disabled,
-            "Disabled",
-        );
-        #[cfg(target_os = "linux")]
-        ui.selectable_value(
-            &mut s.xdmcp_options.clipboard,
-            ClipboardPolicy::Bidirectional,
-            "Bidirectional text",
-        );
-        #[cfg(all(windows, target_arch = "x86_64"))]
-        if ui
-            .selectable_value(
-                &mut s.xdmcp_options.clipboard,
-                ClipboardPolicy::WindowsBidirectional,
-                "Bidirectional text",
-            )
-            .changed()
-        {
-            s.xdmcp_options.clipboard_display = None;
-            s.xdmcp_options.clipboard_authority = None;
-        }
-        #[cfg(not(any(target_os = "linux", all(windows, target_arch = "x86_64"))))]
-        ui.add_enabled(
-            false,
-            egui::Button::new("Bidirectional (unavailable for this engine)"),
-        );
-    });
-    #[cfg(all(windows, target_arch = "x86_64"))]
-    if s.xdmcp_options.clipboard == ClipboardPolicy::WindowsBidirectional {
-        ui.small("Shares Windows clipboard text in both directions with this XDMCP desktop.");
-    }
-    #[cfg(target_os = "linux")]
-    if s.xdmcp_options.clipboard == ClipboardPolicy::Bidirectional {
         ui.horizontal(|ui| {
-            ui.label("Selected local parent X11 display");
-            ui.text_edit_singleline(
-                s.xdmcp_options
-                    .clipboard_display
-                    .get_or_insert_with(String::new),
+            let windows = cfg!(all(windows, target_arch = "x86_64"));
+            ui.label(if windows {
+                "Windows text clipboard"
+            } else {
+                "Parent X11 text clipboard"
+            });
+            ui.selectable_value(
+                &mut s.xdmcp_options.clipboard,
+                ClipboardPolicy::Disabled,
+                "Disabled",
+            );
+            #[cfg(target_os = "linux")]
+            ui.selectable_value(
+                &mut s.xdmcp_options.clipboard,
+                ClipboardPolicy::Bidirectional,
+                "Bidirectional text",
+            );
+            #[cfg(all(windows, target_arch = "x86_64"))]
+            if ui
+                .selectable_value(
+                    &mut s.xdmcp_options.clipboard,
+                    ClipboardPolicy::WindowsBidirectional,
+                    "Bidirectional text",
+                )
+                .changed()
+            {
+                s.xdmcp_options.clipboard_display = None;
+                s.xdmcp_options.clipboard_authority = None;
+            }
+            #[cfg(not(any(target_os = "linux", all(windows, target_arch = "x86_64"))))]
+            ui.add_enabled(
+                false,
+                egui::Button::new("Bidirectional (unavailable for this engine)"),
             );
         });
-        let mut authority = s
-            .xdmcp_options
-            .clipboard_authority
-            .as_ref()
-            .map(|p| p.to_string_lossy().into_owned())
-            .unwrap_or_default();
-        ui.horizontal(|ui| {
-            ui.label("Parent Xauthority (blank: inherited)");
-            if ui.text_edit_singleline(&mut authority).changed() {
-                s.xdmcp_options.clipboard_authority = if authority.is_empty() {
-                    None
-                } else {
-                    Some(authority.into())
-                };
-            }
-        });
-        ui.small("UTF-8 text, up to 1 MiB. Shares this X11 CLIPBOARD; Wayland compositor clipboard sharing depends on the compositor.");
+        #[cfg(all(windows, target_arch = "x86_64"))]
+        if s.xdmcp_options.clipboard == ClipboardPolicy::WindowsBidirectional {
+            ui.small("Shares Windows clipboard text in both directions with this XDMCP desktop.");
+        }
+        #[cfg(target_os = "linux")]
+        if s.xdmcp_options.clipboard == ClipboardPolicy::Bidirectional {
+            ui.horizontal(|ui| {
+                ui.label("Selected local parent X11 display");
+                ui.text_edit_singleline(
+                    s.xdmcp_options
+                        .clipboard_display
+                        .get_or_insert_with(String::new),
+                );
+            });
+            let mut authority = s
+                .xdmcp_options
+                .clipboard_authority
+                .as_ref()
+                .map(|p| p.to_string_lossy().into_owned())
+                .unwrap_or_default();
+            ui.horizontal(|ui| {
+                ui.label("Parent Xauthority (blank: inherited)");
+                if ui.text_edit_singleline(&mut authority).changed() {
+                    s.xdmcp_options.clipboard_authority = if authority.is_empty() {
+                        None
+                    } else {
+                        Some(authority.into())
+                    };
+                }
+            });
+            ui.small("UTF-8 text, up to 1 MiB. Shares this X11 CLIPBOARD; Wayland compositor clipboard sharing depends on the compositor.");
+        }
     }
     if state.advertise.is_empty() {
         if let Some(ip) = s.xdmcp_options.advertise_address {
@@ -420,8 +441,11 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     ui.horizontal(|ui| {
         ui.label("Advertised local IPv4");
         ui.add(
-            TextEdit::singleline(&mut state.advertise)
-                .hint_text("Reachable non-loopback local IPv4"),
+            TextEdit::singleline(&mut state.advertise).hint_text(if native_macos {
+                "Automatic route address"
+            } else {
+                "Reachable non-loopback local IPv4"
+            }),
         );
     });
     s.xdmcp_options.advertise_address = state.advertise.parse().ok();
@@ -437,9 +461,17 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     } else {
         ui.checkbox(
             &mut s.xdmcp_options.allow_network_listener,
-            "Allow unencrypted XDMCP/X11 and this session's TCP listener on all interfaces",
+            if native_macos {
+                "Allow unencrypted XDMCP/X11 and this session's TCP listener on one local IPv4 address"
+            } else {
+                "Allow unencrypted XDMCP/X11 and this session's TCP listener on all interfaces"
+            },
         );
-        ui.small("XDMCP and X11 are unencrypted. Use a trusted isolated network. The advertised address does not restrict the TCP listener. X11 access control remains enabled. Linux requires the pinned owned Xephyr payload and a host X11 display; other platforms need a qualified engine.");
+        if native_macos {
+            ui.small("Use a trusted isolated network. XDMCP does not authenticate the manager. The listener requires the negotiated X11 cookie and is bound to the advertised address. Indirect mode can accept a forwarded manager. Requires the packaged Apple Silicon XQuartz runtime.");
+        } else {
+            ui.small("XDMCP and X11 are unencrypted. Use a trusted isolated network. The advertised address does not restrict the TCP listener. X11 access control remains enabled. Linux requires the pinned owned Xephyr payload and a host X11 display. Other platforms have no automatic engine fallback.");
+        }
     }
 }
 pub(super) fn start(session: &Session) -> Result<ManagedXdmcp, String> {

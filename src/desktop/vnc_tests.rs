@@ -336,8 +336,12 @@ impl TlsFixture {
         use rustls::pki_types::{CertificateDer, PrivateKeyDer, pem::PemObject};
         let root = tempfile::tempdir().unwrap();
         let cert = root.path().join("cert.pem");
+        let ca_key = root.path().join("ca.key");
+        let csr = root.path().join("server.csr");
+        let serial = root.path().join("ca.srl");
+        let server_cert = root.path().join("server.pem");
         let key = root.path().join("key.pem");
-        let output = std::process::Command::new("openssl")
+        let ca = std::process::Command::new("openssl")
             .args([
                 "req",
                 "-x509",
@@ -347,24 +351,69 @@ impl TlsFixture {
                 "-days",
                 "1",
                 "-subj",
-                "/CN=localhost",
+                "/CN=TermCraft test CA",
                 "-addext",
-                "subjectAltName=DNS:localhost",
-                "-addext",
-                "basicConstraints=critical,CA:FALSE",
+                "basicConstraints=critical,CA:TRUE,pathlen:1",
                 "-keyout",
             ])
-            .arg(&key)
+            .arg(&ca_key)
             .arg("-out")
             .arg(&cert)
             .output()
             .unwrap();
         assert!(
-            output.status.success(),
-            "certificate fixture failed: {}",
-            String::from_utf8_lossy(&output.stderr)
+            ca.status.success(),
+            "CA fixture failed: {}",
+            String::from_utf8_lossy(&ca.stderr)
         );
-        let certificate = CertificateDer::from_pem_file(&cert).unwrap();
+        let request = std::process::Command::new("openssl")
+            .args([
+                "req",
+                "-new",
+                "-newkey",
+                "rsa:2048",
+                "-nodes",
+                "-subj",
+                "/CN=localhost",
+                "-keyout",
+            ])
+            .arg(&key)
+            .arg("-out")
+            .arg(&csr)
+            .output()
+            .unwrap();
+        assert!(
+            request.status.success(),
+            "certificate request fixture failed: {}",
+            String::from_utf8_lossy(&request.stderr)
+        );
+        let extensions = root.path().join("server.ext");
+        std::fs::write(
+            &extensions,
+            "subjectAltName=DNS:localhost\nbasicConstraints=critical,CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth\n",
+        )
+        .unwrap();
+        let signed = std::process::Command::new("openssl")
+            .args(["x509", "-req", "-days", "1", "-CAcreateserial", "-CA"])
+            .arg(&cert)
+            .arg("-CAkey")
+            .arg(&ca_key)
+            .arg("-CAserial")
+            .arg(&serial)
+            .arg("-in")
+            .arg(&csr)
+            .arg("-out")
+            .arg(&server_cert)
+            .arg("-extfile")
+            .arg(&extensions)
+            .output()
+            .unwrap();
+        assert!(
+            signed.status.success(),
+            "signed certificate fixture failed: {}",
+            String::from_utf8_lossy(&signed.stderr)
+        );
+        let certificate = CertificateDer::from_pem_file(&server_cert).unwrap();
         let key = PrivateKeyDer::from_pem_file(&key).unwrap();
         let config = rustls::ServerConfig::builder_with_provider(Arc::new(
             rustls::crypto::ring::default_provider(),

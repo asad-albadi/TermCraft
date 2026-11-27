@@ -18,7 +18,7 @@
  
  #ifdef COMPOSITE
  extern Bool noCompositeExtension;
-@@ -633,102 +635,42 @@
+@@ -633,102 +635,47 @@
      /* Ignore SIGPIPE */
      signal(SIGPIPE, SIG_IGN);
  
@@ -35,13 +35,16 @@
 +        long fd = strtol(owned_fd, &end, 10);
 +        struct sockaddr_un address;
 +        socklen_t address_len = sizeof(address);
-+        int accepts = 0;
-+        socklen_t accepts_len = sizeof(accepts);
++        int type = 0;
++        socklen_t type_len = sizeof(type);
++        const char *socket_path = getenv("DISPLAY");
 +        if (!*owned_fd || !end || *end || fd < 3 || fd > INT_MAX ||
++            !socket_path || socket_path[0] != '/' ||
 +            getsockname((int)fd, (struct sockaddr *)&address, &address_len) != 0 ||
 +            address.sun_family != AF_UNIX ||
-+            getsockopt((int)fd, SOL_SOCKET, SO_ACCEPTCONN, &accepts, &accepts_len) != 0 ||
-+            !accepts)
++            strncmp(address.sun_path, socket_path, sizeof(address.sun_path)) != 0 ||
++            getsockopt((int)fd, SOL_SOCKET, SO_TYPE, &type, &type_len) != 0 ||
++            type != SOCK_STREAM || listen((int)fd, SOMAXCONN) != 0)
 +            return EXIT_FAILURE;
 +        const char *root = getenv("TERMCRAFT_X11_ROOT");
 +        if (!root || root[0] != '/' || strpbrk(root, "\"`$\\"))
@@ -52,7 +55,9 @@
 +            return EXIT_FAILURE;
 +        XkbBinDirectory = bin;
 +        XkbBaseDirectory = data;
-+        setup_console_redirect("org.termcraft.private.X11");
++        bundle_id_prefix = strdup(BUNDLE_ID_PREFIX);
++        if (!bundle_id_prefix)
++            return EXIT_FAILURE;
 +        NoListenAll = TRUE; /* Includes no global display lock/unlink. */
 +        noPanoramiXExtension = TRUE;
  #ifdef COMPOSITE
@@ -155,13 +160,29 @@
  }
  
  static int
+--- a/hw/xquartz/darwin.c
++++ b/hw/xquartz/darwin.c
+@@ -672,6 +672,13 @@ OsVendorInit(void)
+ {
+     if (serverGeneration == 1) {
++        if (getenv("TERMCRAFT_OWNED_X11_FD")) {
++            /* The parent owns stderr and the private runtime directory. */
++            LogInit(NULL, NULL);
++            DarwinPrintBanner();
++            return;
++        }
++
+         char *lf;
+         char *home = getenv("HOME");
+         assert(home);
+         assert(0 < asprintf(&lf, "%s/Library/Logs/X11", home));
 --- a/os/connection.c
 +++ b/os/connection.c
 @@ -301,6 +301,18 @@
      ResetHosts(display);
  
      InitParentProcess();
-+#ifdef XQUARTZ
++#ifdef TERMCRAFT_PRIVATE_XQUARTZ
 +    /* Private main already validated this exclusively owned AF_UNIX listener. */
 +    const char *owned_fd = getenv("TERMCRAFT_OWNED_X11_FD");
 +    if (owned_fd) {

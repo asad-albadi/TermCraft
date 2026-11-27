@@ -92,13 +92,27 @@ and must not silently re-enable a vulnerable engine.
 
 This candidate has Linux workflow evidence. A clean machine with no installed
 Chromium and the clean OS/ABI matrix remain separate qualification requirements.
-Windows and macOS bundled selections are explicitly unavailable until an audited
-source-built native payload/complete resources/signatures are pinned. Existing
-Windows known-folder discovery and private helper/handle/job/image checks remain
-unchanged for installed compatibility mode. The Windows helper accepts no arbitrary
-engine path. Existing macOS installed app discovery/native pipe transport likewise
-remain available. Cross-target source checks do not establish native execution,
-Windows sandbox token/job behavior, macOS signing/notarization, or native TLS trust.
+Windows release packages require a qualified native Chromium payload. The
+Apple Silicon qualification package can include the source-matched Chromium
+snapshot from `macos-arm64-qualification.json`. Place the exact archive in a
+directory and run on Apple Silicon:
+
+```sh
+python3 scripts/package-release.py --macos-browser-fixture /path/to/inputs --output dist
+```
+
+The stager checks the archive SHA-256, preserves the framework links, ad-hoc
+seals the native app, verifies its signature and compares its complete file
+and link inventory. The resulting ZIP has a `chromium-qualification` suffix
+and a `qualification` manifest profile. The packager enables the opt-in
+`macos-chromium-qualification` Cargo feature for this build. It is for local software
+qualification. Public redistribution requires its own approved notices and
+signing policy.
+
+Installed compatibility mode uses known-folder discovery and the private
+helper on Windows, and installed app discovery and native pipe transport on
+macOS. Cross-target source checks do not establish native execution, Windows
+sandbox token/job behavior, macOS signing/notarization, or native TLS trust.
 
 Primary references:
 [Arch package](https://archlinux.org/packages/extra/x86_64/chromium/),

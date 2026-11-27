@@ -3,3 +3,4 @@
 /packaging/browser/THIRD-PARTY-NOTICES.html -text
 /packaging/x11/native/*.patch -text
 /runtime/linux-x86_64/*-LICENSE -text
+/packaging/x11/native/macos-arm64.sha256 -text

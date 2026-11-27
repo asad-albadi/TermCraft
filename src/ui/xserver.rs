@@ -20,17 +20,43 @@ pub(super) struct State {
     pending: Vec<u64>,
     error: Option<String>,
     capabilities: Option<Result<XCapabilities, String>>,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    clipboard_pending: bool,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    clipboard_status: Option<String>,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    clipboard_reader: Arc<AtomicBool>,
 }
 
 enum Event {
     Capabilities(Result<XCapabilities, String>),
     Ready(XClientDisplay),
     Ended(Result<(), String>),
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    Clipboard(Result<Option<(isize, String)>, String>),
+}
+
+enum Request {
+    Stop,
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    Clipboard(ClipboardJob),
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+enum ClipboardDirection {
+    ToX11,
+    ToMac,
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+enum ClipboardJob {
+    Write(Result<String, String>),
+    Read(isize),
 }
 
 struct Worker {
     events: Receiver<Event>,
-    stop: SyncSender<()>,
+    requests: SyncSender<Request>,
     cancelled: Arc<AtomicBool>,
     thread: Option<JoinHandle<()>>,
 }
@@ -38,11 +64,49 @@ struct Worker {
 impl Worker {
     fn request_stop(&self) {
         self.cancelled.store(true, Ordering::Relaxed);
-        let _ = self.stop.try_send(());
+        let _ = self.requests.try_send(Request::Stop);
     }
 
     fn stopping(&self) -> bool {
         self.cancelled.load(Ordering::Relaxed)
+    }
+
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    fn request_clipboard(
+        &self,
+        direction: ClipboardDirection,
+        reader: &Arc<AtomicBool>,
+    ) -> Result<(), String> {
+        match direction {
+            ClipboardDirection::ToMac => {
+                let revision = objc2_app_kit::NSPasteboard::generalPasteboard().changeCount();
+                self.requests
+                    .try_send(Request::Clipboard(ClipboardJob::Read(revision)))
+                    .map_err(|_| "The private X11 clipboard is busy.".into())
+            }
+            ClipboardDirection::ToX11 => {
+                if reader.swap(true, Ordering::AcqRel) {
+                    return Err("The macOS pasteboard is still supplying text.".into());
+                }
+                let finished = super::clipboard::Finished(reader.clone());
+                let requests = self.requests.clone();
+                let cancelled = self.cancelled.clone();
+                std::thread::Builder::new()
+                    .name("termcraft-x11-pasteboard".into())
+                    .spawn(move || {
+                        let _finished = finished;
+                        if !cancelled.load(Ordering::Relaxed) {
+                            let text = super::clipboard::read_os_text();
+                            if !cancelled.load(Ordering::Relaxed) {
+                                let _ = requests
+                                    .try_send(Request::Clipboard(ClipboardJob::Write(text)));
+                            }
+                        }
+                    })
+                    .map(|_| ())
+                    .map_err(|error| format!("Could not read the macOS pasteboard: {error}"))
+            }
+        }
     }
 }
 
@@ -75,12 +139,17 @@ impl State {
         let probe_executable = self.probe_executable.clone();
         let options = self.options.clone();
         let (sender, events) = mpsc::sync_channel(3);
-        let (stop, stop_requested) = mpsc::sync_channel(1);
+        let (requests, requested) = mpsc::sync_channel(1);
         let cancelled = Arc::new(AtomicBool::new(false));
         let worker_cancelled = Arc::clone(&cancelled);
         let ctx = ctx.clone();
         self.error = None;
         self.capabilities = None;
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        {
+            self.clipboard_pending = false;
+            self.clipboard_status = None;
+        }
         match std::thread::Builder::new()
             .name("termcraft-xserver".into())
             .spawn(move || {
@@ -92,8 +161,8 @@ impl State {
                 let result = manager
                     .start_cancellable(options, &worker_cancelled)
                     .and_then(|mut lease| {
-                        // Probe before clients are released: an active RandR check may
-                        // briefly switch the newly owned display and then restore it.
+                        // Probe before clients are released. Linux briefly switches
+                        // and restores an advertised mode; macOS only observes geometry.
                         let capabilities = match &probe_executable {
                             Some(executable) => XCapabilities::probe_with_executable(
                                 &lease.client_display(),
@@ -104,8 +173,8 @@ impl State {
                                 XCapabilities::probe(&lease.client_display(), &worker_cancelled)
                             }
                         };
-                        // A crashed or timed-out driver may have interrupted a mode
-                        // transition. Discard this fresh display before exposing clients.
+                        // Discard an unqualified lease. On Linux the probe may also
+                        // have been interrupted while switching modes.
                         if let Err(error) = &capabilities {
                             let error = error.clone();
                             report(Event::Capabilities(capabilities));
@@ -120,16 +189,49 @@ impl State {
                         {
                             return lease.stop_owned();
                         }
+                        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                        let mut clipboard: Option<
+                            harbor_workspace::x11::MacosClipboard,
+                        > = None;
                         loop {
                             use mpsc::RecvTimeoutError;
 
-                            match stop_requested.recv_timeout(Duration::from_millis(250)) {
-                                Ok(()) | Err(RecvTimeoutError::Disconnected) => {
+                            if worker_cancelled.load(Ordering::Relaxed) {
+                                return lease.stop_owned();
+                            }
+                            let interval = Duration::from_millis(250);
+                            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                            let interval = if clipboard.is_some() {
+                                Duration::from_millis(25)
+                            } else {
+                                interval
+                            };
+                            match requested.recv_timeout(interval) {
+                                Ok(Request::Stop) | Err(RecvTimeoutError::Disconnected) => {
                                     return lease.stop_owned();
+                                }
+                                #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                                Ok(Request::Clipboard(job)) => {
+                                    let result = transfer_clipboard(
+                                        &mut clipboard,
+                                        job,
+                                        &lease,
+                                        &worker_cancelled,
+                                    );
+                                    if !worker_cancelled.load(Ordering::Relaxed) {
+                                        let _ = sender.try_send(Event::Clipboard(result));
+                                        ctx.request_repaint();
+                                    }
                                 }
                                 Err(RecvTimeoutError::Timeout) => {
                                     if !lease.is_running()? {
                                         return Err("The packaged X server exited".into());
+                                    }
+                                    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                                    if let Some(bridge) = &mut clipboard
+                                        && bridge.poll().is_err()
+                                    {
+                                        clipboard = None;
                                     }
                                 }
                             }
@@ -140,7 +242,7 @@ impl State {
             Ok(thread) => {
                 self.worker = Some(Worker {
                     events,
-                    stop,
+                    requests,
                     cancelled,
                     thread: Some(thread),
                 });
@@ -156,6 +258,19 @@ impl State {
             match worker.events.try_recv() {
                 Ok(Event::Capabilities(report)) => self.capabilities = Some(report),
                 Ok(Event::Ready(display)) => self.display = Some(display),
+                #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                Ok(Event::Clipboard(result)) => {
+                    self.clipboard_pending = false;
+                    if !worker.stopping() {
+                        self.clipboard_status = Some(match result {
+                            Ok(Some((revision, text))) => write_macos_pasteboard(revision, &text)
+                                .map(|()| "Copied X11 text to macOS.".into())
+                                .unwrap_or_else(|error| error),
+                            Ok(None) => "Copied macOS text to X11.".into(),
+                            Err(error) => error,
+                        });
+                    }
+                }
                 Ok(Event::Ended(result)) => {
                     self.error = if worker.stopping() {
                         let cancelled = (!self.pending.is_empty())
@@ -170,6 +285,11 @@ impl State {
                     };
                     self.display = None;
                     self.worker = None;
+                    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                    {
+                        self.clipboard_pending = false;
+                        self.clipboard_status = None;
+                    }
                 }
                 Err(TryRecvError::Empty) => return,
                 Err(TryRecvError::Disconnected) => {
@@ -234,6 +354,48 @@ impl State {
                 let _ = thread.join();
             }
         }
+    }
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn write_macos_pasteboard(revision: isize, text: &str) -> Result<(), String> {
+    use objc2_app_kit::{NSPasteboard, NSPasteboardTypeString};
+    let text = objc2_foundation::NSString::from_str(text);
+    let pasteboard = NSPasteboard::generalPasteboard();
+    if pasteboard.changeCount() != revision {
+        return Err("The macOS pasteboard changed. Copy from X11 again to replace it.".into());
+    }
+    pasteboard.clearContents();
+    if !pasteboard.setString_forType(&text, unsafe { NSPasteboardTypeString }) {
+        return Err("Could not write the macOS pasteboard.".into());
+    }
+    Ok(())
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn transfer_clipboard(
+    clipboard: &mut Option<harbor_workspace::x11::MacosClipboard>,
+    job: ClipboardJob,
+    lease: &harbor_workspace::x11::XServerLease,
+    cancelled: &Arc<AtomicBool>,
+) -> Result<Option<(isize, String)>, String> {
+    use harbor_workspace::x11::MacosClipboard;
+    if cancelled.load(Ordering::Relaxed) {
+        return Err("The private X display is stopping.".into());
+    }
+    if clipboard.is_none() {
+        *clipboard = Some(MacosClipboard::open(
+            lease.client_display(),
+            cancelled.clone(),
+        )?);
+    }
+    let clipboard = clipboard.as_mut().unwrap();
+    match job {
+        ClipboardJob::Write(text) => {
+            clipboard.write_text(text?)?;
+            Ok(None)
+        }
+        ClipboardJob::Read(revision) => clipboard.read_text().map(|text| Some((revision, text))),
     }
 }
 
@@ -308,8 +470,8 @@ pub(super) fn session_settings(ui: &mut Ui, session: &mut Session) {
     }
     ui.label("X display");
     ui.horizontal_wrapped(|ui| {
-        let owned_supported = Workspace::default_x11_source() == XDisplaySource::Owned
-            && (local || session.ssh_engine == SshEngine::Embedded);
+        let owned_supported =
+            owned_x11_supported() && (local || session.ssh_engine == SshEngine::Embedded);
         ui.add_enabled_ui(owned_supported, |ui| {
             ui.selectable_value(&mut session.x11_source, XDisplaySource::Owned, "TermCraft");
         });
@@ -324,6 +486,17 @@ pub(super) fn session_settings(ui: &mut Ui, session: &mut Session) {
         });
         ui.end_row();
     }
+}
+
+fn owned_x11_supported() -> bool {
+    cfg!(any(
+        all(
+            target_os = "linux",
+            target_arch = "x86_64",
+            target_env = "gnu"
+        ),
+        all(target_os = "macos", target_arch = "aarch64")
+    ))
 }
 
 impl Workspace {
@@ -413,17 +586,16 @@ impl Workspace {
     pub(super) fn xserver_card(&mut self, ui: &mut Ui) {
         surface(ui).show(ui, |ui| {
             ui.label(RichText::new("X11 server").size(18.).strong());
-            if !cfg!(all(
-                target_os = "linux",
-                target_arch = "x86_64",
-                target_env = "gnu"
-            )) {
+            if !owned_x11_supported() {
                 ui.label("A managed X11 server is unavailable on this platform.");
                 return;
             }
-            ui.label(
-                RichText::new("Open a private X display in your Wayland session. Its clipboard is shared between apps on that display.").color(muted(ui)),
-            );
+            let description = if cfg!(target_os = "macos") {
+                "Open an authenticated private XQuartz display in native windows."
+            } else {
+                "Open a private X display in your Wayland session. Its clipboard is shared between apps on that display."
+            };
+            ui.label(RichText::new(description).color(muted(ui)));
             let state = &mut self.xserver;
             if let Some(worker) = &state.worker {
                 if worker.stopping() {
@@ -439,16 +611,31 @@ impl Workspace {
                     if let Some(capabilities) = &state.capabilities {
                         match capabilities {
                             Ok(report) => {
+                                if report.core_x11_pixels {
+                                    ui.label("Core X11 pixel readback verified");
+                                }
+                                #[cfg(target_os = "macos")]
+                                ui.label(format!("GLX: {} · Composite: {}",
+                                    report.glx_version.as_deref().unwrap_or("unavailable"),
+                                    report.composite_version.as_deref().unwrap_or("unavailable")));
+                                #[cfg(not(target_os = "macos"))]
                                 ui.label(format!("GLX: {} · Composite: {} · RandR: {}",
                                     report.glx_version.as_deref().unwrap_or("unavailable"),
                                     report.composite_version.as_deref().unwrap_or("unavailable"),
                                     report.randr_version.as_deref().unwrap_or("unavailable")));
+                                #[cfg(target_os = "macos")]
+                                ui.label("Local direct GLX requires a compatible Apple GLX client library.");
+                                #[cfg(not(target_os = "macos"))]
                                 if let Some(gl) = &report.opengl {
                                     ui.label(format!("{} · {} · pixels {}/{}", gl.renderer,
                                         if gl.software { "software rendering" } else { "driver rendering (hardware unqualified)" },
                                         gl.matched_pixels, gl.sampled_pixels));
                                 } else { ui.label("OpenGL rendering unavailable or unverified"); }
+                                #[cfg(not(target_os = "macos"))]
                                 ui.label(if report.composite_pixels { "Composite redirect/readback verified" } else { "Composite rendering unverified" });
+                                #[cfg(target_os = "macos")]
+                                macos_display_snapshot(ui, report);
+                                #[cfg(not(target_os = "macos"))]
                                 ui.label(format!("Screen {}×{} · resolution change {}", report.dimensions[0], report.dimensions[1], if report.randr_change.is_some() { "verified with event; initial size restored" } else { "unavailable or unverified" }));
                                 for error in &report.errors { ui.colored_label(Color32::from_rgb(200, 120, 50), error); }
                             }
@@ -473,6 +660,31 @@ impl Workspace {
                             display.display()
                         ));
                     }
+                    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+                    {
+                        ui.horizontal_wrapped(|ui| {
+                            for (label, direction) in [
+                                ("Copy macOS text to X11", ClipboardDirection::ToX11),
+                                ("Copy X11 text to macOS", ClipboardDirection::ToMac),
+                            ] {
+                                if ui.add_enabled(!state.clipboard_pending, egui::Button::new(label))
+                                    .on_hover_text("Transfer UTF-8 clipboard text once, up to 64 KiB.")
+                                    .clicked()
+                                {
+                                    match worker.request_clipboard(direction, &state.clipboard_reader) {
+                                        Ok(()) => {
+                                            state.clipboard_pending = true;
+                                            state.clipboard_status = None;
+                                        }
+                                        Err(error) => state.clipboard_status = Some(error),
+                                    }
+                                }
+                            }
+                        });
+                        if let Some(status) = &state.clipboard_status {
+                            ui.small(status);
+                        }
+                    }
                     if ui.button("Stop X server").clicked() {
                         worker.request_stop();
                     }
@@ -485,6 +697,9 @@ impl Workspace {
                 return;
             }
 
+            if cfg!(target_os = "macos") {
+                ui.label("Windowed display. macOS chooses the monitor.");
+            } else {
             ui.horizontal(|ui| {
                 ui.label("Display mode");
                 ComboBox::from_id_salt("xserver_display_mode")
@@ -506,6 +721,7 @@ impl Workspace {
                     });
             });
             ui.label(RichText::new("The compositor chooses the monitor.").color(muted(ui)));
+            }
             ui.horizontal(|ui| {
                 if ui.button("Choose bundle folder").clicked()
                     && let Some(root) = rfd::FileDialog::new().pick_folder()
@@ -526,6 +742,230 @@ impl Workspace {
                 ui.colored_label(ui.visuals().error_fg_color, error);
             }
         });
+    }
+}
+
+#[cfg(target_os = "macos")]
+fn macos_display_snapshot(ui: &mut Ui, report: &XCapabilities) {
+    let [width, height] = report.dimensions;
+    if width > 0 && height > 0 {
+        ui.label(format!(
+            "Windowed X11 desktop at startup — {width}×{height}"
+        ));
+    } else {
+        ui.label("Windowed X11 desktop at startup — size unavailable");
+    }
+    if let Some(layout) = &report.macos_xinerama_layout {
+        ui.label("X11 layout at startup (logical coordinates)");
+        for rect in layout {
+            ui.label(format!(
+                "{}×{} at ({}, {})",
+                rect.width, rect.height, rect.x, rect.y
+            ));
+        }
+    } else {
+        ui.label("X11 layout unavailable");
+    }
+    if let Some(version) = &report.randr_version {
+        ui.label(format!("RandR {version} advertised"));
+    } else {
+        ui.label("RandR version unavailable");
+    }
+    ui.label("macOS manages displays. Monitor selection, full screen, and resolution changes are not supported by this TermCraft profile.");
+}
+
+#[cfg(all(test, target_os = "macos", target_arch = "aarch64"))]
+mod macos_tests {
+    use super::*;
+
+    fn snapshot_labels(report: &XCapabilities) -> Vec<String> {
+        let ctx = Context::default();
+        let mut output = ctx.run_ui(RawInput::default(), |ui| macos_display_snapshot(ui, report));
+        output.textures_delta.clear();
+        output
+            .shapes
+            .iter()
+            .filter_map(|shape| match &shape.shape {
+                egui::epaint::Shape::Text(text) => Some(text.galley.text().to_owned()),
+                _ => None,
+            })
+            .collect()
+    }
+
+    #[test]
+    fn macos_xserver_snapshot_labels_geometry_even_without_a_layout() {
+        let labels = snapshot_labels(&XCapabilities {
+            dimensions: [1920, 1050],
+            randr_version: Some("1.5".into()),
+            ..Default::default()
+        });
+        assert!(
+            labels
+                .iter()
+                .any(|label| label.contains("at startup") && label.contains("1920×1050"))
+        );
+        assert!(
+            labels
+                .iter()
+                .any(|label| label.contains("layout unavailable"))
+        );
+        assert!(
+            labels
+                .iter()
+                .any(|label| label.contains("RandR 1.5") && label.contains("advertised"))
+        );
+        assert!(labels.iter().any(|label| label.contains("Monitor selection") && label.contains("not supported")));
+    }
+
+    #[test]
+    fn macos_xserver_snapshot_renders_logical_rectangles_as_read_only() {
+        let labels = snapshot_labels(&XCapabilities {
+            dimensions: [3200, 1050],
+            macos_xinerama_layout: Some(vec![
+                harbor_workspace::x11::X11LogicalRect {
+                    x: -1280,
+                    y: 72,
+                    width: 1280,
+                    height: 800,
+                },
+                harbor_workspace::x11::X11LogicalRect {
+                    x: 0,
+                    y: 0,
+                    width: 1920,
+                    height: 1050,
+                },
+            ]),
+            ..Default::default()
+        });
+        assert!(
+            labels
+                .iter()
+                .any(|label| label.contains("logical coordinates"))
+        );
+        assert!(
+            labels
+                .iter()
+                .any(|label| label == "1280×800 at (-1280, 72)")
+        );
+        assert!(labels.iter().any(|label| label == "1920×1050 at (0, 0)"));
+    }
+
+    #[test]
+    fn apple_silicon_workspace_offers_the_private_xserver() {
+        let (ctx, _root, mut workspace) = crate::ui::terminal_review_tests::owned_workspace();
+        let mut output = ctx.run_ui(RawInput::default(), |ui| workspace.xserver_card(ui));
+        output.textures_delta.clear();
+        assert!(output.shapes.iter().any(|shape| {
+            matches!(&shape.shape, egui::epaint::Shape::Text(text)
+                if text.galley.text() == "Start X server")
+        }));
+        assert_eq!(Workspace::default_x11_source(), XDisplaySource::System);
+    }
+
+    #[test]
+    #[ignore = "changes the general pasteboard; run only in the disposable macOS GUI fixture"]
+    fn private_xserver_worker_transfers_the_native_pasteboard_on_request() {
+        use harbor_workspace::x11::MacosClipboard;
+        assert_eq!(
+            std::env::var("TERMCRAFT_TEST_DISPOSABLE_PASTEBOARD").as_deref(),
+            Ok("1")
+        );
+        let root = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_XQUARTZ_ROOT").unwrap());
+        let (ctx, _root, mut workspace) = crate::ui::terminal_review_tests::owned_workspace();
+        let state = &mut workspace.xserver;
+        state.probe_executable = Some(root.with_file_name("MacOS").join("harbor-workspace"));
+        state.bundle_root = Some(root);
+        state.start(&ctx);
+        let deadline = Instant::now() + Duration::from_secs(30);
+        let display = loop {
+            state.poll();
+            if let Some(display) = state.display.clone() {
+                break display;
+            }
+            assert!(state.error.is_none(), "{:?}", state.error);
+            assert!(Instant::now() < deadline, "Private XQuartz did not start");
+            std::thread::sleep(Duration::from_millis(15));
+        };
+        let capabilities = state.capabilities.as_ref().unwrap().as_ref().unwrap();
+        assert!(capabilities.core_x11_pixels);
+        let mut peer = MacosClipboard::open(display, Arc::new(AtomicBool::new(false))).unwrap();
+        assert!(peer.read_text().unwrap_err().contains("empty"));
+
+        let mac_text = "native Sonoma clipboard café\n✓";
+        arboard::Clipboard::new()
+            .unwrap()
+            .set_text(mac_text)
+            .unwrap();
+        request(state, ClipboardDirection::ToX11);
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while state.clipboard_pending {
+            state.poll();
+            assert!(Instant::now() < deadline);
+            std::thread::sleep(Duration::from_millis(15));
+        }
+        assert_eq!(
+            state.clipboard_status.as_deref(),
+            Some("Copied macOS text to X11.")
+        );
+        assert_eq!(peer.read_text().unwrap(), mac_text);
+
+        let x11_text = "private X11 clipboard 漢字\n🦀";
+        peer.write_text(x11_text.into()).unwrap();
+        assert_eq!(
+            arboard::Clipboard::new().unwrap().get_text().unwrap(),
+            mac_text
+        );
+        request(state, ClipboardDirection::ToMac);
+        finish_copy(state, &mut peer);
+        assert_eq!(
+            arboard::Clipboard::new().unwrap().get_text().unwrap(),
+            x11_text
+        );
+
+        peer.write_text("old X11 copy".into()).unwrap();
+        request(state, ClipboardDirection::ToMac);
+        // The peer will only reply after the new native clipboard item exists.
+        arboard::Clipboard::new()
+            .unwrap()
+            .set_text("later macOS copy")
+            .unwrap();
+        finish_copy(state, &mut peer);
+        assert!(
+            state
+                .clipboard_status
+                .as_deref()
+                .unwrap()
+                .contains("pasteboard changed")
+        );
+        assert_eq!(
+            arboard::Clipboard::new().unwrap().get_text().unwrap(),
+            "later macOS copy"
+        );
+        state.shutdown();
+        assert!(peer.read_text().is_err());
+    }
+
+    fn request(state: &mut State, direction: ClipboardDirection) {
+        assert!(!state.clipboard_pending);
+        assert!(
+            state
+                .worker
+                .as_ref()
+                .unwrap()
+                .request_clipboard(direction, &state.clipboard_reader)
+                .is_ok()
+        );
+        state.clipboard_pending = true;
+    }
+
+    fn finish_copy(state: &mut State, peer: &mut harbor_workspace::x11::MacosClipboard) {
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while state.clipboard_pending {
+            peer.poll().unwrap();
+            state.poll();
+            assert!(Instant::now() < deadline, "{:?}", state.clipboard_status);
+            std::thread::sleep(Duration::from_millis(15));
+        }
     }
 }
 

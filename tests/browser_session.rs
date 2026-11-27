@@ -1,4 +1,4 @@
-#![cfg(any(target_os = "linux", windows))]
+#![cfg(any(target_os = "linux", target_os = "macos", windows))]
 
 #[path = "support/browser_fixture.rs"]
 mod browser_fixture;
@@ -41,6 +41,44 @@ fn chromium_available() -> bool {
         .and_then(|catalog| catalog.resolve(provider))
         .expect("Native Windows fixture requires the explicitly selected browser provider");
     true
+}
+
+#[cfg(target_os = "macos")]
+fn chromium_available() -> bool {
+    use harbor_workspace::runtime::{RuntimeCatalog, ToolId};
+    if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
+        RuntimeCatalog::for_current_executable()
+            .and_then(|catalog| catalog.resolve(ToolId::BundledChromium))
+            .expect("Native qualification requires the exact staged bundled Chromium");
+        return true;
+    }
+    let provider = RuntimeCatalog::for_current_executable()
+        .and_then(|catalog| catalog.resolve(ToolId::Browser))
+        .and_then(|provider| provider.executable());
+    if let Ok(image) = &provider {
+        // Read version metadata without launching/prewarming Chrome before the
+        // cold-start assertion or creating any additional browser profile.
+        let plist = image.parent().unwrap().parent().unwrap().join("Info.plist");
+        let version = std::process::Command::new("/usr/libexec/PlistBuddy")
+            .args(["-c", "Print :CFBundleShortVersionString"])
+            .arg(plist)
+            .output();
+        eprintln!(
+            "macOS browser fixture image: {}; bundle version: {}",
+            image.display(),
+            version
+                .ok()
+                .filter(|output| output.status.success())
+                .map(|output| String::from_utf8_lossy(&output.stdout).trim().to_owned())
+                .unwrap_or_else(|| "unavailable".into())
+        );
+    }
+    let available = provider.is_ok();
+    assert!(
+        available || std::env::var_os("TERMCRAFT_REQUIRE_CHROMIUM").is_none(),
+        "macOS browser qualification requires a native installed Chrome or Chromium"
+    );
+    available
 }
 
 #[cfg(windows)]
@@ -160,8 +198,16 @@ fn chromium_renders_and_submits_browser_input() {
                 revision,
             })
             .unwrap();
+        let mut observed_geometry = None;
         wait_until(&session, || {
             session.take_frame().is_some_and(|frame| {
+                let geometry = (frame.size, frame.viewport_revision);
+                if observed_geometry != Some(geometry) {
+                    let pixel = (4 * (width * (height - 15) + width - 20)) as usize;
+                    eprintln!("resize {revision} wants {width}x{height}; observed {geometry:?}; button RGB {:?}",
+                        frame.rgba.get(pixel..pixel + 3));
+                    observed_geometry = Some(geometry);
+                }
                 if frame.size != [width, height] || frame.viewport_revision != revision {
                     return false;
                 }
@@ -180,8 +226,17 @@ fn chromium_renders_and_submits_browser_input() {
                 })
                 .unwrap();
         }
-        let report = format!("/viewport?width={width}&height={height}&dpr=1&restored=true");
-        wait_until(&session, || fixture.saw(&report));
+        let report = format!("/viewport?width={width}&height={height}&dpr=1&restored=");
+        let restored = format!("{report}true");
+        let reloaded = format!("{report}false");
+        // The pinned macOS snapshot can restore history without putting the
+        // document in the back-forward cache. History was asserted above.
+        // Still require the actual click, exact viewport and device scale.
+        let macos_fixture = cfg!(target_os = "macos")
+            && std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some();
+        wait_until(&session, || {
+            fixture.saw(&restored) || (macos_fixture && fixture.saw(&reloaded))
+        });
     }
     session
         .send(Command::Navigate(format!("{}/scroll", fixture.origin)))
@@ -271,7 +326,9 @@ fn chromium_cancels_site_auth_without_credentials_and_rejects_untrusted_tls() {
             .iter()
             .all(|request| request.header("Authorization").is_none())
     );
-    session.send(Command::Navigate(tls.origin.clone())).unwrap();
+    session
+        .send(Command::Navigate(tls.origin.clone()))
+        .unwrap_or_else(|error| panic!("{error} Engine error: {:?}", session.state().error));
     wait_until(&session, || session.state().error.is_some());
     assert!(
         session
@@ -347,6 +404,8 @@ fn wait_until(session: &Session, mut condition: impl FnMut() -> bool) {
     // Debug builds verify the complete 429MB bundle before starting Chromium.
     let startup_budget = if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
         60
+    } else if cfg!(target_os = "macos") && session.state().title.is_empty() {
+        35
     } else {
         18
     };

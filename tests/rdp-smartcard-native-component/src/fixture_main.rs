@@ -3,7 +3,7 @@ fn main() {
     if std::env::args().nth(1).as_deref() == Some("--fixture-parent") {
         d02_smartcard_native_component::fixture_parent();
     }
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     if std::env::args().nth(1).as_deref() == Some("--fixture-watchdog-audit") {
         audit_watchdog();
         return;
@@ -19,10 +19,11 @@ fn main() {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 fn audit_watchdog() {
     // Subreaper is confined to this disposable audit process. Every orphan is
     // adopted and reaped here; the test does not leave container-init zombies.
+    #[cfg(target_os = "linux")]
     assert_eq!(
         unsafe { libc::prctl(libc::PR_SET_CHILD_SUBREAPER, 1, 0, 0, 0) },
         0
@@ -41,6 +42,22 @@ fn audit_watchdog() {
         .parse()
         .unwrap();
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(3);
+    #[cfg(target_os = "macos")]
+    loop {
+        // launchd adopts and reaps the orphan. This test process cannot waitpid
+        // it, and must not send a signal after the parent's ownership ends.
+        if unsafe { libc::kill(pid, 0) } == -1 {
+            assert_eq!(
+                std::io::Error::last_os_error().raw_os_error(),
+                Some(libc::ESRCH)
+            );
+            std::fs::remove_file(&marker).unwrap();
+            break;
+        }
+        assert!(std::time::Instant::now() < deadline, "Owned worker survived parent death");
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    #[cfg(target_os = "linux")]
     loop {
         let mut status = 0;
         let result = unsafe { libc::waitpid(pid, &mut status, libc::WNOHANG) };

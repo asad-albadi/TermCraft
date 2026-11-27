@@ -86,15 +86,18 @@ impl SshServer {
         // Reserve the selection→bind interval across parallel fixture startups.
         static STARTUP_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
         let _startup = STARTUP_LOCK.lock().unwrap_or_else(|p| p.into_inner());
-        let root = std::env::temp_dir().join(format!(
-            "termcraft-ssh-test-{}-{}",
-            std::process::id(),
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()
-        ));
-        fs::create_dir_all(&root).unwrap();
+        // Keep SFTP paths canonical and leave room for nested AF_UNIX fixture
+        // sockets under Darwin's short sockaddr_un limit.
+        let temporary = if cfg!(target_os = "macos") {
+            PathBuf::from("/private/tmp")
+        } else {
+            std::env::temp_dir().canonicalize().unwrap()
+        };
+        let root = tempfile::Builder::new()
+            .prefix("termcraft-ssh-")
+            .tempdir_in(temporary)
+            .unwrap()
+            .keep();
         for key in ["host", "client"] {
             let result = Command::new("ssh-keygen")
                 .env_remove("LD_PRELOAD")

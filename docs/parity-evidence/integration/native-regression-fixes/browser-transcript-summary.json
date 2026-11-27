@@ -1,0 +1,44 @@
+{
+  "evidence_type": "agent_tool_transcript_summary",
+  "agent": "/root/windows_pr_review",
+  "raw_log_files": null,
+  "scope": "combined branch browser changes; native Mac replay pending",
+  "rust": "1.96.1",
+  "environment": {
+    "CARGO_BUILD_JOBS": "2",
+    "CARGO_INCREMENTAL": "0",
+    "cpu_affinity": [
+      0
+    ],
+    "cargo_cli_jobs": 1
+  },
+  "runs": [
+    {
+      "session_id": 84663,
+      "phase": "RED",
+      "expected_failed_regressions": 2
+    },
+    {
+      "session_id": 9878,
+      "phase": "GREEN",
+      "test_filter": "browser::engine::tests",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "session_id": 51366,
+      "phase": "real Linux Chromium integration",
+      "target": "browser_session",
+      "TERMCRAFT_REQUIRE_CHROMIUM": "1",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "test_seconds": 10.49
+    }
+  ],
+  "source_sha256": {
+    "src/browser/engine.rs": "1ab29890321b4f533357ec696021038f2ffb2ee40e08b66d9da6181b6d1752c1",
+    "src/browser/pipe.rs": "d1472067f5a17b28ee30fbe17cb4113c1632dbce2b7069431b90e233d3629388",
+    "tests/browser_session.rs": "879354ff3d14a47d9758c877ab36c4e811457d54b05cfcee0ab85d5b2dc5c0e9"
+  }
+}

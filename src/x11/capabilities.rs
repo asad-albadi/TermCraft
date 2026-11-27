@@ -21,14 +21,32 @@ pub struct OpenGlEvidence {
     /// PNG encoded from the actual glReadPixels buffer (OpenGL bottom-up rows).
     pub scene_png_base64: String,
 }
+
+/// A rectangle in the private X server's logical coordinate space.
+#[cfg(target_os = "macos")]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct X11LogicalRect {
+    pub x: i16,
+    pub y: i16,
+    pub width: u16,
+    pub height: u16,
+}
+
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct XCapabilities {
+    #[serde(default)]
+    pub core_x11_pixels: bool,
     pub glx_version: Option<String>,
     pub opengl: Option<OpenGlEvidence>,
     pub composite_version: Option<String>,
     pub composite_pixels: bool,
     pub randr_version: Option<String>,
+    /// Root dimensions at probe time.
     pub dimensions: [u32; 2],
+    /// Startup-only Xinerama rectangles, not physical outputs or selectable modes.
+    #[cfg(target_os = "macos")]
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub macos_xinerama_layout: Option<Vec<X11LogicalRect>>,
     /// An actual observed size transition, never inferred from advertised modes.
     pub randr_change: Option<[u32; 2]>,
     #[serde(default)]
@@ -41,10 +59,10 @@ impl XCapabilities {
             .as_ref()
             .is_some_and(|gl| gl.sampled_pixels > 0 && gl.matched_pixels == gl.sampled_pixels)
     }
-    /// Blocking active qualification; invoke before clients attach to a fresh owned
-    /// display. Temporarily changes an advertised screen mode and restores it.
-    /// On a child crash/timeout, the owner must discard that fresh server because
-    /// an interrupted native driver cannot guarantee its initial mode was restored.
+    /// Blocking qualification before clients attach to a fresh owned display.
+    /// Linux temporarily changes an advertised screen mode and restores it.
+    /// macOS observes windowed geometry without requesting display changes.
+    /// On a child crash/timeout, the owner discards that fresh server.
     pub fn probe(display: &XClientDisplay, cancelled: &AtomicBool) -> Result<Self, String> {
         let exe = std::env::current_exe().map_err(|e| e.to_string())?;
         Self::probe_with_executable(display, &exe, cancelled)
@@ -120,7 +138,13 @@ pub fn capability_probe_entry() -> Option<i32> {
     let result = unsafe { super::native_capabilities::probe() };
     #[cfg(all(windows, target_arch = "x86_64"))]
     let result = super::native_capabilities_windows::probe();
-    #[cfg(not(any(target_os = "linux", all(windows, target_arch = "x86_64"))))]
+    #[cfg(target_os = "macos")]
+    let result = super::native_macos::probe_capabilities();
+    #[cfg(not(any(
+        target_os = "linux",
+        target_os = "macos",
+        all(windows, target_arch = "x86_64")
+    )))]
     let result: Result<XCapabilities, String> =
         Err("Native graphics probing is unavailable on this platform".into());
     match result {

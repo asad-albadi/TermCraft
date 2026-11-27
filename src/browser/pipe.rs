@@ -71,6 +71,19 @@ impl Pipe {
             .env_remove("LD_LIBRARY_PATH")
             .env_remove("LD_PRELOAD")
             .env_remove("LD_AUDIT");
+        #[cfg(target_os = "macos")]
+        if runtime == super::Runtime::BundledChromium {
+            use std::os::unix::ffi::OsStrExt;
+            // macOS initializes Crashpad even with the crash reporting flags
+            // below. Keep its database inside the owned profile, not Cocoa HOME.
+            command.env("BREAKPAD_DUMP_LOCATION", profile.path().join("Crashpad"));
+            for (name, _) in std::env::vars_os() {
+                let bytes = name.as_os_str().as_bytes();
+                if bytes.starts_with(b"DYLD_") || bytes.starts_with(b"__XPC_DYLD_") {
+                    command.env_remove(name);
+                }
+            }
+        }
         #[cfg(target_os = "linux")]
         if runtime == super::Runtime::BundledChromium {
             command.env(
@@ -148,6 +161,32 @@ impl Pipe {
             _profile: profile,
             _runtime: runtime_snapshot,
         })
+    }
+
+    #[cfg(test)]
+    pub(super) fn test_connection() -> (Self, UnixStream, UnixStream) {
+        let (writer, browser_reader) = UnixStream::pair().unwrap();
+        let (browser_writer, reader) = UnixStream::pair().unwrap();
+        reader
+            .set_read_timeout(Some(Duration::from_millis(30)))
+            .unwrap();
+        let process = Command::new("/bin/sleep")
+            .arg("60")
+            .process_group(0)
+            .spawn()
+            .unwrap();
+        (
+            Self {
+                process,
+                writer,
+                reader,
+                pending: Vec::new(),
+                _profile: tempfile::tempdir().unwrap(),
+                _runtime: None,
+            },
+            browser_writer,
+            browser_reader,
+        )
     }
 
     pub(super) fn send(&mut self, message: &impl serde::Serialize) -> Result<(), String> {
@@ -329,5 +368,148 @@ mod bundled_qualification {
         assert!(!profile.exists());
         assert!(!std::path::Path::new(&format!("/proc/{parent}")).exists());
         assert!(!runtime.exists());
+    }
+}
+
+#[cfg(all(
+    test,
+    target_os = "macos",
+    target_arch = "aarch64",
+    feature = "macos-chromium-qualification"
+))]
+mod macos_bundled_qualification {
+    use super::*;
+    use serde_json::json;
+
+    unsafe extern "C" {
+        fn sandbox_check(
+            pid: libc::pid_t,
+            operation: *const libc::c_char,
+            filter: libc::c_int,
+            ...
+        ) -> libc::c_int;
+    }
+
+    fn request(pipe: &mut Pipe, id: u32, method: &str, params: Value) -> Value {
+        pipe.send(&json!({"id": id, "method": method, "params": params}))
+            .unwrap();
+        let until = Instant::now() + Duration::from_secs(if id == 1 { 25 } else { 10 });
+        let cancel = AtomicBool::new(false);
+        loop {
+            let reply = pipe.receive(until, &cancel).unwrap().expect("CDP reply");
+            if reply["id"] == id {
+                assert!(reply.get("error").is_none(), "{reply}");
+                return reply["result"].clone();
+            }
+        }
+    }
+
+    fn process_inventory() -> String {
+        let result = Command::new("/bin/ps")
+            .args(["-axww", "-o", "pid=,pgid=,command="])
+            .output()
+            .unwrap();
+        assert!(result.status.success());
+        String::from_utf8_lossy(&result.stdout).into_owned()
+    }
+
+    #[test]
+    #[ignore = "requires pinned native fixture in relocated TermCraft.app Resources"]
+    fn bundled_renderer_is_seatbelt_sandboxed_and_owned_processes_are_reaped() {
+        let start = || {
+            Pipe::start_with_runtime(
+                "",
+                super::super::Runtime::BundledChromium,
+                &AtomicBool::new(false),
+            )
+            .unwrap()
+        };
+        let mut peer = start();
+        let mut browser = start();
+        let profile = browser._profile.path().to_owned();
+        let runtime = browser._runtime.as_ref().unwrap().path().to_owned();
+        let leader = browser.process.id() as libc::pid_t;
+        for dir in [&profile, &runtime] {
+            assert_eq!(dir.metadata().unwrap().permissions().mode() & 0o777, 0o700);
+        }
+        let version = request(&mut browser, 1, "Browser.getVersion", json!({}));
+        assert!(
+            version["product"]
+                .as_str()
+                .unwrap()
+                .ends_with("/160.0.8185.0")
+        );
+        request(
+            &mut browser,
+            2,
+            "Target.createTarget",
+            json!({"url":"about:blank"}),
+        );
+        let processes = request(&mut browser, 3, "SystemInfo.getProcessInfo", json!({}));
+        let renderer = processes["processInfo"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|process| process["type"] == "renderer")
+            .expect("renderer")["id"]
+            .as_i64()
+            .unwrap() as libc::pid_t;
+        // Chromium itself uses the NULL-operation, no-filter Seatbelt status query.
+        let parent_seatbelt = unsafe { sandbox_check(leader, std::ptr::null(), 0) };
+        let renderer_seatbelt = unsafe { sandbox_check(renderer, std::ptr::null(), 0) };
+        assert_eq!((parent_seatbelt, renderer_seatbelt), (0, 1));
+        println!("Seatbelt query: browser={parent_seatbelt}, renderer={renderer_seatbelt}");
+        let before = process_inventory();
+        let private_path = runtime.to_str().unwrap();
+        let owned = before
+            .lines()
+            .filter(|line| line.contains(private_path))
+            .collect::<Vec<_>>();
+        assert!(owned.len() >= 2);
+        let crash_db = format!("--database={}", profile.join("Crashpad").display());
+        for line in &owned {
+            if line.contains("/Helpers/chrome_crashpad_handler") {
+                assert!(
+                    line.contains(&crash_db),
+                    "Crashpad database is not private: {line}"
+                );
+            }
+            for flag in [
+                "--no-sandbox",
+                "--ignore-certificate-errors",
+                "--remote-debugging-port",
+            ] {
+                assert!(!line.contains(flag), "{line}");
+            }
+        }
+        let args = owned
+            .iter()
+            .find(|line| line.split_whitespace().next() == Some(&leader.to_string()))
+            .unwrap();
+        assert!(args.contains("--remote-debugging-pipe"));
+        println!("Owned Chromium processes before close: {}", owned.len());
+        drop(browser);
+        assert!(!profile.exists());
+        assert!(!runtime.exists());
+        let deadline = Instant::now() + Duration::from_secs(5);
+        loop {
+            let inventory = process_inventory();
+            let live = inventory
+                .lines()
+                .filter(|line| line.contains(private_path))
+                .collect::<Vec<_>>();
+            if live.is_empty() && unsafe { libc::kill(-leader, 0) } == -1 {
+                break;
+            }
+            assert!(
+                Instant::now() < deadline,
+                "Chromium processes survived close: {live:?}"
+            );
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        assert!(!profile.exists(), "Crashpad recreated the closed profile");
+        assert!(peer._profile.path().exists());
+        request(&mut peer, 1, "Browser.getVersion", json!({}));
+        println!("Owned process group, profile and snapshot removed; peer still responsive");
     }
 }

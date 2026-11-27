@@ -29,6 +29,6 @@
   "platform_requirements": {
     "linux": ["glibc and shared libraries listed under linked_libraries", "X11 or Wayland display", "OpenGL with the host driver, EGL or GLX and associated display client libraries", "OS certificate store for network TLS", "POSIX shell for local terminals", "optional xdg-desktop-portal and xdg-open for file integration", "optional Python 3 for menu registration"],
     "windows": ["Native Windows desktop with OpenGL 2.0 or later and the OS certificate store", "PowerShell, Explorer and Windows console support for local integration", "Microsoft Visual C++ runtime if imported by the native binaries"],
-    "macos": ["Native macOS desktop/OpenGL frameworks and the OS certificate store", "POSIX shell and open for local integration"]
+    "macos": ["macOS 14 or later for managed display capture/control and ScreenCaptureKit", "Native macOS desktop/OpenGL frameworks and the OS certificate store", "POSIX shell and open for local integration"]
   }
 }

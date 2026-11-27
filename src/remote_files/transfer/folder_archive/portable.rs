@@ -169,7 +169,10 @@ pub(crate) async fn build(
 
 #[cfg(all(test, unix))]
 mod tests {
-    use std::os::unix::{ffi::OsStringExt, fs::PermissionsExt};
+    #[cfg(not(target_os = "macos"))]
+    use std::os::unix::ffi::OsStringExt;
+    #[cfg(not(target_os = "macos"))]
+    use std::os::unix::fs::PermissionsExt;
     #[tokio::test]
     async fn capability_folder_encoder_preserves_bytes_links_names_and_ordinary_modes() {
         let root = tempfile::tempdir().unwrap();
@@ -177,11 +180,16 @@ mod tests {
         let destination = root.path().join("destination");
         std::fs::create_dir_all(source.join("empty")).unwrap();
         std::fs::create_dir(&destination).unwrap();
-        let raw = std::ffi::OsString::from_vec(b"literal-\xff-\n-'$()".to_vec());
+        #[cfg(not(target_os = "macos"))]
         let bytes = (0..100_000).map(|i| (i % 256) as u8).collect::<Vec<_>>();
-        std::fs::write(source.join(&raw), &bytes).unwrap();
-        std::fs::set_permissions(source.join(&raw), std::fs::Permissions::from_mode(0o444))
-            .unwrap();
+        #[cfg(not(target_os = "macos"))]
+        let raw = std::ffi::OsString::from_vec(b"literal-\xff-\n-'$()".to_vec());
+        #[cfg(not(target_os = "macos"))]
+        {
+            std::fs::write(source.join(&raw), &bytes).unwrap();
+            std::fs::set_permissions(source.join(&raw), std::fs::Permissions::from_mode(0o444))
+                .unwrap();
+        }
         std::os::unix::fs::symlink("cycle", source.join("cycle")).unwrap();
         let (_sender, cancelled) = tokio::sync::watch::channel(false);
         let archive = super::build(source, cancelled.clone()).await.unwrap();
@@ -195,15 +203,18 @@ mod tests {
         super::super::finalize(std::fs::File::open(&destination).unwrap(), modes)
             .await
             .unwrap();
-        assert_eq!(std::fs::read(destination.join(&raw)).unwrap(), bytes);
-        assert_eq!(
-            std::fs::metadata(destination.join(raw))
-                .unwrap()
-                .permissions()
-                .mode()
-                & 0o777,
-            0o444
-        );
+        #[cfg(not(target_os = "macos"))]
+        {
+            assert_eq!(std::fs::read(destination.join(&raw)).unwrap(), bytes);
+            assert_eq!(
+                std::fs::metadata(destination.join(raw))
+                    .unwrap()
+                    .permissions()
+                    .mode()
+                    & 0o777,
+                0o444
+            );
+        }
         assert!(destination.join("empty").is_dir());
         assert_eq!(
             std::fs::read_link(destination.join("cycle")).unwrap(),

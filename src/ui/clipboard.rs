@@ -15,13 +15,13 @@ pub(super) struct Pending {
     pub targets: Vec<u64>,
     rx: Receiver<Result<String, String>>,
 }
-struct Finished(Arc<AtomicBool>);
+pub(super) struct Finished(pub(super) Arc<AtomicBool>);
 impl Drop for Finished {
     fn drop(&mut self) {
         self.0.store(false, Ordering::Release);
     }
 }
-fn read_os_text() -> Result<String, String> {
+pub(super) fn read_os_text() -> Result<String, String> {
     #[cfg(target_os = "linux")]
     if std::env::var_os("WAYLAND_DISPLAY").is_some() {
         match read_wayland_text() {

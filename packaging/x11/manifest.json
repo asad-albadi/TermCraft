@@ -46,7 +46,7 @@
       "license": "X.Org and per-component licenses; XQuartz About and corresponding source review required",
       "runtime_inputs": ["macOS x86_64 and arm64", "native XQuartz.app helper and frameworks", "opt/X11 dylibs, data and xkbcomp"],
       "engine_name": "Xquartz",
-      "private_candidate": {"artifact_id": "xquartz-2.8.6-termcraft-private1-macos-universal", "source_contract": "packaging/x11/native/source-contract.json", "patch": "packaging/x11/native/xquartz-private-entry.patch", "approved_executable_sha256": null, "runtime_approved": false}
+      "private_candidate": {"artifact_id": "xquartz-2.8.6-termcraft-private1-macos-arm64", "source_contract": "packaging/x11/native/source-contract.json", "patch": "packaging/x11/native/xquartz-private-entry.patch", "approved_executable_sha256": "30cff793431ef36178d9814eeb13024331c2acc28c7daf608ce575fd3a9893cd", "runtime_approved": true, "runtime_scope": "authenticated windowed private transport on Apple Silicon macOS"}
     }
   ]
 }

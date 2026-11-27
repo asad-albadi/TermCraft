@@ -17,6 +17,8 @@ pub enum Mode {
     Password,
     PasswordThenMfa,
     X11,
+    #[cfg(target_os = "macos")]
+    NativeX11,
     Mfa,
     KeyThenMfa,
     ScpStartup,
@@ -61,6 +63,8 @@ impl server::Handler for Handler {
             Mode::ScpStartup | Mode::Password | Mode::PasswordThenMfa | Mode::X11 => {
                 MethodKind::Password
             }
+            #[cfg(target_os = "macos")]
+            Mode::NativeX11 => MethodKind::Password,
             Mode::Mfa => MethodKind::KeyboardInteractive,
             Mode::KeyThenMfa => MethodKind::PublicKey,
         };
@@ -222,6 +226,7 @@ impl server::Handler for Handler {
             .map(|i| u8::from_str_radix(&cookie[2 * i..2 * i + 2], 16).unwrap())
             .collect::<Vec<_>>();
         let verified = self.x11_verified.clone();
+        let mode = self.mode;
         tokio::spawn(async move {
             use tokio::io::{AsyncReadExt, AsyncWriteExt};
             let channel = handle.channel_open_x11("127.0.0.1", 12345).await.unwrap();
@@ -230,6 +235,25 @@ impl server::Handler for Handler {
             setup.extend_from_slice(b"MIT-MAGIC-COOKIE-1\0\0");
             setup.extend_from_slice(&cookie);
             stream.write_all(&setup).await.unwrap();
+            #[cfg(not(target_os = "macos"))]
+            let _ = mode;
+            #[cfg(target_os = "macos")]
+            if matches!(mode, Mode::NativeX11) {
+                let mut header = [0; 8];
+                stream.read_exact(&mut header).await.unwrap();
+                assert_eq!(&header[..6], &[1, 0, 11, 0, 0, 0]);
+                let mut body = vec![0; u16::from_le_bytes([header[6], header[7]]) as usize * 4];
+                stream.read_exact(&mut body).await.unwrap();
+                assert!(body.len() >= 32);
+                // GetInputFocus must cross the same negotiated forwarding channel.
+                stream.write_all(&[43, 0, 1, 0]).await.unwrap();
+                let mut reply = [0; 32];
+                stream.read_exact(&mut reply).await.unwrap();
+                assert_eq!(&reply[2..4], &1u16.to_le_bytes());
+                assert_eq!(reply[0], 1);
+                verified.store(true, Ordering::SeqCst);
+                return;
+            }
             let mut reply = [0; 6];
             stream.read_exact(&mut reply).await.unwrap();
             assert_eq!(&reply, b"X11_OK");

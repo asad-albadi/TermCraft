@@ -1,6 +1,16 @@
 # Private native X server candidates
 
-Release approval is pending for both native platforms. `native_policy.rs` rejects unapproved payloads before creating a process or authority file. Windows has exact source-built candidate inventories and private package evidence. Upstream binary hashes serve only as inspection inputs. Full input URLs, source/archive/patch checksums, native toolchain requirements and remaining approval evidence are in `source-contract.json`. PE and Mach-O imports for the upstream binaries are in `upstream-dependencies.json`. The source archives remain in the private work area for offline builds, and exact-source license files are retained in `licenses/`. [Windows native evidence](../../../docs/parity-evidence/execution/2026-11-25-windows-native.md)
+Apple Silicon macOS can run the exact private windowed XQuartz tree pinned in
+`macos-arm64.sha256`. The hash check covers the executable, dylibs, fonts, XKB,
+bundle resources and corresponding source. Windows has an exact source-built private candidate and native package evidence; compiled shipping approval and public distribution remain pending. A local JSON file cannot change these compiled trust
+decisions. `source-contract.json` tracks inputs, toolchains and open evidence.
+`upstream-dependencies.json` records the original PE and Mach-O inspection.
+
+Pass the verified candidate directory to the macOS packager using
+`scripts/package-release.py --xquartz-runtime CANDIDATE --output DIST`. The
+packager copies only pinned files and verifies the staged signatures. A local
+package can exercise the runtime without changing the user's XQuartz
+installation. Public distribution approval is tracked separately.
 
 Prepare either source tree with the pinned **local** source archive:
 
@@ -59,10 +69,58 @@ binary Xauthority cookies and credentials negotiated by an XDMCP manager.
 
 ## macOS native build recipe
 
-A native arm64 and x86_64 worker needs the Xcode macOS SDK, meson/ninja/pkg-config/bison/flex/mig, and the complete pinned XQuartz dependency source/build closure. The release `.pkg` is an inspection/dependency input; never execute its installation scripts. Configure patched xserver with `--wrap-mode=nodownload`, `-Dxquartz=true -Dxorg=false -Dxephyr=false -Dxnest=false -Dxvfb=false -Dxcsecurity=true`, an application-specific `-Dbundle-id-prefix=org.termcraft.private`, and empty Sparkle feed/key options. Use private prefix, XKB and font data paths. Build `hw/xquartz/mach-startup/X11.bin` plus the generated bundle resources. Do **not** run `meson install`: upstream's bundle install hook attempts root ownership. Copy only the build outputs, nib/resources, private xkbcomp/data/fonts and matching dependency dylibs into a fresh staging tree.
+A native worker needs the Xcode macOS SDK, Meson, Ninja, pkg-config, Bison,
+Flex and MIG. Use the distribution gitlinks in `source-contract.json` for
+xorgproto, Mesa, xkbcomp, XKB data and the core bitmap fonts. Mesa 22.2.5's
+configure still uses Python's `distutils`. Python 3.11 with Mako provides a
+working build environment. Set both `TERMCRAFT_XQUARTZ_DEPS` and
+`PKG_CONFIG_PATH` for the private dependency prefix. Install the font
+data with an explicit `FONTROOTDIR` under that prefix, since font-util can
+otherwise select its own absolute directory.
 
-Relocate every non-system Mach-O dependency and install name to app-relative `@loader_path`/`@executable_path` paths, verify both architecture slices contain no `/opt/X11` references, and sign leaf dylibs/frameworks followed by the private app. Snapshot and pin the final signed tree including resources and code-signature files. The current `/opt/X11` release payload cannot substitute for that output. No relocated/signed native build or native build execution exists in this evidence.
+The builder compiles the patched server and stages its generated plist, nibs,
+defaults, xkbcomp, XKB data and fonts into a fresh tree. Upstream's XQuartz
+installer hooks request root ownership. The builder skips these hooks and
+stages the built files directly. To collect bounded desktop evidence, run
+`python3 packaging/x11/native/probe-macos.py CANDIDATE EVIDENCE_DIRECTORY`.
+
+Relocate every non-system Mach-O dependency and install name to app-relative `@loader_path` paths, verify the arm64 slice and dependency closure, and sign leaf dylibs/frameworks followed by the private app. Snapshot and pin the final signed tree including resources and code-signature files. The approved profile uses the exact inventory from this private build.
 
 The direct-entry source patch bypasses Mach registration/startx/shell startup, requires our inherited listening AF_UNIX descriptor, disables all engine-created listeners/locks, and adopts it with `ListenOnOpenFD(fd, 0)` so Xauthority remains mandatory. The stock handoff uses `noxauth=1` and is unsuitable. XKB output stays inside the private runtime; default plist lookup is app-relative and authentication overrides are volatile Objective-C `NSUserDefaults` values. The provider starts a new owned process group; macOS `waitid(WNOWAIT)` preserves its identity until owned helpers are terminated and the leader reaped. The prebound socket lives only in the private directory. Existing displays, launch services, XQuartz preference domains and shell startup files are untouched.
 
-Composite remains explicitly disabled as in XQuartz 2.8.6's upstream known-bug policy. No extension or renderer support is inferred from strings. Existing X03 active qualification still rejects unsupported native platforms; enabling a private runtime requires native X03 implementation/evidence as well as the actual build pins.
+Composite remains explicitly disabled under the upstream XQuartz 2.8.6 policy.
+The authenticated macOS probe reads X11 geometry and GLX and RandR protocol
+versions. The windowed profile leaves display mode and monitor selection to
+macOS.
+
+### Direct GLX qualification client
+
+Use the source tree extracted from the pinned candidate's Mesa archive and
+the pinned private X.Org prefix. The separate fixture records direct
+framebuffer readback without changing the engine inventory. Use the Python
+3.11/Mako environment described above with Meson, Ninja and Bison on `PATH`.
+
+```sh
+export SDKROOT="$(xcrun --show-sdk-path)" MACOSX_DEPLOYMENT_TARGET=14.0
+export PKG_CONFIG_LIBDIR="$DEPS/lib/pkgconfig:$DEPS/share/pkgconfig"
+meson setup "$BUILD" "$MESA_SOURCE" --buildtype=release --prefix="$MESA_PREFIX" \
+  --wrap-mode=nodownload -Dc_std=c11 -Dosmesa=true -Dllvm=disabled \
+  -Dvalgrind=disabled -Dzstd=disabled -Dc_args="-I$DEPS/include" \
+  -Dcpp_args="-I$DEPS/include"
+meson compile -C "$BUILD" -j 2
+meson install -C "$BUILD" --no-rebuild
+mkdir -p "$FIXTURE/opt/X11/bin"
+xcrun clang -arch arm64 -Wl,-headerpad_max_install_names -Wall -Wextra -Werror \
+  -isystem "$MESA_PREFIX/include" -isystem "$DEPS/include" \
+  -L"$MESA_PREFIX/lib" -L"$DEPS/lib" packaging/x11/native/direct-glx-macos.c \
+  -lGL -lX11 -o "$FIXTURE/opt/X11/bin/direct-glx-macos"
+python3 packaging/x11/native/relocate-macos.py "$FIXTURE" arm64 --glx-probe
+ditto "$FIXTURE" "$RELOCATED_FIXTURE"
+python3 packaging/x11/native/probe-macos.py "$CANDIDATE" "$EVIDENCE" \
+  --glx-client "$RELOCATED_FIXTURE/opt/X11/bin/direct-glx-macos"
+```
+
+Use `--allow-software-glx` for a guest without a compatible accelerated CGL
+pixel format. Check `glx.log` for the actual renderer. The same owned socket,
+cookie and cleanup checks apply on both paths. See the
+[graphics evidence](../../../docs/parity-evidence/issue-2/xquartz-build.md#direct-apple-glx-on-apple-silicon).

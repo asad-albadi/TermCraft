@@ -9,6 +9,8 @@ import stat
 import tarfile
 import tempfile
 import unittest
+import zipfile
+from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,7 +27,7 @@ class PortableArchive(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
-        self.root = Path(self.temporary.name)
+        self.root = Path(self.temporary.name).resolve()
         self.archive = self.root / 'fixture.tar.gz'
         self.debian = load('package-debian')
         self.startup = load('package-check-startup')
@@ -162,6 +164,64 @@ class PortableArchive(unittest.TestCase):
                 call(self.archive, out)
             self.assertEqual(list(out.iterdir()), [])
         self.assertFalse(any(p.name.startswith('.portable-extract-') for p in self.root.iterdir()))
+
+    def test_windows_zip_and_tar_publication_accepts_empty_or_absent_destination(self):
+        portable = load('portable_archive')
+        archive_zip = self.root / 'fixture.zip'
+        with zipfile.ZipFile(archive_zip, 'w') as archive:
+            entry = zipfile.ZipInfo('TermCraft/file')
+            entry.external_attr = (stat.S_IFREG | 0o644) << 16
+            archive.writestr(entry, b'payload')
+        self.write([('TermCraft/file', tarfile.REGTYPE, b'payload', 0o644)])
+        real_replace, real_rename = os.replace, Path.rename
+
+        def windows_replace(source, destination):
+            if Path(destination).exists():
+                raise PermissionError('Windows cannot replace an existing directory')
+            return real_replace(source, destination)
+
+        def windows_rename(source, destination):
+            if Path(destination).exists():
+                raise FileExistsError('Windows rename refuses an existing destination')
+            return real_rename(source, destination)
+
+        windows_os = SimpleNamespace(name='nt', path=os.path, replace=windows_replace,
+                                     readlink=os.readlink)
+        with patch.object(portable, 'os', windows_os), patch.object(Path, 'rename', windows_rename):
+            for kind, archive, extract in (
+                ('zip', archive_zip, portable.extract_zip),
+                ('tar', self.archive, portable.extract_tar),
+            ):
+                for existing in (False, True):
+                    with self.subTest(format=kind, precreated=existing):
+                        destination = self.root / f'windows-{kind}-{existing}'
+                        if existing:
+                            destination.mkdir()
+                        extract(archive, destination)
+                        self.assertEqual((destination / 'TermCraft/file').read_bytes(), b'payload')
+
+    def test_windows_publication_preserves_files_arriving_after_preflight(self):
+        portable = load('portable_archive')
+        staged = self.root / 'staged'
+        staged.mkdir()
+        (staged / 'payload').write_bytes(b'extracted')
+        destination = self.root / 'destination'
+        destination.mkdir()
+        real_rmdir = Path.rmdir
+
+        def concurrent_file(path):
+            if path == destination:
+                (destination / 'local-file').write_bytes(b'preserve')
+            return real_rmdir(path)
+
+        with patch.object(portable, 'os', SimpleNamespace(name='nt')), patch.object(
+            Path, 'rmdir', concurrent_file
+        ):
+            with self.assertRaises(OSError):
+                portable._publish(staged, destination)
+        self.assertEqual((destination / 'local-file').read_bytes(), b'preserve')
+        self.assertEqual((staged / 'payload').read_bytes(), b'extracted')
+        self.assertFalse((destination / 'payload').exists())
 
     def test_manifest_tampering_and_missing_manifest_rejected(self):
         for files in ({'files': {}}, {'files': {'harbor-workspace': '0' * 64}}):

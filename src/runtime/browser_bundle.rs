@@ -25,6 +25,8 @@ struct Manifest {
     #[cfg(windows)]
     #[serde(default)]
     approved: bool,
+    #[serde(default)]
+    links: Vec<Link>,
 }
 #[derive(Deserialize)]
 struct Entry {
@@ -33,15 +35,58 @@ struct Entry {
     sha256: String,
     executable: bool,
 }
+#[derive(Deserialize)]
+struct Link {
+    path: PathBuf,
+    target: PathBuf,
+}
+
+#[cfg(not(any(
+    windows,
+    all(
+        target_os = "macos",
+        target_arch = "aarch64",
+        feature = "macos-chromium-qualification"
+    )
+)))]
+const LINUX_MANIFEST: &[u8] = include_bytes!("../../packaging/browser/runtime-manifest.json");
+#[cfg(all(
+    target_os = "macos",
+    target_arch = "aarch64",
+    feature = "macos-chromium-qualification"
+))]
+const MACOS_QUALIFICATION_MANIFEST: &[u8] =
+    include_bytes!("../../packaging/browser/macos-arm64-qualification.json");
+
+fn manifest_pin() -> &'static [u8] {
+    #[cfg(windows)]
+    return WINDOWS_MANIFEST;
+    #[cfg(all(
+        target_os = "macos",
+        target_arch = "aarch64",
+        feature = "macos-chromium-qualification"
+    ))]
+    return MACOS_QUALIFICATION_MANIFEST;
+
+    #[cfg(not(any(
+        windows,
+        all(
+            target_os = "macos",
+            target_arch = "aarch64",
+            feature = "macos-chromium-qualification"
+        )
+    )))]
+    LINUX_MANIFEST
+}
+
 #[cfg(test)]
 pub(crate) static VERIFIED_CHUNKS: std::sync::atomic::AtomicUsize =
     std::sync::atomic::AtomicUsize::new(0);
 
 const FAILURE: &str = "The selected bundled Chromium runtime is unavailable or damaged";
 #[cfg(windows)]
-const PIN: &[u8] = include_bytes!("../../packaging/browser/runtime-manifest-windows.json");
-#[cfg(not(windows))]
-const PIN: &[u8] = include_bytes!("../../packaging/browser/runtime-manifest.json");
+const WINDOWS_MANIFEST: &[u8] =
+    include_bytes!("../../packaging/browser/runtime-manifest-windows.json");
 
 fn relative(path: &Path) -> Result<(), String> {
     if path.components().next().is_none()
@@ -54,25 +99,29 @@ fn relative(path: &Path) -> Result<(), String> {
     Ok(())
 }
 
-fn file(root: &Dir, path: &Path) -> Result<cap_std::fs::File, String> {
+fn nofollow_parent<'a>(root: &Dir, path: &'a Path) -> Result<(Dir, &'a std::ffi::OsStr), String> {
     relative(path)?;
     let mut dir = root.try_clone().map_err(|_| FAILURE)?;
     let mut parts = path.components().peekable();
     while let Some(Component::Normal(name)) = parts.next() {
-        if parts.peek().is_some() {
-            dir = dir.open_dir_nofollow(name).map_err(|_| FAILURE)?;
-        } else {
-            let mut options = OpenOptions::new();
-            options.read(true).follow(FollowSymlinks::No);
-            #[cfg(unix)]
-            {
-                use cap_std::fs::OpenOptionsExt;
-                options.custom_flags(libc::O_NONBLOCK);
-            }
-            return dir.open_with(name, &options).map_err(|_| FAILURE.into());
+        if parts.peek().is_none() {
+            return Ok((dir, name));
         }
+        dir = dir.open_dir_nofollow(name).map_err(|_| FAILURE)?;
     }
     Err(FAILURE.into())
+}
+
+fn file(root: &Dir, path: &Path) -> Result<cap_std::fs::File, String> {
+    let (dir, name) = nofollow_parent(root, path)?;
+    let mut options = OpenOptions::new();
+    options.read(true).follow(FollowSymlinks::No);
+    #[cfg(unix)]
+    {
+        use cap_std::fs::OpenOptionsExt;
+        options.custom_flags(libc::O_NONBLOCK);
+    }
+    dir.open_with(name, &options).map_err(|_| FAILURE.into())
 }
 
 pub(super) fn resolve(resources: &Path) -> Result<super::ToolProvider, String> {
@@ -123,7 +172,8 @@ fn verify(
         }
     };
     check_cancel()?;
-    let info: Manifest = serde_json::from_slice(PIN).map_err(|_| FAILURE)?;
+    let pin = manifest_pin();
+    let info: Manifest = serde_json::from_slice(pin).map_err(|_| FAILURE)?;
     if info.schema_version != 1
         || info.platform != std::env::consts::OS
         || info.architecture != std::env::consts::ARCH
@@ -156,8 +206,22 @@ fn verify(
         .take(1024 * 1024)
         .read_to_end(&mut bytes)
         .map_err(|_| FAILURE)?;
-    if bytes != PIN {
+    if bytes != pin {
         return Err(format!("{FAILURE}: manifest mismatch"));
+    }
+    // Link locations and target text both come from the compiled pin. Never walk a
+    // link to read a file from the installation, even if the link is approved.
+    for link in &info.links {
+        check_cancel()?;
+        relative(&link.target)?;
+        let (dir, name) = nofollow_parent(&directory, &link.path)?;
+        let installed = dir.read_link_contents(name).map_err(|_| FAILURE)?;
+        if installed.as_os_str() != link.target.as_os_str() {
+            return Err(format!(
+                "{FAILURE}: unexpected link {}",
+                link.path.display()
+            ));
+        }
     }
     let mut entry_found = false;
     for entry in &info.files {
@@ -247,6 +311,15 @@ fn verify(
     if !entry_found {
         return Err(FAILURE.into());
     }
+    #[cfg(unix)]
+    if let Some(snapshot) = snapshot {
+        for link in &info.links {
+            check_cancel()?;
+            let path = snapshot.join(&link.path);
+            std::fs::create_dir_all(path.parent().ok_or(FAILURE)?).map_err(|_| FAILURE)?;
+            std::os::unix::fs::symlink(&link.target, path).map_err(|_| FAILURE)?;
+        }
+    }
     Ok(super::ToolProvider::Bundled {
         path: snapshot
             .map_or_else(|| resources.join(&info.root), Path::to_path_buf)
@@ -270,7 +343,7 @@ mod tests {
         )
         .unwrap();
         let error = resolve(resources.path()).unwrap_err();
-        let pin: Manifest = serde_json::from_slice(PIN).unwrap();
+        let pin: Manifest = serde_json::from_slice(manifest_pin()).unwrap();
         let expected = if pin.approved {
             "manifest mismatch"
         } else {
@@ -378,5 +451,68 @@ mod snapshot_qualification {
         drop(restore);
         drop(snapshot);
         assert!(!engine.exists());
+    }
+}
+
+#[cfg(all(
+    test,
+    target_os = "macos",
+    target_arch = "aarch64",
+    feature = "macos-chromium-qualification"
+))]
+mod macos_qualification {
+    use super::*;
+
+    #[test]
+    #[ignore = "requires explicitly staged native qualification fixture"]
+    fn exact_framework_links_survive_snapshot_and_substitutions_fail() {
+        let resources = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_BROWSER_ROOT").unwrap());
+        let framework = Path::new(
+            "Chromium.app/Contents/Frameworks/Chromium Framework.framework/Versions/Current",
+        );
+        let source = resources.join("browser/macos-aarch64");
+        let (provider, snapshot) = prepare(&resources, &AtomicBool::new(false)).unwrap();
+        assert_eq!(
+            std::fs::read_link(snapshot.path().join(framework)).unwrap(),
+            Path::new("160.0.8185.0")
+        );
+        assert!(
+            std::process::Command::new("/usr/bin/codesign")
+                .args(["--verify", "--deep", "--strict"])
+                .arg(snapshot.path().join("Chromium.app"))
+                .status()
+                .unwrap()
+                .success()
+        );
+        let link = source.join(framework);
+        std::fs::remove_file(&link).unwrap();
+        // Same destination, but not the byte-for-byte sealed link.
+        std::os::unix::fs::symlink("./160.0.8185.0", &link).unwrap();
+        let outcome = resolve(&resources);
+        std::fs::remove_file(&link).unwrap();
+        std::os::unix::fs::symlink("160.0.8185.0", &link).unwrap();
+        assert!(outcome.unwrap_err().contains("unexpected link"));
+
+        let plist = source.join("Chromium.app/Contents/Info.plist");
+        let original = std::fs::read(&plist).unwrap();
+        let mut modified = original.clone();
+        modified[0] ^= 1;
+        std::fs::write(&plist, modified).unwrap();
+        let outcome = resolve(&resources);
+        std::fs::write(&plist, original).unwrap();
+        assert!(outcome.unwrap_err().contains("checksum mismatch"));
+
+        let executable = provider.executable().unwrap();
+        let output = std::process::Command::new(&executable)
+            .arg("--version")
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        assert_eq!(
+            String::from_utf8_lossy(&output.stdout).trim(),
+            "Chromium 160.0.8185.0"
+        );
+        drop(snapshot);
+        assert!(!executable.exists());
     }
 }

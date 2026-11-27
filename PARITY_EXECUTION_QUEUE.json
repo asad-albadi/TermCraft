@@ -339,9 +339,9 @@
         "D01",
         "S05"
       ],
-      "dependency": "",
-      "remaining": "Reviewed native printer/smartcard, Linux RXCHAR/BREAK/ERR events and per-open statistics, Windows per-open statistics and bounded native serial owners are merged. Exact general POSIX COMMSTATUS/properties/modem events and opened-object rename/delete remain explicit platform/architecture limitations; native Windows/macOS/device/original qualification remains.",
-      "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; Windows x64 passed independent Unicode clipboard and real release-helper NLA mapped-drive reads, writes, handle-relative rename and read-only refusal. Wider native admin, physical device, security and original interoperability remain open. Publication follow-up: hosted CI run45636600121 reports81helper tests passed/1failed in drive_allocation_is_released_on_last_remote_close_and_disconnect. Root cause unconfirmed; no green hosted CI claim.",
+      "dependency": "Remaining supported native desktop/manual, device, independent endpoint and production distribution fixtures.",
+      "remaining": "The inherited ext4 allocation cleanup defect is repaired and passed hosted Ubuntu RDP checks. Remaining native device/admin-session, independent endpoint and original-workflow qualification and explicit POSIX API limitations remain open.",
+      "validation_remaining": "Windows and Linux regression CI run45923194474 passed. Scoped allocation cleanup has ext4/Btrfs and external-opener/break coverage; unsupported or contended leases retain allocation. Full combined Apple Silicon software regression failures are tracked in issue2; physical RDP devices and independent Windows Session Host acceptance remain open.",
       "evidence": [
         "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/D02/providers/host-full.log",
@@ -362,9 +362,11 @@
         "docs/parity-evidence/D02/windows-native-owner/fixture-FIX1/review.md",
         "docs/parity-evidence/D02/unix-extra-events/root-integration.json",
         "docs/parity-evidence/parallel-integration-local-completion-helper/result.json",
-        "https://github.com/asad-albadi/TermCraft/actions/runs/45636600121"
+        "https://github.com/asad-albadi/TermCraft/actions/runs/45636600121",
+        "docs/parity-evidence/D02/ext4-allocation/README.md",
+        "https://github.com/asad-albadi/TermCraft/actions/runs/45923194474"
       ],
-      "next_action": "Diagnose the first hosted Ubuntu24.04 CI allocation-cleanup failure linked in GitHub issue3. Establish whether implementation cleanup or a nonportable test assumption is wrong, fix with evidence, and rerun required checks. Native device/platform work remains separately dependent on supported hosts and hardware.",
+      "next_action": "Complete the remaining supported native device/admin and independent-endpoint qualification in issues1/2, retaining documented POSIX limitations. Continue the joint software regression fixes before merging platform PRs.",
       "platform_limitations": "Opened-object mutation and general POSIX COMMSTATUS/properties/modem events remain unavailable by design where no identity-safe native API exists. They are not marked implemented or assumed fixable by another Linux machine.",
       "native_dependency": "Native Windows/macOS RDP/redirection endpoints and physical printer, smartcard and serial fixtures. POSIX lacks the required opened-object rename/delete and general COMMSTATUS/properties/modem-event semantics; additional Linux hardware alone cannot supply missing OS APIs."
     },
@@ -410,9 +412,9 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS builders and interactive engine hosts to compile, approve hashes and qualify the reviewed owned-engine candidates.",
-      "remaining": "Windows pinned private VcXsrv built locally with adjacent DLLs, fonts and XKB data. Native probes passed occupied-display refusal, exact loopback address/PID ownership, binary cookie setup and listener cleanup. The Windows engine remains a development candidate while redistribution and compiled shipping approval are open. The native macOS build also remains open. Linux owned Xwayland remains implemented.",
-      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "dependency": "Remaining supported native desktop/manual, device, independent endpoint and production distribution fixtures.",
+      "remaining": "Linux owned Xwayland, private source-built Windows VcXsrv and exact pinned Apple Silicon XQuartz passed bounded lifecycle/authentication checks. Public distribution approval and broader native acceptance remain open.",
+      "validation_remaining": "Both native evidence ledgers retain exact candidate identities and documented limits.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/execution/2026-11-25-windows-native.md",
@@ -421,7 +423,10 @@
         "docs/parity-evidence/parallel-integration-reviewed/result.json",
         "docs/parity-evidence/X01/native-providers.md",
         "docs/parity-evidence/X01/native-providers-review.md",
-        "docs/parity-evidence/parallel-integration-native-clipboard/result.json"
+        "docs/parity-evidence/parallel-integration-native-clipboard/result.json",
+        "docs/parity-evidence/issue-2/artifact-contract.md",
+        "docs/parity-evidence/issue-2/xquartz-build.md",
+        "docs/parity-evidence/issue-2/evidence-schema.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
@@ -432,13 +437,15 @@
       "requires": [
         "F01"
       ],
-      "dependency": "Qualified native Windows/macOS owned engines from X01 and interactive SSH/X authentication, clipboard and display workflows on those systems.",
-      "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. A real owned Windows candidate mapped a window through embedded SSH and separately authenticated through Git for Windows OpenSSH with private xauth. Private Windows XDMCP clipboard passed on a separate loopback address. Microsoft Win32 OpenSSH compatibility, native shipping and original qualification remain open.",
-      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "dependency": "Remaining supported native desktop/manual, device, independent endpoint and production distribution fixtures.",
+      "remaining": "Linux, private Windows and Apple Silicon passed managed SSH/X authorization. Explicit Apple Silicon/X11 clipboard transfer and private Windows XDMCP clipboard passed. Remaining visual workflows, Microsoft Win32 OpenSSH forwarding and original comparisons remain open.",
+      "validation_remaining": "Native controlled fixture evidence is distinct from production shipping approval.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/X02/review.md",
-        "docs/parity-evidence/parallel-integration-clean/result.json"
+        "docs/parity-evidence/parallel-integration-clean/result.json",
+        "docs/parity-evidence/issue-2/xquartz-build.md",
+        "docs/parity-evidence/issue-2/providers.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
       "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
@@ -448,14 +455,16 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS graphics hosts and physical GPU/monitor fixtures; configured headless Linux graphics coverage is retained.",
-      "remaining": "Reviewed actual Linux GLX rendering, Composite readback and RandR change/restoration are integrated and qualified in private fixtures, including actual extracted release app/engine. The Windows x64 probe verified authenticated Composite pixels and live GLX/RANDR protocol versions. Windows OpenGL and actual RANDR changes, native macOS graphics, hardware/GPU/monitor coverage and original comparison remain pending.",
-      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "dependency": "Remaining supported native desktop/manual, device, independent endpoint and production distribution fixtures.",
+      "remaining": "Linux GLX/Composite/RandR passed. Windows passed Composite pixels and GLX/RANDR queries; Apple Silicon passed direct GLX framebuffer readback and read-only geometry reporting. Windows active OpenGL/mode changes, visible presentation, physical GPU/monitors/Retina and original comparisons remain open.",
+      "validation_remaining": "Direct framebuffer evidence does not qualify physical display presentation.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/X03/implementation-report.md",
         "docs/parity-evidence/X03/review.md",
-        "docs/parity-evidence/parallel-integration-browser-vnc-x03/release-verification.json"
+        "docs/parity-evidence/parallel-integration-browser-vnc-x03/release-verification.json",
+        "docs/parity-evidence/issue-2/xquartz-build.md",
+        "docs/parity-evidence/issue-2/windowed-monitor.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
       "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
@@ -465,9 +474,9 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS engines and original Personal26.6 workflow access. Linux genuine-package chooser/clipboard/keyboard/cancel checks already pass.",
-      "remaining": "Linux direct/indirect discovery, hostname, clipboard, keyboard and cleanup workflows are implemented and genuine-package qualified after the reviewed reset fix. Windows application source routes Direct and Indirect through the owned candidate. A controlled Windows peer completed MANAGE and proved binary cookie setup, one selected keyboard layout and first-monitor fullscreen geometry. Authenticated Windows Direct XDMCP exchanged Unicode clipboard on a private station at a separate loopback address. Routed-network and release approval, native macOS and original comparison remain.",
-      "validation_remaining": "Genuine source22bb/full398d traced and untraced strict-auth chooser/clipboard/keyboard/cancel checks passed. The Windows development application and native candidate have separate approval-gate and protocol evidence. The full native Windows/macOS and original workflow matrices remain open.",
+      "dependency": "Remaining supported native desktop/manual, device, independent endpoint and production distribution fixtures.",
+      "remaining": "Linux genuine-package chooser/clipboard/keyboard/cleanup passed. Private Windows Direct/Indirect and Direct clipboard, and Apple Silicon Direct/Indirect with actual Debian xdm passed. Visible chooser operation, routed networks, broader layouts, public release approval and original comparison remain open.",
+      "validation_remaining": "Both native development candidates have controlled protocol and cleanup evidence; full desktop/manual matrices remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/execution/2026-11-25-windows-native.md",
@@ -475,7 +484,8 @@
         "docs/parity-evidence/X04/clipboard-lifecycle/root-integration.json",
         "docs/parity-evidence/X04/keyboard-chooser/root-integration.json",
         "target/agent-work/current-packaged-xdmcp/reliability-boundary/owner-handoff.md",
-        "docs/parity-evidence/parallel-integration-post-xdmcp-reset-fix/result.json"
+        "docs/parity-evidence/parallel-integration-post-xdmcp-reset-fix/result.json",
+        "docs/parity-evidence/issue-2/xdmcp-macos.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
       "interface_prerequisite_note": "Linux owned-engine and forwarding interfaces are already implemented/qualified. Native completeness of X01/X02/X03 does not block additional Linux work; actual native engine gates remain enforced in production."
@@ -744,7 +754,8 @@
         "docs/parity-evidence/B05/implementation.md",
         "docs/parity-evidence/B05/review-fixes.md",
         "docs/parity-evidence/B05/merged-python-final.log",
-        "docs/parity-evidence/parallel-integration-platform-services/result.json"
+        "docs/parity-evidence/parallel-integration-platform-services/result.json",
+        "docs/parity-evidence/issue-2/app-lifecycle.md"
       ],
       "next_action": "Retain reviewed owned Linux integration and native Mac launcher source candidate; collect native qualification without changing defaults."
     },
@@ -770,9 +781,9 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Windows production artifact approval, a native macOS browser payload and original workflow fixtures.",
-      "remaining": "Source22bb Linux bundle passed packaged navigation/input/resize/PTY and nested renderer sandbox checks. A relocated private Windows x64 package used the exact source-built Chromium with native AppContainer, input and cleanup evidence.",
-      "validation_remaining": "Complete Windows production artifact approval, macOS packaging and runtime qualification, and original workflow comparisons. The Windows evidence applies to the exact private candidate.",
+      "dependency": "Remaining supported native desktop/manual, device, independent endpoint and production distribution fixtures.",
+      "remaining": "Linux packaged Chromium workflows and sandbox passed. Private source-built Windows Chromium and opt-in Apple Silicon fixture passed bounded native browser/sandbox/cleanup checks. Production Windows approval, maintained Apple Silicon payload with complete notices/signing and original comparisons remain open.",
+      "validation_remaining": "Keep private/qualification fixture identities separate from production payload approval.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/original-scope/README.md",
@@ -782,7 +793,8 @@
         "docs/parity-evidence/E01/macos/README.md",
         "docs/parity-evidence/E01/windows/README.md",
         "docs/parity-evidence/E01/resize-macos-review.md",
-        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md",
+        "docs/parity-evidence/issue-2/chromium-arm64.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
@@ -944,12 +956,15 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native desktop, endpoint and device fixtures for remaining Windows/macOS qualification.",
-      "remaining": "Complete interactive Windows desktop, clean-account, device redirection, providers and macOS qualification.",
-      "validation_remaining": "Hosted Windows x64 CI passed 615 workspace tests with 32 ignored and 36 locked helper tests. The actual relocated GUI passed live themes, new-terminal shortcut, split, detach, native fullscreen and restore, reattach and process teardown at one scale. Additional input, DPI, provider, hardware and original workflows remain open.",
+      "dependency": "Remaining supported native desktop/manual, device, independent endpoint and production distribution fixtures.",
+      "remaining": "Native Windows and Apple Silicon builds, relocated packages and selected desktop workflows passed. Remaining foreground/manual, devices, physical graphics and public distribution acceptance remain open.",
+      "validation_remaining": "Separate native runs: Windows619/0/36 ignored plus helper36; Apple Silicon922/0/17 ignored plus helper54. Combined integration validation pending.",
       "evidence": [
         "PARITY_PROGRESS.md",
-        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md",
+        "docs/parity-evidence/issue-2/BASELINE.md",
+        "docs/parity-evidence/issue-2/arm64.md",
+        "docs/parity-evidence/issue-2/evidence-schema.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
@@ -992,7 +1007,7 @@
         "B05"
       ],
       "dependency": "",
-      "remaining": "Reviewed clean native Debian12 current-core scenario now covers declared dependencies, real0.1.0→0.1.0-1 upgrade, replacement/removal/reinstall, full workspace/encrypted-test-vault/corrupt-original preservation, actual app/sealed-helper startup and configured native GTK game files. Full optional Arch payload closure, other native platforms and original evidence remain separate.",
+      "remaining": "Reviewed clean native Debian12 current-core scenario now covers declared dependencies, real0.1.0\u21920.1.0-1 upgrade, replacement/removal/reinstall, full workspace/encrypted-test-vault/corrupt-original preservation, actual app/sealed-helper startup and configured native GTK game files. Full optional Arch payload closure, other native platforms and original evidence remain separate.",
       "validation_remaining": "Current Debian core and configured GTK artifact qualified by independent review; full optional Arch artifact, Windows/macOS and original cells remain unverified.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -1030,9 +1045,11 @@
       "macos_issue": "https://github.com/asad-albadi/TermCraft/issues/2",
       "ci_release_issue": "https://github.com/asad-albadi/TermCraft/issues/3",
       "initial_hosted_ci": "https://github.com/asad-albadi/TermCraft/actions/runs/45636600121",
-      "hosted_helper_passed": 81,
-      "hosted_helper_failed": 1,
-      "cause": "Unconfirmed; D02 investigation is actionable again. Prior local qualification is retained as historical evidence."
+      "hosted_helper_passed": 87,
+      "hosted_helper_failed": 0,
+      "cause": "Confirmed ext4 KEEP_SIZE allocation beyond EOF was not reclaimed by hole punch. Scoped write-lease cleanup and regression coverage are committed; hosted Windows-branch Linux CI passed in run45923194474. Full combined Apple Silicon CI remains actionable for separate terminal/browser/SCP/serial fixture failures, and Linux Vim resize needs deterministic synchronization.",
+      "verified_ci": "https://github.com/asad-albadi/TermCraft/actions/runs/45923194474",
+      "combined_ci_follow_up": "https://github.com/asad-albadi/TermCraft/actions/runs/45924008758"
     }
   },
   "supported_platform_scope": {

@@ -6,14 +6,20 @@ mod engine;
 mod native_capabilities;
 #[cfg(all(windows, target_arch = "x86_64"))]
 mod native_capabilities_windows;
+#[cfg(target_os = "macos")]
+pub use capabilities::X11LogicalRect;
 pub use capabilities::{OpenGlEvidence, XCapabilities, capability_probe_entry};
 mod forwarding;
 pub mod remote_environment;
 pub use forwarding::{XClientDisplay, XDisplaySource, XForwardingLease, XTrustMode};
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+mod macos_clipboard;
 #[cfg(any(windows, target_os = "macos", test))]
 mod native_artifact;
 #[cfg(target_os = "macos")]
 mod native_macos;
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+pub use macos_clipboard::MacosClipboard;
 #[cfg(any(windows, target_os = "macos"))]
 mod native_policy;
 #[cfg(any(windows, target_os = "macos", test))]
@@ -23,6 +29,8 @@ mod native_windows;
 #[cfg(windows)]
 mod native_windows_process;
 mod platform;
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+mod unix_connection;
 pub(crate) use platform::bundled_runtime;
 
 use std::path::{Path, PathBuf};
@@ -103,11 +111,9 @@ impl XServerManager {
     ) -> Result<XServerLease, String> {
         let root = match &self.installation {
             Some(root) => root.clone(),
-            None => std::env::current_exe()
-                .map_err(|error| format!("Could not locate the TermCraft installation: {error}"))?
-                .parent()
-                .ok_or("Could not find the TermCraft resource directory")?
-                .to_path_buf(),
+            None => {
+                crate::runtime::RuntimeCatalog::for_current_executable()?.service_runtime_root()
+            }
         };
         platform::start(&root, options, cancelled)
     }
@@ -146,7 +152,9 @@ pub struct XServerLease {
     process: engine::OwnedProcess,
     #[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
     _reservation: platform::DisplayReservation,
-    #[cfg(any(windows, target_os = "macos"))]
+    #[cfg(target_os = "macos")]
+    _native_image: Arc<native_artifact::VerifiedSnapshot>,
+    #[cfg(windows)]
     _native_image: native_artifact::VerifiedSnapshot,
     #[cfg(windows)]
     _runtime_guard: std::fs::File,
@@ -198,6 +206,8 @@ mod xdmcp_engine;
 pub mod xdmcp_host;
 #[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
 mod xdmcp_listener;
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+mod xdmcp_macos;
 pub use xdmcp_engine::{LINUX_XEPHYR_ARTIFACT, ManagedXdmcp, XdmcpSession};
 
 #[cfg(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]

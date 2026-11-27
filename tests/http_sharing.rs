@@ -249,7 +249,9 @@ fn concurrent_uploads_publish_one_complete_file() {
 fn deep_directory_listing_uses_one_base_path() {
     let root = tempfile::tempdir().unwrap();
     let mut directory = root.path().to_path_buf();
-    let segment = "a".repeat(110);
+    // Keep the full fixture path within Darwin's PATH_MAX while making a
+    // repeated absolute base prohibitively large at 240 links.
+    let segment = "a".repeat(48);
     let mut target = String::new();
     for _ in 0..16 {
         directory.push(&segment);
@@ -280,7 +282,11 @@ fn directory_listing_rejects_bodies_over_the_render_limit() {
     let server = start(&root, false, false);
     let listing = request(&server, "GET / HTTP/1.1\r\n\r\n");
     assert_eq!(listing.status, 200);
-    assert!((1000 * 1024..=1024 * 1024).contains(&listing.body.len()));
+    assert!(
+        (1000 * 1024..=1024 * 1024).contains(&listing.body.len()),
+        "rendered listing was {} bytes",
+        listing.body.len()
+    );
 
     for index in 580..590 {
         std::fs::write(root.path().join(format!("{long_name}{index}")), b"").unwrap();

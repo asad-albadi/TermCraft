@@ -67,7 +67,7 @@ impl DisplayTarget {
         })
     }
 }
-fn authority_cookie(
+pub(crate) fn authority_cookie(
     bytes: &[u8],
     display: u16,
     hostname: &[u8],

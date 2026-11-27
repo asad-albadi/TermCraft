@@ -13,6 +13,11 @@ use std::{
 fn error(e: impl std::fmt::Display) -> String {
     e.to_string()
 }
+fn raw_mode(value: u32) -> Result<Mode, String> {
+    fs::RawMode::try_from(value)
+        .map(Mode::from_raw_mode)
+        .map_err(|_| "Folder archive mode does not fit the platform raw mode type".into())
+}
 fn check(cancelled: &tokio::sync::watch::Receiver<bool>) -> Result<(), String> {
     if *cancelled.borrow() {
         Err("Folder preparation cancelled".into())
@@ -254,7 +259,7 @@ pub(crate) async fn extract(
                         file.write_all(&buffer[..n]).map_err(error)?;
                         remaining -= n as u64;
                     }
-                    fs::fchmod(&file, Mode::from_raw_mode(mode)).map_err(error)?;
+                    fs::fchmod(&file, raw_mode(mode)?).map_err(error)?;
                     file.sync_all().map_err(error)?;
                     super::super::operations::close_recovery_file(file).map_err(error)?;
                 }
@@ -357,9 +362,9 @@ pub(crate) async fn finalize(root: File, modes: FolderModes) -> Result<(), Strin
         for (path, mode) in directories {
             let parts = components(&path)?;
             let directory = open_dir(&root, &parts)?;
-            fs::fchmod(&directory, Mode::from_raw_mode(mode)).map_err(error)?;
+            fs::fchmod(&directory, raw_mode(mode)?).map_err(error)?;
         }
-        fs::fchmod(&root, Mode::from_raw_mode(modes.root)).map_err(error)?;
+        fs::fchmod(&root, raw_mode(modes.root)?).map_err(error)?;
         Ok(())
     })
     .await

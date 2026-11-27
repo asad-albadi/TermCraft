@@ -49,7 +49,23 @@
     }
 }
 - (void)openTerminalHere:(NSPasteboard *)pasteboard userData:(NSString *)userData error:(NSString **)error {
-    NSArray<NSURL *> *urls = [pasteboard readObjectsForClasses:@[[NSURL class]] options:@{NSPasteboardURLReadingFileURLsOnlyKey:@YES}];
+    NSArray<NSURL *> *urls = [pasteboard readObjectsForClasses:@[[NSURL class]] options:nil];
+    if (urls.count == 0) {
+        // Finder can negotiate the legacy filenames type instead of file URLs.
+        id files = [pasteboard propertyListForType:@"NSFilenamesPboardType"];
+        if ([files isKindOfClass:[NSArray class]] && [files count] <= 64) {
+            NSMutableArray<NSURL *> *folders = [NSMutableArray new];
+            for (id path in files) {
+                if (![path isKindOfClass:[NSString class]] || ![path hasPrefix:@"/"] ||
+                    [path rangeOfString:@"\0"].location != NSNotFound) {
+                    if (error) *error = @"Open terminal here requires a local folder.";
+                    return;
+                }
+                [folders addObject:[NSURL fileURLWithPath:path]];
+            }
+            urls = folders;
+        }
+    }
     if (urls.count == 0 || urls.count > 64) {
         if (error) *error = @"Select a folder in Finder.";
         return;
@@ -72,6 +88,10 @@
 @end
 int main(int argc, const char *argv[]) {
     @autoreleasepool {
+        if (argc == 2 && strcmp(argv[1], "--refresh-services") == 0) {
+            NSUpdateDynamicServices();
+            return 0;
+        }
         NSApplication *application = [NSApplication sharedApplication];
         [application setActivationPolicy:NSApplicationActivationPolicyAccessory];
         TermCraftLaunchDelegate *delegate = [TermCraftLaunchDelegate new];
