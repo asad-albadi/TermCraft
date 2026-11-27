@@ -9,7 +9,10 @@ existing archive intact. The package contains the application, the adjacent
 headless RDP engine, artwork, font notices, crate notices, and a manifest with
 binary hashes and build input hashes, alongside both lockfiles. Crate metadata
 identifies upstream sources where published archives do not include notice text.
-The Windows ZIP includes and hashes the project MIT license and privacy policy.
+The Linux, Windows and Apple Silicon macOS archives include the project's MIT
+license, privacy policy, and credits byte-for-byte, with SHA-256 hashes in
+`PACKAGE-MANIFEST.json`. On macOS these files and the install guide are in
+`TermCraft.app/Contents/Resources`. The archives are unsigned.
 
 macOS release manifests also record the native architecture, Xcode SDK version,
 deployment-target policy, and compiler identity. A package without those fields
@@ -62,8 +65,9 @@ PowerShell installer with a versioned per-user program directory and Start
 menu shortcut. The [Windows x64 qualification checkpoint](../docs/parity-evidence/execution/2026-11-25-windows-native.md)
 covers an unsigned candidate's relocated startup and versioned installer
 smoke. For a local candidate, run `python scripts/package-check-startup.py <zip> --evidence <new-directory>`
-and `pwsh -File tests/windows-package-lifecycle.ps1 -Archive <zip>`.
-The installer test creates and removes uniquely named per-user versions.
+for portable startup. The separate installer test driver touches the real
+KnownFolders and runs only on disposable GitHub-hosted Windows.
+It is not a local upgrade command.
 On macOS, extract using Finder or `ditto` to preserve executable
 permissions. The bundles are unsigned. Move the app to the chosen Applications
 directory, and use the same location or a new versioned location for upgrades.
@@ -81,6 +85,10 @@ entry and icon. Its Depends field records the required glibc symbol baseline
 and graphics libraries. Build the portable archive on the oldest Debian-family
 system you intend to support. Install or remove with the distro's package manager
 on that system. Workspace settings stay in their existing per-user directories.
+Use the wrapper from the same source revision as the portable archive. Debian
+documentation under `/usr/share/doc/termcraft` includes the complete MIT text
+in `copyright`, alongside `PRIVACY.md` and `CREDITS.md`. Component notices
+remain in the packaged payload.
 
 ```sh
 python3 scripts/package-debian.py dist/TermCraft-0.1.0-linux-x86_64.tar.gz --output dist
@@ -99,10 +107,9 @@ linking is available. Cargo configuration and Rust build-override environment
 variables from the live checkout do not apply. The native toolchain and
 system SDK come from the build machine.
 
-The CI workflow runs the Rust and packaging tests. The manually dispatched
-release workflow builds unsigned archive candidates for Linux x86-64,
-Windows x86-64, and Apple Silicon macOS (arm64). Intel macOS is outside the
-current support scope and is not a required build, artifact or approval gate. Linux startup uses a virtual
-X11 display. Windows and macOS GUI checks require a runner with an available
-desktop session. The workflow retains run artifacts and startup evidence.
-Signing, notarization, and publication are separate release actions.
+The [release workflow](../.github/workflows/release.yml) uses the full
+Linux x86-64, Windows x64 and Apple Silicon macOS regression matrix.
+Manual runs are read-only. Version-tag runs can assemble checked unsigned
+core candidates, but publication remains blocked until the required
+native lifecycle and Wayland checks are integrated. The [release guide](../docs/releases.md)
+describes the exact formats, evidence and publication policy.

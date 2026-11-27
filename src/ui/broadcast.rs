@@ -17,7 +17,9 @@ mod tests {
         ctx.memory_mut(|m| m.request_focus(Id::new(("terminal-input", a))));
         frame(&ctx, &mut w, vec![Event::Text("Z".into())]);
         let deadline = Instant::now() + Duration::from_secs(2);
-        while captured(&w.tabs[2]).is_empty() && Instant::now() < deadline {
+        while (captured(&w.tabs[0]).is_empty() || captured(&w.tabs[2]).is_empty())
+            && Instant::now() < deadline
+        {
             for t in &mut w.tabs {
                 t.poll();
             }

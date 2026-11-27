@@ -1,0 +1,356 @@
+{
+  "libraries": {
+    "libX11-xcb.so.1": {
+      "binary_version": "2:1.8.7-1build1",
+      "glibc": null,
+      "needed": [],
+      "package": "libx11-xcb1",
+      "sha256": "966fc171a949852a606efdf44d255f6f91b35c16328f5405c1b24743b6708ea7",
+      "soname": [
+        "libX11-xcb.so.1"
+      ],
+      "source_package": "libx11",
+      "source_version": "2:1.8.7-1build1"
+    },
+    "libX11.so.6": {
+      "binary_version": "2:1.8.7-1build1",
+      "glibc": "2.38",
+      "needed": [
+        "libc.so.6",
+        "libxcb.so.1"
+      ],
+      "package": "libx11-6",
+      "sha256": "c5b5d782bd9cab3420a62df88f5c991507edf3331a89f98464ddbc538c37b879",
+      "soname": [
+        "libX11.so.6"
+      ],
+      "source_package": "libx11",
+      "source_version": "2:1.8.7-1build1"
+    },
+    "libXau.so.6": {
+      "binary_version": "1:1.0.9-1build6",
+      "glibc": "2.33",
+      "needed": [
+        "libc.so.6"
+      ],
+      "package": "libxau6",
+      "sha256": "8040da3f8516c1acfe39f04ff022480cdb273705ba5e7a4ca70bbdb1527cd67a",
+      "soname": [
+        "libXau.so.6"
+      ],
+      "source_package": "libxau",
+      "source_version": "1:1.0.9-1build6"
+    },
+    "libXcursor.so.1": {
+      "binary_version": "1:1.2.1-1build1",
+      "glibc": "2.38",
+      "needed": [
+        "libX11.so.6",
+        "libXfixes.so.3",
+        "libXrender.so.1",
+        "libc.so.6"
+      ],
+      "package": "libxcursor1",
+      "sha256": "09bd5941a53ee7fb06898fa066709cf098df8e33a45042e065d2f8461d92672c",
+      "soname": [
+        "libXcursor.so.1"
+      ],
+      "source_package": "libxcursor",
+      "source_version": "1:1.2.1-1build1"
+    },
+    "libXdmcp.so.6": {
+      "binary_version": "1:1.1.3-0ubuntu6",
+      "glibc": "2.4",
+      "needed": [
+        "libbsd.so.0",
+        "libc.so.6"
+      ],
+      "package": "libxdmcp6",
+      "sha256": "667d97d6da16016400ab10de9f83ef4ab209ceb6adf68ff9650225ec13e723b0",
+      "soname": [
+        "libXdmcp.so.6"
+      ],
+      "source_package": "libxdmcp",
+      "source_version": "1:1.1.3-0ubuntu6"
+    },
+    "libXext.so.6": {
+      "binary_version": "2:1.3.4-1build2",
+      "glibc": "2.14",
+      "needed": [
+        "libX11.so.6",
+        "libc.so.6"
+      ],
+      "package": "libxext6",
+      "sha256": "2907e6a996465de5b32a0dd10534d4416b87f1dee5670aaa7b19301a1fc93f44",
+      "soname": [
+        "libXext.so.6"
+      ],
+      "source_package": "libxext",
+      "source_version": "2:1.3.4-1build2"
+    },
+    "libXfixes.so.3": {
+      "binary_version": "1:6.0.0-2build1",
+      "glibc": "2.14",
+      "needed": [
+        "libX11.so.6",
+        "libc.so.6"
+      ],
+      "package": "libxfixes3",
+      "sha256": "89e5897f438456013d2297850a7558cd28c9ad1f6978447197568949fb6a0fd9",
+      "soname": [
+        "libXfixes.so.3"
+      ],
+      "source_package": "libxfixes",
+      "source_version": "1:6.0.0-2build1"
+    },
+    "libXi.so.6": {
+      "binary_version": "2:1.8.1-1build1",
+      "glibc": "2.14",
+      "needed": [
+        "libX11.so.6",
+        "libXext.so.6",
+        "libc.so.6"
+      ],
+      "package": "libxi6",
+      "sha256": "a51348c921ce1a35123fa7c99dc59bfd3e815be6829874fe15ae55172901d3e4",
+      "soname": [
+        "libXi.so.6"
+      ],
+      "source_package": "libxi",
+      "source_version": "2:1.8.1-1build1"
+    },
+    "libXrandr.so.2": {
+      "binary_version": "2:1.5.2-2build1",
+      "glibc": "2.14",
+      "needed": [
+        "libX11.so.6",
+        "libXext.so.6",
+        "libXrender.so.1",
+        "libc.so.6"
+      ],
+      "package": "libxrandr2",
+      "sha256": "bc6120a734d52e7f5e3611334e9f3cff0b3ce1b129bb20b6412ce8f0f62c049d",
+      "soname": [
+        "libXrandr.so.2"
+      ],
+      "source_package": "libxrandr",
+      "source_version": "2:1.5.2-2build1"
+    },
+    "libXrender.so.1": {
+      "binary_version": "1:0.9.10-1.1build1",
+      "glibc": "2.14",
+      "needed": [
+        "libX11.so.6",
+        "libc.so.6"
+      ],
+      "package": "libxrender1",
+      "sha256": "250977e0e004b6c0556144c3e683487063b4582dc83d205196ec3aa65d54e2c6",
+      "soname": [
+        "libXrender.so.1"
+      ],
+      "source_package": "libxrender",
+      "source_version": "1:0.9.10-1.1build1"
+    },
+    "libbsd.so.0": {
+      "binary_version": "0.12.1-1build1",
+      "glibc": "2.38",
+      "needed": [
+        "libc.so.6",
+        "libmd.so.0"
+      ],
+      "package": "libbsd0",
+      "sha256": "0fd5a235d714063f17285ad16e6286ca79458e2cbba1388e8b6fc921b912cbdb",
+      "soname": [
+        "libbsd.so.0"
+      ],
+      "source_package": "libbsd",
+      "source_version": "0.12.1-1build1"
+    },
+    "libffi.so.8": {
+      "binary_version": "3.4.6-1build1",
+      "glibc": "2.27",
+      "needed": [
+        "libc.so.6"
+      ],
+      "package": "libffi8",
+      "sha256": "00f593fe192f2851b8ce23b25cec2488d769beb5a8f63e8c9e563071e1075153",
+      "soname": [
+        "libffi.so.8"
+      ],
+      "source_package": "libffi",
+      "source_version": "3.4.6-1build1"
+    },
+    "libgcc_s.so.1": {
+      "binary_version": "14-20240412-0ubuntu1",
+      "glibc": "2.35",
+      "needed": [
+        "ld-linux-x86-64.so.2",
+        "libc.so.6"
+      ],
+      "package": "libgcc-s1",
+      "sha256": "4f502dd464a54d841973a22d6f2585ec548c1950507ab1c89e3efae4f542b2cd",
+      "soname": [
+        "libgcc_s.so.1"
+      ],
+      "source_package": "gcc-14",
+      "source_version": "14-20240412-0ubuntu1"
+    },
+    "libmd.so.0": {
+      "binary_version": "1.1.0-2build1",
+      "glibc": "2.33",
+      "needed": [
+        "libc.so.6"
+      ],
+      "package": "libmd0",
+      "sha256": "4a108e1c28f9150e45d25d2ea3ec886864c18f344272ce0c755d464abc775410",
+      "soname": [
+        "libmd.so.0"
+      ],
+      "source_package": "libmd",
+      "source_version": "1.1.0-2build1"
+    },
+    "libwayland-client.so.0": {
+      "binary_version": "1.22.0-2.1build1",
+      "glibc": "2.38",
+      "needed": [
+        "libc.so.6",
+        "libffi.so.8"
+      ],
+      "package": "libwayland-client0",
+      "sha256": "1c22abb422953442aa12822ea51ac76d1c8be92ed143e0159e0f830776cde2b2",
+      "soname": [
+        "libwayland-client.so.0"
+      ],
+      "source_package": "wayland",
+      "source_version": "1.22.0-2.1build1"
+    },
+    "libwayland-cursor.so.0": {
+      "binary_version": "1.22.0-2.1build1",
+      "glibc": "2.28",
+      "needed": [
+        "libc.so.6",
+        "libwayland-client.so.0"
+      ],
+      "package": "libwayland-cursor0",
+      "sha256": "bcb52f21ed9a07af67795de01143fc5562939e584b5945ebbec60c054660e9f5",
+      "soname": [
+        "libwayland-cursor.so.0"
+      ],
+      "source_package": "wayland",
+      "source_version": "1.22.0-2.1build1"
+    },
+    "libwayland-egl.so.1": {
+      "binary_version": "1.22.0-2.1build1",
+      "glibc": "2.2.5",
+      "needed": [
+        "libc.so.6"
+      ],
+      "package": "libwayland-egl1",
+      "sha256": "f62e5dae4e63cb43e0210f08ef74dd379f0cd87eafbe569998fe6e1c4a820a10",
+      "soname": [
+        "libwayland-egl.so.1"
+      ],
+      "source_package": "wayland",
+      "source_version": "1.22.0-2.1build1"
+    },
+    "libxcb-xkb.so.1": {
+      "binary_version": "1.15-1ubuntu2",
+      "glibc": "2.14",
+      "needed": [
+        "libc.so.6",
+        "libxcb.so.1"
+      ],
+      "package": "libxcb-xkb1",
+      "sha256": "f6b3ca63ff23f3e82d122af4622aaebed49c58614e2f840568a0bb4c9048436c",
+      "soname": [
+        "libxcb-xkb.so.1"
+      ],
+      "source_package": "libxcb",
+      "source_version": "1.15-1ubuntu2"
+    },
+    "libxcb.so.1": {
+      "binary_version": "1.15-1ubuntu2",
+      "glibc": "2.38",
+      "needed": [
+        "libXau.so.6",
+        "libXdmcp.so.6",
+        "libc.so.6"
+      ],
+      "package": "libxcb1",
+      "sha256": "7958a0136b121bdc4c708968569ad152a9ed208ab026e2537b1005dde64ca440",
+      "soname": [
+        "libxcb.so.1"
+      ],
+      "source_package": "libxcb",
+      "source_version": "1.15-1ubuntu2"
+    },
+    "libxkbcommon-x11.so.0": {
+      "binary_version": "1.6.0-1build1",
+      "glibc": "2.4",
+      "needed": [
+        "libc.so.6",
+        "libxcb-xkb.so.1",
+        "libxcb.so.1",
+        "libxkbcommon.so.0"
+      ],
+      "package": "libxkbcommon-x11-0",
+      "sha256": "109a5c2095ab6bcc36f751d3c0deb3b066ecbfb664a36904b6ca212f987a408a",
+      "soname": [
+        "libxkbcommon-x11.so.0"
+      ],
+      "source_package": "libxkbcommon",
+      "source_version": "1.6.0-1build1"
+    },
+    "libxkbcommon.so.0": {
+      "binary_version": "1.6.0-1build1",
+      "glibc": "2.38",
+      "needed": [
+        "libc.so.6"
+      ],
+      "package": "libxkbcommon0",
+      "sha256": "3eb6c7315985803a7c72cb81aa3293b763e6cfc907b70b7b2f641c2827cd90f9",
+      "soname": [
+        "libxkbcommon.so.0"
+      ],
+      "source_package": "libxkbcommon",
+      "source_version": "1.6.0-1build1"
+    }
+  },
+  "notices": {
+    "common-Apache-2.0": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "common-Artistic": "b7fd9b73ea99602016a326e0b62e6646060d18febdd065ceca8bb482208c3d88",
+    "common-BSD": "5d588eb3b157d52112afea935c88a7ff9efddc1e2d95a42c25d3b96ad9055008",
+    "common-CC0-1.0": "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499",
+    "common-GFDL-1.2": "d8e94ae5fdb5433fcae2961aeb1a8cf17174d6f4a0465d24bf37dd8a038bd439",
+    "common-GFDL-1.3": "110535522396708cea37c72a802c5e7e81391139f5f7985631c93ef242b206a4",
+    "common-GPL-1": "d77d235e41d54594865151f4751e835c5a82322b0e87ace266567c3391a4b912",
+    "common-GPL-2": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+    "common-GPL-3": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "common-LGPL-2": "681e386e44a19d7d0674b4320272c90e66b6610b741e7e6305f8219c42e85366",
+    "common-LGPL-2.1": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+    "common-LGPL-3": "e3a994d82e644b03a792a930f574002658412f62407f5fee083f2555c5f23118",
+    "common-MPL-1.1": "f849fc26a7a99981611a3a370e83078deb617d12a45776d6c4cada4d338be469",
+    "common-MPL-2.0": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85",
+    "gcc-14-base.copyright": "20390f8a6f3b1e4d7cb45dd8652dabb259bbef688cbad839bcdb0b9ba7252f79",
+    "libbsd0.copyright": "978426553ab7b9cfb4503d98e578a77b8c3142c099100aa9791fd21be5a95f97",
+    "libffi8.copyright": "737ff68f0eb104d3b0d96b291c3a8f40a775a3ec2b53f9b2e4bcfe3188bde118",
+    "libmd0.copyright": "4365ef6255ad553fce69dd4bc0e093472c5d0e41b8ea493a545cc926ce171aa6",
+    "libwayland-client0.copyright": "736bf54141fa9808939ffff2691b817888ea53197484c2099e8d03b954b83e3b",
+    "libwayland-cursor0.copyright": "736bf54141fa9808939ffff2691b817888ea53197484c2099e8d03b954b83e3b",
+    "libwayland-egl1.copyright": "736bf54141fa9808939ffff2691b817888ea53197484c2099e8d03b954b83e3b",
+    "libx11-6.copyright": "0b380a7fd5b2228f26e9585e56f14812efd3350f3df307507d2bc055dfd8de3e",
+    "libx11-xcb1.copyright": "0b380a7fd5b2228f26e9585e56f14812efd3350f3df307507d2bc055dfd8de3e",
+    "libxau6.copyright": "118dd263a7b91c8f21c489f949bf13281dff9e766deea92b829dac4dce66601a",
+    "libxcb-xkb1.copyright": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80",
+    "libxcb1.copyright": "4f7cb9db6bf6542f5417e3d674c780d3a5fd12291a54d63054fb576ee0cfae80",
+    "libxcursor1.copyright": "817abc0ccc9e2591057be256b0f6d80edb134221ced29dd545a9eafaf40b423c",
+    "libxdmcp6.copyright": "1bcbb50f8603fe8b86d330bfa460b772ea04fbd3c70e4499f0768b5340b9fd6e",
+    "libxext6.copyright": "bc57e445ca1d9fe082c8d54189dd411ff26caa8552c9c63d44ea06a982f32124",
+    "libxfixes3.copyright": "051ffe073ab38244c504bb379903b4ecda6081fb3d97d0d3dce44bc11712eef2",
+    "libxi6.copyright": "c812f9c54513ae593aab9580b54a4b18219648df7068d49ca1daa47f522ba3fa",
+    "libxkbcommon-x11-0.copyright": "5eeaeb1b6e029a0274e1573765bb0bae2926ef96a3679203faa4fd00fdaeaa88",
+    "libxkbcommon0.copyright": "5eeaeb1b6e029a0274e1573765bb0bae2926ef96a3679203faa4fd00fdaeaa88",
+    "libxrandr2.copyright": "6d8e6239cfe9dd25bbeef06dcf0610d802ebbdc8968db87cf5adf00ff98927d4",
+    "libxrender1.copyright": "ed2a78123a5076b4f11da38cb1ffb85b5cb9fdc26b5746c517b1d7e7a9029704"
+  }
+}

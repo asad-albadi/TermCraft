@@ -6,9 +6,11 @@ Updated: 2026-11-27.
 
 ## Current checkpoint
 
-Windows [PR #6](https://github.com/asad-albadi/TermCraft/pull/6) and Apple Silicon [PR #5](https://github.com/asad-albadi/TermCraft/pull/5) are merged in main5dfbf9e. The merged tree matches the tested candidate exactly. [Windows/Linux CI](https://github.com/asad-albadi/TermCraft/actions/runs/45952255029) and [three-platform CI](https://github.com/asad-albadi/TermCraft/actions/runs/45952259870) passed. [Core package/startup validation](https://github.com/asad-albadi/TermCraft/actions/runs/45947639840) passed all three targets on production source5ee32d4. Later changes are test/CI metadata; artifact identities remain explicit.
+Windows [PR #6](https://github.com/asad-albadi/TermCraft/pull/6) and Apple Silicon [PR #5](https://github.com/asad-albadi/TermCraft/pull/5) are merged. Their integration and source-scoped package results are preserved in the [integration ledger](docs/parity-evidence/integration/2026-11-27-platform-pr-review.md).
 
-The ext4 allocation and Iperf ABI blockers are repaired. Manual/hardware/original acceptance remains in issues1/2; public runtime enrollment, signing and release automation remain in issue3. Checkpoints remain46/60; strict native/original closure remains0/60. [Integration ledger](docs/parity-evidence/integration/2026-11-27-platform-pr-review.md).
+[Draft PR #7](https://github.com/asad-albadi/TermCraft/pull/7) implements issue #3 under approved P08. Four independently reviewed increments through `922bc49`, with whole-branch integration fixes approved at `a170a25`, add all-platform policies, coordinated source/artifact validation, native two-version lifecycle/Wayland gates and a source-bound Linux AppImage. [Native CI45962965162](https://github.com/asad-albadi/TermCraft/actions/runs/45962965162) passed all three platforms on `68df7d7`. The stricter [manual run45963002351](https://github.com/asad-albadi/TermCraft/actions/runs/45963002351) found a real idle sidebar preference mutation and a broadcast-test acknowledgement race. Both are fixed in the reviewed follow-up, with fresh final-source hosted qualification still pending. Historical AppImage fixture evidence is explicitly separate from the current release candidate. [P08 implementation and evidence](docs/parity-evidence/release-automation/2026-11-27-p08.md).
+
+The ext4 allocation and Iperf ABI blockers are repaired. Manual/hardware/original acceptance remains in issues #1/#2; final release validation, public optional-runtime enrollment and selected signing/publication remain in issue #3. No tag or public release has been created. Checkpoints remain **46/60**, strict native/original closure **0/60**.
 
 ## Historical pre-publication checkpoint
 
@@ -886,3 +888,8 @@ Qualified archive68f356… (1415 verified files) includes reviewed default13game
 The new36-option parent run has881 passes andone fixture BrokenPipe failure, allsourcehashesstable. Independent review accepted its C fixture protocol repair, deterministicRED/GREEN/40repeats/securitycounterexample; production plugin execution/security logic is unchanged. Advanced51-preset UI integration is next reviewed batch; B06 remains open.
 
 Native Debian Bookworm core app and helper compiled from frozen4726… source, and a29MiB portable archive was produced. Debian wrapping failed because documentedPython3.11 compatibility incorrectly relied on newer tarfile.extractall(filter=...). A private security-preserving compatibility fix and old/current Python tests are in progress; no Debian qualification is claimed yet.
+
+
+### P08 unsigned desktop delivery — 2026-11-27
+
+**76.7% (46/60 implementation checkpoints); strict native/original parity0/60.** Reviewed source6571b95 passed all three native CI lanes and strict manual release run45974136835: Linux/Windows/macOS package qualification, increasing-version lifecycle and preservation, Linux X11/native Wayland/AppImage startup and independent three-platform aggregation. Manual publication was skipped. Source identity and remaining distribution/hardware boundaries are recorded in [P08 evidence](docs/parity-evidence/release-automation/2026-11-27-p08.md). This documentation follow-up does not relabel the tested source, close P08's remaining runtime/signing/publication gates or advance parity counts.

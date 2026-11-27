@@ -1,0 +1,30 @@
+{
+  "commit": "dd6cebedcbddde9c82f89b011e8e1d40b6e43868",
+  "files": {
+    "build/apk-packages.txt": "4cf7ed4153e7f33c0748c4746d1ae24c690aa5731035f86dc10d15354816174e",
+    "build/clang-version.txt": "d04dc17233ce7193245708f4c2782be187a2132e23147f1d4728714ffc5746ac",
+    "build/ld-version.txt": "03f5b40f160ccc27ea646b9d8150be8849e767392e7d7dd911e199a3379d3eab",
+    "notices/libfuse-LGPL2.txt": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+    "notices/libfuse.txt": "b8832d9caaa075bbbd2aef24efa09f8b7ab66a832812d88c602da0c7b4397fad",
+    "notices/musl.txt": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
+    "notices/squashfuse.txt": "9e909cc8a8ba27b1a649c964cf9eda37de911f3138c2b64e6d2f01703904ac13",
+    "notices/type2-runtime.txt": "aa154fc9070614bbe7921f89db11efd1dba7a1f3a41685958110e2230f9c0ca1",
+    "notices/zlib.txt": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243",
+    "notices/zstd.txt": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+    "relink/crti.o": "d4928a5b89504700d84123a302c177938f83ea1c2957ed4f34f971b0fa4b95b0",
+    "relink/crtn.o": "2ffa40fa37a3a49a992b54e5f2680cf1224e55011a7b488607abcbf7b3fa61ea",
+    "relink/data_sections.ld": "3d62a1eaa49c62569927a668d1c62d4b6ebf94a14db9b39ef99ea3d14cd79ab2",
+    "relink/libc.a": "b7361ecdd06bc578f362a2085601e01ad9e09034b0b7a804793f9068dc3324aa",
+    "relink/libfuse3.a": "5b228b45f3ad80136bb1a1b8c2376734bcf86e147966c81efd1bab96c631b578",
+    "relink/libsquashfuse.a": "8e9e18bb659ed4ebacd86a38e82529e9ff23f92ebbb5ee16dd8703679520f0d5",
+    "relink/libsquashfuse_ll.a": "c9ab09604d7175052ac51fb6f40aef7932b22004c6c352eaa561104dfe5ccbb0",
+    "relink/libz.a": "62537ae03c535f291e7be67b8cef0dbb0bf6f96143f81f44855225df60fcdbb4",
+    "relink/libzstd.a": "90cf53f138e3d65a0ede33bbefbcdfe3a05ba32008568e4af25a1b43858bbbd6",
+    "relink/rcrt1.o": "b7a369d0e29cb3dff7eb0a4b091f9263361b8d4ba5d3f23405c1323e7bb62641",
+    "relink/relink.sh": "67cd9b9f322da664eac4164b5358a479330fadb3a6eb51dfed4d836b1ec8b8f1",
+    "relink/runtime.map": "26d3fc0c1adcc40363bdb78d3f698c3fc52db8b92eacd8d53200e6b3971945b8",
+    "relink/runtime.o": "2ec102e36c0c5c8d68e36399159fa0bda62c33a03d1b101493250854e581953c",
+    "runtime": "1479be837ed574ac1ce86155dc6931ece6a03f90c0763f2f46799fda172b1d64"
+  },
+  "size": 844368
+}

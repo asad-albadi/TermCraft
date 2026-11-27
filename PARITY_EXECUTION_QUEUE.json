@@ -637,12 +637,12 @@
     },
     {
       "id": "P08",
-      "state": "Blocked",
+      "state": "Implementation remaining",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Clean Windows upgrade and protocol-integration fixture, native macOS installer/build/upgrade hosts and remaining runtime payloads. Signing identities are needed only if a signed release is chosen.",
-      "remaining": "Current source32e512 genuine full Linux archive d8cec and Debian12 core4628/revision3 are built and independently audited. Native Windows/macOS installers/lifecycle remain; full optional Debian runtime closure is not claimed.",
-      "validation_remaining": "Current Linux full3372hashes/actualGUI37checks and native Debian1074hashes/43commands/16bytepairs/5inventories pass. An unsigned native Windows x64 ZIP passed relocated startup with the exact adjacent RDP child. Two distinct installed Windows GUI revisions preserved the same isolated workspace and encrypted vault through installation and uninstall. Clean hosted GUI and installer startup passed, as did a separate Windows shell activation and uninstall guard check. The local lifecycle preserved the original manifests of two independently versioned development ZIPs. A previously published release upgrade, remaining optional runtimes and macOS/original verification remain open.",
+      "dependency": "Final-source native CI and release lifecycle/AppImage qualification; exact optional runtime/source/notice enrollment, and selected signing identities or previous public artifacts when applicable.",
+      "remaining": "Reviewed PR7 implements all-platform policies, desktop release orchestration, native lifecycle/Wayland gates and source-built AppImage with corresponding sources. Fresh final-source native qualification and remaining distribution acceptance stay open; historical source32 and Debian12/Arch variants retain their original scopes.",
+      "validation_remaining": "CI68df7d7 passed all platforms. Strict manual45963002351 exposed first-baseline idle sidebar mutation and Linux broadcast acknowledgement race; both follow-up fixes are reviewed through922bc49, fresh hosted replay pending. Historical AppImage fixture passed X11/Wayland outer startup, RDP/helper/private libraries and concurrent private cleanup plus exact source-sidecar relink; no final-source/FUSE/wider-distro claim.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/execution/2026-11-25-windows-native.md",
@@ -655,9 +655,10 @@
         "docs/parity-evidence/V08/current-core-qualification/review.md",
         "docs/parity-evidence/P08/post-xdmcp-fix-debian-core-upgrade-22bbf268/evidence-summary.md",
         "docs/parity-evidence/P08/tigervnc-fix-debian-core-upgrade-32e512/evidence-summary.md",
-        "docs/parity-evidence/parallel-integration-tigervnc-clipboard-fix-release/gui-qualification/REPORT.md"
+        "docs/parity-evidence/parallel-integration-tigervnc-clipboard-fix-release/gui-qualification/REPORT.md",
+        "docs/parity-evidence/release-automation/2026-11-27-p08.md"
       ],
-      "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations.",
+      "next_action": "Complete final branch review and fresh hosted qualification without weakening checks; keep optional payload, signing, previous-public-upgrade and hardware/original gates explicit.",
       "interface_prerequisite_note": "Pinned Linux runtime/package manifests already exist and qualified immutable artifacts demonstrate the packaging interface; remaining full P01/native closure is separate from further Linux package validation."
     },
     {
@@ -958,13 +959,14 @@
       "requires": [],
       "dependency": "Remaining supported native desktop/manual, device, independent endpoint and production distribution fixtures.",
       "remaining": "Native Windows and Apple Silicon builds, relocated packages and selected desktop workflows passed. Remaining foreground/manual, devices, physical graphics and public distribution acceptance remain open.",
-      "validation_remaining": "Separate native runs: Windows619/0/36 ignored plus helper36; Apple Silicon922/0/17 ignored plus helper54. Combined integration validation pending.",
+      "validation_remaining": "Integrated native full CI passed three platforms, including run45962965162 on68df7d7. Strict native release lifecycle validation is separate and remains pending after observed failures drove reviewed fixes. Original, foreground/manual, device, physical graphics and independent endpoint acceptance remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/issue-2/BASELINE.md",
         "docs/parity-evidence/issue-2/arm64.md",
-        "docs/parity-evidence/issue-2/evidence-schema.md"
+        "docs/parity-evidence/issue-2/evidence-schema.md",
+        "docs/parity-evidence/release-automation/2026-11-27-p08.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
@@ -1083,5 +1085,24 @@
     "implementation_checkpoints": 46,
     "strict_verified_complete": 0,
     "remaining": "Manual/hardware/original acceptance remains in issues1/2; release orchestration, public runtime enrollment and signing/publication in issue3."
+  },
+  "current_release_implementation": {
+    "date": "2026-11-27",
+    "pr": 7,
+    "reviewed_implementation_commit": "922bc49",
+    "status": "Whole-branch code review approved; final-source native qualification pending",
+    "ci_run": 45962965162,
+    "ci_source": "68df7d7",
+    "ci_result": "success on all three platforms",
+    "first_strict_package_run": 45963002351,
+    "first_strict_package_result": "failed: first-baseline sidebar width mutation on all platforms and Linux broadcast acknowledgement race; follow-up fixes reviewed, replay pending",
+    "appimage_fixture_scope": "historical GUI, Ubuntu24, extract-and-run, both displays and overlapping launch cleanup; not final-source or FUSE qualification",
+    "evidence": "docs/parity-evidence/release-automation/2026-11-27-p08.md",
+    "implementation_checkpoints": 46,
+    "strict_verified_complete": 0,
+    "publication": "No tag or public release created; manual dispatch never publishes",
+    "final_code_review_commit": "a170a25",
+    "local_release_cases_passed": 34,
+    "publication_metadata": "Verified public summaries and raw evidence hashes only; unknown diagnostic fields excluded and covered at staging and assembly."
   }
 }

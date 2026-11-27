@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+case "$0" in
+    /*) appdir=${0%/*} ;;
+    */*) appdir=$PWD/${0%/*} ;;
+    *) exit 126 ;;
+esac
+case "$appdir" in
+    *:*) echo 'The AppImage extraction path contains a library search separator.' >&2; exit 126 ;;
+esac
+export LD_LIBRARY_PATH="$appdir/usr/lib/termcraft-appimage"
+exec "$appdir/usr/lib/termcraft/harbor-workspace" "$@"

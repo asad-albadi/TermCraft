@@ -1633,7 +1633,8 @@ impl Workspace {
         } else {
             226.
         };
-        let panel = Panel::left("sidebar")
+        let sidebar_id = Id::new("sidebar");
+        let panel = Panel::left(sidebar_id)
             .default_size(width)
             .min_size(190.)
             .max_size(480.)
@@ -1827,8 +1828,10 @@ impl Workspace {
                 });
             });
         let new_width = panel.response.rect.width();
+        // egui 0.36 uses a separate response for this panel's resize handle.
+        // Content fitting on an idle frame must not write a user preference.
         if (new_width - self.store.preferences.sidebar_width).abs() > 0.5
-            && !root.ctx().input(|i| i.pointer.any_down())
+            && root.ctx().drag_stopped_id() == Some(sidebar_id.with("__resize"))
         {
             self.store.preferences.sidebar_width = new_width;
             self.persist();
@@ -2799,6 +2802,60 @@ mod gui_tests {
         );
         output.textures_delta.clear();
     }
+    #[test]
+    fn only_a_completed_sidebar_edge_drag_persists_its_outer_width() {
+        let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
+        workspace.store.preferences.sidebar_width = 190.;
+        workspace.store.save(&workspace.store_path).unwrap();
+        let original = fs::read(&workspace.store_path).unwrap();
+        let sidebar = Id::new("sidebar");
+        let panel_rect = || {
+            egui::containers::panel::PanelState::load(&ctx, sidebar)
+                .unwrap()
+                .outer_rect
+        };
+        let button = |pos, pressed| Event::PointerButton {
+            pos,
+            button: PointerButton::Primary,
+            pressed,
+            modifiers: Modifiers::NONE,
+        };
+        frame(&ctx, &mut workspace, vec![]);
+        let initial = panel_rect();
+        assert!(initial.width() > 190.5);
+        let elsewhere = pos2(1358., 878.);
+        for events in [
+            vec![Event::PointerMoved(elsewhere)],
+            vec![button(elsewhere, true)],
+            vec![button(elsewhere, false)],
+        ] {
+            frame(&ctx, &mut workspace, events);
+        }
+        let from = pos2(initial.right() - 1., initial.center().y);
+        let to = from + vec2(70., 0.);
+        for events in [
+            vec![Event::PointerMoved(from)],
+            vec![button(from, true)],
+            vec![Event::PointerMoved(to)],
+        ] {
+            frame(&ctx, &mut workspace, events);
+        }
+        assert_eq!(fs::read(&workspace.store_path).unwrap(), original);
+        frame(&ctx, &mut workspace, vec![button(to, false)]);
+        let width = panel_rect().width();
+        assert!(width > initial.width() + 1.);
+        assert_eq!(
+            Store::load(&workspace.store_path)
+                .unwrap()
+                .preferences
+                .sidebar_width,
+            width
+        );
+        let resized = fs::read(&workspace.store_path).unwrap();
+        frame(&ctx, &mut workspace, vec![]);
+        assert_eq!(fs::read(&workspace.store_path).unwrap(), resized);
+    }
+
     #[test]
     fn all_workspace_pages_and_dialogs_render() {
         let ctx = Context::default();

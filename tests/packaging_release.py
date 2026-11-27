@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import json
 import os
@@ -17,6 +18,25 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts/package-release.py"
+
+
+def assert_archive_policies(test, read, prefix="", guide=False):
+    manifest = json.loads(read(prefix + "PACKAGE-MANIFEST.json"))
+    test.assertEqual(manifest["signing"], "unsigned")
+    with test.subTest(license_path=prefix + "LICENSE"):
+        test.assertEqual(manifest["licenses"]["project"], prefix + "LICENSE")
+    test.assertEqual(manifest["licenses"]["credits"], prefix + "CREDITS.md")
+    policies = {"LICENSE": "LICENSE", "PRIVACY.md": "PRIVACY.md", "CREDITS.md": "CREDITS.md"}
+    if guide:
+        policies["README.txt"] = "packaging/macos/README.txt"
+    for archive_name, source_name in policies.items():
+        with test.subTest(policy=prefix + archive_name):
+            relative = prefix + archive_name
+            data = read(relative)
+            test.assertEqual(data, (ROOT / source_name).read_bytes())
+            checksum = hashlib.sha256(data).hexdigest()
+            test.assertEqual(manifest["files"][relative], checksum)
+            test.assertEqual(manifest["build"]["source_inputs"][source_name], checksum)
 
 
 def module_at(name, path):
@@ -91,13 +111,12 @@ class WindowsPackage(unittest.TestCase):
                 package.package_release("windows", root / "out", payload / "vcxsrv.exe",
                                         payload / "xkbcomp.exe", windows_x11_runtime=payload)
             with (patch.object(package, "windows_x_inventory", return_value=inventory),
-                  patch.object(package, "source_inputs", return_value={}),
                   patch.object(package, "cargo_notices", return_value=[]),
                   patch.object(package, "native_libraries", return_value={"libraries": []}),
                   patch.object(package, "capture", return_value="fixture toolchain"),
                   patch.object(package.platform, "machine", return_value="AMD64")):
                 archive = package.package_release("windows", root / "out", payload / "vcxsrv.exe",
-                                                  payload / "xkbcomp.exe", build_inputs={},
+                                                  payload / "xkbcomp.exe", build_inputs=package.source_inputs(ROOT),
                                                   cargo_settings={}, windows_x11_runtime=payload)
             with zipfile.ZipFile(archive) as zipped:
                 prefix = archive.stem + "/"
@@ -113,6 +132,47 @@ class WindowsPackage(unittest.TestCase):
                     approval.write_text(f"{pin}{'0' * 64}  {invalid}\n", encoding="ascii")
                     with self.assertRaisesRegex(ValueError, "Invalid Windows private X approval"):
                         package.windows_x_inventory(source)
+
+    def test_missing_or_tampered_policy_never_publishes(self):
+        package = module_at("package_release", SCRIPT)
+        header = bytearray(128)
+        header[:2] = b"MZ"
+        struct.pack_into("<I", header, 60, 64)
+        struct.pack_into("<4sH", header, 64, b"PE\0\0", 0x8664)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            app, helper = root / "app.exe", root / "helper.exe"
+            app.write_bytes(header)
+            helper.write_bytes(header)
+            source, inputs = package.freeze_sources(ROOT, root / "snapshots")
+            credits = source / "CREDITS.md"
+            original_copy = shutil.copyfile
+
+            def tamper_copy(origin, destination):
+                result = original_copy(origin, destination)
+                if Path(origin) == source / "PRIVACY.md":
+                    Path(destination).write_bytes(b"tampered after copy")
+                return result
+
+            with (patch.object(package, "cargo_notices", return_value=[]),
+                  patch.object(package, "native_libraries", return_value={"libraries": []}),
+                  patch.object(package.platform, "machine", return_value="x86_64")):
+                with self.subTest("tampered staged policy"):
+                    with patch.object(package.shutil, "copyfile", side_effect=tamper_copy):
+                        with self.assertRaisesRegex(ValueError, "PRIVACY.md"):
+                            package.package_release("windows", root / "tampered", app, helper, source=source)
+                    self.assertEqual(list((root / "tampered").glob("*.zip")), [])
+                with self.subTest("changed frozen policy"):
+                    credits.write_bytes(b"tampered frozen input")
+                    with self.assertRaisesRegex(ValueError, "CREDITS.md"):
+                        package.package_release("windows", root / "changed", app, helper,
+                                                build_inputs=inputs, source=source)
+                    self.assertEqual(list((root / "changed").glob("*.zip")), [])
+                with self.subTest("missing policy"):
+                    credits.unlink()
+                    with self.assertRaisesRegex(ValueError, "CREDITS.md"):
+                        package.package_release("windows", root / "missing", app, helper, source=source)
+                    self.assertEqual(list((root / "missing").glob("*.zip")), [])
 
     @unittest.skipUnless(os.name == "nt", "Windows Cargo cache junction")
     def test_isolated_cargo_home_uses_cache_without_symlink_privilege(self):
@@ -150,16 +210,7 @@ class WindowsPackage(unittest.TestCase):
                 archive = package.package_release("windows", root / "out", app, helper)
             with zipfile.ZipFile(archive) as zipped:
                 prefix = archive.stem + "/"
-                manifest = json.loads(zipped.read(prefix + "PACKAGE-MANIFEST.json"))
-                self.assertEqual(manifest["licenses"]["project"], "LICENSE")
-                for name in ("LICENSE", "PRIVACY.md"):
-                    with self.subTest(name=name):
-                        expected = (ROOT / name).read_bytes()
-                        self.assertEqual(zipped.read(prefix + name), expected)
-                        self.assertEqual(manifest["files"][name], package.sha256(ROOT / name))
-                        self.assertEqual(
-                            manifest["build"]["source_inputs"][name], manifest["files"][name]
-                        )
+                assert_archive_policies(self, lambda name: zipped.read(prefix + name))
 
 
 @unittest.skipUnless(sys.platform.startswith("linux") and shutil.which("cc"), "Linux and cc required")
@@ -202,6 +253,9 @@ class PortablePackage(unittest.TestCase):
                 with self.assertRaises(FileExistsError):
                     package.package_release("linux", output, executable, helper)
                 self.assertEqual(package.sha256(archive), checksum)
+            with tarfile.open(archive) as bundle:
+                prefix = archive.name.removesuffix(".tar.gz") + "/"
+                assert_archive_policies(self, lambda name: bundle.extractfile(prefix + name).read())
             executable.unlink()
             helper.unlink()
             unpack = base / 'relocated "%$`\\'
@@ -531,6 +585,10 @@ class NativePackageLayout(unittest.TestCase):
                             self.assertEqual((bundle.getinfo(name).external_attr >> 16) & 0o777, 0o755)
                     if target == "macos":
                         manifest = json.loads(bundle.read("TermCraft.app/Contents/Resources/PACKAGE-MANIFEST.json"))
+                        assert_archive_policies(
+                            self, lambda name: bundle.read("TermCraft.app/" + name),
+                            prefix="Contents/Resources/", guide=True,
+                        )
                         self.assertNotIn("macos", manifest["build"])
                         plist = plistlib.loads(bundle.read("TermCraft.app/Contents/Info.plist"))
                         self.assertEqual(plist["CFBundleExecutable"], "termcraft-desktop-launcher")

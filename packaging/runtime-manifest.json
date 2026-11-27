@@ -39,7 +39,7 @@
       "manifest": "PACKAGE-MANIFEST.json",
       "source": "engines/rdp",
       "dependency_lock": "build-source/engines/rdp/Cargo.lock",
-      "license": "TermCraft source has no declared project license. Dependency notices are shipped by the release packager.",
+      "license": "MIT",
       "version_field": "rdp_helper_version",
       "digest_field": "files"
     },

@@ -459,9 +459,11 @@ bytes and it unlocked after both installs and the reinstall were removed.
   the application from synthetic data. The installed GUI pair preserved vault
   SHA-256 `b6b60ede114175b8b17b6a4b9b03f37381f67ef7474060d818203ec48c145441`.
   The retained vault unlocked after both uninstalls and returned the same entry.
-  The repeatable commands are `cargo +1.96.1 test --locked --test windows_vault_fixture -- --ignored`
+  The checkpoint used `cargo +1.96.1 test --locked --test windows_vault_fixture -- --ignored`
   with `TERMCRAFT_TEST_VAULT_PATH` set to the private fixture, and
   `tests/windows-package-lifecycle.ps1 -Archive <current> -PreviousArchive <older> -VaultFixture <fixture>`.
+  The maintained installer test driver now requires a disposable GitHub-hosted
+  Windows runner because it touches real KnownFolders.
 - Native tests passed for PowerShell through ConPTY with redirected parent
   stdio, Unicode input/output, resize and normal child exit (1), private
   workspace dispatch (4), VNC application protocol behavior (12), and desktop

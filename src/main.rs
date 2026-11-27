@@ -17,6 +17,10 @@ fn main() -> eframe::Result {
     {
         std::process::exit(code);
     }
+    if std::env::args_os().skip(1).eq(["--version"]) {
+        println!("TermCraft {}", env!("CARGO_PKG_VERSION"));
+        return Ok(());
+    }
     use harbor_workspace::{
         cli::{Cli, CliAction},
         ipc::{Binding, InstanceBroker},

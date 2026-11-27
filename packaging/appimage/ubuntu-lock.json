@@ -1,0 +1,335 @@
+{
+  "inrelease_sha256": "cdb2f31d809f589719a53c6ad15f255b27569c4059542ada282aaa21b8e164b0",
+  "packages": {
+    "base-files": {
+      "architecture": "amd64",
+      "path": "pool/main/b/base-files/base-files_13ubuntu10_amd64.deb",
+      "sha256": "cd06729c776397bb74779773f4dece372a1a3f795e5992804022bffab0278ffb",
+      "soname": null,
+      "source": "base-files",
+      "version": "13ubuntu10"
+    },
+    "gcc-14-base": {
+      "architecture": "amd64",
+      "path": "pool/main/g/gcc-14/gcc-14-base_14-20240412-0ubuntu1_amd64.deb",
+      "sha256": "bc5a682c694a1ce5af50772b7c737a21e9a74f0f0edaae98e97bc9c4af583fef",
+      "soname": null,
+      "source": "gcc-14",
+      "version": "14-20240412-0ubuntu1"
+    },
+    "libbsd0": {
+      "architecture": "amd64",
+      "path": "pool/main/libb/libbsd/libbsd0_0.12.1-1build1_amd64.deb",
+      "sha256": "8e97b7d541416512a81e7845c5f21910344c9c5c610893cf265d3298e0caad6b",
+      "soname": "libbsd.so.0",
+      "source": "libbsd",
+      "version": "0.12.1-1build1"
+    },
+    "libffi8": {
+      "architecture": "amd64",
+      "path": "pool/main/libf/libffi/libffi8_3.4.6-1build1_amd64.deb",
+      "sha256": "637e6a7744de08cd331a41f4efd0d24e6ea9064843dea9d1c6ca87bdb5f038a2",
+      "soname": "libffi.so.8",
+      "source": "libffi",
+      "version": "3.4.6-1build1"
+    },
+    "libgcc-s1": {
+      "architecture": "amd64",
+      "path": "pool/main/g/gcc-14/libgcc-s1_14-20240412-0ubuntu1_amd64.deb",
+      "sha256": "a39efdcaa2245f026dc3254ce14fcff255fc430a17064632b6ba7c5da974a912",
+      "soname": "libgcc_s.so.1",
+      "source": "gcc-14",
+      "version": "14-20240412-0ubuntu1"
+    },
+    "libmd0": {
+      "architecture": "amd64",
+      "path": "pool/main/libm/libmd/libmd0_1.1.0-2build1_amd64.deb",
+      "sha256": "77f8cdbf03a43656bbf6604e18bd16834fc8bf2c949d4fbdf24ac297869b667a",
+      "soname": "libmd.so.0",
+      "source": "libmd",
+      "version": "1.1.0-2build1"
+    },
+    "libwayland-client0": {
+      "architecture": "amd64",
+      "path": "pool/main/w/wayland/libwayland-client0_1.22.0-2.1build1_amd64.deb",
+      "sha256": "6af0aed41d75149bea22fa468f01eb058ffe3e35ef07ff2f13fb88a90387881d",
+      "soname": "libwayland-client.so.0",
+      "source": "wayland",
+      "version": "1.22.0-2.1build1"
+    },
+    "libwayland-cursor0": {
+      "architecture": "amd64",
+      "path": "pool/main/w/wayland/libwayland-cursor0_1.22.0-2.1build1_amd64.deb",
+      "sha256": "29c20da27e8e37c984cf0518635c11cd0441f4cb6a2919a9f6eee1809171d327",
+      "soname": "libwayland-cursor.so.0",
+      "source": "wayland",
+      "version": "1.22.0-2.1build1"
+    },
+    "libwayland-egl1": {
+      "architecture": "amd64",
+      "path": "pool/main/w/wayland/libwayland-egl1_1.22.0-2.1build1_amd64.deb",
+      "sha256": "76cd17d2776428e0a0551b8f8fd954eeb3d39ca8ed2f88a38a5e4ce3ce3b2f16",
+      "soname": "libwayland-egl.so.1",
+      "source": "wayland",
+      "version": "1.22.0-2.1build1"
+    },
+    "libx11-6": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libx11/libx11-6_1.8.7-1build1_amd64.deb",
+      "sha256": "397f84347476a3c5786b39f3ff6f0f82866eb3d8be6d2ad3efeadf019efe5b80",
+      "soname": "libX11.so.6",
+      "source": "libx11",
+      "version": "2:1.8.7-1build1"
+    },
+    "libx11-xcb1": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libx11/libx11-xcb1_1.8.7-1build1_amd64.deb",
+      "sha256": "7d0d357e47cd6e1042be34da1d37cea313420b000035e71e855087c8268ab127",
+      "soname": "libX11-xcb.so.1",
+      "source": "libx11",
+      "version": "2:1.8.7-1build1"
+    },
+    "libxau6": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxau/libxau6_1.0.9-1build6_amd64.deb",
+      "sha256": "e40d29f1d1a62393bacaedebe0da3d9006084152a9f7e5e029293f08ce1c5c80",
+      "soname": "libXau.so.6",
+      "source": "libxau",
+      "version": "1:1.0.9-1build6"
+    },
+    "libxcb-xkb1": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxcb/libxcb-xkb1_1.15-1ubuntu2_amd64.deb",
+      "sha256": "53bc0a58834c981fa8ce5c3ab6195387e5c8a417039d82cc7a8b49724fa53228",
+      "soname": "libxcb-xkb.so.1",
+      "source": "libxcb",
+      "version": "1.15-1ubuntu2"
+    },
+    "libxcb1": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxcb/libxcb1_1.15-1ubuntu2_amd64.deb",
+      "sha256": "e1c6611d11ad7398326f1bf028afc34c3b14c51d917a3426b966ed4b9687fa58",
+      "soname": "libxcb.so.1",
+      "source": "libxcb",
+      "version": "1.15-1ubuntu2"
+    },
+    "libxcursor1": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxcursor/libxcursor1_1.2.1-1build1_amd64.deb",
+      "sha256": "1a4beee621454e42fe0d2f4e1633611126e43d891f0aec28e4a06744f6e9f04d",
+      "soname": "libXcursor.so.1",
+      "source": "libxcursor",
+      "version": "1:1.2.1-1build1"
+    },
+    "libxdmcp6": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxdmcp/libxdmcp6_1.1.3-0ubuntu6_amd64.deb",
+      "sha256": "bcd336fce11ce2a45f34d0f95e6980af22529f22147e8f98c156e5cee8ee42bb",
+      "soname": "libXdmcp.so.6",
+      "source": "libxdmcp",
+      "version": "1:1.1.3-0ubuntu6"
+    },
+    "libxext6": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxext/libxext6_1.3.4-1build2_amd64.deb",
+      "sha256": "45783969a9ece9d7b7b733b8c60981584c53c6bc5ee3b42d295d2f80d1285679",
+      "soname": "libXext.so.6",
+      "source": "libxext",
+      "version": "2:1.3.4-1build2"
+    },
+    "libxfixes3": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxfixes/libxfixes3_6.0.0-2build1_amd64.deb",
+      "sha256": "0ee1015cccd063249e01c0cd0bf45f513c8ac9a1e5e485070c12e69192455e4a",
+      "soname": "libXfixes.so.3",
+      "source": "libxfixes",
+      "version": "1:6.0.0-2build1"
+    },
+    "libxi6": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxi/libxi6_1.8.1-1build1_amd64.deb",
+      "sha256": "0ea7acb5e8a8ce4d6653b30e03a319bfe136db7bfb5ee7cad34c2aa1272ea8d9",
+      "soname": "libXi.so.6",
+      "source": "libxi",
+      "version": "2:1.8.1-1build1"
+    },
+    "libxkbcommon-x11-0": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxkbcommon/libxkbcommon-x11-0_1.6.0-1build1_amd64.deb",
+      "sha256": "3befe840ce612ddfc0998d8610c6eed295726722a78e75cd08520bbd75065a23",
+      "soname": "libxkbcommon-x11.so.0",
+      "source": "libxkbcommon",
+      "version": "1.6.0-1build1"
+    },
+    "libxkbcommon0": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxkbcommon/libxkbcommon0_1.6.0-1build1_amd64.deb",
+      "sha256": "2b9caeb423efb540296a1cb20b872cc630c23908407ecb5c1c787a617622d664",
+      "soname": "libxkbcommon.so.0",
+      "source": "libxkbcommon",
+      "version": "1.6.0-1build1"
+    },
+    "libxrandr2": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxrandr/libxrandr2_1.5.2-2build1_amd64.deb",
+      "sha256": "f2955a5e594f5724b58ad241d9231ea191cb36574a0d5e5ca6b661cd41d6256d",
+      "soname": "libXrandr.so.2",
+      "source": "libxrandr",
+      "version": "2:1.5.2-2build1"
+    },
+    "libxrender1": {
+      "architecture": "amd64",
+      "path": "pool/main/libx/libxrender/libxrender1_0.9.10-1.1build1_amd64.deb",
+      "sha256": "d70bd831aebe8d4834b5dd2ed98df26dd6bd27f1042c47543bd7f66df1ae22ea",
+      "soname": "libXrender.so.1",
+      "source": "libxrender",
+      "version": "1:0.9.10-1.1build1"
+    }
+  },
+  "signer": "F6ECB3762474EDA9D21B7022871920D1991BC93C",
+  "snapshot": "https://snapshot.ubuntu.com/ubuntu/20250401T000000Z",
+  "sources": {
+    "base-files": {
+      "files": {
+        "pool/main/b/base-files/base-files_13ubuntu10.dsc": "d65e1ff3a24e9790db3753f1e6331e24dc743197d26b61fc9dbcf465d4668624",
+        "pool/main/b/base-files/base-files_13ubuntu10.tar.xz": "a9f11adb8de40460e0b814a1b4421c4d2d2089b4baccef46f1385c7d29a1104e"
+      },
+      "version": "13ubuntu10"
+    },
+    "gcc-14": {
+      "files": {
+        "pool/main/g/gcc-14/gcc-14_14-20240412-0ubuntu1.debian.tar.xz": "c4e7763b66fe6f8404d657d5726e43d702b0e00c79ce7844f267ce0dbc2cef6e",
+        "pool/main/g/gcc-14/gcc-14_14-20240412-0ubuntu1.dsc": "f7a090321150c62c21ebd2bec9ba5c2f680ad97ab2b0cc4e4099533eff65a743",
+        "pool/main/g/gcc-14/gcc-14_14-20240412.orig.tar.gz": "64af5af1b305410dbe7aad597551c12f2c8bb7e50a1ffb3698adc62b912ee42d"
+      },
+      "version": "14-20240412-0ubuntu1"
+    },
+    "libbsd": {
+      "files": {
+        "pool/main/libb/libbsd/libbsd_0.12.1-1build1.debian.tar.xz": "06241a8a3e54b1543dc8d36ae461ec40493b9b845a5beeb3d9ac1207b8f20bfb",
+        "pool/main/libb/libbsd/libbsd_0.12.1-1build1.dsc": "30f50d2d5590e15bbba5db48f0d19b4e3bebeef0da11c85afaad281cfe98b54b",
+        "pool/main/libb/libbsd/libbsd_0.12.1.orig.tar.xz": "d7747f8ec1baa6ff5c096a9dd587c061233dec90da0f1aedd66d830f6db6996a",
+        "pool/main/libb/libbsd/libbsd_0.12.1.orig.tar.xz.asc": "04a4b66da93ea3c761e15fcedd705a969b67597d0619c3ebc5fe3cf72d477f1f"
+      },
+      "version": "0.12.1-1build1"
+    },
+    "libffi": {
+      "files": {
+        "pool/main/libf/libffi/libffi_3.4.6-1build1.debian.tar.xz": "9d8712818b833baf002a2413552194b8770800cb20b802ba1d3714156eba14fe",
+        "pool/main/libf/libffi/libffi_3.4.6-1build1.dsc": "a7a2c320c04149192a6dd78df8be28b2b27fd38e48d76f2ee6ba0c19ae0758f6",
+        "pool/main/libf/libffi/libffi_3.4.6.orig.tar.gz": "9ac790464c1eb2f5ab5809e978a1683e9393131aede72d1b0a0703771d3c6cda"
+      },
+      "version": "3.4.6-1build1"
+    },
+    "libmd": {
+      "files": {
+        "pool/main/libm/libmd/libmd_1.1.0-2build1.debian.tar.xz": "1570411dfb44577c70ae28098c92440ceaf45a21a09cb905cd52ca955ef7e9c3",
+        "pool/main/libm/libmd/libmd_1.1.0-2build1.dsc": "02b5064c724dc784654f60c416a1fa13dcdb861e4a4302af0792aaa428cbd406",
+        "pool/main/libm/libmd/libmd_1.1.0.orig.tar.xz": "1bd6aa42275313af3141c7cf2e5b964e8b1fd488025caf2f971f43b00776b332",
+        "pool/main/libm/libmd/libmd_1.1.0.orig.tar.xz.asc": "402fd3024e43ab975733d09e661804a58ca58697194e4b15216b1217cfe1dadb"
+      },
+      "version": "1.1.0-2build1"
+    },
+    "libx11": {
+      "files": {
+        "pool/main/libx/libx11/libx11_1.8.7-1build1.diff.gz": "f475e5203caa43e2881df9f0f25cd5a1c6dfb1ad77d9eb057e3dbe17a46e8563",
+        "pool/main/libx/libx11/libx11_1.8.7-1build1.dsc": "bdf5b5bc66a20bbc6966ac1656c0257a4f5853ec1e01d73d448a8c2237f3dc7e",
+        "pool/main/libx/libx11/libx11_1.8.7.orig.tar.gz": "793ebebf569f12c864b77401798d38814b51790fce206e01a431e5feb982e20b",
+        "pool/main/libx/libx11/libx11_1.8.7.orig.tar.gz.asc": "c1cba69555c89e503abac81ebf1113a756f2fafd72677e7862b40f12208e0260"
+      },
+      "version": "2:1.8.7-1build1"
+    },
+    "libxau": {
+      "files": {
+        "pool/main/libx/libxau/libxau_1.0.9-1build6.diff.gz": "6e68b5a0dd458b0736fb4e327ca96ea5d3a25ec6fe5bd65c8ef66f90006248bd",
+        "pool/main/libx/libxau/libxau_1.0.9-1build6.dsc": "b6a676b936d6c7c2c75b60b789066f0b92f741104d6dfacaaffb985800ba4e55",
+        "pool/main/libx/libxau/libxau_1.0.9.orig.tar.gz": "1f123d8304b082ad63a9e89376400a3b1d4c29e67e3ea07b3f659cccca690eea",
+        "pool/main/libx/libxau/libxau_1.0.9.orig.tar.gz.asc": "af6104aaf3c5ede529e381237dd60f49640ec96593a84502fa493b86582b2f04"
+      },
+      "version": "1:1.0.9-1build6"
+    },
+    "libxcb": {
+      "files": {
+        "pool/main/libx/libxcb/libxcb_1.15-1ubuntu2.diff.gz": "d45e55f604af83b47f621c97b49885f35b518909bb3b9f9c877cfd3daddfb5ee",
+        "pool/main/libx/libxcb/libxcb_1.15-1ubuntu2.dsc": "aa994469e76b17847c1153d43cd37884adebbce5008ad221ef0e1e8ad840f8de",
+        "pool/main/libx/libxcb/libxcb_1.15.orig.tar.gz": "1cb65df8543a69ec0555ac696123ee386321dfac1964a3da39976c9a05ad724d"
+      },
+      "version": "1.15-1ubuntu2"
+    },
+    "libxcursor": {
+      "files": {
+        "pool/main/libx/libxcursor/libxcursor_1.2.1-1build1.debian.tar.xz": "bc511593cf395948184efc6dd861a2864c3cd4a2c55bb7bc11b018bf8f2422fb",
+        "pool/main/libx/libxcursor/libxcursor_1.2.1-1build1.dsc": "eddf2ff8bb61871ff00af5f31333b4e4ab9328ab5b220b269ed3348664cc8b2e",
+        "pool/main/libx/libxcursor/libxcursor_1.2.1.orig.tar.gz": "77f96b9ad0a3c422cfa826afabaf1e02b9bfbfc8908c5fa1a45094faad074b98"
+      },
+      "version": "1:1.2.1-1build1"
+    },
+    "libxdmcp": {
+      "files": {
+        "pool/main/libx/libxdmcp/libxdmcp_1.1.3-0ubuntu6.diff.gz": "9a72f64460520fdc2125472557f30a4748107f98fe008a04b576dc8b93536bc8",
+        "pool/main/libx/libxdmcp/libxdmcp_1.1.3-0ubuntu6.dsc": "71d1e9513fb58807fb131a5a2327eaac801ac5789ce4292038c2fed6365f7f68",
+        "pool/main/libx/libxdmcp/libxdmcp_1.1.3.orig.tar.gz": "2ef9653d32e09d1bf1b837d0e0311024979653fe755ad3aaada8db1aa6ea180c"
+      },
+      "version": "1:1.1.3-0ubuntu6"
+    },
+    "libxext": {
+      "files": {
+        "pool/main/libx/libxext/libxext_1.3.4-1build2.diff.gz": "ed434b3facecdf2c1f9ff58578033da61e087d73d6ce2d84433871ee4fb22ba6",
+        "pool/main/libx/libxext/libxext_1.3.4-1build2.dsc": "0d2faa231cb2d5750994e8d93c4973cf4c24f74d8f1912234a1a244952d5e627",
+        "pool/main/libx/libxext/libxext_1.3.4.orig.tar.gz": "8ef0789f282826661ff40a8eef22430378516ac580167da35cc948be9041aac1"
+      },
+      "version": "2:1.3.4-1build2"
+    },
+    "libxfixes": {
+      "files": {
+        "pool/main/libx/libxfixes/libxfixes_6.0.0-2build1.diff.gz": "4afbdb618c6f60e95c4251a8c08e928b19c3a19316dc9801c1e51c5c0b7f7a49",
+        "pool/main/libx/libxfixes/libxfixes_6.0.0-2build1.dsc": "85c831269a0513da54f1cd6a816a9d2fa75d4bb04159079618fb2ecc5ea2b7ab",
+        "pool/main/libx/libxfixes/libxfixes_6.0.0.orig.tar.gz": "82045da5625350838390c9440598b90d69c882c324ca92f73af9f0e992cb57c7",
+        "pool/main/libx/libxfixes/libxfixes_6.0.0.orig.tar.gz.asc": "e5598f42aa32140936c7772ab4d99ba35ecb859c29adc1703bb51440e7a54928"
+      },
+      "version": "1:6.0.0-2build1"
+    },
+    "libxi": {
+      "files": {
+        "pool/main/libx/libxi/libxi_1.8.1-1build1.diff.gz": "271d0fc504c47738b36f82d2107ec2e3d03c250778f383d4652dc6a7fcaf1b2d",
+        "pool/main/libx/libxi/libxi_1.8.1-1build1.dsc": "be66f78bc6bcd3038e31db9c880c18837bd90ad02860323a74b29e00cf69e2b6",
+        "pool/main/libx/libxi/libxi_1.8.1.orig.tar.gz": "3b5f47c223e4b63d7f7fe758886b8bf665b20a7edb6962c423892fd150e326ea",
+        "pool/main/libx/libxi/libxi_1.8.1.orig.tar.gz.asc": "b5c9eeb7e50cd128d749aa74da9ad4114276b88cc9dd0c0463272d4d5e2ee92d"
+      },
+      "version": "2:1.8.1-1build1"
+    },
+    "libxkbcommon": {
+      "files": {
+        "pool/main/libx/libxkbcommon/libxkbcommon_1.6.0-1build1.debian.tar.xz": "f193f739748e1f6bf28eb27ea0997da93eb20dca3557ae426fefc8f210aa95bb",
+        "pool/main/libx/libxkbcommon/libxkbcommon_1.6.0-1build1.dsc": "b8296cebd84ba35a1148fa10c505a5221aba7b8203349ba9997c76e50857c49a",
+        "pool/main/libx/libxkbcommon/libxkbcommon_1.6.0.orig.tar.xz": "0edc14eccdd391514458bc5f5a4b99863ed2d651e4dd761a90abf4f46ef99c2b"
+      },
+      "version": "1.6.0-1build1"
+    },
+    "libxrandr": {
+      "files": {
+        "pool/main/libx/libxrandr/libxrandr_1.5.2-2build1.diff.gz": "65e365ff8a3205d5532e9867045238dc6abbcdc146e063bafc7f614e730c1b7b",
+        "pool/main/libx/libxrandr/libxrandr_1.5.2-2build1.dsc": "733b5be4c178c017181334e36d6649455c78222b2a146bb732a03598f8da6ffc",
+        "pool/main/libx/libxrandr/libxrandr_1.5.2.orig.tar.gz": "3f10813ab355e7a09f17e147d61b0ce090d898a5ea5b5519acd0ef68675dcf8e"
+      },
+      "version": "2:1.5.2-2build1"
+    },
+    "libxrender": {
+      "files": {
+        "pool/main/libx/libxrender/libxrender_0.9.10-1.1build1.diff.gz": "7a09639402d326f5c665c848286d26932ba3a1d104e41fb921500ca93895598b",
+        "pool/main/libx/libxrender/libxrender_0.9.10-1.1build1.dsc": "fbc2eb120a290e733e01420e6bed5f7158a822e94baa8952b10bdcf5ae55a15e",
+        "pool/main/libx/libxrender/libxrender_0.9.10.orig.tar.gz": "770527cce42500790433df84ec3521e8bf095dfe5079454a92236494ab296adf"
+      },
+      "version": "1:0.9.10-1.1build1"
+    },
+    "wayland": {
+      "files": {
+        "pool/main/w/wayland/wayland_1.22.0-2.1build1.diff.gz": "3a22976ff3f1d80b9c7bdebcf0667f2ca4b30f3c2feaaa7e358b2e307a7d082e",
+        "pool/main/w/wayland/wayland_1.22.0-2.1build1.dsc": "f462ebb5625fc0cdf1c960bb5773099b63fa2765dcc41ec4a66cde33731f30e0",
+        "pool/main/w/wayland/wayland_1.22.0.orig.tar.gz": "b1b023a31902286e476e109ed48070a815d3ab5f615daec29e9635188881eece"
+      },
+      "version": "1.22.0-2.1build1"
+    }
+  },
+  "suite": "noble"
+}
