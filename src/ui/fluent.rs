@@ -76,7 +76,7 @@ impl Palette {
                 pressed: rgb(210, 229, 219),
                 selected: rgb(209, 234, 221),
                 primary: rgb(0, 112, 82),
-                primary_hover: rgb(0, 128, 91),
+                primary_hover: rgb(0, 121, 86),
                 primary_pressed: rgb(0, 83, 60),
                 on_primary: Color32::WHITE,
                 high_contrast,
@@ -540,6 +540,76 @@ mod tests {
         assert_eq!(initial, disabled_rect);
         assert_ne!(rest[0].0, disabled[0].0);
         assert!(!clicked);
+    }
+
+    #[test]
+    fn primary_label_keeps_contrast_at_pointer_highlight_peak() {
+        for theme in [Theme::Light, Theme::Dark] {
+            let ctx = Context::default();
+            ctx.set_theme(theme);
+            setup(&ctx, false, false);
+            let render = |events| {
+                let mut output = ctx.run_ui(
+                    RawInput {
+                        events,
+                        ..Default::default()
+                    },
+                    |ui| {
+                        primary(ui, "Connect");
+                    },
+                );
+                output.textures_delta.clear();
+                output.shapes
+            };
+            let rest = render(vec![]);
+            let point = rest
+                .iter()
+                .find_map(|shape| match &shape.shape {
+                    egui::Shape::Text(text) if text.galley.text() == "Connect" => {
+                        let row = &text.galley.rows[0];
+                        let glyph = &row.row.glyphs[3];
+                        Some(text.pos + row.pos.to_vec2() + glyph.logical_rect().center().to_vec2())
+                    }
+                    _ => None,
+                })
+                .expect("point under the primary label");
+
+            let mut background = None;
+            let mut illuminated = false;
+            let mut label = None;
+            for shape in render(vec![Event::PointerMoved(point)]) {
+                if !shape.clip_rect.contains(point) {
+                    continue;
+                }
+                match shape.shape {
+                    egui::Shape::Rect(rect) if rect.rect.contains(point) => {
+                        background = Some(rect.fill);
+                    }
+                    egui::Shape::Mesh(mesh) => {
+                        let peak = mesh.vertices.iter().find(|vertex| vertex.pos == point);
+                        if let Some(vertex) = peak {
+                            assert!(vertex.color.a() > 0);
+                            background = background.map(|fill| fill.blend(vertex.color));
+                            illuminated = true;
+                        }
+                    }
+                    egui::Shape::Text(text) if text.galley.text() == "Connect" => {
+                        label = text.override_text_color;
+                        break;
+                    }
+                    _ => {}
+                }
+            }
+            assert!(
+                illuminated,
+                "{theme:?}: expected a pointer highlight beneath the label"
+            );
+            let ratio = contrast(label.unwrap(), background.unwrap());
+            assert!(
+                ratio >= 4.5,
+                "{theme:?}: contrast at the pointer is {ratio:.2}:1"
+            );
+        }
     }
 
     #[test]
