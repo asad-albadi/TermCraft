@@ -311,8 +311,10 @@ impl Workspace {
                     "Required command for Rsh",
                 );
             }
-            if matches!(s.protocol.as_str(), "Telnet" | "Rlogin" | "Rsh") {
-                ui.small("Embedded transport. These protocols do not encrypt direct connections. Rlogin/Rsh require a permitted reserved local source port; Telnet can use the verified SSH gateway below.");
+            if s.protocol == "Telnet" {
+                ui.small("Direct Telnet connections are unencrypted. To configure an SSH gateway, open Network and select SSH gateway.");
+            } else if matches!(s.protocol.as_str(), "Rlogin" | "Rsh") {
+                ui.small("Direct connections are unencrypted. This protocol requires a permitted reserved local source port.");
             }
         }
         if section == Advanced && s.protocol == "FTP" {
