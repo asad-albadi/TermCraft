@@ -27,5 +27,7 @@ recipe at /recipe and an empty writable directory at /out; run
 sh /recipe/build-runtime.sh in /build. The measured runtime SHA is pinned. The local runtime patch supplies a positive
 file-descriptor limit for recursive cleanup under musl, propagates removal
 errors, bounds TMPDIR and reserves space for the argument-list terminator.
-The builder restores the measured prefix after appimagetool writes its optional
+Each launch exclusively creates a private extraction directory, including when
+multiple launches share the same TMPDIR. The runtime removes its own tree
+after its GUI exits. The builder restores the measured prefix after appimagetool writes its optional
 MD5 field. SHA256SUMS identifies the resulting complete outer file.

@@ -12,6 +12,7 @@ import shutil
 import signal
 import socket
 import subprocess
+import stat
 import tempfile
 import time
 
@@ -185,10 +186,14 @@ def appimage_gui(parent, image):
             relative = path.relative_to(image["tmp"])
         except (OSError, ValueError):
             continue
-        if (len(relative.parts) == 5 and re.fullmatch(r"appimage_extracted_[0-9a-f]{32}", relative.parts[0])
+        if (len(relative.parts) == 5 and re.fullmatch(r"appimage_extracted_[A-Za-z0-9]{6}", relative.parts[0])
                 and relative.parts[1:] == ("usr", "lib", "termcraft", "harbor-workspace")
                 and os.getpgid(pid) == parent and sha256(proc / "exe") == image["gui_sha256"]):
-            matches.append((pid, image["tmp"] / relative.parts[0]))
+            origin = image["tmp"] / relative.parts[0]
+            st = origin.lstat()
+            if not stat.S_ISDIR(st.st_mode) or st.st_uid != os.getuid() or stat.S_IMODE(st.st_mode) != 0o700:
+                raise ValueError("Verified GUI has no private extraction directory")
+            matches.append((pid, origin))
     if len(matches) != 1:
         raise ValueError("Expected one verified GUI in the owned AppImage process tree")
     return matches[0]
@@ -218,7 +223,7 @@ def require_extraction_cleanup(image):
         raise ValueError("AppImage runtime left its private extraction behind")
 
 
-def stop_appimage(process, image):
+def stop_appimage(process, image, *, siblings=False):
     if process.poll() is None:
         try:
             gui, _ = appimage_gui(process.pid, image)
@@ -238,7 +243,59 @@ def stop_appimage(process, image):
             except ProcessLookupError:
                 pass
             process.wait(timeout=8)
-    require_extraction_cleanup(image)
+    if not siblings:
+        require_extraction_cleanup(image)
+
+
+def overlapping_appimages(executable, isolated, environment, image, log):
+    parent = isolated / "shared temporary directory"
+    parent.mkdir()
+    parent.chmod(0o1777)
+    shared = {**image, "tmp": parent}
+    launches = []
+    roots = []
+    try:
+        for index in range(2):
+            home = isolated / f"independent launch {index}"
+            home.mkdir(mode=0o700)
+            env = {**environment, "HOME": str(home), "TMPDIR": str(parent),
+                   "XDG_CONFIG_HOME": str(home / "config"), "XDG_DATA_HOME": str(home / "data"),
+                   "XDG_CACHE_HOME": str(home / "cache"), "XDG_STATE_HOME": str(home / "state")}
+            process = subprocess.Popen([executable, "--appimage-extract-and-run", "--data-dir", home / "workspace"],
+                                       cwd=home, env=env, start_new_session=True, stdin=subprocess.DEVNULL,
+                                       stdout=log, stderr=subprocess.STDOUT)
+            launches.append(process)
+            deadline = time.monotonic() + 30
+            while process.poll() is None and time.monotonic() < deadline:
+                try:
+                    gui, directory = appimage_gui(process.pid, shared)
+                    appimage_libraries(gui, directory, shared)
+                    break
+                except (OSError, ValueError):
+                    time.sleep(0.1)
+            else:
+                raise ValueError("Overlapping outer launch did not reach its verified GUI and display client")
+            roots.append(directory)
+        stats = [directory.lstat() for directory in roots]
+        if roots[0] == roots[1] or stats[0].st_ino == stats[1].st_ino:
+            raise ValueError("Overlapping outer launches shared an extraction directory")
+        if any(st.st_uid != os.getuid() or stat.S_IMODE(st.st_mode) != 0o700 for st in stats):
+            raise ValueError("AppImage extraction directory is not private to its invoking user")
+        stop_appimage(launches[0], shared, siblings=True)
+        gui, survivor = appimage_gui(launches[1].pid, shared)
+        helper = survivor / "usr/lib/termcraft/termcraft-rdp-engine"
+        if (roots[0].exists() or survivor != roots[1] or survivor.stat().st_ino != stats[1].st_ino
+                or sha256(helper) != image["helper_sha256"]):
+            raise ValueError("Closing an AppImage damaged the surviving launch")
+        appimage_libraries(gui, survivor, shared)
+        stop_appimage(launches[1], shared)
+        return {"shared_parent_mode": "1777", "private_mode": "0700", "uid": os.getuid(),
+                "directories": [directory.name for directory in roots], "inodes": [st.st_ino for st in stats],
+                "surviving_gui_and_files_verified": True, "both_extractions_removed": True}
+    finally:
+        for process in reversed(launches):
+            if process.poll() is None:
+                stop_appimage(process, shared, siblings=True)
 
 
 def initial_rdp_request(header, stream):
@@ -369,6 +426,7 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None, 
             appimage = {"metadata": info, "tmp": isolated / "runtime", "wayland": bool(native_wayland),
                         "gui_sha256": sha256(root / "harbor-workspace")}
             appimage["tmp"].mkdir(mode=0o700)
+            appimage["helper_sha256"] = sha256(root / "termcraft-rdp-engine")
         else:
             extract(archive, package_dir)
             roots = list(package_dir.iterdir())
@@ -467,6 +525,10 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None, 
         helper_digest = manifest["files"][helper.relative_to(root).as_posix()]
         rdp_session_probe(executable, helper, helper_digest, isolated, environment, evidence,
                           software_gl is not None, appimage)
+        if appimage:
+            with (evidence / "startup.log").open("ab") as log:
+                overlap = overlapping_appimages(executable, isolated, environment, appimage, log)
+                log.write(b"\n[AppImage concurrent runtime observations] " + json.dumps(overlap, sort_keys=True).encode() + b"\n")
         (evidence / "verification.json").write_text(json.dumps({
             **wayland,
             **({"appimage": {"mode": "extract-and-run", "core_sha256": info["core"]["sha256"],
@@ -474,7 +536,7 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None, 
                               "highest_required_glibc": info["highest_required_glibc"], "gui_sha256": appimage["gui_sha256"],
                               "helper_sha256": helper_digest, "mapped_private_libraries": appimage["mapped"],
                               "negotiation_sha256": appimage["negotiation_sha256"],
-                              "runtime_reaped_and_clean": True}} if appimage else {}),
+                              "runtime_reaped_and_clean": True, "concurrent_extractions": overlap}} if appimage else {}),
             "archive": archive.name, "archive_sha256": sha256(archive),
             "manifest_schema": manifest["schema_version"], "platform": host,
             "display_backend": (

@@ -667,12 +667,27 @@ def verify_appimage_evidence(root, directory, source, entries, portable, version
         packet = bytes.fromhex(packets[0].decode("ascii"))
         require(packet[:2] == b"\x03\x00" and packet == STARTUP.initial_rdp_request(packet[:4], io.BytesIO(packet[4:])),
                 "Invalid initial AppImage RDP negotiation")
+        overlap = obs["concurrent_extractions"]
+        directories, inodes = overlap["directories"], overlap["inodes"]
+        require(set(overlap) == {"directories", "inodes", "uid", "private_mode", "shared_parent_mode",
+                                 "surviving_gui_and_files_verified", "both_extractions_removed"}
+                and isinstance(directories, list) and len(directories) == 2
+                and all(re.fullmatch(r"appimage_extracted_[A-Za-z0-9]{6}", name) for name in directories)
+                and directories[0] != directories[1] and isinstance(inodes, list) and len(inodes) == 2
+                and all(type(inode) is int and inode > 0 for inode in inodes) and inodes[0] != inodes[1]
+                and type(overlap["uid"]) is int and overlap["uid"] > 0
+                and overlap["private_mode"] == "0700" and overlap["shared_parent_mode"] == "1777"
+                and overlap["surviving_gui_and_files_verified"] is True and overlap["both_extractions_removed"] is True,
+                "Overlapping AppImage invocations lacked distinct private extraction and cleanup")
+        recorded = re.findall(rb"^\[AppImage concurrent runtime observations\] (.+)$",
+                              (location / "startup.log").read_bytes(), re.M)
+        require(recorded == [json.dumps(overlap, sort_keys=True).encode("ascii")], "Missing AppImage overlap observation log")
         require(obs == {"mode": "extract-and-run", "core_sha256": info["core"]["sha256"],
                         "runtime_sha256": info["runtime"]["sha256"], "source_sha256": info["corresponding_source"]["sha256"],
                         "highest_required_glibc": info["highest_required_glibc"], "gui_sha256": manifest["app_sha256"],
                         "helper_sha256": manifest["rdp_helper_sha256"], "mapped_private_libraries": mapped,
                         "negotiation_sha256": hashlib.sha256(packet).hexdigest(),
-                        "runtime_reaped_and_clean": True} and obs["runtime_reaped_and_clean"] is True,
+                        "runtime_reaped_and_clean": True, "concurrent_extractions": overlap} and obs["runtime_reaped_and_clean"] is True,
                 "AppImage launch evidence differs from the inspected outer image, source, GUI or helper")
         checks[backend] = check
     return {"manifest": info, "startup": checks}

@@ -150,6 +150,24 @@ class ProducedImageTests(unittest.TestCase):
                 elif change == "extra":
                     extra.unlink()
 
+    def test_undeclared_squashfs_xattr_table_is_rejected(self):
+        import os
+        import subprocess
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            info, tree = appimage.verify_image(self.core, self.image, self.source, work / "verified")
+            os.setxattr(tree / "termcraft.png", "user.termcraft_fixture", b"qualification")
+            changed = work / self.image.name
+            offset = info["runtime"]["size"]
+            subprocess.run(["mksquashfs", tree, changed, "-offset", str(offset), "-processors", "2",
+                            "-noappend", "-no-progress", "-all-root", "-xattrs"], check=True, stdout=subprocess.DEVNULL)
+            with self.image.open("rb") as original, changed.open("r+b") as target:
+                target.write(original.read(offset))
+                target.seek(offset + 56)
+                self.assertNotEqual(target.read(8), b"\xff" * 8)
+            with self.assertRaisesRegex(ValueError, "xattr"):
+                appimage.verify_image(self.core, changed, self.source, work / "rejected")
+
     def test_real_core_with_wrong_architecture_is_rejected(self):
         import json
         import tarfile

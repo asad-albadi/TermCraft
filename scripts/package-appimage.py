@@ -240,6 +240,7 @@ def verify_image(archive, image, source, work):
         require(len(superblock) == 96, "Truncated SquashFS superblock")
         inodes = struct.unpack_from("<I", superblock, 4)[0]
         used = struct.unpack_from("<Q", superblock, 40)[0]
+        require(superblock[56:64] == b"\xff" * 8, "Undeclared SquashFS xattr table")
         padded = (used + 4095) // 4096 * 4096
         require(inodes == len(expected) and 96 <= used <= 1024**3
                 and image.stat().st_size == offset + padded, "Unexpected SquashFS size or inode count")
@@ -304,7 +305,7 @@ def package(archive, inputs, runtime, output):
         tool_tmp = work / "tmp"
         tool_tmp.mkdir(mode=0o700)
         subprocess.run([tool, "--appimage-extract-and-run", "--no-appstream", "--runtime-file", runtime / "runtime",
-                        "--comp", "zstd", "--mksquashfs-opt", "-processors", "--mksquashfs-opt", "2", staged, image],
+                        "--comp", "zstd", "--mksquashfs-opt", "-no-xattrs", "--mksquashfs-opt", "-processors", "--mksquashfs-opt", "2", staged, image],
                        env={"HOME": str(work), "TMPDIR": str(tool_tmp), "PATH": os.defpath, "ARCH": "x86_64",
                             "SOURCE_DATE_EPOCH": "1743465600", "LC_ALL": "C"}, check=True, timeout=300)
         # appimagetool 1.9.1 fills the optional .digest_md5 section even for

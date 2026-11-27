@@ -426,8 +426,13 @@ class ReleaseDelivery(unittest.TestCase):
                 obs = json.loads((location / "verification.json").read_text())
                 packet = bytes.fromhex("030000130ee000000000000100080003000000")
                 (location / "rdp-session.log").write_text("[AppImage loopback X.224/RDP negotiation] " + packet.hex() + "\n")
+                overlap = {"directories": ["appimage_extracted_a12345", "appimage_extracted_b67890"],
+                           "inodes": [1001, 1002], "uid": 1000, "private_mode": "0700", "shared_parent_mode": "1777",
+                           "surviving_gui_and_files_verified": True, "both_extractions_removed": True}
+                with (location / "startup.log").open("ab") as log:
+                    log.write(b"\n[AppImage concurrent runtime observations] " + json.dumps(overlap, sort_keys=True).encode() + b"\n")
                 obs.update(archive=name, archive_sha256=digest(image), appimage={
-                    "negotiation_sha256": hashlib.sha256(packet).hexdigest(),
+                    "negotiation_sha256": hashlib.sha256(packet).hexdigest(), "concurrent_extractions": overlap,
                     "mode": "extract-and-run", "runtime_sha256": "a" * 64,
                     "core_sha256": digest(archive), "source_sha256": digest(case / "dist" / corresponding),
                     "highest_required_glibc": "2.38", "gui_sha256": manifest["files"]["harbor-workspace"],
@@ -493,6 +498,25 @@ class ReleaseDelivery(unittest.TestCase):
             self.release.stage_candidate(self.root, self.source, self.version, "linux", case / "dist",
                                          case / "startup-evidence", case / "candidate", case / "lifecycle-evidence",
                                          case / "wayland-evidence")
+
+    def test_appimage_gate_rejects_shared_extraction_or_missing_overlap_log(self):
+        case, _ = self.platform_bundle("linux")
+        evidence = case / "appimage-x11-evidence"
+        path = evidence / "verification.json"
+        observed = json.loads(path.read_text())
+        def stage():
+            self.release.stage_candidate(self.root, self.source, self.version, "linux", case / "dist",
+                                         case / "startup-evidence", case / "candidate", case / "lifecycle-evidence",
+                                         case / "wayland-evidence")
+        shared = copy.deepcopy(observed)
+        shared["appimage"]["concurrent_extractions"]["inodes"] = [1001, 1001]
+        write_json(path, shared)
+        with self.assertRaisesRegex(ValueError, "distinct private extraction"):
+            stage()
+        write_json(path, observed)
+        (evidence / "startup.log").write_bytes(b"")
+        with self.assertRaisesRegex(ValueError, "Missing AppImage overlap"):
+            stage()
 
     def test_candidate_rejects_skipped_native_stages_and_wayland_without_socket_trace(self):
         case, archive = self.platform_bundle("linux")

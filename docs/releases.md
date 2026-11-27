@@ -33,7 +33,9 @@ The matching `TermCraft-<version>-linux-x86_64-AppImage-source.tar.gz` includes
 the runtime and client library sources, downstream packaging, notices, static
 relink inputs, build recipes and measured hashes. Each outer startup check
 binds the screenshot and RDP negotiation to the outer bytes and verifies the
-actual private client libraries, GUI and sealed RDP helper.
+actual private client libraries, GUI and sealed RDP helper. Concurrent launches
+use separate owner-only extraction directories. The native checks close one
+GUI and verify the surviving GUI and its files before closing the second.
 
 ## Run and interpret the workflow
 
