@@ -2120,8 +2120,9 @@ mod appearance_tests {
         let t = &mut workspace.tabs[0];
         t.process = Some(
             Process::spawn(
-                "/usr/bin/python3",
+                "python3",
                 &[
+                    "-I".into(),
                     "-c".into(),
                     r#"import os,tty
  tty.setraw(0)
@@ -2143,11 +2144,16 @@ mod appearance_tests {
             .unwrap(),
         );
         let deadline = Instant::now() + Duration::from_secs(3);
-        while !t.screen.plain().contains("READY") && Instant::now() < deadline {
-            t.poll();
-            std::thread::sleep(Duration::from_millis(5));
-        }
-        assert!(t.screen.plain().contains("READY"));
+        super::super::terminal_review_tests::wait_for_fixture(
+            t,
+            deadline,
+            "READY and SGR mouse mode",
+            |tab| {
+                tab.screen.plain().contains("READY")
+                    && tab.screen.mouse_mode().enabled()
+                    && tab.screen.mouse_mode().sgr
+            },
+        );
         t.recording = true;
         let preferences = workspace.store.preferences.clone();
         let mut origin = None;

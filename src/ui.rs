@@ -3221,13 +3221,11 @@ mod gui_tests {
             ..Default::default()
         });
         assert!(w.tabs[0].running());
-        w.start_with_launch(Session{protocol:"Local".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"/usr/bin/python3".into(),args:vec!["-c".into(),"import os,tty\ntty.setraw(0)\nos.write(1,b'READY')\ndata=os.read(0,4096)\nos.write(1,b'CAP:'+data.hex().encode())\nos.read(0,1)".into()],directory:None}));
+        w.start_with_launch(Session{protocol:"Local".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"python3".into(),args:vec!["-I".into(),"-c".into(),"import os,tty\ntty.setraw(0)\nos.write(1,b'READY')\ndata=os.read(0,4096)\nos.write(1,b'CAP:'+data.hex().encode())\nos.read(0,1)".into()],directory:None}));
         let deadline = Instant::now() + Duration::from_secs(3);
-        while !w.tabs[1].screen.plain().contains("READY") {
-            w.tabs[1].poll();
-            assert!(Instant::now() < deadline);
-            std::thread::sleep(Duration::from_millis(5));
-        }
+        terminal_review_tests::wait_for_fixture(&mut w.tabs[1], deadline, "READY", |tab| {
+            tab.screen.plain().contains("READY")
+        });
         w.enable_broadcast_all();
         w.queue_paste(w.tabs[1].id, "one\ntwo".into());
         assert!(w.pending_paste.is_some());
@@ -3289,8 +3287,9 @@ os.read(0,1)
             },
             Some(connection::Launch {
                 rdp_profile: None,
-                program: "/usr/bin/python3".into(),
+                program: "python3".into(),
                 args: vec![
+                    "-I".into(),
                     "-c".into(),
                     program.into(),
                     capture.to_str().unwrap().into(),
@@ -3299,11 +3298,9 @@ os.read(0,1)
             }),
         );
         let deadline = Instant::now() + Duration::from_secs(2);
-        while !w.tabs[0].screen.plain().contains("READY") {
-            w.tabs[0].poll();
-            assert!(Instant::now() < deadline);
-            std::thread::sleep(Duration::from_millis(5));
-        }
+        terminal_review_tests::wait_for_fixture(&mut w.tabs[0], deadline, "READY", |tab| {
+            tab.screen.plain().contains("READY")
+        });
         let path = root.path().join("café.txt");
         fs::write(&path, b"owned").unwrap();
         let mut command = b"put -p ".to_vec();
@@ -3419,23 +3416,17 @@ os.read(0,1)
             session,
             Some(connection::Launch {
                 rdp_profile: None,
-                program: "/usr/bin/python3".into(),
-                args: vec!["-c".into(), program.into()],
+                program: "python3".into(),
+                args: vec!["-I".into(), "-c".into(), program.into()],
                 directory: None,
             }),
         );
         let log = root.path().join("owned-wire.log");
         w.tabs[0].log = Some(fs::File::create(&log).unwrap());
         let deadline = Instant::now() + Duration::from_secs(3);
-        while !w.tabs[0].screen.plain().contains("READY") && Instant::now() < deadline {
-            w.tabs[0].poll();
-            std::thread::sleep(Duration::from_millis(5));
-        }
-        assert!(
-            w.tabs[0].screen.plain().contains("€READY"),
-            "{}",
-            w.tabs[0].screen.plain()
-        );
+        terminal_review_tests::wait_for_fixture(&mut w.tabs[0], deadline, "€READY", |tab| {
+            tab.screen.plain().contains("€READY")
+        });
         assert_eq!(w.tabs[0].screen.cols, 132);
         assert_eq!(w.tabs[0].screen.rows, 40);
         assert!(fs::read(&log).unwrap().starts_with(&[0x80]));
@@ -3464,20 +3455,20 @@ os.read(0,1)
                 },
                 Some(connection::Launch {
                     rdp_profile: None,
-                    program: "/usr/bin/python3".into(),
-                    args: vec!["-c".into(), program.into()],
+                    program: "python3".into(),
+                    args: vec!["-I".into(), "-c".into(), program.into()],
                     directory: None,
                 }),
             );
         }
         let deadline = Instant::now() + Duration::from_secs(3);
-        while w.tabs.iter().any(|t| !t.screen.plain().contains("READY"))
-            && Instant::now() < deadline
-        {
-            for tab in &mut w.tabs {
-                tab.poll();
-            }
-            std::thread::sleep(Duration::from_millis(5));
+        for tab in &mut w.tabs {
+            terminal_review_tests::wait_for_fixture(
+                tab,
+                deadline,
+                "READY and bracketed paste",
+                |tab| tab.screen.plain().contains("READY") && tab.screen.bracketed_paste,
+            );
         }
         assert!(w.tabs.iter().all(|t| t.screen.bracketed_paste));
         w.enable_broadcast_all();

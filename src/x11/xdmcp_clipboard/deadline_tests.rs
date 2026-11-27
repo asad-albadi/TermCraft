@@ -7,15 +7,18 @@ use std::{
 };
 use x11rb::x11_utils::Serialize;
 fn setup_reply(stream: &mut UnixStream) {
+    setup_reply_result(stream).unwrap();
+}
+fn setup_reply_result(stream: &mut UnixStream) -> io::Result<()> {
     let mut header = [0; 12];
-    stream.read_exact(&mut header).unwrap();
+    stream.read_exact(&mut header)?;
     let padded = |n: u16| (usize::from(n) + 3) & !3;
     let mut auth = vec![
         0;
         padded(u16::from_ne_bytes([header[6], header[7]]))
             + padded(u16::from_ne_bytes([header[8], header[9]]))
     ];
-    stream.read_exact(&mut auth).unwrap();
+    stream.read_exact(&mut auth)?;
     let mut setup = Setup {
         status: 1,
         protocol_major_version: 11,
@@ -29,7 +32,7 @@ fn setup_reply(stream: &mut UnixStream) {
         ..Default::default()
     };
     setup.length = ((setup.serialize().len() - 8) / 4) as u16;
-    stream.write_all(&setup.serialize()).unwrap();
+    stream.write_all(&setup.serialize())
 }
 #[test]
 fn delayed_listener_and_stalled_authentication_share_two_seconds() {
@@ -306,22 +309,70 @@ fn endpoint_server(stream: UnixStream, close_owner: bool, ready: Option<mpsc::Se
     endpoint_server_observe(stream, close_owner, ready, |_, _, _| {});
 }
 fn endpoint_server_observe(
+    stream: UnixStream,
+    close_owner: bool,
+    ready: Option<mpsc::Sender<()>>,
+    observe: impl FnMut(u8, &[u8], &mut [u8; 32]),
+) {
+    endpoint_server_observe_until(stream, close_owner, ready, observe, None);
+}
+
+// Only the deadline-composition peer may lose its client while replying. The
+// main thread confirms the expected timeout and its original elapsed bounds;
+// other setup peers stay strict, as do premature or unrelated I/O failures.
+fn confirm_deadline_disconnect(error: io::Error, epoch: (Instant, &mpsc::Receiver<bool>)) {
+    assert!(
+        Instant::now() >= epoch.0
+            && matches!(
+                error.kind(),
+                io::ErrorKind::BrokenPipe
+                    | io::ErrorKind::ConnectionReset
+                    | io::ErrorKind::ConnectionAborted
+                    | io::ErrorKind::UnexpectedEof
+                    | io::ErrorKind::NotConnected
+            ),
+        "unexpected peer disconnect before the original deadline: {error}"
+    );
+    assert!(
+        epoch.1.recv().unwrap(),
+        "client did not finish at its original deadline"
+    );
+}
+
+// True means the complete initializer reached the deliberate owner-query EOF.
+fn endpoint_server_observe_until(
     mut stream: UnixStream,
     close_owner: bool,
     ready: Option<mpsc::Sender<()>>,
     mut observe: impl FnMut(u8, &[u8], &mut [u8; 32]),
-) {
-    setup_reply(&mut stream);
+    epoch: Option<(Instant, &mpsc::Receiver<bool>)>,
+) -> bool {
+    if let Err(error) = setup_reply_result(&mut stream) {
+        match epoch {
+            Some(epoch) => confirm_deadline_disconnect(error, epoch),
+            None => panic!("X11 setup peer failed: {error}"),
+        }
+        return false;
+    }
     let mut sequence = 0u16;
     loop {
         let mut header = [0; 4];
-        if stream.read_exact(&mut header).is_err() {
-            return;
+        if let Err(error) = stream.read_exact(&mut header) {
+            if let Some(epoch) = epoch {
+                confirm_deadline_disconnect(error, epoch);
+            }
+            return false;
         }
         sequence = sequence.wrapping_add(1);
         let length = u16::from_ne_bytes([header[2], header[3]]) as usize * 4;
         let mut payload = vec![0; length - 4];
-        stream.read_exact(&mut payload).unwrap();
+        if let Err(error) = stream.read_exact(&mut payload) {
+            match epoch {
+                Some(epoch) => confirm_deadline_disconnect(error, epoch),
+                None => panic!("partial X11 peer request: {error}"),
+            }
+            return false;
+        }
         let mut reply = [0u8; 32];
         reply[0] = 1;
         reply[2..4].copy_from_slice(&sequence.to_ne_bytes());
@@ -341,7 +392,7 @@ fn endpoint_server_observe(
             43 => {}
             23 => {
                 if close_owner {
-                    return;
+                    return true;
                 }
                 if let Some(ref ready) = ready {
                     let _ = ready.send(());
@@ -349,8 +400,11 @@ fn endpoint_server_observe(
             }
             _ => continue,
         }
-        if stream.write_all(&reply).is_err() {
-            return;
+        if let Err(error) = stream.write_all(&reply) {
+            if let Some(epoch) = epoch {
+                confirm_deadline_disconnect(error, epoch);
+            }
+            return false;
         }
     }
 }
@@ -557,23 +611,36 @@ fn recovery_initializer_retries_share_original_deadline() {
     let listener = UnixListener::bind(&socket).unwrap();
     let flag = Arc::new(AtomicBool::new(false));
     let server_flag = flag.clone();
+    let (begin, begun) = mpsc::channel();
+    let (finished, outcome) = mpsc::channel();
     listener.set_nonblocking(true).unwrap();
     let server = std::thread::spawn(move || {
-        let mut attempts = 0;
+        let deadline = begun.recv().unwrap();
+        let mut completed = 0;
         while !server_flag.load(Ordering::Relaxed) {
             match listener.accept() {
                 Ok((stream, _)) => {
-                    attempts += 1;
-                    endpoint_server(stream, true, None);
+                    if endpoint_server_observe_until(
+                        stream,
+                        true,
+                        None,
+                        |_, _, _| {},
+                        Some((deadline, &outcome)),
+                    ) {
+                        completed += 1;
+                    } else {
+                        break;
+                    }
                 }
                 Err(e) if e.kind() == io::ErrorKind::WouldBlock => std::thread::yield_now(),
                 Err(e) => panic!("{e}"),
             }
         }
-        attempts
+        completed
     });
     let start = Instant::now();
     let deadline = start + Duration::from_millis(150);
+    begin.send(deadline).unwrap();
     let result = recover_endpoint(
         &socket,
         &[0x51; 16],
@@ -583,14 +650,31 @@ fn recovery_initializer_retries_share_original_deadline() {
         deadline,
     );
     let elapsed = start.elapsed();
+    // Drop an unexpected successful endpoint before joining its peer, so a
+    // regression cannot leave that peer blocked waiting for another request.
+    let error = result.err();
+    let timed_out = error
+        .as_ref()
+        .is_some_and(|error| error.kind() == io::ErrorKind::TimedOut);
+    finished
+        .send(
+            timed_out
+                && elapsed >= Duration::from_millis(140)
+                && elapsed < Duration::from_millis(300),
+        )
+        .unwrap();
     flag.store(true, Ordering::Relaxed);
-    let attempts = server.join().unwrap();
-    assert!(result.is_err());
-    assert!(attempts > 1);
+    let completed = server.join().unwrap();
+    assert!(
+        timed_out,
+        "expected original recovery deadline: {:?}",
+        error
+    );
+    assert!(completed > 1);
     assert!(elapsed >= Duration::from_millis(140));
     assert!(elapsed < Duration::from_millis(300));
     println!(
-        "{attempts} complete initializer EOFs shared original 150ms deadline: {}ms",
+        "{completed} complete initializer EOFs shared original 150ms deadline: {}ms",
         elapsed.as_millis()
     );
 }
@@ -752,5 +836,51 @@ fn endpoint_initial_owner_conversion_eof_keeps_transport_kind() {
         e.kind(),
         io::ErrorKind::UnexpectedEof,
         "an initializer's owner conversion must remain eligible for the same bounded recovery: {e}"
+    );
+}
+
+#[test]
+fn initializer_peer_response_after_client_deadline_is_not_a_fixture_failure() {
+    let (client, server) = UnixStream::pair().unwrap();
+    let (release, resume) = mpsc::channel();
+    let (finished, outcome) = mpsc::channel();
+    let deadline = Instant::now() + Duration::from_millis(40);
+    let worker = std::thread::spawn(move || {
+        resume.recv().unwrap();
+        endpoint_server_observe_until(server, true, None, |_, _, _| {}, Some((deadline, &outcome)))
+    });
+    let result = transport::connect(
+        client,
+        0,
+        (vec![], vec![]),
+        Arc::new(AtomicBool::new(false)),
+        deadline,
+    );
+    let timed_out = result.err().unwrap().kind() == io::ErrorKind::TimedOut;
+    finished
+        .send(timed_out && Instant::now() >= deadline)
+        .unwrap();
+    release.send(()).unwrap();
+    assert!(
+        !worker.join().unwrap(),
+        "a partial handshake is not a complete initializer EOF"
+    );
+    assert!(timed_out);
+}
+
+#[test]
+fn deadline_peer_rejects_a_disconnect_before_the_client_epoch_expires() {
+    let (mut client, server) = UnixStream::pair().unwrap();
+    client.write_all(&[0; 12]).unwrap();
+    drop(client);
+    let (finished, outcome) = mpsc::channel();
+    finished.send(false).unwrap();
+    let deadline = Instant::now() + Duration::from_secs(2);
+    let worker = std::thread::spawn(move || {
+        endpoint_server_observe_until(server, true, None, |_, _, _| {}, Some((deadline, &outcome)))
+    });
+    assert!(
+        worker.join().is_err(),
+        "an early peer closure must still fail the fixture"
     );
 }

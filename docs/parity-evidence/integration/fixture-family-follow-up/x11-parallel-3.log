@@ -1,0 +1,26 @@
+
+running 21 tests
+test x11::xdmcp_clipboard::deadline_tests::deadline_peer_rejects_a_disconnect_before_the_client_epoch_expires ... ok
+test x11::xdmcp_clipboard::deadline_tests::expired_endpoint_initialization_sends_no_requests ... ok
+test x11::xdmcp_clipboard::deadline_tests::recovery_cancelled_or_expired_epoch_opens_no_connection ... ok
+test x11::xdmcp_clipboard::deadline_tests::endpoint_initial_owner_conversion_eof_keeps_transport_kind ... ok
+test x11::xdmcp_clipboard::deadline_tests::expired_or_cancelled_setup_sends_no_authentication_bytes ... ok
+test x11::xdmcp_clipboard::tests::incr_completion_rejects_truncated_utf8_text ... ok
+test x11::xdmcp_clipboard::tests::selected_display_is_local_and_bounded ... ok
+test x11::xdmcp_clipboard::deadline_tests::recovery_does_not_retry_authentication_rejection ... ok
+test x11::xdmcp_clipboard::transport::tests::selected_authority_is_bounded_regular_and_matches_cookie_record ... ok
+test x11::xdmcp_clipboard::deadline_tests::recovery_wrong_peer_never_receives_private_cookie ... ok
+test x11::xdmcp_clipboard::transport::tests::unix_connection_identity_is_descriptor_based ... ok
+test x11::xdmcp_clipboard::deadline_tests::recovery_dead_owned_pidfd_opens_no_connection ... ok
+test x11::xdmcp_clipboard::tests::bounded_text_is_utf8_only ... ok
+test x11::xdmcp_clipboard::deadline_tests::recovery_retries_initializer_eof_within_one_reset_epoch ... ok
+test x11::xdmcp_clipboard::deadline_tests::three_recovered_manager_reset_episodes_still_enforce_thirty_second_limit ... ok
+test x11::xdmcp_clipboard::deadline_tests::initializer_peer_response_after_client_deadline_is_not_a_fixture_failure ... ok
+test x11::xdmcp_clipboard::transport::tests::stalled_x11_handshake_is_cancelled_and_worker_joined ... ok
+test x11::xdmcp_clipboard::deadline_tests::recovery_initializer_retries_share_original_deadline ... ok
+test x11::xdmcp_clipboard::deadline_tests::resumed_parent_reads_selection_within_remaining_reset_budget ... ok
+test x11::xdmcp_clipboard::deadline_tests::endpoint_initialization_keeps_remaining_budget_after_successful_handshake ... ok
+test x11::xdmcp_clipboard::deadline_tests::delayed_listener_and_stalled_authentication_share_two_seconds ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.00s
+
