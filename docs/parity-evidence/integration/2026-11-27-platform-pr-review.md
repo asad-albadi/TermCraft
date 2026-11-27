@@ -45,3 +45,11 @@ A full Apple Silicon workspace job is now required in CI, with explicit arm64 id
 - CI-only follow-up12f2a4b: CI45924008758 passed Windows, failed an intermittent Linux Vim resize assertion and four Mac targets. Mac failures cover UI terminal/input fixtures, installed browser compatibility, unsupported SCP interpreter capability and serial output queue coverage. Issue2 now tracks the software follow-up; no merge is claimed.
 - Owner tasks are separated across terminal/SCP, Mac PTY/serial and browser diagnosis. No skipped tests, timeout inflation or unqualified hardware assertions are authorized as a substitute for fixes.
 - Initial ext4 allocation blocker is resolved in issue3 with its passing hosted evidence. Parity remains46/60; strict native/original closure is not claimed.
+
+## Final integration outcome
+
+- Windows PR #6 merged as794d8d7; Apple Silicon PR #5 merged as5dfbf9e. The merged tree exactly matches the reviewed/tested candidate tree83c6d02f177f9eff912a088cb09f3b82f01d9043.
+- CI45952255029 passed Windows/Linux on Windows head3ff31c4. CI45952259870 passed Windows/Linux/Apple Silicon on combined headbddee50. Native Mac browser tests require an available provider; unavailable fixtures do not silently satisfy them.
+- Manual package run45947639840 passed Linux, Windows and Apple Silicon startup and core package gates on production source5ee32d4. Later changes are test fixtures, CI and evidence metadata; those package artifacts retain source5ee32d4 identity.
+- Issues #1/#2 remain open for their manual, physical-device/display, permission and independent-endpoint acceptance. Release-only runtime enrollment/signing/publication is tracked in #3. No public version tag or GitHub Release was created.
+- All review findings were addressed and native software regressions passed. No open critical/important review issue is parked. Parity remains46/60 implementation checkpoints and0/60 strict native/original closure.

@@ -341,7 +341,7 @@
       ],
       "dependency": "Remaining supported native desktop/manual, device, independent endpoint and production distribution fixtures.",
       "remaining": "The inherited ext4 allocation cleanup defect is repaired and passed hosted Ubuntu RDP checks. Remaining native device/admin-session, independent endpoint and original-workflow qualification and explicit POSIX API limitations remain open.",
-      "validation_remaining": "Windows and Linux regression CI run45923194474 passed. Scoped allocation cleanup has ext4/Btrfs and external-opener/break coverage; unsupported or contended leases retain allocation. Full combined Apple Silicon software regression failures are tracked in issue2; physical RDP devices and independent Windows Session Host acceptance remain open.",
+      "validation_remaining": "Integrated Windows/Linux/Apple Silicon software CI passed. Physical RDP devices/admin-session and independent Windows Session Host acceptance and original comparisons remain open; contended/unsupported allocation leases preserve data and retain allocation.",
       "evidence": [
         "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/D02/providers/host-full.log",
@@ -366,7 +366,7 @@
         "docs/parity-evidence/D02/ext4-allocation/README.md",
         "https://github.com/asad-albadi/TermCraft/actions/runs/45923194474"
       ],
-      "next_action": "Complete the remaining supported native device/admin and independent-endpoint qualification in issues1/2, retaining documented POSIX limitations. Continue the joint software regression fixes before merging platform PRs.",
+      "next_action": "Complete supported native device/admin and independent-endpoint acceptance in issues1/2; keep explicit POSIX API limitations. Continue release work in issue3.",
       "platform_limitations": "Opened-object mutation and general POSIX COMMSTATUS/properties/modem events remain unavailable by design where no identity-safe native API exists. They are not marked implemented or assumed fixable by another Linux machine.",
       "native_dependency": "Native Windows/macOS RDP/redirection endpoints and physical printer, smartcard and serial fixtures. POSIX lacks the required opened-object rename/delete and general COMMSTATUS/properties/modem-event semantics; additional Linux hardware alone cannot supply missing OS APIs."
     },
@@ -1047,9 +1047,9 @@
       "initial_hosted_ci": "https://github.com/asad-albadi/TermCraft/actions/runs/45636600121",
       "hosted_helper_passed": 87,
       "hosted_helper_failed": 0,
-      "cause": "Confirmed ext4 KEEP_SIZE allocation beyond EOF was not reclaimed by hole punch. Scoped write-lease cleanup and regression coverage are committed; hosted Windows-branch Linux CI passed in run45923194474. Full combined Apple Silicon CI remains actionable for separate terminal/browser/SCP/serial fixture failures, and Linux Vim resize needs deterministic synchronization.",
+      "cause": "Confirmed ext4 KEEP_SIZE cleanup defect repaired. Both platform PRs merged after verified native Windows/Linux/Apple Silicon CI; scoped lease and remaining platform limitations are documented.",
       "verified_ci": "https://github.com/asad-albadi/TermCraft/actions/runs/45923194474",
-      "combined_ci_follow_up": "https://github.com/asad-albadi/TermCraft/actions/runs/45924008758"
+      "combined_ci_follow_up": "https://github.com/asad-albadi/TermCraft/actions/runs/45952259870"
     }
   },
   "supported_platform_scope": {
@@ -1067,5 +1067,21 @@
     ],
     "instruction": "Intel macOS is not a required artifact, native workflow or approval blocker. Preserve arm64 qualification gates and historical evidence; do not count scope removal as a passing test or new implementation checkpoint.",
     "reference": "docs/SUPPORT.md"
+  },
+  "current_native_integration": {
+    "date": "2026-11-27",
+    "merged_main_commit": "5dfbf9e39e467ffc194ce55eefffbc28e8c6c26b",
+    "merged_tree": "83c6d02f177f9eff912a088cb09f3b82f01d9043",
+    "windows_pr": 6,
+    "macos_pr": 5,
+    "ci_runs": [
+      45952255029,
+      45952259870
+    ],
+    "package_run": 45947639840,
+    "package_source": "5ee32d4",
+    "implementation_checkpoints": 46,
+    "strict_verified_complete": 0,
+    "remaining": "Manual/hardware/original acceptance remains in issues1/2; release orchestration, public runtime enrollment and signing/publication in issue3."
   }
 }
