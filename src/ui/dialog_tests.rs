@@ -270,72 +270,78 @@ fn real_session_rows_name_their_controls_and_allocate_readable_space() {
                 ..Default::default()
             });
             w.session_form.as_mut().unwrap().browser_options.embedded = true;
-            let mut draw = || {
-                shell_frame(&ctx, vec2(width, 1600.), scale, vec![], |ui| {
-                    w.session_dialog(ui.ctx())
-                })
+            use super::pages::SessionSection::*;
+            let basics = match *protocol {
+                "Local" => vec!["Shell executable", "Start folder"],
+                "Serial" => vec!["Device / COM port", "Baud rate"],
+                "Browser" => vec!["Website address"],
+                _ => vec!["Remote host", "Username", "Port"],
             };
-            draw();
-            let output = draw();
-            let nodes = &output
-                .platform_output
-                .accesskit_update
-                .as_ref()
-                .unwrap()
-                .nodes;
-            let mut labels = vec!["Session name", "Folder"];
+            let mut sections = vec![
+                (Connection, basics),
+                (Bookmark, vec!["Session name", "Folder"]),
+            ];
             match *protocol {
-                "Local" => labels.extend(["Shell executable", "Start folder"]),
-                "Serial" => labels.extend(["Device / COM port", "Baud rate"]),
-                "Browser" => labels.push("Website address"),
-                _ => labels.extend(["Remote host", "Username", "Port"]),
-            }
-            if matches!(*protocol, "SSH" | "SFTP" | "Mosh") {
-                labels.extend(["Private key", "Jump host"]);
-            }
-            if *protocol == "Browser" {
-                labels.push("Proxy endpoint");
-            }
-            if *protocol == "RDP" {
-                labels.push("Domain");
-            }
-            for label in labels {
-                let (id, node) = nodes
-                    .iter()
-                    .find(|(_, n)| {
-                        n.role() == Role::Label
-                            && (n.value() == Some(label) || n.label() == Some(label))
-                    })
-                    .unwrap_or_else(|| panic!("missing {label} for {protocol}"));
-                let bounds = node.bounds().unwrap();
-                let field = nodes
-                    .iter()
-                    .find(|(_, n)| n.labelled_by().contains(id))
-                    .unwrap_or_else(|| panic!("unlabelled {label} for {protocol}"))
-                    .1
-                    .bounds()
-                    .unwrap();
-                assert!(
-                    bounds.y1 - bounds.y0 < 36.,
-                    "{protocol}/{label}: {bounds:?}"
-                );
-                if !matches!(label, "Port" | "Baud rate") {
-                    assert!(field.x1 - field.x0 >= 160., "{protocol}/{label}: {field:?}");
+                "SSH" | "SFTP" | "Mosh" => {
+                    sections.push((Network, vec!["Private key", "Jump host"]))
                 }
-                if width > 500. {
+                "Browser" => sections.push((Advanced, vec!["Proxy endpoint"])),
+                "RDP" => sections.push((Security, vec!["Domain"])),
+                _ => {}
+            }
+            for (section, labels) in sections {
+                w.session_section = section;
+                let mut draw = || {
+                    shell_frame(&ctx, vec2(width, 1600.), scale, vec![], |ui| {
+                        w.session_dialog(ui.ctx())
+                    })
+                };
+                draw();
+                let output = draw();
+                let nodes = &output
+                    .platform_output
+                    .accesskit_update
+                    .as_ref()
+                    .unwrap()
+                    .nodes;
+                for label in labels {
+                    let (id, node) = nodes
+                        .iter()
+                        .find(|(_, n)| {
+                            n.role() == Role::Label
+                                && (n.value() == Some(label) || n.label() == Some(label))
+                        })
+                        .unwrap_or_else(|| panic!("missing {label} for {protocol}"));
+                    let bounds = node.bounds().unwrap();
+                    let field = nodes
+                        .iter()
+                        .find(|(_, n)| n.labelled_by().contains(id))
+                        .unwrap_or_else(|| panic!("unlabelled {label} for {protocol}"))
+                        .1
+                        .bounds()
+                        .unwrap();
                     assert!(
-                        ((bounds.y0 + bounds.y1) - (field.y0 + field.y1)).abs() <= 2.,
-                        "{protocol}/{label}: {bounds:?} {field:?}"
+                        bounds.y1 - bounds.y0 < 36.,
+                        "{protocol}/{label}: {bounds:?}"
                     );
-                    assert!(
-                        field.x0 >= bounds.x1 - 1.,
-                        "{protocol}/{label}: {bounds:?} {field:?}"
-                    );
-                } else {
-                    assert!(
-                        field.y0 >= bounds.y1 - 1.,
-                        "{protocol}/{label}: {bounds:?} {field:?}"
-                    );
+                    if !matches!(label, "Port" | "Baud rate") {
+                        assert!(field.x1 - field.x0 >= 160., "{protocol}/{label}: {field:?}");
+                    }
+                    if width > 500. {
+                        assert!(
+                            ((bounds.y0 + bounds.y1) - (field.y0 + field.y1)).abs() <= 2.,
+                            "{protocol}/{label}: {bounds:?} {field:?}"
+                        );
+                        assert!(
+                            field.x0 >= bounds.x1 - 1.,
+                            "{protocol}/{label}: {bounds:?} {field:?}"
+                        );
+                    } else {
+                        assert!(
+                            field.y0 >= bounds.y1 - 1.,
+                            "{protocol}/{label}: {bounds:?} {field:?}"
+                        );
+                    }
                 }
             }
         }
@@ -420,4 +426,230 @@ fn modeless_tab_close_permits_input_to_an_unrelated_real_terminal() {
         );
         std::thread::sleep(Duration::from_millis(5));
     }
+}
+
+#[test]
+fn ssh_and_rdp_open_on_connection_basics() {
+    for protocol in ["SSH", "RDP"] {
+        let (ctx, _root, mut workspace) = owned_workspace();
+        workspace.new_session(protocol);
+        let mut draw = || {
+            shell_frame(&ctx, vec2(1280., 800.), 1., vec![], |ui| {
+                workspace.session_dialog(ui.ctx())
+            })
+        };
+        draw();
+        let frame = draw();
+        for hidden in [
+            "Folder",
+            "Session name",
+            "SSH engine",
+            "Domain",
+            "Desktop size",
+            "Keyword highlighting",
+        ] {
+            assert!(
+                !frame
+                    .shapes
+                    .iter()
+                    .any(|shape| matches!(&shape.shape,Shape::Text(t) if t.galley.text()==hidden))
+            );
+        }
+        for label in ["Remote host", "Username", "Port", "Bookmark", "Connect"] {
+            assert!(
+                ctx.content_rect()
+                    .contains(shell_text_position(&frame, label))
+            );
+        }
+    }
+}
+
+#[test]
+fn workspace_viewport_reserves_scroll_gutter_outside_readable_content() {
+    for width in [1920., 3440.] {
+        let (ctx, _root, _workspace) = owned_workspace();
+        fluent::setup(&ctx, true, false);
+        for _ in 0..3 {
+            shell_frame(&ctx, vec2(width, 480.), 1., vec![], |ui| {
+                let right = ui.available_rect_before_wrap().right();
+                let scroll = fluent::page_scroll(ui, "geometry", |ui| {
+                    ui.allocate_exact_size(vec2(ui.available_width(), 2000.), Sense::hover())
+                        .0
+                });
+                assert!(scroll.inner.width() <= 1040.);
+                assert!(scroll.inner.right() < scroll.inner_rect.right());
+                if scroll.state.offset.y > 0. || ctx.cumulative_frame_nr() > 1 {
+                    let gutter = right - scroll.inner_rect.right();
+                    assert!((12. ..=16.).contains(&gutter), "{width}: gutter {gutter}");
+                }
+            });
+        }
+    }
+}
+
+#[test]
+fn game_library_is_centered_and_responsive() {
+    for width in [640., 1920., 3440.] {
+        let (ctx, _root, mut w) = owned_workspace();
+        w.games.play.open();
+        let mut draw = || {
+            shell_frame(&ctx, vec2(width, 1000.), 1., vec![], |ui| {
+                w.games_frame(ui);
+            })
+        };
+        draw();
+        let out = draw();
+        let first = shell_text_position(&out, "Soliterm");
+        let second = shell_text_position(&out, "Termwalk");
+        assert_eq!(first.y, second.y);
+        assert!(first.x < second.x);
+        if width > 1500. {
+            assert!(
+                first.x > (width - 1250.) / 2.,
+                "{width}: first game at {first:?}"
+            );
+        }
+        shell_text_position(&out, "Untangle");
+    }
+}
+
+#[test]
+fn rdp_tabs_keep_draft_and_help_opens_from_keyboard_and_pointer() {
+    use super::gui_tests::shell_pointer;
+    let (ctx, _root, mut workspace) = owned_workspace();
+    workspace.new_session("RDP");
+    let size = vec2(1280., 900.);
+    let draw = |workspace: &mut Workspace, events| {
+        shell_frame(&ctx, size, 1., events, |ui| {
+            workspace.session_dialog(ui.ctx())
+        })
+    };
+    let click = |workspace: &mut Workspace, label: &str| {
+        draw(workspace, vec![]);
+        let pos = shell_text_position(&draw(workspace, vec![]), label);
+        draw(
+            workspace,
+            vec![Event::PointerMoved(pos), shell_pointer(pos, true)],
+        );
+        draw(workspace, vec![shell_pointer(pos, false)]);
+    };
+    click(&mut workspace, "Display & input");
+    click(&mut workspace, "Both directions");
+    click(&mut workspace, "Bookmark");
+    click(&mut workspace, "Connection");
+    click(&mut workspace, "Display & input");
+    assert_eq!(
+        workspace
+            .session_form
+            .as_ref()
+            .unwrap()
+            .rdp_options
+            .clipboard,
+        harbor_workspace::desktop::rdp_options::ClipboardPolicy::Bidirectional
+    );
+    let mut focused = false;
+    for _ in 0..80 {
+        draw(&mut workspace, vec![key(Key::Tab)]);
+        let mut release = key(Key::Tab);
+        if let Event::Key { pressed, .. } = &mut release {
+            *pressed = false;
+        }
+        let output = draw(&mut workspace, vec![release]);
+        let help = shell_text_position(&output, "Clipboard help");
+        if ctx
+            .memory(|m| m.focused())
+            .and_then(|id| ctx.read_response(id))
+            .is_some_and(|r| r.rect.contains(help))
+        {
+            focused = true;
+            break;
+        }
+    }
+    assert!(focused, "Tab must reach Clipboard help");
+    draw(&mut workspace, vec![key(Key::Enter)]);
+    let text = "Text only, up to 8192 UTF-8 bytes. Copy remote clipboard imports text. Paste sends local text to the remote session.";
+    shell_text_position(&draw(&mut workspace, vec![]), text);
+    draw(&mut workspace, vec![key(Key::Escape)]);
+    assert!(workspace.session_form.is_some());
+    click(&mut workspace, "Clipboard help");
+    shell_text_position(&draw(&mut workspace, vec![]), text);
+}
+
+#[test]
+fn compact_rdp_basics_keep_entire_port_control_in_body() {
+    let (ctx, _root, mut workspace) = owned_workspace();
+    ctx.enable_accesskit();
+    workspace.new_session("RDP");
+    let mut draw = || {
+        shell_frame(&ctx, vec2(640., 480.), 1., vec![], |ui| {
+            workspace.session_dialog(ui.ctx())
+        })
+    };
+    draw();
+    let frame = draw();
+    let nodes = &frame
+        .platform_output
+        .accesskit_update
+        .as_ref()
+        .unwrap()
+        .nodes;
+    let label = nodes
+        .iter()
+        .find(|(_, n)| {
+            n.role() == egui::accesskit::Role::Label
+                && (n.value() == Some("Port") || n.label() == Some("Port"))
+        })
+        .unwrap()
+        .0;
+    let field = nodes
+        .iter()
+        .find(|(_, n)| n.labelled_by().contains(&label))
+        .unwrap()
+        .1
+        .bounds()
+        .unwrap();
+    let bounds = Rect::from_min_max(
+        pos2(field.x0 as f32, field.y0 as f32),
+        pos2(field.x1 as f32, field.y1 as f32),
+    );
+    let painted = frame
+        .shapes
+        .iter()
+        .find(|s| matches!(&s.shape,Shape::Text(t) if t.galley.text()=="3389"))
+        .unwrap();
+    assert!(
+        painted.clip_rect.contains_rect(bounds),
+        "port {bounds:?} clipped to {:?}",
+        painted.clip_rect
+    );
+}
+
+#[test]
+fn input_safety_category_persists_changes_through_save_preferences() {
+    let (ctx, _root, mut w) = owned_workspace();
+    let original = w.store.preferences.confirm_session_close;
+    let mut click = |label: &str| {
+        let mut draw = |events| {
+            shell_frame(&ctx, vec2(1200., 900.), 1., events, |ui| {
+                w.settings_page(ui)
+            })
+        };
+        draw(vec![]);
+        let point = shell_text_position(&draw(vec![]), label);
+        draw(vec![
+            Event::PointerMoved(point),
+            super::gui_tests::shell_pointer(point, true),
+        ]);
+        draw(vec![super::gui_tests::shell_pointer(point, false)]);
+    };
+    click("Input & safety");
+    click("Confirm closing active sessions");
+    click("Save preferences");
+    assert_eq!(
+        Store::load(&w.store_path)
+            .unwrap()
+            .preferences
+            .confirm_session_close,
+        !original
+    );
 }

@@ -122,7 +122,7 @@ impl Workspace {
                             pane.rect.right_top() - vec2(fluent::CONTROL_HEIGHT, 0.),
                             Vec2::splat(fluent::CONTROL_HEIGHT),
                         );
-                        pane.rect.contains(*pos) && !close.contains(*pos)
+                        pane.rect.contains(*pos) && (panes.len() == 1 || !close.contains(*pos))
                     })
                     .map(|pane| pane.id),
                 _ => None,
@@ -164,28 +164,32 @@ impl Workspace {
             );
             child.set_clip_rect(pane.rect.intersect(ui.clip_rect()));
             child.spacing_mut().item_spacing = vec2(4., 4.);
-            child.allocate_ui_with_layout(
-                vec2(child.available_width(), fluent::CONTROL_HEIGHT),
-                Layout::right_to_left(Align::Center),
-                |ui| {
-                    let title = self.terminal_title(pane.id);
-                    let (_, close_button) =
-                        ui.allocate_exact_size(Vec2::splat(fluent::CONTROL_HEIGHT), Sense::click());
-                    if paint_close(ui, close_button, &title).clicked() {
-                        close = Some(pane.id);
-                    }
-                    ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
-                        ui.add(
-                            Label::new(
-                                crate::ui::fluent::emphasized(ui.ctx(), RichText::new(&title))
-                                    .color(if selected { accent(ui) } else { ink(ui) }),
+            if panes.len() > 1 {
+                child.allocate_ui_with_layout(
+                    vec2(child.available_width(), fluent::CONTROL_HEIGHT),
+                    Layout::right_to_left(Align::Center),
+                    |ui| {
+                        let title = self.terminal_title(pane.id);
+                        let (_, close_button) = ui.allocate_exact_size(
+                            Vec2::splat(fluent::CONTROL_HEIGHT),
+                            Sense::click(),
+                        );
+                        if paint_close(ui, close_button, &title).clicked() {
+                            close = Some(pane.id);
+                        }
+                        ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
+                            ui.add(
+                                Label::new(
+                                    crate::ui::fluent::emphasized(ui.ctx(), RichText::new(&title))
+                                        .color(if selected { accent(ui) } else { ink(ui) }),
+                                )
+                                .truncate(),
                             )
-                            .truncate(),
-                        )
-                        .fluent_hint(&title);
-                    });
-                },
-            );
+                            .fluent_hint(&title);
+                        });
+                    },
+                );
+            }
             let bytes = super::pages::terminal_view(&mut child, &mut self.tabs[index], p);
             if pane.rect.intersect(ui.clip_rect()).is_positive() {
                 self.mark_painted_terminal(ui.ctx(), pane.id, 0);
@@ -193,15 +197,17 @@ impl Workspace {
             if !bytes.is_empty() {
                 emitted.push((pane.id, bytes));
             }
-            ui.painter().rect_stroke(
-                pane.rect,
-                0.,
-                Stroke::new(
-                    if selected { 1.5 } else { 1. },
-                    if selected { accent(ui) } else { line(ui) },
-                ),
-                StrokeKind::Inside,
-            );
+            if panes.len() > 1 {
+                ui.painter().rect_stroke(
+                    pane.rect,
+                    0.,
+                    Stroke::new(
+                        if selected { 1.5 } else { 1. },
+                        if selected { accent(ui) } else { line(ui) },
+                    ),
+                    StrokeKind::Inside,
+                );
+            }
         }
         let mut save = false;
         for divider in tree.dividers(bounds) {

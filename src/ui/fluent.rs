@@ -334,14 +334,14 @@ pub(super) fn setup(ctx: &Context, reduced_motion: bool, high_contrast: bool) {
         style.spacing.menu_margin = Margin::same(4);
         style.spacing.scroll = egui::style::ScrollStyle {
             bar_width: 8.,
-            floating_width: 2.,
-            floating_allocated_width: 8.,
+            floating: false,
+            bar_inner_margin: 6.,
             foreground_color: true,
             dormant_background_opacity: 0.,
             active_background_opacity: 0.,
             interact_background_opacity: 0.24,
             interact_handle_opacity: 1.,
-            ..egui::style::ScrollStyle::thin()
+            ..egui::style::ScrollStyle::solid()
         };
         style.animation_time = if reduced_motion { 0. } else { 0.12 };
         style.scroll_animation = if reduced_motion {
@@ -549,6 +549,20 @@ pub(super) fn dialog_size(ctx: &Context, preferred_width: f32, chrome_height: f3
         body_height: (viewport.y - frame_clearance - chrome_height).max(1.),
         window_height: (viewport.y - frame_clearance).max(1.),
     }
+}
+
+pub(super) fn page_scroll<T>(
+    ui: &mut Ui,
+    id: &str,
+    content: impl FnOnce(&mut Ui) -> T,
+) -> egui::scroll_area::ScrollAreaOutput<T> {
+    ScrollArea::vertical()
+        .id_salt(id)
+        .auto_shrink([false, false])
+        .show(ui, |ui| {
+            ui.set_width(ui.available_width().min(1040.));
+            content(ui)
+        })
 }
 
 /// Place only the form content in this scroll area, with the action row after it.
@@ -1344,11 +1358,8 @@ mod tests {
             let style = ctx.style_of(theme);
             assert_eq!(style.animation_time, 0.);
             assert_eq!(style.scroll_animation, egui::style::ScrollAnimation::none());
-            assert!(style.spacing.scroll.floating);
-            assert!(style.spacing.scroll.floating_width < style.spacing.scroll.bar_width);
-            assert!(
-                style.spacing.scroll.floating_allocated_width >= style.spacing.scroll.bar_width
-            );
+            assert!(!style.spacing.scroll.floating);
+            assert!(style.spacing.scroll.bar_inner_margin >= 4.);
         }
     }
 }

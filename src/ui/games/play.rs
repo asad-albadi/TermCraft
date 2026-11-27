@@ -4,6 +4,96 @@ use harbor_workspace::games::{
     GameId, GameInput, GameOutcome, GameRegistry, GameScene, GameSession, puzzles as p,
     terminal as t,
 };
+fn game_actions(ui: &mut Ui, play: &mut PlayState, close: &mut bool) {
+    if ui.button("Close (Esc)").clicked() {
+        *close = true;
+    }
+    if play.session.is_some()
+        && ui
+            .add_enabled(!play.files.busy(), egui::Button::new("Save…"))
+            .clicked()
+    {
+        play.files.start(play.session.clone(), ui.ctx().clone());
+    }
+    if ui
+        .add_enabled(!play.files.busy(), egui::Button::new("Load…"))
+        .clicked()
+    {
+        play.request_file_action(FileAction::Load, ui.ctx());
+    }
+    if play.files.busy() {
+        ui.spinner();
+        ui.label("Game file in progress…");
+    }
+    if play.files.dirty() {
+        ui.label("Unsaved changes");
+    }
+    if play.session.is_some()
+        && ui
+            .button(if play.launcher {
+                "Resume game"
+            } else {
+                "Library"
+            })
+            .clicked()
+    {
+        play.launcher = !play.launcher;
+    }
+}
+
+fn game_catalog(ui: &mut Ui, play: &mut PlayState) {
+    use GameId::*;
+    let width = ui.available_width();
+    let gap = ui.spacing().item_spacing.x;
+    let columns = (((width + gap) / (220. + gap)).floor() as usize).clamp(1, 4);
+    let tile_width = (width - gap * (columns - 1) as f32) / columns as f32;
+    for row in GameRegistry::catalog().chunks(columns) {
+        ui.horizontal(|ui| {
+            for spec in row {
+                let description = match spec.id {
+                    Soliterm => "Freecell and Klondike",
+                    Termwalk => "Connect servers to a router",
+                    Ctris => "Stack and clear falling blocks",
+                    Sudoku => "Complete the number grid",
+                    Nimesweeper => "Flag mines and clear safe cells",
+                    Ninvaders => "Defend against incoming waves",
+                    Greed => "Trace a path through digits",
+                    Netwalk => "Rotate tiles to connect the net",
+                    Mines => "Locate the hidden mines",
+                    Solo => "Solve a number-placement puzzle",
+                    Guess => "Deduce the hidden colour code",
+                    Map => "Colour neighbouring regions",
+                    Untangle => "Separate crossing lines",
+                };
+                let (rect, response) =
+                    ui.allocate_exact_size(vec2(tile_width, 78.), Sense::click());
+                let foreground =
+                    fluent::paint_control(ui, &response, rect, false, ControlKind::Standard);
+                ui.painter().text(
+                    rect.left_top() + vec2(14., 15.),
+                    Align2::LEFT_TOP,
+                    spec.label,
+                    FontId::proportional(18.),
+                    foreground,
+                );
+                ui.painter().text(
+                    rect.left_top() + vec2(14., 44.),
+                    Align2::LEFT_TOP,
+                    description,
+                    FontId::proportional(13.),
+                    muted(ui),
+                );
+                response.widget_info(|| {
+                    WidgetInfo::labeled(WidgetType::Button, response.enabled(), spec.label)
+                });
+                if response.clicked() {
+                    play.request_file_action(FileAction::Start(spec.id, 1), ui.ctx());
+                }
+            }
+        });
+    }
+}
+
 pub(in crate::ui) struct PlayState {
     files: Files,
     exit_ready: bool,
@@ -1033,22 +1123,35 @@ impl Workspace {
                 .ctx()
                 .memory(|m| m.focused().is_some_and(|id| Some(id) != play.board_focus));
         let mut close = false;
-        ScrollArea::vertical().id_salt("games_surface").show(ui,|ui|{Frame::new().fill(content(ui)).inner_margin(16.).show(ui,|ui|{
+        ui.painter()
+            .rect_filled(ui.available_rect_before_wrap(), 0., content(ui));
+        ScrollArea::vertical().auto_shrink([false,false]).id_salt("games_surface").show(ui,|ui|{Frame::new().fill(content(ui)).inner_margin(16.).show(ui,|ui|{
             if play.files.confirming(){ui.disable();}
-            ui.horizontal_wrapped(|ui|{
-                ui.image((self.logo.id(),vec2(28.,28.)));
-                ui.heading(fluent::emphasized(ui.ctx(), RichText::new(play.session.as_ref().filter(|_|!play.launcher).map_or("Games",|s|s.spec().label))));
-                if ui.button("Close (Esc)").clicked(){close=true;}
-                if ui.add_enabled(play.session.is_some()&&!play.files.busy(),egui::Button::new("Save…")).clicked(){play.files.start(play.session.clone(),ui.ctx().clone());}
-                if ui.add_enabled(!play.files.busy(),egui::Button::new("Load…")).clicked(){play.request_file_action(FileAction::Load,ui.ctx());}
-                if play.files.busy(){ui.spinner();ui.label("Game file in progress…");}
-                if play.files.dirty(){ui.label("Unsaved changes");}
-                if play.session.is_some()&&ui.button(if play.launcher{"Resume game"}else{"Library"}).clicked(){play.launcher=!play.launcher;}
-            });
             if play.launcher {
-                ui.label("Choose a game. Terminal sessions continue in the background.");
-                for spec in GameRegistry::catalog(){if ui.button(spec.label).clicked(){play.request_file_action(FileAction::Start(spec.id,1),ui.ctx());}}
-            }else if let Some(s)=&play.session {
+                let width=ui.available_width().min(1160.);
+                ui.add_space((ui.ctx().content_rect().height()*0.07).clamp(4.,72.));
+                ui.vertical_centered(|ui|{
+                    ui.allocate_ui_with_layout(vec2(width,0.),Layout::top_down(Align::Min),|ui|{
+                        ui.set_width(width);
+                        ui.horizontal_wrapped(|ui|{
+                            ui.image((self.logo.id(),vec2(34.,34.)));
+                            ui.heading(fluent::emphasized(ui.ctx(),RichText::new("Games").size(28.)));
+                            if width>680. {
+                                ui.with_layout(Layout::right_to_left(Align::Center),|ui| game_actions(ui,play,&mut close));
+                            }else{game_actions(ui,play,&mut close);}
+                        });
+                        ui.add_space(12.);
+                        game_catalog(ui, play);
+                    });
+                });
+            }else{
+                ui.horizontal_wrapped(|ui|{
+                    ui.image((self.logo.id(),vec2(28.,28.)));
+                    if let Some(s)=&play.session {ui.heading(fluent::emphasized(ui.ctx(),RichText::new(s.spec().label)));}
+                    game_actions(ui,play,&mut close);
+                });
+            }
+            if !play.launcher && let Some(s)=&play.session {
                 let(id,seed,outcome)=(s.id(),s.seed(),s.outcome());
                 ui.horizontal_wrapped(|ui|{
                     if ui.button("New game").clicked(){play.request_file_action(FileAction::New,ui.ctx());}

@@ -112,7 +112,434 @@ fn runtime_providers(ui: &mut Ui) {
     }
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(super) enum SettingsCategory {
+    Appearance,
+    Terminal,
+    Safety,
+    Storage,
+    About,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub(super) enum SessionSection {
+    Connection,
+    Advanced,
+    Security,
+    Display,
+    Redirection,
+    Terminal,
+    Network,
+    Bookmark,
+}
+
+impl SessionSection {
+    const ALL: [Self; 8] = [
+        Self::Connection,
+        Self::Advanced,
+        Self::Security,
+        Self::Display,
+        Self::Redirection,
+        Self::Network,
+        Self::Terminal,
+        Self::Bookmark,
+    ];
+    fn label(self) -> &'static str {
+        match self {
+            Self::Connection => "Connection",
+            Self::Advanced => "Advanced",
+            Self::Security => "Security",
+            Self::Display => "Display & input",
+            Self::Redirection => "Redirection",
+            Self::Network => "Network",
+            Self::Terminal => "Terminal",
+            Self::Bookmark => "Bookmark",
+        }
+    }
+    fn available(self, protocol: &str) -> bool {
+        match self {
+            Self::Connection | Self::Bookmark => true,
+            Self::Advanced => matches!(
+                protocol,
+                "SSH" | "Serial" | "Mosh" | "FTP" | "VNC" | "Browser" | "XDMCP" | "Local"
+            ),
+            Self::Security | Self::Display | Self::Redirection => protocol == "RDP",
+            Self::Network => matches!(protocol, "SSH" | "SFTP" | "Mosh" | "Telnet" | "RDP" | "VNC"),
+            Self::Terminal => protocol != "Browser",
+        }
+    }
+    fn choices(&mut self, ui: &mut Ui, protocol: &str) {
+        for section in Self::ALL
+            .into_iter()
+            .filter(|section| section.available(protocol))
+        {
+            ui.selectable_value(self, section, section.label());
+        }
+    }
+}
+
+fn protocol_choices(ui: &mut Ui, current: &str) -> Option<&'static str> {
+    let mut chosen = None;
+    ui.horizontal_wrapped(|ui| {
+        for protocol in PROTOCOLS {
+            let kind = match *protocol {
+                "SSH" | "SFTP" => "lock",
+                "RDP" | "VNC" | "XDMCP" => "desktop",
+                "Serial" => "serial",
+                "FTP" => "folder",
+                "Browser" => "link",
+                _ => "terminal",
+            };
+            if tool_button(ui, kind, protocol, protocol, Some(current == *protocol)).clicked() {
+                chosen = Some(*protocol);
+            }
+        }
+    });
+    chosen
+}
+
 impl Workspace {
+    fn session_navigation(&mut self, ui: &mut Ui, s: &mut Session, size: fluent::DialogSize) {
+        use SessionSection::*;
+        let compact = ui.ctx().content_rect().height() < 550. && size.width < 840.;
+        let chosen = if compact {
+            let mut chosen = None;
+            ui.horizontal(|ui| {
+                ui.label("Protocol");
+                ui.menu_button(&s.protocol, |ui| {
+                    ui.set_width(size.width.min(360.) - 24.);
+                    chosen = protocol_choices(ui, &s.protocol);
+                    if chosen.is_some() {
+                        ui.close();
+                    }
+                });
+                ComboBox::from_id_salt("session-section")
+                    .selected_text(self.session_section.label())
+                    .show_ui(ui, |ui| {
+                        self.session_section.choices(ui, &s.protocol);
+                    });
+            });
+            chosen
+        } else {
+            protocol_choices(ui, &s.protocol)
+        };
+        if let Some(protocol) = chosen
+            && s.protocol != protocol
+        {
+            self.session_section = Connection;
+            s.protocol = protocol.into();
+            s.port = protocol_port(protocol);
+            if protocol == "Mosh" && self.editing.is_none() {
+                s.mosh_provider = harbor_workspace::model::MoshProvider::Bundled;
+            }
+            if protocol == "FTP" {
+                s.ftp_options = harbor_workspace::protocols::ftp_actor::SessionOptions::embedded();
+            }
+            if protocol == "Browser" {
+                s.browser_options.embedded = true;
+                if self.editing.is_none() {
+                    s.browser_options.runtime = harbor_workspace::browser::Runtime::BundledChromium;
+                }
+            }
+        }
+        if !compact {
+            ui.separator();
+            ui.horizontal_wrapped(|ui| self.session_section.choices(ui, &s.protocol));
+        }
+        ui.separator();
+    }
+    fn session_fields(&mut self, ui: &mut Ui, s: &mut Session, section: SessionSection) {
+        use SessionSection::*;
+        ui.set_width(ui.available_width());
+        if section == Bookmark {
+            fluent::form_text(ui, "Session name", &mut s.name, "Optional display name");
+            fluent::form_text(ui, "Folder", &mut s.folder, "My sessions");
+        }
+        if section == Connection {
+            match s.protocol.as_str() {
+                "Local" => {
+                    fluent::form_text(
+                        ui,
+                        "Shell executable",
+                        &mut s.command,
+                        "Use the system default",
+                    );
+                    session_path(
+                        ui,
+                        "Start folder",
+                        &mut s.directory,
+                        "",
+                        rfd::FileDialog::pick_folder,
+                    );
+                }
+                "Serial" => {
+                    fluent::form_text(
+                        ui,
+                        "Device / COM port",
+                        &mut s.serial_device,
+                        if cfg!(windows) {
+                            "COM3"
+                        } else {
+                            "/dev/ttyUSB0"
+                        },
+                    );
+                    fluent::form_row(ui, "Baud rate", |ui, label| {
+                        ui.add(DragValue::new(&mut s.baud).range(50..=4_000_000))
+                            .labelled_by(label)
+                    });
+                }
+                "Browser" => {
+                    fluent::form_text(ui, "Website address", &mut s.host, "https://example.com");
+                }
+                _ => {
+                    let host =
+                        fluent::form_text(ui, "Remote host", &mut s.host, "Hostname or IP address");
+                    fluent::focus_on_entry(ui, &host, Id::new("session-form"));
+                    fluent::form_text(ui, "Username", &mut s.user, "Use the client default");
+                    fluent::form_row(ui, "Port", |ui, label| {
+                        ui.add(DragValue::new(&mut s.port).range(1..=65535))
+                            .labelled_by(label)
+                    });
+                }
+            }
+
+            if s.protocol == "Rsh" {
+                fluent::form_text(
+                    ui,
+                    "Remote command",
+                    &mut s.command,
+                    "Required command for Rsh",
+                );
+            }
+            if matches!(s.protocol.as_str(), "Telnet" | "Rlogin" | "Rsh") {
+                ui.small("Embedded transport. These protocols do not encrypt direct connections. Rlogin/Rsh require a permitted reserved local source port; Telnet can use the verified SSH gateway below.");
+            }
+        }
+        if section == Advanced && s.protocol == "FTP" {
+            super::ftp_settings::session(ui, s);
+        }
+        if section == Advanced && s.protocol == "Local" {
+            super::xserver::session_settings(ui, s);
+        }
+        if section == Advanced && s.protocol == "Serial" {
+            super::serial_settings::session(ui, s);
+        }
+        if section == Advanced && s.protocol == "Mosh" {
+            use harbor_workspace::model::MoshProvider;
+            fluent::form_row(ui, "SSH port", |ui, label| {
+                ui.add(DragValue::new(&mut s.mosh_ssh_port).range(1..=65535))
+                    .labelled_by(label)
+            });
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Mosh provider");
+                ui.selectable_value(
+                    &mut s.mosh_provider,
+                    MoshProvider::Bundled,
+                    "Packaged client",
+                );
+                ui.selectable_value(
+                    &mut s.mosh_provider,
+                    MoshProvider::System,
+                    "Installed client",
+                );
+            });
+            if s.mosh_provider == MoshProvider::Bundled {
+                ui.small("Requires the Arch Linux x86-64 Mosh payload, system OpenSSH and Perl, and UDP access to the Mosh server.");
+            } else {
+                ui.small("Uses the system Mosh installation and system OpenSSH.");
+            }
+        }
+        if section == Advanced && s.protocol == "SSH" {
+            ui.horizontal_wrapped(|ui| {
+                ui.label("SSH engine");
+                ui.selectable_value(
+                    &mut s.ssh_engine,
+                    SshEngine::Embedded,
+                    "Embedded + remote files",
+                );
+                ui.selectable_value(
+                    &mut s.ssh_engine,
+                    SshEngine::OpenSsh,
+                    "OpenSSH compatibility",
+                );
+            });
+            if s.ssh_engine == SshEngine::OpenSsh {
+                ui.label("Uses installed OpenSSH configuration. Graphical remote files are unavailable in this mode.");
+            } else {
+                use harbor_workspace::remote_files::capabilities::RemoteBackendKind;
+                ui.horizontal_wrapped(|ui| {
+                    ui.label("Remote files");
+                    ui.selectable_value(
+                        &mut s.remote_backend,
+                        RemoteBackendKind::Sftp,
+                        "SFTP (default)",
+                    );
+                    ui.selectable_value(
+                        &mut s.remote_backend,
+                        RemoteBackendKind::Scp,
+                        "SCP compatibility",
+                    );
+                });
+                if s.remote_backend == RemoteBackendKind::Scp {
+                    ui.small("SCP requires Python 3 on the remote host.");
+                }
+            }
+        }
+        if section == Network && matches!(s.protocol.as_str(), "SSH" | "SFTP" | "Mosh") {
+            ui.add_space(5.);
+            CollapsingHeader::new("SSH options")
+                .default_open(true)
+                .show(ui, |ui| {
+                    session_path(
+                        ui,
+                        "Private key",
+                        &mut s.key,
+                        "Optional key file",
+                        rfd::FileDialog::pick_file,
+                    );
+                    fluent::form_text(ui, "Jump host", &mut s.jump, "user@bastion:22");
+                    if s.protocol == "SSH" {
+                        fluent::form_row(ui, "SSH agent", |ui, _| {
+                            ui.horizontal_wrapped(|ui| {
+                                ui.selectable_value(&mut s.agent_mode, AgentMode::System, "System");
+                                ui.selectable_value(
+                                    &mut s.agent_mode,
+                                    AgentMode::Disabled,
+                                    "Disabled",
+                                );
+                                if s.ssh_engine == SshEngine::Embedded {
+                                    ui.selectable_value(
+                                        &mut s.agent_mode,
+                                        AgentMode::Owned,
+                                        "TermCraft-owned",
+                                    );
+                                    if cfg!(windows) {
+                                        ui.selectable_value(
+                                            &mut s.agent_mode,
+                                            AgentMode::Pageant,
+                                            "Pageant",
+                                        );
+                                    }
+                                }
+                                if ui.button("Manage keys…").clicked() {
+                                    self.ssh_keys.open = true;
+                                }
+                            })
+                        });
+                        ui.small(
+                            "An explicit private-key file takes precedence over agent identities.",
+                        );
+                        fluent::form_text(
+                            ui,
+                            "Remote command",
+                            &mut s.command,
+                            "Optional startup command",
+                        );
+                        super::xserver::session_settings(ui, s);
+                    }
+                    fluent::form_row(ui, "Transfer", |ui, label| {
+                        ui.checkbox(&mut s.compression, "Enable compression")
+                            .labelled_by(label)
+                    });
+                });
+            ui.menu_button("Credential help",|ui|{ui.label("Embedded SSH asks for credentials in Remote files. OpenSSH asks in the terminal. Saving passwords requires opting into the credential vault.");});
+        }
+        if section == Network && matches!(s.protocol.as_str(), "SSH" | "SFTP" | "Mosh") {
+            super::ssh_options::session(ui, s, &self.store.preferences.ssh_defaults);
+        }
+        if section == Network && matches!(s.protocol.as_str(), "RDP" | "VNC" | "Telnet") {
+            CollapsingHeader::new("SSH gateway").show(ui,|ui|{
+           fluent::form_text(ui,"Gateway chain",&mut s.jump,"user@bastion:22 (optional; comma-separated hops)");
+           if !s.jump.trim().is_empty(){fluent::form_text(ui,"Gateway private key",&mut s.key,"Optional local SSH key file");ui.small("The gateway is verified and authenticated separately. Desktop certificates and credentials remain bound to the target endpoint.");}
+       });
+            if !s.jump.trim().is_empty() {
+                super::ssh_options::session(ui, s, &self.store.preferences.ssh_defaults);
+            }
+        }
+        if section == Security && s.protocol == "RDP" {
+            use harbor_workspace::model::DesktopEngine;
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Desktop engine");
+                ui.selectable_value(
+                    &mut s.desktop_engine,
+                    DesktopEngine::Embedded,
+                    if cfg!(debug_assertions) {
+                        "Development helper"
+                    } else {
+                        "Packaged helper"
+                    },
+                );
+                ui.selectable_value(
+                    &mut s.desktop_engine,
+                    DesktopEngine::External,
+                    "Installed client",
+                );
+            });
+        }
+        if section == Display && s.protocol == "RDP" {
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Desktop size");
+                ui.add(DragValue::new(&mut s.width).range(200..=8192));
+                ui.label("×");
+                ui.add(DragValue::new(&mut s.height).range(200..=8192));
+            });
+        }
+        if s.protocol == "RDP" && matches!(section, Security | Display | Redirection) {
+            super::rdp_settings::session(ui, s, section);
+        }
+        if section == Advanced && s.protocol == "VNC" {
+            super::vnc_settings::session(ui, s);
+        }
+
+        if (section == Display && s.protocol == "RDP")
+            || (section == Advanced && s.protocol == "VNC")
+        {
+            ui.horizontal_wrapped(|ui| {
+                ui.checkbox(&mut s.fullscreen, "Full screen")
+                    .fluent_hint("Enter fullscreen when the connected desktop is first displayed.");
+                ui.checkbox(&mut s.view_only, "View only");
+            });
+            ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. The view fits server dimensions; server-driven resize is supported."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. The view fits the negotiated desktop."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));
+        }
+        if section == Advanced && s.protocol == "Browser" {
+            super::web_browser::settings(ui, s);
+        }
+        if s.protocol == "XDMCP" {
+            if section == Advanced {
+                super::xdmcp::settings(ui, s, &mut self.xdmcp_discovery);
+            } else {
+                super::xdmcp::sync_editor(s, &mut self.xdmcp_discovery);
+            }
+        } else {
+            self.xdmcp_discovery.end_editor();
+        }
+        if section == Terminal && super::macro_events::supported_session(s) {
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Startup macro");
+                ComboBox::from_id_salt("startup-macro")
+                    .selected_text(s.startup_macro.as_deref().unwrap_or("None"))
+                    .show_ui(ui, |ui| {
+                        ui.selectable_value(&mut s.startup_macro, None, "None");
+                        for value in &self.store.macros {
+                            ui.selectable_value(
+                                &mut s.startup_macro,
+                                Some(value.name.clone()),
+                                &value.name,
+                            );
+                        }
+                    });
+            });
+        }
+        if section == Terminal && s.protocol != "Browser" {
+            CollapsingHeader::new("Terminal profile overrides").show(ui,|ui|{ui.small("Checked options apply when you open this saved session. Unchecked options inherit the global profile.");super::terminal_settings::overrides(ui,&mut s.terminal,&self.store.preferences.terminal_settings());});
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Keyword highlighting");
+                ui.selectable_value(&mut s.highlight_enabled, None, "Global setting");
+                ui.selectable_value(&mut s.highlight_enabled, Some(true), "On");
+                ui.selectable_value(&mut s.highlight_enabled, Some(false), "Off");
+            });
+        }
+    }
     pub(super) fn session_dialog(&mut self, ctx: &Context) {
         let Some(mut s) = self.session_form.take() else {
             self.xdmcp_discovery.end_editor();
@@ -126,7 +553,7 @@ impl Workspace {
         } else {
             0.
         };
-        let size = super::fluent::dialog_size(ctx, 650., 182. + footer_extra);
+        let size = super::fluent::dialog_size(ctx, 940., 182. + footer_extra);
         let response = super::fluent::modal(
             ctx,
             Id::new("session-form"),
@@ -137,114 +564,17 @@ impl Workspace {
             },
             size,
             |ui| {
-                ScrollArea::vertical().id_salt("session-settings-body").max_width(size.width).max_height(size.body_height).auto_shrink([false,true]).show(ui, |ui| {
-   ui.set_width((size.width-20.).max(1.));
-   ui.label(fluent::emphasized(ui.ctx(), RichText::new("Choose a connection").size(14.)));ui.add_space(7.);
-   ui.horizontal_wrapped(|ui|{for p in PROTOCOLS{if ui.selectable_label(s.protocol==*p,*p).clicked(){s.protocol=(*p).into();s.port=protocol_port(p);if *p=="Mosh"&&self.editing.is_none(){s.mosh_provider=harbor_workspace::model::MoshProvider::Bundled;}if *p=="FTP"{s.ftp_options=harbor_workspace::protocols::ftp_actor::SessionOptions::embedded();}if *p=="Browser"{s.browser_options.embedded=true;if self.editing.is_none(){s.browser_options.runtime=harbor_workspace::browser::Runtime::BundledChromium;}}}}});ui.add_space(7.);ui.separator();
-   ui.label(fluent::emphasized(ui.ctx(), RichText::new("Session details")));
-   let name = fluent::form_text(ui,"Session name",&mut s.name,"Optional display name");
-   fluent::focus_on_entry(ui, &name, Id::new("session-form"));
-   fluent::form_text(ui,"Folder",&mut s.folder,"My sessions");
-   ui.label(fluent::emphasized(ui.ctx(), RichText::new("Connection settings")));
-   match s.protocol.as_str() {
-       "Local" => {
-           fluent::form_text(ui,"Shell executable",&mut s.command,"Use the system default");
-           super::xserver::session_settings(ui,&mut s);
-           session_path(ui, "Start folder", &mut s.directory, "", rfd::FileDialog::pick_folder);
-       }
-       "Serial" => {
-           fluent::form_text(ui,"Device / COM port",&mut s.serial_device,if cfg!(windows){"COM3"}else{"/dev/ttyUSB0"});
-           fluent::form_row(ui,"Baud rate",|ui,label| ui.add(DragValue::new(&mut s.baud).range(50..=4_000_000)).labelled_by(label));
-           super::serial_settings::session(ui,&mut s);
-       }
-       "Browser" => { fluent::form_text(ui,"Website address",&mut s.host,"https://example.com"); }
-       _ => {
-           fluent::form_text(ui,"Remote host",&mut s.host,"Hostname or IP address");
-           fluent::form_text(ui,"Username",&mut s.user,"Use the client default");
-           fluent::form_row(ui,"Port",|ui,label| ui.add(DragValue::new(&mut s.port).range(1..=65535)).labelled_by(label));
-       }
-   }
-   if s.protocol=="FTP"{super::ftp_settings::session(ui,&mut s);}
-   if s.protocol=="Rsh"{fluent::form_text(ui,"Remote command",&mut s.command,"Required command for Rsh");}
-   if matches!(s.protocol.as_str(),"Telnet"|"Rlogin"|"Rsh"){ui.small("Embedded transport. These protocols do not encrypt direct connections. Rlogin/Rsh require a permitted reserved local source port; Telnet can use the verified SSH gateway below.");}
-   if s.protocol=="Mosh"{
-       use harbor_workspace::model::MoshProvider;
-       fluent::form_row(ui,"SSH port",|ui,label|ui.add(DragValue::new(&mut s.mosh_ssh_port).range(1..=65535)).labelled_by(label));
-       ui.horizontal_wrapped(|ui|{
-           ui.label("Mosh provider");
-           ui.selectable_value(&mut s.mosh_provider,MoshProvider::Bundled,"Packaged client");
-           ui.selectable_value(&mut s.mosh_provider,MoshProvider::System,"Installed client");
-       });
-       if s.mosh_provider==MoshProvider::Bundled {
-           ui.small("Requires the Arch Linux x86-64 Mosh payload, system OpenSSH and Perl, and UDP access to the Mosh server.");
-       } else {
-           ui.small("Uses the system Mosh installation and system OpenSSH.");
-       }
-   }
-   if s.protocol=="SSH" {
-    ui.horizontal_wrapped(|ui|{ui.label("SSH engine");ui.selectable_value(&mut s.ssh_engine,SshEngine::Embedded,"Embedded + remote files");ui.selectable_value(&mut s.ssh_engine,SshEngine::OpenSsh,"OpenSSH compatibility");});
-    if s.ssh_engine==SshEngine::OpenSsh {ui.label("Uses installed OpenSSH configuration. Graphical remote files are unavailable in this mode.");}
-    else { use harbor_workspace::remote_files::capabilities::RemoteBackendKind;
-     ui.horizontal_wrapped(|ui|{ui.label("Remote files");ui.selectable_value(&mut s.remote_backend,RemoteBackendKind::Sftp,"SFTP (default)");ui.selectable_value(&mut s.remote_backend,RemoteBackendKind::Scp,"SCP compatibility");});
-     if s.remote_backend==RemoteBackendKind::Scp {ui.label("Explicit SCP requires Python 3 on the POSIX remote host. Browsing, files, folders, entry management and editing depend on the live capability checks. No installed scp executable is needed.");}
-    }
-   }
-   if matches!(s.protocol.as_str(),"SSH"|"SFTP"|"Mosh"){
-       ui.add_space(5.);
-       CollapsingHeader::new("SSH options").default_open(true).show(ui,|ui|{
-           session_path(ui, "Private key", &mut s.key, "Optional key file", rfd::FileDialog::pick_file);
-           fluent::form_text(ui,"Jump host",&mut s.jump,"user@bastion:22");
-           if s.protocol=="SSH" {
-               fluent::form_row(ui,"SSH agent",|ui,_|ui.horizontal_wrapped(|ui|{
-                   ui.selectable_value(&mut s.agent_mode,AgentMode::System,"System");
-                   ui.selectable_value(&mut s.agent_mode,AgentMode::Disabled,"Disabled");
-                   if s.ssh_engine==SshEngine::Embedded {
-                       ui.selectable_value(&mut s.agent_mode,AgentMode::Owned,"TermCraft-owned");
-                       if cfg!(windows){ui.selectable_value(&mut s.agent_mode,AgentMode::Pageant,"Pageant");}
-                   }
-                   if ui.button("Manage keys…").clicked(){self.ssh_keys.open=true;}
-               }));
-               ui.small("An explicit private-key file takes precedence over agent identities.");
-               fluent::form_text(ui,"Remote command",&mut s.command,"Optional startup command");
-               super::xserver::session_settings(ui,&mut s);
-           }
-           fluent::form_row(ui,"Transfer",|ui,label| ui.checkbox(&mut s.compression,"Enable compression").labelled_by(label));
-       });
-       ui.label(RichText::new("Embedded SSH asks for credentials in Remote files. OpenSSH compatibility asks in the terminal. Passwords are saved only through the opt-in credential vault.").size(12.).color(muted(ui)));
-   }
-   if matches!(s.protocol.as_str(),"SSH"|"SFTP"|"Mosh"){super::ssh_options::session(ui,&mut s,&self.store.preferences.ssh_defaults);}
-   if matches!(s.protocol.as_str(),"RDP"|"VNC"|"Telnet") {
-       CollapsingHeader::new("SSH gateway").show(ui,|ui|{
-           fluent::form_text(ui,"Gateway chain",&mut s.jump,"user@bastion:22 (optional; comma-separated hops)");
-           if !s.jump.trim().is_empty(){fluent::form_text(ui,"Gateway private key",&mut s.key,"Optional local SSH key file");ui.small("The gateway is verified and authenticated separately. Desktop certificates and credentials remain bound to the target endpoint.");}
-       });
-       if !s.jump.trim().is_empty(){super::ssh_options::session(ui,&mut s,&self.store.preferences.ssh_defaults);}
-   }
-   if s.protocol=="RDP" {use harbor_workspace::model::DesktopEngine;ui.horizontal_wrapped(|ui|{ui.label("Desktop engine");ui.selectable_value(&mut s.desktop_engine,DesktopEngine::Embedded,if cfg!(debug_assertions){"Development helper"}else{"Packaged helper"});ui.selectable_value(&mut s.desktop_engine,DesktopEngine::External,"Installed client");});ui.horizontal_wrapped(|ui|{ui.label("Desktop size");ui.add(DragValue::new(&mut s.width).range(200..=8192));ui.label("×");ui.add(DragValue::new(&mut s.height).range(200..=8192));});}
-   if s.protocol=="RDP" {super::rdp_settings::session(ui,&mut s);}
-   if s.protocol=="VNC" {super::vnc_settings::session(ui,&mut s);}
-
-   if matches!(s.protocol.as_str(),"RDP"|"VNC"){ui.horizontal_wrapped(|ui|{ui.checkbox(&mut s.fullscreen,"Full screen").fluent_hint("Enter fullscreen when the connected desktop is first displayed.");ui.checkbox(&mut s.view_only,"View only");});ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. The view fits server dimensions; server-driven resize is supported."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. The view fits the negotiated desktop."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));}
-   if s.protocol=="Browser"{super::web_browser::settings(ui,&mut s);}
-   if s.protocol=="XDMCP"{super::xdmcp::settings(ui,&mut s,&mut self.xdmcp_discovery);}else{self.xdmcp_discovery.end_editor();}
-   if super::macro_events::supported_session(&s) {
-       ui.horizontal_wrapped(|ui| {
-           ui.label("Startup macro");
-           ComboBox::from_id_salt("startup-macro")
-               .selected_text(s.startup_macro.as_deref().unwrap_or("None"))
-               .show_ui(ui, |ui| {
-                   ui.selectable_value(&mut s.startup_macro, None, "None");
-                   for value in &self.store.macros {
-                       ui.selectable_value(&mut s.startup_macro, Some(value.name.clone()), &value.name);
-                   }
-               });
-       });
-   }
-   if s.protocol!="Browser"{
-   CollapsingHeader::new("Terminal profile overrides").show(ui,|ui|{ui.small("Checked options apply when you open this saved session. Unchecked options inherit the global profile.");super::terminal_settings::overrides(ui,&mut s.terminal,&self.store.preferences.terminal_settings());});
-   ui.horizontal_wrapped(|ui|{ui.label("Keyword highlighting");ui.selectable_value(&mut s.highlight_enabled,None,"Global setting");ui.selectable_value(&mut s.highlight_enabled,Some(true),"On");ui.selectable_value(&mut s.highlight_enabled,Some(false),"Off");});
-   }
-   });
+                let navigation_start = ui.cursor().top();
+                self.session_navigation(ui, &mut s, size);
+                let section = self.session_section;
+                let nav_height = ui.cursor().top() - navigation_start;
+                ScrollArea::vertical()
+                    .id_salt(("session-settings-body", section))
+                    .max_height((size.body_height - nav_height).max(1.))
+                    .auto_shrink([false, true])
+                    .show(ui, |ui| {
+                        self.session_fields(ui, &mut s, section);
+                    });
                 ui.add_space(8.);
                 ui.checkbox(&mut self.save_session, "Save this session");
                 if !self.form_error.is_empty() {
@@ -370,14 +700,6 @@ impl Workspace {
             return;
         }
         self.active = self.active.min(self.tabs.len() - 1);
-        if self.tabs[self.active].session.protocol == "SSH" {
-            let tab = &mut self.tabs[self.active];
-            if let Some(browser) = &mut tab.browser {
-                ui.checkbox(&mut browser.visible, "Remote files");
-            } else {
-                ui.label(RichText::new("OpenSSH compatibility mode · graphical remote files are unavailable. Use the saved session’s companion SFTP action for transfers.").color(muted(ui)).size(12.));
-            }
-        }
         if let Some(read) = &self.clipboard_read {
             let title = self
                 .tabs
@@ -403,30 +725,30 @@ impl Workspace {
         let mut copy = false;
         let mut clear = false;
         ui.horizontal(|ui| {
-            let t = &mut self.tabs[self.active];
-            ui.label(fluent::emphasized(
-                ui.ctx(),
-                RichText::new(t.session.title()).size(17.),
-            ));
-            ui.label(
-                RichText::new(format!(
-                    "{} · {} · {}s",
-                    t.session.protocol,
-                    if t.terminal_starting() {
-                        "Starting"
-                    } else if t.running() {
-                        "Running"
-                    } else {
-                        "Disconnected"
-                    },
-                    t.started.elapsed().as_secs()
-                ))
-                .color(muted(ui))
-                .size(12.),
-            );
+            let index=self.active;
+            let t=&self.tabs[index];
+            dot(ui,if t.running(){ accent(ui) } else { muted(ui) });
+            ui.label(if t.terminal_starting(){ "Starting" } else if t.running(){ "Connected" } else { "Disconnected" });
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                 ui.menu_button("More", |ui| {
+                    self.layout_picker(ui);
+                    layout_toggle=ui.button("Toggle split").clicked();
+                    let t=&mut self.tabs[index];
+                    if t.session.protocol=="SSH" {
+                        if let Some(browser)=&mut t.browser {ui.checkbox(&mut browser.visible,"Remote files");}
+                        else {ui.small("OpenSSH compatibility uses the saved session’s companion SFTP action for transfers.");}
+                    }
                     if t.session.protocol != "Browser" {
+                        ui.menu_button("Terminal profile",|ui|{
+                            super::terminal_settings::overrides(ui,&mut t.session.terminal,&self.store.preferences.terminal_settings());
+                        });
+                        ui.menu_button("Keyword highlighting",|ui|{
+                            ui.selectable_value(&mut t.session.highlight_enabled,None,"Global");
+                            ui.selectable_value(&mut t.session.highlight_enabled,Some(true),"On");
+                            ui.selectable_value(&mut t.session.highlight_enabled,Some(false),"Off");
+                        });
+                        ui.small(format!("Open for {} seconds",t.started.elapsed().as_secs()));
+                        history_status(ui,t);
                         copy = ui.button("Copy terminal output").clicked();
                         save_output = ui.button("Save output to file").clicked();
                         clear = ui.button("Clear screen").clicked();
@@ -440,6 +762,7 @@ impl Workspace {
                     }
                     duplicate = ui.button("Duplicate session").clicked();
                 });
+                let t=&mut self.tabs[index];
                 if t.terminal_starting() {
                     cancel_startup = ui.button("Cancel startup").clicked();
                 } else {
@@ -448,7 +771,7 @@ impl Workspace {
                 if t.session.protocol != "Browser" && ui.button("Find").clicked() {
                     t.search_open = !t.search_open;
                 }
-                layout_toggle = ui.button("Toggle split").clicked();
+
             });
         });
         if layout_toggle {
@@ -593,29 +916,7 @@ impl Workspace {
                 }
             }
         }
-        if self.tabs[self.active].session.protocol != "Browser" {
-            CollapsingHeader::new("Terminal profile for this tab").show(ui, |ui| {
-                ui.small(
-                    "Changes here affect this open tab. Edit the saved session to keep its overrides.",
-                );
-                super::terminal_settings::overrides(
-                    ui,
-                    &mut self.tabs[self.active].session.terminal,
-                    &self.store.preferences.terminal_settings(),
-                );
-            });
-            ui.horizontal(|ui| {
-                ui.label("Keyword highlighting");
-                let session = &mut self.tabs[self.active].session;
-                ui.selectable_value(&mut session.highlight_enabled, None, "Global");
-                ui.selectable_value(&mut session.highlight_enabled, Some(true), "On");
-                ui.selectable_value(&mut session.highlight_enabled, Some(false), "Off");
-            });
-        }
-        ui.horizontal(|ui| {
-            self.layout_picker(ui);
-        });
-        if self.tabs[self.active].session.protocol != "Browser" {
+        if self.broadcast && self.tabs[self.active].session.protocol != "Browser" {
             self.broadcast_targets_ui(ui);
         }
         let preferences = self.store.preferences.clone();
@@ -992,105 +1293,112 @@ impl Workspace {
         }
     }
     pub(super) fn tunnels_page(&mut self, ui: &mut Ui) {
-        ScrollArea::vertical().id_salt("tunnels_page").show(ui, |ui| {
-        page_heading(
-            ui,
-            "SSH tunnels",
-            "Forward a local port, expose a remote port, or create a SOCKS proxy.",
-        );
-        ui.horizontal_wrapped(|ui| {
-            if primary(ui, "+  New tunnel").clicked() {
-                if self.store.tunnels.len() >= 5 {
-                    self.message(
-                        "Five saved tunnels reached. Edit or remove an existing tunnel first.",
-                    );
-                } else {
-                    self.tunnel_form = Tunnel::default();
-                    self.tunnel_editing = None;
-                    self.tunnel_open = true;
-                }
-            }
-            ui.label(
-                RichText::new(format!("{} / 5 saved", self.store.tunnels.len()))
-                    .color(muted(ui))
-                    .size(12.),
-            );
-        });
-        ui.add_space(14.);
-        if self.store.tunnels.is_empty() {
-            empty_state(
+        fluent::page_scroll(ui, "tunnels_page", |ui| {
+            page_heading(
                 ui,
-                "link",
-                "No tunnels yet",
-                "Create a tunnel to reach a database, service, or private network over SSH.",
+                "SSH tunnels",
+                "Forward a local port, expose a remote port, or create a SOCKS proxy.",
             );
-        }
-        let mut run = None;
-        let mut edit = None;
-        let mut remove = None;
-        for (i, t) in self.store.tunnels.iter().enumerate() {
-            surface(ui).show(ui, |ui| {
-                ui.horizontal_wrapped(|ui| {
-                    icon(ui, "link", 25., accent(ui));
-                    ui.vertical(|ui| {
-                        ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new(&t.name).size(16.)));
-                        ui.label(
-                            RichText::new(format!(
-                                "{}  {}:{}  →  {}:{}  via {}",
-                                t.mode, t.bind, t.local_port, t.destination, t.remote_port, t.host
-                            ))
-                            .color(muted(ui))
-                            .size(12.),
+            ui.horizontal_wrapped(|ui| {
+                if primary(ui, "+  New tunnel").clicked() {
+                    if self.store.tunnels.len() >= 5 {
+                        self.message(
+                            "Five saved tunnels reached. Edit or remove an existing tunnel first.",
                         );
-                    });
-                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        if ui.button("Remove").clicked() {
-                            remove = Some(i);
-                        }
-                        if ui.button("Edit").clicked() {
-                            edit = Some(i);
-                        }
-                        if primary(ui, "Start").clicked() {
-                            run = Some(t.clone());
-                        }
+                    } else {
+                        self.tunnel_form = Tunnel::default();
+                        self.tunnel_editing = None;
+                        self.tunnel_open = true;
+                    }
+                }
+                ui.label(
+                    RichText::new(format!("{} / 5 saved", self.store.tunnels.len()))
+                        .color(muted(ui))
+                        .size(12.),
+                );
+            });
+            ui.add_space(14.);
+            if self.store.tunnels.is_empty() {
+                empty_state(
+                    ui,
+                    "link",
+                    "No tunnels yet",
+                    "Create a tunnel to reach a database, service, or private network over SSH.",
+                );
+            }
+            let mut run = None;
+            let mut edit = None;
+            let mut remove = None;
+            for (i, t) in self.store.tunnels.iter().enumerate() {
+                surface(ui).show(ui, |ui| {
+                    ui.horizontal_wrapped(|ui| {
+                        icon(ui, "link", 25., accent(ui));
+                        ui.vertical(|ui| {
+                            ui.label(crate::ui::fluent::emphasized(
+                                ui.ctx(),
+                                RichText::new(&t.name).size(16.),
+                            ));
+                            ui.label(
+                                RichText::new(format!(
+                                    "{}  {}:{}  →  {}:{}  via {}",
+                                    t.mode,
+                                    t.bind,
+                                    t.local_port,
+                                    t.destination,
+                                    t.remote_port,
+                                    t.host
+                                ))
+                                .color(muted(ui))
+                                .size(12.),
+                            );
+                        });
+                        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                            if ui.button("Remove").clicked() {
+                                remove = Some(i);
+                            }
+                            if ui.button("Edit").clicked() {
+                                edit = Some(i);
+                            }
+                            if primary(ui, "Start").clicked() {
+                                run = Some(t.clone());
+                            }
+                        });
                     });
                 });
-            });
-            ui.add_space(5.);
-        }
-        if let Some(i) = edit {
-            self.tunnel_form = self.store.tunnels[i].clone();
-            self.tunnel_editing = Some(i);
-            self.tunnel_open = true;
-        }
-        if let Some(i) = remove {
-            self.store.tunnels.remove(i);
-            self.persist();
-        }
-        if let Some(t) = run {
-            match t.args() {
-                Ok(args) => {
-                    let s = Session {
-                        name: format!("Tunnel: {}", t.name),
-                        host: t.host.clone(),
-                        protocol: "SSH".into(),
-                        ..Default::default()
-                    };
-                    self.start_with_launch(
-                        s,
-                        Some(connection::Launch {
-                            rdp_profile: None,
-                            program: "ssh".into(),
-                            args,
-                            directory: None,
-                        }),
-                    );
-                    self.tabs[self.active].screen.feed(b"SSH tunnel\r\nAuthenticate below if requested. Keep this tab open to keep forwarding active.\r\n");
-                }
-                Err(e) => self.message(e),
+                ui.add_space(5.);
             }
-        }
-
+            if let Some(i) = edit {
+                self.tunnel_form = self.store.tunnels[i].clone();
+                self.tunnel_editing = Some(i);
+                self.tunnel_open = true;
+            }
+            if let Some(i) = remove {
+                self.store.tunnels.remove(i);
+                self.persist();
+            }
+            if let Some(t) = run {
+                match t.args() {
+                    Ok(args) => {
+                        let s = Session {
+                            name: format!("Tunnel: {}", t.name),
+                            host: t.host.clone(),
+                            protocol: "SSH".into(),
+                            ..Default::default()
+                        };
+                        self.start_with_launch(
+                            s,
+                            Some(connection::Launch {
+                                rdp_profile: None,
+                                program: "ssh".into(),
+                                args,
+                                directory: None,
+                            }),
+                        );
+                        self.tabs[self.active].screen.feed(b"SSH tunnel\r\nAuthenticate below if requested. Keep this tab open to keep forwarding active.\r\n");
+                    }
+                    Err(e) => self.message(e),
+                }
+            }
         });
     }
     pub(super) fn tunnel_dialog(&mut self, ctx: &Context) {
@@ -1123,159 +1431,152 @@ impl Workspace {
         }
     }
     pub(super) fn macros_page(&mut self, ui: &mut Ui) {
-        ScrollArea::vertical()
-            .id_salt("macros_page")
-            .show(ui, |ui| {
-                page_heading(
-                    ui,
-                    "Macros",
-                    "Record and replay input in your terminal or embedded desktop.",
-                );
-                ui.horizontal_wrapped(|ui| {
-                    if primary(ui, "New text macro").clicked() {
-                        self.macro_form = Macro {
-                            append_enter: true,
-                            ..Macro::default()
-                        };
-                        self.macro_editing = None;
-                        self.macro_open = true;
-                    }
-                    if ui.button("New event macro").clicked() {
-                        self.macro_form = Macro {
-                            script: Some(harbor_workspace::macros::Script {
-                                version: 1,
-                                events: Vec::new(),
-                            }),
-                            ..Macro::default()
-                        };
-                        self.macro_editing = None;
-                        self.macro_open = true;
-                    }
-                    self.macro_controls(ui);
-                    if ui.button("Import").clicked() {
-                        if let Some(path) = rfd::FileDialog::new()
-                            .add_filter("Macro JSON", &["json"])
-                            .pick_file()
-                        {
-                            match super::macro_events::read_import(&path).and_then(|imported| {
-                                let mut values = self.store.macros.clone();
-                                values.extend(imported);
-                                super::macro_events::validate_library(&values)?;
-                                Ok(values)
-                            }) {
-                                Ok(values) => {
-                                    self.store.macros = values;
-                                    self.persist();
-                                }
-                                Err(error) => self.message(error),
-                            }
-                        }
-                    }
-                    if ui.button("Export").clicked() {
-                        if let Some(path) = rfd::FileDialog::new()
-                            .set_file_name("macros.json")
-                            .save_file()
-                        {
-                            let result = serde_json::to_vec_pretty(&self.store.macros)
-                                .map_err(|error| error.to_string())
-                                .and_then(|bytes| {
-                                    fs::write(path, bytes).map_err(|error| error.to_string())
-                                });
-                            match result {
-                                Ok(()) => self.message("Macros exported."),
-                                Err(error) => self.message(error),
-                            }
-                        }
-                    }
-                });
-                ui.add_space(12.);
-                if self.store.macros.is_empty() {
-                    empty_state(
-                        ui,
-                        "macro",
-                        "No saved macros",
-                        "Create a macro or record input from a connected session.",
-                    );
-                }
-                let mut edit = None;
-                let mut remove = None;
-                let mut run = None;
-                for (index, value) in self.store.macros.iter().enumerate() {
-                    surface(ui).show(ui, |ui| {
-                        ui.horizontal_wrapped(|ui| {
-                            icon(ui, "macro", 24., accent(ui));
-                            ui.vertical(|ui| {
-                                ui.label(
-                                    crate::ui::fluent::emphasized(
-                                        ui.ctx(),
-                                        RichText::new(&value.name),
-                                    )
-                                    .size(16.),
-                                );
-                                let description = value.script.as_ref().map_or_else(
-                                    || value.text.lines().next().unwrap_or("").to_owned(),
-                                    |script| format!("{} events", script.events.len()),
-                                );
-                                ui.add(
-                                    Label::new(
-                                        RichText::new(description).size(12.).color(muted(ui)),
-                                    )
-                                    .truncate(),
-                                );
-                            });
-                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                                if ui.button("Remove").clicked() {
-                                    remove = Some(index);
-                                }
-                                if ui.button("Edit").clicked() {
-                                    edit = Some(index);
-                                }
-                                if ui
-                                    .add_enabled(
-                                        self.tabs.get(self.active).is_some_and(|tab| {
-                                            super::macro_events::supported_session(&tab.session)
-                                        }),
-                                        Button::new("Run in active tab"),
-                                    )
-                                    .clicked()
-                                {
-                                    run = Some(value.clone());
-                                }
-                            });
-                        });
-                    });
-                    ui.add_space(5.);
-                }
-                if let Some(index) = edit {
-                    self.macro_form = self.store.macros[index].clone();
-                    self.macro_editing = Some(index);
+        fluent::page_scroll(ui, "macros_page", |ui| {
+            page_heading(
+                ui,
+                "Macros",
+                "Record and replay input in your terminal or embedded desktop.",
+            );
+            ui.horizontal_wrapped(|ui| {
+                if primary(ui, "New text macro").clicked() {
+                    self.macro_form = Macro {
+                        append_enter: true,
+                        ..Macro::default()
+                    };
+                    self.macro_editing = None;
                     self.macro_open = true;
                 }
-                if let Some(index) = remove {
-                    let name = &self.store.macros[index].name;
-                    let attached = self
-                        .store
-                        .sessions
-                        .iter()
-                        .any(|session| session.startup_macro.as_ref() == Some(name));
-                    let mut values = self.store.macros.clone();
-                    values.remove(index);
-                    if attached {
-                        self.message("Remove this macro from session startup before deleting it.");
-                    } else if let Err(error) = super::macro_events::validate_library(&values) {
-                        self.message(error);
-                    } else {
-                        self.store.macros = values;
-                        self.persist();
+                if ui.button("New event macro").clicked() {
+                    self.macro_form = Macro {
+                        script: Some(harbor_workspace::macros::Script {
+                            version: 1,
+                            events: Vec::new(),
+                        }),
+                        ..Macro::default()
+                    };
+                    self.macro_editing = None;
+                    self.macro_open = true;
+                }
+                self.macro_controls(ui);
+                if ui.button("Import").clicked() {
+                    if let Some(path) = rfd::FileDialog::new()
+                        .add_filter("Macro JSON", &["json"])
+                        .pick_file()
+                    {
+                        match super::macro_events::read_import(&path).and_then(|imported| {
+                            let mut values = self.store.macros.clone();
+                            values.extend(imported);
+                            super::macro_events::validate_library(&values)?;
+                            Ok(values)
+                        }) {
+                            Ok(values) => {
+                                self.store.macros = values;
+                                self.persist();
+                            }
+                            Err(error) => self.message(error),
+                        }
                     }
                 }
-                if let Some(value) = run {
-                    match self.queue_macro(self.tabs[self.active].id, &value) {
-                        Ok(()) => self.page = Page::Terminal,
-                        Err(error) => self.message(error),
+                if ui.button("Export").clicked() {
+                    if let Some(path) = rfd::FileDialog::new()
+                        .set_file_name("macros.json")
+                        .save_file()
+                    {
+                        let result = serde_json::to_vec_pretty(&self.store.macros)
+                            .map_err(|error| error.to_string())
+                            .and_then(|bytes| {
+                                fs::write(path, bytes).map_err(|error| error.to_string())
+                            });
+                        match result {
+                            Ok(()) => self.message("Macros exported."),
+                            Err(error) => self.message(error),
+                        }
                     }
                 }
             });
+            ui.add_space(12.);
+            if self.store.macros.is_empty() {
+                empty_state(
+                    ui,
+                    "macro",
+                    "No saved macros",
+                    "Create a macro or record input from a connected session.",
+                );
+            }
+            let mut edit = None;
+            let mut remove = None;
+            let mut run = None;
+            for (index, value) in self.store.macros.iter().enumerate() {
+                surface(ui).show(ui, |ui| {
+                    ui.horizontal_wrapped(|ui| {
+                        icon(ui, "macro", 24., accent(ui));
+                        ui.vertical(|ui| {
+                            ui.label(
+                                crate::ui::fluent::emphasized(ui.ctx(), RichText::new(&value.name))
+                                    .size(16.),
+                            );
+                            let description = value.script.as_ref().map_or_else(
+                                || value.text.lines().next().unwrap_or("").to_owned(),
+                                |script| format!("{} events", script.events.len()),
+                            );
+                            ui.add(
+                                Label::new(RichText::new(description).size(12.).color(muted(ui)))
+                                    .truncate(),
+                            );
+                        });
+                        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                            if ui.button("Remove").clicked() {
+                                remove = Some(index);
+                            }
+                            if ui.button("Edit").clicked() {
+                                edit = Some(index);
+                            }
+                            if ui
+                                .add_enabled(
+                                    self.tabs.get(self.active).is_some_and(|tab| {
+                                        super::macro_events::supported_session(&tab.session)
+                                    }),
+                                    Button::new("Run in active tab"),
+                                )
+                                .clicked()
+                            {
+                                run = Some(value.clone());
+                            }
+                        });
+                    });
+                });
+                ui.add_space(5.);
+            }
+            if let Some(index) = edit {
+                self.macro_form = self.store.macros[index].clone();
+                self.macro_editing = Some(index);
+                self.macro_open = true;
+            }
+            if let Some(index) = remove {
+                let name = &self.store.macros[index].name;
+                let attached = self
+                    .store
+                    .sessions
+                    .iter()
+                    .any(|session| session.startup_macro.as_ref() == Some(name));
+                let mut values = self.store.macros.clone();
+                values.remove(index);
+                if attached {
+                    self.message("Remove this macro from session startup before deleting it.");
+                } else if let Err(error) = super::macro_events::validate_library(&values) {
+                    self.message(error);
+                } else {
+                    self.store.macros = values;
+                    self.persist();
+                }
+            }
+            if let Some(value) = run {
+                match self.queue_macro(self.tabs[self.active].id, &value) {
+                    Ok(()) => self.page = Page::Terminal,
+                    Err(error) => self.message(error),
+                }
+            }
+        });
     }
 
     pub(super) fn macro_dialog(&mut self, ctx: &Context) {
@@ -1355,86 +1656,96 @@ impl Workspace {
         }
     }
     pub(super) fn tools_page(&mut self, ui: &mut Ui) {
-        ScrollArea::vertical().id_salt("tools_page").show(ui, |ui| {
-        page_heading(ui, "Tools", "Manage packages and plugins, compare files, and inspect network connections.");
-        self.portable_packages_section(ui);
-        self.plugins_section(ui);
-        ui.separator();
-        self.tools.render(ui);
-        ui.separator();
-        ui.label(fluent::emphasized(ui.ctx(), RichText::new("Network tools").size(18.)));
-        surface(ui).show(ui, |ui| {
-            ui.horizontal_wrapped(|ui| {
-                let host_label = ui.label("Host");
-                fluent::text_input(ui, host_label.id, &mut self.diagnostic_host, "", 280.);
-                if ui.button("DNS lookup").clicked() {
-                    let host = self.diagnostic_host.clone();
-                    if let Err(e) = validate_host(&host) {
-                        self.diagnostic_result = e;
-                    } else {
+        fluent::page_scroll(ui, "tools_page", |ui| {
+            page_heading(
+                ui,
+                "Tools",
+                "Manage packages and plugins, compare files, and inspect network connections.",
+            );
+            self.portable_packages_section(ui);
+            self.plugins_section(ui);
+            ui.separator();
+            self.tools.render(ui);
+            ui.separator();
+            ui.label(fluent::emphasized(
+                ui.ctx(),
+                RichText::new("Network tools").size(18.),
+            ));
+            surface(ui).show(ui, |ui| {
+                ui.horizontal_wrapped(|ui| {
+                    let host_label = ui.label("Host");
+                    fluent::text_input(ui, host_label.id, &mut self.diagnostic_host, "", 280.);
+                    if ui.button("DNS lookup").clicked() {
+                        let host = self.diagnostic_host.clone();
+                        if let Err(e) = validate_host(&host) {
+                            self.diagnostic_result = e;
+                        } else {
+                            let (tx, rx) = mpsc::channel();
+                            self.diagnostic_rx = Some(rx);
+                            std::thread::spawn(move || {
+                                use std::net::ToSocketAddrs;
+                                let result = (host.as_str(), 0)
+                                    .to_socket_addrs()
+                                    .map(|a| {
+                                        let mut ips =
+                                            a.map(|a| a.ip().to_string()).collect::<Vec<_>>();
+                                        ips.sort();
+                                        ips.dedup();
+                                        ips.join("\n")
+                                    })
+                                    .unwrap_or_else(|e| e.to_string());
+                                let _ = tx.send(result);
+                            });
+                        }
+                    }
+                    if ui.button("Ping").clicked() {
+                        if validate_host(&self.diagnostic_host).is_ok() {
+                            let a = vec![
+                                if cfg!(windows) { "-n" } else { "-c" }.into(),
+                                "4".into(),
+                                self.diagnostic_host.clone(),
+                            ];
+                            self.start_tool("Ping", "ping", a);
+                        } else {
+                            self.diagnostic_result = "Enter a valid host first.".into();
+                        }
+                    }
+                    if ui.button("Test SSH port").clicked() {
+                        let host = self.diagnostic_host.clone();
                         let (tx, rx) = mpsc::channel();
                         self.diagnostic_rx = Some(rx);
                         std::thread::spawn(move || {
-                            use std::net::ToSocketAddrs;
-                            let result = (host.as_str(), 0)
+                            use std::net::{TcpStream, ToSocketAddrs};
+                            let r = (host.as_str(), 22)
                                 .to_socket_addrs()
-                                .map(|a| {
-                                    let mut ips = a.map(|a| a.ip().to_string()).collect::<Vec<_>>();
-                                    ips.sort();
-                                    ips.dedup();
-                                    ips.join("\n")
+                                .and_then(|mut a| {
+                                    a.next()
+                                        .ok_or_else(|| std::io::Error::other("No address found"))
                                 })
-                                .unwrap_or_else(|e| e.to_string());
-                            let _ = tx.send(result);
+                                .and_then(|a| {
+                                    TcpStream::connect_timeout(&a, Duration::from_secs(4))
+                                })
+                                .map(|_| format!("{host}:22 is reachable"))
+                                .unwrap_or_else(|e| format!("Connection failed: {e}"));
+                            let _ = tx.send(r);
                         });
                     }
+                });
+                if self.diagnostic_rx.is_some() {
+                    ui.spinner();
+                    ui.label("Checking…");
                 }
-                if ui.button("Ping").clicked() {
-                    if validate_host(&self.diagnostic_host).is_ok() {
-                        let a = vec![
-                            if cfg!(windows) { "-n" } else { "-c" }.into(),
-                            "4".into(),
-                            self.diagnostic_host.clone(),
-                        ];
-                        self.start_tool("Ping", "ping", a);
-                    } else {
-                        self.diagnostic_result = "Enter a valid host first.".into();
-                    }
-                }
-                if ui.button("Test SSH port").clicked() {
-                    let host = self.diagnostic_host.clone();
-                    let (tx, rx) = mpsc::channel();
-                    self.diagnostic_rx = Some(rx);
-                    std::thread::spawn(move || {
-                        use std::net::{TcpStream, ToSocketAddrs};
-                        let r = (host.as_str(), 22)
-                            .to_socket_addrs()
-                            .and_then(|mut a| {
-                                a.next()
-                                    .ok_or_else(|| std::io::Error::other("No address found"))
-                            })
-                            .and_then(|a| TcpStream::connect_timeout(&a, Duration::from_secs(4)))
-                            .map(|_| format!("{host}:22 is reachable"))
-                            .unwrap_or_else(|e| format!("Connection failed: {e}"));
-                        let _ = tx.send(r);
-                    });
+                if !self.diagnostic_result.is_empty() {
+                    ui.add(
+                        Label::new(RichText::new(&self.diagnostic_result).monospace())
+                            .selectable(true),
+                    );
                 }
             });
-            if self.diagnostic_rx.is_some() {
-                ui.spinner();
-                ui.label("Checking…");
-            }
-            if !self.diagnostic_result.is_empty() {
-                ui.add(
-                    Label::new(RichText::new(&self.diagnostic_result).monospace()).selectable(true),
-                );
-            }
-        });
-        ui.add_space(16.);
-        ui.columns(2,|cols|{surface(&cols[0]).show(&mut cols[0],|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("SSH keys").size(17.)));ui.label(RichText::new("Create or import key bundles, inspect fingerprints, and manage system or TermCraft-owned agent identities.").color(muted(ui)));if ui.button("SSH keys and agents…").clicked(){self.ssh_keys.open=true;}});surface(&cols[1]).show(&mut cols[1],|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("X11 display").size(17.)));let display=std::env::var("DISPLAY").unwrap_or_else(|_|"No DISPLAY configured".into());ui.label(RichText::new(display).monospace());ui.label(RichText::new("SSH can forward X11 to an available display. Start a packaged Xwayland display in Servers on supported installations.").color(muted(ui)));});});
-        ui.add_space(18.);
-        runtime_providers(ui);
-
+            ui.add_space(16.);
+            ui.columns(2,|cols|{surface(&cols[0]).show(&mut cols[0],|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("SSH keys").size(17.)));ui.label(RichText::new("Create or import key bundles, inspect fingerprints, and manage system or TermCraft-owned agent identities.").color(muted(ui)));if ui.button("SSH keys and agents…").clicked(){self.ssh_keys.open=true;}});surface(&cols[1]).show(&mut cols[1],|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("X11 display").size(17.)));let display=std::env::var("DISPLAY").unwrap_or_else(|_|"No DISPLAY configured".into());ui.label(RichText::new(display).monospace());ui.label(RichText::new("SSH can forward X11 to an available display. Start a packaged Xwayland display in Servers on supported installations.").color(muted(ui)));});});
+            ui.add_space(18.);
+            runtime_providers(ui);
         });
     }
     pub(super) fn start_tool(&mut self, name: &str, program: &str, args: Vec<String>) {
@@ -1479,90 +1790,184 @@ impl Workspace {
         }
     }
     pub(super) fn settings_page(&mut self, ui: &mut Ui) {
-        ScrollArea::vertical().id_salt("settings_page").show(ui, |ui| {
-        page_heading(
-            ui,
-            "Workspace settings",
-            "Make the terminal yours and keep a portable copy of your connections.",
-        );
-        if ui.button("Configure global terminal profile").clicked() {
-            self.terminal_profile_editor = Some(
-                super::terminal_settings::ProfileEditor::from_preferences(&self.store.preferences),
-            );
-        }
-        ui.small("New and open terminals inherit the global profile for each option without an override. Saved-session overrides apply when the session opens. Changes made in an open tab last for that tab.");
-        ui.label("Paste and session safety");
-        ui.checkbox(
-            &mut self.store.preferences.paste.confirm_multiline,
-            "Confirm multiline paste",
-        );
-        ui.horizontal_wrapped(|ui| {
-            ui.label("Delay between pasted lines");
-            ui.add(
-                DragValue::new(&mut self.store.preferences.paste.line_delay_ms)
-                    .range(0..=5000)
-                    .suffix(" ms"),
-            );
-        });
-        ui.checkbox(
-            &mut self.store.preferences.confirm_session_close,
-            "Confirm closing active sessions",
-        );
-        ui.label("Terminal clipboard and selection");
-        ui.checkbox(
-            &mut self.store.preferences.clipboard.copy_on_select,
-            "Copy selection automatically on release",
-        );
-        ui.horizontal_wrapped(|ui| {
-            ui.label("Right click");
-            ui.selectable_value(
-                &mut self.store.preferences.clipboard.right_click,
-                RightClickBehavior::ContextMenu,
-                "Context menu",
-            );
-            ui.selectable_value(
-                &mut self.store.preferences.clipboard.right_click,
-                RightClickBehavior::Paste,
-                "Paste (Shift-right-click for menu)",
-            );
-        });
-        ui.horizontal_wrapped(|ui| {
-            ui.label("Word delimiters");
-            ui.add(crate::ui::fluent::singleline(&mut self.store.preferences.clipboard.word_delimiters));
-        });
-        ui.small("Alt-drag selects a rectangle. Ctrl+Shift+C copies; Ctrl+Shift+V pastes. Hold Shift to select when a terminal program uses the mouse. Save preferences below to keep these options.");
-        if ui.button("Configure terminal highlighting").clicked() {
-            self.highlight_editor = Some(super::highlighting::Editor::from_preferences(
-                &self.store.preferences,
-            ));
-        }
-
-            surface(ui).show(ui, |ui| {
-                ui.label(fluent::emphasized(ui.ctx(), RichText::new("Appearance").size(18.)));
-                self.appearance_picker(ui);
-                let reduced_motion = ui.checkbox(
-                    &mut self.store.preferences.reduced_motion,
-                    "Reduce interface transitions",
-                );
-                let high_contrast = ui.checkbox(
-                    &mut self.store.preferences.high_contrast,
-                    "Increase interface contrast",
-                );
-                if reduced_motion.changed() || high_contrast.changed() {
-                    self.apply_appearance(ui.ctx());
-                    self.persist();
+        use SettingsCategory::*;
+        fluent::page_scroll(ui, "settings_page", |ui| {
+            ui.heading("Workspace settings");
+            ui.add_space(8.);
+            ui.horizontal_wrapped(|ui| {
+                for (category, label) in [
+                    (Appearance, "Appearance"),
+                    (Terminal, "Terminal"),
+                    (Safety, "Input & safety"),
+                    (Storage, "Sessions & backups"),
+                    (About, "About"),
+                ] {
+                    ui.selectable_value(&mut self.settings_category, category, label);
                 }
             });
-            ui.add_space(8.);
-            surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Terminal").size(18.)));fluent::settings_grid(ui, "prefs", |ui|{ui.label("Scrollback lines");ui.add(DragValue::new(&mut self.store.preferences.scrollback).range(100..=360000));ui.end_row();ui.label("History memory");ui.label("128 MiB per terminal; older lines expire when either limit is reached");ui.end_row();ui.label("SSH keepalive interval");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.keepalive_secs).range(1..=86400).suffix("s"));ui.end_row();ui.label("SSH connect timeout");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.connect_timeout_secs).range(1..=3600).suffix("s"));ui.end_row();field(ui,"Default shell executable",&mut self.store.preferences.shell,"Use the system default");field(ui,"Download folder",&mut self.store.preferences.downloads,"Folder path");});if primary(ui,"Save preferences").clicked(){self.persist();}});ui.add_space(17.);
-   surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Sessions and backups").size(18.)));ui.label(RichText::new("Session settings, folders, tunnels and macros are stored locally. Exported backups contain hostnames and key-file paths, but no passwords.").color(muted(ui)));ui.horizontal_wrapped(|ui|{
+            ui.separator();
+            if self.settings_category == Terminal {
+                if ui.button("Configure global terminal profile").clicked() {
+                    self.terminal_profile_editor =
+                        Some(super::terminal_settings::ProfileEditor::from_preferences(
+                            &self.store.preferences,
+                        ));
+                }
+            }
+            if self.settings_category == Safety {
+                ui.label("Paste and session safety");
+                ui.checkbox(
+                    &mut self.store.preferences.paste.confirm_multiline,
+                    "Confirm multiline paste",
+                );
+                ui.horizontal_wrapped(|ui| {
+                    ui.label("Delay between pasted lines");
+                    ui.add(
+                        DragValue::new(&mut self.store.preferences.paste.line_delay_ms)
+                            .range(0..=5000)
+                            .suffix(" ms"),
+                    );
+                });
+                ui.checkbox(
+                    &mut self.store.preferences.confirm_session_close,
+                    "Confirm closing active sessions",
+                );
+                ui.label("Terminal clipboard and selection");
+                ui.checkbox(
+                    &mut self.store.preferences.clipboard.copy_on_select,
+                    "Copy selection automatically on release",
+                );
+                ui.horizontal_wrapped(|ui| {
+                    ui.label("Right click");
+                    ui.selectable_value(
+                        &mut self.store.preferences.clipboard.right_click,
+                        RightClickBehavior::ContextMenu,
+                        "Context menu",
+                    );
+                    ui.selectable_value(
+                        &mut self.store.preferences.clipboard.right_click,
+                        RightClickBehavior::Paste,
+                        "Paste (Shift-right-click for menu)",
+                    );
+                });
+                ui.horizontal_wrapped(|ui| {
+                    ui.label("Word delimiters");
+                    ui.add(crate::ui::fluent::singleline(
+                        &mut self.store.preferences.clipboard.word_delimiters,
+                    ));
+                });
+                ui.menu_button("Selection help",|ui|{ui.label("Alt-drag selects a rectangle. Ctrl+Shift+C copies. Ctrl+Shift+V pastes. Hold Shift to select while a terminal program uses the mouse.");});
+                if primary(ui, "Save preferences").clicked() {
+                    self.persist();
+                }
+            }
+            if self.settings_category == Terminal {
+                if ui.button("Configure terminal highlighting").clicked() {
+                    self.highlight_editor = Some(super::highlighting::Editor::from_preferences(
+                        &self.store.preferences,
+                    ));
+                }
+            }
+            if self.settings_category == Appearance {
+                surface(ui).show(ui, |ui| {
+                    ui.set_min_width(ui.available_width());
+                    ui.label(fluent::emphasized(
+                        ui.ctx(),
+                        RichText::new("Appearance").size(18.),
+                    ));
+                    self.appearance_picker(ui);
+                    let reduced_motion = ui.checkbox(
+                        &mut self.store.preferences.reduced_motion,
+                        "Reduce interface transitions",
+                    );
+                    let high_contrast = ui.checkbox(
+                        &mut self.store.preferences.high_contrast,
+                        "Increase interface contrast",
+                    );
+                    if reduced_motion.changed() || high_contrast.changed() {
+                        self.apply_appearance(ui.ctx());
+                        self.persist();
+                    }
+                });
+            }
+            if self.settings_category == Terminal {
+                surface(ui).show(ui, |ui| {
+                    ui.set_min_width(ui.available_width());
+                    ui.label(crate::ui::fluent::emphasized(
+                        ui.ctx(),
+                        RichText::new("Terminal").size(18.),
+                    ));
+                    fluent::settings_grid(ui, "prefs", |ui| {
+                        ui.label("Scrollback lines");
+                        ui.add(
+                            DragValue::new(&mut self.store.preferences.scrollback)
+                                .range(100..=360000),
+                        );
+                        ui.end_row();
+                        ui.label("History memory");
+                        ui.label(
+                            "128 MiB per terminal; older lines expire when either limit is reached",
+                        );
+                        ui.end_row();
+                        ui.label("SSH keepalive interval");
+                        ui.add(
+                            DragValue::new(&mut self.store.preferences.ssh_defaults.keepalive_secs)
+                                .range(1..=86400)
+                                .suffix("s"),
+                        );
+                        ui.end_row();
+                        ui.label("SSH connect timeout");
+                        ui.add(
+                            DragValue::new(
+                                &mut self.store.preferences.ssh_defaults.connect_timeout_secs,
+                            )
+                            .range(1..=3600)
+                            .suffix("s"),
+                        );
+                        ui.end_row();
+                        field(
+                            ui,
+                            "Default shell executable",
+                            &mut self.store.preferences.shell,
+                            "Use the system default",
+                        );
+                        field(
+                            ui,
+                            "Download folder",
+                            &mut self.store.preferences.downloads,
+                            "Folder path",
+                        );
+                    });
+                    if primary(ui, "Save preferences").clicked() {
+                        self.persist();
+                    }
+                });
+            }
+            if self.settings_category == Storage {
+                surface(ui).show(ui,|ui|{ui.set_min_width(ui.available_width());ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Sessions and backups").size(18.)));ui.label(RichText::new("Session settings, folders, tunnels and macros are stored locally. Exported backups contain hostnames and key-file paths, but no passwords.").color(muted(ui)));ui.horizontal_wrapped(|ui|{
     if ui.button("Export workspace").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("termcraft-workspace.json").save_file(){match self.store.save(&p){Ok(())=>self.message("Workspace exported"),Err(e)=>self.message(e)}}}
     if ui.button("Import workspace").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Workspace JSON",&["json"]).pick_file(){match Store::load_bounded(&p, 16 * 1024 * 1024).and_then(|mut imported| { let mut macros = self.store.macros.clone(); macros.append(&mut imported.macros); super::macro_events::validate_library(&macros)?; imported.macros = macros; Ok(imported) }) { Ok(imported) => { self.store.sessions.extend(imported.sessions.into_iter().map(|mut session| {session.id=harbor_workspace::model::new_session_id();session})); self.store.tunnels.extend(imported.tunnels.into_iter().take(5_usize.saturating_sub(self.store.tunnels.len()))); self.store.macros = imported.macros; self.persist(); }, Err(error) => self.message(error) }}}
    });if !self.store_ok{ui.colored_label(ui.visuals().error_fg_color,"The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.settings_load_error=None;self.persist();},Err(e)=>self.message(e.to_string())}}}});
-   ui.add_space(17.);surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("About TermCraft").size(18.)));ui.label("An independently written Rust desktop remote workspace with a Fluent-inspired interface.");ui.label(RichText::new("Built with eframe/egui and OpenSSH. No original branding or bundled engines are reused.").size(12.).color(muted(ui)));ui.add_space(5.);ui.label(RichText::new("Original feature parity has not been established. Linux terminal operation is tested; Windows and macOS need platform validation. See Network tools for engine availability and known gaps.").size(12.).color(muted(ui)));});
-
+            }
+            if self.settings_category == About {
+                surface(ui).show(ui,|ui|{ui.set_min_width(ui.available_width());ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("About TermCraft").size(18.)));ui.label("An independently written Rust desktop remote workspace with a Fluent-inspired interface.");ui.label(RichText::new("Built with eframe/egui and OpenSSH. No original branding or bundled engines are reused.").size(12.).color(muted(ui)));ui.add_space(5.);ui.label(RichText::new("Original feature parity has not been established. Linux terminal operation is tested; Windows and macOS need platform validation. See Network tools for engine availability and known gaps.").size(12.).color(muted(ui)));});
+            }
         });
     }
+}
+pub(super) fn history_status(ui: &mut Ui, t: &TerminalTab) {
+    let stats = t.screen.stats();
+    ui.small(format!(
+        "History: {} lines · {:.1} / {} MiB{}",
+        t.screen.history().len(),
+        stats.history_bytes as f64 / (1024. * 1024.),
+        stats.history_budget / (1024 * 1024),
+        if stats.discarded_lines > 0 {
+            format!(" · {} older lines expired", stats.discarded_lines)
+        } else {
+            String::new()
+        }
+    ));
 }
 pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -> Vec<u8> {
     if t.session.protocol == "Browser" && t.session.browser_options.embedded {
@@ -1613,18 +2018,6 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
             t.codec.errors()
         ));
     }
-    let stats = t.screen.stats();
-    ui.small(format!(
-        "History: {} lines · {:.1} / {} MiB{}",
-        t.screen.history().len(),
-        stats.history_bytes as f64 / (1024. * 1024.),
-        stats.history_budget / (1024 * 1024),
-        if stats.discarded_lines > 0 {
-            format!(" · {} older lines expired", stats.discarded_lines)
-        } else {
-            String::new()
-        }
-    ));
     let scroll_action = super::shortcuts::terminal_actions(ui, t, p);
     let height = ui.available_height().max(150.);
     let font = FontId::new(

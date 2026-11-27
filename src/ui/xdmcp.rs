@@ -101,7 +101,10 @@ impl State {
         }
     }
 }
-pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
+pub(super) fn sync_editor(
+    s: &mut Session,
+    state: &mut State,
+) -> (HostRequest, Option<std::net::SocketAddr>) {
     if state.session_id.as_deref() != Some(s.id.as_str()) {
         state.end_editor();
         *state = State {
@@ -125,20 +128,6 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             ..Default::default()
         };
     }
-    ui.horizontal_wrapped(|ui| {
-        ui.label("Query mode");
-        ui.selectable_value(&mut s.xdmcp_options.mode, QueryMode::Direct, "Direct");
-        ui.selectable_value(
-            &mut s.xdmcp_options.mode,
-            QueryMode::Indirect,
-            "Indirect chooser",
-        );
-        ui.selectable_value(
-            &mut s.xdmcp_options.mode,
-            QueryMode::Broadcast,
-            "Broadcast discovery",
-        );
-    });
     let fingerprint = format!(
         "{}:{}:{:?}:{:?}",
         s.host, s.port, s.xdmcp_options.mode, s.xdmcp_options.discovery_network
@@ -170,6 +159,25 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     if s.xdmcp_options.selected_endpoint != endpoint && !bound {
         s.xdmcp_options.selected_endpoint = None;
     }
+    (request, endpoint)
+}
+
+pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
+    ui.horizontal_wrapped(|ui| {
+        ui.label("Query mode");
+        ui.selectable_value(&mut s.xdmcp_options.mode, QueryMode::Direct, "Direct");
+        ui.selectable_value(
+            &mut s.xdmcp_options.mode,
+            QueryMode::Indirect,
+            "Indirect chooser",
+        );
+        ui.selectable_value(
+            &mut s.xdmcp_options.mode,
+            QueryMode::Broadcast,
+            "Broadcast discovery",
+        );
+    });
+    let (request, endpoint) = sync_editor(s, state);
     if s.xdmcp_options.mode == QueryMode::Broadcast {
         if state.interface.is_empty() {
             if let Some(network) = s.xdmcp_options.discovery_network {
@@ -733,6 +741,40 @@ mod tests {
         let (n, _) = socket.recv_from(&mut packet).unwrap();
         assert_eq!(&packet[..n], &[0, 1, 0, 2, 0, 1, 0]);
         w.xdmcp_discovery.end_editor();
+    }
+
+    #[test]
+    fn switching_editor_sections_retains_only_current_xdmcp_candidates() {
+        use crate::ui::pages::SessionSection::{Advanced, Bookmark, Connection};
+        let (ctx, _root, mut w) = crate::ui::terminal_review_tests::owned_workspace();
+        w.open_session_form(hostname_session());
+        let render =
+            |w: &mut Workspace| test_frame(&ctx, input(vec![]), |_| w.session_dialog(&ctx));
+        render(&mut w);
+        let endpoint = "127.0.0.1:1177".parse().unwrap();
+        seed_candidates(
+            w.session_form.as_mut().unwrap(),
+            &mut w.xdmcp_discovery,
+            endpoint,
+        );
+        let generation = w.xdmcp_discovery.generation;
+        for section in [Advanced, Bookmark, Connection] {
+            w.session_section = section;
+            render(&mut w);
+            assert_eq!(w.xdmcp_discovery.generation, generation);
+            assert_eq!(
+                w.session_form
+                    .as_ref()
+                    .unwrap()
+                    .xdmcp_options
+                    .selected_endpoint,
+                Some(endpoint)
+            );
+            assert!(w.xdmcp_discovery.pending.is_none() && w.xdmcp_discovery.resolving.is_none());
+        }
+        w.session_form.as_mut().unwrap().host = "different.invalid".into();
+        render(&mut w);
+        assert!(w.xdmcp_discovery.resolved.is_empty() && w.xdmcp_discovery.selection.is_none());
     }
 
     #[test]

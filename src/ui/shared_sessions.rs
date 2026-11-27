@@ -1158,16 +1158,11 @@ impl Workspace {
 }
 impl Workspace {
     pub(super) fn shared_session_tree(&mut self, ui: &mut Ui) {
+        if self.store.shared_sources.is_empty() {
+            return;
+        }
         ui.separator();
-        ui.horizontal_wrapped(|ui| {
-            ui.label(crate::ui::fluent::emphasized(
-                ui.ctx(),
-                RichText::new("Read-only shared sources"),
-            ));
-            if ui.small_button("Manage…").clicked() {
-                self.shared_sources.manager = true;
-            }
-        });
+        ui.label("Shared sessions");
         let configs: Vec<_> = self.store.shared_sources.iter().take(32).cloned().collect();
         let query = self.session_search.to_lowercase();
         let mut actions = Vec::new();

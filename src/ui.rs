@@ -611,6 +611,8 @@ pub struct Workspace {
     next_id: u64,
     session_search: String,
     session_form: Option<Session>,
+    session_section: pages::SessionSection,
+    settings_category: pages::SettingsCategory,
     session_import: Option<session_import::State>,
     shared_sources: shared_sessions::State,
     session_groups: session_groups::State,
@@ -747,6 +749,8 @@ impl Workspace {
             next_id: 1,
             session_search: String::new(),
             session_form: None,
+            session_section: pages::SessionSection::Connection,
+            settings_category: pages::SettingsCategory::Appearance,
             session_import: None,
             shared_sources: Default::default(),
             session_groups: Default::default(),
@@ -861,6 +865,7 @@ impl Workspace {
     }
     fn open_session_form(&mut self, session: Session) {
         self.xdmcp_discovery.end_editor();
+        self.session_section = pages::SessionSection::Connection;
         self.session_form = Some(session);
     }
     fn new_session(&mut self, protocol: &str) {
@@ -1701,6 +1706,17 @@ impl Workspace {
         ui.horizontal(|ui| {
             ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Sessions")).size(15.));
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                ui.menu_button("⋯", |ui| {
+                    if ui.button("Manage shared sources…").clicked() {
+                        self.shared_sources.manager = true;
+                        ui.close();
+                    }
+                    ui.label(
+                        "Double-click or press Enter to connect. Shift+F10 opens session actions.",
+                    );
+                })
+                .response
+                .widget_info(|| WidgetInfo::labeled(WidgetType::Button, true, "Session actions"));
                 let hint = self.shortcut_hint(Action::NewSession, "Add a saved session");
                 if shell_button(ui, "+", &hint).clicked() {
                     self.new_session("SSH");
@@ -1734,18 +1750,6 @@ impl Workspace {
         }
         let mut create_first = false;
         if self.store.sessions.is_empty() {
-            ui.add_space(12.);
-            ui.horizontal(|ui| {
-                icon(ui, "folder", 16., muted(ui));
-                ui.label(RichText::new("My sessions").color(muted(ui)).size(13.));
-            });
-            ui.add_space(10.);
-            ui.label(
-                RichText::new("Your saved connections\nwill appear here.")
-                    .size(12.)
-                    .color(muted(ui)),
-            );
-            ui.add_space(9.);
             if ui.link("Create your first session").clicked() {
                 create_first = true;
             }
@@ -1844,8 +1848,6 @@ impl Workspace {
             self.store.sessions.remove(i);
             self.persist();
         }
-        ui.separator();
-        ui.small("Double-click a session or focus it and press Enter. Shift+F10 opens actions.");
     }
     fn apply_appearance(&mut self, ctx: &Context) {
         let previous = ctx.theme();
@@ -2006,7 +2008,7 @@ impl Workspace {
             });
     }
     fn home(&mut self, ui: &mut Ui) {
-        ScrollArea::vertical().show(ui, |ui| {
+        ScrollArea::vertical().auto_shrink([false,false]).show(ui, |ui| {
             ui.add_space((ui.available_height() * 0.15).clamp(36., 100.));
             ui.vertical_centered(|ui| {
                 ui.add(Image::new(&self.logo).fit_to_exact_size(vec2(112., 112.)));

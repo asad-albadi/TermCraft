@@ -39,15 +39,16 @@ mod tests {
                     (viewport.viewport_ui_cb)(ui);
                 });
                 output.textures_delta.clear();
-                let history = output
+                let command = output
                     .shapes
                     .iter()
                     .position(|shape| {
                         matches!(&shape.shape,
-                    egui::Shape::Text(text) if text.galley.text().starts_with("History: "))
+                    egui::Shape::Text(text) if text.galley.text() == "Reattach")
                     })
-                    .expect("native child painted its own History status");
-                assert!(output.shapes[..history].iter().any(|shape| matches!(&shape.shape,
+                    .expect("native child painted its own commands");
+                assert!(!output.shapes.iter().any(|shape| matches!(&shape.shape, egui::Shape::Text(t) if t.galley.text().starts_with("History: "))));
+                assert!(output.shapes[..command].iter().any(|shape| matches!(&shape.shape,
                     egui::Shape::Rect(rect) if rect.fill == expected && rect.rect.contains_rect(bounds) && shape.clip_rect.contains_rect(bounds))),
                     "detached client needs an opaque {theme:?} surface behind History");
                 rendered.store(true, Ordering::SeqCst);
@@ -76,6 +77,17 @@ mod tests {
         shell_frame(&ctx, size, 2., vec![], &mut draw);
         let output = shell_frame(&ctx, size, 2., vec![], &mut draw);
         let screen = Rect::from_min_size(Pos2::ZERO, size);
+        let more = shell_text_position(&output, "More");
+        assert!(screen.contains(shell_text_position(&output, "Reattach")));
+        shell_frame(
+            &ctx,
+            size,
+            2.,
+            vec![Event::PointerMoved(more), shell_pointer(more, true)],
+            &mut draw,
+        );
+        shell_frame(&ctx, size, 2., vec![shell_pointer(more, false)], &mut draw);
+        let output = shell_frame(&ctx, size, 2., vec![], &mut draw);
         for label in ["Reattach", "Close window…", "Fullscreen", "Rename…"] {
             assert!(screen.contains(shell_text_position(&output, label)));
         }
@@ -319,29 +331,34 @@ impl Workspace {
             if ui.button("Reattach").clicked() {
                 actions.push((active, false));
             }
-            if ui.button("Close window…").clicked() {
-                self.window_close_prompt.insert(window);
-            }
-            if class != ViewportClass::EmbeddedWindow {
-                let label = if self.windows.fullscreen(window) {
-                    "Restore window"
-                } else {
-                    "Fullscreen"
-                };
-                if ui
-                    .button(label)
-                    .fluent_hint(self.shortcut_hint(Action::Fullscreen, label))
-                    .clicked()
-                {
-                    self.toggle_window_fullscreen(ui.ctx(), window);
+            ui.menu_button("More", |ui| {
+                if let Some(tab) = self.tabs.iter().find(|t| t.id == active) {
+                    super::pages::history_status(ui, tab);
                 }
-            }
-            if ui.button("Rename…").clicked() {
-                self.title_editor = Some((
-                    active,
-                    self.windows.override_title(active).unwrap_or("").to_owned(),
-                ));
-            }
+                if ui.button("Close window…").clicked() {
+                    self.window_close_prompt.insert(window);
+                }
+                if class != ViewportClass::EmbeddedWindow {
+                    let label = if self.windows.fullscreen(window) {
+                        "Restore window"
+                    } else {
+                        "Fullscreen"
+                    };
+                    if ui
+                        .button(label)
+                        .fluent_hint(self.shortcut_hint(Action::Fullscreen, label))
+                        .clicked()
+                    {
+                        self.toggle_window_fullscreen(ui.ctx(), window);
+                    }
+                }
+                if ui.button("Rename…").clicked() {
+                    self.title_editor = Some((
+                        active,
+                        self.windows.override_title(active).unwrap_or("").to_owned(),
+                    ));
+                }
+            });
         });
     }
 
@@ -388,7 +405,7 @@ impl Workspace {
                 if self.import_applying(){ui.disable();}
                 self.handle_shortcuts(&child_ctx, window);
                 self.restore_window_geometry(&child_ctx, window);
-                ScrollArea::horizontal()
+                if ids.len()>1 {ScrollArea::horizontal()
                     .id_salt(("detached-tabs", window))
                     .auto_shrink([false, true])
                     .show(ui, |ui| ui.horizontal(|ui| {
@@ -401,7 +418,7 @@ impl Workspace {
                                 self.window_active.insert(window, *id);
                             }
                         }
-                    }));
+                    }));}
                 self.detached_commands(ui, class, window, active, &mut actions);
                 if self.window_close_prompt.contains(&window) { child_ctx.request_repaint(); return; }
                 if self.title_editor.as_ref().is_some_and(|(tab, _)| self.windows.window(*tab) == window) {
