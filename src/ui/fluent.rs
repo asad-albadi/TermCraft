@@ -334,8 +334,13 @@ pub(super) fn setup(ctx: &Context, reduced_motion: bool, high_contrast: bool) {
         style.spacing.menu_margin = Margin::same(4);
         style.spacing.scroll = egui::style::ScrollStyle {
             bar_width: 8.,
-            floating: false,
+            // Animate the thumb inside a permanently reserved track.
+            floating: true,
+            floating_allocated_width: 14.,
+            floating_width: 2.,
             bar_inner_margin: 6.,
+            dormant_handle_opacity: 0.5,
+            active_handle_opacity: 0.7,
             foreground_color: true,
             dormant_background_opacity: 0.,
             active_background_opacity: 0.,
@@ -1347,6 +1352,84 @@ mod tests {
     }
 
     #[test]
+    fn scrollbar_hover_and_drag_keep_a_fixed_gutter() {
+        for width in [1920., 3440.] {
+            for reduced in [false, true] {
+                let ctx = Context::default();
+                setup(&ctx, reduced, false);
+                let mut time = 0.;
+                let mut draw = |events: Vec<egui::Event>| {
+                    time += 0.1;
+                    let mut right = 0.;
+                    let mut inner = egui::Rect::NOTHING;
+                    let mut offset = 0.;
+                    let mut output = ctx.run_ui(
+                        egui::RawInput {
+                            screen_rect: Some(egui::Rect::from_min_size(
+                                egui::Pos2::ZERO,
+                                vec2(width, 600.),
+                            )),
+                            time: Some(time),
+                            events,
+                            ..Default::default()
+                        },
+                        |ui| {
+                            right = ui.available_rect_before_wrap().right();
+                            let scroll = page_scroll(ui, "scrollbar-input", |ui| {
+                                ui.allocate_space(vec2(200., 2400.));
+                            });
+                            inner = scroll.inner_rect;
+                            offset = scroll.state.offset.y;
+                        },
+                    );
+                    output.textures_delta.clear();
+                    let thumb = output.shapes.iter().find_map(|item| match &item.shape {
+                        egui::Shape::Rect(r)
+                            if (r.rect.right() - right).abs() < 0.1
+                                && r.rect.width() <= 9.
+                                && (50. ..250.).contains(&r.rect.height()) =>
+                        {
+                            Some((r.rect, r.fill))
+                        }
+                        _ => None,
+                    });
+                    (right, inner, offset, thumb)
+                };
+                let settle = |draw: &mut dyn FnMut(Vec<egui::Event>) -> _| {
+                    for _ in 0..12 {
+                        draw(vec![]);
+                    }
+                    draw(vec![])
+                };
+                let (right, rest_view, _, rest) = settle(&mut draw);
+                let (rest, rest_color) = rest.expect("painted idle thumb");
+                let point = egui::pos2(right - 1., rest.center().y);
+                draw(vec![egui::Event::PointerMoved(point)]);
+                let (_, hover_view, _, hover) = settle(&mut draw);
+                let (hover, hover_color) = hover.expect("painted hovered thumb");
+                assert_eq!(rest_view, hover_view);
+                assert_eq!(right - rest_view.right(), 14.);
+                assert_eq!(rest.width(), 2.);
+                assert_eq!(hover.width(), 8.);
+                assert_eq!(hover.left() - hover_view.right(), 6.);
+                assert_ne!(rest_color, hover_color);
+                draw(vec![egui::Event::PointerButton {
+                    pos: point,
+                    button: egui::PointerButton::Primary,
+                    pressed: true,
+                    modifiers: egui::Modifiers::NONE,
+                }]);
+                draw(vec![egui::Event::PointerMoved(point + vec2(0., 100.))]);
+                let (_, drag_view, offset, drag) = settle(&mut draw);
+                let (drag, _) = drag.expect("painted dragged thumb");
+                assert_eq!(hover_view, drag_view);
+                assert_eq!(drag.width(), 8.);
+                assert!(offset > 0. && drag.top() > hover.top() + 90.);
+            }
+        }
+    }
+
+    #[test]
     fn reduced_motion_keeps_native_scrolling_but_removes_transitions() {
         let ctx = Context::default();
         setup(&ctx, false, false);
@@ -1358,7 +1441,7 @@ mod tests {
             let style = ctx.style_of(theme);
             assert_eq!(style.animation_time, 0.);
             assert_eq!(style.scroll_animation, egui::style::ScrollAnimation::none());
-            assert!(!style.spacing.scroll.floating);
+            assert_eq!(style.spacing.scroll.allocated_width(), 14.);
             assert!(style.spacing.scroll.bar_inner_margin >= 4.);
         }
     }
