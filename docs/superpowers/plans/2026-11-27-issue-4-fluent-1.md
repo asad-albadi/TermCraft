@@ -30,10 +30,10 @@
 
 Files: create src/ui/fluent.rs; modify src/ui.rs theme/bootstrap/shared helpers, src/model.rs appearance preferences, src/ui/pages.rs appearance-settings section as needed; Cargo.toml/Cargo.lock only if the accessibility backend demonstrably requires it.
 
-- [ ] Implement semantic palettes, typography, spacing, geometry, menu/window materials, scroll indicator behavior and bounded feedback motion.
-- [ ] Correct primary/button/field feedback and custom focus helper; provide bounded dialog/form helpers consumed by later tasks.
-- [ ] Add backward-compatible reduced-motion/high-contrast settings, enable/inspect available accessibility backend rather than assume screen-reader support.
-- [ ] Meaningful state/layout/contrast/persistence tests, focused locked gate, self-review, commit and independent task review.
+- [x] Implement semantic palettes, typography, spacing, geometry, menu/window materials, scroll indicator behavior and bounded feedback motion.
+- [x] Correct primary/button/field feedback and custom focus helper; provide bounded dialog/form helpers consumed by later tasks.
+- [x] Add backward-compatible reduced-motion/high-contrast settings, enable/inspect available accessibility backend rather than assume screen-reader support.
+- [x] Meaningful state/layout/contrast/persistence tests, focused locked gate, self-review, commit and independent task review.
 
 Interfaces: expose documented theme setup, semantic colors, focused/hover/pressed paint, bounded dialog dimensions/body and form sizing. Preserve existing helper wrappers where callers depend on them.
 
@@ -41,19 +41,19 @@ Interfaces: expose documented theme setup, semantic colors, focused/hover/presse
 
 Files: src/ui.rs shell/sidebar/tabs, src/ui/{layout,windows,shared_sessions,session_groups,shortcuts}.rs where navigation/owner behavior lives.
 
-- [ ] Apply shared states to rail, command tiles, session rows, tabs/close and split chrome; accessible names and keyboard activation.
-- [ ] Responsive toolbars/sidebar/status and long-title behavior, preserving actual drag-only width persistence and close-hit separation. Remove the redundant name/theme header per owner steering; integrate the theme picker into the existing menu row.
-- [ ] Real pointer/keyboard selection/press/disabled/close workflows and focused regressions, commit and review.
+- [x] Apply shared states to rail, command tiles, session rows, tabs/close and split chrome; accessible names and keyboard activation.
+- [x] Responsive toolbars/sidebar/status and long-title behavior, preserving actual drag-only width persistence and close-hit separation. Remove the redundant name/theme header per owner steering; integrate the theme picker into the existing menu row.
+- [x] Real pointer/keyboard selection/press/disabled/close workflows and focused regressions, commit and review.
 
 ## Task 3 — All dialogs, protocol forms and safety ownership
 
 Files: every actual Window/Modal listed in docs/uiux/issue-4/dialog-audit.md, especially src/ui/pages.rs, credentials, ssh_keys, session_import, shared_sessions, session_confirmations, terminal_settings, highlighting, remote_files, remote_editor, ftp, windows and games/play. Do not touch test-only Owned overlay as a production dialog.
 
-- [ ] Fix session form first: all 13 protocols, grouped content, adaptive sizing, preserved draft, viewport budget and fixed actions.
-- [ ] Migrate audited blocking prompts to bounded modal shells; retain modeless document/recovery comparisons and coordinate nested flows.
-- [ ] Normalize titles/padding/actions/inline validation, initial focus/Escape/restore, long content and persistent footers across the complete dialog inventory.
-- [ ] Test actual modal input isolation, safe cancellation, nested key/vault, dirty SSH+FTP close, detached ownership and protocol form visibility; preserve existing safety regressions.
-- [ ] Commit and independent review, correcting findings before moving on.
+- [x] Fix session form first: all 13 protocols, grouped content, adaptive sizing, preserved draft, viewport budget and fixed actions.
+- [x] Migrate audited blocking prompts to bounded modal shells; retain modeless document/recovery comparisons and coordinate nested flows.
+- [x] Normalize titles/padding/actions/inline validation, initial focus/Escape/restore, long content and persistent footers across the complete dialog inventory.
+- [x] Test actual modal input isolation, safe cancellation, nested key/vault, dirty SSH+FTP close, detached ownership and protocol form visibility; preserve existing safety regressions.
+- [x] Commit and independent review, correcting findings before moving on.
 
 ## Task 4 — Pages, embedded tools, games and web shell
 

@@ -11,8 +11,8 @@ Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over 
 | Research and complete source inventories | Complete | research.md, screen-audit.md, dialog-audit.md |
 | 1. Shared foundation | Independently reviewed throughca444ba | Windows 11 geometry correction approved; six current component tests and one actual-model disk round-trip passed; native integration pending |
 | 2. Shell/navigation/tabs/splits | Independently reviewed atb77581a | Seventeen actual-source component tests, strict remote-pane loading/ready probe and app type check passed; dedicated name/theme bar removed |
-| 3. Dialogs and protocol forms | In progress | Complete source inventory in dialog-audit.md |
-| 4. Specialist pages and web shell | Pending | Complete source inventory in screen-audit.md |
+| 3. Dialogs and protocol forms | Independently reviewed through acc3132 | Twenty-five focused production UI/PTY/protocol cases, eight shared components and actual SSH/Local native previews; readable aligned fields, accessible labels, scoped input ownership and safe recovery workflows |
+| 4. Specialist pages and web shell | In progress | Complete source inventory in screen-audit.md |
 | 5. Integrated visual/interaction verification | Pending | Before captures in before/; no human/native-only acceptance claimed |
 
 The detailed boxes below are acceptance tracking for the integrated interface; a completed implementation batch does not mark unexecuted native checks as passed.
@@ -109,3 +109,7 @@ The detailed boxes below are acceptance tracking for the integrated interface; a
 - [ ] Independent per-batch reviews and final whole-branch review
 - [ ] Human checks — owner explicitly required before merge
 
+
+### Dialog batch verification
+
+The dialog batch is independently approved through `acc3132`. Focused tests exercise all 13 protocol forms at normal/compact widths and scale, pinned actions, production accessible field names, safe key/vault nesting, dirty mixed SSH/FTP decisions, unrelated-terminal input, save failure and XDMCP close-frame network isolation with a positive control. Native Linux development previews confirmed readable, aligned SSH and Local form rows. These local checks used cached pre-adapter dependencies; full current distribution checks and human acceptance remain pending. The previous hosted run46003044432 failed two old XDMCP coordinate fixtures on all three platforms; the actual Cancel/Escape replacements pass focused checks, but a fresh full run is required.
