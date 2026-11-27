@@ -171,11 +171,41 @@ fn install_fonts(ctx: &Context) {
         }
         Some(())
     });
+    // Use a locally installed CJK face when available. Collections use face zero.
+    #[cfg(target_os = "windows")]
+    let cjk = std::env::var_os("WINDIR").and_then(|root| {
+        let directory = std::path::PathBuf::from(root).join("Fonts");
+        ["YuGothR.ttc", "meiryo.ttc", "msyh.ttc"]
+            .iter()
+            .find_map(|name| std::fs::read(directory.join(name)).ok())
+    });
+    #[cfg(target_os = "macos")]
+    let cjk = std::fs::read("/System/Library/Fonts/PingFang.ttc").ok();
+    #[cfg(target_os = "linux")]
+    let cjk = [
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
+    ]
+    .iter()
+    .find_map(|path| std::fs::read(path).ok());
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    let cjk: Option<Vec<u8>> = None;
+    let has_cjk = cjk.is_some();
+    if let Some(bytes) = cjk {
+        fonts.font_data.insert(
+            "System CJK".into(),
+            std::sync::Arc::new(FontData::from_owned(bytes)),
+        );
+    }
     let regular = fonts.families.get_mut(&FontFamily::Proportional).unwrap();
     regular.insert(0, "Selawik".into());
     #[cfg(windows)]
     if system_faces.is_some() {
         regular.insert(0, "System Segoe UI".into());
+    }
+    regular.push("terminal".into());
+    if has_cjk {
+        regular.push("System CJK".into());
     }
     let mut semibold = regular.clone();
     semibold.insert(0, "Selawik Semibold".into());
@@ -734,6 +764,33 @@ pub(super) fn text_input(
 mod tests {
     use super::*;
     use egui::{Event, Key, Modifiers, PointerButton, Pos2, RawInput, ViewportId};
+
+    #[test]
+    fn interface_fallback_covers_filename_glyphs_without_changing_terminal_family() {
+        let ctx = Context::default();
+        install_fonts(&ctx);
+        let mut output = ctx.run_ui(Default::default(), |ui| {
+            ui.fonts_mut(|fonts| {
+                let definitions = fonts.definitions();
+                assert_eq!(
+                    definitions.families[&egui::FontFamily::Monospace][0],
+                    "terminal"
+                );
+                let cjk_installed = definitions.font_data.contains_key("System CJK");
+                for family in [
+                    egui::FontFamily::Proportional,
+                    egui::FontFamily::Name("Interface Semibold".into()),
+                ] {
+                    let id = egui::FontId::new(14., family);
+                    assert!(fonts.has_glyphs(&id, "ملف مثال"), "Arabic filename glyphs");
+                    if cjk_installed {
+                        assert!(fonts.has_glyphs(&id, "日本語"), "Japanese filename glyphs");
+                    }
+                }
+            });
+        });
+        output.textures_delta.clear();
+    }
 
     fn contrast(a: Color32, b: Color32) -> f32 {
         fn luminance(c: Color32) -> f32 {
