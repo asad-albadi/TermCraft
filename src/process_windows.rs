@@ -101,6 +101,33 @@ fn quote(s: &str) -> String {
     out.push('"');
     out
 }
+
+fn command_line(program: &str, args: &[String]) -> String {
+    let is_cmd = Path::new(program)
+        .file_name()
+        .and_then(|name| name.to_str())
+        .is_some_and(|name| {
+            name.eq_ignore_ascii_case("cmd") || name.eq_ignore_ascii_case("cmd.exe")
+        });
+    if is_cmd
+        && let [disable_autorun, execute, script] = args
+        && disable_autorun.eq_ignore_ascii_case("/D")
+        && execute.eq_ignore_ascii_case("/C")
+    {
+        // cmd parses its script itself. /S removes just the enclosing pair
+        // after /C, preserving quotes the caller put inside the script.
+        return format!(
+            "{} /D /S /C \"{script}\"",
+            quote(&program.replace('/', "\\"))
+        );
+    }
+    std::iter::once(program)
+        .chain(args.iter().map(String::as_str))
+        .map(quote)
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
 fn error() -> String {
     std::io::Error::last_os_error().to_string()
 }
@@ -215,12 +242,11 @@ impl Process {
             }
             let mut startup: STARTUPINFOEXW = std::mem::zeroed();
             startup.StartupInfo.cb = std::mem::size_of::<STARTUPINFOEXW>() as u32;
+            // Null standard handles let ConPTY supply its console streams even
+            // when TermCraft itself was launched with redirected stdio.
+            startup.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
             startup.lpAttributeList = list;
-            let command = std::iter::once(program.to_string())
-                .chain(args.iter().cloned())
-                .map(|s| quote(&s))
-                .collect::<Vec<_>>()
-                .join(" ");
+            let command = command_line(program, args);
             let mut command = wide(&command);
             let cwd = directory.map(|path| {
                 path.as_os_str()

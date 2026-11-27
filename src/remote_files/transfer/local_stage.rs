@@ -229,17 +229,22 @@ impl LocalStage {
         ))
     }
     #[cfg(windows)]
+    pub async fn pin_merge_target(path: PathBuf) -> Result<std::fs::File, String> {
+        tokio::task::spawn_blocking(move || windows::WindowsStage::pin_merge_target(&path))
+            .await
+            .map_err(|e| e.to_string())?
+            .map_err(|e| e.to_string())
+    }
+    #[cfg(windows)]
     pub async fn attach_merge_target(
         &mut self,
-        expected: std::fs::Metadata,
+        selected: std::fs::File,
     ) -> Result<std::fs::File, String> {
-        use std::os::windows::fs::MetadataExt;
-        if !expected.is_dir() || expected.file_attributes() & 0x400 != 0 {
-            return Err("A folder merge cannot follow a reparse point or non-directory".into());
-        }
         let mut backend = self.windows.clone();
         let (backend, file) = tokio::task::spawn_blocking(move || {
-            let file = backend.attach_merge_target().map_err(|e| e.to_string())?;
+            let file = backend
+                .attach_merge_target(selected)
+                .map_err(|e| e.to_string())?;
             Ok::<_, String>((backend, file))
         })
         .await

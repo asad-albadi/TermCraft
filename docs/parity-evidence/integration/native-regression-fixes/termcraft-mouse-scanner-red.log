@@ -1,0 +1,6 @@
+exit=1
+Traceback (most recent call last):
+  File "<string>", line 4, in <module>
+    assert release_received(b'1;1m')
+           ~~~~~~~~~~~~~~~~^^^^^^^^^
+AssertionError

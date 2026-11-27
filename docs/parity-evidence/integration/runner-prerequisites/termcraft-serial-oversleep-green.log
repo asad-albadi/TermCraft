@@ -1,0 +1,6 @@
+
+running 1 test
+test devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.04s
+

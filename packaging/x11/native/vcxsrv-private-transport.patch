@@ -45,6 +45,15 @@
  #else
          prmsg (1,
                 "SocketINETCreateListener: unsupported address family %d\n",
+--- a/xorg-server/os/xstrans.c
++++ b/xorg-server/os/xstrans.c
+@@ -9,6 +9,5 @@
+ #define TCPCONN
+ #endif
+ #ifdef WIN32
+-#undef SO_REUSEADDR
+ #define SO_BINDRETRYCOUNT 0  // do not try to bind again when it fails, this will speed up searching for a free listening port
+ #endif
 --- a/xorg-server/os/connection.c
 +++ b/xorg-server/os/connection.c
 @@ -273,6 +273,11 @@
@@ -59,3 +68,192 @@
      if (NoListenAll) {
          ListenTransCount = 0;
      }
+--- a/xorg-server/xkb/ddxLoad.c
++++ b/xorg-server/xkb/ddxLoad.c
+@@ -57,0 +58 @@
++#include <windows.h>
+@@ -104,0 +106,32 @@
++
++#ifdef WIN32
++/* Invoke the adjacent compiler within the server's job, without a command shell. */
++static Bool
++RunWindowsXkbComp(const char *directory, const char *separator, char *command)
++{
++    char executable[PATH_MAX];
++    STARTUPINFOA startup = {sizeof(startup)};
++    PROCESS_INFORMATION child;
++    DWORD status;
++    size_t length = strlen(command);
++    int result = snprintf(executable, sizeof(executable), "%s%sxkbcomp.exe",
++                          directory, separator);
++    if (result < 0 || result >= sizeof(executable) || length < 2 ||
++        command[0] != '"' || command[length - 1] != '"')
++        return FALSE;
++
++    /* The formatting below wraps the command in an extra pair of shell quotes. */
++    command[length - 1] = '\0';
++    if (!CreateProcessA(executable, command + 1, NULL, NULL, FALSE,
++                        CREATE_NO_WINDOW, NULL, NULL, &startup, &child)) {
++        command[length - 1] = '"';
++        return FALSE;
++    }
++    command[length - 1] = '"';
++    CloseHandle(child.hThread);
++    Bool success = WaitForSingleObject(child.hProcess, INFINITE) == WAIT_OBJECT_0 &&
++        GetExitCodeProcess(child.hProcess, &status) && status == 0;
++    CloseHandle(child.hProcess);
++    return success;
++}
++#endif
+@@ -188 +221 @@
+-        if (fclose(out) == 0 && system(buf) >= 0)
++        if (fclose(out) == 0 && RunWindowsXkbComp(xkbbindir, xkbbindirsep, buf))
+--- a/xorg-server/os/xdmcp.c
++++ b/xorg-server/os/xdmcp.c
+@@ -743,0 +744,3 @@
++  if (HostIdx < 0 || HostIdx >= g_NrHosts)
++    return;
++
+@@ -764 +767,3 @@
+-  char szHostName[200];
++  char szHostName[128];
++  char address[INET6_ADDRSTRLEN];
++  const void *address_bytes;
+@@ -767,5 +772,4 @@
+-  if (hostname->length!=0)
+-  {
+-    memcpy(szHostName,hostname->data,hostname->length);
+-    szHostName[hostname->length]=0;
+-  }
++  if (from->sa_family == AF_INET && fromlen >= (int) sizeof(struct sockaddr_in))
++    address_bytes = &((const struct sockaddr_in *)from)->sin_addr;
++  else if (from->sa_family == AF_INET6 && fromlen >= (int) sizeof(struct sockaddr_in6))
++    address_bytes = &((const struct sockaddr_in6 *)from)->sin6_addr;
+@@ -773,19 +777,11 @@
+-    strcpy(szHostName,"????");
+-  strcat(szHostName," - ");
+-  switch(from->sa_family)
+-  {
+-    case AF_INET:
+-    {
+-      struct sockaddr_in *addr_in = (struct sockaddr_in *)from;
+-      inet_ntop(AF_INET, &(addr_in->sin_addr), szHostName+strlen(szHostName), INET_ADDRSTRLEN);
+-      break;
+-    }
+-    case AF_INET6:
+-    {
+-      struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *)free;
+-      inet_ntop(AF_INET6, &(addr_in6->sin6_addr), szHostName+strlen(szHostName), INET6_ADDRSTRLEN);
+-      break;
+-    }
+-    default:
+-      break;
+-  }
++    return;
++  if (!inet_ntop(from->sa_family, address_bytes, address, sizeof(address)))
++    return;
++
++  int name_limit = sizeof(szHostName) - strlen(address) - sizeof(" - ");
++  int name_length = hostname->length < name_limit ? hostname->length : name_limit;
++  if (name_length > 0)
++    snprintf(szHostName, sizeof(szHostName), "%.*s - %s", name_length,
++             (const char *)hostname->data, address);
++  else
++    snprintf(szHostName, sizeof(szHostName), "???? - %s", address);
+--- a/xorg-server/hw/xwin/xdmcphostselect.c
++++ b/xorg-server/hw/xwin/xdmcphostselect.c
+@@ -15,0 +16 @@
++  LRESULT length = SendDlgItemMessage(g_hDlgHosts, IDC_HOSTLIST, LB_GETTEXTLEN, (WPARAM)Index, 0);
+@@ -16,0 +18,3 @@
++
++  if (length == LB_ERR || length >= sizeof(HostToConnect) || HostIndex == LB_ERR)
++    return;
+@@ -179 +183 @@
+-  PostMessage (g_hDlgAbout, WM_NEXTDLGCTL, (WPARAM)GetDlgItem (g_hDlgHosts, IDOK), TRUE);
++  PostMessage (g_hDlgHosts, WM_NEXTDLGCTL, (WPARAM)GetDlgItem (g_hDlgHosts, IDOK), TRUE);
+--- a/xorg-server/os/auth.c
++++ b/xorg-server/os/auth.c
+@@ -114,7 +114,8 @@
+         return 0;
+
+     errno = 0;
+-    f = Fopen(authorization_file, "r");
++    /* Xauthority contains binary cookies, including bytes such as 0x1a. */
++    f = Fopen(authorization_file, "rb");
+     if (!f) {
+         LogMessageVerb(X_ERROR, 0,
+                        "Failed to open authorization file \"%s\": %s\n",
+--- a/xorg-server/os/connection.c
++++ b/xorg-server/os/connection.c
+@@ -563,18 +563,25 @@
+     priv = (OsCommPtr) client->osPrivate;
+     trans_conn = priv->trans_conn;
+
++#ifndef _WIN32
+     /* Allow any client to connect without authorization on a launchd socket,
+        because it is securely created -- this prevents a race condition on launch */
+     if (trans_conn->flags & TRANS_NOXAUTH) {
+         auth_id = (XID) 0L;
+     }
+-    else {
++    else
++#endif
++    {
+         auth_id =
+             CheckAuthorization(proto_n, auth_proto, string_n, auth_string,
+                                client, &reason);
+     }
+
+     if (auth_id == (XID) ~0L) {
++#ifdef _WIN32
++        /* The private Windows transport requires an authenticated cookie. */
++        return reason ? reason : "Client is not authorized to connect to Server";
++#else
+         if (_XSERVTransGetPeerAddr(trans_conn, &family, &fromlen, &from) != -1) {
+             if (InvalidHost((struct sockaddr *) from, fromlen, client))
+                 AuthAudit(client, FALSE, (struct sockaddr *) from,
+@@ -600,6 +607,7 @@
+             else
+                 return "Client is not authorized to connect to Server";
+         }
++#endif
+     }
+ #ifdef XSERVER_DTRACE
+     else if ((auditTrailLevel > 1) || XSERVER_CLIENT_AUTH_ENABLED())
+--- a/X11/xtrans/Xtranssock.c
++++ b/X11/xtrans/Xtranssock.c
+@@ -1385,0 +1386,17 @@
++#ifdef WIN32
++        /* A Windows XDMCP session can explicitly bind one local IPv4 address.
++           The regular owned X server supplies no override and stays loopback. */
++        {
++            const char *requested = getenv("TERMCRAFT_X11_LISTEN_IPV4");
++            if (requested != NULL) {
++                struct in_addr *address = &((struct sockaddr_in *)&sockname)->sin_addr;
++                u_long host_address;
++                if (inet_pton(AF_INET, requested, address) != 1)
++                    return TRANS_CREATE_LISTENER_FAILED;
++                host_address = ntohl(address->s_addr);
++                if (host_address == INADDR_ANY || host_address == INADDR_BROADCAST ||
++                    (host_address & 0xf0000000UL) == 0xe0000000UL)
++                    return TRANS_CREATE_LISTENER_FAILED;
++            }
++        }
++#endif
+--- a/xorg-server/hw/xwin/windisplay.c
++++ b/xorg-server/hw/xwin/windisplay.c
+@@ -32,2 +32,3 @@
++#include <stdlib.h>
+ #include <opaque.h>             // for display
+ #include "dix/dix_priv.h"       // for display
+@@ -54,7 +55,9 @@
+     else
+ #endif
+     if (_XSERVTransIsListening("inet")) {
+-        snprintf(szDisplay, 512, "127.0.0.1:%s.%d", display, screen);
++        /* A live IPv4 listener has already validated the requested address. */
++        const char *address = getenv("TERMCRAFT_X11_LISTEN_IPV4");
++        snprintf(szDisplay, 512, "%s:%s.%d", address != NULL ? address : "127.0.0.1", display, screen);
+     }
+     else if (_XSERVTransIsListening("inet6")) {
+         snprintf(szDisplay, 512, "[::1]:%s.%d", display, screen);

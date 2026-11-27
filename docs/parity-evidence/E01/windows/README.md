@@ -1,12 +1,13 @@
-# Windows embedded Browser source candidate
+# Windows embedded Browser
 
-The Windows candidate connects the existing embedded Browser worker to a
-64-bit Google Chrome or Chromium installation. It discovers `chrome.exe`
+Installed compatibility connects the embedded Browser worker to a 64-bit
+Google Chrome or Chromium installation. It discovers `chrome.exe`
 in the Windows Program Files and Local AppData known folders and checks the
 PE machine type, executable flag and header bounds. The candidate accepts
 x86-64 and ARM64 images matching the app architecture. The Windows loader
-and local policy govern the installed binary. TermCraft does not bundle an
-engine or select programs from PATH. [Microsoft PE format](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format)
+and local policy govern the installed binary. The optional Windows x64
+bundle requires the exact compile-time artifact and resource inventory.
+[Microsoft PE format](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format)
 
 Each Browser tab starts Chrome or Chromium headless into a new directory
 with a protected DACL granting access to the current user. TermCraft uses
@@ -56,7 +57,7 @@ job teardown, the worker leaves the directory in place. [Microsoft process creat
   during native dependency compilation because this Linux host lacks
   `lib.exe`. The application was not linked or run on Windows.
 
-## Native qualification pending
+## Native Windows qualification
 
 On a Windows 10 or later machine with the supported Rust and Windows SDK
 tooling, run the native transport fixtures and then the loopback Chromium
@@ -79,8 +80,10 @@ provider and exercise Chromium pixels, input, history and resize, HTTP
 authentication, proxy handling and rejection of an untrusted certificate
 using loopback endpoints.
 
-Windows execution, GUI input and DPI behavior, sandbox nesting under host
-job policies, and cleanup with real Chrome descendants remain unmeasured.
-There is no qualified Windows package, measured engine version or Windows
-binary checksum yet. P01/P08 packaged runtime closure and the corresponding
-native demonstrations remain open. [Browser runtime packaging](../../../../packaging/browser/README.md)
+The Windows x64 continuation records installed compatibility and the exact
+private source-built Chromium 158.0.8127.88 package, including bundled
+input, resize, the network AppContainer, restricted renderer tokens and
+profile cleanup. The package was launched from the relocated GUI. The
+production artifact approval, foreground DPI matrix and broader Windows
+host-policy coverage remain open. [Windows qualification](../../execution/2026-11-25-windows-native.md),
+[Browser runtime packaging](../../../../packaging/browser/README.md).

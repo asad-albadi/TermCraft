@@ -415,7 +415,7 @@ fn network_exposure_requires_explicit_permission() {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, windows))]
 fn wait_for(stream: &mut TcpStream, text: &str) -> String {
     let mut result = Vec::new();
     let mut buffer = [0; 1024];
@@ -490,6 +490,86 @@ fn telnet_authenticates_before_spawning_and_stops_only_owned_pty() {
     assert!(unrelated.try_wait().unwrap().is_none());
     unrelated.kill().unwrap();
     unrelated.wait().unwrap();
+}
+
+#[cfg(windows)]
+#[test]
+fn windows_telnet_bridges_native_conpty_and_stops_the_owned_child() {
+    use std::process::Command;
+    use windows_sys::Win32::{
+        Foundation::{CloseHandle, HANDLE, WAIT_OBJECT_0, WAIT_TIMEOUT},
+        System::Threading::{OpenProcess, PROCESS_SYNCHRONIZE, WaitForSingleObject},
+    };
+
+    struct ChildHandle(HANDLE);
+    impl Drop for ChildHandle {
+        fn drop(&mut self) {
+            unsafe { CloseHandle(self.0) };
+        }
+    }
+
+    let root = tempfile::tempdir().unwrap();
+    let shell = root.path().join("isolated console fixture.exe");
+    let source = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/support/windows_telnet_shell.rs");
+    let compile = Command::new(std::env::var_os("RUSTC").unwrap_or_else(|| "rustc".into()))
+        .arg(source)
+        .arg("-o")
+        .arg(&shell)
+        .output()
+        .unwrap();
+    assert!(
+        compile.status.success(),
+        "{}",
+        String::from_utf8_lossy(&compile.stderr)
+    );
+
+    let supervisor = ServiceSupervisor::default();
+    let id = supervisor
+        .start(ServiceConfig::telnet(
+            shell,
+            "fixture".into(),
+            Secret::new("fixture-password"),
+        ))
+        .unwrap();
+    let endpoint = supervisor.status(id).unwrap().address.unwrap();
+    let login = |password: &[u8]| {
+        let mut stream = TcpStream::connect(endpoint).unwrap();
+        stream
+            .set_read_timeout(Some(Duration::from_secs(4)))
+            .unwrap();
+        wait_for(&mut stream, "Workspace login: ");
+        stream.write_all(b"fixture\r\n").unwrap();
+        wait_for(&mut stream, "Password: ");
+        stream.write_all(password).unwrap();
+        stream
+    };
+    let mut denied = login(b"wrong\r\n");
+    let rejection = wait_for(&mut denied, "Authentication failed.");
+    assert!(!rejection.contains("TC_PID:"));
+
+    let mut client = login(b"fixture-password\r\n");
+    let response = wait_for(&mut client, ":END");
+    assert!(!response.contains("fixture-password"));
+    let (_, response) = response.split_once("TC_PID:").unwrap();
+    let pid = response
+        .split_once(":END")
+        .unwrap()
+        .0
+        .parse::<u32>()
+        .unwrap();
+    let handle = ChildHandle(unsafe { OpenProcess(PROCESS_SYNCHRONIZE, 0, pid) });
+    assert!(!handle.0.is_null());
+    assert_eq!(unsafe { WaitForSingleObject(handle.0, 0) }, WAIT_TIMEOUT);
+    client.write_all(b"round trip\r\n").unwrap();
+    wait_for(&mut client, "TC_RESULT:round trip:END");
+    supervisor.stop(id).unwrap();
+    stopped(&supervisor, id);
+    assert_eq!(
+        unsafe { WaitForSingleObject(handle.0, 4000) },
+        WAIT_OBJECT_0
+    );
+    assert!(TcpStream::connect_timeout(&endpoint, Duration::from_millis(500)).is_err());
 }
 
 #[test]

@@ -341,8 +341,9 @@
       ],
       "dependency": "",
       "remaining": "Reviewed native printer/smartcard, Linux RXCHAR/BREAK/ERR events and per-open statistics, Windows per-open statistics and bounded native serial owners are merged. Exact general POSIX COMMSTATUS/properties/modem events and opened-object rename/delete remain explicit platform/architecture limitations; native Windows/macOS/device/original qualification remains.",
-      "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; actual RDP native/admin/drive/device/clipboard/security/original interoperability remains unverified. Publication follow-up: hosted CI run45636600121 reports81helper tests passed/1failed in drive_allocation_is_released_on_last_remote_close_and_disconnect. Root cause unconfirmed; no green hosted CI claim.",
+      "validation_remaining": "Current helper82unit+10PCSC, owner27/pure22 controlled tests, MSVC source typecheck and independent reviews pass; Windows x64 passed independent Unicode clipboard and real release-helper NLA mapped-drive reads, writes, handle-relative rename and read-only refusal. Wider native admin, physical device, security and original interoperability remain open. Publication follow-up: hosted CI run45636600121 reports81helper tests passed/1failed in drive_allocation_is_released_on_last_remote_close_and_disconnect. Root cause unconfirmed; no green hosted CI claim.",
       "evidence": [
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/D02/providers/host-full.log",
         "docs/parity-evidence/execution/d02-engine-green.log",
         "docs/parity-evidence/parallel-rdp-serial/README.md",
@@ -410,10 +411,11 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS builders and interactive engine hosts to compile, approve hashes and qualify the reviewed owned-engine candidates.",
-      "remaining": "Reviewed Windows owned-job/loopback/PID/authentication and macOS private-socket/process-group source candidates are merged, with pinned upstream patches and offline source preparation. Native built engines, compiled checksum approvals and redistribution/runtime qualification remain unavailable; production gates reject stock engines. Linux owned Xwayland remains implemented.",
+      "remaining": "Windows pinned private VcXsrv built locally with adjacent DLLs, fonts and XKB data. Native probes passed occupied-display refusal, exact loopback address/PID ownership, binary cookie setup and listener cleanup. The Windows engine remains a development candidate while redistribution and compiled shipping approval are open. The native macOS build also remains open. Linux owned Xwayland remains implemented.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/X01/implementation.md",
         "docs/parity-evidence/X01/review.md",
         "docs/parity-evidence/parallel-integration-reviewed/result.json",
@@ -431,7 +433,7 @@
         "F01"
       ],
       "dependency": "Qualified native Windows/macOS owned engines from X01 and interactive SSH/X authentication, clipboard and display workflows on those systems.",
-      "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. Complete Windows/macOS owned-engine integration, native clipboard/display behavior and native/original qualification.",
+      "remaining": "Reviewed on-demand owned X startup and per-session authorization work for Linux local/embedded SSH with authoritative SSH configuration. A real owned Windows candidate mapped a window through embedded SSH and separately authenticated through Git for Windows OpenSSH with private xauth. Private Windows XDMCP clipboard passed on a separate loopback address. Microsoft Win32 OpenSSH compatibility, native shipping and original qualification remain open.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -447,7 +449,7 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS graphics hosts and physical GPU/monitor fixtures; configured headless Linux graphics coverage is retained.",
-      "remaining": "Reviewed actual Linux GLX rendering, Composite readback and RandR change/restoration are integrated and qualified in private fixtures, including actual extracted release app/engine. Native Windows/macOS graphics, hardware/GPU/monitor coverage and original comparison remain pending.",
+      "remaining": "Reviewed actual Linux GLX rendering, Composite readback and RandR change/restoration are integrated and qualified in private fixtures, including actual extracted release app/engine. The Windows x64 probe verified authenticated Composite pixels and live GLX/RANDR protocol versions. Windows OpenGL and actual RANDR changes, native macOS graphics, hardware/GPU/monitor coverage and original comparison remain pending.",
       "validation_remaining": "Targeted/host/native/original evidence after implementation.",
       "evidence": [
         "PARITY_PROGRESS.md",
@@ -464,10 +466,11 @@
       "implementation_checkpoint": false,
       "requires": [],
       "dependency": "Native Windows/macOS engines and original Personal26.6 workflow access. Linux genuine-package chooser/clipboard/keyboard/cancel checks already pass.",
-      "remaining": "Linux direct/indirect discovery, hostname, clipboard, keyboard and cleanup workflows are implemented and genuine-package qualified after the reviewed reset fix. Native Windows/macOS engine implementation/runtime qualification and original comparison remain.",
-      "validation_remaining": "Genuine source22bb/full398d traced and untraced strict-auth chooser/clipboard/keyboard/cancel checks passed. Current32 source retains identical XDMCP paths and native engine; native Windows/macOS and original workflows remain unverified.",
+      "remaining": "Linux direct/indirect discovery, hostname, clipboard, keyboard and cleanup workflows are implemented and genuine-package qualified after the reviewed reset fix. Windows application source routes Direct and Indirect through the owned candidate. A controlled Windows peer completed MANAGE and proved binary cookie setup, one selected keyboard layout and first-monitor fullscreen geometry. Authenticated Windows Direct XDMCP exchanged Unicode clipboard on a private station at a separate loopback address. Routed-network and release approval, native macOS and original comparison remain.",
+      "validation_remaining": "Genuine source22bb/full398d traced and untraced strict-auth chooser/clipboard/keyboard/cancel checks passed. The Windows development application and native candidate have separate approval-gate and protocol evidence. The full native Windows/macOS and original workflow matrices remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/X04/hostnames/root-integration.json",
         "docs/parity-evidence/X04/clipboard-lifecycle/root-integration.json",
         "docs/parity-evidence/X04/keyboard-chooser/root-integration.json",
@@ -506,9 +509,10 @@
       ],
       "dependency": "Native Windows/macOS required-client payload builds and clean-runtime hosts. Declared Arch-compatible Linux optional closure and Debian12 core scopes are qualified separately.",
       "remaining": "Linux optional protocol/runtime bundle is integrated and qualified for declared Arch x86_64 ABI, with actual empty-client-PATH Mosh SSH/UDP and sandboxed embedded Chromium. Debian12 core deliberately omits these optional native payloads. Native Windows/macOS required-client payloads and clean-runtime qualification remain.",
-      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "validation_remaining": "Windows x64 core startup passed with empty PATH. A private combined Windows package carried source-built Chromium, private X, BusyBox-w32 and the locked RDP helper. Windows production approval, Mosh and other optional native payloads remain open.",
       "evidence": [
-        "PARITY_PROGRESS.md"
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
@@ -612,24 +616,26 @@
       "requires": [],
       "dependency": "",
       "remaining": "",
-      "validation_remaining": "Collect native Windows/Npcap and macOS capture/permissions, deployed-tool and original workflow evidence; Linux namespace capture is fixture evidence only.",
+      "validation_remaining": "Linux namespace and native Windows Npcap loopback fixtures passed. Collect Windows routed-adapter and macOS capture/permissions, deployed-tool and original workflow evidence.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/P07/review.md",
-        "docs/parity-evidence/parallel-integration-ftp-tools/README.md"
+        "docs/parity-evidence/parallel-integration-ftp-tools/README.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
       ],
-      "next_action": "Collect native Windows/Npcap and macOS capture/permissions, deployed-tool and original workflow evidence; Linux namespace capture is fixture evidence only."
+      "next_action": "Collect Windows routed-adapter and macOS capture/permissions, deployed-tool and original workflow evidence."
     },
     {
       "id": "P08",
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS installer/build/upgrade hosts. Signing identities are needed only if a signed release is chosen, not for unsigned native qualification.",
+      "dependency": "Clean Windows upgrade and protocol-integration fixture, native macOS installer/build/upgrade hosts and remaining runtime payloads. Signing identities are needed only if a signed release is chosen.",
       "remaining": "Current source32e512 genuine full Linux archive d8cec and Debian12 core4628/revision3 are built and independently audited. Native Windows/macOS installers/lifecycle remain; full optional Debian runtime closure is not claimed.",
-      "validation_remaining": "Current Linux full3372hashes/actualGUI37checks and native Debian1074hashes/43commands/16bytepairs/5inventories pass. Native Windows/macOS installers and additional platform/original behavior remain unverified.",
+      "validation_remaining": "Current Linux full3372hashes/actualGUI37checks and native Debian1074hashes/43commands/16bytepairs/5inventories pass. An unsigned native Windows x64 ZIP passed relocated startup with the exact adjacent RDP child. Two distinct installed Windows GUI revisions preserved the same isolated workspace and encrypted vault through installation and uninstall. Clean hosted GUI and installer startup passed, as did a separate Windows shell activation and uninstall guard check. The local lifecycle preserved the original manifests of two independently versioned development ZIPs. A previously published release upgrade, remaining optional runtimes and macOS/original verification remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/parallel-packaging/review.md",
         "docs/parity-evidence/parallel-packaging/reviewed-artifact.json",
         "docs/parity-evidence/P01/combined-release-verification.json",
@@ -691,15 +697,16 @@
       ],
       "dependency": "",
       "remaining": "",
-      "validation_remaining": "Native Windows/macOS managed service and packaged Iperf providers plus original server behavior remain unverified; tested source-built Iperf payload is Linux x86_64/glibc2.44 only.",
+      "validation_remaining": "Explicit Windows Iperf2/3 compatibility passed TCP, UDP and listener cleanup. Native packaged Iperf outside Linux, macOS service evidence and original server behavior remain open.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/B03/implementation.md",
         "docs/parity-evidence/B03/review-fixes.md",
         "docs/parity-evidence/B03/ui-credentials-review.md",
-        "docs/parity-evidence/parallel-integration-platform-services/result.json"
+        "docs/parity-evidence/parallel-integration-platform-services/result.json",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
       ],
-      "next_action": "Retain reviewed SSH/SFTP/Iperf service integration; collect native provider/original interoperability evidence."
+      "next_action": "Collect native packaged Iperf, macOS service and original interoperability evidence."
     },
     {
       "id": "B04",
@@ -763,9 +770,9 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS packaged Chromium runtimes and interactive profile, input and lifecycle qualification.",
-      "remaining": "Reviewed embedded Chromium and private process/pipe source backends are present for Linux, Windows and macOS. Genuine source22bb Linux bundle passes actual normal-app navigation/input/resize/PTY and five nested sandboxed renderer checks with clean cleanup. Native Windows/macOS browser packaging and interactive provider qualification remain.",
-      "validation_remaining": "Native Windows/Linux/macOS and original runtime comparisons remain pending; static exact-target and official scope evidence established.",
+      "dependency": "Windows production artifact approval, a native macOS browser payload and original workflow fixtures.",
+      "remaining": "Source22bb Linux bundle passed packaged navigation/input/resize/PTY and nested renderer sandbox checks. A relocated private Windows x64 package used the exact source-built Chromium with native AppContainer, input and cleanup evidence.",
+      "validation_remaining": "Complete Windows production artifact approval, macOS packaging and runtime qualification, and original workflow comparisons. The Windows evidence applies to the exact private candidate.",
       "evidence": [
         "PARITY_PROGRESS.md",
         "docs/parity-evidence/original-scope/README.md",
@@ -774,7 +781,8 @@
         "docs/parity-evidence/parallel-integration-reviewed/result.json",
         "docs/parity-evidence/E01/macos/README.md",
         "docs/parity-evidence/E01/windows/README.md",
-        "docs/parity-evidence/E01/resize-macos-review.md"
+        "docs/parity-evidence/E01/resize-macos-review.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },
@@ -936,11 +944,12 @@
       "state": "Blocked",
       "implementation_checkpoint": false,
       "requires": [],
-      "dependency": "Native Windows/macOS build runners with interactive desktop access; source/type checks do not establish native runtime behavior.",
-      "remaining": "Run native Windows and macOS builds and interactive workflows. Windows cross-target `cargo check` proves compilation only.",
-      "validation_remaining": "Targeted/host/native/original evidence after implementation.",
+      "dependency": "Native desktop, endpoint and device fixtures for remaining Windows/macOS qualification.",
+      "remaining": "Complete interactive Windows desktop, clean-account, device redirection, providers and macOS qualification.",
+      "validation_remaining": "Hosted Windows x64 CI passed 615 workspace tests with 32 ignored and 36 locked helper tests. The actual relocated GUI passed live themes, new-terminal shortcut, split, detach, native fullscreen and restore, reattach and process teardown at one scale. Additional input, DPI, provider, hardware and original workflows remain open.",
       "evidence": [
-        "PARITY_PROGRESS.md"
+        "PARITY_PROGRESS.md",
+        "docs/parity-evidence/execution/2026-11-25-windows-native.md"
       ],
       "next_action": "Provide the stated supported environment/fixture, then complete the remaining implementation and qualification there; preserve the reviewed local implementation and explicit platform limitations."
     },

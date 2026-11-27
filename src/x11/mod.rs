@@ -4,6 +4,8 @@ mod capabilities;
 mod engine;
 #[cfg(target_os = "linux")]
 mod native_capabilities;
+#[cfg(all(windows, target_arch = "x86_64"))]
+mod native_capabilities_windows;
 pub use capabilities::{OpenGlEvidence, XCapabilities, capability_probe_entry};
 mod forwarding;
 pub mod remote_environment;

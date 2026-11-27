@@ -12,6 +12,8 @@ use std::{
     sync::mpsc::{self, Receiver},
     thread,
 };
+const OUTPUT_QUEUE_CAPACITY: usize = 256;
+
 pub struct Serial {
     pub rx: Receiver<Vec<u8>>,
     input: Option<crate::process::InputQueue>,
@@ -92,7 +94,7 @@ impl Serial {
         #[cfg(unix)]
         let probe = file.try_clone().map_err(|e| e.to_string())?;
         let input = crate::process::InputQueue::new(file)?;
-        let (tx, rx) = mpsc::sync_channel(256);
+        let (tx, rx) = mpsc::sync_channel(OUTPUT_QUEUE_CAPACITY);
         let reader_closed = Arc::new(AtomicBool::new(false));
         let closed = reader_closed.clone();
         let cancel = Arc::new(AtomicBool::new(false));
@@ -141,22 +143,8 @@ impl Serial {
                         thread::sleep(std::time::Duration::from_millis(30));
                     }
                     Ok(n) => {
-                        let mut data = buf[..n].to_vec();
-                        loop {
-                            match tx.try_send(data) {
-                                Ok(()) => break,
-                                Err(mpsc::TrySendError::Full(value)) => {
-                                    if stop.load(Ordering::Acquire) {
-                                        break;
-                                    }
-                                    data = value;
-                                    thread::sleep(std::time::Duration::from_millis(10));
-                                }
-                                Err(_) => {
-                                    stop.store(true, Ordering::Release);
-                                    break;
-                                }
-                            }
+                        if !send_output(&tx, buf[..n].to_vec(), &stop) {
+                            break;
                         }
                     }
                     Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
@@ -250,5 +238,62 @@ impl Drop for Serial {
         // Native read timeouts and queue backpressure both observe cancellation.
         // Do not join here: GUI close remains nonblocking.
         let _ = self.reader_thread.take();
+    }
+}
+
+// A full UI queue must retain already-read bytes while allowing close to cancel
+// the unsent chunk. Keep this same path shared by every native serial reader.
+fn send_output(tx: &mpsc::SyncSender<Vec<u8>>, mut data: Vec<u8>, stop: &AtomicBool) -> bool {
+    loop {
+        match tx.try_send(data) {
+            Ok(()) => return true,
+            Err(mpsc::TrySendError::Full(value)) => {
+                if stop.load(Ordering::Acquire) {
+                    return false;
+                }
+                data = value;
+                thread::sleep(std::time::Duration::from_millis(10));
+            }
+            Err(_) => {
+                stop.store(true, Ordering::Release);
+                return false;
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod output_queue_tests {
+    use super::*;
+
+    #[test]
+    fn cancelling_full_serial_output_preserves_all_queued_payloads() {
+        let (tx, rx) = mpsc::sync_channel(OUTPUT_QUEUE_CAPACITY);
+        let expected: Vec<_> = (0u32..256).map(|n| n.to_le_bytes().to_vec()).collect();
+        for bytes in &expected {
+            tx.try_send(bytes.clone()).unwrap();
+        }
+        let stop = Arc::new(AtomicBool::new(false));
+        let cancelled = stop.clone();
+        let (started, entered) = mpsc::channel();
+        let (done, finished) = mpsc::channel();
+        let worker = thread::spawn(move || {
+            started.send(()).unwrap();
+            let sent = send_output(&tx, b"unsent-257th-chunk".to_vec(), &cancelled);
+            done.send(sent).unwrap();
+        });
+        entered
+            .recv_timeout(std::time::Duration::from_secs(1))
+            .unwrap();
+        // No receiver drains the queue. The 257th chunk can only leave the
+        // actual Full branch through cancellation; it can never be admitted.
+        stop.store(true, Ordering::Release);
+        assert!(
+            !finished
+                .recv_timeout(std::time::Duration::from_secs(1))
+                .expect("full serial queue trapped the cancelled reader")
+        );
+        worker.join().unwrap();
+        assert_eq!(rx.try_iter().collect::<Vec<_>>(), expected);
     }
 }

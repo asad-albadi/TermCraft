@@ -130,7 +130,10 @@ fn open_verified_input(path: &Path) -> Result<File, String> {
 }
 #[cfg(windows)]
 pub fn protect_directory(path: &Path) -> Result<File, String> {
-    use std::os::windows::{fs::OpenOptionsExt, io::AsRawHandle};
+    use std::os::windows::{
+        fs::{MetadataExt, OpenOptionsExt},
+        io::AsRawHandle,
+    };
     use windows_sys::Win32::{
         Foundation::LocalFree,
         Security::{Authorization::*, *},
@@ -138,12 +141,17 @@ pub fn protect_directory(path: &Path) -> Result<File, String> {
     };
     let handle = OpenOptions::new()
         .read(true)
-        .access_mode(0x00020000 | 0x00040000 | FILE_LIST_DIRECTORY)
+        .access_mode(READ_CONTROL | WRITE_DAC | WRITE_OWNER | FILE_LIST_DIRECTORY)
         .share_mode(FILE_SHARE_READ | FILE_SHARE_WRITE)
         .custom_flags(FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT)
         .open(path)
         .map_err(|e| e.to_string())?;
-    let sddl: Vec<u16> = "D:P(A;OICI;FA;;;OW)".encode_utf16().chain([0]).collect();
+    let metadata = handle.metadata().map_err(|e| e.to_string())?;
+    if !metadata.is_dir() || metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0 {
+        return Err("Private native X workspace must be an ordinary directory".into());
+    }
+    let sddl = crate::platform::private_file::user_owned_descriptor("OICI", "FA")
+        .map_err(|e| e.to_string())?;
     unsafe {
         let mut descriptor = std::ptr::null_mut();
         if ConvertStringSecurityDescriptorToSecurityDescriptorW(
@@ -157,12 +165,16 @@ pub fn protect_directory(path: &Path) -> Result<File, String> {
         }
         let (mut present, mut defaulted, mut dacl) = (0, 0, std::ptr::null_mut());
         let parsed = GetSecurityDescriptorDacl(descriptor, &mut present, &mut dacl, &mut defaulted);
-        let result = if parsed != 0 && present != 0 {
+        let mut owner = std::ptr::null_mut();
+        let parsed_owner = GetSecurityDescriptorOwner(descriptor, &mut owner, &mut defaulted);
+        let result = if parsed != 0 && present != 0 && parsed_owner != 0 && !owner.is_null() {
             SetSecurityInfo(
                 handle.as_raw_handle(),
                 SE_FILE_OBJECT,
-                DACL_SECURITY_INFORMATION | PROTECTED_DACL_SECURITY_INFORMATION,
-                std::ptr::null_mut(),
+                OWNER_SECURITY_INFORMATION
+                    | DACL_SECURITY_INFORMATION
+                    | PROTECTED_DACL_SECURITY_INFORMATION,
+                owner,
                 std::ptr::null_mut(),
                 dacl,
                 std::ptr::null_mut(),

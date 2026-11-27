@@ -387,9 +387,8 @@ pub fn windows_rdp_launch(session: &Session) -> Result<Launch, String> {
     let mut profile = tempfile::Builder::new()
         .prefix("termcraft-rdp-")
         .suffix(".rdp")
-        .tempfile()
+        .make(crate::platform::private_file::create_new)
         .map_err(|e| format!("Create private RDP profile: {e}"))?;
-    crate::platform::private_file::verify(profile.as_file())?;
     profile
         .write_all(&bytes)
         .map_err(|e| format!("Write RDP profile: {e}"))?;

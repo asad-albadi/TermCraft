@@ -261,7 +261,38 @@ impl ReviewedArchive {
         let stage_name = format!(".import-{}", digest(&nonce));
         root_dir.create_dir(&stage_name)?;
         let result = (|| {
+            #[cfg(not(windows))]
             let stage = root_dir.open_dir_nofollow(&stage_name)?;
+            #[cfg(windows)]
+            let stage = {
+                use cap_fs_ext::{FollowSymlinks, OpenOptionsFollowExt};
+                use cap_std::fs::OpenOptionsExt;
+                use std::os::windows::fs::MetadataExt;
+                use windows_sys::Win32::{
+                    Foundation::GENERIC_READ,
+                    Storage::FileSystem::{
+                        DELETE, FILE_ATTRIBUTE_REPARSE_POINT, FILE_FLAG_BACKUP_SEMANTICS,
+                        FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE,
+                    },
+                };
+                let mut options = cap_std::fs::OpenOptions::new();
+                options
+                    .read(true)
+                    .follow(FollowSymlinks::No)
+                    .access_mode(GENERIC_READ | DELETE)
+                    .share_mode(FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE)
+                    .custom_flags(FILE_FLAG_BACKUP_SEMANTICS);
+                let file = root_dir.open_with(&stage_name, &options)?.into_std();
+                let metadata = file.metadata()?;
+                if !metadata.is_dir()
+                    || metadata.file_attributes() & FILE_ATTRIBUTE_REPARSE_POINT != 0
+                {
+                    return Err(invalid(
+                        "Legacy import staging is not an ordinary directory",
+                    ));
+                }
+                Dir::from_std_file(file)
+            };
             stage.create_dir("payload")?;
             let payload = stage.open_dir_nofollow("payload")?;
             let source = Dir::open_ambient_dir(self.scratch.path(), ambient_authority())?
@@ -296,6 +327,9 @@ impl ReviewedArchive {
             serde_json::to_writer_pretty(&mut metadata, &self.metadata)
                 .map_err(io::Error::other)?;
             metadata.sync_all()?;
+            // Close child handles before publishing the held directory.
+            drop(metadata);
+            drop(payload);
             cancelled(cancel)?;
             // An exclusive root lock closes the concurrent-import existence/rename race.
             let mut options = cap_std::fs::OpenOptions::new();
@@ -318,9 +352,20 @@ impl ReviewedArchive {
                 ));
             }
             cancelled(cancel)?;
+            #[cfg(not(windows))]
             root_dir.rename(&stage_name, &root_dir, &final_name)?;
+            #[cfg(windows)]
+            crate::platform::windows_rename::rename(
+                &stage,
+                &root_dir,
+                std::ffi::OsStr::new(&final_name),
+                false,
+            )?;
             Ok(root.join(&final_name))
         })();
+        // Windows retains a failed staging directory. Recursive cleanup by
+        // path after the held handle closes cannot identify our directory.
+        #[cfg(not(windows))]
         if result.is_err() {
             let _ = root_dir.remove_dir_all(&stage_name);
         }
@@ -781,12 +826,23 @@ mod tests {
         let root = parent.path().join("legacy");
         std::fs::write(review.scratch.path().join("payload/bin/a"), b"tampered").unwrap();
         assert!(review.import(&root, &AtomicBool::new(false)).is_err());
-        assert_eq!(std::fs::read_dir(&root).unwrap().count(), 0);
+        let unpublished: Vec<_> = std::fs::read_dir(&root)
+            .unwrap()
+            .map(|entry| entry.unwrap().file_name())
+            .collect();
+        #[cfg(not(windows))]
+        assert!(unpublished.is_empty());
+        #[cfg(windows)]
+        assert!(
+            unpublished
+                .iter()
+                .all(|entry| entry.to_string_lossy().starts_with(".import-"))
+        );
         assert!(matches!(
             review.import(&root, &AtomicBool::new(true)),
             Err(PackageError::Cancelled)
         ));
-        assert_eq!(std::fs::read_dir(&root).unwrap().count(), 0);
+        assert_eq!(std::fs::read_dir(&root).unwrap().count(), unpublished.len());
     }
 
     #[cfg(unix)]

@@ -7,13 +7,20 @@
       "architecture": "x86_64",
       "path": "runtime/linux-x86_64/iperf2",
       "version": "2.2.1",
-      "sha256": "570328443a3fbeb426dba301e2c892b3026645c2d7b3da8bc2fea9688978a834",
+      "sha256": "487898553ead5875deea12ca44720c7a3893768657fb15cc4c6a13f7e4f32722",
       "archive_url": "https://downloads.sourceforge.net/project/iperf2/iperf-2.2.1.tar.gz",
       "archive_sha256": "754ab0a7e28033dbea81308ef424bc7df4d6e2fe31b60cc536b61b51fefbd8fb",
       "source_url": "https://downloads.sourceforge.net/project/iperf2/iperf-2.2.1.tar.gz",
       "source_sha256": "754ab0a7e28033dbea81308ef424bc7df4d6e2fe31b60cc536b61b51fefbd8fb",
       "license": "NCSA (see bundled upstream COPYING)",
-      "license_sha256": "5f9f5c4feca3347c3b3c0ada8b16b4e6b698aac4e6f016a24adf61a5915336d1"
+      "license_sha256": "5f9f5c4feca3347c3b3c0ada8b16b4e6b698aac4e6f016a24adf61a5915336d1",
+      "build": {
+        "distribution": "Debian GNU/Linux 12 (bookworm)",
+        "compiler": "GCC 12.2.0 (Debian 12.2.0-14+deb12u1)",
+        "glibc": "2.36-9+deb12u14",
+        "configure": [],
+        "maximum_glibc_symbol": "2.34"
+      }
     },
     {
       "tool": "iperf3",
@@ -21,13 +28,24 @@
       "architecture": "x86_64",
       "path": "runtime/linux-x86_64/iperf3",
       "version": "3.19.1",
-      "sha256": "b24644f3fe69e19f332acd64645f1a85336e5e07f80634b92ed84bdc4eb6f8c9",
+      "sha256": "6b5000d9918471cf785f1dd2b09fb8294cdf4053db48e9fabb749f0ac46ec9c1",
       "archive_url": "https://downloads.es.net/pub/iperf/iperf-3.19.1.tar.gz",
       "archive_sha256": "dc63f89ec581ea99f8b558d8eb35109de06383010db5a1906c208a562ba0c270",
       "source_url": "https://downloads.es.net/pub/iperf/iperf-3.19.1.tar.gz",
       "source_sha256": "dc63f89ec581ea99f8b558d8eb35109de06383010db5a1906c208a562ba0c270",
       "license": "Upstream BSD-style and third-party notices (see full bundled LICENSE)",
-      "license_sha256": "7c9ba0385fcf35c4c9e08ad0c0cba72d4315f36f0f742fef4de826a28cc33a97"
+      "license_sha256": "7c9ba0385fcf35c4c9e08ad0c0cba72d4315f36f0f742fef4de826a28cc33a97",
+      "build": {
+        "distribution": "Debian GNU/Linux 12 (bookworm)",
+        "compiler": "GCC 12.2.0 (Debian 12.2.0-14+deb12u1)",
+        "glibc": "2.36-9+deb12u14",
+        "configure": [
+          "--disable-shared",
+          "--enable-static",
+          "--without-openssl"
+        ],
+        "maximum_glibc_symbol": "2.34"
+      }
     }
   ]
 }

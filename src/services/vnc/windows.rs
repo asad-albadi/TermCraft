@@ -2,6 +2,9 @@
 //! GDI objects are created/released on the calling thread; no handles cross workers.
 #[path = "windows_clipboard.rs"]
 mod clipboard;
+#[cfg(test)]
+#[path = "windows_qualification.rs"]
+mod qualification;
 use super::{Frame, Input, MAX_PIXELS, Source};
 use std::{
     io,

@@ -1,0 +1,2 @@
+chunk=32768, real_stable_full_samples=5, accepted_filler=1081344, release_admitted=true, received=500736, release_observed_within_4s=false, elapsed=4.002741827s
+chunk=1024, real_stable_full_samples=5, accepted_filler=54272, release_admitted=true, received=54281, release_observed_within_4s=true, elapsed=437.315844ms

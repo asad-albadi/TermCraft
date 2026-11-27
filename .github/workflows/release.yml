@@ -6,6 +6,18 @@ on:
         description: Attempt GUI and RDP startup on Windows and macOS runners
         type: boolean
         default: true
+      windows_x_fixture:
+        description: Build an unpublished Windows x64 X11 candidate and exercise its private desktop
+        type: boolean
+        default: false
+      windows_vnc_fixture:
+        description: Exercise native input on a disposable Windows runner desktop
+        type: boolean
+        default: false
+      windows_printer_fixture:
+        description: Verify the packaged printer worker with a disposable loopback RAW port
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -47,6 +59,13 @@ jobs:
             Split-Path $reader | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           }
       - run: cargo test --locked --test package_manifest
+      - if: runner.os == 'Windows'
+        run: cargo test --locked --test cli_dispatch --test credential_vault
+      - name: Verify native input on the disposable Windows desktop
+        if: runner.os == 'Windows' && inputs.windows_vnc_fixture
+        env:
+          TERMCRAFT_VNC_DISPOSABLE_CONTROL: "1"
+        run: cargo test --locked --lib windows_vnc_control_reaches_only_the_disposable_desktop_fixture -- --ignored --nocapture
       - run: python scripts/package-release.py --output dist
       - if: runner.os == 'Linux'
         shell: bash
@@ -60,12 +79,40 @@ jobs:
           (cd "$stage" && md5sum --quiet -c DEBIAN/md5sums)
           env PATH= "$stage/opt/termcraft/harbor-workspace" --help
           xvfb-run -a -s '-screen 0 1440x1024x24' bash -c 'python scripts/package-check-startup.py "$1" --display "$DISPLAY" --evidence startup-evidence' _ "${archive[0]}"
-      - if: runner.os != 'Linux' && inputs.native_gui
+      - if: runner.os == 'macOS' && inputs.native_gui
         shell: bash
         run: |
           archive=(dist/TermCraft-*.zip)
           test "${#archive[@]}" -eq 1
           python scripts/package-check-startup.py "${archive[0]}" --evidence startup-evidence
+      - if: runner.os == 'Windows' && inputs.native_gui
+        shell: pwsh
+        run: |
+          $fixture = Get-Content tests/windows-software-gl.json -Raw | ConvertFrom-Json
+          $graphics = New-Item -ItemType Directory -Path (Join-Path $env:RUNNER_TEMP 'termcraft-software-gl')
+          $download = Join-Path $graphics.FullName 'mesa.7z'
+          Invoke-WebRequest -Uri $fixture.url -OutFile $download
+          if ((Get-FileHash -LiteralPath $download).Hash -ne $fixture.sha256) { throw 'Mesa fixture checksum mismatch.' }
+          $members = @($fixture.files.PSObject.Properties.Name | ForEach-Object { "x64/$_" })
+          tar.exe -xf $download -C $graphics.FullName @members
+          if ($LASTEXITCODE -ne 0) { throw 'Could not extract the pinned Mesa fixture.' }
+          $softwareGl = Join-Path $graphics.FullName 'x64'
+          $archive = @(Get-ChildItem dist -Filter 'TermCraft-*.zip')
+          if ($archive.Count -ne 1) { throw 'Expected exactly one Windows package.' }
+          python scripts/package-check-startup.py $archive[0].FullName --evidence startup-evidence --windows-software-gl $softwareGl
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./tests/windows-package-lifecycle.ps1 -Archive $archive[0].FullName -SoftwareGlDirectory $softwareGl
+      - name: Verify packaged Winspool worker with a disposable queue
+        if: runner.os == 'Windows' && inputs.windows_printer_fixture
+        shell: pwsh
+        run: |
+          $archive = @(Get-ChildItem dist -Filter 'TermCraft-*.zip')
+          if ($archive.Count -ne 1) { throw 'Expected exactly one Windows package.' }
+          $root = Join-Path $env:RUNNER_TEMP 'termcraft-print-fixture'
+          Expand-Archive -LiteralPath $archive[0].FullName -DestinationPath $root
+          $helper = @(Get-ChildItem -LiteralPath $root -Recurse -Filter 'termcraft-rdp-engine.exe')
+          if ($helper.Count -ne 1) { throw 'Expected exactly one packaged RDP helper.' }
+          ./tests/windows-printer-fixture.ps1 -Helper $helper[0].FullName
       - if: success()
         shell: bash
         run: |
@@ -89,3 +136,129 @@ jobs:
             dist/*
             startup-evidence/
           if-no-files-found: ignore
+
+  windows-x-fixture:
+    if: inputs.windows_x_fixture
+    runs-on: windows-2022
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.9"
+          architecture: x64
+      - name: Provision pinned native build and clipboard inputs
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:RUNNER_TEMP 'termcraft-x11-fixture'
+          $null = New-Item -ItemType Directory -Path $work
+          function Download-Pinned([string]$Url, [string]$Sha256, [string]$File) {
+            Invoke-WebRequest -Uri $Url -OutFile $File -TimeoutSec 300
+            if ((Get-FileHash -LiteralPath $File -Algorithm SHA256).Hash -ne $Sha256) {
+              throw "Tool or source archive checksum mismatch: $File"
+            }
+          }
+          $contract = Get-Content packaging/x11/native/source-contract.json -Raw | ConvertFrom-Json
+          Download-Pinned $contract.windows.source_archive_url $contract.windows.source_archive_sha256 (Join-Path $work 'source.tar.gz')
+          $zipTools = @{
+            'jom' = @('https://download.qt.io/official_releases/jom/jom_1_1_4.zip',
+              'd533c1ef49214229681e90196ed2094691e8c4a0a0bef0b2c901debcb562682b')
+            'nasm' = @('https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/win64/nasm-2.16.03-win64.zip',
+              '3ee4782247bcb874378d02f7eab4e294a84d3d15f3f6ee2de2f47a46aa7226e6')
+            'perl' = @('https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_54022_64bit/strawberry-perl-5.40.2.2-64bit-portable.zip',
+              '7df5cdc41e8638c00b2aa00cccc69ec8cd5a5ad0ec265c81f389beffb53b6920')
+            'winflexbison' = @('https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip',
+              '8d324b62be33604b2c45ad1dd34ab93d722534448f55a16ca7292de32b6ac135')
+          }
+          foreach ($name in $zipTools.Keys) {
+            $archive = Join-Path $work "$name.zip"
+            Download-Pinned $zipTools[$name][0] $zipTools[$name][1] $archive
+            Expand-Archive -LiteralPath $archive -DestinationPath (Join-Path $work $name)
+          }
+          $msys = Join-Path $work 'gperf'
+          $null = New-Item -ItemType Directory -Path $msys
+          $msysPackages = @{
+            'gperf-3.1-6-x86_64.pkg.tar.zst' = @('393a048d6eb490e572951df7a99e0548cf064703adce365f960f3c0b45996256', 'usr/bin/gperf.exe')
+            'gcc-libs-13.4.0-1-x86_64.pkg.tar.zst' = @('3dfd7663495e17ec10df44a9fa431c4849d96ed1cc6e1cf3dd145ad5ce5d38bd',
+              'usr/bin/msys-gcc_s-seh-1.dll', 'usr/bin/msys-stdc++-6.dll')
+            'msys2-runtime-3.6.2-2-x86_64.pkg.tar.zst' = @('94b77379f0da40a6e6b3c1485487ff9bbb48d8d0fe1f5c402c310d9bebabbe7c', 'usr/bin/msys-2.0.dll')
+          }
+          foreach ($name in $msysPackages.Keys) {
+            $archive = Join-Path $work $name
+            $digest = $msysPackages[$name][0]
+            $members = @($msysPackages[$name] | Select-Object -Skip 1)
+            Download-Pinned "https://repo.msys2.org/msys/x86_64/$name" $digest $archive
+            tar.exe -xf $archive -C $msys @members
+            if ($LASTEXITCODE -ne 0) { throw "Could not extract pinned gperf input: $name" }
+          }
+          python -m venv (Join-Path $work 'python')
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $python = Join-Path $work 'python/Scripts/python.exe'
+          $requirements = Join-Path $work 'requirements.txt'
+          $wheels = Join-Path $work 'wheels'
+          @'
+          lxml==6.1.3 --hash=sha256:7ae4949f212a53b007dbc355884fda122545c5764a54256c9217e419a62a6559
+          Mako==1.4.3 --hash=sha256:723296007c870bfd6b3f0c3230dba7198096e5269297ebf5e4eff9e7ffa39d4f
+          MarkupSafe==3.0.4 --hash=sha256:fdb4ca07ab75ffadab4a8b135ad59cdbb3156b99310f3d565370da74a15d6bd3
+          PyYAML==6.0.4 --hash=sha256:0db75f402e99c25239003a499c214a61947b4ef5312af34711d4c63e5c179318
+          meson==1.12.1 --hash=sha256:930bc7542cbd9f57009e182fd014eba48cf1a0180a7b9006d2d32d8f168d8b02
+          ninja==1.13.2 --hash=sha256:1293f4078278b70d0ee4b6cc8f3a9e030656c9b2f59909970343c4fe76070118
+          python-xlib==0.33 --hash=sha256:c3534038d42e0df2f1392a1b30a15a4ff5fdc2b86cfa94f072bf11b10a164398
+          six==1.17.0 --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274
+          '@ | Set-Content -LiteralPath $requirements -Encoding utf8
+          & $python -m pip download --index-url https://pypi.org/simple --require-hashes --only-binary=:all: -r $requirements --dest $wheels
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & $python -m pip install --no-index --find-links $wheels --require-hashes -r $requirements
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build and inventory the private x64 candidate
+        id: build_x11
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:RUNNER_TEMP 'termcraft-x11-fixture'
+          $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+          $vs = & $vswhere -latest -version '[17.0,18.0)' -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if ($LASTEXITCODE -ne 0 -or !$vs) { throw 'Visual Studio 2022 x64 tools are required.' }
+          Import-Module (Join-Path $vs 'Common7/Tools/Microsoft.VisualStudio.DevShell.dll')
+          Enter-VsDevShell -VsInstallPath $vs -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64'
+          $arguments = @{
+            SourceArchive = Join-Path $work 'source.tar.gz'
+            BuildDirectory = Join-Path $work 'build'
+            PythonExecutable = Join-Path $work 'python/Scripts/python.exe'
+            GitUnixBin = Join-Path $env:ProgramFiles 'Git/usr/bin'
+            ToolDirectories = @('jom', 'nasm/nasm-2.16.03', 'perl/perl/bin', 'winflexbison', 'gperf/usr/bin') |
+              ForEach-Object { Join-Path $work $_ }
+            Jobs = 2
+          }
+          ./packaging/x11/native/build-private-windows.ps1 @arguments
+      - name: Verify X11 wire behavior
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:RUNNER_TEMP 'termcraft-x11-fixture'
+          $python = Join-Path $work 'python/Scripts/python.exe'
+          $build = Join-Path $work 'build'
+          $candidate = Join-Path $build 'x11/windows-x86_64-private1'
+          $inventory = Join-Path $build 'candidate-inventory.json'
+          $digest = (Get-FileHash -LiteralPath $inventory -Algorithm SHA256).Hash.ToLowerInvariant()
+          Get-Content (Join-Path $build 'build-inputs.json')
+          $engine = (Get-FileHash -LiteralPath (Join-Path $candidate 'vcxsrv.exe') -Algorithm SHA256).Hash.ToLowerInvariant()
+          "VcXsrv SHA-256 $engine"
+          "Inventory SHA-256 $digest"
+          & $python tests/windows_xdmcp_candidate.py --candidate $candidate --inventory $inventory --evidence (Join-Path $work 'wire-evidence')
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Verify isolated clipboard behavior
+        if: always() && !cancelled() && steps.build_x11.outcome == 'success'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $work = Join-Path $env:RUNNER_TEMP 'termcraft-x11-fixture'
+          $python = Join-Path $work 'python/Scripts/python.exe'
+          $candidate = Join-Path $work 'build/x11/windows-x86_64-private1'
+          $inventory = Join-Path $work 'build/candidate-inventory.json'
+          $digest = (Get-FileHash -LiteralPath $inventory -Algorithm SHA256).Hash.ToLowerInvariant()
+          & $python tests/windows_x_clipboard.py --candidate $candidate --inventory $inventory --inventory-sha256 $digest --wheel-directory (Join-Path $work 'wheels') --evidence (Join-Path $work 'clipboard-evidence') --address 127.0.0.2 --xdmcp
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

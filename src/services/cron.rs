@@ -373,10 +373,9 @@ fn persist_with_barrier(
     }
     let parent = path.parent().ok_or("Choose a cron storage folder.")?;
     std::fs::create_dir_all(parent).map_err(|_| "Could not create cron storage.")?;
-    let mut temporary = tempfile::NamedTempFile::new_in(parent)
+    let mut temporary = tempfile::Builder::new()
+        .make_in(parent, crate::platform::private_file::create_new)
         .map_err(|_| "Could not stage cron configuration.")?;
-    crate::platform::private_file::verify(temporary.as_file())
-        .map_err(|_| "Could not secure cron configuration.")?;
     temporary
         .write_all(&bytes)
         .and_then(|_| temporary.as_file().sync_all())

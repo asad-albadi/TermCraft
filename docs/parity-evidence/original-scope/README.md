@@ -4,6 +4,8 @@ Read-only review on Linux, 2026-11-24. Runtime result for each point is **unavai
 
 Raw offsets below are hexadecimal positions in that file. Craft addresses are virtual addresses and Craft pseudocode line numbers refer to the decoded `result.pseudo_code` field, beginning with its initial blank line. Evidence IDs resolve under [the exported investigation](../../../../investigation.cany/evidence/) by the first two characters after `ev_`. Resources establish the presence and initial serialized values of UI controls. Compiled strings, including those in bundled libraries, do not establish enabled controls, selectable options, or runtime defaults. Derived handler observations are marked accordingly.
 
+A later Windows replay recovered the same executable digest from the supplied signed MSI. It records observed startup and terminal defaults, the original DPI overrides and a paired SSH bookmark/import workflow. The original runtime UI probes below remain open. [Windows runtime evidence](../execution/2026-11-25-windows-native.md#personal-266-reference-replay)
+
 ## Official sources
 
 All accessed 2026-11-24.

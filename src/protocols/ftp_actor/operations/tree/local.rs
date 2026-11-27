@@ -297,6 +297,12 @@ pub(in crate::protocols::ftp_actor::operations) async fn download(
         Err(error) if error.kind() == ErrorKind::NotFound => None,
         Err(error) => return Err(io(error)),
     };
+    #[cfg(windows)]
+    let existing = if existing.is_some() {
+        Some(LocalStage::pin_merge_target(local.to_owned()).await?)
+    } else {
+        None
+    };
     let Some(plan) = remote_plan(backend, remote, job, false).await? else {
         return Ok(TransferOutcome::Cancelled);
     };

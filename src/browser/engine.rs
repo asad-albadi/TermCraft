@@ -409,12 +409,32 @@ impl Browser<'_> {
     }
 
     fn resize(&mut self, size: [u32; 2], revision: u64) -> Result<(), String> {
+        if cfg!(windows) {
+            // A screenshot can restore the metrics it saved when it started.
+            // Let that capture finish before changing Windows page metrics.
+            while let Some(capture) = self.capture {
+                let message = self
+                    .pipe
+                    .receive(capture.deadline, &self.shared.cancelled)?
+                    .ok_or("Chromium timed out finishing the previous preview.")?;
+                self.event(&message)?;
+            }
+        }
         let [width, height] = bounded_size(size);
         self.size = [width, height];
         self.viewport_revision = revision;
         self.shared.frame.lock().unwrap().take();
-        // An emulated screenshot can restore its previous viewport when it
-        // completes. Resize the owned headless window without device emulation.
+        // Chromium's Windows headless window clamps narrow widths to 500px.
+        // Override the page viewport so layout, captured pixels, and pointer
+        // input keep the same dimensions for narrow workspace panes.
+        if cfg!(windows) {
+            self.call(
+                true,
+                "Emulation.setDeviceMetricsOverride",
+                json!({"width":width,"height":height,"deviceScaleFactor":1,"mobile":false}),
+            )?;
+            return Ok(());
+        }
         self.call(
             false,
             "Browser.setContentsSize",

@@ -385,7 +385,24 @@ impl FtpBackend {
             .await?;
         if self.data_tls.is_some() {
             self.limits
-                .io("closing data download", stream.shutdown())
+                .io("closing data download", async {
+                    match stream.shutdown().await {
+                        // The TLS read already reached an authenticated EOF.
+                        // Windows can reset the write side after the peer has
+                        // closed its socket. The control reply is still checked.
+                        #[cfg(windows)]
+                        Err(error)
+                            if matches!(
+                                error.kind(),
+                                std::io::ErrorKind::ConnectionReset
+                                    | std::io::ErrorKind::BrokenPipe
+                            ) =>
+                        {
+                            Ok(())
+                        }
+                        result => result,
+                    }
+                })
                 .await?;
         }
         drop(stream);

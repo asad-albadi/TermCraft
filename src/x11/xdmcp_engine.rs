@@ -1,25 +1,38 @@
-//! Owned Linux nested XDMCP engine. Never starts or stops a display manager.
+//! Owned XDMCP display sessions. Never starts or stops a display manager.
 use super::{
     XServerManager,
-    engine::OwnedProcess,
-    xdmcp::{XdmcpConfig, check_cancelled, engine_arguments},
+    xdmcp::{XdmcpConfig, check_cancelled},
 };
+#[cfg(not(all(windows, target_arch = "x86_64")))]
+use super::{engine::OwnedProcess, xdmcp::engine_arguments};
+#[cfg(not(all(windows, target_arch = "x86_64")))]
+use std::path::PathBuf;
+#[cfg(target_os = "linux")]
+use std::time::Instant;
 use std::{
-    path::{Path, PathBuf},
+    path::Path,
     sync::{
         Arc,
         atomic::{AtomicBool, Ordering},
         mpsc::{self, Receiver},
     },
-    time::{Duration, Instant},
+    time::Duration,
 };
 
 pub const LINUX_XEPHYR_ARTIFACT: &str = "xephyr-21.1.26-arch-x86_64";
 /// Per-session ownership. The child stops before its private credentials are removed.
 pub struct XdmcpSession {
+    ready_message: String,
+    backend: SessionBackend,
+}
+
+#[cfg(all(windows, target_arch = "x86_64"))]
+type SessionBackend = super::XServerLease;
+
+#[cfg(not(all(windows, target_arch = "x86_64")))]
+struct SessionBackend {
     #[cfg(target_os = "linux")]
     clipboard: Option<super::xdmcp_clipboard::Bridge>,
-    ready_message: String,
     process: OwnedProcess,
     display: String,
     authority: PathBuf,
@@ -29,15 +42,34 @@ pub struct XdmcpSession {
 }
 impl XdmcpSession {
     pub fn display(&self) -> &str {
-        &self.display
+        self.backend.display()
     }
     pub fn authority_path(&self) -> &Path {
-        &self.authority
+        self.backend.authority_path()
     }
     pub fn process_id(&self) -> Option<u32> {
-        self.process.id()
+        self.backend.process_id()
     }
     pub fn is_running(&mut self) -> Result<bool, String> {
+        self.backend.is_running()
+    }
+    pub fn stop_owned(self) -> Result<(), String> {
+        self.backend.stop_owned()
+    }
+}
+
+#[cfg(not(all(windows, target_arch = "x86_64")))]
+impl SessionBackend {
+    fn display(&self) -> &str {
+        &self.display
+    }
+    fn authority_path(&self) -> &Path {
+        &self.authority
+    }
+    fn process_id(&self) -> Option<u32> {
+        self.process.id()
+    }
+    fn is_running(&mut self) -> Result<bool, String> {
         #[cfg(target_os = "linux")]
         if let Some(bridge) = self.clipboard.as_mut() {
             bridge.check()?;
@@ -57,7 +89,7 @@ impl XdmcpSession {
         }
         self.process.is_running().map_err(|e| e.to_string())
     }
-    pub fn stop_owned(mut self) -> Result<(), String> {
+    fn stop_owned(mut self) -> Result<(), String> {
         #[cfg(target_os = "linux")]
         drop(self.clipboard.take());
         self.process.stop().map_err(|e| e.to_string())
@@ -123,10 +155,15 @@ impl ManagedXdmcp {
             generation: 0,
         };
         request.validate()?;
-        let mut preflight = config.clone();
-        // A placeholder is used only for option/consent validation. It never reaches the engine.
-        preflight.selected_endpoint = Some(std::net::SocketAddr::from(([127, 0, 0, 1], port)));
-        engine_arguments(&preflight, preflight.display.unwrap_or(100), width, height)?;
+        #[cfg(all(windows, target_arch = "x86_64"))]
+        super::xdmcp::windows_options(&config, width, height)?;
+        #[cfg(not(all(windows, target_arch = "x86_64")))]
+        {
+            let mut preflight = config.clone();
+            // A placeholder is used only for option/consent validation. It never reaches the engine.
+            preflight.selected_endpoint = Some(std::net::SocketAddr::from(([127, 0, 0, 1], port)));
+            engine_arguments(&preflight, preflight.display.unwrap_or(100), width, height)?;
+        }
         Self::start_inner(
             manager,
             config,
@@ -147,6 +184,9 @@ impl ManagedXdmcp {
     ) -> Result<Self, String> {
         // Validate numeric configurations before allocating a worker.
         if host.is_none() {
+            #[cfg(all(windows, target_arch = "x86_64"))]
+            super::xdmcp::windows_network(&config, width, height)?;
+            #[cfg(not(all(windows, target_arch = "x86_64")))]
             engine_arguments(&config, config.display.unwrap_or(100), width, height)?;
         }
         let cancelled = Arc::new(AtomicBool::new(false));
@@ -455,13 +495,15 @@ fn start(
             };
             return Ok(XdmcpSession {
                 ready_message,
-                clipboard,
-                process,
-                display: format!(":{display}"),
-                authority,
-                log,
-                diagnostics,
-                _runtime: runtime,
+                backend: SessionBackend {
+                    clipboard,
+                    process,
+                    display: format!(":{display}"),
+                    authority,
+                    log,
+                    diagnostics,
+                    _runtime: runtime,
+                },
             });
         }
         std::thread::sleep(Duration::from_millis(20));
@@ -556,9 +598,71 @@ pub(super) fn connect_ready_socket(
     }
 }
 
-#[cfg(not(all(target_os = "linux", target_arch = "x86_64", target_env = "gnu")))]
+#[cfg(all(windows, target_arch = "x86_64"))]
+fn start(
+    root: &Path,
+    config: XdmcpConfig,
+    width: u32,
+    height: u32,
+    cancelled: &AtomicBool,
+) -> Result<XdmcpSession, String> {
+    let backend = super::native_windows::start_xdmcp(root, &config, width, height, cancelled)?;
+    let ready_message = format!(
+        "Owned Windows X11 listener {} ready. XDMCP manager authentication is pending confirmation.",
+        backend.display(),
+    );
+    Ok(XdmcpSession {
+        ready_message,
+        backend,
+    })
+}
+
+#[cfg(not(any(
+    all(target_os = "linux", target_arch = "x86_64", target_env = "gnu"),
+    all(windows, target_arch = "x86_64"),
+)))]
 fn start(_: &Path, _: XdmcpConfig, _: u32, _: u32, _: &AtomicBool) -> Result<XdmcpSession, String> {
     Err("The owned native XDMCP engine has not passed its platform qualification. Installed-client fallback is not automatic".into())
+}
+
+#[cfg(all(test, windows, target_arch = "x86_64"))]
+mod windows_tests {
+    use super::*;
+    use crate::x11::xdmcp::QueryMode;
+    use std::time::Instant;
+
+    #[test]
+    fn windows_xdmcp_managed_loopback_reaches_native_approval_gate() {
+        for mode in [QueryMode::Direct, QueryMode::Indirect] {
+            let config = XdmcpConfig {
+                mode,
+                selected_endpoint: Some("127.0.0.1:1177".parse().unwrap()),
+                allow_network_listener: true,
+                ..Default::default()
+            };
+            let direct = ManagedXdmcp::start(XServerManager::default(), config.clone(), 800, 600);
+            let resolved = ManagedXdmcp::start_hostname(
+                XServerManager::default(),
+                config,
+                "127.0.0.1".into(),
+                1177,
+                800,
+                600,
+            );
+            for pending in [direct, resolved] {
+                let managed = pending.expect("Loopback is a valid Windows XDMCP endpoint");
+                let deadline = Instant::now() + Duration::from_secs(3);
+                loop {
+                    if let Some(status) = managed.poll() {
+                        assert!(status.unwrap_err().contains("no approved native build"));
+                        break;
+                    }
+                    assert!(Instant::now() < deadline, "XDMCP worker did not finish");
+                    std::thread::sleep(Duration::from_millis(5));
+                }
+            }
+        }
+    }
 }
 
 #[cfg(all(test, target_os = "linux", target_arch = "x86_64", target_env = "gnu"))]
@@ -658,7 +762,7 @@ pub(super) mod tests {
         let result = session.is_running();
         let details = format!(
             "owned engine {status}; bridge/engine running result={result:?}; Xephyr log={}",
-            String::from_utf8_lossy(&session.diagnostics)
+            String::from_utf8_lossy(&session.backend.diagnostics)
         );
         (matches!(result, Ok(true)), details)
     }

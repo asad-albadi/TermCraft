@@ -25,6 +25,142 @@ def module_at(name, path):
     return module
 
 
+class WindowsPackage(unittest.TestCase):
+    def test_private_x_inventory_requires_source_approval_and_exact_payload(self):
+        package = module_at("package_release", SCRIPT)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            source, payload, resources = (root / name for name in ("source", "input", "resources"))
+            approval = source / package.WINDOWS_X_APPROVAL
+            approval.parent.mkdir(parents=True)
+            approval.write_bytes((ROOT / package.WINDOWS_X_APPROVAL).read_bytes())
+            image = bytearray(256)
+            image[:2] = b"MZ"
+            struct.pack_into("<I", image, 60, 128)
+            image[128:132] = b"PE\0\0"
+            struct.pack_into("<H", image, 132, 0x8664)
+            files = {
+                "vcxsrv.exe": bytes(image), "xkbcomp.exe": bytes(image), "freetype.dll": bytes(image),
+                "fonts/misc/fonts.dir": b"test fonts", "xkbdata/rules/base": b"test rules",
+            }
+            for relative, content in files.items():
+                path = payload / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(content)
+            pin = "".join(f"{package.sha256(payload / name)}  {name}\n" for name in files)
+            fake_pin = payload / approval.name
+            fake_pin.write_text(pin, encoding="ascii")
+            resources.mkdir()
+            with self.assertRaisesRegex(ValueError, "No approved Windows x64 private X"):
+                package.stage_windows_x11(resources, payload, package.windows_x_inventory(source))
+            self.assertFalse((resources / package.WINDOWS_X_ROOT).exists())
+
+            approval.write_text(pin, encoding="ascii")
+            inventory = package.windows_x_inventory(source)
+            with self.assertRaisesRegex(ValueError, "file inventory mismatch"):
+                package.stage_windows_x11(resources, payload, inventory)
+            fake_pin.unlink()
+            (payload / "freetype.dll").write_bytes(b"altered")
+            with self.assertRaisesRegex(ValueError, "checksum mismatch: freetype.dll"):
+                package.stage_windows_x11(resources, payload, inventory)
+            self.assertFalse((resources / package.WINDOWS_X_ROOT).exists())
+
+            (payload / "freetype.dll").write_bytes(files["freetype.dll"])
+            if os.name == "nt":
+                import _winapi
+                junction = payload / "unapproved-junction"
+                _winapi.CreateJunction(str(payload / "fonts"), str(junction))
+                with self.assertRaisesRegex(ValueError, "must be ordinary paths"):
+                    package.stage_windows_x11(resources, payload, inventory)
+                junction.rmdir()
+            with patch.object(package, "native_libraries", return_value={"libraries": []}):
+                info, libraries = package.stage_windows_x11(resources, payload, inventory)
+            staged = resources / package.WINDOWS_X_ROOT
+            self.assertEqual(info["entry_point"], f"{package.WINDOWS_X_ROOT.as_posix()}/vcxsrv.exe")
+            self.assertEqual(info["executable_sha256"], package.sha256(payload / "vcxsrv.exe"))
+            self.assertEqual(set(libraries), {
+                f"{package.WINDOWS_X_ROOT.as_posix()}/{name}"
+                for name in ("vcxsrv.exe", "xkbcomp.exe", "freetype.dll")
+            })
+            self.assertEqual({p.relative_to(staged).as_posix() for p in staged.rglob("*") if p.is_file()}, set(files))
+            for relative, content in files.items():
+                self.assertEqual((staged / relative).read_bytes(), content)
+
+            with self.assertRaisesRegex(ValueError, "requires a native Windows x64 build"):
+                package.package_release("windows", root / "out", payload / "vcxsrv.exe",
+                                        payload / "xkbcomp.exe", windows_x11_runtime=payload)
+            with (patch.object(package, "windows_x_inventory", return_value=inventory),
+                  patch.object(package, "source_inputs", return_value={}),
+                  patch.object(package, "cargo_notices", return_value=[]),
+                  patch.object(package, "native_libraries", return_value={"libraries": []}),
+                  patch.object(package, "capture", return_value="fixture toolchain"),
+                  patch.object(package.platform, "machine", return_value="AMD64")):
+                archive = package.package_release("windows", root / "out", payload / "vcxsrv.exe",
+                                                  payload / "xkbcomp.exe", build_inputs={},
+                                                  cargo_settings={}, windows_x11_runtime=payload)
+            with zipfile.ZipFile(archive) as zipped:
+                prefix = archive.stem + "/"
+                metadata = json.loads(zipped.read(prefix + "PACKAGE-MANIFEST.json"))
+                self.assertEqual(metadata["runtime"]["managed_windows_x11"], info)
+                for relative, content in files.items():
+                    path = (package.WINDOWS_X_ROOT / relative).as_posix()
+                    self.assertEqual(metadata["files"][path], inventory[relative])
+                    self.assertEqual(zipped.read(prefix + path), content)
+
+            for invalid in ("NUL.txt", "read/fonts/AUX", "dir/COM1.xkb", "dir/file.", "../outside", "VCXSRV.EXE"):
+                with self.subTest(path=invalid):
+                    approval.write_text(f"{pin}{'0' * 64}  {invalid}\n", encoding="ascii")
+                    with self.assertRaisesRegex(ValueError, "Invalid Windows private X approval"):
+                        package.windows_x_inventory(source)
+
+    @unittest.skipUnless(os.name == "nt", "Windows Cargo cache junction")
+    def test_isolated_cargo_home_uses_cache_without_symlink_privilege(self):
+        package = module_at("package_release", SCRIPT)
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary).resolve()
+            cache = base / "cache"
+            registry = cache / "registry"
+            registry.mkdir(parents=True)
+            (registry / "marker").write_bytes(b"keep")
+            with tempfile.TemporaryDirectory(dir=base) as state, patch.dict(
+                os.environ, {"CARGO_HOME": str(cache)}
+            ), patch.object(Path, "symlink_to", side_effect=PermissionError):
+                settings = package.cargo_invocation(Path(state))
+                home = Path(settings["env"]["CARGO_HOME"])
+                self.assertTrue((home / "registry").samefile(registry))
+                self.assertFalse((home / "config.toml").exists())
+            self.assertEqual((registry / "marker").read_bytes(), b"keep")
+
+    def test_zip_includes_project_license_and_privacy_policy(self):
+        package = module_at("package_release", SCRIPT)
+        with tempfile.TemporaryDirectory(prefix="Windows package ") as temporary:
+            root = Path(temporary).resolve()
+            app, helper = root / "app.exe", root / "helper.exe"
+            header = bytearray(256)
+            header[:2] = b"MZ"
+            struct.pack_into("<I", header, 60, 128)
+            header[128:132] = b"PE\0\0"
+            struct.pack_into("<H", header, 132, 0x8664)
+            app.write_bytes(header)
+            helper.write_bytes(header)
+            with patch.object(package, "cargo_notices", return_value=[]), patch.object(
+                package, "native_libraries", return_value={"libraries": []}
+            ):
+                archive = package.package_release("windows", root / "out", app, helper)
+            with zipfile.ZipFile(archive) as zipped:
+                prefix = archive.stem + "/"
+                manifest = json.loads(zipped.read(prefix + "PACKAGE-MANIFEST.json"))
+                self.assertEqual(manifest["licenses"]["project"], "LICENSE")
+                for name in ("LICENSE", "PRIVACY.md"):
+                    with self.subTest(name=name):
+                        expected = (ROOT / name).read_bytes()
+                        self.assertEqual(zipped.read(prefix + name), expected)
+                        self.assertEqual(manifest["files"][name], package.sha256(ROOT / name))
+                        self.assertEqual(
+                            manifest["build"]["source_inputs"][name], manifest["files"][name]
+                        )
+
+
 @unittest.skipUnless(sys.platform.startswith("linux") and shutil.which("cc"), "Linux and cc required")
 class PortablePackage(unittest.TestCase):
     def test_archive_relocates_with_empty_path_and_keeps_workspace_data(self):

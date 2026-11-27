@@ -16,14 +16,17 @@ use std::{
 };
 
 use serde_json::Value;
+use sha1::{Digest, Sha1};
 use windows_sys::Win32::{
     Foundation::*,
-    Security::{Authorization::*, *},
+    Security::{Authorization::*, Isolation::DeleteAppContainerProfile, *},
     Storage::FileSystem::*,
     System::{
         IO::*, JobObjects::*, Pipes::*, SystemInformation::GetSystemWindowsDirectoryW, Threading::*,
     },
 };
+
+use crate::runtime::{RuntimeCatalog, ToolId};
 
 #[path = "windows_pipe/bootstrap.rs"]
 pub(super) mod bootstrap;
@@ -31,7 +34,7 @@ pub(super) mod bootstrap;
 const MAX_MESSAGE: usize = 12 * 1024 * 1024;
 const CONNECTION_ERROR: &str = "Private Chromium connection failed.";
 const CANCELLED: &str = "Browser closed.";
-const START_ERROR: &str = "Could not launch installed Chromium in its private Windows process job.";
+const START_ERROR: &str = "Could not launch Chromium in its private Windows process job.";
 
 pub(super) struct Pipe {
     process: Process,
@@ -47,18 +50,29 @@ impl Pipe {
         cancel: &AtomicBool,
         runtime: super::Runtime,
     ) -> Result<Self, String> {
-        if runtime == super::Runtime::BundledChromium {
-            return Err("No qualified bundled Chromium payload for Windows".into());
-        }
-        installed_chromium()?;
+        let catalog = RuntimeCatalog::for_current_executable()?;
         let security =
             OwnerSecurity::new().map_err(|_| "Could not secure the private browser profile.")?;
-        let profile =
+        let mut profile =
             Profile::new(&security).map_err(|_| "Could not create a private browser profile.")?;
+        let chromium = match runtime {
+            super::Runtime::SystemChromium => {
+                catalog.resolve(ToolId::SystemChromium)?.executable()?
+            }
+            super::Runtime::BundledChromium => {
+                let directory = profile
+                    .create_runtime_directory()
+                    .map_err(|_| "Could not secure the private browser runtime.")?;
+                let image = catalog.stage_bundled_browser(&directory, cancel)?;
+                profile.bundled_image = Some(image.clone());
+                image
+            }
+        };
         let (writer, browser_reader) = pipe_pair(false, &security).map_err(|_| CONNECTION_ERROR)?;
         let (reader, browser_writer) = pipe_pair(true, &security).map_err(|_| CONNECTION_ERROR)?;
         let process = bootstrap::start(
             &profile.path,
+            &chromium,
             &security,
             &browser_reader,
             &browser_writer,
@@ -137,7 +151,7 @@ impl Pipe {
                 })?;
             match count {
                 None => return Ok(None),
-                Some(0) => return Err("The Chromium process exited. Check the installed browser and sandbox configuration.".into()),
+                Some(0) => return Err("The Chromium process exited. Check the selected browser and sandbox configuration.".into()),
                 Some(count) => self.pending.extend_from_slice(&bytes[..count]),
             }
         }
@@ -345,10 +359,20 @@ fn handle(raw: HANDLE) -> io::Result<OwnedHandle> {
     Ok(unsafe { OwnedHandle::from_raw_handle(raw) })
 }
 
+// Chromium's installer grants these capabilities access to its install files.
+const CHROMIUM_INSTALL_CAPABILITIES: [&str; 2] = [
+    "S-1-15-3-1024-3424233489-972189580-2057154623-747635277-1604371224-316187997-3786583170-1043257646",
+    "S-1-15-3-1024-2302894289-466761758-1166120688-1039016420-2430351297-4240214049-4028510897-3317428798",
+];
+
 struct OwnerSecurity(PSECURITY_DESCRIPTOR);
 
 impl OwnerSecurity {
     fn new() -> io::Result<Self> {
+        Self::with_runtime_readers(&[])
+    }
+
+    fn with_runtime_readers(readers: &[&str]) -> io::Result<Self> {
         unsafe {
             let mut token = null_mut();
             if OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &mut token) == 0 {
@@ -377,7 +401,12 @@ impl OwnerSecurity {
             let mut sddl: Vec<u16> = "D:P(A;OICI;FA;;;".encode_utf16().collect();
             sddl.extend_from_slice(std::slice::from_raw_parts(sid, len));
             LocalFree(sid.cast());
-            sddl.extend([')' as u16, 0]);
+            sddl.push(')' as u16);
+            for reader in readers {
+                // FRFX is FILE_GENERIC_READ | FILE_GENERIC_EXECUTE.
+                sddl.extend(format!("(A;OICI;FRFX;;;{reader})").encode_utf16());
+            }
+            sddl.push(0);
             let mut descriptor = null_mut();
             if ConvertStringSecurityDescriptorToSecurityDescriptorW(
                 sddl.as_ptr(),
@@ -410,10 +439,22 @@ impl Drop for OwnerSecurity {
 struct Profile {
     path: PathBuf,
     directory: Option<OwnedHandle>,
+    bundled_image: Option<PathBuf>,
     remove: bool,
 }
 
 impl Profile {
+    fn create_runtime_directory(&self) -> io::Result<PathBuf> {
+        let path = self.path.join("runtime");
+        let name = wide(path.as_os_str())?;
+        let security = OwnerSecurity::with_runtime_readers(&CHROMIUM_INSTALL_CAPABILITIES)?;
+        let attributes = security.non_inheritable_attributes();
+        if unsafe { CreateDirectoryW(name.as_ptr(), &attributes) } == 0 {
+            return Err(io::Error::last_os_error());
+        }
+        Ok(path)
+    }
+
     fn new(security: &OwnerSecurity) -> io::Result<Self> {
         const FILE_PERSISTENT_ACLS: u32 = 8;
         let root = super::native_windows::local_app_data()?;
@@ -426,6 +467,7 @@ impl Profile {
         let mut profile = Self {
             path,
             directory: None,
+            bundled_image: None,
             remove: true,
         };
         let directory = unsafe {
@@ -475,9 +517,15 @@ impl Profile {
 
 impl Drop for Profile {
     fn drop(&mut self) {
+        if self.remove
+            && let Some(image) = &self.bundled_image
+        {
+            remove_chromium_app_containers(&self.path, image);
+        }
         drop(self.directory.take());
         if self.remove {
-            let until = Instant::now() + Duration::from_millis(400);
+            // Windows may still hold a scanned runtime file after the job exits.
+            let until = Instant::now() + Duration::from_secs(3);
             loop {
                 match std::fs::remove_dir_all(&self.path) {
                     Ok(()) => break,
@@ -488,6 +536,23 @@ impl Drop for Profile {
                     Err(_) => break,
                 }
             }
+        }
+    }
+}
+
+fn remove_chromium_app_containers(profile: &Path, image: &Path) {
+    // Chromium names its utility AppContainers using the exact executable path.
+    let suffix: String = Sha1::digest(image.to_string_lossy().as_bytes())
+        .iter()
+        .map(|byte| format!("{byte:02X}"))
+        .collect();
+    let packages = profile.join("AppData/Local/Packages");
+    for kind in ["net", "cdm", "odm", "prnc", "pxy", "wnn", "xr"] {
+        let name = format!("cr.sb.{kind}{suffix}");
+        if packages.join(&name).is_dir()
+            && let Ok(name) = wide(OsStr::new(&name))
+        {
+            unsafe { DeleteAppContainerProfile(name.as_ptr()) };
         }
     }
 }
@@ -669,12 +734,6 @@ fn spawn(
     }
 }
 
-fn installed_chromium() -> Result<PathBuf, String> {
-    crate::runtime::RuntimeCatalog::for_current_executable()?
-        .resolve(crate::runtime::ToolId::Browser)?
-        .executable()
-}
-
 fn environment(profile: &Path) -> io::Result<Vec<(&'static str, OsString)>> {
     use std::os::windows::ffi::OsStringExt;
     let mut root = [0u16; 260];
@@ -688,7 +747,14 @@ fn environment(profile: &Path) -> io::Result<Vec<(&'static str, OsString)>> {
         ("WINDIR", root.as_os_str().to_owned()),
         ("PATH", root.join("System32").into_os_string()),
     ];
-    for key in ["APPDATA", "LOCALAPPDATA", "TEMP", "TMP", "USERPROFILE"] {
+    // The Windows shell resolves these known folders under USERPROFILE when
+    // Chromium creates a new AppContainer. Keep them inside the owned profile.
+    for (key, folder) in [("APPDATA", "Roaming"), ("LOCALAPPDATA", "Local")] {
+        let path = profile.join("AppData").join(folder);
+        std::fs::create_dir_all(&path)?;
+        environment.push((key, path.into_os_string()));
+    }
+    for key in ["TEMP", "TMP", "USERPROFILE"] {
         environment.push((key, profile.as_os_str().to_owned()));
     }
     Ok(environment)

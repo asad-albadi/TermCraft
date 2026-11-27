@@ -58,6 +58,8 @@ pub enum Binding {
 }
 pub struct InstanceBroker {
     record: Record,
+    #[cfg(windows)]
+    record_path: std::path::PathBuf,
 }
 pub struct Primary {
     rx: Receiver<DispatchRequest>,
@@ -103,6 +105,8 @@ impl InstanceBroker {
             .map(|b| format!("{b:02x}"))
             .collect::<String>();
         let mut lock = crate::platform::private_file::open(&workspace.join("instance.lock"), true)?;
+        #[cfg(windows)]
+        let record_path = workspace.join("instance.json");
         match lock.try_lock() {
             Ok(()) => {
                 let token = random()?;
@@ -124,8 +128,8 @@ impl InstanceBroker {
                     use interprocess::os::windows::{
                         local_socket::ListenerOptionsExt, security_descriptor::SecurityDescriptor,
                     };
-                    let descriptor =
-                        widestring::U16CString::from_str("D:P(A;;GA;;;OW)").map_err(ioerr)?;
+                    let descriptor = crate::platform::private_file::user_owned_descriptor("", "GA")
+                        .map_err(ioerr)?;
                     options.security_descriptor(
                         SecurityDescriptor::deserialize(&descriptor).map_err(ioerr)?,
                     )
@@ -138,10 +142,16 @@ impl InstanceBroker {
                     token,
                 };
                 let data = serde_json::to_vec(&record).map_err(ioerr)?;
-                lock.set_len(0).map_err(ioerr)?;
-                lock.seek(SeekFrom::Start(0)).map_err(ioerr)?;
-                lock.write_all(&data).map_err(ioerr)?;
-                lock.sync_all().map_err(ioerr)?;
+                // Windows enforces the byte-range lock on reads by other
+                // handles. Keep discovery data in its own private file there.
+                #[cfg(windows)]
+                let mut metadata = crate::platform::private_file::open(&record_path, true)?;
+                #[cfg(not(windows))]
+                let metadata = &mut lock;
+                metadata.set_len(0).map_err(ioerr)?;
+                metadata.seek(SeekFrom::Start(0)).map_err(ioerr)?;
+                metadata.write_all(&data).map_err(ioerr)?;
+                metadata.sync_all().map_err(ioerr)?;
                 let (tx, rx) = mpsc::sync_channel(32);
                 let stop = Arc::new(AtomicBool::new(false));
                 let stopped = stop.clone();
@@ -177,9 +187,21 @@ impl InstanceBroker {
             Err(std::fs::TryLockError::WouldBlock) => {
                 let end = Instant::now() + Duration::from_secs(2);
                 loop {
-                    lock.seek(SeekFrom::Start(0)).map_err(ioerr)?;
+                    #[cfg(windows)]
+                    let mut metadata =
+                        match crate::platform::private_file::open(&record_path, false) {
+                            Ok(file) => file,
+                            Err(_) if !record_path.exists() && Instant::now() < end => {
+                                std::thread::sleep(Duration::from_millis(10));
+                                continue;
+                            }
+                            Err(error) => return Err(error),
+                        };
+                    #[cfg(not(windows))]
+                    let metadata = &mut lock;
+                    metadata.seek(SeekFrom::Start(0)).map_err(ioerr)?;
                     let mut bytes = Vec::new();
-                    (&mut lock)
+                    metadata
                         .take(16385)
                         .read_to_end(&mut bytes)
                         .map_err(ioerr)?;
@@ -191,7 +213,11 @@ impl InstanceBroker {
                         {
                             return Err("Invalid workspace dispatch metadata.".into());
                         }
-                        return Ok(Binding::Secondary(Self { record }));
+                        return Ok(Binding::Secondary(Self {
+                            record,
+                            #[cfg(windows)]
+                            record_path,
+                        }));
                     }
                     if Instant::now() >= end {
                         return Err("Existing workspace is still starting; retry shortly.".into());
@@ -211,10 +237,17 @@ impl InstanceBroker {
             return Err("Invalid request ID.".into());
         }
         action.validate()?;
+        if serde_json::to_vec(&action).map_err(ioerr)?.len() > MAX_FRAME {
+            return Err("Dispatch request is too large.".into());
+        }
+        #[cfg(not(windows))]
+        let (mut stream, record) = (connect(&self.record)?, &self.record);
+        #[cfg(windows)]
+        let (mut stream, record) = self.connect_current()?;
         let envelope = Envelope {
             version: 1,
-            workspace: self.record.workspace.clone(),
-            token: self.record.token.clone(),
+            workspace: record.workspace.clone(),
+            token: record.token.clone(),
             id: id.into(),
             action,
         };
@@ -222,14 +255,6 @@ impl InstanceBroker {
         if bytes.len() > MAX_FRAME {
             return Err("Dispatch request is too large.".into());
         }
-        let name = self
-            .record
-            .name
-            .as_str()
-            .to_ns_name::<GenericNamespaced>()
-            .map_err(ioerr)?;
-        let mut stream = Stream::connect(name)
-            .map_err(|_| "Could not connect to the existing workspace.".to_string())?;
         if !peer_is_user(&stream) {
             return Err("Workspace peer belongs to another user.".into());
         }
@@ -245,6 +270,40 @@ impl InstanceBroker {
         }
         Ok(receipt)
     }
+
+    #[cfg(windows)]
+    fn connect_current(&self) -> Result<(Stream, Record), String> {
+        let end = Instant::now() + Duration::from_secs(2);
+        loop {
+            if let Ok(file) = crate::platform::private_file::open(&self.record_path, false) {
+                let mut bytes = Vec::new();
+                file.take(16385).read_to_end(&mut bytes).map_err(ioerr)?;
+                if let Ok(record) = serde_json::from_slice::<Record>(&bytes) {
+                    if record.version == 1
+                        && record.workspace == self.record.workspace
+                        && record.token.len() == 64
+                        && record.name.len() <= 100
+                    {
+                        if let Ok(stream) = connect(&record) {
+                            return Ok((stream, record));
+                        }
+                    }
+                }
+            }
+            if Instant::now() >= end {
+                return Err("Could not connect to the existing workspace. Retry shortly.".into());
+            }
+            std::thread::sleep(Duration::from_millis(10));
+        }
+    }
+}
+fn connect(record: &Record) -> Result<Stream, String> {
+    let name = record
+        .name
+        .as_str()
+        .to_ns_name::<GenericNamespaced>()
+        .map_err(ioerr)?;
+    Stream::connect(name).map_err(|_| "Could not connect to the existing workspace.".into())
 }
 fn peer_is_user(stream: &Stream) -> bool {
     #[cfg(unix)]
@@ -273,6 +332,29 @@ fn transfer(stream: &mut Stream, buf: &mut [u8], write: bool, end: Instant) -> R
             stream.read(&mut buf[done..])
         };
         match result {
+            // A nonblocking Windows named pipe can report zero bytes while
+            // the other end is still preparing its frame.
+            #[cfg(windows)]
+            Ok(0) => {
+                use std::os::windows::io::{AsHandle, AsRawHandle};
+                use windows_sys::Win32::System::Pipes::PeekNamedPipe;
+                let Stream::NamedPipe(pipe) = stream;
+                let result = unsafe {
+                    PeekNamedPipe(
+                        pipe.as_handle().as_raw_handle(),
+                        std::ptr::null_mut(),
+                        0,
+                        std::ptr::null_mut(),
+                        std::ptr::null_mut(),
+                        std::ptr::null_mut(),
+                    )
+                };
+                if result == 0 {
+                    return Err("Dispatch peer closed the connection.".into());
+                }
+                std::thread::sleep(Duration::from_millis(2));
+            }
+            #[cfg(not(windows))]
             Ok(0) => return Err("Dispatch peer closed the connection.".into()),
             Ok(n) => done += n,
             Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {

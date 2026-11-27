@@ -1,8 +1,8 @@
 use harbor_workspace::tools::capture::{CaptureConfig, PacketCapture, inspect_pcap};
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", windows))]
 use harbor_workspace::tools::capture::{CaptureHandle, StopReason, enumerate_interfaces};
 use std::{fs, path::Path, time::Duration};
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", windows))]
 use std::{net::UdpSocket, thread, time::Instant};
 
 fn config(path: &Path, filter: &str) -> CaptureConfig {
@@ -60,7 +60,7 @@ fn in_isolated_namespace() {
     );
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", windows))]
 fn wait_for_progress(handle: &CaptureHandle, packets: u64) {
     let deadline = Instant::now() + Duration::from_secs(2);
     loop {
@@ -88,25 +88,47 @@ fn reports_kernel_capture_permission_denied() {
     assert!(!output.exists());
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", windows))]
 #[test]
-#[ignore = "run only in a fresh network namespace with loopback enabled"]
+#[cfg_attr(
+    target_os = "linux",
+    ignore = "requires an isolated Linux network namespace"
+)]
+#[cfg_attr(
+    windows,
+    ignore = "requires the installed Windows Npcap loopback provider"
+)]
 fn captures_only_selected_loopback_packets_and_honors_limits() {
+    #[cfg(target_os = "linux")]
     use std::os::unix::fs::PermissionsExt;
 
+    #[cfg(target_os = "linux")]
     in_isolated_namespace();
+    #[cfg(target_os = "linux")]
+    let (interface, linktype, truncated_payload) = ("lo", 1, 22);
+    #[cfg(windows)]
+    let (interface, linktype, truncated_payload) = (r"\Device\NPF_Loopback", 0, 32);
     let dir = tempfile::tempdir().unwrap();
     let output = dir.path().join("out.pcap");
     assert!(
         enumerate_interfaces()
             .unwrap()
             .iter()
-            .any(|item| item.name == "lo")
+            .any(|item| item.name == interface),
+        "Required loopback capture interface is unavailable"
     );
     let selected = UdpSocket::bind("127.0.0.1:0").unwrap();
     let excluded = UdpSocket::bind("127.0.0.1:0").unwrap();
     let sender = UdpSocket::bind("127.0.0.1:0").unwrap();
-    let filter = format!("udp dst port {}", selected.local_addr().unwrap().port());
+    let filter = format!(
+        "udp and src host 127.0.0.1 and dst host 127.0.0.1 and src port {} and dst port {}",
+        sender.local_addr().unwrap().port(),
+        selected.local_addr().unwrap().port()
+    );
+    let config = |path: &Path, filter: &str| CaptureConfig {
+        interface: interface.into(),
+        ..config(path, filter)
+    };
     let handle = config(&output, &filter).start().unwrap();
     wait_for_progress(&handle, 0);
     sender
@@ -119,12 +141,13 @@ fn captures_only_selected_loopback_packets_and_honors_limits() {
     assert_eq!(report.reason, StopReason::PacketLimit);
     assert_eq!(report.metadata, inspect_pcap(&output).unwrap());
     assert_eq!(report.metadata.packets, 1);
-    assert_eq!(report.metadata.linktype, 1);
+    assert_eq!(report.metadata.linktype, linktype);
     assert_eq!(report.metadata.snaplen, 128);
     assert_ne!(report.metadata.first_timestamp.unwrap().seconds, 0);
     let bytes = fs::read(&output).unwrap();
     assert!(bytes.ends_with(b"selected test payload"));
     assert_eq!(report.metadata.bytes, bytes.len() as u64);
+    #[cfg(target_os = "linux")]
     assert_eq!(
         fs::metadata(&output).unwrap().permissions().mode() & 0o777,
         0o600
@@ -141,7 +164,11 @@ fn captures_only_selected_loopback_packets_and_honors_limits() {
     let report = truncation.wait().unwrap();
     assert_eq!(report.metadata.snaplen, 64);
     assert_eq!(report.metadata.bytes, 24 + 16 + 64);
-    assert!(fs::read(&truncated_output).unwrap().ends_with(&[0x7e; 22]));
+    assert!(
+        fs::read(&truncated_output)
+            .unwrap()
+            .ends_with(&vec![0x7e; truncated_payload])
+    );
 
     let idle_output = dir.path().join("idle.pcap");
     let idle = config(&idle_output, &filter).start().unwrap();
@@ -191,10 +218,13 @@ fn captures_only_selected_loopback_packets_and_honors_limits() {
     assert!(!malformed_output.exists());
     assert!(config(&output, &filter).start().unwrap().wait().is_err());
     assert_eq!(fs::read(&output).unwrap(), bytes);
-    let symlink = dir.path().join("symlink.pcap");
-    std::os::unix::fs::symlink(&malformed_output, &symlink).unwrap();
-    assert!(config(&symlink, &filter).start().unwrap().wait().is_err());
-    assert!(!malformed_output.exists());
+    #[cfg(target_os = "linux")]
+    {
+        let symlink = dir.path().join("symlink.pcap");
+        std::os::unix::fs::symlink(&malformed_output, &symlink).unwrap();
+        assert!(config(&symlink, &filter).start().unwrap().wait().is_err());
+        assert!(!malformed_output.exists());
+    }
 
     let byte_output = dir.path().join("byte.pcap");
     let mut byte_limited = config(&byte_output, &filter);

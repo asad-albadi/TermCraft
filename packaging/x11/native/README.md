@@ -1,6 +1,6 @@
 # Private native X server candidates
 
-These source-backed providers remain **unqualified and unavailable**. There is no approved private executable checksum. `native_policy.rs` fails before a process or authority file is created. A local JSON file cannot change that trust decision. Upstream native binaries were downloaded and hashed, then examined with LLVM tools without executing them. Full input URLs, source/archive/patch checksums, native toolchain requirements and missing evidence are in `source-contract.json`; actual PE and Mach-O imports are in `upstream-dependencies.json`. The source archives remain in the private work area for offline builds. Licenses copied from the exact sources are retained in `licenses/`; their presence does not close the documented MSVC and complete XQuartz dependency redistribution gaps.
+Release approval is pending for both native platforms. `native_policy.rs` rejects unapproved payloads before creating a process or authority file. Windows has exact source-built candidate inventories and private package evidence. Upstream binary hashes serve only as inspection inputs. Full input URLs, source/archive/patch checksums, native toolchain requirements and remaining approval evidence are in `source-contract.json`. PE and Mach-O imports for the upstream binaries are in `upstream-dependencies.json`. The source archives remain in the private work area for offline builds, and exact-source license files are retained in `licenses/`. [Windows native evidence](../../../docs/parity-evidence/execution/2026-11-25-windows-native.md)
 
 Prepare either source tree with the pinned **local** source archive:
 
@@ -13,9 +13,49 @@ This validates the archive, safely extracts it, applies the exact private patch,
 
 ## Windows native build recipe
 
-Use a Windows x86_64 native worker with the upstream pinned source's `HOW_TO_BUILD.txt` prerequisites: Visual Studio 2022/VC143, the Windows SDK, Cygwin tools, Strawberry Perl and Python lxml/mako. In the freshly prepared tree, upstream's `buildall.sh 1 2 R` builds the 64-bit release with two jobs; its final NSIS step only produces installer archives, which must never be executed. The server output is `xorg-server/obj64/servrelease/vcxsrv.exe`. The DLLs, fonts, xkbcomp and xkbdata must come from that same native build and have their own complete pinned inventory. Do not combine an arbitrary rebuilt executable with PATH DLLs. Preserve corresponding source, this patch, exact SDK/tool versions, compiler options, PE import inventory and MSVC redistribution notices. Upstream scripts have not been run here: Windows native build/SDK tooling is unavailable.
+Run `build-private-windows.ps1` from a native x64 Visual Studio 2022 Developer
+PowerShell. Provide the pinned source archive, an unused build directory
+without spaces, and the native tools. The opt-in `windows_x_fixture` release
+workflow records the dependency versions and verifies all downloaded hashes.
 
-The transport patch changes listener binds to IPv4/IPv6 loopback, replaces Windows SO_REUSEADDR with checked SO_EXCLUSIVEADDRUSE, and rejects a missing explicit display or displayfd scanning. The Rust provider reserves exactly one OS-selected loopback port, creates a suspended process with no inherited handles, assigns it to a kill-on-close job, releases the reservation, resumes, checks IP Helper ownership of the exact listener and requires anonymous rejection plus cookie-authenticated setup. A collision fails without scanning or altering the competing server. Snapshot PE/DLL handles deny write/delete sharing for the entire lease. The old upstream checksum is never an approval for this changed output.
+```powershell
+$tools = @('C:/tools/jom', 'C:/tools/nasm', 'C:/tools/perl/perl/bin',
+    'C:/tools/winflexbison', 'C:/tools/gperf/usr/bin')
+./packaging/x11/native/build-private-windows.ps1 `
+    -SourceArchive C:/offline/vcxsrv-source.tar.gz `
+    -BuildDirectory C:/tc-x11-build `
+    -PythonExecutable C:/tools/x11-python/Scripts/python.exe `
+    -GitUnixBin 'C:/Program Files/Git/usr/bin' -ToolDirectories $tools
+```
+
+The Python environment needs lxml, Mako, PyYAML, Meson and Ninja. The recipe
+adapts the pinned upstream tool paths in its prepared copy, builds the native
+components and stages the adjacent DLLs, fonts, xkbcomp and XKB data. Its
+output includes `build-inputs.json`, `candidate-inventory.json` and
+`pe-imports.txt`. The output stays in the build directory.
+
+For an existing build, `stage-private-windows.ps1` takes the prepared source
+directory, an empty candidate destination and the x64 VC143 CRT directory.
+Save its JSON output outside the candidate directory. The qualification test
+expects `x11/windows-x86_64-private1` beneath `TERMCRAFT_TEST_WINDOWS_X11_ROOT`
+and the JSON report at `TERMCRAFT_TEST_WINDOWS_X11_INVENTORY`.
+
+To exercise the private Windows capability probe with the authenticated
+wire fixture, pass a native TermCraft executable as
+`tests/windows_xdmcp_candidate.py --capability-probe`. The JSON report records
+the executable digest, live extension versions and actual Composite pixels.
+The probe leaves the screen mode and indirect GLX policy unchanged.
+
+The transport patch changes listener binds to IPv4/IPv6 loopback, configures checked SO_EXCLUSIVEADDRUSE on Windows, and rejects a missing explicit display or displayfd scanning. The Windows SDK expands SO_EXCLUSIVEADDRUSE through SO_REUSEADDR, so the patch keeps the header's constant defined and excludes its reuse branch on Windows. The Rust provider reserves exactly one OS-selected loopback port, creates a suspended process with no inherited handles, assigns it to a kill-on-close job, releases the reservation, resumes, checks IP Helper ownership of the exact listener and requires anonymous rejection plus cookie-authenticated setup. A collision fails without scanning or altering the competing server. Snapshot PE/DLL handles deny write/delete sharing for the entire lease. The old upstream checksum is never an approval for this changed output.
+
+Windows XKB starts the adjacent `xkbcomp.exe` directly with explicit input and output paths. It inherits the server's job and does not load Command Processor startup hooks. The server reads its own runtime directory for user-level X configuration.
+
+The private Windows XDMCP provider accepts one explicit local IPv4 address
+with per-session consent. It reserves the chosen address and display port,
+passes the restriction to the private engine, and verifies that the resulting
+listener belongs to the owned process. The regular owned display continues
+to reserve loopback. Both paths require protocol authentication, including
+binary Xauthority cookies and credentials negotiated by an XDMCP manager.
 
 ## macOS native build recipe
 

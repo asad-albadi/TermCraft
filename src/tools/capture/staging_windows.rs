@@ -24,9 +24,9 @@ use windows_sys::Win32::{
     Storage::FileSystem::{
         BY_HANDLE_FILE_INFORMATION, FILE_ATTRIBUTE_NORMAL, FILE_ATTRIBUTE_REPARSE_POINT,
         FILE_DISPOSITION_INFO, FILE_FLAG_BACKUP_SEMANTICS, FILE_FLAG_OPEN_REPARSE_POINT,
-        FILE_RENAME_INFO, FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE,
-        FileDispositionInfo, FileRenameInfo, GetFileInformationByHandle, GetFinalPathNameByHandleW,
-        GetVolumeInformationByHandleW, SYNCHRONIZE, SetFileInformationByHandle,
+        FILE_SHARE_DELETE, FILE_SHARE_READ, FILE_SHARE_WRITE, FileDispositionInfo,
+        GetFileInformationByHandle, GetFinalPathNameByHandleW, GetVolumeInformationByHandleW,
+        SYNCHRONIZE, SetFileInformationByHandle,
     },
     System::IO::IO_STATUS_BLOCK,
 };
@@ -131,33 +131,7 @@ impl Stage {
             ));
         }
         let file = self.file.as_ref().expect("open capture stage");
-        let name: Vec<_> = self.target.encode_wide().collect();
-        let offset = std::mem::offset_of!(FILE_RENAME_INFO, FileName);
-        let length = std::mem::size_of::<FILE_RENAME_INFO>().max(offset + name.len() * 2);
-        let mut buffer = vec![0usize; length.div_ceil(std::mem::size_of::<usize>())];
-        // The aligned buffer contains the variable-size rename structure and its
-        // UTF-16 tail. Both file handles stay live for this relative rename.
-        let result = unsafe {
-            let information = buffer.as_mut_ptr().cast::<FILE_RENAME_INFO>();
-            (*information).Anonymous.ReplaceIfExists = false;
-            (*information).RootDirectory = self.parent.as_raw_handle() as HANDLE;
-            (*information).FileNameLength = (name.len() * 2) as u32;
-            ptr::copy_nonoverlapping(
-                name.as_ptr(),
-                buffer.as_mut_ptr().cast::<u8>().add(offset).cast::<u16>(),
-                name.len(),
-            );
-            SetFileInformationByHandle(
-                file.as_raw_handle() as HANDLE,
-                FileRenameInfo,
-                information.cast(),
-                length as u32,
-            )
-        };
-        if result == 0 {
-            return Err(io::Error::last_os_error());
-        }
-        Ok(())
+        crate::platform::windows_rename::rename(file, &self.parent, &self.target, false)
     }
 }
 

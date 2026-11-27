@@ -32,9 +32,14 @@ fn chromium_available() -> bool {
 #[cfg(windows)]
 fn chromium_available() -> bool {
     use harbor_workspace::runtime::{RuntimeCatalog, ToolId};
+    let provider = if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
+        ToolId::BundledChromium
+    } else {
+        ToolId::Browser
+    };
     RuntimeCatalog::for_current_executable()
-        .and_then(|catalog| catalog.resolve(ToolId::Browser))
-        .expect("Native Windows fixture requires installed Chromium or Google Chrome");
+        .and_then(|catalog| catalog.resolve(provider))
+        .expect("Native Windows fixture requires the explicitly selected browser provider");
     true
 }
 
@@ -69,7 +74,7 @@ fn browser(generation: u64, address: String, proxy: String) -> Session {
 #[test]
 #[cfg_attr(
     windows,
-    ignore = "requires native Windows and an installed Chrome or Chromium"
+    ignore = "requires native Windows and the selected Chromium provider"
 )]
 fn chromium_renders_and_submits_browser_input() {
     if !chromium_available() {
@@ -95,6 +100,16 @@ fn chromium_renders_and_submits_browser_input() {
                       "&dpr=" + devicePixelRatio + "&restored=" + restored);
               }
             </script>"#,
+        ),
+        "/scroll" => Response::html(
+            r#"<title>Scroll fixture</title><body style="margin:0;height:1500px;background:red">
+            <button aria-label="Below fold" style="position:absolute;top:600px;width:100%;height:900px;border:0;background:green"
+                onclick="fetch('/scroll-hit')"></button>
+            <script>
+              document.addEventListener("scrollend", () => {
+                document.querySelector("button").style.background = "lime";
+              }, {once: true});
+            </script></body>"#,
         ),
         _ => Response::html(
             "<title>Fixture</title><body style='margin:0;background:red'>\
@@ -169,6 +184,41 @@ fn chromium_renders_and_submits_browser_input() {
         wait_until(&session, || fixture.saw(&report));
     }
     session
+        .send(Command::Navigate(format!("{}/scroll", fixture.origin)))
+        .unwrap();
+    let pixel = 4 * (460 * 90 + 50);
+    wait_until(&session, || {
+        session.state().title == "Scroll fixture"
+            && session.take_frame().is_some_and(|frame| {
+                frame.size == [460, 320] && frame.rgba[pixel] > 200 && frame.rgba[pixel + 1] < 40
+            })
+    });
+    session
+        .send(Command::Wheel {
+            x: 50.,
+            y: 90.,
+            dx: 0.,
+            dy: 700.,
+        })
+        .unwrap();
+    wait_until(&session, || {
+        session.take_frame().is_some_and(|frame| {
+            // The page turns the button bright green after scrolling settles.
+            frame.size == [460, 320] && frame.rgba[pixel] < 40 && frame.rgba[pixel + 1] > 200
+        })
+    });
+    for kind in ["mousePressed", "mouseReleased"] {
+        session
+            .send(Command::Pointer {
+                kind,
+                button: "left",
+                x: 50.,
+                y: 90.,
+            })
+            .unwrap();
+    }
+    wait_until(&session, || fixture.saw("/scroll-hit"));
+    session
         .send(Command::Navigate("file:///etc/passwd".into()))
         .unwrap();
     wait_until(&session, || session.state().notice.is_some());
@@ -178,7 +228,7 @@ fn chromium_renders_and_submits_browser_input() {
 #[test]
 #[cfg_attr(
     windows,
-    ignore = "requires native Windows and an installed Chrome or Chromium"
+    ignore = "requires native Windows and the selected Chromium provider"
 )]
 fn chromium_cancels_site_auth_without_credentials_and_rejects_untrusted_tls() {
     if !chromium_available() {
@@ -237,7 +287,7 @@ fn chromium_cancels_site_auth_without_credentials_and_rejects_untrusted_tls() {
 #[test]
 #[cfg_attr(
     windows,
-    ignore = "requires native Windows and an installed Chrome or Chromium"
+    ignore = "requires native Windows and the selected Chromium provider"
 )]
 fn chromium_routes_through_configured_proxy_and_signs_in_only_after_consent() {
     if !chromium_available() {
@@ -292,6 +342,7 @@ fn chromium_routes_through_configured_proxy_and_signs_in_only_after_consent() {
     assert!(origin.requests.lock().unwrap().is_empty());
 }
 
+#[track_caller]
 fn wait_until(session: &Session, mut condition: impl FnMut() -> bool) {
     // Debug builds verify the complete 429MB bundle before starting Chromium.
     let startup_budget = if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {

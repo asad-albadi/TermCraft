@@ -71,6 +71,15 @@ pub struct RuntimeCatalog {
 }
 
 impl RuntimeCatalog {
+    #[cfg(windows)]
+    pub(crate) fn stage_bundled_browser(
+        &self,
+        snapshot: &Path,
+        cancelled: &std::sync::atomic::AtomicBool,
+    ) -> Result<PathBuf, String> {
+        browser_bundle::prepare_windows(&self.resources, snapshot, cancelled)?.executable()
+    }
+
     #[cfg(unix)]
     pub(crate) fn bundled_browser_snapshot(
         &self,

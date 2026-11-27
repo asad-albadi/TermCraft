@@ -118,7 +118,9 @@ pub fn capability_probe_entry() -> Option<i32> {
     }
     #[cfg(target_os = "linux")]
     let result = unsafe { super::native_capabilities::probe() };
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(all(windows, target_arch = "x86_64"))]
+    let result = super::native_capabilities_windows::probe();
+    #[cfg(not(any(target_os = "linux", all(windows, target_arch = "x86_64"))))]
     let result: Result<XCapabilities, String> =
         Err("Native graphics probing is unavailable on this platform".into());
     match result {

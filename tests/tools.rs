@@ -124,7 +124,13 @@ fn scan_reports_configured_loopback_ports() {
     assert_eq!(report.address, Ipv4Addr::LOCALHOST);
     assert_eq!(report.ports.len(), 2);
     assert_eq!(report.ports[&open], PortStatus::Open);
+    #[cfg(not(windows))]
     assert_eq!(report.ports[&closed_port], PortStatus::Closed);
+    #[cfg(windows)]
+    assert!(matches!(
+        report.ports[&closed_port],
+        PortStatus::Closed | PortStatus::TimedOut
+    ));
     assert!(!report.cancelled);
 }
 

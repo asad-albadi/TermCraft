@@ -9,7 +9,7 @@ existing archive intact. The package contains the application, the adjacent
 headless RDP engine, artwork, font notices, crate notices, and a manifest with
 binary hashes and build input hashes, alongside both lockfiles. Crate metadata
 identifies upstream sources where published archives do not include notice text.
-The manifest records the project license as unspecified.
+The Windows ZIP includes and hashes the project MIT license and privacy policy.
 
 ```sh
 python3 scripts/package-release.py --output dist
@@ -20,8 +20,9 @@ Cargo to cached crates. The packager builds Linux tar.gz, Windows portable ZIP,
 and macOS ZIP containing a Finder application bundle. Linux needs `readelf`
 and `ldd`. Windows uses the MSVC Rust target and needs `llvm-objdump`, `objdump`, or Visual Studio's
 `dumpbin`. macOS needs Xcode's `otool`. Windows and macOS additionally need
-Pillow for native icon generation. Native Windows and macOS build, startup,
-and upgrade verification remain pending.
+Pillow for native icon generation. The Windows x64 candidate has native build,
+portable and installed startup evidence. Clean-account upgrade, optional
+runtime coverage and macOS qualification remain pending.
 
 To stage trusted prebuilt app and helper binaries, supply both
 `--app-binary` and `--helper-binary`. Build them with `cargo build --release`
@@ -54,7 +55,12 @@ build host is distinct from validation on a clean target system.
 Linux menu registration is optional. The package includes its install and
 uninstall commands. The Windows ZIP supports portable launch and a built-in
 PowerShell installer with a versioned per-user program directory and Start
-menu shortcut. On macOS, extract using Finder or `ditto` to preserve executable
+menu shortcut. The [Windows x64 qualification checkpoint](../docs/parity-evidence/execution/2026-11-25-windows-native.md)
+covers an unsigned candidate's relocated startup and versioned installer
+smoke. For a local candidate, run `python scripts/package-check-startup.py <zip> --evidence <new-directory>`
+and `pwsh -File tests/windows-package-lifecycle.ps1 -Archive <zip>`.
+The installer test creates and removes uniquely named per-user versions.
+On macOS, extract using Finder or `ditto` to preserve executable
 permissions. The bundles are unsigned. Move the app to the chosen Applications
 directory, and use the same location or a new versioned location for upgrades.
 

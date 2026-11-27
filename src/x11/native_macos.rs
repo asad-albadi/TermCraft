@@ -37,7 +37,7 @@ pub(super) fn start(
 fn launch(
     root: &Path,
     flag: &AtomicBool,
-    pin: &native_policy::NativePin,
+    pin: &native_policy::NativePin<'_>,
 ) -> Result<XServerLease, String> {
     let image = VerifiedSnapshot::create(&root.join("x11/macos-universal-private1"), pin.files)?;
     let runtime = tempfile::Builder::new()

@@ -5,14 +5,12 @@ use super::*;
 fn opaque_client_password_keyboard_and_paste_stay_private() {
     let (ctx, _root, mut w) = owned_workspace();
     let peer = raw_terminal(&mut w, "unrelated shell");
-    w.start_with_launch(Session{protocol:"SSH".into(),ssh_engine:SshEngine::OpenSsh,name:"compatibility client".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"/usr/bin/python3".into(),args:vec!["-c".into(),"import os,tty\ntty.setraw(0)\nos.write(1,b'Password: ')\nwhile True:\n data=os.read(0,32768)\n if not data: break\n os.write(1,b'\\r\\nCAP:'+data.hex().encode()+b'\\r\\n')".into()],directory:None}));
+    w.start_with_launch(Session{protocol:"SSH".into(),ssh_engine:SshEngine::OpenSsh,name:"compatibility client".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"python3".into(),args:vec!["-I".into(),"-c".into(),"import os,tty\ntty.setraw(0)\nos.write(1,b'Password: ')\nwhile True:\n data=os.read(0,32768)\n if not data: break\n os.write(1,b'\\r\\nCAP:'+data.hex().encode()+b'\\r\\n')".into()],directory:None}));
     let client = w.tabs[1].id;
     let deadline = Instant::now() + Duration::from_secs(3);
-    while !w.tabs[1].screen.plain().contains("Password:") {
-        w.tabs[1].poll();
-        assert!(Instant::now() < deadline);
-        std::thread::sleep(Duration::from_millis(5));
-    }
+    super::terminal_review_tests::wait_for_fixture(&mut w.tabs[1], deadline, "Password:", |tab| {
+        tab.screen.plain().contains("Password:")
+    });
     w.enable_broadcast_all();
     assert!(
         !w.broadcast_group.selected().contains(&client),

@@ -7,11 +7,13 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import platform
+import shutil
 import socket
 import stat
 import subprocess
 import tarfile
 import tempfile
+import time
 import zipfile
 
 
@@ -22,6 +24,10 @@ _archive_spec = importlib.util.spec_from_file_location(
 _archive_module = importlib.util.module_from_spec(_archive_spec)
 _archive_spec.loader.exec_module(_archive_module)
 extract_tar = _archive_module.extract_tar
+
+def windows_software_gl_files():
+    fixture = Path(__file__).resolve().parents[1] / "tests/windows-software-gl.json"
+    return json.loads(fixture.read_text())["files"]
 
 
 def extract(archive, directory):
@@ -90,35 +96,84 @@ def linux_rdp_helper_matches(image, expected_digest):
         return False
 
 
-def rdp_session_probe(executable, helper_digest, isolated, environment, evidence):
-    workspace = isolated / "RDP test workspace"
-    workspace.mkdir()
+def windows_rdp_child(parent_pid, helper, expected_digest, software_gl=False):
+    """Observe the Windows process image while its loopback connection is open."""
+    powershell = Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe"
+    # Windows PowerShell 5.1 has no -AsArray parameter. Wrap the query results
+    # and pass them as a single value to ConvertTo-Json.
+    modules = (f"$modules = @((Get-Process -Id {parent_pid}).Modules | Select-Object -ExpandProperty FileName); "
+               if software_gl else "$modules = @(); ")
+    command = (
+        "[Console]::OutputEncoding = [Text.Encoding]::UTF8; "
+        f"$children = @(Get-CimInstance Win32_Process -Filter 'ParentProcessId = {parent_pid}' "
+        "| Select-Object ProcessId,ExecutablePath); "
+        + modules + "ConvertTo-Json -InputObject @{children=$children; modules=$modules} -Compress"
+    )
+    completed = subprocess.run(
+        [powershell, "-NoProfile", "-NonInteractive", "-Command", command],
+        check=True, capture_output=True, text=True, encoding="utf-8-sig", timeout=15,
+    )
+    observed = json.loads(completed.stdout)
+    if software_gl:
+        actual = {Path(path) for path in observed["modules"]}
+        if not {helper.parent / name for name in windows_software_gl_files()} <= actual:
+            raise ValueError("The GUI did not load the app-local Windows software GL fixture.")
+    for child in observed["children"]:
+        if child["ExecutablePath"]:
+            actual = Path(child["ExecutablePath"])
+            if actual == helper and sha256(actual) == expected_digest:
+                return child["ProcessId"]
+    raise ValueError("RDP session did not start the verified adjacent Windows package helper.")
+
+
+def rdp_session_probe(executable, helper, helper_digest, isolated, environment, evidence, software_gl=False):
+    host = platform.system()
+    windows_workspace = host == "Windows"
+    workspace = (Path(environment["LOCALAPPDATA"]) / "Harbor" if windows_workspace
+                 else isolated / "RDP test workspace")
+    workspace.mkdir(parents=True)
     config = workspace / "workspace.json"
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
         listener.bind(("127.0.0.1", 0))
         listener.listen(1)
-        listener.settimeout(30)
+        listener.settimeout(0.25)
         profile = {
             "id": "package-rdp-test", "name": "Packaged helper startup", "protocol": "RDP",
             "host": "127.0.0.1", "user": "package-test", "port": listener.getsockname()[1],
         }
         preferences = {"font_size": 19.0}
         config.write_text(json.dumps({"sessions": [profile], "preferences": preferences}))
+        args = [executable]
+        if not windows_workspace:
+            args.extend(["--data-dir", workspace])
+        args.extend(["--session", "package-rdp-test"])
         with (evidence / "rdp-session.log").open("xb") as log:
             app = subprocess.Popen(
-                [executable, "--data-dir", workspace, "--session", "package-rdp-test"],
+                args,
                 cwd=isolated, env=environment, stdin=subprocess.DEVNULL,
                 stdout=log, stderr=subprocess.STDOUT,
             )
             try:
-                connection, _ = listener.accept()
+                deadline = time.monotonic() + 30
+                while True:
+                    try:
+                        connection, _ = listener.accept()
+                        break
+                    except socket.timeout:
+                        if app.poll() is not None:
+                            details = (evidence / "rdp-session.log").read_text(errors="replace").strip()
+                            raise ValueError(f"Packaged GUI exited before RDP negotiation ({app.returncode}): {details}")
+                        if time.monotonic() >= deadline:
+                            raise TimeoutError("Packaged GUI did not start RDP negotiation within 30 seconds.")
                 with connection:
                     connection.settimeout(10)
                     with connection.makefile("rb") as incoming:
                         header = incoming.read(4)
                         if len(header) != 4 or header[:2] != b"\x03\x00":
                             raise ValueError("Packaged RDP session did not send a TPKT header.")
-                        if platform.system() == "Linux":
+                        if host == "Windows":
+                            windows_rdp_child(app.pid, helper, helper_digest, software_gl)
+                        elif host == "Linux":
                             threads = Path(f"/proc/{app.pid}/task")
                             children = {
                                 pid for thread in threads.iterdir()
@@ -147,7 +202,7 @@ def rdp_session_probe(executable, helper_digest, isolated, environment, evidence
         raise ValueError("RDP startup modified the saved workspace preferences.")
 
 
-def smoke(archive, evidence, display):
+def smoke(archive, evidence, display, software_gl=None):
     from PIL import Image, ImageStat
 
     evidence.mkdir(parents=True, exist_ok=False)
@@ -181,6 +236,17 @@ def smoke(archive, evidence, display):
         if display:
             environment["DISPLAY"] = display
             environment.pop("WAYLAND_DISPLAY", None)
+        if software_gl is not None:
+            if host != "windows" or manifest["architecture"] != "x86_64":
+                raise ValueError("This software GL fixture requires a Windows x64 package.")
+            for name, digest in windows_software_gl_files().items():
+                source, target = software_gl / name, bindir / name
+                if target.exists() or sha256(source) != digest:
+                    raise ValueError(f"Cannot stage verified software GL fixture: {name}")
+                shutil.copyfile(source, target)
+                if sha256(target) != digest:
+                    raise ValueError(f"Staged software GL fixture changed: {name}")
+            environment["GALLIUM_DRIVER"] = "llvmpipe"
         for name, program, args in (
             ("help", executable, ["--help"]),
             ("rdp-helper", helper, []),
@@ -203,7 +269,8 @@ def smoke(archive, evidence, display):
                 raise ValueError("Screenshot is too small or blank.")
             size = image.size
         helper_digest = manifest["files"][helper.relative_to(root).as_posix()]
-        rdp_session_probe(executable, helper_digest, isolated, environment, evidence)
+        rdp_session_probe(executable, helper, helper_digest, isolated, environment, evidence,
+                          software_gl is not None)
         (evidence / "verification.json").write_text(json.dumps({
             "archive": archive.name, "archive_sha256": sha256(archive),
             "manifest_schema": manifest["schema_version"], "platform": host,
@@ -213,7 +280,11 @@ def smoke(archive, evidence, display):
             "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
             "screen_size": size, "rdp_helper_wire_version": 1,
             "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
-            "rdp_helper_child_location_verified": host == "linux",
+            "rdp_workspace": (
+                "isolated LOCALAPPDATA/Harbor default" if host == "windows" else "explicit isolated workspace"
+            ),
+            "rdp_helper_child_location_verified": host in ("linux", "windows"),
+            "windows_software_gl_fixture": windows_software_gl_files() if software_gl else None,
         }, indent=2) + "\n")
 
 
@@ -222,9 +293,12 @@ def main():
     parser.add_argument("archive", type=Path)
     parser.add_argument("--evidence", type=Path, required=True)
     parser.add_argument("--display", help="Optional X11 display, e.g. :99")
+    parser.add_argument("--windows-software-gl", type=Path,
+                        help="Directory with the pinned x64 Mesa 26.3.1 test DLLs")
     args = parser.parse_args()
     try:
-        smoke(args.archive.resolve(strict=True), args.evidence.resolve(), args.display)
+        smoke(args.archive.resolve(strict=True), args.evidence.resolve(), args.display,
+              args.windows_software_gl)
     except (OSError, ValueError, ImportError, subprocess.SubprocessError) as error:
         parser.exit(1, f"Startup verification failed: {error}\n")
 

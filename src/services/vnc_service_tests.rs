@@ -65,6 +65,53 @@ fn vnc_unsupported_sources_and_clipboard_fail_closed() {
     assert!(s.start_vnc(c).is_err());
 }
 
+#[cfg(windows)]
+#[test]
+#[ignore = "requires an unlocked Windows desktop and permission to exercise local capture"]
+fn windows_native_view_only_capture_starts_and_releases_listener() {
+    use crate::services::ServiceState;
+    use std::{
+        io::Read,
+        net::TcpStream,
+        time::{Duration, Instant},
+    };
+
+    let supervisor = ServiceSupervisor::default();
+    let mut config =
+        VncServiceConfig::local(VncSource::WindowsPrimaryDesktop, Secret::new("fixture"));
+    config.allow_unencrypted = true;
+    let id = supervisor.start_vnc(config).unwrap();
+    // Startup validates a real captured frame before publishing the listener.
+    let status = supervisor.status(id).unwrap();
+    assert_eq!(status.state, ServiceState::Running);
+    let address = status.address.unwrap();
+    assert!(address.ip().is_loopback());
+    let mut connection = TcpStream::connect_timeout(&address, Duration::from_secs(3)).unwrap();
+    connection
+        .set_read_timeout(Some(Duration::from_secs(3)))
+        .unwrap();
+    let mut greeting = [0; 12];
+    connection.read_exact(&mut greeting).unwrap();
+    assert_eq!(&greeting, b"RFB 003.008\n");
+    // End before authenticating. No desktop pixels leave the service.
+    drop(connection);
+    supervisor.stop(id).unwrap();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    loop {
+        let status = supervisor.status(id).unwrap();
+        if status.state == ServiceState::Stopped {
+            assert!(status.error.is_none());
+            break;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "service failed to stop: {status:?}"
+        );
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    assert!(TcpStream::connect_timeout(&address, Duration::from_secs(1)).is_err());
+}
+
 #[cfg(target_os = "linux")]
 mod isolated {
     use super::fixture_keyboard::{next_character, send_key};

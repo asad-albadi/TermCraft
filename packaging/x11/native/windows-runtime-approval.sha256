@@ -1,0 +1,5 @@
+# No Windows x64 private X runtime is approved.
+# After native qualification and redistribution review, record every approved
+# payload file as its lowercase SHA-256, two spaces, and its relative path.
+# Include the exact DLL, font, XKB and notice files. This list is compiled into
+# the application and read from the same frozen source by the packager.

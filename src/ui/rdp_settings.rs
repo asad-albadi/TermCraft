@@ -147,7 +147,7 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
     }
     if ui
         .add_enabled(
-            embedded && cfg!(unix) && options.serial_mappings.len() < 16,
+            embedded && cfg!(any(unix, windows)) && options.serial_mappings.len() < 16,
             Button::new("Add serial mapping"),
         )
         .clicked()

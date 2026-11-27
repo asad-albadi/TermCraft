@@ -12,6 +12,7 @@ import platform
 import plistlib
 import re
 import shutil
+import stat
 import struct
 import subprocess
 import sys
@@ -26,6 +27,9 @@ ASSETS = tuple(Path("assets") / name for name in (
     "Interface.ttf", "Terminal.ttf", "Interface-LICENSE", "Terminal-LICENSE",
     "termcraft-mascot.png", "termcraft-logo.png",
 ))
+WINDOWS_X_APPROVAL = Path("packaging/x11/native/windows-runtime-approval.sha256")
+WINDOWS_X_ROOT = Path("x11/windows-x86_64-private1")
+WINDOWS_X_REQUIRED = {"vcxsrv.exe", "xkbcomp.exe", "fonts/misc/fonts.dir", "xkbdata/rules/base"}
 
 NATIVE = {"Linux": "linux", "Windows": "windows", "Darwin": "macos"}.get(platform.system())
 ARCHES = {
@@ -95,7 +99,7 @@ def source_inputs(root):
     paths = [
         *PACKAGES, *(p.with_name("Cargo.lock") for p in PACKAGES),
         Path("engines/wayland/Cargo.toml"), Path("engines/wayland/Cargo.lock"),
-        Path("CREDITS.md"), Path("FEATURE_PARITY.md"),
+        Path("CREDITS.md"), Path("FEATURE_PARITY.md"), Path("LICENSE"), Path("PRIVACY.md"),
         Path("scripts/package-release.py"), Path("scripts/package-debian.py"),
         Path("scripts/package-check-startup.py"), Path("scripts/portable_archive.py"),
         Path("scripts/build-release.sh"), *ASSETS,
@@ -190,6 +194,8 @@ def cargo_invocation(state):
             except OSError:
                 if os.name != "nt":
                     raise
+                import _winapi
+                _winapi.CreateJunction(str(cache / name), str(home / name))
     return {"cwd": cwd, "env": {**variables, "CARGO_HOME": str(home), "CARGO_BUILD_JOBS": "2"}}
 
 
@@ -427,6 +433,91 @@ def stage_xephyr(source, destination, archive):
     return info, native_libraries(executable, "linux")
 
 
+def windows_x_inventory(source):
+    """Read the source-controlled inventory compiled into the Windows application."""
+    inventory = {}
+    names = set()
+    approval = regular_source(source, WINDOWS_X_APPROVAL)
+    for line in approval.read_bytes().decode("utf-8").split("\n"):
+        line = line.removesuffix("\r")
+        if not line or line.startswith("#"):
+            continue
+        checksum, _, name = line.partition("  ")
+        parts = name.split("/")
+        if (not re.fullmatch(r"[0-9a-f]{64}", checksum) or name.lower() in names
+                or any(not re.fullmatch(r"[a-zA-Z0-9_+@(),.\-]+", part)
+                       or part.endswith(".")
+                       or re.fullmatch(r"con|prn|aux|nul|com[0-9]|lpt[0-9]", part.split(".", 1)[0], re.I)
+                       for part in parts)):
+            raise ValueError("Invalid Windows private X approval inventory.")
+        names.add(name.lower())
+        inventory[name] = checksum
+    if not inventory:
+        raise ValueError("No approved Windows x64 private X runtime is available.")
+    if not WINDOWS_X_REQUIRED <= inventory.keys():
+        raise ValueError("Windows private X approval inventory lacks a required runtime file.")
+    return inventory
+
+
+def stage_windows_x11(resources, candidate, inventory):
+    """Copy an exact approved Windows tree without staging a candidate-local manifest."""
+    def ordinary(path, expected):
+        metadata = path.lstat()
+        if (stat.S_IFMT(metadata.st_mode) != expected
+                or getattr(metadata, "st_file_attributes", 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+            raise ValueError(f"Windows private X files and directories must be ordinary paths: {path}")
+        return metadata
+
+    def walk_error(error):
+        raise error
+
+    candidate = candidate.absolute()
+    for directory in (*reversed(candidate.parents), candidate):
+        ordinary(directory, stat.S_IFDIR)
+    entries = set()
+    total = 0
+    for path, directories, files in os.walk(candidate, onerror=walk_error):
+        directory = Path(path)
+        for name in directories:
+            ordinary(directory / name, stat.S_IFDIR)
+        for name in files:
+            original = directory / name
+            size = ordinary(original, stat.S_IFREG).st_size
+            entries.add(original.relative_to(candidate).as_posix())
+            total += size
+            if size > 128 * 1024 * 1024 or total > 512 * 1024 * 1024:
+                raise ValueError("Windows private X payload exceeds its size limit.")
+    if entries != inventory.keys():
+        raise ValueError("Windows private X file inventory mismatch.")
+
+    destination = resources / WINDOWS_X_ROOT
+    if os.path.lexists(destination):
+        raise FileExistsError(destination)
+    libraries = {}
+    with tempfile.TemporaryDirectory(prefix=".x11-", dir=resources) as temporary:
+        verified = Path(temporary) / "runtime"
+        for name, expected in sorted(inventory.items()):
+            staged = verified / name
+            staged.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(candidate / name, staged)
+            if sha256(staged) != expected:
+                raise ValueError(f"Windows private X checksum mismatch: {name}")
+        for name in sorted(inventory):
+            staged = verified / name
+            if staged.suffix.lower() in (".exe", ".dll"):
+                if binary_arch(staged, "windows") != "x86_64":
+                    raise ValueError(f"Windows private X image is not x64: {name}")
+                libraries[(WINDOWS_X_ROOT / name).as_posix()] = native_libraries(staged, "windows")
+        destination.parent.mkdir(exist_ok=True)
+        verified.rename(destination)
+    return {
+        "artifact_id": "vcxsrv-21.1.16.1-termcraft-private1-windows-x86_64",
+        "entry_point": (WINDOWS_X_ROOT / "vcxsrv.exe").as_posix(),
+        "executable_sha256": inventory["vcxsrv.exe"],
+        "source_approval": WINDOWS_X_APPROVAL.as_posix(),
+    }, libraries
+
+
 def stage_mosh(source, destination, inputs):
     manifest_path = regular_source(source, Path("packaging/runtime-manifest.json"))
     stage = regular_source(source, Path("packaging/runtime/stage-mosh.py"))
@@ -449,11 +540,18 @@ def stage_unix(source, destination, cache, target, arch):
     return json.loads(inventory.read_text())
 
 
-def stage_browser(source, resources, inputs, target, arch):
-    manifest = regular_source(source, Path("packaging/browser/runtime-manifest.json"))
+def browser_runtime_manifest(source, target, arch):
+    name = "runtime-manifest-windows.json" if target == "windows" else "runtime-manifest.json"
+    manifest = regular_source(source, Path("packaging/browser") / name)
     info = json.loads(manifest.read_text())
-    if (target, arch) != (info["platform"], info["architecture"]):
+    if ((target, arch) != (info["platform"], info["architecture"])
+            or (target == "windows" and info.get("approved") is not True)):
         raise ValueError("No qualified bundled Chromium payload for this platform.")
+    return manifest, info
+
+
+def stage_browser(source, resources, inputs, target, arch):
+    manifest, info = browser_runtime_manifest(source, target, arch)
     stage = regular_source(source, Path("packaging/browser/stage-runtime.py"))
     subprocess.run([sys.executable, "-I", "-B", stage, manifest, resources,
                     inputs.resolve(strict=True)], check=True)
@@ -463,6 +561,11 @@ def stage_browser(source, resources, inputs, target, arch):
             continue
         relative = Path(info["root"]) / item["path"]
         path = regular_source(resources, relative)
+        if target == "windows":
+            if binary_arch(path, target) != arch:
+                raise ValueError(f"Browser image architecture differs from the package: {relative}")
+            libraries[relative.as_posix()] = native_libraries(path, target)
+            continue
         if ".so" not in path.name:
             libraries[relative.as_posix()] = native_libraries(path, target, resources / info["root"] / "libraries")
             continue
@@ -488,7 +591,7 @@ def stage_browser(source, resources, inputs, target, arch):
 
 
 def package_release(target, output, app_binary, helper_binary, build_inputs=None, source=ROOT,
-                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None, xephyr_archive=None, wayland_helper_binary=None):
+                    cargo_settings=None, xwayland_archive=None, mosh_inputs=None, iperf_runtime=None, unix_cache=None, browser_inputs=None, xephyr_archive=None, wayland_helper_binary=None, windows_x11_runtime=None):
     packaging = source / "packaging"
     binaries = [app_binary.resolve(strict=True), helper_binary.resolve(strict=True)]
     if binaries[0].samefile(binaries[1]):
@@ -512,8 +615,14 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         raise ValueError("The pinned Mosh payload targets the Linux x86_64 Arch runtime ABI.")
     if unix_cache is not None and (target, arch) not in (("linux", "x86_64"), ("windows", "x86_64")):
         raise ValueError("Unix payload supports Linux and Windows x86_64 only.")
-    if browser_inputs is not None and (target, arch) != ("linux", "x86_64"):
-        raise ValueError("No qualified bundled Chromium payload for this platform.")
+    if browser_inputs is not None:
+        if target == "windows" and build_inputs is None:
+            raise ValueError("The Windows Chromium payload requires a native build from the approval source.")
+        browser_runtime_manifest(source, target, arch)
+    if windows_x11_runtime is not None:
+        if (target, arch) != ("windows", "x86_64") or build_inputs is None:
+            raise ValueError("The private X payload requires a native Windows x64 build from the approval source.")
+        x11_inventory = windows_x_inventory(source)
     if wayland_helper_binary is not None:
         if target != "linux" or binary_arch(wayland_helper_binary, target) != arch:
             raise ValueError("The optional Wayland helper requires the same native Linux architecture as the app.")
@@ -530,6 +639,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         basename += "-unix"
     if browser_inputs is not None:
         basename += "-chromium"
+    if windows_x11_runtime is not None:
+        basename += "-private-x11"
     if wayland_helper_binary is not None:
         basename += "-wayland-sharing"
     name = f"{basename}.tar.gz" if target == "linux" else f"{basename}.zip"
@@ -540,7 +651,10 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
     suffix = ".exe" if target == "windows" else ""
     with tempfile.TemporaryDirectory(prefix=".package-", dir=output) as temporary:
         temp = Path(temporary)
-        root = temp / ("TermCraft.app" if target == "macos" else basename)
+        archive_root = "TermCraft.app" if target == "macos" else basename
+        # Windows stages deep dependency notices. Keep the versioned archive
+        # name out of those host paths while preserving the ZIP's public layout.
+        root = temp / ("pkg" if target == "windows" else archive_root)
         root.mkdir()
         bindir, resources = macos_bundle(root, version, packaging) if target == "macos" else (root, root)
         bindir.mkdir(exist_ok=True)
@@ -604,10 +718,17 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
         if browser_inputs is not None:
             browser, browser_libraries = stage_browser(source, resources, browser_inputs, target, arch)
             linked.update(browser_libraries)
+        windows_x11 = None
+        if windows_x11_runtime is not None:
+            windows_x11, x11_libraries = stage_windows_x11(resources, windows_x11_runtime, x11_inventory)
+            linked.update(x11_libraries)
         unix = stage_unix(source, resources, unix_cache, target, arch) if unix_cache is not None else None
         vnc_browser = stage_vnc_browser(source, resources)
         copy_release_assets(source, resources / "assets")
         shutil.copyfile(source / "CREDITS.md", resources / "CREDITS.md")
+        if target == "windows":
+            for name in ("LICENSE", "PRIVACY.md"):
+                shutil.copyfile(regular_source(source, Path(name)), resources / name)
         for cargo in PACKAGES:
             relative = cargo.with_name("Cargo.lock")
             destination = resources / "build-source" / relative
@@ -648,6 +769,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
             runtime["managed_xwayland"] = xwayland
         if xephyr is not None:
             runtime["managed_xdmcp"] = xephyr
+        if windows_x11 is not None:
+            runtime["managed_windows_x11"] = windows_x11
         if target != "linux":
             del runtime["linux_display_libraries"]
         notices = cargo_notices(resources, arch, target, source, cargo_settings,
@@ -668,7 +791,8 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
                 "cargo": capture("cargo", "--version", **cargo_settings).strip() if build_inputs is not None else None,
                 "rustc": capture("rustc", "--version", **cargo_settings).strip() if build_inputs is not None else None,
             },
-            "licenses": {"project": None, "credits": (resources / "CREDITS.md").relative_to(root).as_posix(),
+            "licenses": {"project": "LICENSE" if target == "windows" else None,
+                         "credits": (resources / "CREDITS.md").relative_to(root).as_posix(),
                          "crate_notice_paths_relative_to": resources.relative_to(root).as_posix(),
                          "crates": notices},
             "files": {p.relative_to(root).as_posix(): sha256(p) for p in sorted(root.rglob("*")) if p.is_file()},
@@ -684,7 +808,7 @@ def package_release(target, output, app_binary, helper_binary, build_inputs=None
             with zipfile.ZipFile(temporary_archive, "w", zipfile.ZIP_DEFLATED) as zipped:
                 for path in sorted(root.rglob("*")):
                     if path.is_file():
-                        zipped.write(path, path.relative_to(temp).as_posix())
+                        zipped.write(path, f"{archive_root}/{path.relative_to(root).as_posix()}")
         # Publish a complete archive without replacing another version or concurrent output.
         if os.name == "nt":
             # Windows rename is atomic and refuses an existing destination.
@@ -712,7 +836,9 @@ def main():
     parser.add_argument("--mosh-dependencies", type=Path, help="Offline cache of pinned Perl/OpenSSH/native dependency archives, source and recipes.")
     parser.add_argument("--unix-cache", type=Path,
                         help="Bundle target-matching pinned Unix archives from an offline upstream hash cache (Linux/Windows x86_64).")
-    parser.add_argument("--browser-inputs", type=Path, help="Offline pinned Chromium archive, signature and third-party notices directory (Linux x86_64).")
+    parser.add_argument("--browser-inputs", type=Path, help="Offline inputs for the approved platform-specific Chromium archive.")
+    parser.add_argument("--windows-x11-runtime", type=Path,
+                        help="Offline directory of the exact source-approved private Windows x64 X runtime.")
     args = parser.parse_args()
     if bool(args.app_binary) != bool(args.helper_binary):
         parser.error("Supply both prebuilt binaries or omit both to build a native release.")
@@ -722,6 +848,8 @@ def main():
         parser.error("Choose a supported platform.")
     if args.platform != NATIVE:
         parser.error("Run the packager on the target operating system.")
+    if args.platform == "windows" and args.browser_inputs and args.app_binary:
+        parser.error("The Windows Chromium payload requires a native build from the approval source.")
     if args.xwayland_archive and args.platform != "linux":
         parser.error("--xwayland-archive is available for Linux x86_64 only.")
     if args.xephyr_archive and args.platform != "linux":
@@ -730,6 +858,9 @@ def main():
         parser.error("--unix-cache supports Linux and Windows x86_64 only.")
     if args.wayland_helper_binary is not None and args.platform != "linux":
         parser.error("--wayland-helper-binary is available for native Linux only.")
+    if args.windows_x11_runtime is not None and (args.platform != "windows" or args.app_binary
+                                                or platform.machine().lower() not in ("amd64", "x86_64")):
+        parser.error("--windows-x11-runtime requires a native Windows x64 build from source.")
     mosh_inputs = (args.mosh_archive, args.mosh_source, args.mosh_recipe, args.mosh_dependencies)
     if any(mosh_inputs):
         if not all(mosh_inputs):
@@ -739,6 +870,12 @@ def main():
     else:
         mosh_inputs = None
     try:
+        if args.platform == "windows" and args.browser_inputs:
+            browser_runtime_manifest(ROOT, args.platform, "x86_64")
+        if args.windows_x11_runtime is not None:
+            # Refuse an unapproved input before the native build. Staging still
+            # reads the authoritative inventory from the exact frozen source.
+            windows_x_inventory(ROOT)
         if args.app_binary:
             archive = package_release(args.platform, args.output.resolve(), args.app_binary, args.helper_binary,
                                       xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary)
@@ -750,7 +887,8 @@ def main():
                 print(f"Building source snapshot {source.name}", flush=True)
                 app, helper = release_build(source, build_root, settings)
                 archive = package_release(args.platform, args.output.resolve(), app, helper, inputs, source, settings,
-                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary)
+                                          xwayland_archive=args.xwayland_archive, mosh_inputs=mosh_inputs, iperf_runtime=args.iperf_runtime, unix_cache=args.unix_cache, browser_inputs=args.browser_inputs, xephyr_archive=args.xephyr_archive, wayland_helper_binary=args.wayland_helper_binary,
+                                          windows_x11_runtime=args.windows_x11_runtime)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f"Packaging failed: {error}\n")
     print(f"{sha256(archive)}  {archive}")

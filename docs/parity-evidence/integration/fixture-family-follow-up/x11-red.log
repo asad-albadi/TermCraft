@@ -1,0 +1,18 @@
+
+running 1 test
+
+thread '<unnamed>' (62417) panicked at /tmp/termcraft-deadline-component/deadline_tests.rs:32:42:
+called `Result::unwrap()` on an `Err` value: Os { code: 32, kind: BrokenPipe, message: "Broken pipe" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'x11::xdmcp_clipboard::deadline_tests::initializer_peer_response_after_client_deadline_is_not_a_fixture_failure' (62416) panicked at /tmp/termcraft-deadline-component/deadline_tests.rs:652:19:
+called `Result::unwrap()` on an `Err` value: Any { .. }
+test x11::xdmcp_clipboard::deadline_tests::initializer_peer_response_after_client_deadline_is_not_a_fixture_failure ... FAILED
+
+failures:
+
+failures:
+    x11::xdmcp_clipboard::deadline_tests::initializer_peer_response_after_client_deadline_is_not_a_fixture_failure
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 19 filtered out; finished in 0.04s
+

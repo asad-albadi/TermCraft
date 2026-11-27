@@ -27,7 +27,6 @@ fn install(manager: &PackageManager, version: &str) {
     manager.install(release, archive(version)).wait().unwrap();
 }
 
-#[cfg(target_os = "linux")]
 fn wait_pty_text(process: &harbor_workspace::process::Process, needle: &str) {
     let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
     let mut output = Vec::new();
@@ -204,6 +203,35 @@ fn windows_drive_mapping_resolves_expected_file() {
         String::from_utf8_lossy(&output.stdout).replace("\r\n", "\n"),
         "drive data\n"
     );
+}
+
+#[cfg(windows)]
+#[test]
+#[ignore = "requires native Windows and the staged BusyBox-w32 upstream artifact"]
+fn windows_portable_shell_runs_in_conpty_and_keeps_its_private_home() {
+    let root = tempfile::tempdir().unwrap();
+    let manager = PackageManager::new(root.path().join("portable space"));
+    install(&manager, "FRP-6354");
+    let environment = UnixEnvironment::new(manager);
+    let home_before = std::env::var_os("HOME");
+    let path_before = std::env::var_os("PATH");
+    let launch = environment.launch_config().unwrap();
+    let mut shell = launch.spawn_terminal(80, 24).unwrap();
+    shell
+        .write(b"printf '%s%s\\n' portable -input > note; cat note; exit\r")
+        .unwrap();
+    wait_pty_text(&shell, "portable-input");
+    assert_eq!(
+        fs::read(launch.directory.join("note")).unwrap(),
+        b"portable-input\n"
+    );
+    drop(shell);
+    assert_eq!(
+        environment.launch_config().unwrap().directory,
+        launch.directory
+    );
+    assert_eq!(std::env::var_os("HOME"), home_before);
+    assert_eq!(std::env::var_os("PATH"), path_before);
 }
 
 #[cfg(target_os = "linux")]

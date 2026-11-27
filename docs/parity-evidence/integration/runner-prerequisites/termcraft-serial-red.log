@@ -1,0 +1,15 @@
+
+running 1 test
+
+thread 'devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads' (13623) panicked at src/devices_tests.rs:1107:9:
+partial read must wait for the configured interval
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads ... FAILED
+
+failures:
+
+failures:
+    devices_tests::serial::serial_configured_timeouts_accumulate_bytes_and_support_immediate_reads
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 85 filtered out; finished in 0.09s
+

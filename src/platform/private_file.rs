@@ -26,20 +26,31 @@ fn options() -> OpenOptions {
     options
 }
 pub(crate) fn open(path: &Path, create: bool) -> Result<File, String> {
-    let file = options()
-        .create(create)
-        .open(path)
-        .map_err(|e| e.to_string())?;
+    #[cfg(windows)]
+    if create {
+        match create_new(path) {
+            Ok(file) => return Ok(file),
+            Err(error) if error.kind() == io::ErrorKind::AlreadyExists => {}
+            Err(error) => return Err(error.to_string()),
+        }
+    }
+    let mut options = options();
+    #[cfg(unix)]
+    options.create(create);
+    let file = options.open(path).map_err(|e| e.to_string())?;
     verify(&file)?;
     Ok(file)
 }
+#[cfg(unix)]
 pub(crate) fn create_new(path: &Path) -> io::Result<File> {
     let file = options().create_new(true).open(path)?;
     verify(&file).map_err(|e| io::Error::new(io::ErrorKind::PermissionDenied, e))?;
     Ok(file)
 }
+#[cfg(windows)]
+pub(crate) use windows::{create_new, user_owned_descriptor};
 #[cfg(unix)]
-pub(crate) fn verify(file: &File) -> Result<(), String> {
+fn verify(file: &File) -> Result<(), String> {
     use std::os::unix::fs::MetadataExt;
     let m = file.metadata().map_err(|e| e.to_string())?;
     if m.nlink() != 1
@@ -52,7 +63,7 @@ pub(crate) fn verify(file: &File) -> Result<(), String> {
     Ok(())
 }
 #[cfg(windows)]
-pub(crate) fn verify(file: &File) -> Result<(), String> {
+fn verify(file: &File) -> Result<(), String> {
     windows::secure_file(file)
 }
 #[cfg(windows)]

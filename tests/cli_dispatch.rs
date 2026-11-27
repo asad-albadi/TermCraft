@@ -30,7 +30,12 @@ fn cli_missing_value_returns_error_not_panic() {
         "--session".into(),
         "saved-id".into(),
         "--cwd".into(),
-        "/path with spaces".into(),
+        if cfg!(windows) {
+            r"C:\path with spaces"
+        } else {
+            "/path with spaces"
+        }
+        .into(),
     ])
     .unwrap();
     assert!(matches!(parsed,CliAction::OpenSession{id,cwd:Some(_),..} if id=="saved-id"));
@@ -100,22 +105,108 @@ fn different_data_dirs_do_not_share_commands() {
     assert!(pa.recv_timeout(Duration::from_secs(1)).is_ok());
     assert!(pb.recv_timeout(Duration::from_millis(100)).is_err());
 }
+#[cfg(windows)]
+#[test]
+fn secondary_rediscovers_the_primary_after_a_restart() {
+    let root = tempfile::tempdir().unwrap();
+    let Binding::Primary(old) = InstanceBroker::bind(root.path()).unwrap() else {
+        panic!("expected the first primary")
+    };
+    let Binding::Secondary(client) = InstanceBroker::bind(root.path()).unwrap() else {
+        panic!("expected a secondary")
+    };
+    drop(old);
+    let Binding::Primary(mut replacement) = InstanceBroker::bind(root.path()).unwrap() else {
+        panic!("expected the replacement to own the workspace")
+    };
+    let receipt = client
+        .send(CliAction::NewTab {
+            cwd: None,
+            exit_when_done: false,
+        })
+        .unwrap();
+    assert_eq!(
+        replacement.recv_timeout(Duration::from_secs(1)).unwrap().id,
+        receipt.id
+    );
+}
 #[test]
 fn malformed_oversized_and_unauthenticated_ipc_are_rejected() {
     use interprocess::local_socket::{GenericNamespaced, Stream, prelude::*};
     use std::io::{Read, Write};
+    fn read_before_deadline(stream: &mut Stream, mut buffer: &mut [u8]) {
+        let deadline = std::time::Instant::now() + Duration::from_secs(2);
+        while !buffer.is_empty() {
+            assert!(
+                std::time::Instant::now() < deadline,
+                "dispatch response timed out"
+            );
+            match stream.read(buffer) {
+                Ok(0) => std::thread::sleep(Duration::from_millis(2)),
+                Ok(size) => buffer = &mut buffer[size..],
+                Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
+                    std::thread::sleep(Duration::from_millis(2));
+                }
+                Err(error) => panic!("dispatch frame read failed: {error}"),
+            }
+        }
+    }
     let root = tempfile::tempdir().unwrap();
     let Binding::Primary(mut primary) = InstanceBroker::bind(root.path()).unwrap() else {
         panic!()
     };
+    let record = if cfg!(windows) {
+        "instance.json"
+    } else {
+        "instance.lock"
+    };
     let metadata: serde_json::Value =
-        serde_json::from_slice(&std::fs::read(root.path().join("instance.lock")).unwrap()).unwrap();
-    for payload in [b"not-json".to_vec(),serde_json::to_vec(&serde_json::json!({"version":1,"workspace":metadata["workspace"],"token":"wrong","id":"bad-auth","action":{"NewTab":{"cwd":null,"exit_when_done":false}}})).unwrap(),vec![b'X';65537]]{
-  let name=metadata["name"].as_str().unwrap().to_ns_name::<GenericNamespaced>().unwrap();let mut stream=Stream::connect(name).unwrap();stream.set_recv_timeout(Some(Duration::from_secs(2))).unwrap();
-  stream.write_all(&(payload.len()as u32).to_be_bytes()).unwrap();if payload.len()<=65536{stream.write_all(&payload).unwrap();}
-  let mut len=[0;4];stream.read_exact(&mut len).unwrap();let mut response=vec![0;u32::from_be_bytes(len)as usize];stream.read_exact(&mut response).unwrap();
-  let response:serde_json::Value=serde_json::from_slice(&response).unwrap();assert!(response["receipt"].is_null());assert!(response["error"].is_string());
- }
+        serde_json::from_slice(&std::fs::read(root.path().join(record)).unwrap()).unwrap();
+    let unauthorized = serde_json::json!({
+        "version": 1, "workspace": metadata["workspace"], "token": "wrong",
+        "id": "bad-auth", "action": {"NewTab": {"cwd": null, "exit_when_done": false}}
+    });
+    for payload in [
+        b"not-json".to_vec(),
+        serde_json::to_vec(&unauthorized).unwrap(),
+        vec![b'X'; 65537],
+    ] {
+        let name = metadata["name"]
+            .as_str()
+            .unwrap()
+            .to_ns_name::<GenericNamespaced>()
+            .unwrap();
+        let deadline = std::time::Instant::now() + Duration::from_secs(2);
+        let mut stream = loop {
+            match Stream::connect(name.borrow()) {
+                Ok(stream) => break stream,
+                Err(error)
+                    if cfg!(windows)
+                        && error.raw_os_error() == Some(231)
+                        && std::time::Instant::now() < deadline =>
+                {
+                    std::thread::sleep(Duration::from_millis(2))
+                }
+                Err(error) => panic!("dispatch connection failed: {error}"),
+            }
+        };
+        stream.set_nonblocking(true).unwrap();
+        stream
+            .write_all(&(payload.len() as u32).to_be_bytes())
+            .unwrap();
+        if payload.len() <= 65536 {
+            stream.write_all(&payload).unwrap();
+        }
+        let mut len = [0; 4];
+        read_before_deadline(&mut stream, &mut len);
+        let len = u32::from_be_bytes(len) as usize;
+        assert!((1..=65536).contains(&len));
+        let mut response = vec![0; len];
+        read_before_deadline(&mut stream, &mut response);
+        let response: serde_json::Value = serde_json::from_slice(&response).unwrap();
+        assert!(response["receipt"].is_null());
+        assert!(response["error"].is_string());
+    }
     assert!(primary.recv_timeout(Duration::from_millis(100)).is_err());
 }
 #[cfg(unix)]

@@ -319,8 +319,13 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     ui.horizontal(|ui| {
         ui.label("Monitor output");
         let mut monitor = s.xdmcp_options.monitor.clone().unwrap_or_default();
+        let monitor_hint = if cfg!(all(windows, target_arch = "x86_64")) {
+            "Default; e.g. 1"
+        } else {
+            "Default; e.g. HDMI-1"
+        };
         if ui
-            .add(TextEdit::singleline(&mut monitor).hint_text("Default; e.g. HDMI-1"))
+            .add(TextEdit::singleline(&mut monitor).hint_text(monitor_hint))
             .changed()
         {
             s.xdmcp_options.monitor = if monitor.is_empty() {
@@ -340,7 +345,12 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
         }
     });
     ui.horizontal(|ui| {
-        ui.label("Parent X11 text clipboard");
+        let windows = cfg!(all(windows, target_arch = "x86_64"));
+        ui.label(if windows {
+            "Windows text clipboard"
+        } else {
+            "Parent X11 text clipboard"
+        });
         ui.selectable_value(
             &mut s.xdmcp_options.clipboard,
             ClipboardPolicy::Disabled,
@@ -352,12 +362,29 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             ClipboardPolicy::Bidirectional,
             "Bidirectional text",
         );
-        #[cfg(not(target_os = "linux"))]
+        #[cfg(all(windows, target_arch = "x86_64"))]
+        if ui
+            .selectable_value(
+                &mut s.xdmcp_options.clipboard,
+                ClipboardPolicy::WindowsBidirectional,
+                "Bidirectional text",
+            )
+            .changed()
+        {
+            s.xdmcp_options.clipboard_display = None;
+            s.xdmcp_options.clipboard_authority = None;
+        }
+        #[cfg(not(any(target_os = "linux", all(windows, target_arch = "x86_64"))))]
         ui.add_enabled(
             false,
             egui::Button::new("Bidirectional (unavailable for this engine)"),
         );
     });
+    #[cfg(all(windows, target_arch = "x86_64"))]
+    if s.xdmcp_options.clipboard == ClipboardPolicy::WindowsBidirectional {
+        ui.small("Shares Windows clipboard text in both directions with this XDMCP desktop.");
+    }
+    #[cfg(target_os = "linux")]
     if s.xdmcp_options.clipboard == ClipboardPolicy::Bidirectional {
         ui.horizontal(|ui| {
             ui.label("Selected local parent X11 display");
@@ -401,11 +428,19 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     if !state.advertise.is_empty() && s.xdmcp_options.advertise_address.is_none() {
         ui.colored_label(Color32::RED, "Enter a valid local IPv4 address");
     }
-    ui.checkbox(
-        &mut s.xdmcp_options.allow_network_listener,
-        "Allow unencrypted XDMCP/X11 and this session's TCP listener on all interfaces",
-    );
-    ui.small("XDMCP and X11 are unencrypted. Use a trusted isolated network. The advertised address does not restrict the TCP listener. X11 access control remains enabled. Linux requires the pinned owned Xephyr payload and a host X11 display; native Windows/macOS engines still require qualification.");
+    if cfg!(all(windows, target_arch = "x86_64")) {
+        ui.checkbox(
+            &mut s.xdmcp_options.allow_network_listener,
+            "Allow unencrypted XDMCP/X11 and this session's TCP listener on the selected address",
+        );
+        ui.small("Use a trusted isolated network. The private Windows engine binds only the selected local IPv4 address and requires X11 authentication. The engine needs an approved native package.");
+    } else {
+        ui.checkbox(
+            &mut s.xdmcp_options.allow_network_listener,
+            "Allow unencrypted XDMCP/X11 and this session's TCP listener on all interfaces",
+        );
+        ui.small("XDMCP and X11 are unencrypted. Use a trusted isolated network. The advertised address does not restrict the TCP listener. X11 access control remains enabled. Linux requires the pinned owned Xephyr payload and a host X11 display; other platforms need a qualified engine.");
+    }
 }
 pub(super) fn start(session: &Session) -> Result<ManagedXdmcp, String> {
     if session.host.parse::<std::net::IpAddr>().is_err() {

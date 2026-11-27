@@ -81,6 +81,121 @@ fn typed_registry_value_input_is_bounded_and_literal() {
     assert!(RegistryValue::parse_text(1, "bad\0value").is_err());
     assert!(RegistryValue::parse_text(99, "anything").is_err());
 }
+
+#[cfg(windows)]
+#[test]
+#[ignore = "temporarily installs the real per-user integration for an explicitly supplied staged executable"]
+fn packaged_windows_registration_dispatches_and_guards_uninstall() {
+    use harbor_workspace::{
+        cli::CliAction,
+        ipc::{Binding, InstanceBroker},
+    };
+    use std::{path::PathBuf, process::Command, sync::atomic::AtomicBool, time::Duration};
+    use windows_sys::Win32::{
+        Foundation::{CloseHandle, WAIT_OBJECT_0},
+        System::Threading::{
+            GetExitCodeProcess, QueryFullProcessImageNameW, TerminateProcess, WaitForSingleObject,
+        },
+        UI::Shell::{
+            SEE_MASK_FLAG_NO_UI, SEE_MASK_NOASYNC, SEE_MASK_NOCLOSEPROCESS, SHELLEXECUTEINFOW,
+            ShellExecuteExW,
+        },
+    };
+
+    let executable = PathBuf::from(std::env::var_os("TERMCRAFT_TEST_ACTIVATION_EXE").unwrap());
+    assert!(executable.is_absolute() && executable.is_file());
+    let expected_image = std::fs::canonicalize(&executable).unwrap();
+    let fixture_variable = "TERMCRAFT_TEST_ACTIVATION_LOCALAPPDATA";
+    let Some(private_data) = std::env::var_os(fixture_variable) else {
+        let private = tempfile::tempdir().unwrap();
+        let status = Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "packaged_windows_registration_dispatches_and_guards_uninstall",
+                "--ignored",
+            ])
+            .env("LOCALAPPDATA", private.path())
+            .env(fixture_variable, private.path())
+            .status()
+            .unwrap();
+        assert!(status.success());
+        return;
+    };
+    assert_eq!(std::env::var_os("LOCALAPPDATA"), Some(private_data.clone()));
+    let Binding::Primary(mut workspace) =
+        InstanceBroker::bind(&PathBuf::from(private_data).join("Harbor")).unwrap()
+    else {
+        panic!("private activation workspace was occupied")
+    };
+    let integration = WindowsIntegration::new(executable.to_str().unwrap()).unwrap();
+    let cancel = AtomicBool::new(false);
+    assert!(
+        !integration.status(&cancel).unwrap(),
+        "fixture already registered"
+    );
+    integration.install_user(&cancel).unwrap();
+    struct Registration(WindowsIntegration);
+    impl Drop for Registration {
+        fn drop(&mut self) {
+            let _ = self.0.remove_user(&AtomicBool::new(false));
+        }
+    }
+    let owned = Registration(integration);
+    assert!(owned.0.status(&cancel).unwrap());
+    let guard = || {
+        Command::new(&executable)
+            .arg("--windows-integration-uninstall-guard")
+            .output()
+            .unwrap()
+            .status
+            .code()
+    };
+    assert_eq!(guard(), Some(3));
+
+    let shell_exit = |url: &str| {
+        let target: Vec<u16> = url.encode_utf16().chain([0]).collect();
+        let mut launch = SHELLEXECUTEINFOW {
+            cbSize: std::mem::size_of::<SHELLEXECUTEINFOW>() as u32,
+            fMask: SEE_MASK_NOASYNC | SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI,
+            lpFile: target.as_ptr(),
+            ..Default::default()
+        };
+        let launched = unsafe { ShellExecuteExW(&mut launch) };
+        assert_ne!(launched, 0, "{}", std::io::Error::last_os_error());
+        assert!(!launch.hProcess.is_null());
+        let mut exit = 0;
+        let completed = unsafe {
+            let result = WaitForSingleObject(launch.hProcess, 8000) == WAIT_OBJECT_0;
+            if !result {
+                let mut name = [0u16; 4096];
+                let mut length = name.len() as u32;
+                if QueryFullProcessImageNameW(launch.hProcess, 0, name.as_mut_ptr(), &mut length)
+                    != 0
+                    && std::fs::canonicalize(String::from_utf16_lossy(&name[..length as usize]))
+                        .ok()
+                        .as_ref()
+                        == Some(&expected_image)
+                {
+                    TerminateProcess(launch.hProcess, 1);
+                    WaitForSingleObject(launch.hProcess, 2000);
+                }
+            }
+            let read = result && GetExitCodeProcess(launch.hProcess, &mut exit) != 0;
+            CloseHandle(launch.hProcess);
+            read
+        };
+        assert!(completed);
+        exit
+    };
+    assert_eq!(shell_exit("termcraft://invalid-qualification-request"), 2);
+    assert_eq!(shell_exit("termcraft://session/qualification-fixture"), 0);
+    let request = workspace.recv_timeout(Duration::from_secs(4)).unwrap();
+    assert!(
+        matches!(request.action, CliAction::OpenSession { id, .. } if id == "qualification-fixture")
+    );
+    owned.0.remove_user(&cancel).unwrap();
+    assert_eq!(guard(), Some(0));
+}
 #[cfg(windows)]
 mod native_windows {
     use super::*;

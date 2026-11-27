@@ -1,6 +1,9 @@
 //! RDP device redirection. Disk operations run on a bounded worker,
 //! confined to capability directory handles. No ambient path from the peer is opened.
 use crate::rdp_options::{DriveMapping, PrinterMapping, RdpOptions, SerialMapping};
+#[cfg(target_os = "linux")]
+#[path = "allocation_lease.rs"]
+mod allocation_lease;
 #[cfg(target_os = "macos")]
 #[path = "native_file_macos.rs"]
 mod native_file_macos;
@@ -116,6 +119,14 @@ struct Handle {
     pattern: String,
     reservation: Option<std::sync::Arc<Reservation>>,
 }
+#[cfg(target_os = "linux")]
+impl Drop for Handle {
+    fn drop(&mut self) {
+        // All independently opened remote files must close before the last
+        // shared reservation tries to acquire its exclusive cleanup lease.
+        self.file.take();
+    }
+}
 struct Reservation {
     file: File,
     top: std::sync::atomic::AtomicU64,
@@ -125,17 +136,16 @@ impl Reservation {
         #[cfg(target_os = "linux")]
         {
             use std::sync::atomic::Ordering;
-            let end = self.file.metadata().map_err(status)?.len();
             let top = self.top.load(Ordering::Acquire);
-            if top > end {
-                rustix::fs::fallocate(
-                    &self.file,
-                    rustix::fs::FallocateFlags::PUNCH_HOLE | rustix::fs::FallocateFlags::KEEP_SIZE,
-                    end,
-                    top - end,
-                )
-                .map_err(|e| status(e.into()))?;
+            if top == 0 {
+                return Ok(());
             }
+            let Some(lease) = allocation_lease::Lease::acquire(&self.file) else {
+                // An independent reader/writer, unsupported filesystem, or
+                // unavailable notification setup makes reclamation optional.
+                return Ok(());
+            };
+            lease.release_tail(top).map_err(status)?;
             self.top.store(0, Ordering::Release);
         }
         Ok(())
@@ -225,6 +235,11 @@ impl Drives {
                 Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
                 Err(e) => return Err(status(e)),
             };
+            #[cfg(windows)]
+            if existing.is_none() && disposition == 1 && access == 0x00100080 && options == 0 {
+                // xrdp's FUSE lookup requires STATUS_NO_SUCH_FILE before it can create the file.
+                return Err(0xc000000f);
+            }
             if existing
                 .as_ref()
                 .is_some_and(|m| !m.is_file() && !m.is_dir())
@@ -349,12 +364,25 @@ impl Drives {
             .ok_or(0xc0000008u32)?;
         match major {
             2 => {
-                if let Some(reservation) = &h.reservation {
-                    if std::sync::Arc::strong_count(reservation) == 1 {
-                        reservation.release()?;
+                #[cfg(target_os = "linux")]
+                {
+                    let mut handle = self.handles.remove(&file).ok_or(INVALID)?;
+                    handle.file.take();
+                    if let Some(reservation) = &handle.reservation {
+                        if std::sync::Arc::strong_count(reservation) == 1 {
+                            reservation.release()?;
+                        }
                     }
                 }
-                self.handles.remove(&file);
+                #[cfg(not(target_os = "linux"))]
+                {
+                    if let Some(reservation) = &h.reservation {
+                        if std::sync::Arc::strong_count(reservation) == 1 {
+                            reservation.release()?;
+                        }
+                    }
+                    self.handles.remove(&file);
+                }
                 Ok(vec![0; 5])
             }
             3 | 4 => {

@@ -252,7 +252,9 @@ impl Workspace {
 #[cfg(test)]
 mod tests {
     use super::super::*;
-    use crate::ui::terminal_review_tests::{captured, owned_workspace, raw_terminal};
+    use crate::ui::terminal_review_tests::owned_workspace;
+    #[cfg(unix)]
+    use crate::ui::terminal_review_tests::{captured, raw_terminal};
     use harbor_workspace::workspace::layout::LayoutPreset;
     #[cfg(unix)]
     #[test]
@@ -353,7 +355,6 @@ mod tests {
                 .contains(&removed)
         );
     }
-    #[cfg(unix)]
     #[test]
     fn dragging_real_divider_persists_the_ratio_and_small_views_fall_back() {
         let (ctx, root, mut w) = owned_workspace();

@@ -31,6 +31,27 @@ standard unprivileged namespace sandbox. There is no unsafe launch fallback.
 
 ## Offline staging
 
+### Windows x64
+
+`runtime-manifest-windows.json` records the pinned Chromium source and the
+current approval state. The Windows product and release package both require
+approval in that repository manifest. The release entry point builds the app
+from that same source when including the optional runtime. The staging input, once approved,
+is a native Chromium ZIP with the exact pinned SHA-256. Its regular files must
+match the approved inventory by path, size and SHA-256, including
+`THIRD-PARTY-NOTICES.html`. Packaging verifies the PE architecture and records
+named imports for each pinned native image. The installed browser compatibility
+workflow uses a separate explicit provider.
+
+TermCraft grants the Chromium installer capabilities read and execute access
+to the verified runtime snapshot. The profile root and DevTools pipes retain
+owner-only access. The profile contains private Windows AppData folders for
+Chromium to create its AppContainer store. After the process job drains,
+TermCraft removes AppContainer registrations tied to its bundled snapshot
+and deletes the private tree.
+
+### Linux x86_64
+
 Supply this explicit directory to `scripts/package-release.py --browser-inputs`:
 
 - The exact Chromium archive named in the manifest and its detached `.sig`.
