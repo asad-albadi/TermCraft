@@ -1,0 +1,210 @@
+acknowledged 1
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 2
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.18s
+
+acknowledged 3
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.17s
+
+acknowledged 4
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.17s
+
+acknowledged 5
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 6
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 7
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.17s
+
+acknowledged 8
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.17s
+
+acknowledged 9
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 10
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 11
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.17s
+
+acknowledged 12
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 13
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 14
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 15
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.18s
+
+acknowledged 16
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 17
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 18
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.18s
+
+acknowledged 19
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 20
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 21
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 22
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 23
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 24
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 25
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.17s
+
+acknowledged 26
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 27
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.17s
+
+acknowledged 28
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+
+acknowledged 29
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.18s
+
+acknowledged 30
+
+running 1 test
+test vim_redraw_resize_and_exit_restore_the_primary_screen ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.16s
+

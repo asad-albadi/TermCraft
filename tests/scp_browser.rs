@@ -142,12 +142,37 @@ fn scp_names_cannot_be_interpreted_as_commands() {
 }
 #[test]
 fn unsupported_enumerator_reports_capability_error() {
-    let server =
-        ssh_server::SshServer::start_with_settings(false, "", "SetEnv PATH=/termcraft-no-helpers");
+    let fixture = tempfile::tempdir().unwrap();
+    let empty_path = fixture.path().join("empty-path");
+    std::fs::create_dir(&empty_path).unwrap();
+    let wrapper = fixture.path().join("without-helpers.sh");
+    let observed = fixture.path().join("requested-command");
+    std::fs::write(
+        &wrapper,
+        b"if [ -z \"$SSH_ORIGINAL_COMMAND\" ]; then exec /bin/sh; fi\nprintf '%s\n' \"$SSH_ORIGINAL_COMMAND\" >\"$2\"\nexec /usr/bin/env -i PATH=\"$1\" /bin/sh -c \"$SSH_ORIGINAL_COMMAND\"\n",
+    )
+    .unwrap();
+    let quote = |path: &Path| format!("'{}'", path.to_str().unwrap().replace('\'', "'\\''"));
+    // A user's shell startup files can reset sshd's SetEnv PATH (notably on
+    // macOS). Apply an empty owned PATH after that startup, then execute the
+    // actual SSH command; no helper response or capability error is fabricated.
+    let extra = format!(
+        "ForceCommand /bin/sh {} {} {}",
+        quote(&wrapper),
+        quote(&empty_path),
+        quote(&observed),
+    );
+    let server = ssh_server::SshServer::start_with_settings(false, "", &extra);
     let mut h = connect(&server);
     let error =
         listing(&mut h).expect_err("A missing helper cannot produce a fake empty directory");
     assert!(error.contains("SCP") && error.contains("helper"), "{error}");
+    assert!(
+        std::fs::read_to_string(observed)
+            .unwrap()
+            .starts_with("python3 -c ")
+    );
+    assert_eq!(std::fs::read_dir(empty_path).unwrap().count(), 0);
 }
 #[test]
 fn scp_enumeration_failure_retains_the_remote_reason() {

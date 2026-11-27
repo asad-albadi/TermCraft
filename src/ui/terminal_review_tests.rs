@@ -14,12 +14,20 @@ pub(super) fn owned_workspace() -> (Context, tempfile::TempDir, Workspace) {
 }
 #[cfg(unix)]
 pub(super) fn raw_terminal(w: &mut Workspace, name: &str) -> u64 {
-    w.start_with_launch(Session{name:name.into(),protocol:"Local".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"/usr/bin/python3".into(),args:vec!["-c".into(),"import os,tty\ntty.setraw(0)\nos.write(1,b'\\x1b[?2004hREADY')\nwhile True:\n data=os.read(0,32768)\n if not data: break\n os.write(1,b'\\r\\nCAP:'+data.hex().encode()+b'\\r\\n')".into()],directory:None}));
+    // Match the provisioned endpoint interpreter, including setup-python on CI,
+    // and keep user Python environment/site hooks out of the owned fixture.
+    w.start_with_launch(Session{name:name.into(),protocol:"Local".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"python3".into(),args:vec!["-I".into(),"-c".into(),"import os,tty\ntty.setraw(0)\nos.write(1,b'\\x1b[?2004hREADY')\nwhile True:\n data=os.read(0,32768)\n if not data: break\n os.write(1,b'\\r\\nCAP:'+data.hex().encode()+b'\\r\\n')".into()],directory:None}));
     let index = w.active;
     let deadline = Instant::now() + Duration::from_secs(3);
     while !w.tabs[index].screen.plain().contains("READY") {
         w.tabs[index].poll();
-        assert!(Instant::now() < deadline);
+        assert!(
+            Instant::now() < deadline,
+            "owned Python PTY did not become ready: running={}, error={}, screen={:?}",
+            w.tabs[index].running(),
+            w.tabs[index].error,
+            w.tabs[index].screen.plain()
+        );
         std::thread::sleep(Duration::from_millis(5));
     }
     w.tabs[index].id
@@ -118,7 +126,7 @@ fn cancelling_recorded_paste_records_logical_text_without_framing() {
 fn output_bursts_share_one_work_budget_and_keep_close_cancel_responsive() {
     let (ctx, _root, mut w) = owned_workspace();
     for name in ["flood-one", "flood-two"] {
-        w.start_with_launch(Session{name:name.into(),protocol:"Local".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"/usr/bin/python3".into(),args:vec!["-c".into(),"import os,tty\ntty.setraw(0)\nos.write(1,b'READY')\nos.read(0,1)\nos.write(1,b'ordinary owned log line\\r\\n'*50000)\nos.read(0,1)".into()],directory:None}));
+        w.start_with_launch(Session{name:name.into(),protocol:"Local".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"python3".into(),args:vec!["-I".into(),"-c".into(),"import os,tty\ntty.setraw(0)\nos.write(1,b'READY')\nos.read(0,1)\nos.write(1,b'ordinary owned log line\\r\\n'*50000)\nos.read(0,1)".into()],directory:None}));
         let index = w.active;
         let deadline = Instant::now() + Duration::from_secs(2);
         while !w.tabs[index].screen.plain().contains("READY") {
@@ -172,12 +180,39 @@ fn output_bursts_share_one_work_budget_and_keep_close_cancel_responsive() {
     );
 }
 #[cfg(unix)]
+const MOUSE_RELEASE_SCANNER: &str = r#"tail=b''
+release=b'\x1b[<0;1;1m'
+def release_received(chunk):
+ global tail
+ data=tail+chunk
+ found=release in data
+ tail=data[-(len(release)-1):]
+ return found
+"#;
+
+#[cfg(unix)]
+#[test]
+fn mouse_release_fixture_recognizes_escape_split_across_reads() {
+    let result = std::process::Command::new("python3")
+        .args(["-I", "-c", &format!("{MOUSE_RELEASE_SCANNER}\nassert not release_received(b'noise\\x1b[<0;')\nassert release_received(b'1;1m')\nassert not release_received(b'noise')")])
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+}
+
+#[cfg(unix)]
 #[test]
 fn refused_mouse_release_is_retried_after_transport_admission_recovers() {
     use super::terminal_mouse::Viewport;
     let (ctx, root, mut w) = owned_workspace();
     let resume = root.path().join("resume-reader");
-    let program = "import os,sys,tty,time\ntty.setraw(0)\nos.write(1,b'\\x1b[?1000h\\x1b[?1006hREADY')\ndata=os.read(0,4096)\nos.write(1,b'PRESS_ACK')\nwhile not os.path.exists(sys.argv[1]): time.sleep(.001)\nwhile True:\n data=os.read(0,32768)\n if not data: break\n if b'\\x1b[<0;1;1m' in data: os.write(1,b'RELEASE_ACK')";
+    let program = format!(
+        "import os,sys,tty,time\ntty.setraw(0)\nos.write(1,b'\\x1b[?1000h\\x1b[?1006hREADY')\ndata=os.read(0,4096)\nos.write(1,b'PRESS_ACK')\nwhile not os.path.exists(sys.argv[1]): time.sleep(.001)\n{MOUSE_RELEASE_SCANNER}\nwhile True:\n data=os.read(0,32768)\n if not data: break\n if release_received(data): os.write(1,b'RELEASE_ACK')"
+    );
     w.start_with_launch(
         Session {
             protocol: "Local".into(),
@@ -185,8 +220,13 @@ fn refused_mouse_release_is_retried_after_transport_admission_recovers() {
         },
         Some(connection::Launch {
             rdp_profile: None,
-            program: "/usr/bin/python3".into(),
-            args: vec!["-c".into(), program.into(), resume.to_str().unwrap().into()],
+            program: "python3".into(),
+            args: vec![
+                "-I".into(),
+                "-c".into(),
+                program.into(),
+                resume.to_str().unwrap().into(),
+            ],
             directory: None,
         }),
     );
@@ -277,7 +317,14 @@ fn refused_mouse_release_is_retried_after_transport_admission_recovers() {
         w.tabs[0].poll();
         std::thread::sleep(Duration::from_millis(5));
     }
-    assert!(w.tabs[0].screen.plain().contains("RELEASE_ACK"));
+    assert!(
+        w.tabs[0].screen.plain().contains("RELEASE_ACK"),
+        "release ACK missing: pending={}, running={}, error={}, screen={:?}",
+        w.tabs[0].pending_mouse.is_some(),
+        w.tabs[0].running(),
+        w.tabs[0].error,
+        w.tabs[0].screen.plain()
+    );
     assert!(w.tabs[0].pending_mouse.is_none());
 }
 #[cfg(unix)]
