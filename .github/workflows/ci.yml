@@ -23,7 +23,32 @@ jobs:
       - run: python -m pip install Pillow
       - run: rustup toolchain install 1.96.1 --profile minimal --component rustfmt && rustup default 1.96.1
       - run: rustc --version && cargo --version
-      - run: sudo apt-get update && sudo apt-get install -y libx11-dev libxkbcommon-dev libwayland-dev libegl1-mesa-dev libgl1-mesa-dev libpcap-dev
+      - name: Install Linux build and owned endpoint prerequisites
+        shell: bash
+        run: |
+          # The runner also configures unrelated vendor repositories. These
+          # dependencies come from its signed Ubuntu sources exclusively.
+          termcraft_apt_sources=$(mktemp -d)
+          trap 'rm -rf -- "$termcraft_apt_sources"' EXIT
+          cp /etc/apt/sources.list.d/ubuntu.sources "$termcraft_apt_sources/ubuntu.sources"
+          termcraft_apt_options=(-o Dir::Etc::sourcelist=/dev/null -o "Dir::Etc::sourceparts=$termcraft_apt_sources")
+          sudo apt-get "${termcraft_apt_options[@]}" update
+          sudo apt-get "${termcraft_apt_options[@]}" install -y --no-install-recommends \
+            build-essential libx11-dev libxkbcommon-dev libxkbcommon-x11-0 \
+            libwayland-dev libegl1-mesa-dev libgl1-mesa-dev libpcap-dev \
+            openssh-client openssh-server openssl desktop-file-utils libglib2.0-bin vim less python3
+          # OpenSSH requires its privilege-separation directory even when the
+          # tests launch only their own unprivileged loopback endpoints.
+          sudo install -d -m 0755 /run/sshd
+      - name: Prepare independently locked RDP endpoint fixtures
+        shell: bash
+        run: |
+          # The integration harness deliberately builds these offline. Root
+          # Cargo.lock does not fetch their independent dependency graphs.
+          for manifest in engines/rdp/Cargo.toml docs/parity-evidence/rdp-prototype/Cargo.toml; do
+            cargo fetch --locked --manifest-path "$manifest"
+            cargo build --locked --offline --manifest-path "$manifest"
+          done
       - run: cargo fmt --all --check
       - id: linux_rdp
         run: cargo test --locked --manifest-path engines/rdp/Cargo.toml

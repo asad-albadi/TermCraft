@@ -46,6 +46,8 @@ fn vim_redraw_resize_and_exit_restore_the_primary_screen() {
         "NONE",
         "-n",
         "--noplugin",
+        "-c",
+        "set ruler",
         path.to_str().unwrap(),
     ]
     .map(str::to_owned);

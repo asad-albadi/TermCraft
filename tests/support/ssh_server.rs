@@ -6,6 +6,15 @@ use std::{
     process::{Child, Command, Stdio},
     time::{Duration, Instant},
 };
+// OpenSSH installs in sbin on Ubuntu/macOS and bin on Arch. Use an
+// installed absolute path: sshd rejects a relative argv[0] during re-exec.
+fn sshd_path() -> &'static str {
+    ["/usr/sbin/sshd", "/usr/bin/sshd"]
+        .into_iter()
+        .find(|path| std::path::Path::new(path).is_file())
+        .expect("Install the OpenSSH server fixture (/usr/sbin/sshd or /usr/bin/sshd)")
+}
+
 // A live socket protects selection; a logical claim protects the interval after
 // handing the port to ssh/sshd, cancellation, and subsequent rebind checks.
 // Claims are conservative across address families because an IPv6 wildcard may
@@ -111,7 +120,7 @@ impl SshServer {
             }
         );
         fs::write(root.join("sshd_config"), format!("{config}\n{extra}\n")).unwrap();
-        let mut child = Command::new("/usr/bin/sshd")
+        let mut child = Command::new(sshd_path())
             .env_remove("LD_PRELOAD")
             .args(["-D", "-e", "-f"])
             .arg(root.join("sshd_config"))
@@ -202,7 +211,7 @@ impl SshServer {
                 .unwrap()
                 .success()
         );
-        self.child = Command::new("/usr/bin/sshd")
+        self.child = Command::new(sshd_path())
             .env_remove("LD_PRELOAD")
             .args(["-D", "-e", "-f"])
             .arg(self.root.join("sshd_config"))
