@@ -260,13 +260,14 @@ impl Workspace {
         let size = fluent::dialog_size(ctx, 680., 148.);
         fluent::modeless(ctx, Id::new("global-terminal-profile"), "Global terminal profile", size).open(&mut open).show(ctx,|ui|{
             fluent::dialog_body(ui,size,|ui|{
+                ui.small("Saving updates new and open terminals wherever the option inherits the global profile.");
                 ui.label("Font family (bundled fonts and configured fallback)");fonts(ui,&mut editor.settings.font_family);ui.add(Slider::new(&mut editor.settings.font_size,8.0..=32.).suffix(" px"));
                 ui.label("Character encoding");encoding(ui,&mut editor.settings.encoding);ui.small("Other encodings, UTF-16/stateful control encodings and arbitrary OS font discovery are not supported. Encoding changes affect new bytes; retained output and raw logs are preserved. An encoding change waits for a running paste to finish.");
                 ui.label("Backspace sends");backspace(ui,&mut editor.settings.backspace);dimensions(ui,&mut editor.settings.dimensions);
                 ui.push_id("light",|ui|{CollapsingHeader::new("Light palette").show(ui,|ui|palette(ui,&mut editor.settings.light_palette));});ui.push_id("dark",|ui|{CollapsingHeader::new("Dark palette").show(ui,|ui|palette(ui,&mut editor.settings.dark_palette));});
             });
             if !editor.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&editor.error);}
-            ui.horizontal(|ui|{save=primary(ui,"Save global profile").clicked();cancel=ui.button("Cancel").clicked();});
+            ui.horizontal_wrapped(|ui|{save=primary(ui,"Save global profile").clicked();cancel=ui.button("Cancel").clicked();});
         });
         if save {
             match editor.apply(&mut self.store.preferences) {

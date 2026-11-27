@@ -100,7 +100,7 @@ impl State {
             ui.label("Inspect a local MobaXterm archive and save its files separately. Imported commands stay disabled.");
             ui.label("These files need a supported Windows/Cygwin runtime and their dependencies before they can run.");
             if let Some(job) = &self.job {
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     ui.spinner();
                     ui.label("Processing package archive…");
                     if ui.button("Cancel").clicked() { job.cancel.store(true, Ordering::Release); }

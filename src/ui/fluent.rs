@@ -105,12 +105,134 @@ pub(super) fn palette(ui: &Ui) -> Palette {
     Palette::new(ui.visuals().dark_mode, high_contrast)
 }
 
+fn install_fonts(ctx: &Context) {
+    use egui::{FontData, FontDefinitions, FontFamily};
+    let mut fonts = FontDefinitions::default();
+    fonts.font_data.insert(
+        "interface".into(),
+        std::sync::Arc::new(FontData::from_static(include_bytes!(
+            "../../assets/Interface.ttf"
+        ))),
+    );
+    fonts.font_data.insert(
+        "terminal".into(),
+        std::sync::Arc::new(FontData::from_static(include_bytes!(
+            "../../assets/Terminal.ttf"
+        ))),
+    );
+    fonts
+        .families
+        .get_mut(&FontFamily::Proportional)
+        .unwrap()
+        .insert(0, "interface".into());
+    fonts
+        .families
+        .get_mut(&FontFamily::Monospace)
+        .unwrap()
+        .insert(0, "terminal".into());
+    fonts.families.insert(
+        FontFamily::Name("DejaVu Sans Mono".into()),
+        vec!["terminal".into()],
+    );
+    fonts.families.insert(
+        FontFamily::Name("Liberation Sans".into()),
+        vec!["interface".into()],
+    );
+    for (key, bytes) in [
+        (
+            "Selawik",
+            include_bytes!("../../assets/Selawik.ttf").as_slice(),
+        ),
+        (
+            "Selawik Semibold",
+            include_bytes!("../../assets/Selawik-Semibold.ttf").as_slice(),
+        ),
+    ] {
+        fonts.font_data.insert(
+            key.into(),
+            std::sync::Arc::new(FontData::from_static(bytes)),
+        );
+    }
+    // On Windows use the locally installed pair together when available.
+    // The application package contains only the redistributable Selawik faces.
+    #[cfg(windows)]
+    let system_faces = std::env::var_os("WINDIR").and_then(|root| {
+        let directory = std::path::PathBuf::from(root).join("Fonts");
+        let regular = std::fs::read(directory.join("segoeui.ttf")).ok()?;
+        let semibold = std::fs::read(directory.join("seguisb.ttf")).ok()?;
+        for (name, bytes) in [
+            ("System Segoe UI", regular),
+            ("System Segoe UI Semibold", semibold),
+        ] {
+            fonts.font_data.insert(
+                name.into(),
+                std::sync::Arc::new(FontData::from_owned(bytes)),
+            );
+        }
+        Some(())
+    });
+    let regular = fonts.families.get_mut(&FontFamily::Proportional).unwrap();
+    regular.insert(0, "Selawik".into());
+    #[cfg(windows)]
+    if system_faces.is_some() {
+        regular.insert(0, "System Segoe UI".into());
+    }
+    let mut semibold = regular.clone();
+    semibold.insert(0, "Selawik Semibold".into());
+    #[cfg(windows)]
+    if system_faces.is_some() {
+        semibold.insert(0, "System Segoe UI Semibold".into());
+    }
+    fonts
+        .families
+        .insert(FontFamily::Name("Interface Semibold".into()), semibold);
+    ctx.set_fonts(fonts);
+}
+
+/// Bare component contexts can render before application fonts become active.
+pub(super) fn emphasized(ctx: &Context, text: RichText) -> RichText {
+    let family = egui::FontFamily::Name("Interface Semibold".into());
+    if ctx.fonts(|fonts| fonts.definitions().families.contains_key(&family)) {
+        text.family(family)
+    } else {
+        text.strong()
+    }
+}
+
+pub(super) trait FluentTooltip {
+    fn fluent_hint(self, text: impl Into<egui::WidgetText>) -> Self;
+    fn disabled_hint(self, text: impl Into<egui::WidgetText>) -> Self;
+}
+
+fn show_hint(response: &Response, mut tooltip: egui::Tooltip<'_>, text: egui::WidgetText) {
+    let frame = Frame::popup(&response.ctx.global_style()).corner_radius(CONTROL_RADIUS);
+    tooltip.popup = tooltip.popup.frame(frame);
+    tooltip.show(|ui| {
+        ui.set_max_width(ui.spacing().tooltip_width);
+        ui.add(Label::new(text));
+    });
+}
+
+impl FluentTooltip for Response {
+    fn fluent_hint(self, text: impl Into<egui::WidgetText>) -> Self {
+        show_hint(&self, egui::Tooltip::for_enabled(&self), text.into());
+        self
+    }
+    fn disabled_hint(self, text: impl Into<egui::WidgetText>) -> Self {
+        show_hint(&self, egui::Tooltip::for_disabled(&self), text.into());
+        self
+    }
+}
+
 /// Install both styles so System theme changes never discard accessibility settings.
 pub(super) fn setup(ctx: &Context, reduced_motion: bool, high_contrast: bool) {
     let settings = (reduced_motion, high_contrast);
     let id = Id::new(STYLE_SETTINGS);
     if ctx.data(|data| data.get_temp(id)) == Some(settings) {
         return;
+    }
+    if ctx.data(|data| data.get_temp::<(bool, bool)>(id)).is_none() {
+        install_fonts(ctx);
     }
     ctx.data_mut(|data| data.insert_temp(id, settings));
 
@@ -198,6 +320,7 @@ pub(super) fn setup(ctx: &Context, reduced_motion: bool, high_contrast: bool) {
 
 #[derive(Clone, Copy)]
 pub(super) enum ControlKind {
+    Flat,
     Standard,
     Primary,
 }
@@ -216,7 +339,9 @@ pub(super) fn paint_control(
     let enabled = response.enabled();
     let pressed = response.is_pointer_button_down_on();
     let hovered = response.hovered();
+    let flat = matches!(kind, ControlKind::Flat);
     let fill = match (enabled, primary, pressed, hovered, selected) {
+        (false, ..) if flat => Color32::TRANSPARENT,
         (false, ..) => p.control,
         (true, true, true, ..) => p.primary_pressed,
         (true, true, false, true, _) => p.primary_hover,
@@ -224,6 +349,7 @@ pub(super) fn paint_control(
         (true, false, true, ..) => p.pressed,
         (true, false, false, true, _) => p.hover,
         (true, false, false, false, true) => p.selected,
+        (true, false, false, false, false) if flat => Color32::TRANSPARENT,
         (true, false, false, false, false) => p.control,
     };
     let text = if primary && enabled {
@@ -244,7 +370,11 @@ pub(super) fn paint_control(
             rect,
             CONTROL_RADIUS,
             fill,
-            Stroke::new(1., border),
+            if flat && !p.high_contrast {
+                Stroke::NONE
+            } else {
+                Stroke::new(1., border)
+            },
             StrokeKind::Inside,
         );
         if enabled
@@ -283,8 +413,12 @@ pub(super) fn paint_control(
 }
 
 pub(super) fn primary(ui: &mut Ui, label: &str) -> Response {
+    painted_button(ui, label, ControlKind::Primary, None)
+}
+
+fn painted_button(ui: &mut Ui, label: &str, kind: ControlKind, width: Option<f32>) -> Response {
     let padding = ui.spacing().button_padding;
-    let max_width = (ui.available_width() - 2. * padding.x).max(1.);
+    let max_width = (width.unwrap_or_else(|| ui.available_width()) - 2. * padding.x).max(1.);
     let galley = egui::WidgetText::from(label).into_galley(
         ui,
         Some(egui::TextWrapMode::Wrap),
@@ -292,9 +426,10 @@ pub(super) fn primary(ui: &mut Ui, label: &str) -> Response {
         TextStyle::Button,
     );
     let size = (galley.size() + 2. * padding).max(vec2(0., CONTROL_HEIGHT));
+    let size = vec2(width.unwrap_or(size.x), size.y);
     let (rect, response) = ui.allocate_exact_size(size, Sense::click());
     response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, response.enabled(), label));
-    let text = paint_control(ui, &response, rect, false, ControlKind::Primary);
+    let text = paint_control(ui, &response, rect, false, kind);
     if ui.is_rect_visible(rect) {
         ui.painter().galley_with_override_text_color(
             rect.center() - galley.size() * 0.5,
@@ -303,6 +438,43 @@ pub(super) fn primary(ui: &mut Ui, label: &str) -> Response {
         );
     }
     response
+}
+
+/// Allocate equal command slots, wrapping when a 120-point slot cannot fit.
+pub(super) fn dialog_actions<const N: usize>(
+    ui: &mut Ui,
+    labels: [&str; N],
+    accent: Option<usize>,
+) -> [Response; N] {
+    let width = ui.available_width().max(1.);
+    let spacing = ui.spacing().item_spacing.x;
+    let columns = (((width + spacing) / (120. + spacing)).floor() as usize).clamp(1, N);
+    let slot = if N == 1 {
+        width.min(120.)
+    } else {
+        (width - (columns - 1) as f32 * spacing) / columns as f32
+    };
+    let owner = ui.id();
+    ui.horizontal_wrapped(|ui| {
+        if N == 1 && width > slot {
+            ui.add_space(width - slot);
+        }
+        std::array::from_fn(|index| {
+            if index > 0 && index % columns == 0 {
+                ui.end_row();
+            }
+            let kind = if Some(index) == accent {
+                ControlKind::Primary
+            } else {
+                ControlKind::Standard
+            };
+            ui.push_id(owner.with(labels[index]), |ui| {
+                painted_button(ui, labels[index], kind, Some(slot))
+            })
+            .inner
+        })
+    })
+    .inner
 }
 
 pub(super) fn surface(ui: &Ui) -> Frame {
@@ -446,7 +618,7 @@ pub(super) fn modal<T>(
         .frame(Frame::window(&ctx.style_of(ctx.theme())))
         .show(ctx, |ui| {
             ui.set_width(size.width);
-            ui.add(Label::new(RichText::new(title).size(DIALOG_TITLE).strong()).wrap());
+            ui.add(Label::new(emphasized(ctx, RichText::new(title).size(DIALOG_TITLE))).wrap());
             content(ui)
         });
     ctx.accesskit_node_builder(modal.response.id, |node| {
@@ -459,7 +631,7 @@ pub(super) fn modal<T>(
 
 /// A bounded modeless window. Put long content in `dialog_body` inside it.
 pub(super) fn modeless<'a>(ctx: &Context, id: Id, title: &'a str, size: DialogSize) -> Window<'a> {
-    Window::new(RichText::new(title).size(DIALOG_TITLE))
+    Window::new(emphasized(ctx, RichText::new(title).size(DIALOG_TITLE)))
         .id(id)
         .min_width(1.)
         .default_width(size.width)
@@ -467,6 +639,23 @@ pub(super) fn modeless<'a>(ctx: &Context, id: Id, title: &'a str, size: DialogSi
         .min_height(1.)
         .max_height(size.window_height)
         .constrain_to(ctx.content_rect())
+}
+
+/// Stack a label and its control on compact service pages. Existing end_row
+/// calls only advance the grid in the wider layout.
+pub(super) fn settings_grid(ui: &mut Ui, id: &str, content: impl FnOnce(&mut Ui)) {
+    let width = ui.available_width();
+    if width < 460. {
+        ui.push_id(id, |ui| {
+            ui.vertical(content);
+        });
+    } else {
+        egui::Grid::new(id)
+            .num_columns(2)
+            .spacing([16., 8.])
+            .max_col_width((width - 24.) * 0.56)
+            .show(ui, content);
+    }
 }
 
 /// Stack narrow rows. At desktop widths the label column has a fixed measure,
@@ -511,6 +700,13 @@ pub(super) fn field(
     text_input(ui, label.id, value, hint, preferred_width)
 }
 
+pub(super) fn singleline(text: &mut dyn egui::TextBuffer) -> TextEdit<'_> {
+    TextEdit::singleline(text)
+        .vertical_align(egui::Align::Center)
+        .min_size(vec2(0., CONTROL_HEIGHT))
+        .margin(Margin::symmetric(8, 4))
+}
+
 pub(super) fn text_input(
     ui: &mut Ui,
     label: Id,
@@ -520,14 +716,7 @@ pub(super) fn text_input(
 ) -> Response {
     let width = ui.available_width().min(preferred_width).max(1.);
     let response = ui
-        .add(
-            TextEdit::singleline(value)
-                .hint_text(hint)
-                .desired_width(width)
-                .vertical_align(egui::Align::Center)
-                .min_size(vec2(0., CONTROL_HEIGHT))
-                .margin(Margin::symmetric(8, 4)),
-        )
+        .add(singleline(value).hint_text(hint).desired_width(width))
         .labelled_by(label);
     if response.enabled() && response.has_focus() {
         let underline = response.rect.shrink2(vec2(4., 2.));

@@ -811,12 +811,13 @@ impl Workspace {
                     }
                 });
                 ui.separator();
-                ui.horizontal_wrapped(|ui| {
-                    if self.credentials.editor.is_some() && self.credentials.job.is_none() {
-                        leave_master_editor = ui.button("Back to vault").clicked();
-                    }
-                    close = ui.button("Close").clicked();
-                });
+                if self.credentials.editor.is_some() && self.credentials.job.is_none() {
+                    let [back, done] = fluent::dialog_actions(ui, ["Back to vault", "Close"], None);
+                    leave_master_editor = back.clicked();
+                    close = done.clicked();
+                } else {
+                    close = fluent::dialog_actions(ui, ["Close"], None)[0].clicked();
+                }
             },
         );
         close |= response.should_close();

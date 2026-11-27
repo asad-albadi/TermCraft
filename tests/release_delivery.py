@@ -167,7 +167,8 @@ class ReleaseDelivery(unittest.TestCase):
         for src in (self.root / "vendor/noVNC").rglob("*"):
             if src.is_file():
                 originals["build-source/noVNC/" + src.relative_to(self.root / "vendor/noVNC").as_posix()] = src.relative_to(self.root).as_posix()
-        for name in ("Interface.ttf", "Terminal.ttf", "Interface-LICENSE", "Terminal-LICENSE",
+        for name in ("Selawik.ttf", "Selawik-Semibold.ttf", "Selawik-LICENSE",
+                     "Interface.ttf", "Terminal.ttf", "Interface-LICENSE", "Terminal-LICENSE",
                      "termcraft-mascot.png", "termcraft-logo.png"):
             originals["assets/" + name] = "assets/" + name
         if platform == "windows":

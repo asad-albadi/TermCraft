@@ -3,7 +3,10 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
     use harbor_workspace::desktop::rdp_options::*;
     let embedded = session.desktop_engine == harbor_workspace::model::DesktopEngine::Embedded;
     ui.separator();
-    ui.label(RichText::new("RDP settings").strong());
+    ui.label(crate::ui::fluent::emphasized(
+        ui.ctx(),
+        RichText::new("RDP settings"),
+    ));
     let options = &mut session.rdp_options;
     fluent::form_text(ui, "Domain", &mut options.domain, "");
     ui.label("Clipboard · text only, maximum 8192 UTF-8 bytes");
@@ -55,7 +58,10 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
     }
     ui.checkbox(&mut options.administrative, "Administrative session");
     {
-        ui.label(RichText::new("Redirected folders").strong());
+        ui.label(crate::ui::fluent::emphasized(
+            ui.ctx(),
+            RichText::new("Redirected folders"),
+        ));
         ui.small("Only the folders listed here are shared. New mappings are read only. Writable mappings allow file creation, overwrites and resizing. Linux supports allocation requests and releases unused reservations on close. Rename, deletion and non-Linux allocation remain unavailable; applications that save by renaming a temporary file cannot use these mappings.");
         let mut remove = None;
         for (index, drive) in options.drives.iter_mut().enumerate() {
@@ -113,7 +119,10 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
             });
         }
     }
-    ui.label(RichText::new("Explicit serial mappings").strong());
+    ui.label(crate::ui::fluent::emphasized(
+        ui.ctx(),
+        RichText::new("Explicit serial mappings"),
+    ));
     ui.small("Share only explicitly named local serial devices. Read-only mappings refuse remote writes. Native device compatibility still requires validation.");
     let mut remove_serial = None;
     for (index, mapping) in options.serial_mappings.iter_mut().enumerate() {
@@ -168,7 +177,10 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
         if (embedded && cfg!(any(target_os = "linux", target_os = "macos", windows)))
             || options.printer_mapping.is_some()
         {
-            ui.label(RichText::new("Redirected printer").strong());
+            ui.label(crate::ui::fluent::emphasized(
+                ui.ctx(),
+                RichText::new("Redirected printer"),
+            ));
             if let Some(mapping) = &mut options.printer_mapping {
                 ui.horizontal_wrapped(|ui| {
                     ui.label("Local installed queue");

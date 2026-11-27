@@ -582,7 +582,7 @@ impl Workspace {
     }
     pub(super) fn xserver_card(&mut self, ui: &mut Ui) {
         surface(ui).show(ui, |ui| {
-            ui.label(RichText::new("X11 server").size(18.).strong());
+            ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("X11 server").size(18.)));
             if !owned_x11_supported() {
                 ui.label("A managed X11 server is unavailable on this platform.");
                 return;
@@ -634,7 +634,7 @@ impl Workspace {
                                 macos_display_snapshot(ui, report);
                                 #[cfg(not(target_os = "macos"))]
                                 ui.label(format!("Screen {}×{} · resolution change {}", report.dimensions[0], report.dimensions[1], if report.randr_change.is_some() { "verified with event; initial size restored" } else { "unavailable or unverified" }));
-                                for error in &report.errors { ui.colored_label(Color32::from_rgb(200, 120, 50), error); }
+                                for error in &report.errors { ui.colored_label(ui.visuals().warn_fg_color, error); }
                             }
                             Err(error) => { ui.label(format!("Graphics capability check failed: {error}")); }
                         }
@@ -645,7 +645,7 @@ impl Workspace {
                     ));
                     if ui
                         .button("Copy client environment")
-                        .on_hover_text("Paste before an X application command to use this display.")
+                        .fluent_hint("Paste before an X application command to use this display.")
                         .clicked()
                     {
                         let path = display
@@ -665,7 +665,7 @@ impl Workspace {
                                 ("Copy X11 text to macOS", ClipboardDirection::ToMac),
                             ] {
                                 if ui.add_enabled(!state.clipboard_pending, egui::Button::new(label))
-                                    .on_hover_text("Transfer UTF-8 clipboard text once, up to 64 KiB.")
+                                    .fluent_hint("Transfer UTF-8 clipboard text once, up to 64 KiB.")
                                     .clicked()
                                 {
                                     match worker.request_clipboard(direction, &state.clipboard_reader) {
@@ -697,7 +697,7 @@ impl Workspace {
             if cfg!(target_os = "macos") {
                 ui.label("Windowed display. macOS chooses the monitor.");
             } else {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.label("Display mode");
                 ComboBox::from_id_salt("xserver_display_mode")
                     .selected_text(match state.options.display_mode {
@@ -719,7 +719,7 @@ impl Workspace {
             });
             ui.label(RichText::new("The compositor chooses the monitor.").color(muted(ui)));
             }
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 if ui.button("Choose bundle folder").clicked()
                     && let Some(root) = rfd::FileDialog::new().pick_folder()
                 {

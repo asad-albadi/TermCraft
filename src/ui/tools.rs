@@ -1,8 +1,9 @@
+use crate::ui::fluent::FluentTooltip;
 #[cfg(windows)]
 #[path = "windows_platform.rs"]
 mod windows_platform;
 use eframe::egui::{
-    self, Button, ColorImage, RichText, ScrollArea, TextEdit, TextureHandle, TextureOptions, Ui,
+    self, Button, ColorImage, RichText, ScrollArea, TextureHandle, TextureOptions, Ui,
 };
 use harbor_workspace::tools::capture::{
     CaptureConfig, CaptureHandle, CaptureInterface, CaptureReport, PacketCapture, StopReason,
@@ -82,7 +83,7 @@ impl Comparison {
         let busy = self.pending.is_some();
         ui.add_enabled_ui(!busy, |ui| {
             let folders = self.folders;
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.selectable_value(&mut self.folders, false, "Files");
                 ui.selectable_value(&mut self.folders, true, "Folders");
             });
@@ -123,7 +124,7 @@ impl Comparison {
             }
         });
         if busy {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.spinner();
                 if let Some(cancel) = &self.cancel {
                     if cancel.load(Ordering::Relaxed) {
@@ -146,7 +147,7 @@ impl Comparison {
 }
 
 fn select_path(ui: &mut Ui, button: &str, selected: &mut Option<PathBuf>, folders: bool) -> bool {
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         let mut changed = false;
         if ui.button(button).clicked() {
             let dialog = rfd::FileDialog::new();
@@ -229,7 +230,7 @@ fn render_folder_diff(ui: &mut Ui, diff: &FolderDiffResult) {
                     for path in &paths[rows] {
                         let display = path.to_string_lossy();
                         ui.add(egui::Label::new(RichText::new(&*display).monospace()).truncate())
-                            .on_hover_text(display);
+                            .fluent_hint(display);
                     }
                 });
         });
@@ -328,18 +329,18 @@ impl Scan {
 
     fn render(&mut self, ui: &mut Ui) {
         ui.add_enabled_ui(self.pending.is_none(), |ui| {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.label("IP address");
                 ui.add(
-                    TextEdit::singleline(&mut self.address)
-                        .desired_width(125.)
+                    crate::ui::fluent::singleline(&mut self.address)
+                        .desired_width(ui.available_width().clamp(1., 125.))
                         .char_limit(45),
                 );
                 ui.label("TCP ports");
                 ui.add(
-                    TextEdit::singleline(&mut self.ports)
+                    crate::ui::fluent::singleline(&mut self.ports)
                         .hint_text("22, 8080")
-                        .desired_width(135.)
+                        .desired_width(ui.available_width().clamp(1., 135.))
                         .char_limit(1800),
                 );
                 if ui.button("Check ports").clicked() {
@@ -353,7 +354,7 @@ impl Scan {
             });
         });
         if let Some(handle) = &self.pending {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.spinner();
                 if ui.button("Cancel").clicked() {
                     handle.cancel();
@@ -479,7 +480,7 @@ impl Capture {
 
     fn render(&mut self, ui: &mut Ui) {
         ui.add_enabled_ui(!self.busy(), |ui| {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 if ui.button("List capture interfaces").clicked() {
                     self.interface_error = None;
                     match start_job("capture-interfaces", enumerate_interfaces) {
@@ -497,18 +498,18 @@ impl Capture {
                                 &item.name,
                             );
                             if let Some(description) = &item.description {
-                                row.on_hover_text(description);
+                                row.fluent_hint(description);
                             }
                         }
                     });
             });
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.label("Capture filter");
                 ui.add(
-                    TextEdit::singleline(&mut self.filter)
+                    crate::ui::fluent::singleline(&mut self.filter)
                         .hint_text("Optional BPF filter, e.g. udp port 53")
                         .char_limit(4096)
-                        .desired_width(260.),
+                        .desired_width(ui.available_width().clamp(1., 260.)),
                 );
             });
             egui::Grid::new("packet-capture-limits").show(ui, |ui| {
@@ -523,7 +524,7 @@ impl Capture {
                 ui.add(egui::DragValue::new(&mut self.packets).range(1..=1_000_000));
                 ui.end_row();
             });
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 if ui.button("Choose PCAP output…").clicked()
                     && let Some(path) = rfd::FileDialog::new()
                         .set_file_name("capture.pcap")
@@ -534,7 +535,7 @@ impl Capture {
                 }
                 if let Some(path) = &self.output {
                     ui.add(egui::Label::new(path.to_string_lossy().as_ref()).truncate())
-                        .on_hover_text(path.to_string_lossy());
+                        .fluent_hint(path.to_string_lossy());
                 }
             });
             let ready = self.interface.is_some() && self.output.is_some();
@@ -568,7 +569,7 @@ impl Capture {
         }
         if let Some(handle) = &self.pending {
             let progress = handle.progress();
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.spinner();
                 if !progress.ready {
                     ui.label("Opening capture interface…");

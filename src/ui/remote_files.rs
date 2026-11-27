@@ -174,10 +174,10 @@ impl TransferUi {
     ) {
         ui.separator();
         ui.label("Local download folder");
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             if ui
                 .add(
-                    TextEdit::singleline(&mut self.local_path_text)
+                    crate::ui::fluent::singleline(&mut self.local_path_text)
                         .desired_width(145.)
                         .hint_text("Choose a local folder"),
                 )
@@ -394,7 +394,7 @@ impl TransferUi {
                 });
             }
         });
-        ui.checkbox(&mut self.overwrite,"Replace existing destination files").on_hover_text("Off by default. Conflicting files are preserved until you explicitly choose replacement and retry.");
+        ui.checkbox(&mut self.overwrite,"Replace existing destination files").fluent_hint("Off by default. Conflicting files are preserved until you explicitly choose replacement and retry.");
         if let Some(error) = &self.error {
             ui.colored_label(ui.visuals().error_fg_color, error);
         }
@@ -445,12 +445,12 @@ impl TransferUi {
                 FileActionForm::NewFolder { parent, name } => {
                     ui.label("Create a folder in:");
                     ui.monospace(parent.display());
-                    ui.add(TextEdit::singleline(name).hint_text("Folder name"));
+                    ui.add(crate::ui::fluent::singleline(name).hint_text("Folder name"));
                 }
                 FileActionForm::Rename { source, name } => {
                     ui.label("Rename this remote entry:");
                     ui.monospace(source.display());
-                    ui.add(TextEdit::singleline(name).hint_text("New name"));
+                    ui.add(crate::ui::fluent::singleline(name).hint_text("New name"));
                 }
                 FileActionForm::Delete {
                     target,
@@ -553,7 +553,10 @@ impl TransferUi {
             return;
         }
         ui.separator();
-        ui.label(RichText::new("Transfers").strong());
+        ui.label(crate::ui::fluent::emphasized(
+            ui.ctx(),
+            RichText::new("Transfers"),
+        ));
         ScrollArea::vertical()
             .id_salt("remote-transfer-jobs")
             .max_height(140.)
@@ -710,10 +713,10 @@ impl TerminalTab {
             if ui.button("Copy cleanup command").clicked(){ui.ctx().copy_text("__termcraft_osc7_remove".to_owned());}
         });
         let mut go = false;
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             let response = ui.add_enabled(
                 self.ssh_connected,
-                TextEdit::singleline(&mut self.remote_path)
+                crate::ui::fluent::singleline(&mut self.remote_path)
                     .hint_text("/remote/folder")
                     .desired_width(150.),
             );
@@ -827,12 +830,15 @@ impl Workspace {
                     .id_salt(("remote-pane-body", id))
                     .show(ui, |ui| {
                         let tab = &mut self.tabs[self.active];
-                        ui.horizontal(|ui| {
-                            ui.label(RichText::new("Remote files").strong());
+                        ui.horizontal_wrapped(|ui| {
+                            ui.label(crate::ui::fluent::emphasized(
+                                ui.ctx(),
+                                RichText::new("Remote files"),
+                            ));
                             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                                 if ui
                                     .small_button("×")
-                                    .on_hover_text("Hide remote files")
+                                    .fluent_hint("Hide remote files")
                                     .clicked()
                                 {
                                     tab.browser.as_mut().unwrap().visible = false;
@@ -861,9 +867,10 @@ impl Workspace {
                         ui.add(
                             Label::new(RichText::new(browser.path.display()).monospace().size(12.))
                                 .truncate(),
-                        );
+                        )
+                        .fluent_hint(browser.path.display());
                         let mut navigate = None;
-                        ui.horizontal(|ui| {
+                        ui.horizontal_wrapped(|ui| {
                             if ui
                                 .add_enabled(tab.ssh_connected, Button::new("↑ Parent"))
                                 .clicked()
@@ -919,7 +926,7 @@ impl Workspace {
                         ScrollArea::vertical()
                             .id_salt(("remote-entries", id))
                             .max_height(300.)
-                            .min_scrolled_height(180.)
+                            .min_scrolled_height(32.)
                             .show(ui, |ui| {
                                 for entry in &browser.entries {
                                     let marker = match entry.kind {
@@ -930,9 +937,16 @@ impl Workspace {
                                     let response = ui.add_enabled(
                                         !browser.loading && tab.ssh_connected,
                                         Button::new(format!("{marker}  {}", entry.display_name))
-                                            .frame(false)
+                                            .selected(
+                                                tab.transfer_ui
+                                                    .selected
+                                                    .as_ref()
+                                                    .is_some_and(|row| row.path == entry.path),
+                                            )
+                                            .truncate()
                                             .sense(Sense::click_and_drag()),
                                     );
+                                    let response = response.fluent_hint(entry.path.display());
                                     response.dnd_set_drag_payload(RemoteDragPayload {
                                         connection: id,
                                         path: entry.path.clone(),
@@ -955,7 +969,7 @@ impl Workspace {
                                     {
                                         navigate = Some(entry.path.clone());
                                     }
-                                    response.on_hover_text(format!(
+                                    response.fluent_hint(format!(
                                         "{}\n{}",
                                         entry.path.display(),
                                         entry
@@ -1010,7 +1024,7 @@ pub(super) fn auth_field_scoped(
         state.clear_undoer();
         state.store(ui.ctx(), id);
     }
-    let response = TextEdit::singleline(value)
+    let response = crate::ui::fluent::singleline(value)
         .id(id)
         .password(!prompt.echo)
         .desired_width(ui.available_width())
@@ -1309,7 +1323,7 @@ pub(super) fn authentication_ui(ui: &mut Ui, tab: &mut TerminalTab) -> bool {
         if let Some(credential) = &auth.credential {
             ui.horizontal_wrapped(|ui|{
                 if credential.reference.is_some()&&ui.button("Use saved credential").clicked(){tab.vault_request=Some(credentials::Request::use_terminal(tab.id,auth.id,credential.clone()));}
-                ui.checkbox(&mut auth.save_in_vault,"Save entered value in vault").on_hover_text("Unlock the vault first. Saving is optional and does not wait for authentication success.");
+                ui.checkbox(&mut auth.save_in_vault,"Save entered value in vault").fluent_hint("Unlock the vault first. Saving is optional and does not wait for authentication success.");
             });
         }
         let host_key = auth.host_key;

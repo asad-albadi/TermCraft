@@ -565,12 +565,14 @@ impl Workspace {
                             ui.label(RichText::new(paste.preview()).monospace());
                         }
                     });
-                    ui.horizontal_wrapped(|ui| {
-                        approve = ui.button("Paste to these targets").clicked();
-                        let safe = primary(ui, "Cancel paste");
-                        super::fluent::focus_on_entry(ui, &safe, ui.id());
-                        cancel = safe.clicked();
-                    });
+                    let [send, safe] = fluent::dialog_actions(
+                        ui,
+                        ["Paste to these targets", "Cancel paste"],
+                        Some(1),
+                    );
+                    approve = send.clicked();
+                    fluent::focus_on_entry(ui, &safe, ui.id());
+                    cancel = safe.clicked();
                 },
             );
             cancel |= response.should_close();
@@ -603,25 +605,15 @@ impl Workspace {
                             ui.label(self.confirmation_target(tab.id));
                         }
                     });
-                    ui.horizontal_wrapped(|ui| {
-                        approve = ui
-                            .button(if reconnect {
-                                "Reconnect session"
-                            } else {
-                                "Close sessions"
-                            })
-                            .clicked();
-                        let safe = primary(
-                            ui,
-                            if reconnect {
-                                "Stay connected"
-                            } else {
-                                "Keep sessions open"
-                            },
-                        );
-                        super::fluent::focus_on_entry(ui, &safe, ui.id());
-                        cancel = safe.clicked();
-                    });
+                    let labels = if reconnect {
+                        ["Reconnect session", "Stay connected"]
+                    } else {
+                        ["Close sessions", "Keep sessions open"]
+                    };
+                    let [confirm, safe] = fluent::dialog_actions(ui, labels, Some(1));
+                    approve = confirm.clicked();
+                    fluent::focus_on_entry(ui, &safe, ui.id());
+                    cancel = safe.clicked();
                 },
             );
             cancel |= response.should_close();

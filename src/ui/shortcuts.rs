@@ -617,7 +617,7 @@ impl TerminalTab {
                 self.screen.search_count(&self.search)
             };
             ui.label(format!("{count} matches"));
-            if ui.small_button("×").on_hover_text("Close search").clicked() {
+            if ui.small_button("×").fluent_hint("Close search").clicked() {
                 self.search_open = false;
                 ui.memory_mut(|m| m.request_focus(Id::new(("terminal-input", self.id))));
             }

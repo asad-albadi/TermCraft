@@ -291,16 +291,15 @@ impl PlayState {
                 size,
                 |ui| {
                     ui.label(format!("Replace {} with this game?", prompt.path.display()));
-                    ui.horizontal_wrapped(|ui| {
-                        if ui.button("Replace file").clicked() {
-                            decision = Some(true);
-                        }
-                        let safe = ui.button("Keep existing file");
-                        fluent::focus_on_entry(ui, &safe, ui.id());
-                        if safe.clicked() {
-                            decision = Some(false);
-                        }
-                    });
+                    let [replace, safe] =
+                        fluent::dialog_actions(ui, ["Replace file", "Keep existing file"], None);
+                    if replace.clicked() {
+                        decision = Some(true);
+                    }
+                    fluent::focus_on_entry(ui, &safe, ui.id());
+                    if safe.clicked() {
+                        decision = Some(false);
+                    }
                 },
             );
             if modal.should_close() {
@@ -326,12 +325,14 @@ impl PlayState {
             size,
             |ui| {
                 ui.label("Continuing discards changes to this game. Save first to keep them.");
-                ui.horizontal_wrapped(|ui| {
-                    discard = ui.button("Discard changes and continue").clicked();
-                    let safe = ui.button("Keep playing");
-                    fluent::focus_on_entry(ui, &safe, ui.id());
-                    cancel = safe.clicked();
-                });
+                let [lose, safe] = fluent::dialog_actions(
+                    ui,
+                    ["Discard changes and continue", "Keep playing"],
+                    None,
+                );
+                discard = lose.clicked();
+                fluent::focus_on_entry(ui, &safe, ui.id());
+                cancel = safe.clicked();
             },
         );
         if cancel || modal.should_close() {
@@ -1032,11 +1033,11 @@ impl Workspace {
                 .ctx()
                 .memory(|m| m.focused().is_some_and(|id| Some(id) != play.board_focus));
         let mut close = false;
-        ScrollArea::both().id_salt("games_surface").show(ui,|ui|{Frame::new().fill(content(ui)).inner_margin(16.).show(ui,|ui|{
+        ScrollArea::vertical().id_salt("games_surface").show(ui,|ui|{Frame::new().fill(content(ui)).inner_margin(16.).show(ui,|ui|{
             if play.files.confirming(){ui.disable();}
-            ui.horizontal(|ui|{
+            ui.horizontal_wrapped(|ui|{
                 ui.image((self.logo.id(),vec2(28.,28.)));
-                ui.heading(play.session.as_ref().filter(|_|!play.launcher).map_or("Games",|s|s.spec().label));
+                ui.heading(fluent::emphasized(ui.ctx(), RichText::new(play.session.as_ref().filter(|_|!play.launcher).map_or("Games",|s|s.spec().label))));
                 if ui.button("Close (Esc)").clicked(){close=true;}
                 if ui.add_enabled(play.session.is_some()&&!play.files.busy(),egui::Button::new("Save…")).clicked(){play.files.start(play.session.clone(),ui.ctx().clone());}
                 if ui.add_enabled(!play.files.busy(),egui::Button::new("Load…")).clicked(){play.request_file_action(FileAction::Load,ui.ctx());}
@@ -1049,7 +1050,7 @@ impl Workspace {
                 for spec in GameRegistry::catalog(){if ui.button(spec.label).clicked(){play.request_file_action(FileAction::Start(spec.id,1),ui.ctx());}}
             }else if let Some(s)=&play.session {
                 let(id,seed,outcome)=(s.id(),s.seed(),s.outcome());
-                ui.horizontal(|ui|{
+                ui.horizontal_wrapped(|ui|{
                     if ui.button("New game").clicked(){play.request_file_action(FileAction::New,ui.ctx());}
                     if ui.button("Reset").clicked(){play.request_file_action(FileAction::Reset,ui.ctx());}
                     if ui.add_enabled(play.session.as_ref().unwrap().can_undo(),egui::Button::new("Undo")).clicked(){if play.session.as_mut().unwrap().undo(){play.files.changed();}}
@@ -1072,7 +1073,7 @@ _=>{}}});
                 controls(ui,play,id);
                 ScrollArea::both().show(ui,|ui|{draw_scene(ui,play);});
                 if outcome!=GameOutcome::Playing{ui.strong("Game finished — Undo, Reset or New game to continue.");}
-                if !play.message.is_empty(){ui.label(RichText::new(&play.message).color(Color32::from_rgb(215,120,55)));}
+                if !play.message.is_empty(){ui.label(RichText::new(&play.message).color(ui.visuals().warn_fg_color));}
             }
         });});
         // Let focused controls and popups consume their events first. Only the
@@ -1389,25 +1390,30 @@ fn board_with_minimum(
             rect.min + vec2((i % w) as f32 * size, (i / w) as f32 * size),
             vec2(size, size),
         );
-        ui.painter().rect_filled(
-            r.shrink(1.),
-            2.,
-            colours.get(i).copied().unwrap_or(palette(0)),
-        );
+        let fill = colours.get(i).copied().unwrap_or(palette(0));
+        ui.painter().rect_filled(r.shrink(1.), 2., fill);
+        let linear = egui::Rgba::from(fill);
+        let luminance = 0.2126 * linear.r() + 0.7152 * linear.g() + 0.0722 * linear.b();
+        // Equal black and white WCAG contrast occurs at sqrt(.0525) - .05.
+        let foreground = if luminance > 0.179 {
+            Color32::BLACK
+        } else {
+            Color32::WHITE
+        };
         if let Some(label) = labels.get(i) {
             ui.painter().text(
                 r.center(),
                 Align2::CENTER_CENTER,
                 label,
                 FontId::monospace((size * 0.50).max(9.)),
-                Color32::WHITE,
+                foreground,
             );
         }
         if i == play.selected {
             ui.painter().rect_stroke(
                 r.shrink(1.),
                 1.,
-                Stroke::new(2., Color32::from_rgb(100, 245, 180)),
+                Stroke::new(2., foreground),
                 StrokeKind::Inside,
             );
         }
@@ -4052,6 +4058,43 @@ mod options_ui_tests {
         let pos = label_position(ctx, w, label);
         click(ctx, w, pos, PointerButton::Primary, vec2(1200., 1000.));
     }
+    #[test]
+    fn narrow_game_actions_wrap_and_help_remains_clickable() {
+        let (ctx, _root, mut w) = crate::ui::terminal_review_tests::owned_workspace();
+        w.games.play.start(GameId::Guess, 7);
+        for scale in [1., 1.5, 2.] {
+            let size = vec2(360., 560.);
+            let draw = |w: &mut Workspace, events| {
+                crate::ui::gui_tests::shell_frame(&ctx, size, scale, events, |ui| {
+                    w.games_frame(ui);
+                })
+            };
+            draw(&mut w, vec![]);
+            let out = draw(&mut w, vec![]);
+            let mut positions = Vec::new();
+            for label in ["Save…", "Load…", "New game", "Undo", "Redo", "Help"] {
+                let pos = crate::ui::gui_tests::shell_text_position(&out, label);
+                assert!(Rect::from_min_size(Pos2::ZERO, size).contains(pos));
+                positions.push(pos);
+            }
+            let pos = *positions.last().unwrap();
+            assert!(pos.y > positions[0].y);
+            let before = w.games.play.help;
+            draw(
+                &mut w,
+                vec![
+                    Event::PointerMoved(pos),
+                    crate::ui::gui_tests::shell_pointer(pos, true),
+                ],
+            );
+            draw(
+                &mut w,
+                vec![crate::ui::gui_tests::shell_pointer(pos, false)],
+            );
+            assert_ne!(w.games.play.help, before);
+        }
+    }
+
     #[test]
     fn save_ui_actual_all_thirteen_controls_and_save_snapshot_during_chooser() {
         use std::sync::{Arc, Mutex, mpsc};

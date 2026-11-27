@@ -8,7 +8,15 @@ Dependencies: eframe/egui (MIT OR Apache-2.0), serde and serde_json (MIT OR Apac
 
 The supplied executable is used only as investigation evidence. The original program and product names belong to their owners. No affiliation is claimed.
 
-Interface typography: Liberation Sans (SIL Open Font License 1.1) and DejaVu Sans Mono (Bitstream Vera/DejaVu license); full license texts are included beside the font assets. These are system-font copies, not assets extracted from the original.
+The Windows interface uses the installed Segoe UI regular and semibold pair when available. The cross-platform interface uses the unmodified Selawik Regular and Semibold faces from Microsoft, licensed under the SIL Open Font License 1.1. The license is included in `assets/Selawik-LICENSE`. Both files come from the [Selawik 1.01 release](https://github.com/microsoft/Selawik/releases/tag/1.01).
+
+| File | SHA-256 |
+| --- | --- |
+| Upstream Selawik_Release.zip | 3f62c51e05e3b5a1e6241cf92a371f0be2ea1183aa87b30718bbd40832a8d423 |
+| Selawik.ttf (selawk.ttf) | e9d98518d8ac2817782a9a382430463a2e0793ea68350b695bb727d9a830ee1c |
+| Selawik-Semibold.ttf (selawksb.ttf) | 0a9e9d0549a10f24bef9b3a29e06fe6e0b5c21e7a784c503b048a307841a7783 |
+
+Fallback and terminal typography: Liberation Sans (SIL Open Font License 1.1) and DejaVu Sans Mono (Bitstream Vera/DejaVu license); full license texts are included beside the font assets. These are system-font copies, not assets extracted from the original.
 
 Embedded SSH/SFTP dependencies: russh (Apache-2.0), russh-sftp (MIT), tokio (MIT), zeroize (Apache-2.0 OR MIT), hmac, sha1 and sha2 (MIT OR Apache-2.0). Exact versions and transitive packages are recorded in Cargo.lock.
 

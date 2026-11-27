@@ -272,7 +272,7 @@ impl Workspace {
                 };
                 if ui
                     .button(label)
-                    .on_hover_text(self.shortcut_hint(Action::Fullscreen, label))
+                    .fluent_hint(self.shortcut_hint(Action::Fullscreen, label))
                     .clicked()
                 {
                     self.toggle_window_fullscreen(ui.ctx(), window);

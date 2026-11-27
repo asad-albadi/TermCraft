@@ -1,3 +1,4 @@
+use super::fluent::FluentTooltip;
 use eframe::egui::{self, Button, Context, Id, ScrollArea, TextEdit, Ui};
 use harbor_workspace::{
     credentials::Secret,
@@ -252,9 +253,11 @@ impl State {
             });
         }
         if self.actor.as_ref().is_none_or(FtpWorkspace::closed) {
-            ui.horizontal(|ui| {
-                ui.label("Password");
-                let field = ui.add(TextEdit::singleline(&mut *self.password).password(true));
+            ui.horizontal_wrapped(|ui| {
+                let label = ui.label("Password");
+                let field = ui
+                    .add(crate::ui::fluent::singleline(&mut *self.password).password(true))
+                    .labelled_by(label.id);
                 if let Some(mut state) = TextEdit::load_state(ui.ctx(), field.id) {
                     state.clear_undoer();
                     TextEdit::store_state(ui.ctx(), field.id, state);
@@ -283,15 +286,16 @@ impl State {
         let actor = self.actor.as_mut().unwrap();
         let page_path = actor.browser.path.clone();
         let mut requested_path = None;
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             if ui.button("Up").clicked() {
                 requested_path = Some(Ok(page_path.parent()));
             }
             if ui.button("Refresh").clicked() {
                 requested_path = Some(Ok(page_path.clone()));
             }
-            let address =
-                ui.add(TextEdit::singleline(&mut self.address).hint_text("Absolute remote path"));
+            let address = ui.add(
+                crate::ui::fluent::singleline(&mut self.address).hint_text("Absolute remote path"),
+            );
             if ui.button("Go").clicked()
                 || address.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter))
             {
@@ -307,7 +311,7 @@ impl State {
         }
         ScrollArea::vertical()
             .id_salt("ftp-list")
-            .max_height(360.)
+            .max_height((ui.available_height() * 0.45).clamp(36., 360.))
             .show_rows(ui, 24.0, actor.browser.entries.len(), |ui, rows| {
                 for row in rows {
                     let entry = &actor.browser.entries[row];
@@ -316,7 +320,12 @@ impl State {
                         .as_ref()
                         .is_some_and(|selected| selected.path == entry.path);
                     ui.horizontal(|ui| {
-                        let response = ui.selectable_label(selected, &entry.display_name);
+                        let response = ui
+                            .add_sized(
+                                [(ui.available_width() - 90.).max(1.), 24.],
+                                Button::selectable(selected, &entry.display_name).truncate(),
+                            )
+                            .fluent_hint(entry.path.display());
                         if response.clicked() || response.double_clicked() {
                             self.selected = Some(entry.clone());
                         }

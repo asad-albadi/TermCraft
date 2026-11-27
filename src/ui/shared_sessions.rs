@@ -1160,7 +1160,10 @@ impl Workspace {
     pub(super) fn shared_session_tree(&mut self, ui: &mut Ui) {
         ui.separator();
         ui.horizontal_wrapped(|ui| {
-            ui.label(RichText::new("Read-only shared sources").strong());
+            ui.label(crate::ui::fluent::emphasized(
+                ui.ctx(),
+                RichText::new("Read-only shared sources"),
+            ));
             if ui.small_button("Manage…").clicked() {
                 self.shared_sources.manager = true;
             }
@@ -1179,7 +1182,7 @@ impl Workspace {
                 .show(ui, |ui| {
                     if !r.error.is_empty() {
                         ui.add(Label::new(&r.error).truncate())
-                            .on_hover_text(&r.error);
+                            .fluent_hint(&r.error);
                     }
                     ui.horizontal_wrapped(|ui| {
                         if ui
@@ -1500,7 +1503,7 @@ impl Workspace {
                         for (index, prompt) in c.prompts.iter().enumerate() {
                             let label = ui
                                 .add(Label::new(&prompt.label).wrap())
-                                .on_hover_text(&prompt.label);
+                                .fluent_hint(&prompt.label);
                             super::remote_files::auth_field_scoped(
                                 ui,
                                 "shared-source-auth",
@@ -1516,7 +1519,7 @@ impl Workspace {
                 if let Some(credential) = &c.credential {
                     ui.horizontal_wrapped(|ui|{
                 if credential.reference.is_some(){use_saved=ui.button("Use saved credential").clicked();}
-                ui.checkbox(&mut form.save_in_vault,"Save entered value in vault").on_hover_text("Unlock the vault first. Saving does not wait for authentication success.");
+                ui.checkbox(&mut form.save_in_vault,"Save entered value in vault").fluent_hint("Unlock the vault first. Saving does not wait for authentication success.");
             });
                 }
                 ui.horizontal_wrapped(|ui| {

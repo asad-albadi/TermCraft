@@ -124,7 +124,7 @@ impl State {
                     };
                     ui.ctx().request_repaint();
                 } else {
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         ui.spinner();
                         ui.label(match self.progress {
                             Some(Progress::Verifying) => "Verifying package…",

@@ -13,6 +13,58 @@ fn key(key: Key) -> Event {
 }
 
 #[test]
+fn session_footer_preserves_command_width_order_and_compact_access() {
+    for width in [360., 680.] {
+        let (ctx, _root, mut w) = owned_workspace();
+        w.new_session("Local");
+        let size = vec2(width, 500.);
+        let draw = |w: &mut Workspace, events| {
+            shell_frame(&ctx, size, 1., events, |ui| w.session_dialog(ui.ctx()))
+        };
+        draw(&mut w, vec![]);
+        let out = draw(&mut w, vec![]);
+        let mut bounds = Vec::new();
+        for label in ["Connect", "Save only", "Cancel"] {
+            let pos = shell_text_position(&out, label);
+            let r = out
+                .shapes
+                .iter()
+                .filter_map(|s| match &s.shape {
+                    Shape::Rect(r)
+                        if r.rect.contains(pos) && r.rect.height() == fluent::CONTROL_HEIGHT =>
+                    {
+                        Some(r.rect)
+                    }
+                    _ => None,
+                })
+                .min_by(|a, b| a.width().total_cmp(&b.width()))
+                .unwrap();
+            assert!(
+                r.width() >= 120. && Rect::from_min_size(Pos2::ZERO, size).contains_rect(r),
+                "{label} {r:?} at {width}"
+            );
+            bounds.push(r);
+        }
+        assert!(bounds[0].right() <= bounds[1].left());
+        if width > 400. {
+            assert!(bounds[1].right() <= bounds[2].left());
+        } else {
+            assert!(bounds[2].top() >= bounds[0].bottom());
+        }
+        let cancel = bounds[2].center();
+        draw(
+            &mut w,
+            vec![
+                Event::PointerMoved(cancel),
+                super::gui_tests::shell_pointer(cancel, true),
+            ],
+        );
+        draw(&mut w, vec![super::gui_tests::shell_pointer(cancel, false)]);
+        assert!(w.session_form.is_none() && w.tabs.is_empty());
+    }
+}
+
+#[test]
 fn every_protocol_keeps_validation_and_actions_visible_at_scaled_viewports() {
     for scale in [1., 1.5, 2.] {
         let (ctx, _root, mut workspace) = owned_workspace();

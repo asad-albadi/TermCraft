@@ -75,19 +75,19 @@ impl Default for ManagedSshIperf {
 }
 impl ManagedSshIperf {
     pub(super) fn cards(&mut self, ui: &mut Ui, data: &Path) {
-        surface(ui).show(ui,|ui|{ui.label(RichText::new("SSH / SFTP server").size(18.).strong());ui.label("Embedded encrypted service with a persistent workspace host key. Authorized usernames control service access; they do not create OS accounts.");
+        surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("SSH / SFTP server").size(18.)));ui.label("Embedded encrypted service with a persistent workspace host key. Authorized usernames control service access; they do not create OS accounts.");
             let busy=active(&self.supervisor,self.ssh.id);
             ui.add_enabled_ui(!busy,|ui|{
-                Grid::new("ssh-service-form").num_columns(2).show(ui,|ui|{
-                    ui.label("Listen address");ui.text_edit_singleline(&mut self.ssh.bind);ui.end_row();
+                fluent::settings_grid(ui, "ssh-service-form", |ui|{
+                    ui.label("Listen address");ui.add(crate::ui::fluent::singleline(&mut self.ssh.bind));ui.end_row();
                     ui.label("Network access");ui.checkbox(&mut self.ssh.network,"Allow non-loopback listening");ui.end_row();
-                    ui.label("Authorized username");ui.text_edit_singleline(&mut self.ssh.user);ui.end_row();
-                    ui.label("Password (optional with key)");super::managed_servers::service_password_field(ui, &mut self.ssh.password, ui.spacing().text_edit_width);ui.end_row();
+                    ui.label("Authorized username");ui.add(crate::ui::fluent::singleline(&mut self.ssh.user));ui.end_row();
+                    let label=ui.label("Password (optional with key)");super::managed_servers::service_password_field(ui, &mut self.ssh.password, ui.spacing().text_edit_width).labelled_by(label.id);ui.end_row();
                     ui.label("Authorized public keys");ui.add(TextEdit::multiline(&mut self.ssh.keys).desired_rows(2).hint_text("One OpenSSH public key per line"));ui.end_row();
                     ui.label("File access");ui.checkbox(&mut self.ssh.sftp,"Enable SFTP");ui.end_row();
-                    if self.ssh.sftp {ui.label("Shared folder");ui.horizontal(|ui|{ui.text_edit_singleline(&mut self.ssh.root);if ui.button("Browse").clicked(){if let Some(path)=rfd::FileDialog::new().pick_folder(){self.ssh.root=path.to_string_lossy().into_owned();}}});ui.end_row();ui.label("Permissions");ui.checkbox(&mut self.ssh.write,"Allow new uploads, renames and deletes");ui.end_row();}
+                    if self.ssh.sftp {ui.label("Shared folder");ui.horizontal_wrapped(|ui|{ui.add(crate::ui::fluent::singleline(&mut self.ssh.root));if ui.button("Browse").clicked(){if let Some(path)=rfd::FileDialog::new().pick_folder(){self.ssh.root=path.to_string_lossy().into_owned();}}});ui.end_row();ui.label("Permissions");ui.checkbox(&mut self.ssh.write,"Allow new uploads, renames and deletes");ui.end_row();}
                     ui.label("Terminal access");ui.checkbox(&mut self.ssh.shell_enabled,"Allow shell with my account’s full permissions");ui.end_row();
-                    if self.ssh.shell_enabled {ui.label("Shell executable");ui.text_edit_singleline(&mut self.ssh.shell);ui.end_row();}
+                    if self.ssh.shell_enabled {ui.label("Shell executable");ui.add(crate::ui::fluent::singleline(&mut self.ssh.shell));ui.end_row();}
                     ui.label("Stop after");ui.add(DragValue::new(&mut self.ssh.lifetime).range(0..=86400).suffix(" seconds (0 = until stopped)"));ui.end_row();
                 });
                 ui.small("Uploads create new files (64 MiB maximum); existing files are never overwritten. Shell access has your full account authority and is not restricted to the shared folder.");
@@ -102,11 +102,11 @@ impl ManagedSshIperf {
             }
         });
         ui.add_space(17.);
-        surface(ui).show(ui,|ui|{ui.label(RichText::new("Iperf bandwidth server").size(18.).strong());ui.label("Owned foreground Iperf engine. Qualified packaged engines are checksum verified; installed compatibility engines require explicit selection.");
+        surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Iperf bandwidth server").size(18.)));ui.label("Owned foreground Iperf engine. Qualified packaged engines are checksum verified; installed compatibility engines require explicit selection.");
             let busy=active(&self.supervisor,self.iperf.id);ui.add_enabled_ui(!busy,|ui|{
-                Grid::new("iperf-service-form").num_columns(2).show(ui,|ui|{
+                fluent::settings_grid(ui, "iperf-service-form", |ui|{
                     ui.label("Version");ComboBox::from_id_salt("iperf-version").selected_text(if self.iperf.version==IperfVersion::Three{"Iperf 3"}else{"Iperf 2"}).show_ui(ui,|ui|{for(version,label,bind)in[(IperfVersion::Three,"Iperf 3","127.0.0.1:5201"),(IperfVersion::Two,"Iperf 2","127.0.0.1:5001")]{if ui.selectable_value(&mut self.iperf.version,version,label).clicked(){self.iperf.bind=bind.into();self.iperf.udp=false;}}});ui.end_row();
-                    ui.label("Listen address");ui.text_edit_singleline(&mut self.iperf.bind);ui.end_row();ui.label("Network access");ui.checkbox(&mut self.iperf.network,"Allow non-loopback listening");ui.end_row();ui.label("Provider");ui.checkbox(&mut self.iperf.installed,"Allow installed compatibility engine if packaged engine is absent");ui.end_row();
+                    ui.label("Listen address");ui.add(crate::ui::fluent::singleline(&mut self.iperf.bind));ui.end_row();ui.label("Network access");ui.checkbox(&mut self.iperf.network,"Allow non-loopback listening");ui.end_row();ui.label("Provider");ui.checkbox(&mut self.iperf.installed,"Allow installed compatibility engine if packaged engine is absent");ui.end_row();
                     if self.iperf.version==IperfVersion::Two {ui.label("Transport");ui.checkbox(&mut self.iperf.udp,"UDP server");ui.end_row();}
                     ui.label("Report interval");ui.add(DragValue::new(&mut self.iperf.interval).range(1..=60).suffix(" seconds"));ui.end_row();ui.label("Stop after");ui.add(DragValue::new(&mut self.iperf.lifetime).range(0..=86400).suffix(" seconds (0 = until stopped)"));ui.end_row();
                 });

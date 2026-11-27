@@ -7,7 +7,10 @@ fn runtime_providers(ui: &mut Ui) {
 
     let refresh = ui
         .horizontal(|ui| {
-            ui.label(RichText::new("Runtime providers").size(18.).strong());
+            ui.label(crate::ui::fluent::emphasized(
+                ui.ctx(),
+                RichText::new("Runtime providers").size(18.),
+            ));
             ui.button("Refresh").clicked()
         })
         .inner;
@@ -100,7 +103,7 @@ fn runtime_providers(ui: &mut Ui) {
             .show(ui, |ui| {
                 for (name, label, detail) in rows {
                     ui.label(*name);
-                    ui.label(label).on_hover_text(detail);
+                    ui.label(label).fluent_hint(detail);
                     ui.end_row();
                 }
             });
@@ -118,7 +121,12 @@ impl Workspace {
         let mut cancel = false;
         let mut connect = false;
         let mut save = false;
-        let size = super::fluent::dialog_size(ctx, 650., 182.);
+        let footer_extra = if ctx.content_rect().width() < 424. {
+            40.
+        } else {
+            0.
+        };
+        let size = super::fluent::dialog_size(ctx, 650., 182. + footer_extra);
         let response = super::fluent::modal(
             ctx,
             Id::new("session-form"),
@@ -131,13 +139,13 @@ impl Workspace {
             |ui| {
                 ScrollArea::vertical().id_salt("session-settings-body").max_width(size.width).max_height(size.body_height).auto_shrink([false,true]).show(ui, |ui| {
    ui.set_width((size.width-20.).max(1.));
-   ui.label(RichText::new("Choose a connection").size(20.).strong());ui.add_space(7.);
+   ui.label(fluent::emphasized(ui.ctx(), RichText::new("Choose a connection").size(14.)));ui.add_space(7.);
    ui.horizontal_wrapped(|ui|{for p in PROTOCOLS{if ui.selectable_label(s.protocol==*p,*p).clicked(){s.protocol=(*p).into();s.port=protocol_port(p);if *p=="Mosh"&&self.editing.is_none(){s.mosh_provider=harbor_workspace::model::MoshProvider::Bundled;}if *p=="FTP"{s.ftp_options=harbor_workspace::protocols::ftp_actor::SessionOptions::embedded();}if *p=="Browser"{s.browser_options.embedded=true;if self.editing.is_none(){s.browser_options.runtime=harbor_workspace::browser::Runtime::BundledChromium;}}}}});ui.add_space(7.);ui.separator();
-   ui.strong("Session details");
+   ui.label(fluent::emphasized(ui.ctx(), RichText::new("Session details")));
    let name = fluent::form_text(ui,"Session name",&mut s.name,"Optional display name");
    fluent::focus_on_entry(ui, &name, Id::new("session-form"));
    fluent::form_text(ui,"Folder",&mut s.folder,"My sessions");
-   ui.strong("Connection settings");
+   ui.label(fluent::emphasized(ui.ctx(), RichText::new("Connection settings")));
    match s.protocol.as_str() {
        "Local" => {
            fluent::form_text(ui,"Shell executable",&mut s.command,"Use the system default");
@@ -216,7 +224,7 @@ impl Workspace {
    if s.protocol=="RDP" {super::rdp_settings::session(ui,&mut s);}
    if s.protocol=="VNC" {super::vnc_settings::session(ui,&mut s);}
 
-   if matches!(s.protocol.as_str(),"RDP"|"VNC"){ui.horizontal_wrapped(|ui|{ui.checkbox(&mut s.fullscreen,"Full screen").on_hover_text("Enter fullscreen when the connected desktop is first displayed.");ui.checkbox(&mut s.view_only,"View only");});ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. The view fits server dimensions; server-driven resize is supported."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. The view fits the negotiated desktop."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));}
+   if matches!(s.protocol.as_str(),"RDP"|"VNC"){ui.horizontal_wrapped(|ui|{ui.checkbox(&mut s.fullscreen,"Full screen").fluent_hint("Enter fullscreen when the connected desktop is first displayed.");ui.checkbox(&mut s.view_only,"View only");});ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. The view fits server dimensions; server-driven resize is supported."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. The view fits the negotiated desktop."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));}
    if s.protocol=="Browser"{super::web_browser::settings(ui,&mut s);}
    if s.protocol=="XDMCP"{super::xdmcp::settings(ui,&mut s,&mut self.xdmcp_discovery);}else{self.xdmcp_discovery.end_editor();}
    if super::macro_events::supported_session(&s) {
@@ -233,7 +241,7 @@ impl Workspace {
        });
    }
    if s.protocol!="Browser"{
-   CollapsingHeader::new("Terminal profile overrides").show(ui,|ui|{super::terminal_settings::overrides(ui,&mut s.terminal,&self.store.preferences.terminal_settings());});
+   CollapsingHeader::new("Terminal profile overrides").show(ui,|ui|{ui.small("Checked options apply when you open this saved session. Unchecked options inherit the global profile.");super::terminal_settings::overrides(ui,&mut s.terminal,&self.store.preferences.terminal_settings());});
    ui.horizontal_wrapped(|ui|{ui.label("Keyword highlighting");ui.selectable_value(&mut s.highlight_enabled,None,"Global setting");ui.selectable_value(&mut s.highlight_enabled,Some(true),"On");ui.selectable_value(&mut s.highlight_enabled,Some(false),"Off");});
    }
    });
@@ -243,11 +251,11 @@ impl Workspace {
                     ui.colored_label(super::fluent::palette(ui).error, &self.form_error);
                 }
                 ui.separator();
-                ui.horizontal_wrapped(|ui| {
-                    save = ui.button("Save only").clicked();
-                    connect = primary(ui, "Connect").clicked();
-                    cancel = ui.button("Cancel").clicked();
-                });
+                let [launch, store, safe] =
+                    fluent::dialog_actions(ui, ["Connect", "Save only", "Cancel"], Some(0));
+                connect = launch.clicked();
+                save = store.clicked();
+                cancel = safe.clicked();
             },
         );
         if cancel
@@ -396,7 +404,10 @@ impl Workspace {
         let mut clear = false;
         ui.horizontal(|ui| {
             let t = &mut self.tabs[self.active];
-            ui.label(RichText::new(t.session.title()).size(17.).strong());
+            ui.label(fluent::emphasized(
+                ui.ctx(),
+                RichText::new(t.session.title()).size(17.),
+            ));
             ui.label(
                 RichText::new(format!(
                     "{} · {} · {}s",
@@ -518,7 +529,7 @@ impl Workspace {
                 upload = ui.button("Upload file…").clicked();
                 download = ui.button("Download path").clicked();
                 ui.add(
-                    TextEdit::singleline(&mut self.tabs[self.active].remote_path)
+                    crate::ui::fluent::singleline(&mut self.tabs[self.active].remote_path)
                         .hint_text("Remote file or directory")
                         .desired_width(260.),
                 );
@@ -621,8 +632,12 @@ impl Workspace {
             "Browse your computer. Open, edit, copy, and organize files.",
         );
         let mut go = false;
-        ui.horizontal(|ui| {
-            if ui.button("↑").on_hover_text("Parent folder").clicked() {
+        ui.horizontal_wrapped(|ui| {
+            let parent = ui.button("↑").fluent_hint("Parent folder");
+            parent.widget_info(|| {
+                WidgetInfo::labeled(WidgetType::Button, parent.enabled(), "Parent folder")
+            });
+            if parent.clicked() {
                 if let Some(p) = self.files.path.parent() {
                     self.files.path = p.into();
                     self.files.refresh();
@@ -633,9 +648,10 @@ impl Workspace {
                 self.files.refresh();
             }
             let r = ui.add_sized(
-                [ui.available_width() - 180., 34.],
-                TextEdit::singleline(&mut self.files.path_text),
+                [(ui.available_width() - 140.).clamp(96., 640.), 34.],
+                crate::ui::fluent::singleline(&mut self.files.path_text),
             );
+            r.widget_info(|| WidgetInfo::labeled(WidgetType::TextEdit, r.enabled(), "Folder path"));
             go = r.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
             go |= ui.button("Go").clicked();
             if ui.button("Browse…").clicked() {
@@ -657,14 +673,17 @@ impl Workspace {
                 self.files.error = "That folder does not exist or cannot be opened.".into();
             }
         }
-        ui.horizontal(|ui|{if ui.button("Refresh").clicked(){self.files.refresh();}if ui.button("New folder").clicked(){self.files.show_new=true;self.files.new_name.clear();}if ui.add_enabled(self.files.selected.is_some(),Button::new("Copy")).clicked(){self.files.clipboard=self.files.selected.clone();}
+        ui.horizontal_wrapped(|ui|{if ui.button("Refresh").clicked(){self.files.refresh();}if ui.button("New folder").clicked(){self.files.show_new=true;self.files.new_name.clear();}if ui.add_enabled(self.files.selected.is_some(),Button::new("Copy")).clicked(){self.files.clipboard=self.files.selected.clone();}
    if ui.add_enabled(self.files.clipboard.is_some(),Button::new("Paste copy")).clicked(){if let Some(from)=&self.files.clipboard{if from.is_file(){let to=self.files.path.join(from.file_name().unwrap());if to.exists(){self.files.error="A file with that name already exists. Rename it before copying.".into();}else{match copy_new_file(from,&to){Ok(_)=>self.files.refresh(),Err(e)=>self.files.error=e.to_string()}}}else{self.files.error="Folder copying is not supported yet. Open the system file manager for this operation.".into();}}}
    if ui.add_enabled(self.files.selected.is_some(),Button::new("Rename")).clicked(){self.files.error.clear();self.rename_file=self.files.selected.clone();self.rename_text=self.rename_file.as_ref().unwrap().file_name().unwrap().to_string_lossy().into();}
    if ui.add_enabled(self.files.selected.is_some(),Button::new("Delete")).clicked(){self.delete_file=self.files.selected.clone();}
-   ui.with_layout(Layout::right_to_left(Align::Center),|ui|{ui.add(TextEdit::singleline(&mut self.files.query).hint_text("Filter files").desired_width(170.));});});
+   ui.add(crate::ui::fluent::singleline(&mut self.files.query).hint_text("Filter files").desired_width(170.));});
         if self.files.show_new {
-            ui.horizontal(|ui| {
-                ui.add(TextEdit::singleline(&mut self.files.new_name).hint_text("Folder name"));
+            ui.horizontal_wrapped(|ui| {
+                ui.add(
+                    crate::ui::fluent::singleline(&mut self.files.new_name)
+                        .hint_text("Folder name"),
+                );
                 if ui.button("Create").clicked() {
                     if valid_filename(&self.files.new_name) {
                         match fs::create_dir(self.files.path.join(&self.files.new_name)) {
@@ -685,7 +704,7 @@ impl Workspace {
             });
         }
         if !self.files.error.is_empty() {
-            ui.colored_label(Color32::from_rgb(180, 42, 42), &self.files.error);
+            ui.colored_label(ui.visuals().error_fg_color, &self.files.error);
         }
         ui.separator();
         let mut open = None;
@@ -710,32 +729,35 @@ impl Workspace {
                     {
                         continue;
                     }
-                    let (r, response) =
-                        ui.allocate_exact_size(vec2(ui.available_width(), 37.), Sense::click());
+                    let (_, r) = ui.allocate_space(vec2(ui.available_width(), 37.));
+                    let response = ui.interact(r, ui.id().with(&entry.path), Sense::click());
                     let selected = self.files.selected.as_ref() == Some(&entry.path);
-                    if selected || response.hovered() {
-                        ui.painter().rect_filled(
-                            r,
-                            4.,
-                            if selected {
-                                ui.visuals().selection.bg_fill
-                            } else {
-                                mist(ui)
-                            },
-                        );
+                    let foreground =
+                        fluent::paint_control(ui, &response, r, selected, ControlKind::Flat);
+                    response.widget_info(|| {
+                        WidgetInfo::selected(
+                            WidgetType::SelectableLabel,
+                            response.enabled(),
+                            selected,
+                            &entry.name,
+                        )
+                    });
+                    if response.gained_focus() {
+                        response.scroll_to_me(None);
                     }
+                    let response = response.fluent_hint(entry.path.display().to_string());
                     draw_icon(
                         ui.painter(),
                         Rect::from_min_size(r.min + vec2(6., 9.), vec2(19., 19.)),
                         if entry.dir { "folder" } else { "terminal" },
                         if entry.dir { accent(ui) } else { muted(ui) },
                     );
-                    ui.painter().text(
-                        r.min + vec2(36., 18.),
-                        Align2::LEFT_CENTER,
+                    paint_ellipsized(
+                        ui,
+                        r.left_center() + vec2(36., 0.),
+                        r.width() - 122.,
                         &entry.name,
-                        FontId::proportional(14.),
-                        ink(ui),
+                        foreground,
                     );
                     ui.painter().text(
                         r.right_center() - vec2(12., 0.),
@@ -749,6 +771,7 @@ impl Workspace {
                         muted(ui),
                     );
                     if response.clicked() {
+                        response.request_focus();
                         self.files.selected = Some(entry.path.clone());
                     }
                     if response.double_clicked() {
@@ -837,12 +860,11 @@ impl Workspace {
                         ui.label(p.display().to_string());
                         ui.label("This permanently removes the item. Only empty folders can be deleted here.");
                     });
-                    ui.horizontal_wrapped(|ui| {
-                        delete = ui.button("Delete permanently").clicked();
-                        let safe = ui.button("Cancel");
-                        super::fluent::focus_on_entry(ui, &safe, ui.id());
-                        cancel = safe.clicked();
-                    });
+                    let [remove, safe] =
+                        fluent::dialog_actions(ui, ["Delete permanently", "Cancel"], None);
+                    delete = remove.clicked();
+                    fluent::focus_on_entry(ui, &safe, ui.id());
+                    cancel = safe.clicked();
                 },
             );
             cancel |= modal.should_close();
@@ -877,10 +899,9 @@ impl Workspace {
                 if !self.files.error.is_empty() {
                     ui.colored_label(super::fluent::palette(ui).error, &self.files.error);
                 }
-                ui.horizontal(|ui| {
-                    cancel = ui.button("Cancel").clicked();
-                    rename = primary(ui, "Rename").clicked();
-                });
+                let [commit, safe] = fluent::dialog_actions(ui, ["Rename", "Cancel"], Some(0));
+                rename = commit.clicked();
+                cancel = safe.clicked();
             });
             if cancel || modal.should_close() {
                 self.rename_file = None;
@@ -995,12 +1016,13 @@ impl Workspace {
         }
     }
     pub(super) fn tunnels_page(&mut self, ui: &mut Ui) {
+        ScrollArea::vertical().id_salt("tunnels_page").show(ui, |ui| {
         page_heading(
             ui,
             "SSH tunnels",
             "Forward a local port, expose a remote port, or create a SOCKS proxy.",
         );
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             if primary(ui, "+  New tunnel").clicked() {
                 if self.store.tunnels.len() >= 5 {
                     self.message(
@@ -1032,10 +1054,10 @@ impl Workspace {
         let mut remove = None;
         for (i, t) in self.store.tunnels.iter().enumerate() {
             surface(ui).show(ui, |ui| {
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     icon(ui, "link", 25., accent(ui));
                     ui.vertical(|ui| {
-                        ui.label(RichText::new(&t.name).size(16.).strong());
+                        ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new(&t.name).size(16.)));
                         ui.label(
                             RichText::new(format!(
                                 "{}  {}:{}  →  {}:{}  via {}",
@@ -1092,6 +1114,8 @@ impl Workspace {
                 Err(e) => self.message(e),
             }
         }
+
+        });
     }
     pub(super) fn tunnel_dialog(&mut self, ctx: &Context) {
         if !self.tunnel_open {
@@ -1101,7 +1125,7 @@ impl Workspace {
         let mut save = false;
         let mut cancel = false;
         let size = fluent::dialog_size(ctx, 520., 138.);
-        fluent::modeless(ctx, Id::new("Configure SSH tunnel"), "Configure SSH tunnel", size).open(&mut open).collapsible(false).show(ctx,|ui|{fluent::dialog_body(ui,size,|ui|{let t=&mut self.tunnel_form;ui.horizontal(|ui|{for mode in ["Local","Remote","Dynamic"]{ui.selectable_value(&mut t.mode,mode.into(),mode);}});ui.label(RichText::new(match t.mode.as_str(){"Remote"=>"Listen on the SSH server and forward to a destination from your computer.","Dynamic"=>"Create a local SOCKS proxy through the SSH server.",_=>"Listen on your computer and reach a destination from the SSH server."}).color(muted(ui)).size(12.));Grid::new("tunnel_fields").num_columns(2).spacing([20.,11.]).show(ui,|ui|{let name=fluent::field(ui,"Name",&mut t.name,"Tunnel name",390.);fluent::focus_on_entry(ui,&name,ui.id());ui.end_row();field(ui,"SSH server",&mut t.host,"bastion.example.com");field(ui,"SSH username",&mut t.user,"");ui.label("SSH port");ui.add(DragValue::new(&mut t.ssh_port).range(1..=65535));ui.end_row();field(ui,"Private key",&mut t.key,"Optional key file");field(ui,"Listen address",&mut t.bind,"127.0.0.1");ui.label("Listen port");ui.add(DragValue::new(&mut t.local_port).range(1..=65535));ui.end_row();if t.mode!="Dynamic"{field(ui,"Destination",&mut t.destination,"localhost");ui.label("Destination port");ui.add(DragValue::new(&mut t.remote_port).range(1..=65535));ui.end_row();}});});if !self.form_error.is_empty(){ui.colored_label(super::fluent::palette(ui).error,&self.form_error);}ui.horizontal(|ui|{cancel=ui.button("Cancel").clicked();save=primary(ui,"Save tunnel").clicked();});});
+        fluent::modeless(ctx, Id::new("Configure SSH tunnel"), "Configure SSH tunnel", size).open(&mut open).collapsible(false).show(ctx,|ui|{fluent::dialog_body(ui,size,|ui|{let t=&mut self.tunnel_form;ui.horizontal(|ui|{for mode in ["Local","Remote","Dynamic"]{ui.selectable_value(&mut t.mode,mode.into(),mode);}});ui.label(RichText::new(match t.mode.as_str(){"Remote"=>"Listen on the SSH server and forward to a destination from your computer.","Dynamic"=>"Create a local SOCKS proxy through the SSH server.",_=>"Listen on your computer and reach a destination from the SSH server."}).color(muted(ui)).size(12.));fluent::settings_grid(ui, "tunnel_fields", |ui|{let name=fluent::field(ui,"Name",&mut t.name,"Tunnel name",390.);fluent::focus_on_entry(ui,&name,ui.id());ui.end_row();field(ui,"SSH server",&mut t.host,"bastion.example.com");field(ui,"SSH username",&mut t.user,"");ui.label("SSH port");ui.add(DragValue::new(&mut t.ssh_port).range(1..=65535));ui.end_row();field(ui,"Private key",&mut t.key,"Optional key file");field(ui,"Listen address",&mut t.bind,"127.0.0.1");ui.label("Listen port");ui.add(DragValue::new(&mut t.local_port).range(1..=65535));ui.end_row();if t.mode!="Dynamic"{field(ui,"Destination",&mut t.destination,"localhost");ui.label("Destination port");ui.add(DragValue::new(&mut t.remote_port).range(1..=65535));ui.end_row();}});});if !self.form_error.is_empty(){ui.colored_label(super::fluent::palette(ui).error,&self.form_error);}ui.horizontal(|ui|{cancel=ui.button("Cancel").clicked();save=primary(ui,"Save tunnel").clicked();});});
         if !open || cancel {
             self.tunnel_open = false;
             self.form_error.clear();
@@ -1123,147 +1147,159 @@ impl Workspace {
         }
     }
     pub(super) fn macros_page(&mut self, ui: &mut Ui) {
-        page_heading(
-            ui,
-            "Macros",
-            "Record and replay input in your terminal or embedded desktop.",
-        );
-        ui.horizontal_wrapped(|ui| {
-            if primary(ui, "New text macro").clicked() {
-                self.macro_form = Macro {
-                    append_enter: true,
-                    ..Macro::default()
-                };
-                self.macro_editing = None;
-                self.macro_open = true;
-            }
-            if ui.button("New event macro").clicked() {
-                self.macro_form = Macro {
-                    script: Some(harbor_workspace::macros::Script {
-                        version: 1,
-                        events: Vec::new(),
-                    }),
-                    ..Macro::default()
-                };
-                self.macro_editing = None;
-                self.macro_open = true;
-            }
-            self.macro_controls(ui);
-            if ui.button("Import").clicked() {
-                if let Some(path) = rfd::FileDialog::new()
-                    .add_filter("Macro JSON", &["json"])
-                    .pick_file()
-                {
-                    match super::macro_events::read_import(&path).and_then(|imported| {
-                        let mut values = self.store.macros.clone();
-                        values.extend(imported);
-                        super::macro_events::validate_library(&values)?;
-                        Ok(values)
-                    }) {
-                        Ok(values) => {
-                            self.store.macros = values;
-                            self.persist();
-                        }
-                        Err(error) => self.message(error),
+        ScrollArea::vertical()
+            .id_salt("macros_page")
+            .show(ui, |ui| {
+                page_heading(
+                    ui,
+                    "Macros",
+                    "Record and replay input in your terminal or embedded desktop.",
+                );
+                ui.horizontal_wrapped(|ui| {
+                    if primary(ui, "New text macro").clicked() {
+                        self.macro_form = Macro {
+                            append_enter: true,
+                            ..Macro::default()
+                        };
+                        self.macro_editing = None;
+                        self.macro_open = true;
                     }
-                }
-            }
-            if ui.button("Export").clicked() {
-                if let Some(path) = rfd::FileDialog::new()
-                    .set_file_name("macros.json")
-                    .save_file()
-                {
-                    let result = serde_json::to_vec_pretty(&self.store.macros)
-                        .map_err(|error| error.to_string())
-                        .and_then(|bytes| {
-                            fs::write(path, bytes).map_err(|error| error.to_string())
-                        });
-                    match result {
-                        Ok(()) => self.message("Macros exported."),
-                        Err(error) => self.message(error),
+                    if ui.button("New event macro").clicked() {
+                        self.macro_form = Macro {
+                            script: Some(harbor_workspace::macros::Script {
+                                version: 1,
+                                events: Vec::new(),
+                            }),
+                            ..Macro::default()
+                        };
+                        self.macro_editing = None;
+                        self.macro_open = true;
                     }
-                }
-            }
-        });
-        ui.add_space(12.);
-        if self.store.macros.is_empty() {
-            empty_state(
-                ui,
-                "macro",
-                "No saved macros",
-                "Create a macro or record input from a connected session.",
-            );
-        }
-        let mut edit = None;
-        let mut remove = None;
-        let mut run = None;
-        for (index, value) in self.store.macros.iter().enumerate() {
-            surface(ui).show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    icon(ui, "macro", 24., accent(ui));
-                    ui.vertical(|ui| {
-                        ui.label(RichText::new(&value.name).strong().size(16.));
-                        let description = value.script.as_ref().map_or_else(
-                            || value.text.lines().next().unwrap_or("").to_owned(),
-                            |script| format!("{} events", script.events.len()),
-                        );
-                        ui.add(
-                            Label::new(RichText::new(description).size(12.).color(muted(ui)))
-                                .truncate(),
-                        );
-                    });
-                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        if ui.button("Remove").clicked() {
-                            remove = Some(index);
-                        }
-                        if ui.button("Edit").clicked() {
-                            edit = Some(index);
-                        }
-                        if ui
-                            .add_enabled(
-                                self.tabs.get(self.active).is_some_and(|tab| {
-                                    super::macro_events::supported_session(&tab.session)
-                                }),
-                                Button::new("Run in active tab"),
-                            )
-                            .clicked()
+                    self.macro_controls(ui);
+                    if ui.button("Import").clicked() {
+                        if let Some(path) = rfd::FileDialog::new()
+                            .add_filter("Macro JSON", &["json"])
+                            .pick_file()
                         {
-                            run = Some(value.clone());
+                            match super::macro_events::read_import(&path).and_then(|imported| {
+                                let mut values = self.store.macros.clone();
+                                values.extend(imported);
+                                super::macro_events::validate_library(&values)?;
+                                Ok(values)
+                            }) {
+                                Ok(values) => {
+                                    self.store.macros = values;
+                                    self.persist();
+                                }
+                                Err(error) => self.message(error),
+                            }
                         }
-                    });
+                    }
+                    if ui.button("Export").clicked() {
+                        if let Some(path) = rfd::FileDialog::new()
+                            .set_file_name("macros.json")
+                            .save_file()
+                        {
+                            let result = serde_json::to_vec_pretty(&self.store.macros)
+                                .map_err(|error| error.to_string())
+                                .and_then(|bytes| {
+                                    fs::write(path, bytes).map_err(|error| error.to_string())
+                                });
+                            match result {
+                                Ok(()) => self.message("Macros exported."),
+                                Err(error) => self.message(error),
+                            }
+                        }
+                    }
                 });
+                ui.add_space(12.);
+                if self.store.macros.is_empty() {
+                    empty_state(
+                        ui,
+                        "macro",
+                        "No saved macros",
+                        "Create a macro or record input from a connected session.",
+                    );
+                }
+                let mut edit = None;
+                let mut remove = None;
+                let mut run = None;
+                for (index, value) in self.store.macros.iter().enumerate() {
+                    surface(ui).show(ui, |ui| {
+                        ui.horizontal_wrapped(|ui| {
+                            icon(ui, "macro", 24., accent(ui));
+                            ui.vertical(|ui| {
+                                ui.label(
+                                    crate::ui::fluent::emphasized(
+                                        ui.ctx(),
+                                        RichText::new(&value.name),
+                                    )
+                                    .size(16.),
+                                );
+                                let description = value.script.as_ref().map_or_else(
+                                    || value.text.lines().next().unwrap_or("").to_owned(),
+                                    |script| format!("{} events", script.events.len()),
+                                );
+                                ui.add(
+                                    Label::new(
+                                        RichText::new(description).size(12.).color(muted(ui)),
+                                    )
+                                    .truncate(),
+                                );
+                            });
+                            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                                if ui.button("Remove").clicked() {
+                                    remove = Some(index);
+                                }
+                                if ui.button("Edit").clicked() {
+                                    edit = Some(index);
+                                }
+                                if ui
+                                    .add_enabled(
+                                        self.tabs.get(self.active).is_some_and(|tab| {
+                                            super::macro_events::supported_session(&tab.session)
+                                        }),
+                                        Button::new("Run in active tab"),
+                                    )
+                                    .clicked()
+                                {
+                                    run = Some(value.clone());
+                                }
+                            });
+                        });
+                    });
+                    ui.add_space(5.);
+                }
+                if let Some(index) = edit {
+                    self.macro_form = self.store.macros[index].clone();
+                    self.macro_editing = Some(index);
+                    self.macro_open = true;
+                }
+                if let Some(index) = remove {
+                    let name = &self.store.macros[index].name;
+                    let attached = self
+                        .store
+                        .sessions
+                        .iter()
+                        .any(|session| session.startup_macro.as_ref() == Some(name));
+                    let mut values = self.store.macros.clone();
+                    values.remove(index);
+                    if attached {
+                        self.message("Remove this macro from session startup before deleting it.");
+                    } else if let Err(error) = super::macro_events::validate_library(&values) {
+                        self.message(error);
+                    } else {
+                        self.store.macros = values;
+                        self.persist();
+                    }
+                }
+                if let Some(value) = run {
+                    match self.queue_macro(self.tabs[self.active].id, &value) {
+                        Ok(()) => self.page = Page::Terminal,
+                        Err(error) => self.message(error),
+                    }
+                }
             });
-            ui.add_space(5.);
-        }
-        if let Some(index) = edit {
-            self.macro_form = self.store.macros[index].clone();
-            self.macro_editing = Some(index);
-            self.macro_open = true;
-        }
-        if let Some(index) = remove {
-            let name = &self.store.macros[index].name;
-            let attached = self
-                .store
-                .sessions
-                .iter()
-                .any(|session| session.startup_macro.as_ref() == Some(name));
-            let mut values = self.store.macros.clone();
-            values.remove(index);
-            if attached {
-                self.message("Remove this macro from session startup before deleting it.");
-            } else if let Err(error) = super::macro_events::validate_library(&values) {
-                self.message(error);
-            } else {
-                self.store.macros = values;
-                self.persist();
-            }
-        }
-        if let Some(value) = run {
-            match self.queue_macro(self.tabs[self.active].id, &value) {
-                Ok(()) => self.page = Page::Terminal,
-                Err(error) => self.message(error),
-            }
-        }
     }
 
     pub(super) fn macro_dialog(&mut self, ctx: &Context) {
@@ -1280,7 +1316,7 @@ impl Workspace {
             .show(ctx, |ui| {
                 fluent::dialog_body(ui, size, |ui| {
                     ui.label("Name");
-                    ui.text_edit_singleline(&mut self.macro_form.name);
+                    ui.add(crate::ui::fluent::singleline(&mut self.macro_form.name));
                     if let Some(script) = &mut self.macro_form.script {
                         super::macro_events::edit_events(ui, script);
                     } else {
@@ -1343,20 +1379,18 @@ impl Workspace {
         }
     }
     pub(super) fn tools_page(&mut self, ui: &mut Ui) {
+        ScrollArea::vertical().id_salt("tools_page").show(ui, |ui| {
+        page_heading(ui, "Tools", "Manage packages and plugins, compare files, and inspect network connections.");
         self.portable_packages_section(ui);
         self.plugins_section(ui);
         ui.separator();
         self.tools.render(ui);
         ui.separator();
-        page_heading(
-            ui,
-            "Network tools",
-            "Inspect a host, test reachability, and manage your local client tools.",
-        );
+        ui.label(fluent::emphasized(ui.ctx(), RichText::new("Network tools").size(18.)));
         surface(ui).show(ui, |ui| {
-            ui.horizontal(|ui| {
-                ui.label("Host");
-                ui.add(TextEdit::singleline(&mut self.diagnostic_host).desired_width(280.));
+            ui.horizontal_wrapped(|ui| {
+                let host_label = ui.label("Host");
+                fluent::text_input(ui, host_label.id, &mut self.diagnostic_host, "", 280.);
                 if ui.button("DNS lookup").clicked() {
                     let host = self.diagnostic_host.clone();
                     if let Err(e) = validate_host(&host) {
@@ -1421,9 +1455,11 @@ impl Workspace {
             }
         });
         ui.add_space(16.);
-        ui.columns(2,|cols|{surface(&cols[0]).show(&mut cols[0],|ui|{ui.label(RichText::new("SSH keys").size(17.).strong());ui.label(RichText::new("Create or import key bundles, inspect fingerprints, and manage system or TermCraft-owned agent identities.").color(muted(ui)));if ui.button("SSH keys and agents…").clicked(){self.ssh_keys.open=true;}});surface(&cols[1]).show(&mut cols[1],|ui|{ui.label(RichText::new("X11 display").size(17.).strong());let display=std::env::var("DISPLAY").unwrap_or_else(|_|"No DISPLAY configured".into());ui.label(RichText::new(display).monospace());ui.label(RichText::new("SSH can forward X11 to an available display. Start a packaged Xwayland display in Servers on supported installations.").color(muted(ui)));});});
+        ui.columns(2,|cols|{surface(&cols[0]).show(&mut cols[0],|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("SSH keys").size(17.)));ui.label(RichText::new("Create or import key bundles, inspect fingerprints, and manage system or TermCraft-owned agent identities.").color(muted(ui)));if ui.button("SSH keys and agents…").clicked(){self.ssh_keys.open=true;}});surface(&cols[1]).show(&mut cols[1],|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("X11 display").size(17.)));let display=std::env::var("DISPLAY").unwrap_or_else(|_|"No DISPLAY configured".into());ui.label(RichText::new(display).monospace());ui.label(RichText::new("SSH can forward X11 to an available display. Start a packaged Xwayland display in Servers on supported installations.").color(muted(ui)));});});
         ui.add_space(18.);
         runtime_providers(ui);
+
+        });
     }
     pub(super) fn start_tool(&mut self, name: &str, program: &str, args: Vec<String>) {
         let program = connection::find_program(program)
@@ -1445,7 +1481,8 @@ impl Workspace {
     }
     pub(super) fn appearance_picker(&mut self, ui: &mut Ui) {
         let mut appearance = self.store.preferences.appearance;
-        ComboBox::from_label("Theme")
+        let label = ui.label("Theme");
+        ComboBox::from_id_salt("appearance-theme")
             .width(72.)
             .selected_text(format!("{appearance:?}"))
             .show_ui(ui, |ui| {
@@ -1456,7 +1493,9 @@ impl Workspace {
                 ] {
                     ui.selectable_value(&mut appearance, value, label);
                 }
-            });
+            })
+            .response
+            .labelled_by(label.id);
         if appearance != self.store.preferences.appearance {
             self.store.preferences.appearance = appearance;
             self.apply_appearance(ui.ctx());
@@ -1464,6 +1503,7 @@ impl Workspace {
         }
     }
     pub(super) fn settings_page(&mut self, ui: &mut Ui) {
+        ScrollArea::vertical().id_salt("settings_page").show(ui, |ui| {
         page_heading(
             ui,
             "Workspace settings",
@@ -1474,12 +1514,13 @@ impl Workspace {
                 super::terminal_settings::ProfileEditor::from_preferences(&self.store.preferences),
             );
         }
+        ui.small("New and open terminals inherit the global profile for each option without an override. Saved-session overrides apply when the session opens. Changes made in an open tab last for that tab.");
         ui.label("Paste and session safety");
         ui.checkbox(
             &mut self.store.preferences.paste.confirm_multiline,
             "Confirm multiline paste",
         );
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Delay between pasted lines");
             ui.add(
                 DragValue::new(&mut self.store.preferences.paste.line_delay_ms)
@@ -1496,7 +1537,7 @@ impl Workspace {
             &mut self.store.preferences.clipboard.copy_on_select,
             "Copy selection automatically on release",
         );
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Right click");
             ui.selectable_value(
                 &mut self.store.preferences.clipboard.right_click,
@@ -1509,9 +1550,9 @@ impl Workspace {
                 "Paste (Shift-right-click for menu)",
             );
         });
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Word delimiters");
-            ui.text_edit_singleline(&mut self.store.preferences.clipboard.word_delimiters);
+            ui.add(crate::ui::fluent::singleline(&mut self.store.preferences.clipboard.word_delimiters));
         });
         ui.small("Alt-drag selects a rectangle. Ctrl+Shift+C copies; Ctrl+Shift+V pastes. Hold Shift to select when a terminal program uses the mouse. Save preferences below to keep these options.");
         if ui.button("Configure terminal highlighting").clicked() {
@@ -1519,13 +1560,13 @@ impl Workspace {
                 &self.store.preferences,
             ));
         }
-        ScrollArea::vertical().show(ui,|ui|{
+
             surface(ui).show(ui, |ui| {
-                ui.heading(RichText::new("Appearance").size(20.));
+                ui.label(fluent::emphasized(ui.ctx(), RichText::new("Appearance").size(18.)));
                 self.appearance_picker(ui);
                 let reduced_motion = ui.checkbox(
                     &mut self.store.preferences.reduced_motion,
-                    "Reduce interface motion",
+                    "Reduce interface transitions",
                 );
                 let high_contrast = ui.checkbox(
                     &mut self.store.preferences.high_contrast,
@@ -1537,13 +1578,14 @@ impl Workspace {
                 }
             });
             ui.add_space(8.);
-            surface(ui).show(ui,|ui|{ui.label(RichText::new("Terminal").size(18.).strong());Grid::new("prefs").num_columns(2).spacing([24.,17.]).show(ui,|ui|{ui.label("Scrollback lines");ui.add(DragValue::new(&mut self.store.preferences.scrollback).range(100..=360000));ui.end_row();ui.label("History memory");ui.label("128 MiB per terminal; older lines expire when either limit is reached");ui.end_row();ui.label("SSH keepalive interval");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.keepalive_secs).range(1..=86400).suffix("s"));ui.end_row();ui.label("SSH connect timeout");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.connect_timeout_secs).range(1..=3600).suffix("s"));ui.end_row();field(ui,"Default shell executable",&mut self.store.preferences.shell,"Use the system default");field(ui,"Download folder",&mut self.store.preferences.downloads,"Folder path");});if primary(ui,"Save preferences").clicked(){self.persist();}});ui.add_space(17.);
-   surface(ui).show(ui,|ui|{ui.label(RichText::new("Sessions and backups").size(18.).strong());ui.label(RichText::new("Session settings, folders, tunnels and macros are stored locally. Exported backups contain hostnames and key-file paths, but no passwords.").color(muted(ui)));ui.horizontal(|ui|{
+            surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Terminal").size(18.)));fluent::settings_grid(ui, "prefs", |ui|{ui.label("Scrollback lines");ui.add(DragValue::new(&mut self.store.preferences.scrollback).range(100..=360000));ui.end_row();ui.label("History memory");ui.label("128 MiB per terminal; older lines expire when either limit is reached");ui.end_row();ui.label("SSH keepalive interval");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.keepalive_secs).range(1..=86400).suffix("s"));ui.end_row();ui.label("SSH connect timeout");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.connect_timeout_secs).range(1..=3600).suffix("s"));ui.end_row();field(ui,"Default shell executable",&mut self.store.preferences.shell,"Use the system default");field(ui,"Download folder",&mut self.store.preferences.downloads,"Folder path");});if primary(ui,"Save preferences").clicked(){self.persist();}});ui.add_space(17.);
+   surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Sessions and backups").size(18.)));ui.label(RichText::new("Session settings, folders, tunnels and macros are stored locally. Exported backups contain hostnames and key-file paths, but no passwords.").color(muted(ui)));ui.horizontal_wrapped(|ui|{
     if ui.button("Export workspace").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("termcraft-workspace.json").save_file(){match self.store.save(&p){Ok(())=>self.message("Workspace exported"),Err(e)=>self.message(e)}}}
     if ui.button("Import workspace").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Workspace JSON",&["json"]).pick_file(){match Store::load_bounded(&p, 16 * 1024 * 1024).and_then(|mut imported| { let mut macros = self.store.macros.clone(); macros.append(&mut imported.macros); super::macro_events::validate_library(&macros)?; imported.macros = macros; Ok(imported) }) { Ok(imported) => { self.store.sessions.extend(imported.sessions.into_iter().map(|mut session| {session.id=harbor_workspace::model::new_session_id();session})); self.store.tunnels.extend(imported.tunnels.into_iter().take(5_usize.saturating_sub(self.store.tunnels.len()))); self.store.macros = imported.macros; self.persist(); }, Err(error) => self.message(error) }}}
-   });if !self.store_ok{ui.colored_label(Color32::from_rgb(180,42,42),"The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.settings_load_error=None;self.persist();},Err(e)=>self.message(e.to_string())}}}});
-   ui.add_space(17.);surface(ui).show(ui,|ui|{ui.label(RichText::new("About TermCraft").size(18.).strong());ui.label("An independently written Rust desktop remote workspace with a Fluent-inspired interface.");ui.label(RichText::new("Built with eframe/egui and OpenSSH. No original branding or bundled engines are reused.").size(12.).color(muted(ui)));ui.add_space(5.);ui.label(RichText::new("Original feature parity has not been established. Linux terminal operation is tested; Windows and macOS need platform validation. See Network tools for engine availability and known gaps.").size(12.).color(muted(ui)));});
-  });
+   });if !self.store_ok{ui.colored_label(ui.visuals().error_fg_color,"The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.settings_load_error=None;self.persist();},Err(e)=>self.message(e.to_string())}}}});
+   ui.add_space(17.);surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("About TermCraft").size(18.)));ui.label("An independently written Rust desktop remote workspace with a Fluent-inspired interface.");ui.label(RichText::new("Built with eframe/egui and OpenSSH. No original branding or bundled engines are reused.").size(12.).color(muted(ui)));ui.add_space(5.);ui.label(RichText::new("Original feature parity has not been established. Linux terminal operation is tested; Windows and macOS need platform validation. See Network tools for engine availability and known gaps.").size(12.).color(muted(ui)));});
+
+        });
     }
 }
 pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -> Vec<u8> {
@@ -2216,11 +2258,10 @@ fn field(ui: &mut Ui, label: &str, value: &mut String, hint: &str) {
 }
 pub(super) fn page_heading(ui: &mut Ui, title: &str, description: &str) {
     ui.add_space(20.);
-    ui.label(
-        RichText::new(title)
-            .size(super::fluent::PAGE_TITLE)
-            .strong(),
-    );
+    ui.label(fluent::emphasized(
+        ui.ctx(),
+        RichText::new(title).size(fluent::PAGE_TITLE),
+    ));
     ui.label(RichText::new(description).color(muted(ui)));
     ui.add_space(20.);
 }
@@ -2229,7 +2270,10 @@ fn empty_state(ui: &mut Ui, kind: &str, title: &str, description: &str) {
     ui.vertical_centered(|ui| {
         icon(ui, kind, 42., accent(ui));
         ui.add_space(10.);
-        ui.label(RichText::new(title).size(21.).strong());
+        ui.label(crate::ui::fluent::emphasized(
+            ui.ctx(),
+            RichText::new(title).size(21.),
+        ));
         ui.add_space(5.);
         ui.label(RichText::new(description).color(muted(ui)));
     });

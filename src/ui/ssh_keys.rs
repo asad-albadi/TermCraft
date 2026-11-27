@@ -411,7 +411,7 @@ impl Workspace {
     });
                 });
                 ui.separator();
-                close = ui.button("Close").clicked();
+                close = fluent::dialog_actions(ui, ["Close"], None)[0].clicked();
             },
         );
         close |= response.should_close();

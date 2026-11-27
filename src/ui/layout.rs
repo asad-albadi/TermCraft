@@ -176,14 +176,13 @@ impl Workspace {
                     }
                     ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
                         ui.add(
-                            Label::new(RichText::new(&title).strong().color(if selected {
-                                accent(ui)
-                            } else {
-                                ink(ui)
-                            }))
+                            Label::new(
+                                crate::ui::fluent::emphasized(ui.ctx(), RichText::new(&title))
+                                    .color(if selected { accent(ui) } else { ink(ui) }),
+                            )
                             .truncate(),
                         )
-                        .on_hover_text(&title);
+                        .fluent_hint(&title);
                     });
                 },
             );

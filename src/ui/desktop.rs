@@ -596,15 +596,13 @@ impl Workspace {
 }
 pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     let state = tab.desktop.as_mut().unwrap();
-    ui.horizontal(|ui| {
-        ui.label(RichText::new(&state.message).strong());
-        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-            ui.small(format!("{} · embedded display", tab.session.protocol));
-        });
+    ui.horizontal_wrapped(|ui| {
+        ui.label(fluent::emphasized(ui.ctx(), RichText::new(&state.message)));
+        ui.small(format!("{} · embedded display", tab.session.protocol));
     });
     if state.options.clipboard != harbor_workspace::desktop::rdp_options::ClipboardPolicy::Disabled
     {
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             state.clipboard.controls(ui);
             ui.small(if state.clipboard.ready {
                 "Text clipboard ready · paste with Ctrl+V in the desktop"

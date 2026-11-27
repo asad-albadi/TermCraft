@@ -178,7 +178,8 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         browser.address.clone_from(&state.address);
     }
     ui.add_enabled_ui(!state.closed, |ui| {
-        ui.horizontal(|ui| {
+        let narrow = ui.available_width() < 420.;
+        ui.horizontal_wrapped(|ui| {
             if ui
                 .add_enabled(state.can_back, Button::new("Back"))
                 .clicked()
@@ -198,12 +199,18 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
             } else if ui.button("Reload").clicked() {
                 browser.send(Command::Reload);
             }
+            if narrow {
+                ui.end_row();
+            }
             let response = ui.add(
-                TextEdit::singleline(&mut browser.address)
+                crate::ui::fluent::singleline(&mut browser.address)
                     .id(address_id)
                     .char_limit(8192)
-                    .desired_width((ui.available_width() - 45.).max(90.)),
+                    .desired_width((ui.available_width() - 62.).max(1.)),
             );
+            response.widget_info(|| {
+                WidgetInfo::labeled(WidgetType::TextEdit, response.enabled(), "Website address")
+            });
             browser.address_dirty |= response.changed();
             let go = ui.button("Go");
             let submit = go.clicked()
@@ -218,7 +225,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         });
     });
     if let Some(error) = browser.input_error {
-        ui.add(Label::new(error).truncate());
+        ui.colored_label(ui.visuals().error_fg_color, error);
     } else if state.loading {
         ui.horizontal(|ui| {
             ui.spinner();
@@ -259,7 +266,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
                     (&mut auth.username, "Username", false),
                     (&mut auth.password, "Password", true),
                 ] {
-                    let mut output = TextEdit::singleline(&mut **value)
+                    let mut output = crate::ui::fluent::singleline(&mut **value)
                         .id_salt((tab.id, challenge.id, hint))
                         .hint_text(hint)
                         .password(password)

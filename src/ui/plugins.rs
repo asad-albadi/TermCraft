@@ -150,7 +150,7 @@ impl State {
                 }
             }
             if let Some(job) = &self.job {
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     ui.spinner();
                     let cancelling = job.cancelled.load(Ordering::Acquire);
                     ui.label(if cancelling { "Cancelling…" } else { job.label });
@@ -160,7 +160,7 @@ impl State {
                 });
                 return;
             }
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 if ui.button("Inspect plugin bundle…").clicked() {
                     self.review = None;
                     self.approval = None;
@@ -239,7 +239,7 @@ impl State {
     fn render_item(&mut self, ui: &mut Ui, registry: &PluginRegistry, item: InstalledPlugin) {
         let id = item.manifest.id.clone();
         ui.group(|ui| {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 let status = if item.enabled { "Enabled" } else { "Disabled" };
                 ui.strong(format!("{id} {} · {status}", item.manifest.version));
                 if item.enabled {

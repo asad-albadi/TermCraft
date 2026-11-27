@@ -387,7 +387,7 @@ impl Workspace {
                                         ))
                                         .strong(),
                                     )
-                                    .on_hover_text(format!("Source line {}", entry.location.line));
+                                    .fluent_hint(format!("Source line {}", entry.location.line));
                                     ui.add(
                                         Label::new(format!(
                                             "User: {} · key: {}",

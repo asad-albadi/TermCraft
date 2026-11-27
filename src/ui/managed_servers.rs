@@ -100,8 +100,8 @@ impl Form {
         };
         ui.push_id(name, |ui| {
             surface(ui).show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    ui.label(RichText::new(title).size(18.).strong());
+                ui.horizontal_wrapped(|ui| {
+                    ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new(title).size(18.)));
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                         dot(ui, if state == ServiceState::Running { accent(ui) } else { muted(ui) });
                         ui.label(match state {
@@ -122,7 +122,7 @@ impl Form {
                 ui.add_space(5.);
                 ui.add_enabled_ui(!busy, |ui| self.fields(ui));
                 if let Some(address) = status.as_ref().and_then(|status| status.address).filter(|_| state == ServiceState::Running) {
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         ui.label(RichText::new(address.to_string()).monospace());
                         if ui.button("Copy address").clicked() {
                             ui.ctx().copy_text(address.to_string());
@@ -165,86 +165,90 @@ impl Form {
     }
 
     fn fields(&mut self, ui: &mut Ui) {
-        Grid::new("configuration")
-            .num_columns(2)
-            .spacing([16., 8.])
-            .show(ui, |ui| {
-                if self.protocol == ServiceProtocol::Telnet {
-                    ui.label("Shell executable");
-                    ui.horizontal(|ui| {
-                        ui.add(
-                            TextEdit::singleline(&mut self.executable)
-                                .hint_text("Absolute path")
-                                .desired_width(300.),
-                        );
-                        if ui.button("Browse").clicked() {
-                            if let Some(path) = rfd::FileDialog::new().pick_file() {
-                                self.executable = path.to_string_lossy().into_owned();
-                            }
-                        }
-                    });
-                } else {
-                    ui.label("Shared folder");
-                    ui.horizontal(|ui| {
-                        ui.add(TextEdit::singleline(&mut self.root).desired_width(300.));
-                        if ui.button("Browse").clicked() {
-                            if let Some(path) = rfd::FileDialog::new().pick_folder() {
-                                self.root = path.to_string_lossy().into_owned();
-                            }
-                        }
-                    });
-                }
-                ui.end_row();
-                ui.label("Listen address");
-                ui.add(TextEdit::singleline(&mut self.bind).desired_width(210.));
-                ui.end_row();
-                ui.label("Network access");
-                ui.checkbox(&mut self.allow_non_loopback, "Allow a non-loopback address");
-                ui.end_row();
-                if self.protocol == ServiceProtocol::Ftp {
-                    ui.label("Access");
-                    if ui
-                        .checkbox(&mut self.anonymous, "Allow anonymous sign-in (read-only)")
-                        .changed()
-                        && self.anonymous
-                    {
-                        self.allow_write = false;
-                        self.password.zeroize();
-                    }
-                    ui.end_row();
-                }
-                if self.protocol == ServiceProtocol::Telnet
-                    || (self.protocol == ServiceProtocol::Ftp && !self.anonymous)
-                {
-                    ui.label("Username");
-                    ui.add(TextEdit::singleline(&mut self.username).desired_width(210.));
-                    ui.end_row();
-                    ui.label("Password");
-                    service_password_field(ui, &mut self.password, 210.);
-                    ui.end_row();
-                }
-                if self.protocol != ServiceProtocol::Telnet && !self.anonymous {
-                    ui.label("Permissions");
-                    ui.checkbox(
-                        &mut self.allow_write,
-                        match self.protocol {
-                            ServiceProtocol::Ftp => "Allow uploads, renames and deletes",
-                            ServiceProtocol::Nfs => {
-                                "Allow writes, replacement, renames and deletes"
-                            }
-                            _ => "Allow uploads",
-                        },
+        fluent::settings_grid(ui, "configuration", |ui| {
+            if self.protocol == ServiceProtocol::Telnet {
+                ui.label("Shell executable");
+                ui.horizontal_wrapped(|ui| {
+                    ui.add(
+                        crate::ui::fluent::singleline(&mut self.executable)
+                            .hint_text("Absolute path")
+                            .desired_width(ui.available_width().clamp(1., 300.)),
                     );
-                    ui.end_row();
+                    if ui.button("Browse").clicked() {
+                        if let Some(path) = rfd::FileDialog::new().pick_file() {
+                            self.executable = path.to_string_lossy().into_owned();
+                        }
+                    }
+                });
+            } else {
+                ui.label("Shared folder");
+                ui.horizontal_wrapped(|ui| {
+                    ui.add(
+                        crate::ui::fluent::singleline(&mut self.root)
+                            .desired_width(ui.available_width().clamp(1., 300.)),
+                    );
+                    if ui.button("Browse").clicked() {
+                        if let Some(path) = rfd::FileDialog::new().pick_folder() {
+                            self.root = path.to_string_lossy().into_owned();
+                        }
+                    }
+                });
+            }
+            ui.end_row();
+            ui.label("Listen address");
+            ui.add(
+                crate::ui::fluent::singleline(&mut self.bind)
+                    .desired_width(ui.available_width().clamp(1., 210.)),
+            );
+            ui.end_row();
+            ui.label("Network access");
+            ui.checkbox(&mut self.allow_non_loopback, "Allow a non-loopback address");
+            ui.end_row();
+            if self.protocol == ServiceProtocol::Ftp {
+                ui.label("Access");
+                if ui
+                    .checkbox(&mut self.anonymous, "Allow anonymous sign-in (read-only)")
+                    .changed()
+                    && self.anonymous
+                {
+                    self.allow_write = false;
+                    self.password.zeroize();
                 }
-                ui.label("Stop after");
+                ui.end_row();
+            }
+            if self.protocol == ServiceProtocol::Telnet
+                || (self.protocol == ServiceProtocol::Ftp && !self.anonymous)
+            {
+                ui.label("Username");
                 ui.add(
-                    DragValue::new(&mut self.lifetime)
-                        .range(0..=86400)
-                        .suffix(" seconds (0 = until stopped)"),
+                    crate::ui::fluent::singleline(&mut self.username)
+                        .desired_width(ui.available_width().clamp(1., 210.)),
                 );
                 ui.end_row();
-            });
+                let label = ui.label("Password");
+                service_password_field(ui, &mut self.password, 210.).labelled_by(label.id);
+                ui.end_row();
+            }
+            if self.protocol != ServiceProtocol::Telnet && !self.anonymous {
+                ui.label("Permissions");
+                ui.checkbox(
+                    &mut self.allow_write,
+                    match self.protocol {
+                        ServiceProtocol::Ftp => "Allow uploads, renames and deletes",
+                        ServiceProtocol::Nfs => "Allow writes, replacement, renames and deletes",
+                        _ => "Allow uploads",
+                    },
+                );
+                ui.end_row();
+            }
+            ui.label("Stop after");
+            ui.add(
+                DragValue::new(&mut self.lifetime)
+                    .range(0..=86400)
+                    .suffix(" seconds (0 = until stopped)"),
+            );
+            ui.end_row();
+        });
     }
 
     fn start(&mut self, supervisor: &ServiceSupervisor) {
@@ -310,10 +314,10 @@ pub(super) fn service_password_field(ui: &mut Ui, password: &mut String, width: 
         state.clear_undoer();
         state.store(ui.ctx(), id);
     }
-    let response = TextEdit::singleline(password)
+    let response = crate::ui::fluent::singleline(password)
         .id(id)
         .password(true)
-        .desired_width(width)
+        .desired_width(width.min(ui.available_width()).max(1.))
         .show(ui)
         .response
         .response;

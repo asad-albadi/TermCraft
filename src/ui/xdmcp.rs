@@ -181,7 +181,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
         }
         ui.horizontal_wrapped(|ui| {
             ui.label("Local interface IPv4");
-            ui.text_edit_singleline(&mut state.interface);
+            ui.add(crate::ui::fluent::singleline(&mut state.interface));
             ui.label("Prefix");
             ui.add(DragValue::new(&mut state.prefix).range(16..=30));
         });
@@ -288,7 +288,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
         }
     }
     if !state.error.is_empty() {
-        ui.colored_label(Color32::from_rgb(180, 42, 42), &state.error);
+        ui.colored_label(ui.visuals().error_fg_color, &state.error);
     }
     ui.small(format!(
         "Selected endpoint: {}",
@@ -345,7 +345,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 "Default; e.g. HDMI-1"
             };
             if ui
-                .add(TextEdit::singleline(&mut monitor).hint_text(monitor_hint))
+                .add(crate::ui::fluent::singleline(&mut monitor).hint_text(monitor_hint))
                 .changed()
             {
                 s.xdmcp_options.monitor = if monitor.is_empty() {
@@ -358,8 +358,8 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
         ui.horizontal_wrapped(|ui| {
         ui.label("Session keyboard");
         let keyboard = &mut s.xdmcp_options.keyboard;
-        ui.add(TextEdit::singleline(keyboard).hint_text("Host keyboard").desired_width(120.0))
-            .on_hover_text("Enter an installed XKB layout ID, such as us, de, or fr. Leave empty to inherit the host keyboard.");
+        ui.add(crate::ui::fluent::singleline(keyboard).hint_text("Host keyboard").desired_width(120.0))
+            .fluent_hint("Enter an installed XKB layout ID, such as us, de, or fr. Leave empty to inherit the host keyboard.");
         if !keyboard.is_empty() && ui.button("Use host keyboard").clicked() {
             keyboard.clear();
         }
@@ -422,7 +422,10 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 .unwrap_or_default();
             ui.horizontal_wrapped(|ui| {
                 ui.label("Parent Xauthority (blank: inherited)");
-                if ui.text_edit_singleline(&mut authority).changed() {
+                if ui
+                    .add(crate::ui::fluent::singleline(&mut authority))
+                    .changed()
+                {
                     s.xdmcp_options.clipboard_authority = if authority.is_empty() {
                         None
                     } else {
@@ -441,7 +444,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     ui.horizontal_wrapped(|ui| {
         ui.label("Advertised local IPv4");
         ui.add(
-            TextEdit::singleline(&mut state.advertise).hint_text(if native_macos {
+            crate::ui::fluent::singleline(&mut state.advertise).hint_text(if native_macos {
                 "Automatic route address"
             } else {
                 "Reachable non-loopback local IPv4"

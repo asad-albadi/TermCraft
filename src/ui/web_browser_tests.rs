@@ -236,6 +236,31 @@ fn wait_for_browser(mut condition: impl FnMut() -> bool, message: &str) {
 }
 
 #[test]
+fn narrow_browser_wraps_address_and_go_without_losing_input_focus() {
+    let Some(_slot) = chromium_fixture_slot() else {
+        return;
+    };
+    let fixture = fixture::Fixture::http(|_| fixture::Response::html("<title>Owned page</title>"));
+    let (ctx, _root, mut w) = owned_workspace();
+    let tab = test_tab(&mut w, fixture.origin.clone());
+    let size = vec2(300., 380.);
+    render_browser_at(&ctx, tab, size, vec![], Some(true));
+    let mut out = browser_output(&ctx, tab, size, vec![], Some(true));
+    out.textures_delta.clear();
+    let back = crate::ui::gui_tests::shell_text_position(&out, "Back");
+    let go = crate::ui::gui_tests::shell_text_position(&out, "Go");
+    assert!(go.x < size.x && go.y > back.y + 16.);
+    render_browser_at(&ctx, tab, size, vec![Event::Text("/narrow".into())], None);
+    assert!(
+        tab.web_browser
+            .as_ref()
+            .unwrap()
+            .address
+            .contains("/narrow")
+    );
+}
+
+#[test]
 fn embedded_browser_address_reconciles_redirect_after_editing_blurs() {
     let Some(_chromium_slot) = chromium_fixture_slot() else {
         return;

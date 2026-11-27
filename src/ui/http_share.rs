@@ -100,7 +100,7 @@ impl Workspace {
             );
             ui.small("Clients send Authorization: Bearer TOKEN. HTTP is not encrypted; use a trusted connection or a TLS reverse proxy.");
         }
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Request deadline");
             ui.add(
                 DragValue::new(&mut self.http_request_timeout)
