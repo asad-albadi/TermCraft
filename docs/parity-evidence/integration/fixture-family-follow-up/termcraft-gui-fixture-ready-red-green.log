@@ -1,0 +1,7 @@
+RED control: READY-only predicate proceeded before capability negotiation
+GREEN: exact shared wait requires marker plus mode negotiation
+
+thread 'main' (63392) panicked at /tmp/termcraft-gui-fixture-ready-check.rs:19:9:
+owned fixture "owned-two" did not reach READY and bracketed paste: running=true, error=fixture diagnostic, screen="READY"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+GREEN: faulty capability is rejected with per-child state at original deadline

@@ -1,0 +1,18 @@
+
+running 1 test
+
+thread '<unnamed>' (63570) panicked at /tmp/termcraft-deadline-component/deadline_tests.rs:237:5:
+client did not finish at its original deadline
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'x11::xdmcp_clipboard::deadline_tests::recovery_initializer_retries_share_original_deadline' (63569) panicked at /tmp/termcraft-deadline-component/deadline_tests.rs:549:34:
+called `Result::unwrap()` on an `Err` value: Any { .. }
+test x11::xdmcp_clipboard::deadline_tests::recovery_initializer_retries_share_original_deadline ... FAILED
+
+failures:
+
+failures:
+    x11::xdmcp_clipboard::deadline_tests::recovery_initializer_retries_share_original_deadline
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.30s
+

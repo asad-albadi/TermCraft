@@ -12,6 +12,32 @@ pub(super) fn owned_workspace() -> (Context, tempfile::TempDir, Workspace) {
     let w = Workspace::new_context(&ctx, None, root.path().to_owned());
     (ctx, root, w)
 }
+/// Wait for a real child acknowledgement and any terminal mode it negotiated.
+/// Callers keep their original absolute deadline, including multi-tab fixtures.
+#[cfg(unix)]
+pub(super) fn wait_for_fixture(
+    tab: &mut TerminalTab,
+    deadline: Instant,
+    expected: &str,
+    ready: impl Fn(&TerminalTab) -> bool,
+) {
+    loop {
+        tab.poll();
+        if ready(tab) {
+            return;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "owned fixture {:?} did not reach {expected}: running={}, error={}, screen={:?}",
+            tab.session.name,
+            tab.running(),
+            tab.error,
+            tab.screen.plain()
+        );
+        std::thread::sleep(Duration::from_millis(5));
+    }
+}
+
 #[cfg(unix)]
 pub(super) fn raw_terminal(w: &mut Workspace, name: &str) -> u64 {
     // Match the provisioned endpoint interpreter, including setup-python on CI,
@@ -19,17 +45,12 @@ pub(super) fn raw_terminal(w: &mut Workspace, name: &str) -> u64 {
     w.start_with_launch(Session{name:name.into(),protocol:"Local".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"python3".into(),args:vec!["-I".into(),"-c".into(),"import os,tty\ntty.setraw(0)\nos.write(1,b'\\x1b[?2004hREADY')\nwhile True:\n data=os.read(0,32768)\n if not data: break\n os.write(1,b'\\r\\nCAP:'+data.hex().encode()+b'\\r\\n')".into()],directory:None}));
     let index = w.active;
     let deadline = Instant::now() + Duration::from_secs(3);
-    while !w.tabs[index].screen.plain().contains("READY") {
-        w.tabs[index].poll();
-        assert!(
-            Instant::now() < deadline,
-            "owned Python PTY did not become ready: running={}, error={}, screen={:?}",
-            w.tabs[index].running(),
-            w.tabs[index].error,
-            w.tabs[index].screen.plain()
-        );
-        std::thread::sleep(Duration::from_millis(5));
-    }
+    wait_for_fixture(
+        &mut w.tabs[index],
+        deadline,
+        "READY and bracketed paste",
+        |tab| tab.screen.plain().contains("READY") && tab.screen.bracketed_paste,
+    );
     w.tabs[index].id
 }
 #[cfg(unix)]
@@ -129,11 +150,9 @@ fn output_bursts_share_one_work_budget_and_keep_close_cancel_responsive() {
         w.start_with_launch(Session{name:name.into(),protocol:"Local".into(),..Default::default()},Some(connection::Launch{rdp_profile:None,program:"python3".into(),args:vec!["-I".into(),"-c".into(),"import os,tty\ntty.setraw(0)\nos.write(1,b'READY')\nos.read(0,1)\nos.write(1,b'ordinary owned log line\\r\\n'*50000)\nos.read(0,1)".into()],directory:None}));
         let index = w.active;
         let deadline = Instant::now() + Duration::from_secs(2);
-        while !w.tabs[index].screen.plain().contains("READY") {
-            w.tabs[index].poll();
-            assert!(Instant::now() < deadline);
-            std::thread::sleep(Duration::from_millis(5));
-        }
+        wait_for_fixture(&mut w.tabs[index], deadline, "READY", |tab| {
+            tab.screen.plain().contains("READY")
+        });
     }
     let initial: Vec<_> = w.tabs.iter().map(|t| t.codec.source_bytes()).collect();
     for t in &mut w.tabs {
@@ -233,11 +252,16 @@ fn refused_mouse_release_is_retried_after_transport_admission_recovers() {
         }),
     );
     let deadline = Instant::now() + Duration::from_secs(3);
-    while !w.tabs[0].screen.plain().contains("READY") {
-        w.tabs[0].poll();
-        assert!(Instant::now() < deadline);
-        std::thread::sleep(Duration::from_millis(5));
-    }
+    wait_for_fixture(
+        &mut w.tabs[0],
+        deadline,
+        "READY and SGR mouse mode",
+        |tab| {
+            tab.screen.plain().contains("READY")
+                && tab.screen.mouse_mode().enabled()
+                && tab.screen.mouse_mode().sgr
+        },
+    );
     let route = |ctx: &Context, w: &mut Workspace, events: Vec<Event>| {
         let mut output = ctx.run_ui(
             RawInput {
