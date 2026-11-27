@@ -411,15 +411,31 @@ pub(super) mod tests {
     }
 
     pub(in crate::ui) fn click(ctx: &Context, workspace: &mut Workspace, label: &str) {
+        ctx.enable_accesskit();
         let target = |output: &FullOutput| {
+            let update = output.platform_output.accesskit_update.as_ref()?;
+            let (_, node) = update.nodes.iter().find(|(_, node)| {
+                node.role() == egui::accesskit::Role::Button
+                    && node.label() == Some(label)
+                    && !node.is_disabled()
+            })?;
+            let button = node.bounds()?;
+            let bounds = Rect::from_min_max(
+                pos2(button.x0 as f32, button.y0 as f32),
+                pos2(button.x1 as f32, button.y1 as f32),
+            );
             output.shapes.iter().find_map(|shape| {
-                label_position(&shape.shape, label).filter(|point| shape.clip_rect.contains(*point))
+                let visible = bounds.intersect(shape.clip_rect);
+                label_position(&shape.shape, label).filter(|point| visible.contains(*point))?;
+                Some(visible)
             })
         };
+        // The first pass measures the service grids. Use their arranged bounds.
+        frame(ctx, workspace, vec![]);
         let mut output = frame(ctx, workspace, vec![]);
-        let mut pos = target(&output);
+        let mut button = target(&output);
         for offset in [-700., -700., 700., 700., 700.] {
-            if pos.is_some() {
+            if button.is_some() {
                 break;
             }
             frame(
@@ -439,9 +455,9 @@ pub(super) mod tests {
             for _ in 0..40 {
                 output = frame(ctx, workspace, vec![]);
             }
-            pos = target(&output);
+            button = target(&output);
         }
-        let pos = pos.unwrap_or_else(|| {
+        let button = button.unwrap_or_else(|| {
             let labels: Vec<_> = output
                 .shapes
                 .iter()
@@ -452,7 +468,13 @@ pub(super) mod tests {
                 .collect();
             panic!("Servers UI did not paint {label}. Painted text: {labels:?}")
         });
-        frame(ctx, workspace, vec![Event::PointerMoved(pos)]);
+        let pos = button.center();
+        let hovered = frame(ctx, workspace, vec![Event::PointerMoved(pos)]);
+        assert_eq!(
+            target(&hovered),
+            Some(button),
+            "{label} moved before pointer press"
+        );
         for pressed in [true, false] {
             frame(
                 ctx,
