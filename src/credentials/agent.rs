@@ -242,14 +242,14 @@ impl AgentManager {
    runtime.block_on(async move{
     let name=match name.to_ns_name::<GenericNamespaced>(){Ok(n)=>n,Err(_)=>{let _=tx.send(Err("Invalid agent endpoint".into()));return}};
     let options=ListenerOptions::new().name(name);
-    #[cfg(unix)]let options={use interprocess::os::unix::local_socket::ListenerOptionsExt;options.mode(0o600)};
+    #[cfg(all(unix, not(target_os = "macos")))]let options={use interprocess::os::unix::local_socket::ListenerOptionsExt;options.mode(0o600)};
     #[cfg(windows)]let options={use interprocess::os::windows::{local_socket::ListenerOptionsExt,security_descriptor::SecurityDescriptor};let value=widestring::U16CString::from_str("D:P(A;;GA;;;OW)").unwrap();match SecurityDescriptor::deserialize(&value){Ok(sd)=>options.security_descriptor(sd),Err(_)=>{let _=tx.send(Err("Could not protect agent endpoint".into()));return}}};
     let listener=match options.create_tokio(){Ok(l)=>l,Err(_)=>{let _=tx.send(Err("Could not listen on the owned agent endpoint".into()));return}};
     let active=Arc::new(AtomicUsize::new(0));
     let incoming=futures::stream::unfold((listener,active),|(listener,active)|async move{
      loop{let stream=match listener.accept().await{Ok(s)=>s,Err(e)=>return Some((Err(e),(listener,active)))};
       #[cfg(unix)]if stream.peer_creds().ok().and_then(|p|p.euid())!=Some(unsafe{libc::geteuid()}){continue}
-      if active.try_update(Ordering::AcqRel,Ordering::Acquire,|n|if n<32{Some(n+1)}else{None}).is_err(){continue}
+      if active.fetch_update(Ordering::AcqRel,Ordering::Acquire,|n|if n<32{Some(n+1)}else{None}).is_err(){continue}
       return Some((Ok(Counted{stream,active:active.clone()}),(listener,active)));
      }
     });

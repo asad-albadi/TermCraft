@@ -32,6 +32,7 @@ impl Echo {
         let worker = thread::spawn(move || {
             while !s.load(Ordering::Acquire) {
                 if let Ok((mut socket, peer)) = listener.accept() {
+                    socket.set_nonblocking(false).unwrap();
                     socket
                         .set_read_timeout(Some(Duration::from_secs(2)))
                         .unwrap();
@@ -285,8 +286,14 @@ fn local_remote_dynamic_tunnels_carry_exact_payload() {
 }
 #[test]
 fn explicit_nondefault_loopback_bind() {
+    // Darwin does not implicitly configure 127.0.0.2 as an interface address.
+    let address = if cfg!(target_os = "macos") {
+        "::1"
+    } else {
+        "127.0.0.2"
+    };
     for mode in ["Local", "Remote", "Dynamic"] {
-        roundtrip(mode, "127.0.0.2");
+        roundtrip(mode, address);
     }
 }
 #[test]

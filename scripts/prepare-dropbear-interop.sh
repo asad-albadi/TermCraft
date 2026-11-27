@@ -33,8 +33,10 @@ printf '%s\n' "$interop_owner" > "$interop_parent/.termcraft-dropbear-owner"
 interop_stage=
 interop_publishlink=
 interop_published=no
+interop_gpg=$(mktemp -d /tmp/tc-dropbear-gpg.XXXXXXXX)
 interop_cleanup() {
-    gpgconf --homedir "$interop_parent/gnupg" --kill all >/dev/null 2>&1 || true
+    gpgconf --homedir "$interop_gpg" --kill all >/dev/null 2>&1 || true
+    rm -rf -- "$interop_gpg"
     if [ -n "$interop_publishlink" ]; then rm -f -- "$interop_publishlink"; fi
     if [ "$interop_published" = no ] && [ -n "$interop_stage" ]; then rm -rf -- "$interop_stage"; fi
 }
@@ -44,13 +46,10 @@ for interop_file in dropbear-2026.94.tar.bz2 dropbear-2026.94.tar.bz2.asc dropbe
     curl -fL --max-time 90 "$interop_url/$interop_file" -o "$interop_parent/$interop_file"
 done
 printf '%s  %s\n' e098034a843699200c8c977a991fff73159735bf795d5f72ef672c41a6b1ae81 "$interop_parent/dropbear-2026.94.tar.bz2" | sha256sum -c -
-mkdir -p "$interop_parent/gnupg"
-chmod 700 "$interop_parent/gnupg"
-
-gpg --batch --homedir "$interop_parent/gnupg" --import "$interop_parent/dropbear-key-2015.asc" > "$interop_parent/signature.log" 2>&1
-gpg --batch --homedir "$interop_parent/gnupg" --status-fd 1 --verify "$interop_parent/dropbear-2026.94.tar.bz2.asc" "$interop_parent/dropbear-2026.94.tar.bz2" >> "$interop_parent/signature.log" 2>&1
+gpg --batch --homedir "$interop_gpg" --import "$interop_parent/dropbear-key-2015.asc" > "$interop_parent/signature.log" 2>&1
+gpg --batch --homedir "$interop_gpg" --status-fd 1 --verify "$interop_parent/dropbear-2026.94.tar.bz2.asc" "$interop_parent/dropbear-2026.94.tar.bz2" >> "$interop_parent/signature.log" 2>&1
 grep -q 'VALIDSIG F7347EF2EE2E07A267628CA944931494F29C6773 ' "$interop_parent/signature.log"
-gpgconf --homedir "$interop_parent/gnupg" --kill all
+gpgconf --homedir "$interop_gpg" --kill all
 # Build only from a new extraction of the archive just verified above. No file
 # from a prior source/object tree is executed or reused, even on repeated runs.
 mkdir -p "$interop_parent/.stages"
@@ -67,6 +66,10 @@ fi
 # Prevent C-string injection in the one explicit configured subsystem path.
 case "$interop_sftp" in *[!a-zA-Z0-9_./+-]*) echo 'Unsupported SFTP subsystem path characters' >&2; exit 1;; esac
 printf '#define SFTPSERVER_PATH "%s"\n#define DROPBEAR_SVR_PASSWORD_AUTH 0\n#define DROPBEAR_SVR_PAM_AUTH 0\n' "$interop_sftp" > "$interop_build/localoptions.h"
+if [ "$(uname -s)" = Darwin ]; then
+    # Darwin lacks setresgid. Switch in the session child and omit Unix socket forwarding.
+    printf '#define DROPBEAR_SVR_DROP_PRIVS 0\n#define DROPBEAR_SVR_LOCALSTREAMFWD 0\n#define DROPBEAR_SVR_REMOTESTREAMFWD 0\n' >> "$interop_build/localoptions.h"
+fi
 cd "$interop_build"
 ./configure --disable-zlib --disable-syslog --disable-shadow --disable-lastlog --disable-utmp --disable-utmpx --disable-wtmp --disable-wtmpx --disable-loginfunc --disable-pututline --disable-pututxline --enable-bundled-libtom > "$interop_parent/configure.log" 2>&1
 make -j2 PROGRAMS='dropbear dropbearkey' > "$interop_parent/build.log" 2>&1

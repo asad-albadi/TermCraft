@@ -3,6 +3,9 @@ mod clipboard;
 #[path = "../../../../engines/rdp/src/clipboard.rs"]
 mod clipboard_backend;
 mod config;
+#[path = "../../../../tests/support/tls.rs"]
+#[allow(dead_code)]
+mod tls_fixture;
 use ironrdp::cliprdr as clipapi;
 use ironrdp::core as clipcore;
 use ironrdp::{
@@ -388,36 +391,9 @@ fn fixture() -> anyhow::Result<()> {
     rustls::crypto::ring::default_provider()
         .install_default()
         .map_err(|_| anyhow::anyhow!("provider already installed"))?;
-    let cert = root.join("cert.pem");
-    let key = root.join("key.pem");
-    let status = std::process::Command::new("openssl")
-        .args([
-            "req",
-            "-x509",
-            "-newkey",
-            "rsa:2048",
-            "-nodes",
-            "-days",
-            "1",
-            "-subj",
-            "/CN=localhost",
-            "-addext",
-            "subjectAltName=DNS:localhost",
-            "-addext",
-            "basicConstraints=critical,CA:FALSE",
-            "-keyout",
-        ])
-        .arg(&key)
-        .arg("-out")
-        .arg(&cert)
-        .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::piped())
-        .output()?;
-    assert!(
-        status.status.success(),
-        "TLS fixture certificate generation failed: {}",
-        String::from_utf8_lossy(&status.stderr)
-    );
+    tls_fixture::prepare_localhost_identity(&root);
+    let cert = root.join("server.pem");
+    let key = root.join("server.key");
     let cursor = args.get(4).is_some_and(|s| s == "cursor");
     let resize = args.get(4).is_some_and(|s| s == "resize");
     let shrink = args.get(4).is_some_and(|s| s == "shrink");

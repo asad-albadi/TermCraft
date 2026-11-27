@@ -1,0 +1,28 @@
+..E
+======================================================================
+ERROR: test_release_archive_includes_both_engines_and_declares_host_libraries (__main__.IperfStaging.test_release_archive_includes_both_engines_and_declares_host_libraries)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/work/tests/packaging_iperf.py", line 52, in test_release_archive_includes_both_engines_and_declares_host_libraries
+    archive=release.package_release('linux',root/'out',app,helper,iperf_runtime=ROOT)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/scripts/package-release.py", line 802, in package_release
+    linked[entry.as_posix()] = native_libraries(regular_source(resources, entry), "linux")
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/scripts/package-release.py", line 328, in native_libraries
+    raise ValueError(f"Missing linked libraries for {path.name}:\n{linked}")
+ValueError: Missing linked libraries for iperf2:
+/tmp/tmpd_txafif/out/.package-u9n4khda/TermCraft-0.1.0-linux-x86_64/runtime/linux-x86_64/iperf2: /lib/x86_64-linux-gnu/libm.so.6: version `GLIBC_2.43' not found (required by /tmp/tmpd_txafif/out/.package-u9n4khda/TermCraft-0.1.0-linux-x86_64/runtime/linux-x86_64/iperf2)
+/tmp/tmpd_txafif/out/.package-u9n4khda/TermCraft-0.1.0-linux-x86_64/runtime/linux-x86_64/iperf2: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.38' not found (required by /tmp/tmpd_txafif/out/.package-u9n4khda/TermCraft-0.1.0-linux-x86_64/runtime/linux-x86_64/iperf2)
+	linux-vdso.so.1 (0x00007fd185302000)
+	libstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fd185089000)
+	libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fd184fa9000)
+	libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fd184f89000)
+	libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd184da7000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007fd185304000)
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.208s
+
+FAILED (errors=1)

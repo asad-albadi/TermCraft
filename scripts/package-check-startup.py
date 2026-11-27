@@ -5,16 +5,13 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import platform
 import shutil
 import socket
-import stat
 import subprocess
-import tarfile
 import tempfile
 import time
-import zipfile
 
 
 # Load from this script's directory even when imported by file-location fixtures.
@@ -24,6 +21,7 @@ _archive_spec = importlib.util.spec_from_file_location(
 _archive_module = importlib.util.module_from_spec(_archive_spec)
 _archive_spec.loader.exec_module(_archive_module)
 extract_tar = _archive_module.extract_tar
+extract_zip = _archive_module.extract_zip
 
 def windows_software_gl_files():
     fixture = Path(__file__).resolve().parents[1] / "tests/windows-software-gl.json"
@@ -34,19 +32,7 @@ def extract(archive, directory):
     if archive.name.endswith(".tar.gz"):
         extract_tar(archive, directory)
     else:
-        with zipfile.ZipFile(archive) as bundle:
-            seen = set()
-            for member in bundle.infolist():
-                name = PurePosixPath(member.filename)
-                if name.is_absolute() or ".." in name.parts or "\\" in member.filename or ":" in member.filename or name in seen:
-                    raise ValueError(f"Invalid archive member: {member.filename}")
-                seen.add(name)
-                mode = member.external_attr >> 16
-                if not (stat.S_ISREG(mode) or member.is_dir()):
-                    raise ValueError(f"Unexpected archive member type: {member.filename}")
-                extracted = Path(bundle.extract(member, directory))
-                if not member.is_dir():
-                    extracted.chmod(mode & 0o777)
+        extract_zip(archive, directory)
 
 
 def sha256(path):
@@ -61,10 +47,14 @@ def verify(root, manifest_path):
         raise ValueError("The startup check must run on the package's native platform.")
     actual = {
         path.relative_to(root).as_posix(): sha256(path)
-        for path in root.rglob("*") if path.is_file() and path != manifest_path
+        for path in root.rglob("*") if not path.is_symlink() and path.is_file() and path != manifest_path
     }
     if actual != manifest["files"]:
         raise ValueError("Package files differ from the manifest.")
+    links = {path.relative_to(root).as_posix(): os.readlink(path)
+             for path in root.rglob("*") if path.is_symlink()}
+    if links != manifest.get("symlinks", {}):
+        raise ValueError("Package links differ from the manifest.")
     return host, manifest
 
 
@@ -94,6 +84,26 @@ def linux_rdp_helper_matches(image, expected_digest):
             )
     except OSError:
         return False
+
+
+def macos_rdp_helper_matches(parent_pid, expected_digest):
+    import ctypes
+
+    libproc = ctypes.CDLL("/usr/lib/libproc.dylib")
+    libproc.proc_pidpath.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_uint32]
+    libproc.proc_pidpath.restype = ctypes.c_int
+    children = subprocess.run(
+        ["/usr/bin/pgrep", "-P", str(parent_pid)],
+        text=True, capture_output=True, timeout=5,
+    )
+    for pid in children.stdout.split():
+        path = ctypes.create_string_buffer(4096)
+        if libproc.proc_pidpath(int(pid), path, len(path)) <= 0:
+            continue
+        executable = Path(os.fsdecode(path.value))
+        if executable.name == "termcraft-rdp-engine" and sha256(executable) == expected_digest:
+            return True
+    return False
 
 
 def windows_rdp_child(parent_pid, helper, expected_digest, software_gl=False):
@@ -185,6 +195,9 @@ def rdp_session_probe(executable, helper, helper_digest, isolated, environment, 
                                 for pid in children
                             ):
                                 raise ValueError("RDP session did not start the verified package helper.")
+                        elif platform.system() == "Darwin":
+                            if not macos_rdp_helper_matches(app.pid, helper_digest):
+                                raise ValueError("RDP session did not start the verified macOS helper.")
             finally:
                 if app.poll() is None:
                     app.terminate()
@@ -261,7 +274,8 @@ def smoke(archive, evidence, display, software_gl=None):
                 if json.loads(result[5:end]) != {"Ready": {"version": 1}}:
                     raise ValueError("RDP helper returned an unexpected handshake.")
         screenshot = evidence / "startup.png"
-        run([executable, "--data-dir", isolated / "workspace data", "--screenshot", screenshot],
+        launcher = bindir / "termcraft-desktop-launcher" if host == "macos" else executable
+        run([launcher, "--data-dir", isolated / "workspace data", "--screenshot", screenshot],
             isolated, environment, evidence / "startup.log")
         with Image.open(screenshot) as image:
             stats = ImageStat.Stat(image.convert("RGB"))
@@ -283,7 +297,7 @@ def smoke(archive, evidence, display, software_gl=None):
             "rdp_workspace": (
                 "isolated LOCALAPPDATA/Harbor default" if host == "windows" else "explicit isolated workspace"
             ),
-            "rdp_helper_child_location_verified": host in ("linux", "windows"),
+            "rdp_helper_child_location_verified": host in ("linux", "windows", "macos"),
             "windows_software_gl_fixture": windows_software_gl_files() if software_gl else None,
         }, indent=2) + "\n")
 

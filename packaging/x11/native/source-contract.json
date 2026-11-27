@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "qualification": "unqualified source-engineered native providers; no approved private executable or dependency inventory pin yet",
+  "qualification": "Apple Silicon macOS windowed XQuartz approved for the exact pinned inventory; Windows runtime remains unqualified",
   "redistribution_approved": false,
   "windows": {
     "artifact_id": "vcxsrv-21.1.16.1-termcraft-private1-windows-x86_64",
@@ -25,27 +25,48 @@
     ]
   },
   "macos": {
-    "artifact_id": "xquartz-2.8.6-termcraft-private1-macos-universal",
+    "artifact_id": "xquartz-2.8.6-termcraft-private1-macos-arm64",
     "upstream_archive_sha256": "9ac35a505095bfbd3009c3b4772f0c6421e2f79c4210ab908459270d1c447909",
     "distribution_source_url": "https://codeload.github.com/XQuartz/XQuartz/tar.gz/db446ed66b76f386b815e8b095beb56aa368424a",
     "distribution_source_sha256": "d534c1dbb9736e044eff8beaa895fa90dd05a3fc987dd9d0dddb6b4400c6e12b",
     "xserver_source_url": "https://codeload.github.com/XQuartz/xorg-server/tar.gz/0f7f5eb17c2e22528ecd2cf7feff11da85c7dcbc",
     "xserver_source_sha256": "36db027489d6370ec5b1b6d07c8155c547193c2a6914fd617eb4311fb029257f",
-    "patch_sha256": "5e1e42e50c918ed28f9d782e743c6e6708278b84e069badbeb9b06c2630b98ff",
-    "private_executable_sha256": null,
+    "distribution_gitlinks": {
+      "src/xorg/proto/xorgproto": "04482cdee458445eab7c6a0b6d4ea64b74387401",
+      "src/mesa/mesa": "f21688aeda07c74cdad2506691ad53fa8a4fed5c",
+      "src/freetype2": "0a0221a1347e2f1e07c395263540026e9a0aa7c7",
+      "src/pixman": "9cc163c9da0fb4da430641715313d95a6ec466d9",
+      "src/xorg/proto/xcbproto": "cf7e2581b613802f2f8ec2a4b50a6a20aad4bf52",
+      "src/xorg/lib/libxtrans": "693d28a76024a2a0a28eef25037bcb7558b8bbfa",
+      "src/xorg/lib/libXau": "3861176ca80013c867b32451075e566caab4d5c2",
+      "src/xorg/lib/libXdmcp": "cd27f35c08cd8a7b14cef31d3edc021e638aab7f",
+      "src/xorg/lib/libxcb": "17682ba754b274c393c545b14811e4dc1160cd49",
+      "src/xorg/lib/libX11": "13fd1cbb6f5140fb620e7769def1dc02ab0e5391",
+      "src/xorg/lib/libXext": "2a694ba264ccdb205909909abfe8b136f9156ebe",
+      "src/xorg/lib/libXfixes": "55bb2d1d57d43e0595ce45393f26eb433d75a7cc",
+      "src/xorg/lib/libAppleWM": "d8926ba5805ac8feed0b0cf8ebf54d8ab7af2314",
+      "src/xorg/lib/libxkbfile": "42e5dedd7fd3c7c73f3870a8751893c03c1afc69",
+      "src/xorg/lib/libfontenc": "780d1f6f192a331de7b298a96e23ebc44d2a884b",
+      "src/xorg/lib/libXfont2": "67520db20c6cc37927ae3a212f357e2dd26143f5",
+      "src/xorg/app/xkbcomp": "2c7789785981ad1fce3858c726615b49293f7de0",
+      "src/xkeyboard-config": "7bbd9af0dabf1dac30fe4bf728e18ffe34a7f9f4",
+      "src/xorg/font/misc-misc": "c4e2af05583764fae3d0b2aa20d5c93b031cbcbf",
+      "src/xorg/font/cursor-misc": "73b2095391d5bcf326c903946de48d0710daa169",
+      "src/xorg/font/alias": "ebeee85f070dc12197ad98d1c849786f8e3be124"
+    },
+    "patch_sha256": "901aaa59e77b566388d4728d63ec3afa4bafba9b92445962676d6d958ecf8d2e",
+    "private_executable_sha256": "30cff793431ef36178d9814eeb13024331c2acc28c7daf608ce575fd3a9893cd",
+    "runtime_inventory_sha256": "0fd1bb3ffd162962691d4b7c0b6283b53e448b6a50a51c502c86074b5317f171",
     "native_build_inputs": [
       "macOS SDK/Xcode clang and Objective-C/AppKit/CoreFoundation",
       "meson/ninja/pkg-config/bison/flex/mig",
       "complete pinned XQuartz component dependencies and matching headers/pkg-config data",
       "private app-relative Mach-O dylib relocation",
-      "codesign for both x86_64 and arm64"
+      "ad-hoc codesign for arm64"
     ],
     "blocking_evidence": [
-      "no relocated signed private native build",
-      "full source/license closure for all upstream binary dependencies remains unreviewed",
       "upstream Composite explicitly disabled due known bug 1409; not overridden",
-      "native authenticated inherited-listener/no-global-lock tests unavailable",
-      "X03 native graphics probe unavailable on macOS"
+      "X03 measured native graphics qualification remains open"
     ]
   }
 }

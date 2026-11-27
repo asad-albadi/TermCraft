@@ -20,6 +20,7 @@ pub(super) fn run(
     if shared.cancelled.load(Ordering::Acquire) {
         return Ok(());
     }
+    let mac_bundle = cfg!(target_os = "macos") && runtime == super::Runtime::BundledChromium;
     let mut browser = Browser {
         #[cfg(not(windows))]
         pipe: Pipe::start_with_runtime(&config.proxy, runtime, &shared.cancelled)?,
@@ -38,10 +39,24 @@ pub(super) fn run(
         history_index: 0,
         auth: None,
         capture: None,
+        // The pinned macOS build's JPEGs are decoded with wrong colors by
+        // the current Rust image backend on arm64. Request lossless pixels.
+        screenshot_format: if mac_bundle {
+            image::ImageFormat::Png
+        } else {
+            image::ImageFormat::Jpeg
+        },
         navigation_request: None,
         buttons: 0,
     };
-    browser.initialize()?;
+    let startup_timeout = if mac_bundle {
+        // A private, freshly materialized macOS app can incur OS code checks
+        // before it reads its first CDP message. Bound just the cold start.
+        Duration::from_secs(25)
+    } else {
+        REQUEST_TIMEOUT
+    };
+    browser.initialize(startup_timeout)?;
     browser.navigate(&config.address)?;
     let mut frame_due = Instant::now();
     let mut metadata_due = frame_due;
@@ -97,14 +112,16 @@ struct Browser<'a> {
     history_index: usize,
     auth: Option<(u64, String)>,
     capture: Option<Capture>,
+    screenshot_format: image::ImageFormat,
     navigation_request: Option<String>,
     buttons: u8,
 }
 
 impl Browser<'_> {
-    fn initialize(&mut self) -> Result<(), String> {
+    fn initialize(&mut self, startup_timeout: Duration) -> Result<(), String> {
         // Reuse the blank target launched with the private profile and attach before loading any page.
-        let targets = self.call(false, "Target.getTargets", json!({}))?;
+        let targets =
+            self.call_with_timeout(false, "Target.getTargets", json!({}), startup_timeout)?;
         self.target = targets["targetInfos"]
             .as_array()
             .and_then(|targets| {
@@ -182,14 +199,35 @@ impl Browser<'_> {
     }
 
     fn call(&mut self, target: bool, method: &str, params: Value) -> Result<Value, String> {
+        self.call_with_timeout(target, method, params, REQUEST_TIMEOUT)
+    }
+
+    fn call_with_timeout(
+        &mut self,
+        target: bool,
+        method: &str,
+        params: Value,
+        timeout: Duration,
+    ) -> Result<Value, String> {
+        let message = self.response(target, method, params, timeout)?;
+        if message.get("error").is_some() {
+            return Err(format!("Chromium could not complete {method}."));
+        }
+        Ok(message["result"].clone())
+    }
+
+    fn response(
+        &mut self,
+        target: bool,
+        method: &str,
+        params: Value,
+        timeout: Duration,
+    ) -> Result<Value, String> {
         let id = self.issue(target, method, params)?;
-        let deadline = Instant::now() + REQUEST_TIMEOUT;
+        let deadline = Instant::now() + timeout;
         while let Some(message) = self.pipe.receive(deadline, &self.shared.cancelled)? {
             if message["id"] == id {
-                if message.get("error").is_some() {
-                    return Err(format!("Chromium could not complete {method}."));
-                }
-                return Ok(message["result"].clone());
+                return Ok(message);
             }
             self.event(&message)?;
         }
@@ -335,7 +373,26 @@ impl Browser<'_> {
             "Target.getTargetInfo",
             json!({"targetId":self.target}),
         )?;
-        let history = self.call(true, "Page.getNavigationHistory", json!({}))?;
+        let response = self.response(
+            true,
+            "Page.getNavigationHistory",
+            json!({}),
+            REQUEST_TIMEOUT,
+        )?;
+        if let Some(error) = response.get("error") {
+            // A history navigation can briefly leave CDP attached to the
+            // inactive renderer. The next metadata poll sees the active page.
+            if error["code"].as_i64() == Some(-32000)
+                && matches!(
+                    error["message"].as_str(),
+                    Some("Not attached to an active page" | "Not attached to a page")
+                )
+            {
+                return Ok(());
+            }
+            return Err("Chromium could not complete Page.getNavigationHistory.".into());
+        }
+        let history = &response["result"];
         let entries = history["entries"]
             .as_array()
             .ok_or("Invalid browser history response.")?;
@@ -360,11 +417,12 @@ impl Browser<'_> {
     }
 
     fn request_frame(&mut self) -> Result<(), String> {
-        let id = self.issue(
-            true,
-            "Page.captureScreenshot",
-            json!({"format":"jpeg","quality":78,"captureBeyondViewport":false}),
-        )?;
+        let params = if self.screenshot_format == image::ImageFormat::Png {
+            json!({"format":"png","captureBeyondViewport":false})
+        } else {
+            json!({"format":"jpeg","quality":78,"captureBeyondViewport":false})
+        };
+        let id = self.issue(true, "Page.captureScreenshot", params)?;
         self.capture = Some(Capture {
             id,
             deadline: Instant::now() + REQUEST_TIMEOUT,
@@ -385,7 +443,7 @@ impl Browser<'_> {
             .decode(encoded)
             .map_err(|_| "Chromium returned an invalid preview.")?;
         let mut reader =
-            image::ImageReader::with_format(Cursor::new(bytes), image::ImageFormat::Jpeg);
+            image::ImageReader::with_format(Cursor::new(bytes), self.screenshot_format);
         let mut limits = image::Limits::default();
         limits.max_image_width = Some(1920);
         limits.max_image_height = Some(1080);
@@ -404,6 +462,26 @@ impl Browser<'_> {
                 size: capture.size,
                 rgba: rgba.into_raw(),
             });
+        }
+        Ok(())
+    }
+
+    fn finish_macos_capture(&mut self) -> Result<(), String> {
+        // CDP temporarily changes the emulated view while capturing. Wait
+        // for restoration before changing its size or sending coordinates.
+        if self.screenshot_format == image::ImageFormat::Png {
+            while let Some(capture) = self.capture {
+                let Some(message) = self
+                    .pipe
+                    .receive(capture.deadline, &self.shared.cancelled)?
+                else {
+                    // Navigation can retire the renderer and its pending
+                    // request. Use the same deadline as the ordinary poll.
+                    self.capture = None;
+                    break;
+                };
+                self.event(&message)?;
+            }
         }
         Ok(())
     }
@@ -435,11 +513,28 @@ impl Browser<'_> {
             )?;
             return Ok(());
         }
+        self.finish_macos_capture()?;
         self.call(
             false,
             "Browser.setContentsSize",
             json!({"windowId":self.window,"width":width,"height":height}),
         )?;
+        #[cfg(target_os = "macos")]
+        {
+            // AppKit clamps the native window width. Chromium needs both the
+            // CSS viewport and the visible surface sized for matching input
+            // coordinates and screenshot pixels.
+            self.call(
+                true,
+                "Emulation.setDeviceMetricsOverride",
+                json!({"width":width,"height":height,"deviceScaleFactor":1,"mobile":false}),
+            )?;
+            self.call(
+                true,
+                "Emulation.setVisibleSize",
+                json!({"width":width,"height":height}),
+            )?;
+        }
         Ok(())
     }
 
@@ -540,6 +635,7 @@ impl Browser<'_> {
         y: f64,
         click_count: u8,
     ) -> Result<(), String> {
+        self.finish_macos_capture()?;
         let mask = match button {
             "left" => 1,
             "right" => 2,
@@ -594,6 +690,7 @@ impl Browser<'_> {
                 self.pointer("mouseMoved", "none", -1., -1., 0)?;
             }
             Command::Wheel { x, y, dx, dy } => {
+                self.finish_macos_capture()?;
                 self.issue(
                     true,
                     "Input.dispatchMouseEvent",

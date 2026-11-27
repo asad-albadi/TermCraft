@@ -85,7 +85,7 @@ impl Resolution {
     ) -> Result<Self, String> {
         request.validate()?;
         active
-            .try_update(Ordering::AcqRel, Ordering::Acquire, |n| {
+            .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
                 (n < LIMIT).then_some(n + 1)
             })
             .map_err(|_| {

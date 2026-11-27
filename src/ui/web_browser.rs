@@ -549,6 +549,12 @@ fn key_code(name: &str, key: Key) -> String {
     }
 }
 
-#[cfg(all(test, target_os = "linux"))]
+#[cfg(all(
+    test,
+    any(
+        target_os = "linux",
+        all(target_os = "macos", feature = "macos-chromium-qualification")
+    )
+))]
 #[path = "web_browser_tests.rs"]
 mod tests;

@@ -137,7 +137,7 @@ impl Server {
             },
             engine_binary(),
         );
-        cfg.certificate_authority = Some(self.root.path().join("cert.pem"));
+        cfg.certificate_authority = Some(self.root.path().join("ca.pem"));
         cfg
     }
     pub fn stop(&mut self) {

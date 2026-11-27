@@ -114,9 +114,8 @@ mod tests {
     fn exit_when_done_retires_telnet_job_when_gateway_cannot_connect() {
         let (ctx, _root, mut workspace) = owned_workspace();
         let original = raw_terminal(&mut workspace, "keep");
-        let gateway = tokio::net::TcpSocket::new_v4().unwrap();
-        // A bound socket reserves this port without accepting connections.
-        gateway.bind("127.0.0.1:0".parse().unwrap()).unwrap();
+        let gateway = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        gateway.set_nonblocking(true).unwrap();
         let session = Session {
             protocol: "Telnet".into(),
             host: "private-target.invalid".into(),
@@ -142,6 +141,13 @@ mod tests {
 
         let end = Instant::now() + Duration::from_secs(3);
         while workspace.tabs[1].error.is_empty() {
+            // Close the fixture connection before SSH identification. A bound
+            // but non-listening socket need not yield immediate refusal on macOS.
+            match gateway.accept() {
+                Ok((stream, _)) => drop(stream),
+                Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {}
+                Err(error) => panic!("could not accept fixture gateway connection: {error}"),
+            }
             workspace.tabs[1].poll();
             assert!(
                 Instant::now() < end,

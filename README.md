@@ -87,7 +87,7 @@ Implementation and platform limits are recorded in the [feature matrix](FEATURE_
 | --- | --- |
 | Linux x86-64 | Strongest implementation and validation coverage. Native Debian 12 core packages and a separate Arch-compatible optional-runtime bundle are qualified within their declared scopes. |
 | Windows x86-64 | The native GUI and adjacent RDP helper have a verified unsigned portable package and per-user installer on a supported desktop. Clean-user graphics and activation, optional runtimes, native engine release approval and broader device and workflow qualification remain open. |
-| macOS — Apple Silicon (arm64) | Current macOS target. Native implementation and qualification are tracked in issue #2. Intel macOS is outside the current support scope. |
+| macOS — Apple Silicon (arm64) | macOS 14+ target. Native tests, relocated packages and selected desktop workflows passed on macOS 26.6.2 and 14.8.7. Physical graphics, devices, remaining manual checks and public distribution approval remain open in issue #2. |
 
 Current targets are Linux x86-64, Windows x64 and Apple Silicon macOS (arm64). Intel macOS is excluded at this stage; removing it is a scope decision, not a claim of additional verified coverage. See [support scope](docs/SUPPORT.md).
 

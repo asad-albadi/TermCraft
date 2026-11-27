@@ -52,6 +52,7 @@ impl Proxy {
                     Err(_) => return,
                 }
             };
+            client.set_nonblocking(false).unwrap();
             client
                 .set_read_timeout(Some(Duration::from_secs(5)))
                 .unwrap();

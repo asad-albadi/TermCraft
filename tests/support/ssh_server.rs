@@ -6,6 +6,15 @@ use std::{
     process::{Child, Command, Stdio},
     time::{Duration, Instant},
 };
+
+fn sshd_path() -> &'static str {
+    if cfg!(target_os = "macos") {
+        "/usr/sbin/sshd"
+    } else {
+        "/usr/bin/sshd"
+    }
+}
+
 // A live socket protects selection; a logical claim protects the interval after
 // handing the port to ssh/sshd, cancellation, and subsequent rebind checks.
 // Claims are conservative across address families because an IPv6 wildcard may
@@ -77,15 +86,18 @@ impl SshServer {
         // Reserve the selection→bind interval across parallel fixture startups.
         static STARTUP_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
         let _startup = STARTUP_LOCK.lock().unwrap_or_else(|p| p.into_inner());
-        let root = std::env::temp_dir().join(format!(
-            "termcraft-ssh-test-{}-{}",
-            std::process::id(),
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()
-        ));
-        fs::create_dir_all(&root).unwrap();
+        // Keep SFTP paths canonical and leave room for nested AF_UNIX fixture
+        // sockets under Darwin's short sockaddr_un limit.
+        let temporary = if cfg!(target_os = "macos") {
+            PathBuf::from("/private/tmp")
+        } else {
+            std::env::temp_dir().canonicalize().unwrap()
+        };
+        let root = tempfile::Builder::new()
+            .prefix("termcraft-ssh-")
+            .tempdir_in(temporary)
+            .unwrap()
+            .keep();
         for key in ["host", "client"] {
             let result = Command::new("ssh-keygen")
                 .env_remove("LD_PRELOAD")
@@ -111,7 +123,7 @@ impl SshServer {
             }
         );
         fs::write(root.join("sshd_config"), format!("{config}\n{extra}\n")).unwrap();
-        let mut child = Command::new("/usr/bin/sshd")
+        let mut child = Command::new(sshd_path())
             .env_remove("LD_PRELOAD")
             .args(["-D", "-e", "-f"])
             .arg(root.join("sshd_config"))
@@ -202,7 +214,7 @@ impl SshServer {
                 .unwrap()
                 .success()
         );
-        self.child = Command::new("/usr/bin/sshd")
+        self.child = Command::new(sshd_path())
             .env_remove("LD_PRELOAD")
             .args(["-D", "-e", "-f"])
             .arg(self.root.join("sshd_config"))

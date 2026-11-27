@@ -16,10 +16,22 @@ python3 scripts/package-release.py --platform linux --xwayland-archive /path/to/
 
 The managed engine opens a separate compositor window with the X desktop inside it. The compositor chooses its monitor. The engine's compile-time XKB locations resolve on the runtime system, so `xorg-xkbcomp` and `xkeyboard-config` remain requirements. The installed Wayland, Mesa, and other shared dependencies are also required. The application verifies the staged binary and executes a sealed in-memory copy through Linux procfs. It passes only two already-bound local Unix listeners to the engine. The runtime needs a kernel policy that allows executable memfds. The upstream package disables XDMCP. A native engine with XDMCP support will be needed for that feature.
 
-`build-windows.ps1` and `build-macos.sh` extract pinned native upstream inputs into a separate candidate directory for qualification. They require native tooling and review before their payloads can enter an application build. The application currently reports these managed runtimes as unavailable.
+`build-windows.ps1` and `build-macos.sh` extract pinned native upstream inputs into a separate candidate directory for qualification. They require native tooling and review before their payloads can enter an application build. The approved private arm64 XQuartz build is described below. The Windows candidate remains unavailable.
 
 - VcXsrv requires review of the PE/DLL imports, runtime redistribution notices, license coverage and corresponding source, and a native owned-display and authority test after Windows lifecycle support is implemented. The script reads the exact NSIS payload with 7-Zip.
-- XQuartz still needs a private app-relative relocation of executable, dylibs, data, and frameworks, followed by signing and native tests on arm64 and x86_64. The script expands the upstream package with `pkgutil` and records the engine's current library references. It does not run package installation scripts or install system launch agents.
+- The upstream XQuartz package is an inspection input. TermCraft ships the separate private arm64 build through an exact inventory. The script expands the upstream package with `pkgutil` and records the engine's current library references. It does not run package installation scripts or install system launch agents.
+
+The source-backed private build path is separate from that inspection candidate:
+
+```sh
+TERMCRAFT_XQUARTZ_DEPS=/path/to/private-prefix \
+bash packaging/x11/build-private-macos.sh \
+  --source-archive /offline/XQuartz-xorg-server-source.tar.gz \
+  --destination /tmp/termcraft-xquartz-private \
+  --arch universal
+```
+
+It requires a native Xcode SDK and Meson/Ninja dependency closure, applies the pinned direct-entry patch through `prepare-source.py`, uses the authenticated-listener build flags, relocates non-system Mach-O dependencies, ad-hoc signs the staged tree, and writes `NATIVE-BUILD.json`. The resulting candidate remains unqualified until native lifecycle, authority, graphics, permission, and package evidence is recorded; it is not accepted by the compiled runtime trust gate automatically.
 
 ## Linux qualification
 
@@ -32,3 +44,41 @@ tests/support/run_xserver_isolated.sh /path/to/application-folder \
 ```
 
 The fixture replaces the compositor's Xwayland executable inside the namespace with the pinned payload. The test inspects the application worker's actual executable path separately. [Implementation evidence](../../docs/parity-evidence/X01/implementation.md) records the verified cases.
+
+### Apple Silicon managed X11
+
+With the approved private engine in the app, choose **Servers → X11 server →
+Start X server**. Local and Embedded SSH profiles can choose **TermCraft** as
+their X display. The managed display uses native XQuartz windows and macOS
+selects the monitor. The app checks core drawing by reading pixels back from
+a scratch pixmap.
+
+Use **Copy macOS text to X11** or **Copy X11 text to macOS** for a one-time
+UTF-8 text transfer of up to 64 KiB. The private display maintains its own
+selection between requests. Automatic pasteboard synchronization remains
+disabled. XDMCP sessions have a separate private display and do not use
+these workspace controls.
+
+### Apple Silicon Direct and Indirect XDMCP
+
+Bundle the existing private arm64 XQuartz tree with
+`scripts/package-release.py --xquartz-runtime CANDIDATE`. The same compiled
+inventory is used for managed X11 forwarding and XDMCP. TermCraft never runs
+the installed XQuartz or changes its preferences, launch services or listeners.
+
+In an XDMCP session, choose a Direct or Indirect IPv4 manager and explicitly
+enable the session's TCP listener. If no local address is specified, TermCraft
+uses the IPv4 route to the manager. The listener binds only that address at
+TCP port 6000 plus the display number. Automatic allocation tries displays
+100–199. Broadcast is discovery-only. The XQuartz process remains Unix-only,
+and the TCP endpoint accepts only the negotiated manager's IP and
+MIT-MAGIC-COOKIE-1 before passing traffic to that private process.
+
+Use this on a trusted isolated network. Neither the manager nor the TCP
+traffic is cryptographically authenticated or encrypted against a network
+observer. Indirect mode explicitly allows a forwarded manager to reply.
+TermCraft supports one chooser handoff, with a fresh XQuartz process and
+X11 cookie after the original manager closes its first connection. This
+path uses XQuartz native windows and host geometry/keyboard. Monitor and
+fullscreen overrides, layout overrides, IPv6, and host clipboard sharing
+are not part of this mode.

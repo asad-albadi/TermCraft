@@ -540,6 +540,30 @@ fn redirected_drives_reject_fifos_without_opening_a_blocking_stream() {
 }
 
 #[cfg(target_os = "linux")]
+pub(crate) fn isolated_allocation_test(name: &str) -> bool {
+    const CHILD: &str = "TERMCRAFT_ALLOCATION_TEST_CHILD";
+    if std::env::var(CHILD).as_deref() == Ok(name) {
+        return false;
+    }
+    // Other parallel tests spawn native workers. A fork briefly inherits every
+    // CLOEXEC descriptor, including independent handles for this file, until
+    // exec. Own the exclusive-cleanup fixture entirely inside one child so a
+    // correct lease refusal cannot make its allocation assertion flaky.
+    let output = std::process::Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", name, "--nocapture"])
+        .env(CHILD, name)
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "isolated {name} failed:\n{}\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    true
+}
+
+#[cfg(target_os = "linux")]
 #[test]
 fn allocation_reserves_space_without_extending_eof_and_validates_signed_lengths() {
     use std::os::unix::fs::MetadataExt;
@@ -583,6 +607,11 @@ fn allocation_reserves_space_without_extending_eof_and_validates_signed_lengths(
 #[cfg(target_os = "linux")]
 #[test]
 fn drive_allocation_is_released_on_last_remote_close_and_disconnect() {
+    if isolated_allocation_test(
+        "devices_tests::drive_allocation_is_released_on_last_remote_close_and_disconnect",
+    ) {
+        return;
+    }
     use std::os::unix::fs::MetadataExt;
     let root = tempfile::tempdir().unwrap();
     let path = root.path().join("file");
@@ -619,6 +648,103 @@ fn drive_allocation_is_released_on_last_remote_close_and_disconnect() {
 }
 
 #[cfg(target_os = "linux")]
+#[test]
+fn drive_allocation_release_preserves_data_written_into_the_reservation() {
+    if isolated_allocation_test(
+        "devices_tests::drive_allocation_release_preserves_data_written_into_the_reservation",
+    ) {
+        return;
+    }
+    use std::os::unix::fs::MetadataExt;
+    let root = tempfile::tempdir().unwrap();
+    let path = root.path().join("file");
+    std::fs::write(&path, b"original").unwrap();
+    let mut b = backend(root.path(), false);
+    let id = value(&open(&mut b, "file", 0xc0000000, 1), 16);
+    assert_eq!(
+        value(&set_info(&mut b, id, 19, &1048576u64.to_le_bytes()), 12),
+        0
+    );
+    // Grow EOF into the reservation, ending in the middle of a filesystem block.
+    let mut body = Vec::new();
+    word(&mut body, 3);
+    body.extend(8192u64.to_le_bytes());
+    body.extend([0; 20]);
+    body.extend(b"end");
+    assert_eq!(
+        value(&b.process(&request(1, id, 2, 4, 0, &body)).unwrap(), 12),
+        0
+    );
+    assert!(std::fs::metadata(&path).unwrap().blocks() * 512 >= 1048576);
+    assert_eq!(
+        value(&b.process(&request(1, id, 3, 2, 0, &[0; 32])).unwrap(), 12),
+        0
+    );
+    let metadata = std::fs::metadata(&path).unwrap();
+    assert_eq!(metadata.len(), 8195, "release changed logical EOF");
+    assert!(
+        metadata.blocks() * 512 < 1048576,
+        "unused remote allocation leaked after writing and closing"
+    );
+    let mut expected = b"original".to_vec();
+    expected.resize(8192, 0);
+    expected.extend(b"end");
+    assert_eq!(std::fs::read(&path).unwrap(), expected);
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn drive_allocation_release_keeps_the_tail_when_an_external_file_is_open() {
+    use std::os::unix::fs::MetadataExt;
+    for disconnect in [false, true] {
+        for writer in [false, true] {
+            let root = tempfile::tempdir().unwrap();
+            let path = root.path().join("file");
+            std::fs::write(&path, b"original").unwrap();
+            let mut b = backend(root.path(), false);
+            let id = value(&open(&mut b, "file", 0xc0000000, 1), 16);
+            assert_eq!(
+                value(&set_info(&mut b, id, 19, &1048576u64.to_le_bytes()), 12),
+                0
+            );
+            let external = std::fs::OpenOptions::new()
+                .read(true)
+                .write(writer)
+                .open(&path)
+                .unwrap();
+            if !disconnect {
+                assert_eq!(
+                    value(&b.process(&request(1, id, 3, 2, 0, &[0; 32])).unwrap(), 12),
+                    0
+                );
+            }
+            drop(b);
+            assert!(
+                std::fs::metadata(&path).unwrap().blocks() * 512 >= 1048576,
+                "cleanup must retain storage when an independent opener prevents exclusion"
+            );
+            assert_eq!(std::fs::read(&path).unwrap(), b"original");
+            // The still-open local writer can safely grow beyond the remote reservation.
+            if writer {
+                external.set_len(2097152).unwrap();
+                assert!(
+                    std::process::Command::new("/bin/sh")
+                        .args(["-c", "printf local >> \"$1\"", "rdp-fixture"])
+                        .arg(&path)
+                        .status()
+                        .unwrap()
+                        .success()
+                );
+                let content = std::fs::read(&path).unwrap();
+                assert_eq!(content.len(), 2097157);
+                assert_eq!(&content[..8], b"original");
+                assert_eq!(&content[2097152..], b"local");
+            }
+        }
+    }
+}
+
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 pub(crate) mod serial {
     use super::*;
     use crate::{
@@ -643,8 +769,8 @@ pub(crate) mod serial {
                     &mut master,
                     &mut slave,
                     path.as_mut_ptr(),
-                    std::ptr::null(),
-                    std::ptr::null(),
+                    std::ptr::null_mut(),
+                    std::ptr::null_mut(),
                 )
             },
             0
@@ -1016,15 +1142,26 @@ pub(crate) mod serial {
         transfer.extend(b"flow");
         send(&mut channel, handle, 3, 4, &transfer);
         std::thread::sleep(Duration::from_millis(10));
-        assert!(channel.poll().unwrap().is_empty());
+        // Darwin may accept the write into its paused output queue. The
+        // portable contract is that the PTY peer cannot read it before XON.
+        let mut packets: Vec<_> = channel
+            .poll()
+            .unwrap()
+            .iter()
+            .map(|p| p.encode_unframed_pdu().unwrap())
+            .collect();
+        assert!(packets.len() <= usize::from(cfg!(target_os = "macos")));
         assert_eq!(
             master.read(&mut [0; 4]).unwrap_err().kind(),
             std::io::ErrorKind::WouldBlock
         );
         send(&mut channel, handle, 4, 14, &ioctl(0x001b003c, &[], 0));
-        let mut packets = completions(&mut channel, 2);
+        packets.extend(completions(&mut channel, 2 - packets.len()));
         packets.sort_by_key(|p| value(p, 8));
+        assert_eq!(packets.len(), 2);
         assert!(packets.iter().all(|p| value(p, 12) == 0));
+        assert_eq!((value(&packets[0], 8), value(&packets[0], 16)), (3, 4));
+        assert_eq!(value(&packets[1], 8), 4);
         let mut data = [0; 4];
         master.read_exact(&mut data).unwrap();
         assert_eq!(&data, b"flow");

@@ -32,7 +32,8 @@ fn local_socket() -> io::Result<()> {
         if m.uid() != 0
             || m.file_type().is_symlink()
             || (path.ends_with("cupsd") && !m.file_type().is_socket())
-            || (!path.ends_with("cupsd") && (!m.is_dir() || m.mode() & 0o022 != 0))
+            || (!path.ends_with("cupsd")
+                && (!m.is_dir() || !protected_directory(path, m.gid(), m.mode())))
         {
             return Err(io::Error::new(
                 io::ErrorKind::PermissionDenied,
@@ -41,6 +42,27 @@ fn local_socket() -> io::Result<()> {
         }
     }
     Ok(())
+}
+
+fn protected_directory(path: &str, group: u32, mode: u32) -> bool {
+    // Darwin ships /private/var/run as root:daemon 0775. This system group
+    // owns the launchd socket namespace. The connected peer must still be root.
+    let writable = mode & 0o022;
+    writable == 0 || (path == "/private/var/run" && group == 1 && writable == 0o020)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::protected_directory;
+
+    #[test]
+    fn only_the_darwin_runtime_directory_may_be_daemon_group_writable() {
+        assert!(protected_directory("/private", 0, 0o755));
+        assert!(protected_directory("/private/var/run", 1, 0o775));
+        assert!(!protected_directory("/private/var", 1, 0o775));
+        assert!(!protected_directory("/private/var/run", 20, 0o775));
+        assert!(!protected_directory("/private/var/run", 1, 0o777));
+    }
 }
 impl Native {
     async fn request(

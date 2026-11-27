@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "status": "unavailable",
+  "source_revision": "0123456789abcdef0123456789abcdef01234567",
+  "host": {
+    "os": "macOS",
+    "architecture": "arm64"
+  },
+  "target": {
+    "architecture": "arm64",
+    "deployment_target": "14.0",
+    "sdk_version": "record from xcrun --sdk macosx --show-sdk-version",
+    "toolchain": "record from xcodebuild -version and clang --version"
+  },
+  "lockfiles": [
+    "Cargo.lock"
+  ],
+  "artifacts": [],
+  "workflows": [
+    {
+      "name": "replace with the exact workflow or smoke test",
+      "result": "not-run"
+    }
+  ],
+  "unavailable": [
+    {
+      "requirement": "replace with an open issue #2 requirement",
+      "reason": "replace with the precise missing artifact, device, permission, or runner evidence"
+    }
+  ]
+}
