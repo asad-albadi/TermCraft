@@ -13,6 +13,7 @@ import tarfile
 import tempfile
 import tomllib
 import unittest
+from unittest import mock
 import zipfile
 import zlib
 
@@ -119,6 +120,18 @@ class ReleaseDelivery(unittest.TestCase):
         self.root = self.fixture
         self.source = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=self.root, text=True).strip()
         self.read_fixture_versions()
+        # This suite isolates delivery from the native SquashFS builder. The
+        # AppImage package suite separately inspects real produced images.
+        inspector = mock.patch.object(self.release.APPIMAGE, "verify_image", side_effect=self.fixture_image)
+        inspector.start()
+        self.addCleanup(inspector.stop)
+
+    def fixture_image(self, core, image, source, work):
+        self.assertEqual(image.read_bytes(), b"synthetic delivery image")
+        self.assertEqual(source.read_bytes(), b"synthetic delivery source")
+        return {"core": {"sha256": digest(core)}, "runtime": {"sha256": "a" * 64},
+                "corresponding_source": {"sha256": digest(source)}, "highest_required_glibc": "2.38",
+                "libraries": {"libX11.so.6": {}, "libwayland-client.so.0": {}}}, None
 
     def read_fixture_versions(self):
         self.version = tomllib.loads((self.root / "Cargo.toml").read_text())["package"]["version"]
@@ -235,6 +248,9 @@ class ReleaseDelivery(unittest.TestCase):
                 bundle.add(root, arcname=root.name)
             if not wrong_file and profile == "release":
                 self.debian.package_debian(archive, output)
+            image, source = self.release.APPIMAGE.names(self.version)
+            (output / image).write_bytes(b"synthetic delivery image")
+            (output / source).write_bytes(b"synthetic delivery source")
         else:
             with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as bundle:
                 for file in sorted(root.rglob("*")):
@@ -402,6 +418,25 @@ class ReleaseDelivery(unittest.TestCase):
             write_json(wayland / "verification.json", obs)
             (wayland / "startup.log").write_text(f'37 connect(4, {{sa_family=AF_UNIX, sun_path="{socket}"}}, 44) = 0\n')
 
+            for backend, base in (("X11", case / "startup-evidence"), ("Wayland", wayland)):
+                location = case / f"appimage-{backend.lower()}-evidence"
+                shutil.copytree(base, location)
+                name, corresponding = r.APPIMAGE.names(self.version)
+                image = case / "dist" / name
+                obs = json.loads((location / "verification.json").read_text())
+                packet = bytes.fromhex("030000130ee000000000000100080003000000")
+                (location / "rdp-session.log").write_text("[AppImage loopback X.224/RDP negotiation] " + packet.hex() + "\n")
+                obs.update(archive=name, archive_sha256=digest(image), appimage={
+                    "negotiation_sha256": hashlib.sha256(packet).hexdigest(),
+                    "mode": "extract-and-run", "runtime_sha256": "a" * 64,
+                    "core_sha256": digest(archive), "source_sha256": digest(case / "dist" / corresponding),
+                    "highest_required_glibc": "2.38", "gui_sha256": manifest["files"]["harbor-workspace"],
+                    "helper_sha256": manifest["files"]["termcraft-rdp-engine"],
+                    "mapped_private_libraries": ["libX11.so.6" if backend == "X11" else "libwayland-client.so.0"],
+                    "runtime_reaped_and_clean": True,
+                })
+                write_json(location / "verification.json", obs)
+
     def candidate(self, platform, **kwargs):
         case, archive = self.platform_bundle(platform, **kwargs)
         candidate = case / ("candidate-" + {"linux": "linux-amd64", "windows": "windows-amd64", "macos": "macos-arm64"}[platform])
@@ -443,6 +478,21 @@ class ReleaseDelivery(unittest.TestCase):
         self.assertEqual(value["scope"], "unsigned-core")
         self.assertEqual(value["package_manifest"]["dependency_notices"]["crates"], 2)
         self.assertIn("locked-dependency-notices", value["checks_passed"])
+
+    def test_appimage_gate_requires_evidence_bound_to_outer_image(self):
+        case, archive = self.platform_bundle("linux")
+        location = case / "appimage-x11-evidence" / "verification.json"
+        observation = json.loads(location.read_text())
+        write_json(location, {**observation, "archive_sha256": digest(archive)})
+        with self.assertRaisesRegex(ValueError, "Startup observations"):
+            self.release.stage_candidate(self.root, self.source, self.version, "linux", case / "dist",
+                                         case / "startup-evidence", case / "candidate", case / "lifecycle-evidence",
+                                         case / "wayland-evidence")
+        location.unlink()
+        with self.assertRaisesRegex(ValueError, "Startup evidence is incomplete"):
+            self.release.stage_candidate(self.root, self.source, self.version, "linux", case / "dist",
+                                         case / "startup-evidence", case / "candidate", case / "lifecycle-evidence",
+                                         case / "wayland-evidence")
 
     def test_candidate_rejects_skipped_native_stages_and_wayland_without_socket_trace(self):
         case, archive = self.platform_bundle("linux")
@@ -635,7 +685,7 @@ class ReleaseDelivery(unittest.TestCase):
         self.assertTrue(value["publication_ready"])
         self.assertEqual(value["pending_gates"], [])
         self.assertTrue(set(self.release.PENDING_GATES).issubset(value["checks_passed"]))
-        self.assertEqual(len(self.release.publication_files(out, self.source, self.version)), 7)
+        self.assertEqual(len(self.release.publication_files(out, self.source, self.version)), 9)
         (candidates[0] / "wayland-evidence/verification.json").unlink()
         withheld = self.work / "withheld"
         with self.assertRaisesRegex(ValueError, "Startup evidence is incomplete"):

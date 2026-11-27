@@ -7,17 +7,33 @@ shows assets that have actually been published.
 
 | Target | Candidate format | How it runs or installs |
 | --- | --- | --- |
-| Linux x86-64 | `.tar.gz` and Debian-family `.deb` | Extract and launch `harbor-workspace`, use the optional per-user desktop integration, or install the Debian package with the distribution's package manager. The hosted artifacts are built on Ubuntu 24.04. Read the package's glibc and graphics requirements rather than assuming compatibility with an older distribution. |
+| Linux x86-64 | `.tar.gz`, Debian-family `.deb` and `.AppImage` | Extract and launch `harbor-workspace`, use the optional per-user desktop integration, or install the Debian package with the distribution's package manager. The hosted artifacts are built on Ubuntu 24.04. Read the package's glibc and graphics requirements rather than assuming compatibility with an older distribution. |
 | Windows x64 | `.zip` | Extract and launch `harbor-workspace.exe`, or run the included `install-per-user.ps1`. Keep the adjacent RDP worker with the app. |
 | Apple Silicon macOS | `.zip` containing `TermCraft.app` | Extract with Finder or `ditto` and move the bundle to the desired Applications directory. The deployment target is macOS 14.0. Gatekeeper may require explicit user approval for this unsigned bundle. |
 
-Intel macOS and Android are outside this workflow. AppImage is not a
-candidate format yet. The core includes the app, adjacent RDP worker,
+Intel macOS and Android are outside this workflow. The core includes the app, adjacent RDP worker,
 desktop integration, policies and dependency notices. It does not include
 optional private X servers, bundled Chromium, Mosh, the optional Wayland
 sharing worker, or other separately qualified runtime packages. An installed
 Chrome or Chromium provider is required by the macOS regression lane but
 is not added to the release ZIP.
+
+### Linux AppImage
+
+After checking the download against SHA256SUMS, run `chmod +x` on the AppImage
+and launch it with `--appimage-extract-and-run`. This unsigned format requires
+writable, executable temporary storage, a compatible x86-64 glibc and loader,
+a POSIX shell, system CA trust, keyboard-layout and X11 locale data, and a
+working host EGL/GLX driver stack and display. Each candidate records its
+measured GLIBC symbol requirement in `APPIMAGE-MANIFEST.json`. The qualification
+target is Ubuntu 24.04 on X11 and native Wayland in extract-and-run mode. FUSE
+mounting and wider distribution compatibility require separate qualification.
+
+The matching `TermCraft-<version>-linux-x86_64-AppImage-source.tar.gz` includes
+the runtime and client library sources, downstream packaging, notices, static
+relink inputs, build recipes and measured hashes. Each outer startup check
+binds the screenshot and RDP negotiation to the outer bytes and verifies the
+actual private client libraries, GUI and sealed RDP helper.
 
 ## Run and interpret the workflow
 
@@ -79,7 +95,7 @@ separate decisions. An unsigned core release does not imply any of them.
 ## Verify bytes and locate source
 
 Check the downloaded `SHA256SUMS` (for example, with
-`sha256sum -c SHA256SUMS`) against the four installer/portable assets,
+`sha256sum -c SHA256SUMS`) against the five application packages, the AppImage corresponding-source sidecar,
 `release-inventory.json` and the tracked project source archive. The
 inventory records the source commit, archive digests, Cargo package
 versions, toolchain strings, package manifest digests, terminal gate results,

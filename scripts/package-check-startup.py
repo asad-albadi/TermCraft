@@ -155,7 +155,104 @@ def windows_rdp_child(parent_pid, helper, expected_digest, software_gl=False):
     raise ValueError("RDP session did not start the verified adjacent Windows package helper.")
 
 
-def rdp_session_probe(executable, helper, helper_digest, isolated, environment, evidence, software_gl=False):
+def linux_children(pid):
+    children = set()
+    try:
+        for thread in Path(f"/proc/{pid}/task").iterdir():
+            try:
+                children.update(map(int, (thread / "children").read_text().split()))
+            except FileNotFoundError:
+                continue
+    except FileNotFoundError:
+        pass
+    return children
+
+
+def appimage_gui(parent, image):
+    """Identify the actual GUI under this invocation's private runtime extraction."""
+    pending = [parent]
+    seen = set()
+    matches = []
+    while pending:
+        pid = pending.pop()
+        if pid in seen:
+            continue
+        seen.add(pid)
+        pending.extend(linux_children(pid))
+        proc = Path(f"/proc/{pid}")
+        try:
+            path = Path(os.readlink(proc / "exe"))
+            relative = path.relative_to(image["tmp"])
+        except (OSError, ValueError):
+            continue
+        if (len(relative.parts) == 5 and re.fullmatch(r"appimage_extracted_[0-9a-f]{32}", relative.parts[0])
+                and relative.parts[1:] == ("usr", "lib", "termcraft", "harbor-workspace")
+                and os.getpgid(pid) == parent and sha256(proc / "exe") == image["gui_sha256"]):
+            matches.append((pid, image["tmp"] / relative.parts[0]))
+    if len(matches) != 1:
+        raise ValueError("Expected one verified GUI in the owned AppImage process tree")
+    return matches[0]
+
+
+def appimage_libraries(pid, directory, image):
+    private = directory / "usr/lib/termcraft-appimage"
+    libraries = image["metadata"]["libraries"]
+    found = set()
+    for line in Path(f"/proc/{pid}/maps").read_text().splitlines():
+        fields = line.split(None, 5)
+        if len(fields) < 6:
+            continue
+        mapped = Path(fields[5])
+        if mapped.name in libraries:
+            if mapped != private / mapped.name or sha256(mapped) != libraries[mapped.name]["sha256"]:
+                raise ValueError("AppImage loaded an unexpected display-client library")
+            found.add(mapped.name)
+    backend = "libwayland-client.so.0" if image["wayland"] else "libX11.so.6"
+    if backend not in found:
+        raise ValueError("AppImage GUI did not map the private backend client")
+    return sorted(found)
+
+
+def require_extraction_cleanup(image):
+    if any(image["tmp"].glob("appimage_extracted_*")):
+        raise ValueError("AppImage runtime left its private extraction behind")
+
+
+def stop_appimage(process, image):
+    if process.poll() is None:
+        try:
+            gui, _ = appimage_gui(process.pid, image)
+        except (OSError, ValueError):
+            # The GUI may already be gone while its parent removes the AppDir.
+            gui = None
+        if gui is not None:
+            try:
+                os.kill(gui, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+        try:
+            process.wait(timeout=8)
+        except subprocess.TimeoutExpired:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            process.wait(timeout=8)
+    require_extraction_cleanup(image)
+
+
+def initial_rdp_request(header, stream):
+    length = int.from_bytes(header[2:], "big")
+    if not 19 <= length <= 4096:
+        raise ValueError("Invalid initial RDP request length")
+    body = stream.read(length - 4)
+    if (len(body) != length - 4 or body[0] != len(body) - 1 or body[1] != 0xe0
+            or body[2:4] != b"\x00\x00" or body[-8] != 1 or body[-6:-4] != b"\x08\x00"):
+        raise ValueError("Missing X.224 connection request or RDP negotiation request")
+    return header + body
+
+
+def rdp_session_probe(executable, helper, helper_digest, isolated, environment, evidence, software_gl=False, appimage=None):
     host = platform.system()
     windows_workspace = host == "Windows"
     workspace = (Path(environment["LOCALAPPDATA"]) / "Harbor" if windows_workspace
@@ -172,7 +269,7 @@ def rdp_session_probe(executable, helper, helper_digest, isolated, environment, 
         }
         preferences = {"font_size": 19.0}
         config.write_text(json.dumps({"sessions": [profile], "preferences": preferences}))
-        args = [executable]
+        args = [executable, *(["--appimage-extract-and-run"] if appimage else [])]
         if not windows_workspace:
             args.extend(["--data-dir", workspace])
         args.extend(["--session", "package-rdp-test"])
@@ -180,7 +277,7 @@ def rdp_session_probe(executable, helper, helper_digest, isolated, environment, 
             app = subprocess.Popen(
                 args,
                 cwd=isolated, env=environment, stdin=subprocess.DEVNULL,
-                stdout=log, stderr=subprocess.STDOUT,
+                stdout=log, stderr=subprocess.STDOUT, start_new_session=bool(appimage),
             )
             try:
                 deadline = time.monotonic() + 30
@@ -200,15 +297,19 @@ def rdp_session_probe(executable, helper, helper_digest, isolated, environment, 
                         header = incoming.read(4)
                         if len(header) != 4 or header[:2] != b"\x03\x00":
                             raise ValueError("Packaged RDP session did not send a TPKT header.")
+                        if appimage:
+                            request = initial_rdp_request(header, incoming)
+                            appimage["negotiation_sha256"] = hashlib.sha256(request).hexdigest()
+                            log.write(b"\n[AppImage loopback X.224/RDP negotiation] " + request.hex().encode("ascii") + b"\n")
+                            log.flush()
                         if host == "Windows":
                             windows_rdp_child(app.pid, helper, helper_digest, software_gl)
                         elif host == "Linux":
-                            threads = Path(f"/proc/{app.pid}/task")
-                            children = {
-                                pid for thread in threads.iterdir()
-                                if (thread / "children").exists()
-                                for pid in (thread / "children").read_text().split()
-                            }
+                            gui_pid = app.pid
+                            if appimage:
+                                gui_pid, appdir = appimage_gui(app.pid, appimage)
+                                appimage["mapped"] = appimage_libraries(gui_pid, appdir, appimage)
+                            children = linux_children(gui_pid)
                             if not any(
                                 linux_rdp_helper_matches(Path(f"/proc/{pid}/exe"), helper_digest)
                                 for pid in children
@@ -218,7 +319,9 @@ def rdp_session_probe(executable, helper, helper_digest, isolated, environment, 
                             if not macos_rdp_helper_matches(app.pid, helper_digest):
                                 raise ValueError("RDP session did not start the verified macOS helper.")
             finally:
-                if app.poll() is None:
+                if appimage:
+                    stop_appimage(app, appimage)
+                elif app.poll() is None:
                     app.terminate()
                     try:
                         app.wait(5)
@@ -240,7 +343,7 @@ def successful_wayland_connect(trace, socket_path):
     return next((line for line in trace.splitlines() if re.fullmatch(pattern, line)), None)
 
 
-def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None):
+def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None, appimage_core=None):
     from PIL import Image, ImageStat
 
     evidence.mkdir(parents=True, exist_ok=False)
@@ -250,11 +353,28 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None):
         isolated = Path(temporary).resolve()
         package_dir = isolated / "package files"
         package_dir.mkdir()
-        extract(archive, package_dir)
-        roots = list(package_dir.iterdir())
-        if len(roots) != 1 or not roots[0].is_dir():
-            raise ValueError("Expected one package directory.")
-        root = roots[0]
+        appimage = None
+        if appimage_core:
+            spec = importlib.util.spec_from_file_location("appimage", Path(__file__).with_name("package-appimage.py"))
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            info, appdir = module.verify_image(appimage_core, archive, archive.with_name(
+                archive.name.removesuffix(".AppImage") + "-AppImage-source.tar.gz"), package_dir)
+            root = appdir / module.PORTABLE
+            local_image = isolated / archive.name
+            shutil.copyfile(archive, local_image)
+            if sha256(local_image) != sha256(archive):
+                raise ValueError("Relocated AppImage differs from the inspected file")
+            local_image.chmod(0o700)
+            appimage = {"metadata": info, "tmp": isolated / "runtime", "wayland": bool(native_wayland),
+                        "gui_sha256": sha256(root / "harbor-workspace")}
+            appimage["tmp"].mkdir(mode=0o700)
+        else:
+            extract(archive, package_dir)
+            roots = list(package_dir.iterdir())
+            if len(roots) != 1 or not roots[0].is_dir():
+                raise ValueError("Expected one package directory.")
+            root = roots[0]
         manifests = list(root.rglob("PACKAGE-MANIFEST.json"))
         if len(manifests) != 1:
             raise ValueError("Expected one package manifest.")
@@ -271,6 +391,16 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None):
         for variable in tuple(environment):
             if variable.startswith(("LD_", "DYLD_", "CARGO_", "TERMCRAFT_")):
                 environment.pop(variable)
+        if appimage:
+            executable = local_image
+            for key in tuple(environment):
+                if key.startswith("APPIMAGE") or key in {"APPDIR", "ARGV0", "TARGET_APPIMAGE", "NO_CLEANUP"}:
+                    environment.pop(key)
+            environment.update(TMPDIR=str(appimage["tmp"]), XDG_CACHE_HOME=str(isolated / "cache"),
+                               XDG_STATE_HOME=str(isolated / "state"))
+            if not native_wayland:
+                environment["XDG_RUNTIME_DIR"] = str(isolated / "xdg-runtime")
+                Path(environment["XDG_RUNTIME_DIR"]).mkdir(mode=0o700)
         if display:
             environment["DISPLAY"] = display
             environment.pop("WAYLAND_DISPLAY", None)
@@ -287,10 +417,12 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None):
                     raise ValueError(f"Staged software GL fixture changed: {name}")
             environment["GALLIUM_DRIVER"] = "llvmpipe"
         for name, program, args in (
-            ("help", executable, ["--help"]),
+            ("help", executable, [*(["--appimage-extract-and-run"] if appimage else []), "--help"]),
             ("rdp-helper", helper, []),
         ):
             result = run([program, *args], isolated, environment, evidence / f"{name}.log")
+            if appimage and name == "help":
+                require_extraction_cleanup(appimage)
             if name == "help" and b"TermCraft remote workspace" not in result:
                 raise ValueError("Packaged executable returned unexpected help output.")
             if name == "rdp-helper":
@@ -301,7 +433,7 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None):
                     raise ValueError("RDP helper returned an unexpected handshake.")
         screenshot = evidence / "startup.png"
         launcher = bindir / "termcraft-desktop-launcher" if host == "macos" else executable
-        launch = [launcher, "--data-dir", isolated / "workspace data", "--screenshot", screenshot]
+        launch = [launcher, *(["--appimage-extract-and-run"] if appimage else []), "--data-dir", isolated / "workspace data", "--screenshot", screenshot]
         if native_wayland:
             socket_path = native_wayland["socket"]
             tracer = shutil.which("strace")
@@ -311,6 +443,8 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None):
             trace = isolated / "wayland-connect.trace"
             launch = [tracer, "--kill-on-exit", "-f", "-e", "trace=connect", "-s", "256", "-o", trace, *launch]
         run(launch, isolated, environment, evidence / "startup.log")
+        if appimage:
+            require_extraction_cleanup(appimage)
         wayland = {}
         if native_wayland:
             connected = successful_wayland_connect(trace.read_bytes(), socket_path)
@@ -324,15 +458,23 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None):
                 "display_absent": True, "wayland_socket_absent": True,
             }}
         with Image.open(screenshot) as image:
+            if image.width > 8192 or image.height > 8192:
+                raise ValueError("Screenshot exceeds the size limit")
             stats = ImageStat.Stat(image.convert("RGB"))
             if image.width < 640 or image.height < 400 or max(stats.stddev) < 2:
                 raise ValueError("Screenshot is too small or blank.")
             size = image.size
         helper_digest = manifest["files"][helper.relative_to(root).as_posix()]
         rdp_session_probe(executable, helper, helper_digest, isolated, environment, evidence,
-                          software_gl is not None)
+                          software_gl is not None, appimage)
         (evidence / "verification.json").write_text(json.dumps({
             **wayland,
+            **({"appimage": {"mode": "extract-and-run", "core_sha256": info["core"]["sha256"],
+                              "runtime_sha256": info["runtime"]["sha256"], "source_sha256": info["corresponding_source"]["sha256"],
+                              "highest_required_glibc": info["highest_required_glibc"], "gui_sha256": appimage["gui_sha256"],
+                              "helper_sha256": helper_digest, "mapped_private_libraries": appimage["mapped"],
+                              "negotiation_sha256": appimage["negotiation_sha256"],
+                              "runtime_reaped_and_clean": True}} if appimage else {}),
             "archive": archive.name, "archive_sha256": sha256(archive),
             "manifest_schema": manifest["schema_version"], "platform": host,
             "display_backend": (
@@ -356,10 +498,11 @@ def main():
     parser.add_argument("--display", help="Optional X11 display, e.g. :99")
     parser.add_argument("--windows-software-gl", type=Path,
                         help="Directory with the pinned x64 Mesa 26.3.1 test DLLs")
+    parser.add_argument("--appimage-core", type=Path, help="Independently verified core tarball for outer AppImage qualification")
     args = parser.parse_args()
     try:
         smoke(args.archive.resolve(strict=True), args.evidence.resolve(), args.display,
-              args.windows_software_gl)
+              args.windows_software_gl, appimage_core=args.appimage_core)
     except (OSError, ValueError, ImportError, subprocess.SubprocessError) as error:
         parser.exit(1, f"Startup verification failed: {error}\n")
 

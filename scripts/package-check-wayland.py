@@ -35,7 +35,7 @@ def wait_socket(server, path, deadline):
     raise ValueError("Private Weston socket did not become ready")
 
 
-def check(archive, evidence, source, log):
+def check(archive, evidence, source, log, appimage_core=None):
     if os.getuid() == 0:
         raise ValueError("Run the private Wayland fixture as an ordinary user")
     log.parent.mkdir(parents=True, exist_ok=True)
@@ -59,7 +59,7 @@ def check(archive, evidence, source, log):
                 STARTUP.smoke(archive, evidence, None, native_wayland={
                     "source_sha": source, "environment": {**environment, "WAYLAND_DISPLAY": name},
                     "socket": path, "weston_pid": server.pid, "socket_inode": inode,
-                })
+                }, appimage_core=appimage_core)
                 if server.poll() is not None or not path.is_socket() or path.stat().st_ino != inode:
                     raise ValueError("Owned compositor or socket changed during the startup check")
             finally:
@@ -80,9 +80,10 @@ def main():
     parser.add_argument("--evidence", required=True, type=Path)
     parser.add_argument("--source", required=True)
     parser.add_argument("--weston-log", required=True, type=Path)
+    parser.add_argument("--appimage-core", type=Path)
     args = parser.parse_args()
     try:
-        check(args.archive.resolve(strict=True), args.evidence.resolve(), args.source, args.weston_log)
+        check(args.archive.resolve(strict=True), args.evidence.resolve(), args.source, args.weston_log, args.appimage_core)
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         parser.exit(1, f"Native Wayland check failed: {error}\n")
 

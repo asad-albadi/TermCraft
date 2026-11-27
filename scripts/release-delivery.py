@@ -5,6 +5,7 @@ import argparse
 import gzip
 import hashlib
 import importlib.util
+import io
 import json
 import math
 import os
@@ -43,7 +44,7 @@ SAFE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,199}")
 REPO = re.compile(r"[A-Za-z0-9][A-Za-z0-9-]*/[A-Za-z0-9][A-Za-z0-9_.-]*")
 STARTUP_FILES = {"verification.json", "startup.png", "startup.log", "help.log",
                  "rdp-helper.log", "rdp-session.log"}
-PENDING_GATES = ("linux-native-wayland", "two-version-lifecycle-linux",
+PENDING_GATES = ("linux-appimage-x11-wayland-source", "linux-native-wayland", "two-version-lifecycle-linux",
                  "two-version-lifecycle-macos", "two-version-lifecycle-windows")
 
 
@@ -57,6 +58,7 @@ def load_sibling(name):
 PACKAGER = load_sibling("package-release")
 DEBIAN = load_sibling("package-debian")
 STARTUP = load_sibling("package-check-startup")
+APPIMAGE = load_sibling("package-appimage")
 
 
 def require(condition, message):
@@ -310,6 +312,7 @@ def verify_portable(root, archive, platform, versions, inputs, work):
     return {"name": manifest_path.relative_to(package).as_posix(),
             "sha256": sha256(manifest_path), "schema": manifest["schema_version"], "build": identity,
             "app_sha256": files[app_member(platform)],
+            **({"rdp_helper_sha256": files["termcraft-rdp-engine"]} if platform == "linux" else {}),
             **({"linux_portable_files": sorted([*files, "PACKAGE-MANIFEST.json"])} if platform == "linux" else {}),
             "dependency_notices": {"sha256": PACKAGER.source_digest(expected_notices),
                                    "crates": len(expected_notices["crates"]),
@@ -624,18 +627,55 @@ def verify_native_evidence(root, lifecycle, wayland, platform, source, version, 
     if platform == "linux":
         require(wayland is not None and wayland.is_dir(), "Native Wayland evidence is required")
         check = verify_startup(root, wayland, portable, artifacts[portable], platform, expected_backend="Wayland")
-        obs = check["observation"]
-        weston = obs["weston"]
-        socket = weston["socket"]
-        trace = (wayland / "startup.log").read_bytes()
-        require(obs["source_sha"] == source and weston["backend"] == "headless"
-                and weston["display_absent"] is True and weston["wayland_socket_absent"] is True
-                and weston["runtime_mode"] == "0700" and type(weston["pid"]) is int and weston["pid"] > 1
-                and type(weston["socket_inode"]) is int and weston["socket_inode"] > 0
-                and PurePosixPath(socket).is_absolute() and PurePosixPath(socket).name == "termcraft-release-wayland"
-                and STARTUP.successful_wayland_connect(trace, socket), "Native Wayland provenance or actual Weston socket connection missing")
+        verify_wayland(check, wayland, source)
         result["wayland"] = check
     return result
+
+
+def verify_wayland(check, wayland, source):
+    obs = check["observation"]
+    weston = obs["weston"]
+    socket = weston["socket"]
+    trace = (wayland / "startup.log").read_bytes()
+    require(obs["source_sha"] == source and weston["backend"] == "headless"
+            and weston["display_absent"] is True and weston["wayland_socket_absent"] is True
+            and weston["runtime_mode"] == "0700" and type(weston["pid"]) is int and weston["pid"] > 1
+            and type(weston["socket_inode"]) is int and weston["socket_inode"] > 0
+            and PurePosixPath(socket).is_absolute() and PurePosixPath(socket).name == "termcraft-release-wayland"
+            and STARTUP.successful_wayland_connect(trace, socket), "Native Wayland provenance or actual Weston socket connection missing")
+
+
+
+def verify_appimage_evidence(root, directory, source, entries, portable, version, manifest, work):
+    name, corresponding = APPIMAGE.names(version)
+    info, _ = APPIMAGE.verify_image(entries[portable], entries[name], entries[corresponding], work)
+    checks = {}
+    for backend in ("X11", "Wayland"):
+        location = directory / f"appimage-{backend.lower()}-evidence"
+        check = verify_startup(root, location, name, sha256(entries[name]), "linux", expected_backend=backend)
+        if backend == "Wayland":
+            verify_wayland(check, location, source)
+        obs = check["observation"]["appimage"]
+        mapped = obs["mapped_private_libraries"]
+        require(isinstance(mapped, list) and all(isinstance(lib, str) for lib in mapped)
+                and mapped == sorted(set(mapped)) and set(mapped) <= set(info["libraries"])
+                and ("libwayland-client.so.0" if backend == "Wayland" else "libX11.so.6") in mapped,
+                "Missing actual AppImage private client-library identity")
+        evidence = (location / "rdp-session.log").read_bytes()
+        packets = re.findall(rb"^\[AppImage loopback X\.224/RDP negotiation\] ([0-9a-f]{38,8192})$", evidence, re.M)
+        require(len(packets) == 1, "Missing unique initial RDP negotiation observation")
+        packet = bytes.fromhex(packets[0].decode("ascii"))
+        require(packet[:2] == b"\x03\x00" and packet == STARTUP.initial_rdp_request(packet[:4], io.BytesIO(packet[4:])),
+                "Invalid initial AppImage RDP negotiation")
+        require(obs == {"mode": "extract-and-run", "core_sha256": info["core"]["sha256"],
+                        "runtime_sha256": info["runtime"]["sha256"], "source_sha256": info["corresponding_source"]["sha256"],
+                        "highest_required_glibc": info["highest_required_glibc"], "gui_sha256": manifest["app_sha256"],
+                        "helper_sha256": manifest["rdp_helper_sha256"], "mapped_private_libraries": mapped,
+                        "negotiation_sha256": hashlib.sha256(packet).hexdigest(),
+                        "runtime_reaped_and_clean": True} and obs["runtime_reaped_and_clean"] is True,
+                "AppImage launch evidence differs from the inspected outer image, source, GUI or helper")
+        checks[backend] = check
+    return {"manifest": info, "startup": checks}
 
 
 def verify_candidate(root, source, version, platform, dist, startup, inputs, lifecycle=None, wayland=None):
@@ -646,12 +686,14 @@ def verify_candidate(root, source, version, platform, dist, startup, inputs, lif
     names = {portable}
     if platform == "linux":
         names.add(f"termcraft_{version}_amd64.deb")
+        names.update(APPIMAGE.names(version))
     entries = regular_entries(dist)
     require(set(entries) == names, "Missing or unexpected candidate artifact filenames")
     artifacts = {name: sha256(path) for name, path in entries.items()}
     with tempfile.TemporaryDirectory(prefix="termcraft-verify-") as temporary:
         work = Path(temporary).resolve()
         manifest = verify_portable(root, entries[portable], platform, versions, inputs, work)
+        appimage = {}
         if platform == "linux":
             # The repository builder emits a deterministic envelope including
             # the portable payload and both internal manifests. Comparing it
@@ -659,6 +701,8 @@ def verify_candidate(root, source, version, platform, dist, startup, inputs, lif
             deb = DEBIAN.package_debian(entries[portable], work / "deb")
             require(sha256(deb) == artifacts[deb.name], "Debian package differs from its portable source or own manifest")
             debian = {"name": deb.name, "portable_archive_sha256": artifacts[portable]}
+            appimage["appimage"] = verify_appimage_evidence(root, startup.parent, source, entries, portable, version,
+                                                            manifest, work / "appimage")
         else:
             debian = None
     observation = verify_startup(root, startup, portable, artifacts[portable], platform)
@@ -666,8 +710,9 @@ def verify_candidate(root, source, version, platform, dist, startup, inputs, lif
     return {"schema": 1, "source_sha": source, "version": version, "package_versions": versions,
             "scope": SCOPE, "platform": platform, "architecture": TARGETS[platform][0],
             "artifacts": artifacts, "package_manifest": manifest, "debian": debian,
-            "checks_passed": ["portable-contents", "locked-dependency-notices", "native-startup", *(["debian-portable-match"] if debian else [])],
-            "startup": observation, **native}
+            "checks_passed": ["portable-contents", "locked-dependency-notices", "native-startup",
+                              *(["debian-portable-match", "linux-appimage-x11-wayland-source"] if debian else [])],
+            "startup": observation, **native, **appimage}
 
 
 def stage_candidate(root, source, version, platform, dist, startup, output, lifecycle=None, wayland=None):
@@ -679,6 +724,9 @@ def stage_candidate(root, source, version, platform, dist, startup, output, life
     shutil.copytree(lifecycle, output / "lifecycle-evidence")
     if wayland is not None:
         shutil.copytree(wayland, output / "wayland-evidence")
+        for backend in ("x11", "wayland"):
+            name = f"appimage-{backend}-evidence"
+            shutil.copytree(startup.parent / name, output / name)
     write_json(output / "candidate.json", result)
     return result
 
@@ -708,7 +756,7 @@ def assemble(root, source, version, candidates, output, regression=None):
                 "Expected exactly one inventory for each platform")
         require(directory.name == f"candidate-{TARGETS[platform][1]}" and
                 {item.name for item in directory.iterdir()} == ({"candidate.json", "dist", "startup-evidence", "lifecycle-evidence"} |
-                 ({"wayland-evidence"} if platform == "linux" else set())),
+                 ({"wayland-evidence", "appimage-x11-evidence", "appimage-wayland-evidence"} if platform == "linux" else set())),
                 "Unexpected candidate artifact layout")
         inventory[platform] = (value, directory)
     require(set(inventory) == set(TARGETS), "Expected exactly one inventory for each platform")
@@ -857,7 +905,7 @@ def publication_files(directory, source, version):
             "Release inventory is not publication-ready")
     expected_assets = {portable_name(platform, version) for platform in TARGETS}
     source_archive = f"TermCraft-source-{source}.tar.gz"
-    expected_assets |= {f"termcraft_{version}_amd64.deb", source_archive}
+    expected_assets |= {f"termcraft_{version}_amd64.deb", source_archive, *APPIMAGE.names(version)}
     artifacts = inventory["artifacts"]
     require(set(artifacts) == expected_assets and set(entries) == (expected_assets | {"release-inventory.json", "SHA256SUMS"})
             and inventory["source"]["archive"] == source_archive and inventory["source"]["commit"] == source
