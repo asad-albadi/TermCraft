@@ -888,3 +888,8 @@ Qualified archive68f356… (1415 verified files) includes reviewed default13game
 The new36-option parent run has881 passes andone fixture BrokenPipe failure, allsourcehashesstable. Independent review accepted its C fixture protocol repair, deterministicRED/GREEN/40repeats/securitycounterexample; production plugin execution/security logic is unchanged. Advanced51-preset UI integration is next reviewed batch; B06 remains open.
 
 Native Debian Bookworm core app and helper compiled from frozen4726… source, and a29MiB portable archive was produced. Debian wrapping failed because documentedPython3.11 compatibility incorrectly relied on newer tarfile.extractall(filter=...). A private security-preserving compatibility fix and old/current Python tests are in progress; no Debian qualification is claimed yet.
+
+
+### P08 unsigned desktop delivery — 2026-11-27
+
+**76.7% (46/60 implementation checkpoints); strict native/original parity0/60.** Reviewed source6571b95 passed all three native CI lanes and strict manual release run45974136835: Linux/Windows/macOS package qualification, increasing-version lifecycle and preservation, Linux X11/native Wayland/AppImage startup and independent three-platform aggregation. Manual publication was skipped. Source identity and remaining distribution/hardware boundaries are recorded in [P08 evidence](docs/parity-evidence/release-automation/2026-11-27-p08.md). This documentation follow-up does not relabel the tested source, close P08's remaining runtime/signing/publication gates or advance parity counts.
