@@ -5,6 +5,14 @@ ditto to preserve executable permissions. Move the entire TermCraft.app
 bundle to Applications or another folder you control, then open it in
 Finder. Keep the bundle intact when moving or copying it.
 
+Gatekeeper may block the first launch of this downloaded bundle because it
+is unsigned and not notarized. Only if you have verified the download's
+source and integrity and your device policy permits it, follow Apple's
+per-app approval guidance:
+  https://support.apple.com/en-us/102445
+If your device policy prohibits opening the bundle, stop and contact your
+administrator. Do not disable Gatekeeper or change global security settings.
+
 Optional per-user registration requires Python 3. In Terminal, set APP to
 the actual location of the extracted or installed bundle, for example:
 
