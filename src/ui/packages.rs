@@ -203,15 +203,15 @@ impl State {
                 }
             });
             if let Some((release, archive, repair)) = self.archive.as_ref() {
-                ui.separator();
-                ui.label(format!(
+                let dismissed = fluent::surface(ui).show(ui,|ui| {
+                ui.strong(format!(
                     "BusyBox {} · {}",
                     release.version,
                     archive.display()
                 ));
                 ui.monospace(&release.sha256);
-                let dismissed = ui
-                    .horizontal(|ui| {
+                ui
+                    .horizontal_wrapped(|ui| {
                         if ui.button("Confirm package operation").clicked() {
                             self.job = Some(if *repair {
                                 manager.repair(release.clone(), archive.clone())
@@ -223,7 +223,8 @@ impl State {
                             ui.button("Cancel selection").clicked()
                         }
                     })
-                    .inner;
+                    .inner
+                }).inner;
                 if dismissed {
                     self.archive = None;
                 }

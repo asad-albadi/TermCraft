@@ -339,33 +339,129 @@ impl Workspace {
         let mut apply = false;
         let mut close = false;
         let applying = state.applying();
-        let response=Modal::new(Id::new("session-import-preview")).show(ctx,|ui|{
-            ui.set_min_width(620.);ui.set_max_width(800.);
-            ui.heading("Import saved sessions");ui.label(&state.source);
-            if state.job.is_some(){ui.spinner();ui.label(if applying{"Saving the reviewed sessions…"}else{"Reading and checking the source…"});}
-            if !state.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&state.error);}
-            if let Some(summary)=&state.applied {ui.label(format!("Imported {} · replaced {} · skipped {}",summary.added,summary.replaced,summary.skipped));}
-            if let Some(report)=&state.preview {
-                ui.label(format!("{} · {} · {} candidate sessions",report.format,report.encoding,report.candidates.len()));
-                ui.small("Preview only until Apply. Credentials and unsupported options are omitted; no connection is started.");
-                ScrollArea::vertical().id_salt("import-candidates").max_height(260.).show_rows(ui,54.,report.candidates.len(),|ui,range|{
-                    for i in range {let entry=&report.candidates[i];let s=&entry.session;
-                        ui.label(RichText::new(format!("{} · {}:{} · {}",s.name,s.host,s.port,s.folder)).strong()).on_hover_text(format!("Source line {}",entry.location.line));
-                        ui.add(Label::new(format!("User: {} · key: {}",s.user,if s.key.is_empty(){"none"}else{&s.key})).truncate());ui.add_space(8.);
+        let size = fluent::dialog_size(ctx, 680., 120.);
+        let response = fluent::modal(
+            ctx,
+            Id::new("session-import-preview"),
+            "Import saved sessions",
+            size,
+            |ui| {
+                fluent::dialog_body(ui, size, |ui| {
+                    ui.label(&state.source);
+                    if state.job.is_some() {
+                        ui.spinner();
+                        ui.label(if applying {
+                            "Saving the reviewed sessions…"
+                        } else {
+                            "Reading and checking the source…"
+                        });
                     }
-                });
-                if !report.unsupported.is_empty(){ui.collapsing(format!("{} unsupported/excluded fields (values omitted)",report.unsupported.len()),|ui|{
-                    ScrollArea::vertical().id_salt("import-warnings").max_height(180.).show_rows(ui,40.,report.unsupported.len(),|ui,range|for i in range {let f=&report.unsupported[i];ui.label(format!("Line {} · {}",f.location.line,f.field));ui.add(Label::new(&f.message).truncate());});
-                });}
-                if report.omitted_warnings>0{ui.label(format!("{} more warning details omitted at the 1,000-detail display limit",report.omitted_warnings));}
-                ui.add_enabled_ui(!applying,|ui|{
+                    if !state.error.is_empty() {
+                        ui.colored_label(ui.visuals().error_fg_color, &state.error);
+                    }
+                    if let Some(summary) = &state.applied {
+                        ui.label(format!(
+                            "Imported {} · replaced {} · skipped {}",
+                            summary.added, summary.replaced, summary.skipped
+                        ));
+                    }
+                    if let Some(report) = &state.preview {
+                        ui.label(format!(
+                            "{} · {} · {} candidate sessions",
+                            report.format,
+                            report.encoding,
+                            report.candidates.len()
+                        ));
+                        ui.small("Preview only until Apply. Credentials and unsupported options are omitted; no connection is started.");
+                        ScrollArea::vertical()
+                            .id_salt("import-candidates")
+                            .max_height(260.)
+                            .show_rows(ui, 54., report.candidates.len(), |ui, range| {
+                                for i in range {
+                                    let entry = &report.candidates[i];
+                                    let s = &entry.session;
+                                    ui.label(
+                                        RichText::new(format!(
+                                            "{} · {}:{} · {}",
+                                            s.name, s.host, s.port, s.folder
+                                        ))
+                                        .strong(),
+                                    )
+                                    .on_hover_text(format!("Source line {}", entry.location.line));
+                                    ui.add(
+                                        Label::new(format!(
+                                            "User: {} · key: {}",
+                                            s.user,
+                                            if s.key.is_empty() { "none" } else { &s.key }
+                                        ))
+                                        .truncate(),
+                                    );
+                                    ui.add_space(8.);
+                                }
+                            });
+                        if !report.unsupported.is_empty() {
+                            ui.collapsing(
+                                format!(
+                                    "{} unsupported/excluded fields (values omitted)",
+                                    report.unsupported.len()
+                                ),
+                                |ui| {
+                                    ScrollArea::vertical()
+                                        .id_salt("import-warnings")
+                                        .max_height(180.)
+                                        .show_rows(
+                                            ui,
+                                            40.,
+                                            report.unsupported.len(),
+                                            |ui, range| {
+                                                for i in range {
+                                                    let f = &report.unsupported[i];
+                                                    ui.label(format!(
+                                                        "Line {} · {}",
+                                                        f.location.line, f.field
+                                                    ));
+                                                    ui.add(Label::new(&f.message).truncate());
+                                                }
+                                            },
+                                        );
+                                },
+                            );
+                        }
+                        if report.omitted_warnings > 0 {
+                            ui.label(format!(
+                                "{} more warning details omitted at the 1,000-detail display limit",
+                                report.omitted_warnings
+                            ));
+                        }
+                        ui.add_enabled_ui(!applying,|ui|{
                     ui.horizontal(|ui|{ui.label("Same name and folder:");ui.selectable_value(&mut state.policy,DuplicatePolicy::Skip,"Skip");ui.selectable_value(&mut state.policy,DuplicatePolicy::KeepBoth,"Keep both");ui.selectable_value(&mut state.policy,DuplicatePolicy::Replace,"Replace");});
                     ui.small("Replace keeps the existing saved-session ID. Keep both creates a new identity and name.");
-                    apply=ui.add_enabled(self.store_ok&&!report.candidates.is_empty(),Button::new("Apply reviewed import")).clicked();
+
                 });
-            }
-            close=ui.add_enabled(!applying,Button::new(if state.applied.is_some(){"Close"}else{"Cancel import"})).clicked();
-        });
+                    }
+                });
+                ui.horizontal_wrapped(|ui| {
+                    if let Some(report) = &state.preview {
+                        apply = ui
+                            .add_enabled(
+                                !applying && self.store_ok && !report.candidates.is_empty(),
+                                Button::new("Apply reviewed import"),
+                            )
+                            .clicked();
+                    }
+                    close = ui
+                        .add_enabled(
+                            !applying,
+                            Button::new(if state.applied.is_some() {
+                                "Close"
+                            } else {
+                                "Cancel import"
+                            }),
+                        )
+                        .clicked();
+                });
+            },
+        );
         if response.should_close() && !applying {
             close = true;
         }

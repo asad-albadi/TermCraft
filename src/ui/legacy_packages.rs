@@ -114,6 +114,9 @@ impl State {
                     }
                 }
                 if let Some(review) = &self.review {
+                    let mut import = false;
+                    let mut cancel = false;
+                    crate::ui::fluent::surface(ui).show(ui, |ui| {
                     let metadata = review.metadata();
                     ui.strong(&metadata.source_name);
                     ui.label(format!("{} files · {:.1} MB unpacked", metadata.files.len(), metadata.files.iter().map(|file| file.decoded_bytes).sum::<u64>() as f64 / (1024.0 * 1024.0)));
@@ -124,13 +127,15 @@ impl State {
                         }
                     });
                     ui.label("Importing saves a local file inventory and fingerprints. It does not verify the publisher or install missing dependencies.");
-                    ui.horizontal(|ui| {
-                        if ui.button("Import files with commands disabled").clicked() {
-                            let review = self.review.take().unwrap();
-                            self.start(ui, move |cancel| review.import(&root, cancel).map(Reply::Imported).map_err(|e| e.to_string()));
-                        }
-                        if ui.button("Discard preview").clicked() { self.review = None; }
+                    ui.horizontal_wrapped(|ui| {
+                        import = ui.button("Import files with commands disabled").clicked();
+                        cancel = ui.button("Discard preview").clicked();
                     });
+                    });
+                    if import {
+                        let review = self.review.take().unwrap();
+                        self.start(ui, move |cancel| review.import(&root, cancel).map(Reply::Imported).map_err(|e| e.to_string()));
+                    } else if cancel { self.review = None; }
                 }
             }
             if !self.status.is_empty() { ui.label(&self.status); }

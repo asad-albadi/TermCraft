@@ -254,8 +254,9 @@ impl Workspace {
         let mut open = true;
         let mut save = false;
         let mut cancel = false;
-        Window::new("Global terminal profile").id(Id::new("global-terminal-profile")).open(&mut open).default_width(680.).show(ctx,|ui|{
-            ScrollArea::vertical().max_height(530.).show(ui,|ui|{
+        let size = fluent::dialog_size(ctx, 680., 148.);
+        fluent::modeless(ctx, Id::new("global-terminal-profile"), "Global terminal profile", size).open(&mut open).show(ctx,|ui|{
+            fluent::dialog_body(ui,size,|ui|{
                 ui.label("Font family (bundled fonts and configured fallback)");fonts(ui,&mut editor.settings.font_family);ui.add(Slider::new(&mut editor.settings.font_size,8.0..=32.).suffix(" px"));
                 ui.label("Character encoding");encoding(ui,&mut editor.settings.encoding);ui.small("Other encodings, UTF-16/stateful control encodings and arbitrary OS font discovery are not supported. Encoding changes affect new bytes; retained output and raw logs are preserved. An encoding change waits for a running paste to finish.");
                 ui.label("Backspace sends");backspace(ui,&mut editor.settings.backspace);dimensions(ui,&mut editor.settings.dimensions);

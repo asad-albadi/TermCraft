@@ -670,133 +670,160 @@ impl Workspace {
         let mut delete = None;
         let mut change = false;
         let mut lock = false;
-        let response = Modal::new(Id::new("credential-manager")).show(ctx, |ui| {
-            ui.set_min_width(480.);
-            ui.heading("Credential vault");
-            if self.credentials.lock_requested {
-                ui.label("Locking after the current operation finishes…");
-            } else if self.credentials.job.is_some() {
-                ui.label("Working…");
-            } else if self.vault_unlocked() {
-                ui.label("Unlocked");
-            } else {
-                ui.label("Locked. Passwords are saved only when you choose Save in vault.");
-            }
-            if !self.credentials.error.is_empty() {
-                ui.colored_label(Color32::from_rgb(210, 90, 75), &self.credentials.error);
-            }
-            if self.credentials.job.is_none() {
-                if let Some(editor) = &mut self.credentials.editor {
-                    let title = match editor.mode {
-                        MasterMode::Create => "Create vault",
-                        MasterMode::Unlock => "Unlock vault",
-                        MasterMode::Change => "Change master password",
-                    };
-                    ui.strong(title);
-                    let prompt = harbor_workspace::ssh::Prompt {
-                        label: "Master password".into(),
-                        echo: false,
-                    };
-                    ui.label(&prompt.label);
-                    remote_files::auth_field_scoped(
-                        ui,
-                        "vault-master",
-                        0,
-                        0,
-                        0,
-                        &prompt,
-                        &mut editor.master,
-                    );
-                    if editor.mode != MasterMode::Unlock {
-                        ui.label("Repeat master password");
-                        remote_files::auth_field_scoped(
-                            ui,
-                            "vault-master",
-                            0,
-                            0,
-                            1,
-                            &prompt,
-                            &mut editor.repeat,
-                        );
+        let mut leave_master_editor = false;
+        let size = fluent::dialog_size(ctx, 520., 110.);
+        let response = fluent::modal(
+            ctx,
+            Id::new("credential-manager"),
+            "Credential vault",
+            size,
+            |ui| {
+                fluent::dialog_body(ui, size, |ui| {
+                    if self.credentials.lock_requested {
+                        ui.label("Locking after the current operation finishes…");
+                    } else if self.credentials.job.is_some() {
+                        ui.label("Working…");
+                    } else if self.vault_unlocked() {
+                        ui.label("Unlocked");
+                    } else {
+                        ui.label("Locked. Passwords are saved only when you choose Save in vault.");
                     }
-                    if ui.button(title).clicked() {
-                        if editor.master.is_empty() || editor.master.len() > 1024 {
-                            self.credentials.error =
-                                "Enter a master password of 1–1024 bytes.".into();
-                        } else if editor.mode != MasterMode::Unlock
-                            && editor.master.as_str() != editor.repeat.as_str()
-                        {
-                            self.credentials.error = "The master passwords do not match.".into();
+                    if !self.credentials.error.is_empty() {
+                        ui.colored_label(ui.visuals().error_fg_color, &self.credentials.error);
+                    }
+                    if self.credentials.job.is_none() {
+                        if let Some(editor) = &mut self.credentials.editor {
+                            let title = match editor.mode {
+                                MasterMode::Create => "Create vault",
+                                MasterMode::Unlock => "Unlock vault",
+                                MasterMode::Change => "Change master password",
+                            };
+                            ui.strong(title);
+                            let prompt = harbor_workspace::ssh::Prompt {
+                                label: "Master password".into(),
+                                echo: false,
+                            };
+                            let label = ui.label(&prompt.label);
+                            remote_files::auth_field_scoped(
+                                ui,
+                                "vault-master",
+                                0,
+                                0,
+                                0,
+                                &prompt,
+                                &mut editor.master,
+                            )
+                            .labelled_by(label.id);
+                            if editor.mode != MasterMode::Unlock {
+                                let label = ui.label("Repeat master password");
+                                remote_files::auth_field_scoped(
+                                    ui,
+                                    "vault-master",
+                                    0,
+                                    0,
+                                    1,
+                                    &prompt,
+                                    &mut editor.repeat,
+                                )
+                                .labelled_by(label.id);
+                            }
+                            if ui.button(title).clicked() {
+                                if editor.master.is_empty() || editor.master.len() > 1024 {
+                                    self.credentials.error =
+                                        "Enter a master password of 1–1024 bytes.".into();
+                                } else if editor.mode != MasterMode::Unlock
+                                    && editor.master.as_str() != editor.repeat.as_str()
+                                {
+                                    self.credentials.error =
+                                        "The master passwords do not match.".into();
+                                } else {
+                                    unlock = Some((
+                                        editor.mode,
+                                        Secret::new(std::mem::take(&mut *editor.master)),
+                                    ));
+                                }
+                            }
+                        } else if self.vault_unlocked() {
+                            ui.horizontal_wrapped(|ui| {
+                                lock = ui.button("Lock vault").clicked();
+                                change = ui.button("Change master password…").clicked();
+                            });
+                            let entries = self
+                                .credentials
+                                .vault
+                                .as_ref()
+                                .and_then(|v| v.list().ok())
+                                .unwrap_or_default();
+                            ScrollArea::vertical().max_height(280.).show(ui, |ui| {
+                                for entry in entries {
+                                    ui.push_id(&entry.id, |ui| {
+                                        ui.horizontal_wrapped(|ui| {
+                                            let label = match &entry.binding {
+                                                Some(CredentialBinding::Rdp {
+                                                    host,
+                                                    port,
+                                                    user,
+                                                    domain,
+                                                    ..
+                                                }) => {
+                                                    format!("RDP {host}:{port} · {domain}\\{user}")
+                                                }
+                                                Some(CredentialBinding::Ssh {
+                                                    host,
+                                                    port,
+                                                    user,
+                                                    role,
+                                                    ..
+                                                }) => format!("{role:?} · {user}@{host}:{port}"),
+                                                Some(CredentialBinding::HttpsBasic {
+                                                    url, ..
+                                                }) => url.clone(),
+                                                Some(CredentialBinding::Proxy {
+                                                    kind,
+                                                    host,
+                                                    port,
+                                                    ..
+                                                }) => format!("{kind:?} proxy · {host}:{port}"),
+                                                None => "Unlinked credential".into(),
+                                            };
+                                            ui.label(label);
+                                            if ui.button("Delete").clicked() {
+                                                delete = Some(entry.id.clone());
+                                            }
+                                        });
+                                    });
+                                }
+                            });
                         } else {
-                            unlock = Some((
-                                editor.mode,
-                                Secret::new(std::mem::take(&mut *editor.master)),
-                            ));
-                        }
-                    }
-                } else if self.vault_unlocked() {
-                    ui.horizontal(|ui| {
-                        lock = ui.button("Lock vault").clicked();
-                        change = ui.button("Change master password…").clicked();
-                    });
-                    let entries = self
-                        .credentials
-                        .vault
-                        .as_ref()
-                        .and_then(|v| v.list().ok())
-                        .unwrap_or_default();
-                    ScrollArea::vertical().max_height(280.).show(ui, |ui| {
-                        for entry in entries {
-                            ui.push_id(&entry.id, |ui| {
-                                ui.horizontal(|ui| {
-                                    let label = match &entry.binding {
-                                        Some(CredentialBinding::Rdp {
-                                            host,
-                                            port,
-                                            user,
-                                            domain,
-                                            ..
-                                        }) => format!("RDP {host}:{port} · {domain}\\{user}"),
-                                        Some(CredentialBinding::Ssh {
-                                            host,
-                                            port,
-                                            user,
-                                            role,
-                                            ..
-                                        }) => format!("{role:?} · {user}@{host}:{port}"),
-                                        Some(CredentialBinding::HttpsBasic { url, .. }) => {
-                                            url.clone()
-                                        }
-                                        Some(CredentialBinding::Proxy {
-                                            kind, host, port, ..
-                                        }) => format!("{kind:?} proxy · {host}:{port}"),
-                                        None => "Unlinked credential".into(),
-                                    };
-                                    ui.label(label);
-                                    if ui.button("Delete").clicked() {
-                                        delete = Some(entry.id.clone());
-                                    }
-                                });
+                            ui.horizontal_wrapped(|ui| {
+                                if ui.button("Unlock vault…").clicked() {
+                                    self.credentials.editor =
+                                        Some(MasterEditor::new(MasterMode::Unlock));
+                                }
+                                if ui.button("Create vault…").clicked() {
+                                    self.credentials.editor =
+                                        Some(MasterEditor::new(MasterMode::Create));
+                                }
                             });
                         }
-                    });
-                } else {
-                    ui.horizontal(|ui| {
-                        if ui.button("Unlock vault…").clicked() {
-                            self.credentials.editor = Some(MasterEditor::new(MasterMode::Unlock));
-                        }
-                        if ui.button("Create vault…").clicked() {
-                            self.credentials.editor = Some(MasterEditor::new(MasterMode::Create));
-                        }
-                    });
-                }
-            } else if ui.button("Lock when finished").clicked() {
-                lock = true;
-            }
-            ui.separator();
-            close = ui.button("Close").clicked();
-        });
+                    } else if ui.button("Lock when finished").clicked() {
+                        lock = true;
+                    }
+                });
+                ui.separator();
+                ui.horizontal_wrapped(|ui| {
+                    if self.credentials.editor.is_some() && self.credentials.job.is_none() {
+                        leave_master_editor = ui.button("Back to vault").clicked();
+                    }
+                    close = ui.button("Close").clicked();
+                });
+            },
+        );
         close |= response.should_close();
+        if leave_master_editor {
+            self.credentials.editor = None;
+            self.credentials.error.clear();
+        }
         if close {
             self.credentials.open = false;
             self.credentials.editor = None;

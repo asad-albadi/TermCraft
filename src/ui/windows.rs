@@ -207,7 +207,14 @@ impl Workspace {
             }
         }
     }
-    pub(super) fn window_title_editor(&mut self, ctx: &Context) {
+    pub(super) fn window_title_editor(&mut self, ctx: &Context, window: u64) {
+        if self
+            .title_editor
+            .as_ref()
+            .is_some_and(|(tab, _)| self.windows.window(*tab) != window)
+        {
+            return;
+        }
         let Some((id, mut text)) = self.title_editor.take() else {
             return;
         };
@@ -216,14 +223,28 @@ impl Workspace {
         }
         let mut open = true;
         let mut done = false;
-        Window::new("Rename terminal tab").id(Id::new("terminal-title-editor")).open(&mut open).collapsible(false).show(ctx, |ui| {
-            ui.label("A custom title takes priority over the server title. Leave empty to use the server/session title.");
-            ui.add(TextEdit::singleline(&mut text).char_limit(128));
-            ui.horizontal(|ui| {
-                if ui.button("Save").clicked() { self.windows.rename(id, text.clone()); done = true; }
-                if ui.button("Cancel").clicked() { done = true; }
-            });
-        });
+        let size = fluent::dialog_size(ctx, 420., 124.);
+        let modal = fluent::modal(
+            ctx,
+            Id::new("terminal-title-editor"),
+            "Rename terminal tab",
+            size,
+            |ui| {
+                ui.label("A custom title takes priority over the server title. Leave empty to use the server/session title.");
+                let name = ui.add(TextEdit::singleline(&mut text).char_limit(128));
+                fluent::select_name_on_entry(ui, &name, Id::new(("terminal-title", id)), &text);
+                ui.horizontal(|ui| {
+                    if ui.button("Save").clicked() {
+                        self.windows.rename(id, text.clone());
+                        done = true;
+                    }
+                    if ui.button("Cancel").clicked() {
+                        done = true;
+                    }
+                });
+            },
+        );
+        open &= !modal.should_close();
         if open && !done {
             self.title_editor = Some((id, text));
         }
@@ -288,17 +309,23 @@ impl Workspace {
                 // Lifecycle requests are always intercepted. The existing
                 // confirmation appears after wake without requiring Close again.
                 if self.screensaver_frame(ui) { return; }
-                if self.games_frame(ui) {
-                    if self.window_close_prompt.contains(&window) {
+                if self.window_close_prompt.contains(&window) {
+                    if child_ctx.input(|i| i.viewport().close_requested()) { self.games_frame(ui); }
+                    let size = super::fluent::dialog_size(&child_ctx, 420., 110.);
+                    let response = super::fluent::modal(&child_ctx, Id::new(("detached-close", window)), "Close terminal window?", size, |ui| {
                         ui.label("Reattach these terminals, or close the selected session? Active sessions and remote edits require confirmation in the main window.");
                         ui.horizontal_wrapped(|ui| {
                             if ui.button("Reattach all").clicked() { actions.extend(ids.iter().map(|id| (*id, false))); self.window_close_prompt.remove(&window); }
                             if ui.button("Close selected session").clicked() { actions.push((active, true)); self.window_close_prompt.remove(&window); }
-                            if ui.button("Cancel").clicked() { self.window_close_prompt.remove(&window); }
+                            let safe = ui.button("Cancel");
+                            super::fluent::focus_on_entry(ui, &safe, ui.id());
+                            if safe.clicked() { self.window_close_prompt.remove(&window); }
                         });
-                    }
+                    });
+                    if response.should_close() { self.window_close_prompt.remove(&window); }
                     return;
                 }
+                if self.games_frame(ui) { return; }
                 if self.import_applying(){ui.disable();}
                 self.handle_shortcuts(&child_ctx, window);
                 self.restore_window_geometry(&child_ctx, window);
@@ -317,13 +344,10 @@ impl Workspace {
                         }
                     }));
                 self.detached_commands(ui, class, window, active, &mut actions);
-                if self.window_close_prompt.contains(&window) {
-                    ui.label("Reattach these terminals, or close the selected session? Active sessions and remote edits require confirmation in the main window.");
-                    ui.horizontal_wrapped(|ui| {
-                        if ui.button("Reattach all").clicked() { actions.extend(ids.iter().map(|id| (*id, false))); self.window_close_prompt.remove(&window); }
-                        if ui.button("Close selected session").clicked() { actions.push((active, true)); self.window_close_prompt.remove(&window); }
-                        if ui.button("Cancel").clicked() { self.window_close_prompt.remove(&window); }
-                    });
+                if self.window_close_prompt.contains(&window) { child_ctx.request_repaint(); return; }
+                if self.title_editor.as_ref().is_some_and(|(tab, _)| self.windows.window(*tab) == window) {
+                    self.window_title_editor(&child_ctx, window);
+                    return;
                 }
                 if let Some(index) = self.tabs.iter().position(|t| t.id == active) {
                     super::remote_files::authentication_ui(ui,&mut self.tabs[index]);

@@ -22,6 +22,8 @@ mod credential_tests;
 mod credentials;
 mod desktop;
 mod desktop_gateway;
+#[cfg(test)]
+mod dialog_tests;
 mod fluent;
 mod ftp;
 mod ftp_settings;
@@ -572,6 +574,9 @@ impl FileView {
     }
 }
 struct Editor {
+    closing: bool,
+    closing_app: bool,
+    error: String,
     path: PathBuf,
     text: String,
     dirty: bool,
@@ -627,6 +632,7 @@ pub struct Workspace {
     macro_form: Macro,
     macro_editing: Option<usize>,
     macro_open: bool,
+    macro_error: String,
     http: Option<harbor_workspace::http_server::Server>,
     http_start: Option<http_share::Pending>,
     http_auth_enabled: bool,
@@ -793,6 +799,7 @@ impl Workspace {
             macro_form: Macro::default(),
             macro_editing: None,
             macro_open: false,
+            macro_error: String::new(),
             http: None,
             http_start: None,
             http_auth_enabled: false,
@@ -1489,6 +1496,7 @@ impl Workspace {
                     }
                     let help = tool_button(ui, "help", "Help", "Help and keyboard shortcuts", None);
                     egui::Popup::menu(&help).show(|ui| {
+                        ui.set_max_width((ui.ctx().content_rect().width() - 32.).clamp(1., 320.));
                         ui.label(RichText::new("Keyboard shortcuts").strong());
                         ui.label(self.shortcut_hint(Action::NewSession, "New session"));
                         ui.label(self.shortcut_hint(Action::NewTerminal, "New local terminal"));
@@ -2048,6 +2056,7 @@ impl Workspace {
         self.highlighting_dialog(ctx);
         self.terminal_profile_dialog(ctx);
         self.file_dialogs(ctx);
+        self.remote_file_action_window(ctx);
         self.tunnel_dialog(ctx);
         self.macro_dialog(ctx);
     }
@@ -2120,12 +2129,21 @@ impl Workspace {
             self.detached_windows(&ctx);
             return;
         }
-        Window::new("Feature parity and known differences")
-            .open(&mut self.parity_open)
-            .default_size([850., 580.])
-            .show(&ctx, |ui| {
-                ui.label("Full MobaXterm parity is the target. This build is incomplete.");
-                ScrollArea::both().show(ui, |ui| {
+        let parity_size = fluent::dialog_size(&ctx, 850., 130.);
+        let mut close_parity = false;
+        fluent::modeless(
+            &ctx,
+            Id::new("Feature parity and known differences"),
+            "Feature parity and known differences",
+            parity_size,
+        )
+        .open(&mut self.parity_open)
+        .default_size([850., 580.])
+        .show(&ctx, |ui| {
+            ui.label("Full MobaXterm parity is the target. This build is incomplete.");
+            ScrollArea::both()
+                .max_height(parity_size.body_height)
+                .show(ui, |ui| {
                     Grid::new("parity_matrix")
                         .striped(true)
                         .spacing([16., 12.])
@@ -2142,7 +2160,11 @@ impl Workspace {
                             }
                         });
                 });
-            });
+            close_parity = ui.button("Close").clicked();
+        });
+        if close_parity {
+            self.parity_open = false;
+        }
         self.top(root);
         if self.games_frame(root) {
             self.session_confirmations(&ctx);
@@ -2155,6 +2177,7 @@ impl Workspace {
             .show(root, |ui| {
                 self.tab_bar(ui);
                 self.remote_files_panel(ui);
+                self.set_shortcut_context(&ctx);
                 Frame::new()
                     .fill(content(ui))
                     .inner_margin(12)
@@ -2171,7 +2194,7 @@ impl Workspace {
             });
         self.detached_windows(&ctx);
         self.collect_terminal_requests(&ctx);
-        self.window_title_editor(&ctx);
+        self.window_title_editor(&ctx, harbor_workspace::workspace::windows::ROOT);
         self.shortcut_editor(&ctx);
         self.handle_shortcuts(&ctx, 0);
         self.dialogs(&ctx);
@@ -3438,7 +3461,7 @@ mod gui_tests {
     }
     #[cfg(unix)]
     #[allow(dead_code)]
-    mod remote_fixture {
+    pub(super) mod remote_fixture {
         include!(concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/tests/support/ssh_server.rs"

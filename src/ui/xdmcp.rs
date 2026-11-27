@@ -634,18 +634,18 @@ mod tests {
             address,
         );
         let generation = w.xdmcp_discovery.generation;
-        let output = frame(&mut w, input(vec![]));
-        let title = text_pos(&output.shapes, "New session");
-        let rect = ctx
-            .memory(|memory| memory.area_rect(Id::new("session-form")))
-            .unwrap();
-        let close = pos2(rect.right() - 16., title.y);
-        let _ = frame(&mut w, pointer(close, true));
-        let _ = frame(&mut w, pointer(close, false));
-        assert!(
-            w.session_form.is_none(),
-            "Window X did not close the editor"
+        let _ = frame(&mut w, input(vec![]));
+        let _ = frame(
+            &mut w,
+            input(vec![egui::Event::Key {
+                key: egui::Key::Escape,
+                physical_key: None,
+                pressed: true,
+                repeat: false,
+                modifiers: egui::Modifiers::NONE,
+            }]),
         );
+        assert!(w.session_form.is_none(), "Escape did not cancel the editor");
         let mut original = session;
         original.xdmcp_options.selected_endpoint = Some(address);
         w.session_form = Some(original);
@@ -694,11 +694,7 @@ mod tests {
         let frame = |w: &mut Workspace, input| test_frame(&ctx, input, |_| w.session_dialog(&ctx));
         let _ = frame(&mut w, input(vec![]));
         let output = frame(&mut w, input(vec![]));
-        let title = text_pos(&output.shapes, "New session");
-        let rect = ctx
-            .memory(|memory| memory.area_rect(Id::new("session-form")))
-            .unwrap();
-        let close = pos2(rect.right() - 16., title.y);
+        let close = text_pos(&output.shapes, "Cancel");
         let _ = frame(&mut w, pointer(close, true));
         // A numeric answer is ready synchronously, making the DNS-to-UDP
         // handoff deterministic without leaving a system resolver behind.

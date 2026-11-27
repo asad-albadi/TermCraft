@@ -101,6 +101,9 @@ pub(super) struct TransferUi {
     error: Option<String>,
 }
 impl TransferUi {
+    pub(super) fn blocking_action(&self) -> bool {
+        matches!(self.form, Some(FileActionForm::Delete { .. }))
+    }
     pub(super) fn effective_capabilities(
         &self,
     ) -> harbor_workspace::remote_files::capabilities::RemoteCapabilities {
@@ -430,54 +433,103 @@ impl TransferUi {
         let mut open = true;
         let mut submit = false;
         let mut cancel = false;
-        Window::new("Remote file action")
-            .id(Id::new("remote-file-action"))
-            .collapsible(false)
-            .resizable(false)
-            .default_width(400.)
-            .open(&mut open)
-            .show(ctx, |ui| {
-                match &mut form {
-                    FileActionForm::NewFolder { parent, name } => {
-                        ui.label("Create a folder in:");
-                        ui.monospace(parent.display());
-                        ui.add(TextEdit::singleline(name).hint_text("Folder name"));
+        let deleting = matches!(form, FileActionForm::Delete { .. });
+        let title = match form {
+            FileActionForm::NewFolder { .. } => "Create remote folder",
+            FileActionForm::Rename { .. } => "Rename remote entry",
+            FileActionForm::Delete { .. } => "Delete remote entry?",
+        };
+        let size = super::fluent::dialog_size(ctx, 420., 110.);
+        let mut content = |ui: &mut Ui| {
+            super::fluent::dialog_body(ui, size, |ui| match &mut form {
+                FileActionForm::NewFolder { parent, name } => {
+                    ui.label("Create a folder in:");
+                    ui.monospace(parent.display());
+                    ui.add(TextEdit::singleline(name).hint_text("Folder name"));
+                }
+                FileActionForm::Rename { source, name } => {
+                    ui.label("Rename this remote entry:");
+                    ui.monospace(source.display());
+                    ui.add(TextEdit::singleline(name).hint_text("New name"));
+                }
+                FileActionForm::Delete {
+                    target,
+                    directory,
+                    include_contents,
+                } => {
+                    ui.label("Permanently delete this remote entry?");
+                    ui.monospace(target.display());
+                    if target.identity() != target.display() {
+                        ui.monospace(format!("Exact path: {}", target.identity()));
                     }
-                    FileActionForm::Rename { source, name } => {
-                        ui.label("Rename this remote entry:");
-                        ui.monospace(source.display());
-                        ui.add(TextEdit::singleline(name).hint_text("New name"));
+                    if *directory {
+                        if !self.effective_capabilities().recursive_remove {
+                            *include_contents = false;
+                        }
+                        ui.add_enabled(
+                            self.effective_capabilities().recursive_remove,
+                            egui::Checkbox::new(
+                                include_contents,
+                                "Also delete everything inside this folder",
+                            ),
+                        );
                     }
-                    FileActionForm::Delete{target,directory,include_contents} => {
-                        ui.label("Permanently delete this remote entry?");
-                        ui.monospace(target.display());
-                        if target.identity() != target.display() {
-                            ui.monospace(format!("Exact path: {}", target.identity()));
-                        }
-                        if *directory {
-                            if !self.effective_capabilities().recursive_remove { *include_contents = false; }
-                            ui.add_enabled(self.effective_capabilities().recursive_remove, egui::Checkbox::new(include_contents,"Also delete everything inside this folder"));
-                        }
-                        if *include_contents {ui.label("Completed deletions cannot be undone. Cancel stops the remaining entries.");}else{ui.label("A nonempty directory is preserved unless contents deletion is selected.");}
+                    if *include_contents {
+                        ui.label("Completed deletions cannot be undone. Cancel stops the remaining entries.");
+                    } else {
+                        ui.label("A nonempty directory is preserved unless contents deletion is selected.");
                     }
                 }
-                ui.horizontal(|ui| {
-                    if ui
-                        .button(if matches!(form, FileActionForm::Delete { .. }) {
-                            if matches!(form,FileActionForm::Delete{directory:true,include_contents:true,..}) {"Delete folder and contents"}else{"Delete this entry"}
-                        } else {
-                            "Apply"
-                        })
-                        .clicked()
-                    {
-                        submit = true;
-                    }
-                    if ui.button("Cancel").clicked() {
-                        cancel = true;
-                    }
-                });
             });
-        if submit {
+            if let Some(error) = &self.error {
+                ui.colored_label(ui.visuals().error_fg_color, error);
+            }
+            ui.horizontal_wrapped(|ui| {
+                if ui
+                    .button(if matches!(form, FileActionForm::Delete { .. }) {
+                        if matches!(
+                            form,
+                            FileActionForm::Delete {
+                                directory: true,
+                                include_contents: true,
+                                ..
+                            }
+                        ) {
+                            "Delete folder and contents"
+                        } else {
+                            "Delete this entry"
+                        }
+                    } else {
+                        if matches!(form, FileActionForm::Rename { .. }) {
+                            "Rename"
+                        } else {
+                            "Create folder"
+                        }
+                    })
+                    .clicked()
+                {
+                    submit = true;
+                }
+                let safe = ui.button("Cancel");
+                if deleting {
+                    super::fluent::focus_on_entry(ui, &safe, ui.id());
+                }
+                if safe.clicked() {
+                    cancel = true;
+                }
+            });
+        };
+        let id = Id::new("remote-file-action");
+        if deleting {
+            let modal = super::fluent::modal(ctx, id, title, size, &mut content);
+            cancel |= modal.should_close();
+        } else {
+            super::fluent::modeless(ctx, id, title, size)
+                .open(&mut open)
+                .collapsible(false)
+                .show(ctx, &mut content);
+        }
+        if submit && !cancel {
             let result = form.operation(self.policy()).and_then(|op| {
                 ssh.ok_or_else(|| "SSH connection is unavailable".to_string())?
                     .transfers
@@ -735,6 +787,16 @@ impl TerminalTab {
     }
 }
 impl Workspace {
+    pub(super) fn remote_file_action_window(&mut self, ctx: &Context) {
+        if let Some(tab) = self
+            .tabs
+            .iter_mut()
+            .find(|tab| tab.transfer_ui.form.is_some())
+        {
+            tab.transfer_ui.dialog(ctx, tab.ssh.as_mut());
+        }
+    }
+
     pub(super) fn remote_files_panel(&mut self, ui: &mut Ui) {
         if self
             .tabs
@@ -914,7 +976,6 @@ impl Workspace {
                         if let Some(path) = navigate {
                             tab.navigate_remote(path);
                         }
-                        tab.transfer_ui.dialog(ui.ctx(), tab.ssh.as_mut());
                     });
             });
         if let Some(path) = edit_remote {
@@ -1239,10 +1300,11 @@ mod transfer_tests {
 pub(super) fn authentication_ui(ui: &mut Ui, tab: &mut TerminalTab) -> bool {
     if let Some(auth) = &mut tab.auth {
         ui.separator();
-        ui.label(&auth.title);
+        ui.strong(&auth.title);
         for (index, prompt) in auth.prompts.iter().enumerate() {
-            ui.label(&prompt.label);
-            auth_field(ui, tab.id, auth.id, index, prompt, &mut auth.values[index]);
+            let label = ui.label(&prompt.label);
+            auth_field(ui, tab.id, auth.id, index, prompt, &mut auth.values[index])
+                .labelled_by(label.id);
         }
         if let Some(credential) = &auth.credential {
             ui.horizontal_wrapped(|ui|{
@@ -1263,7 +1325,11 @@ pub(super) fn authentication_ui(ui: &mut Ui, tab: &mut TerminalTab) -> bool {
             } else if primary(ui, "Continue").clicked() {
                 decision = Some(None);
             }
-            if ui.button("Cancel").clicked() {
+            let safe = ui.button("Cancel");
+            if host_key {
+                super::fluent::focus_on_entry(ui, &safe, Id::new((tab.id, auth.id)));
+            }
+            if safe.clicked() {
                 decision = Some(Some(TrustDecision::Reject));
             }
         });

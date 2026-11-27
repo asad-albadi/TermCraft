@@ -372,27 +372,48 @@ impl Workspace {
         let mut close = false;
         let mut use_key = false;
         let busy = self.ssh_keys_busy();
-        let response=Modal::new(Id::new("ssh-key-manager")).show(ctx,|ui|{
-   ui.set_min_width(640.);ui.heading("SSH keys and agents");if !self.ssh_keys.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&self.ssh_keys.error);}ui.label(&self.ssh_keys.status);
-   if busy{ui.label("Running in the background. Canceling key generation stops publication after the current computation finishes.");if ui.button("Cancel operation").clicked(){if let Some(job)=&self.ssh_keys.job{job.cancel.store(true,Ordering::Release);}self.ssh_keys.status="Cancellation requested; an already accepted agent update may still complete.".into();}}
-   ui.add_enabled_ui(!busy,|ui|{
-    ScrollArea::vertical().max_height(590.).show(ui,|ui|{
-     ui.horizontal(|ui|{ui.label("Agent");ui.selectable_value(&mut self.ssh_keys.target,AgentTarget::System,"System");ui.selectable_value(&mut self.ssh_keys.target,AgentTarget::Owned,"TermCraft-owned");if cfg!(windows){ui.selectable_value(&mut self.ssh_keys.target,AgentTarget::Pageant,"Pageant");}if ui.button("Refresh identities").clicked(){operation=Some(Operation::List(self.ssh_keys.target));}});
-     ui.horizontal(|ui|{if ui.add_enabled(self.ssh_keys.owned.is_none(),Button::new("Start owned agent")).clicked(){operation=Some(Operation::Start);}if ui.add_enabled(self.ssh_keys.owned.is_some(),Button::new("Stop owned agent")).clicked(){operation=Some(Operation::Stop);}ui.label("System agents are never stopped by TermCraft.");});
-     if let Some((listed_target,listing))=&self.ssh_keys.listing{if *listed_target==self.ssh_keys.target{if listing.omitted>0{ui.label(format!("{} additional identities omitted; showing the first 256.",listing.omitted));}for identity in &listing.identities{ui.push_id(&identity.fingerprint,|ui|{ui.horizontal(|ui|{ui.label(format!("{} · {} {}",identity.algorithm,identity.fingerprint,identity.comment));if ui.button("Remove from agent").clicked(){operation=Some(Operation::Remove{target:*listed_target,public:identity.public_key.clone()});}});});}}}
+        let size = fluent::dialog_size(ctx, 640., 110.);
+        let response = fluent::modal(
+            ctx,
+            Id::new("ssh-key-manager"),
+            "SSH keys and agents",
+            size,
+            |ui| {
+                fluent::dialog_body(ui, size, |ui| {
+                    if !self.ssh_keys.error.is_empty() {
+                        ui.colored_label(ui.visuals().error_fg_color, &self.ssh_keys.error);
+                    }
+                    ui.label(&self.ssh_keys.status);
+                    if busy {
+                        ui.label("Running in the background. Canceling key generation stops publication after the current computation finishes.");
+                        if ui.button("Cancel operation").clicked() {
+                            if let Some(job) = &self.ssh_keys.job {
+                                job.cancel.store(true, Ordering::Release);
+                            }
+                            self.ssh_keys.status="Cancellation requested; an already accepted agent update may still complete.".into();
+                        }
+                    }
+                    ui.add_enabled_ui(!busy,|ui|{
+
+     ui.horizontal_wrapped(|ui|{ui.label("Agent");ui.selectable_value(&mut self.ssh_keys.target,AgentTarget::System,"System");ui.selectable_value(&mut self.ssh_keys.target,AgentTarget::Owned,"TermCraft-owned");if cfg!(windows){ui.selectable_value(&mut self.ssh_keys.target,AgentTarget::Pageant,"Pageant");}if ui.button("Refresh identities").clicked(){operation=Some(Operation::List(self.ssh_keys.target));}});
+     ui.horizontal_wrapped(|ui|{if ui.add_enabled(self.ssh_keys.owned.is_none(),Button::new("Start owned agent")).clicked(){operation=Some(Operation::Start);}if ui.add_enabled(self.ssh_keys.owned.is_some(),Button::new("Stop owned agent")).clicked(){operation=Some(Operation::Stop);}ui.label("System agents are never stopped by TermCraft.");});
+     if let Some((listed_target,listing))=&self.ssh_keys.listing{if *listed_target==self.ssh_keys.target{if listing.omitted>0{ui.label(format!("{} additional identities omitted; showing the first 256.",listing.omitted));}for identity in &listing.identities{ui.push_id(&identity.fingerprint,|ui|{ui.horizontal_wrapped(|ui|{ui.label(format!("{} · {} {}",identity.algorithm,identity.fingerprint,identity.comment));if ui.button("Remove from agent").clicked(){operation=Some(Operation::Remove{target:*listed_target,public:identity.public_key.clone()});}});});}}}
      ui.separator();ui.strong("Inspect / import a key");if ui.button("Choose key file…").clicked(){operation=Some(Operation::PickKey);}if let Some(path)=&self.ssh_keys.selected{ui.label(path.display().to_string());}
      if let Some(info)=&self.ssh_keys.info{ui.label(format!("{} · {}",info.algorithm,info.fingerprint));ui.label(if info.encrypted{"Private key is passphrase-protected."}else if info.private{"Unencrypted private key."}else{"Public key only."});if ui.button("Copy public key").clicked(){ui.ctx().copy_text(info.public_key.clone());}if ui.add_enabled(info.private,Button::new("Use private key in session…")).clicked(){use_key=true;}}
      let prompt=harbor_workspace::ssh::Prompt{label:"Key passphrase (optional)".into(),echo:false};ui.label(&prompt.label);remote_files::auth_field_scoped(ui,"key-manager",0,0,0,&prompt,&mut self.ssh_keys.passphrase);
-     ui.horizontal(|ui|{ui.checkbox(&mut self.ssh_keys.expires,"Expire added identity");if self.ssh_keys.expires{ui.add(DragValue::new(&mut self.ssh_keys.lifetime).range(1..=u32::MAX).suffix(" seconds"));}});
-     if let Some(path)=self.ssh_keys.selected.clone(){ui.horizontal(|ui|{if ui.button("Unlock / inspect selected file").clicked(){let pass=if self.ssh_keys.passphrase.is_empty(){None}else{Some(Secret::new(std::mem::take(&mut *self.ssh_keys.passphrase)))};operation=Some(Operation::Inspect{path:path.clone(),passphrase:pass});}if ui.add_enabled(self.ssh_keys.info.as_ref().is_none_or(|i|i.private),Button::new("Add selected key to agent")).clicked(){let pass=if self.ssh_keys.passphrase.is_empty(){None}else{Some(Secret::new(std::mem::take(&mut *self.ssh_keys.passphrase)))};operation=Some(Operation::Add{target:self.ssh_keys.target,path,passphrase:pass,lifetime:if self.ssh_keys.expires{Some(Duration::from_secs(self.ssh_keys.lifetime.into()))}else{None}});}});}
-     ui.separator();ui.strong("Create a new key bundle");ui.label("Parent folder");ui.horizontal(|ui|{ui.text_edit_singleline(&mut self.ssh_keys.parent);if ui.button("Choose folder…").clicked(){operation=Some(Operation::PickParent);}});ui.label("New bundle folder name");ui.text_edit_singleline(&mut self.ssh_keys.name);
+     ui.horizontal_wrapped(|ui|{ui.checkbox(&mut self.ssh_keys.expires,"Expire added identity");if self.ssh_keys.expires{ui.add(DragValue::new(&mut self.ssh_keys.lifetime).range(1..=u32::MAX).suffix(" seconds"));}});
+     if let Some(path)=self.ssh_keys.selected.clone(){ui.horizontal_wrapped(|ui|{if ui.button("Unlock / inspect selected file").clicked(){let pass=if self.ssh_keys.passphrase.is_empty(){None}else{Some(Secret::new(std::mem::take(&mut *self.ssh_keys.passphrase)))};operation=Some(Operation::Inspect{path:path.clone(),passphrase:pass});}if ui.add_enabled(self.ssh_keys.info.as_ref().is_none_or(|i|i.private),Button::new("Add selected key to agent")).clicked(){let pass=if self.ssh_keys.passphrase.is_empty(){None}else{Some(Secret::new(std::mem::take(&mut *self.ssh_keys.passphrase)))};operation=Some(Operation::Add{target:self.ssh_keys.target,path,passphrase:pass,lifetime:if self.ssh_keys.expires{Some(Duration::from_secs(self.ssh_keys.lifetime.into()))}else{None}});}});}
+     ui.separator();ui.strong("Create a new key bundle");ui.label("Parent folder");ui.horizontal_wrapped(|ui|{ui.text_edit_singleline(&mut self.ssh_keys.parent);if ui.button("Choose folder…").clicked(){operation=Some(Operation::PickParent);}});ui.label("New bundle folder name");ui.text_edit_singleline(&mut self.ssh_keys.name);
      ui.label("Algorithm");ui.horizontal_wrapped(|ui|for(algorithm,label)in[(KeyAlgorithm::Ed25519,"Ed25519"),(KeyAlgorithm::EcdsaP256,"ECDSA P-256"),(KeyAlgorithm::EcdsaP384,"ECDSA P-384"),(KeyAlgorithm::EcdsaP521,"ECDSA P-521"),(KeyAlgorithm::Rsa3072,"RSA 3072"),(KeyAlgorithm::Rsa4096,"RSA 4096")]{ui.selectable_value(&mut self.ssh_keys.algorithm,algorithm,label);});ui.label("Comment");ui.text_edit_singleline(&mut self.ssh_keys.comment);
      ui.label("The passphrase field above protects a generated key. Leave it blank for an unencrypted key.");ui.label("Repeat passphrase for generation");remote_files::auth_field_scoped(ui,"key-manager",0,0,1,&prompt,&mut self.ssh_keys.repeat);
-     ui.horizontal(|ui|{if primary(ui,"Generate key bundle").clicked(){match self.key_destination(){Ok(destination)=>{if self.ssh_keys.passphrase.as_str()!=self.ssh_keys.repeat.as_str(){self.ssh_keys.error="Key passphrases do not match.".into();}else{let passphrase=if self.ssh_keys.passphrase.is_empty(){None}else{Some(Secret::new(std::mem::take(&mut *self.ssh_keys.passphrase)))};self.ssh_keys.repeat.zeroize();operation=Some(Operation::Generate{destination,settings:KeySettings{algorithm:self.ssh_keys.algorithm,comment:self.ssh_keys.comment.clone(),passphrase}});}},Err(error)=>self.ssh_keys.error=error}}if ui.button("Import selected key into new bundle").clicked(){if let Some(source)=self.ssh_keys.selected.clone(){match self.key_destination(){Ok(destination)=>{let passphrase=if self.ssh_keys.passphrase.is_empty(){None}else{Some(Secret::new(std::mem::take(&mut *self.ssh_keys.passphrase)))};operation=Some(Operation::Import{source,destination,passphrase});},Err(error)=>self.ssh_keys.error=error}}else{self.ssh_keys.error="Choose a key file first.".into();}}});
+     ui.horizontal_wrapped(|ui|{if primary(ui,"Generate key bundle").clicked(){match self.key_destination(){Ok(destination)=>{if self.ssh_keys.passphrase.as_str()!=self.ssh_keys.repeat.as_str(){self.ssh_keys.error="Key passphrases do not match.".into();}else{let passphrase=if self.ssh_keys.passphrase.is_empty(){None}else{Some(Secret::new(std::mem::take(&mut *self.ssh_keys.passphrase)))};self.ssh_keys.repeat.zeroize();operation=Some(Operation::Generate{destination,settings:KeySettings{algorithm:self.ssh_keys.algorithm,comment:self.ssh_keys.comment.clone(),passphrase}});}},Err(error)=>self.ssh_keys.error=error}}if ui.button("Import selected key into new bundle").clicked(){if let Some(source)=self.ssh_keys.selected.clone(){match self.key_destination(){Ok(destination)=>{let passphrase=if self.ssh_keys.passphrase.is_empty(){None}else{Some(Secret::new(std::mem::take(&mut *self.ssh_keys.passphrase)))};operation=Some(Operation::Import{source,destination,passphrase});},Err(error)=>self.ssh_keys.error=error}}else{self.ssh_keys.error="Choose a key file first.".into();}}});
      ui.label("A bundle contains private_key and public_key.pub. Existing destinations are never replaced. Owned/Pageant session selection is available with embedded SSH.");
     });
-   });ui.separator();close=ui.button("Close").clicked();
-  });
+                });
+                ui.separator();
+                close = ui.button("Close").clicked();
+            },
+        );
         close |= response.should_close();
         if close {
             self.ssh_keys.open = false;
@@ -409,6 +430,8 @@ impl Workspace {
                         session.key = path.into();
                     }
                     self.ssh_keys.open = false;
+                    self.ssh_keys.passphrase.zeroize();
+                    self.ssh_keys.repeat.zeroize();
                 } else {
                     self.ssh_keys.error = "Session key paths require valid Unicode.".into();
                 }

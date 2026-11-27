@@ -181,14 +181,14 @@ impl State {
             ui.label("Select a .termcraft-plugin.json manifest. Keep its matching .tar.gz archive alongside it.");
 
             if let Some(review) = self.review.clone() {
-                ui.group(|ui| {
+                fluent::surface(ui).show(ui, |ui| {
                     let manifest = review.manifest().clone();
                     ui.strong(format!("{} {}", manifest.id, manifest.version));
                     ui.label(format!("Plugin protocol {} · {} {}", manifest.host_protocol, manifest.platform, manifest.architecture));
                     ui.label(format!("Entrypoints · {}", manifest.entrypoints.join(", ")));
                     ui.label("Requested permission · Native execution with full access to your account.");
                     ui.label(format!("Release SHA-256 · {}", review.release_digest()));
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         let update = self.items.iter().any(|item| item.manifest.id == manifest.id);
                         let label = if update { "Install update disabled" } else { "Install disabled" };
                         if ui.button(label).clicked() {
@@ -206,11 +206,11 @@ impl State {
             if self.job.is_some() { return; }
 
             if let Some(approval) = self.approval.clone() {
-                ui.group(|ui| {
+                fluent::surface(ui).show(ui, |ui| {
                     ui.strong(format!("Enable {} {}?", approval.manifest.id, approval.manifest.version));
                     ui.label("This native plugin runs as you. It can access your files, credentials and network and start other programs. Grant access only to code you trust.");
                     ui.label(format!("Release SHA-256 · {}", approval.release_digest));
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         if ui.button("Grant full account access and enable").clicked() {
                             self.approval = None;
                             self.start(ui, registry.clone(), "Enabling plugin…", false, move |registry, _| {

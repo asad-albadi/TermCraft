@@ -661,7 +661,9 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
                             decision: TrustDecision::Remember,
                         });
                     }
-                    if ui.button("Reject").clicked() {
+                    let reject = ui.button("Reject");
+                    super::fluent::focus_on_entry(ui, &reject, Id::new((tab.id, *id)));
+                    if reject.clicked() {
                         answer = Some(DesktopInput::Trust {
                             id: *id,
                             decision: TrustDecision::Reject,
@@ -851,10 +853,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         ui.ctx().set_cursor_icon(CursorIcon::None);
     }
     let allowed = ui.is_enabled()
-        && !ui
-            .ctx()
-            .data(|data| data.get_temp::<bool>(Id::new("termcraft-shortcuts-blocked")))
-            .unwrap_or(false)
+        && !super::shortcuts::input_blocked(ui.ctx())
         && ui.memory(|memory| memory.allows_interaction(ui.layer_id()));
     let point_ctx = ui.ctx().clone();
     let layer = ui.layer_id();

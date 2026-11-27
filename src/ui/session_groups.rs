@@ -187,11 +187,18 @@ impl Workspace {
         }
         if let Some(report) = &self.session_groups.report {
             let mut open = true;
-            Window::new(format!("Folder launch: {}",self.session_groups.folder)).id(Id::new("group-launch-report")).open(&mut open).default_width(480.).show(ctx,|ui|{
-    ui.label(format!("{} submitted · {} failed",report.accepted.len(),report.failed.len()));ui.label("Submitted sessions connect independently. Check each tab for authentication or later connection failures.");
-    ScrollArea::vertical().max_height(320.).show_rows(ui,48.,report.failed.len(),|ui,range|for i in range{let failure=&report.failed[i];ui.label(format!("{}: {}",failure.name,failure.error));});
-   });
-            if !open {
+            let size = fluent::dialog_size(ctx, 480., 120.);
+            let mut close = false;
+            fluent::modeless(ctx, Id::new("group-launch-report"), "Folder launch report", size).open(&mut open).show(ctx, |ui| {
+                fluent::dialog_body(ui, size, |ui| {
+                    ui.strong(&self.session_groups.folder);
+                    ui.label(format!("{} submitted · {} failed", report.accepted.len(), report.failed.len()));
+                    ui.label("Submitted sessions connect independently. Check each tab for authentication or later connection failures.");
+                    for failure in &report.failed { ui.label(format!("{}: {}", failure.name, failure.error)); }
+                });
+                close = ui.button("Close").clicked();
+            });
+            if close || !open {
                 self.session_groups.report = None;
             }
         }

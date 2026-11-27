@@ -141,7 +141,10 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         return;
     };
     let state = browser.handle.state();
-    if state.challenge.is_some() || !ui.is_enabled() || !ui.input(|input| input.focused) {
+    let blocked = super::shortcuts::input_blocked(ui.ctx())
+        || !ui.memory(|m| m.allows_interaction(ui.layer_id()));
+    if blocked || state.challenge.is_some() || !ui.is_enabled() || !ui.input(|input| input.focused)
+    {
         browser.release_pointer(PointerRelease::Cancel);
     }
     if !state.closed {
@@ -244,7 +247,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         let auth = browser.auth.as_mut().unwrap();
         let command = ui
             .group(|ui| {
-                ui.label(if challenge.proxy {
+                ui.strong(if challenge.proxy {
                     "Proxy authentication"
                 } else {
                     "Website authentication"
@@ -260,11 +263,18 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
                         .password(password)
                         .char_limit(if password { 4096 } else { 1024 })
                         .show(ui);
+                    if !password {
+                        super::fluent::focus_on_entry(
+                            ui,
+                            &output.response,
+                            egui::Id::new((tab.id, challenge.id)),
+                        );
+                    }
                     // Keep the challenge fields out of egui's cross-frame undo history.
                     output.state.clear_undoer();
                     output.state.store(ui.ctx(), output.response.id);
                 }
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     let send = ui.button("Sign in").clicked();
                     let cancel = ui.button("Cancel").clicked();
                     (send || cancel).then(|| Command::Auth {
@@ -334,7 +344,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
             frame,
         });
     }
-    if state.challenge.is_some() || state.closed || !ui.is_enabled() {
+    if blocked || state.challenge.is_some() || state.closed || !ui.is_enabled() {
         return;
     }
     if response.clicked() || response.drag_started() {

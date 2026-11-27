@@ -283,18 +283,26 @@ impl PlayState {
     fn file_confirmation(&mut self, ctx: &Context) {
         if let Some(prompt) = &self.files.prompt {
             let mut decision = None;
-            let modal = egui::Modal::new(Id::new("game_file_replace")).show(ctx, |ui| {
-                ui.heading("Replace saved game?");
-                ui.label(format!("Replace {} with this game?", prompt.path.display()));
-                ui.horizontal(|ui| {
-                    if ui.button("Keep existing file").clicked() {
-                        decision = Some(false);
-                    }
-                    if ui.button("Replace file").clicked() {
-                        decision = Some(true);
-                    }
-                });
-            });
+            let size = fluent::dialog_size(ctx, 460., 112.);
+            let modal = fluent::modal(
+                ctx,
+                Id::new("game_file_replace"),
+                "Replace saved game?",
+                size,
+                |ui| {
+                    ui.label(format!("Replace {} with this game?", prompt.path.display()));
+                    ui.horizontal_wrapped(|ui| {
+                        if ui.button("Replace file").clicked() {
+                            decision = Some(true);
+                        }
+                        let safe = ui.button("Keep existing file");
+                        fluent::focus_on_entry(ui, &safe, ui.id());
+                        if safe.clicked() {
+                            decision = Some(false);
+                        }
+                    });
+                },
+            );
             if modal.should_close() {
                 decision = Some(false);
             }
@@ -310,15 +318,23 @@ impl PlayState {
         }
         let mut discard = false;
         let mut cancel = false;
-        egui::Modal::new(Id::new("game_file_discard")).show(ctx, |ui| {
-            ui.heading("Unsaved game changes");
-            ui.label("Continuing discards changes to this game. Save first to keep them.");
-            ui.horizontal(|ui| {
-                discard = ui.button("Discard changes and continue").clicked();
-                cancel = ui.button("Keep playing").clicked();
-            });
-        });
-        if cancel {
+        let size = fluent::dialog_size(ctx, 460., 112.);
+        let modal = fluent::modal(
+            ctx,
+            Id::new("game_file_discard"),
+            "Unsaved game changes",
+            size,
+            |ui| {
+                ui.label("Continuing discards changes to this game. Save first to keep them.");
+                ui.horizontal_wrapped(|ui| {
+                    discard = ui.button("Discard changes and continue").clicked();
+                    let safe = ui.button("Keep playing");
+                    fluent::focus_on_entry(ui, &safe, ui.id());
+                    cancel = safe.clicked();
+                });
+            },
+        );
+        if cancel || modal.should_close() {
             self.files.pending = None;
         }
         if discard {
@@ -876,7 +892,7 @@ impl Workspace {
         ctx.request_repaint();
         true
     }
-    fn continue_game_window_close(&mut self, ctx: &Context) {
+    pub(in crate::ui) fn continue_window_close(&mut self, ctx: &Context) {
         if self.remote_documents_block_close(None) {
             self.begin_ftp_document_close(None);
             self.pending_remote_exit = true;
@@ -906,6 +922,8 @@ impl Workspace {
         if current == ViewportId::ROOT && ui.ctx().input(|i| i.viewport().close_requested()) {
             self.intercept_game_exit(ui.ctx());
         }
+        let pending_session_decision =
+            self.pending_session_close.is_some() || self.pending_paste.is_some();
         let play = &mut self.games.play;
         if current == ViewportId::ROOT {
             if let Some(session) = play.files.poll(&mut play.message) {
@@ -980,6 +998,9 @@ impl Workspace {
         if !play.is_open() {
             return false;
         }
+        if pending_session_decision {
+            return true;
+        }
         let events = ui.ctx().input(|i| i.events.clone());
         if events.iter().any(|e| {
             matches!(
@@ -1005,6 +1026,7 @@ impl Workspace {
         // An editor may release focus while consuming Enter. Remember ownership
         // before widgets run as well as after, so that finishing an edit cannot
         // submit a Guess or trigger a board shortcut in the same frame.
+        let solve_owned_keys = play.solve_confirm;
         let widgets_owned_keys = egui::Popup::is_any_open(ui.ctx())
             || ui
                 .ctx()
@@ -1037,7 +1059,7 @@ impl Workspace {
                     ui.label(format!("Seed {seed} · {outcome:?}"));
                 });
                 if play.session.as_ref().unwrap().assisted(){ui.strong("Assisted — solution revealed");}
-                if play.solve_confirm {ui.horizontal_wrapped(|ui|{ui.label(if id==GameId::Guess {"Give up and reveal the code? This marks the game assisted."}else{"Reveal the solution? This marks the game assisted."});if ui.button("Reveal solution").clicked(){match play.session.as_mut().unwrap().solve(){Ok(changed)=>{if changed{play.files.changed();}play.message.clear();},Err(e)=>play.message=player_error(e)};play.solve_confirm=false;}if ui.button("Cancel").clicked(){play.solve_confirm=false;}});}
+                if play.solve_confirm {fluent::surface(ui).show(ui, |ui| {ui.horizontal_wrapped(|ui|{ui.label(if id==GameId::Guess {"Give up and reveal the code? This marks the game assisted."}else{"Reveal the solution? This marks the game assisted."});if ui.button("Reveal solution").clicked(){match play.session.as_mut().unwrap().solve(){Ok(changed)=>{if changed{play.files.changed();}play.message.clear();},Err(e)=>play.message=player_error(e)};play.solve_confirm=false;}let safe = ui.button("Cancel"); fluent::focus_on_entry(ui,&safe,ui.id()); if safe.clicked() || (!play.files.confirming() && ui.ctx().memory(|m|m.top_modal_layer().is_none()) && ui.input_mut(|i|i.consume_key(Modifiers::NONE,Key::Escape))) {play.solve_confirm=false;}});});}
                 puzzle_options(ui,play);
                 ui.horizontal_wrapped(|ui|{match id {
                     GameId::Soliterm=>{ui.label("New game variant:");ui.selectable_value(&mut play.variant,0,"Freecell");ui.selectable_value(&mut play.variant,1,"Klondike");ui.add(egui::Slider::new(&mut play.passes,1..=20).text("passes"));},
@@ -1059,7 +1081,12 @@ _=>{}}});
             || ui
                 .ctx()
                 .memory(|m| m.focused().is_some_and(|id| Some(id) != play.board_focus));
-        if !widgets_owned_keys && !widgets_own_keys && !play.files.confirming() {
+        if !solve_owned_keys
+            && !play.solve_confirm
+            && !widgets_owned_keys
+            && !widgets_own_keys
+            && !play.files.confirming()
+        {
             let keys = ui.ctx().input(|i| i.events.clone());
             for event in keys {
                 if let Event::Key {
@@ -1120,7 +1147,7 @@ _=>{}}});
         play.file_confirmation(ui.ctx());
         let exit_ready = std::mem::take(&mut play.exit_ready);
         if exit_ready {
-            self.continue_game_window_close(ui.ctx());
+            self.continue_window_close(ui.ctx());
         }
         ui.ctx().input_mut(|i| i.events.clear());
         // Polling remains bounded and active while terminal rendering is suspended.
@@ -2483,6 +2510,7 @@ mod tests {
         Context::set_immediate_viewport_renderer(move |ctx, mut viewport| {
             let mut raw = RawInput {
                 viewport_id: viewport.ids.this,
+                events: vec![Event::Text("blocked".into())],
                 screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(960., 640.))),
                 ..Default::default()
             };
@@ -2504,14 +2532,19 @@ mod tests {
         });
         let mut raw = RawInput::default();
         raw.viewports.insert(child, egui::ViewportInfo::default());
-        let mut out = ctx.run_ui(raw, |ui| w.detached_windows(ui.ctx()));
+        let mut out = ctx.run_ui(raw.clone(), |ui| w.detached_windows(ui.ctx()));
         assert!(
             out.viewport_output[&child]
                 .commands
                 .contains(&ViewportCommand::CancelClose)
         );
         out.textures_delta.clear();
+        ctx.run_ui(raw, |ui| w.detached_windows(ui.ctx()))
+            .textures_delta
+            .clear();
         assert!(seen.load(Ordering::SeqCst));
+        w.tabs[0].poll();
+        assert!(crate::ui::terminal_review_tests::captured(&w.tabs[0]).is_empty());
         assert!(w.window_close_prompt.contains(&window));
         assert!(!w.games.play.is_open());
         assert_eq!(w.games.play.session.as_ref().unwrap().scene(), saved);
@@ -4261,6 +4294,41 @@ mod options_ui_tests {
         assert!(
             ctx.input(|i| i.events.is_empty() && i.keys_down.is_empty() && !i.pointer.any_down())
         );
+    }
+    #[test]
+    fn actual_game_escape_keeps_dirty_game_and_does_not_play_the_queued_move() {
+        let (ctx, _dir, mut w) = crate::ui::terminal_review_tests::owned_workspace();
+        w.games.play.start(GameId::Netwalk, 5);
+        w.games.play.puzzle(p::PuzzleInput::Rotate {
+            cell: 0,
+            clockwise: true,
+        });
+        let before = w.games.play.session.as_ref().unwrap().save_bytes().unwrap();
+        w.games.play.request_file_action(FileAction::Close, &ctx);
+        assert!(w.games.play.files.pending.is_some());
+        frame(&ctx, &mut w, vec![], vec2(1200., 1000.));
+        label_position(&ctx, &mut w, "Keep playing");
+        frame(
+            &ctx,
+            &mut w,
+            vec![
+                Event::Key {
+                    key: Key::Escape,
+                    physical_key: None,
+                    pressed: true,
+                    repeat: false,
+                    modifiers: Modifiers::NONE,
+                },
+                Event::Text("x".into()),
+            ],
+            vec2(1200., 1000.),
+        );
+        assert!(w.games.play.files.pending.is_none());
+        assert_eq!(
+            w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),
+            before
+        );
+        assert!(w.games.play.files.dirty());
     }
     #[test]
     fn save_ui_actual_discard_resets_creates_and_closes() {

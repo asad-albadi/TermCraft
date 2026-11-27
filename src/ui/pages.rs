@@ -115,16 +115,31 @@ impl Workspace {
             self.xdmcp_discovery.end_editor();
             return;
         };
-        let mut open = true;
         let mut cancel = false;
         let mut connect = false;
         let mut save = false;
-        Window::new(if self.editing.is_some(){"Edit session"}else{"New session"}).id(Id::new("session-form")).open(&mut open).collapsible(false).resizable(false).vscroll(true).max_height(650.).default_width(650.).show(ctx,|ui|{
+        let size = super::fluent::dialog_size(ctx, 650., 182.);
+        let response = super::fluent::modal(
+            ctx,
+            Id::new("session-form"),
+            if self.editing.is_some() {
+                "Edit session"
+            } else {
+                "New session"
+            },
+            size,
+            |ui| {
+                ScrollArea::both().id_salt("session-settings-body").max_width(size.width).max_height(size.body_height).auto_shrink([false,true]).show(ui, |ui| {
+   ui.set_width((size.width-20.).max(1.));
    ui.label(RichText::new("Choose a connection").size(20.).strong());ui.add_space(7.);
    ui.horizontal_wrapped(|ui|{for p in PROTOCOLS{if ui.selectable_label(s.protocol==*p,*p).clicked(){s.protocol=(*p).into();s.port=protocol_port(p);if *p=="Mosh"&&self.editing.is_none(){s.mosh_provider=harbor_workspace::model::MoshProvider::Bundled;}if *p=="FTP"{s.ftp_options=harbor_workspace::protocols::ftp_actor::SessionOptions::embedded();}if *p=="Browser"{s.browser_options.embedded=true;if self.editing.is_none(){s.browser_options.runtime=harbor_workspace::browser::Runtime::BundledChromium;}}}}});ui.add_space(7.);ui.separator();
+   ui.strong("Session details");
    Grid::new("session_fields").num_columns(2).spacing([20.,13.]).show(ui,|ui|{
-    field(ui,"Session name",&mut s.name,"Optional display name");field(ui,"Folder",&mut s.folder,"My sessions");
-    if s.protocol=="Local"{field(ui,"Shell executable",&mut s.command,"Use the system default");super::xserver::session_settings(ui,&mut s);ui.label("Start folder");ui.horizontal(|ui|{ui.add(TextEdit::singleline(&mut s.directory).desired_width(330.));if ui.small_button("Browse").clicked(){if let Some(p)=rfd::FileDialog::new().pick_folder(){s.directory=p.to_string_lossy().into();}}});ui.end_row();}
+    let name = fluent::field(ui,"Session name",&mut s.name,"Optional display name",390.); fluent::focus_on_entry(ui, &name, Id::new("session-form")); ui.end_row();field(ui,"Folder",&mut s.folder,"My sessions");
+   });
+   ui.strong("Connection settings");
+   Grid::new("session-endpoint").num_columns(2).spacing([20.,13.]).show(ui,|ui|{
+    if s.protocol=="Local"{field(ui,"Shell executable",&mut s.command,"Use the system default");super::xserver::session_settings(ui,&mut s);ui.label("Start folder");ui.horizontal_wrapped(|ui|{ui.add(TextEdit::singleline(&mut s.directory).desired_width((size.width-230.).clamp(50.,330.)));if ui.small_button("Browse").clicked(){if let Some(p)=rfd::FileDialog::new().pick_folder(){s.directory=p.to_string_lossy().into();}}});ui.end_row();}
     else if s.protocol=="Serial"{field(ui,"Device / COM port",&mut s.serial_device,if cfg!(windows){"COM3"}else{"/dev/ttyUSB0"});ui.label("Baud rate");ui.add(DragValue::new(&mut s.baud).range(50..=4_000_000));ui.end_row();super::serial_settings::session(ui,&mut s);}
     else{field(ui,if s.protocol=="Browser"{"Website address"}else{"Remote host"},&mut s.host,if s.protocol=="Browser"{"https://example.com"}else{"Hostname or IP address"});if s.protocol!="Browser"{field(ui,"Username",&mut s.user,"Use the client default");ui.label("Port");ui.add(DragValue::new(&mut s.port).range(1..=65535));ui.end_row();}}
    });
@@ -133,7 +148,7 @@ impl Workspace {
    if matches!(s.protocol.as_str(),"Telnet"|"Rlogin"|"Rsh"){ui.small("Embedded transport. These protocols do not encrypt direct connections. Rlogin/Rsh require a permitted reserved local source port; Telnet can use the verified SSH gateway below.");}
    if s.protocol=="Mosh"{
        use harbor_workspace::model::MoshProvider;
-       ui.horizontal(|ui|{ui.label("SSH port");ui.add(DragValue::new(&mut s.mosh_ssh_port).range(1..=65535));});
+       ui.horizontal_wrapped(|ui|{ui.label("SSH port");ui.add(DragValue::new(&mut s.mosh_ssh_port).range(1..=65535));});
        ui.horizontal_wrapped(|ui|{
            ui.label("Mosh provider");
            ui.selectable_value(&mut s.mosh_provider,MoshProvider::Bundled,"Packaged client");
@@ -146,7 +161,7 @@ impl Workspace {
        }
    }
    if s.protocol=="SSH" {
-    ui.horizontal(|ui|{ui.label("SSH engine");ui.selectable_value(&mut s.ssh_engine,SshEngine::Embedded,"Embedded + remote files");ui.selectable_value(&mut s.ssh_engine,SshEngine::OpenSsh,"OpenSSH compatibility");});
+    ui.horizontal_wrapped(|ui|{ui.label("SSH engine");ui.selectable_value(&mut s.ssh_engine,SshEngine::Embedded,"Embedded + remote files");ui.selectable_value(&mut s.ssh_engine,SshEngine::OpenSsh,"OpenSSH compatibility");});
     if s.ssh_engine==SshEngine::OpenSsh {ui.label("Uses installed OpenSSH configuration. Graphical remote files are unavailable in this mode.");}
     else { use harbor_workspace::remote_files::capabilities::RemoteBackendKind;
      ui.horizontal_wrapped(|ui|{ui.label("Remote files");ui.selectable_value(&mut s.remote_backend,RemoteBackendKind::Sftp,"SFTP (default)");ui.selectable_value(&mut s.remote_backend,RemoteBackendKind::Scp,"SCP compatibility");});
@@ -154,7 +169,7 @@ impl Workspace {
     }
    }
    if matches!(s.protocol.as_str(),"SSH"|"SFTP"|"Mosh"){ui.add_space(5.);CollapsingHeader::new("SSH options").default_open(true).show(ui,|ui|{Grid::new("ssh_options").num_columns(2).spacing([20.,10.]).show(ui,|ui|{
-    ui.label("Private key");ui.horizontal(|ui|{ui.add(TextEdit::singleline(&mut s.key).hint_text("Optional key file").desired_width(330.));if ui.small_button("Browse").clicked(){if let Some(p)=rfd::FileDialog::new().pick_file(){s.key=p.to_string_lossy().into();}}});ui.end_row();field(ui,"Jump host",&mut s.jump,"user@bastion:22");
+    ui.label("Private key");ui.horizontal_wrapped(|ui|{ui.add(TextEdit::singleline(&mut s.key).hint_text("Optional key file").desired_width((size.width-230.).clamp(50.,330.)));if ui.small_button("Browse").clicked(){if let Some(p)=rfd::FileDialog::new().pick_file(){s.key=p.to_string_lossy().into();}}});ui.end_row();field(ui,"Jump host",&mut s.jump,"user@bastion:22");
     if s.protocol=="SSH"{ui.label("SSH agent");ui.horizontal_wrapped(|ui|{ui.selectable_value(&mut s.agent_mode,AgentMode::System,"System");ui.selectable_value(&mut s.agent_mode,AgentMode::Disabled,"Disabled");if s.ssh_engine==SshEngine::Embedded{ui.selectable_value(&mut s.agent_mode,AgentMode::Owned,"TermCraft-owned");if cfg!(windows){ui.selectable_value(&mut s.agent_mode,AgentMode::Pageant,"Pageant");}}if ui.button("Manage keys…").clicked(){self.ssh_keys.open=true;}});ui.end_row();ui.label("An explicit private-key file takes precedence over agent identities.");ui.end_row();field(ui,"Remote command",&mut s.command,"Optional startup command");}if s.protocol=="SSH"{super::xserver::session_settings(ui,&mut s);}ui.label("Transfer");ui.checkbox(&mut s.compression,"Enable compression");ui.end_row();});});ui.label(RichText::new("Embedded SSH asks for credentials in Remote files. OpenSSH compatibility asks in the terminal. Passwords are saved only through the opt-in credential vault.").size(11.).color(muted(ui)));}
    if matches!(s.protocol.as_str(),"SSH"|"SFTP"|"Mosh"){super::ssh_options::session(ui,&mut s,&self.store.preferences.ssh_defaults);}
    if matches!(s.protocol.as_str(),"RDP"|"VNC"|"Telnet") {
@@ -164,15 +179,15 @@ impl Workspace {
        });
        if !s.jump.trim().is_empty(){super::ssh_options::session(ui,&mut s,&self.store.preferences.ssh_defaults);}
    }
-   if s.protocol=="RDP" {use harbor_workspace::model::DesktopEngine;ui.horizontal_wrapped(|ui|{ui.label("Desktop engine");ui.selectable_value(&mut s.desktop_engine,DesktopEngine::Embedded,if cfg!(debug_assertions){"Development helper"}else{"Packaged helper"});ui.selectable_value(&mut s.desktop_engine,DesktopEngine::External,"Installed client");});ui.horizontal(|ui|{ui.label("Desktop size");ui.add(DragValue::new(&mut s.width).range(200..=8192));ui.label("×");ui.add(DragValue::new(&mut s.height).range(200..=8192));});}
+   if s.protocol=="RDP" {use harbor_workspace::model::DesktopEngine;ui.horizontal_wrapped(|ui|{ui.label("Desktop engine");ui.selectable_value(&mut s.desktop_engine,DesktopEngine::Embedded,if cfg!(debug_assertions){"Development helper"}else{"Packaged helper"});ui.selectable_value(&mut s.desktop_engine,DesktopEngine::External,"Installed client");});ui.horizontal_wrapped(|ui|{ui.label("Desktop size");ui.add(DragValue::new(&mut s.width).range(200..=8192));ui.label("×");ui.add(DragValue::new(&mut s.height).range(200..=8192));});}
    if s.protocol=="RDP" {super::rdp_settings::session(ui,&mut s);}
    if s.protocol=="VNC" {super::vnc_settings::session(ui,&mut s);}
 
-   if matches!(s.protocol.as_str(),"RDP"|"VNC"){ui.horizontal(|ui|{ui.checkbox(&mut s.fullscreen,"Full screen").on_hover_text("Enter fullscreen when the connected desktop is first displayed.");ui.checkbox(&mut s.view_only,"View only");});ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. The view fits server dimensions; server-driven resize is supported."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. The view fits the negotiated desktop."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));}
+   if matches!(s.protocol.as_str(),"RDP"|"VNC"){ui.horizontal_wrapped(|ui|{ui.checkbox(&mut s.fullscreen,"Full screen").on_hover_text("Enter fullscreen when the connected desktop is first displayed.");ui.checkbox(&mut s.view_only,"View only");});ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. The view fits server dimensions; server-driven resize is supported."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. The view fits the negotiated desktop."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));}
    if s.protocol=="Browser"{super::web_browser::settings(ui,&mut s);}
    if s.protocol=="XDMCP"{super::xdmcp::settings(ui,&mut s,&mut self.xdmcp_discovery);}else{self.xdmcp_discovery.end_editor();}
    if super::macro_events::supported_session(&s) {
-       ui.horizontal(|ui| {
+       ui.horizontal_wrapped(|ui| {
            ui.label("Startup macro");
            ComboBox::from_id_salt("startup-macro")
                .selected_text(s.startup_macro.as_deref().unwrap_or("None"))
@@ -186,11 +201,28 @@ impl Workspace {
    }
    if s.protocol!="Browser"{
    CollapsingHeader::new("Terminal profile overrides").show(ui,|ui|{super::terminal_settings::overrides(ui,&mut s.terminal,&self.store.preferences.terminal_settings());});
-   ui.horizontal(|ui|{ui.label("Keyword highlighting");ui.selectable_value(&mut s.highlight_enabled,None,"Global setting");ui.selectable_value(&mut s.highlight_enabled,Some(true),"On");ui.selectable_value(&mut s.highlight_enabled,Some(false),"Off");});
+   ui.horizontal_wrapped(|ui|{ui.label("Keyword highlighting");ui.selectable_value(&mut s.highlight_enabled,None,"Global setting");ui.selectable_value(&mut s.highlight_enabled,Some(true),"On");ui.selectable_value(&mut s.highlight_enabled,Some(false),"Off");});
    }
-   ui.add_space(8.);ui.checkbox(&mut self.save_session,"Save this session");if !self.form_error.is_empty(){ui.colored_label(Color32::from_rgb(180,42,42),&self.form_error);}ui.separator();ui.horizontal(|ui|{save=ui.button("Save only").clicked();ui.with_layout(Layout::right_to_left(Align::Center),|ui|{connect=primary(ui,"Connect").clicked();cancel=ui.button("Cancel").clicked();});});
-  });
-        if !open || cancel {
+   });
+                ui.add_space(8.);
+                ui.checkbox(&mut self.save_session, "Save this session");
+                if !self.form_error.is_empty() {
+                    ui.colored_label(super::fluent::palette(ui).error, &self.form_error);
+                }
+                ui.separator();
+                ui.horizontal_wrapped(|ui| {
+                    save = ui.button("Save only").clicked();
+                    connect = primary(ui, "Connect").clicked();
+                    cancel = ui.button("Cancel").clicked();
+                });
+            },
+        );
+        if cancel
+            || (!self.ssh_keys.open
+                && response.is_top_modal
+                && !response.any_popup_open
+                && ctx.input_mut(|i| i.consume_key(Modifiers::NONE, Key::Escape)))
+        {
             self.xdmcp_discovery.end_editor();
             return;
         }
@@ -594,7 +626,7 @@ impl Workspace {
         }
         ui.horizontal(|ui|{if ui.button("Refresh").clicked(){self.files.refresh();}if ui.button("New folder").clicked(){self.files.show_new=true;self.files.new_name.clear();}if ui.add_enabled(self.files.selected.is_some(),Button::new("Copy")).clicked(){self.files.clipboard=self.files.selected.clone();}
    if ui.add_enabled(self.files.clipboard.is_some(),Button::new("Paste copy")).clicked(){if let Some(from)=&self.files.clipboard{if from.is_file(){let to=self.files.path.join(from.file_name().unwrap());if to.exists(){self.files.error="A file with that name already exists. Rename it before copying.".into();}else{match copy_new_file(from,&to){Ok(_)=>self.files.refresh(),Err(e)=>self.files.error=e.to_string()}}}else{self.files.error="Folder copying is not supported yet. Open the system file manager for this operation.".into();}}}
-   if ui.add_enabled(self.files.selected.is_some(),Button::new("Rename")).clicked(){self.rename_file=self.files.selected.clone();self.rename_text=self.rename_file.as_ref().unwrap().file_name().unwrap().to_string_lossy().into();}
+   if ui.add_enabled(self.files.selected.is_some(),Button::new("Rename")).clicked(){self.files.error.clear();self.rename_file=self.files.selected.clone();self.rename_text=self.rename_file.as_ref().unwrap().file_name().unwrap().to_string_lossy().into();}
    if ui.add_enabled(self.files.selected.is_some(),Button::new("Delete")).clicked(){self.delete_file=self.files.selected.clone();}
    ui.with_layout(Layout::right_to_left(Align::Center),|ui|{ui.add(TextEdit::singleline(&mut self.files.query).hint_text("Filter files").desired_width(170.));});});
         if self.files.show_new {
@@ -689,8 +721,8 @@ impl Workspace {
                     if response.double_clicked() {
                         open = Some(entry.clone());
                     }
-                    response.context_menu(|ui| {
-                        if ui.button("Open").clicked() {
+                    context_actions(&response, |ui, focus_first| {
+                        if context_item(ui, "Open", focus_first) {
                             open = Some(entry.clone());
                             ui.close();
                         }
@@ -713,11 +745,18 @@ impl Workspace {
                 edit = Some(e.path);
             }
         }
+        if edit.is_some() && self.editor.as_ref().is_some_and(|editor| editor.dirty) {
+            self.message("Save or close the current document before opening another file.");
+            edit = None;
+        }
         if let Some(p) = edit {
             match fs::metadata(&p) {
                 Ok(m) if m.len() <= 2_000_000 => match fs::read_to_string(&p) {
                     Ok(text) => {
                         self.editor = Some(Editor {
+                            closing: false,
+                            closing_app: false,
+                            error: String::new(),
                             path: p,
                             text,
                             dirty: false,
@@ -735,15 +774,48 @@ impl Workspace {
             }
         }
     }
+    pub(super) fn confirm_local_document_exit(&mut self, ctx: &Context) -> bool {
+        let Some(editor) = self.editor.as_mut().filter(|editor| editor.dirty) else {
+            return false;
+        };
+        editor.closing = true;
+        editor.closing_app = true;
+        self.allow_session_exit = false;
+        self.allow_remote_exit = false;
+        ctx.send_viewport_cmd(ViewportCommand::CancelClose);
+        ctx.send_viewport_cmd(ViewportCommand::Minimized(false));
+        ctx.send_viewport_cmd(ViewportCommand::Visible(true));
+        ctx.send_viewport_cmd(ViewportCommand::Focus);
+        true
+    }
+
     pub(super) fn file_dialogs(&mut self, ctx: &Context) {
         if let Some(p) = self.delete_file.clone() {
             let mut cancel = false;
             let mut delete = false;
-            Window::new("Delete this item?").collapsible(false).resizable(false).show(ctx,|ui|{ui.label(p.file_name().unwrap_or_default().to_string_lossy());ui.label("This permanently removes the item. Only empty folders can be deleted here.");ui.horizontal(|ui|{cancel=ui.button("Cancel").clicked();delete=ui.button("Delete permanently").clicked();});});
+            let size = super::fluent::dialog_size(ctx, 410., 102.);
+            let modal = super::fluent::modal(
+                ctx,
+                Id::new("delete-local-item"),
+                "Delete this item?",
+                size,
+                |ui| {
+                    super::fluent::dialog_body(ui, size, |ui| {
+                        ui.label(p.display().to_string());
+                        ui.label("This permanently removes the item. Only empty folders can be deleted here.");
+                    });
+                    ui.horizontal_wrapped(|ui| {
+                        delete = ui.button("Delete permanently").clicked();
+                        let safe = ui.button("Cancel");
+                        super::fluent::focus_on_entry(ui, &safe, ui.id());
+                        cancel = safe.clicked();
+                    });
+                },
+            );
+            cancel |= modal.should_close();
             if cancel {
                 self.delete_file = None;
-            }
-            if delete {
+            } else if delete {
                 let result = if p.is_dir() {
                     fs::remove_dir(p)
                 } else {
@@ -759,56 +831,69 @@ impl Workspace {
         if let Some(p) = self.rename_file.clone() {
             let mut cancel = false;
             let mut rename = false;
-            Window::new("Rename item")
-                .collapsible(false)
-                .resizable(false)
-                .show(ctx, |ui| {
-                    ui.text_edit_singleline(&mut self.rename_text);
-                    ui.horizontal(|ui| {
-                        cancel = ui.button("Cancel").clicked();
-                        rename = primary(ui, "Rename").clicked();
-                    });
+            let size = fluent::dialog_size(ctx, 420., 110.);
+            let modal = fluent::modal(ctx, Id::new("Rename item"), "Rename item", size, |ui| {
+                let field = fluent::field(
+                    ui,
+                    "New name",
+                    &mut self.rename_text,
+                    "File name",
+                    size.width,
+                );
+                fluent::select_name_on_entry(ui, &field, ui.id(), &self.rename_text);
+                if !self.files.error.is_empty() {
+                    ui.colored_label(super::fluent::palette(ui).error, &self.files.error);
+                }
+                ui.horizontal(|ui| {
+                    cancel = ui.button("Cancel").clicked();
+                    rename = primary(ui, "Rename").clicked();
                 });
-            if cancel {
+            });
+            if cancel || modal.should_close() {
                 self.rename_file = None;
-            }
-            if rename {
+            } else if rename {
                 if valid_filename(&self.rename_text) {
                     let dest = p.parent().unwrap().join(&self.rename_text);
                     if dest.exists() {
                         self.files.error = "An item with that name already exists.".into();
                     } else {
                         match fs::rename(p, dest) {
-                            Ok(()) => self.files.refresh(),
+                            Ok(()) => {
+                                self.rename_file = None;
+                                self.files.refresh();
+                            }
                             Err(e) => self.files.error = e.to_string(),
                         }
                     }
                 } else {
                     self.files.error = "Enter a single file name.".into();
                 }
-                self.rename_file = None;
             }
         }
         if let Some(mut editor) = self.editor.take() {
             let mut open = true;
             let mut save = false;
-            Window::new(format!(
-                "{}{}",
-                editor
-                    .path
-                    .file_name()
-                    .unwrap_or_default()
-                    .to_string_lossy(),
-                if editor.dirty { " *" } else { "" }
-            ))
-            .id(Id::new("text-editor"))
+            let size = fluent::dialog_size(ctx, 850., 130.);
+            fluent::modeless(
+                ctx,
+                Id::new("text-editor"),
+                if editor.dirty {
+                    "Text editor · Unsaved"
+                } else {
+                    "Text editor"
+                },
+                size,
+            )
             .open(&mut open)
-            .default_size([850., 580.])
             .show(ctx, |ui| {
-                ui.horizontal(|ui| {
+                ui.label(editor.path.display().to_string());
+                ui.horizontal_wrapped(|ui| {
                     save = primary(ui, "Save file").clicked();
                     ui.label(RichText::new("UTF-8 text").color(muted(ui)));
                 });
+                if !editor.error.is_empty() {
+                    ui.colored_label(ui.visuals().error_fg_color, &editor.error);
+                }
                 ScrollArea::both().show(ui, |ui| {
                     let response = ui.add(
                         TextEdit::multiline(&mut editor.text)
@@ -820,19 +905,59 @@ impl Workspace {
                     editor.dirty |= response.changed();
                 });
             });
+            if !open && editor.dirty {
+                editor.closing = true;
+                open = true;
+            }
+            if editor.closing {
+                let size = super::fluent::dialog_size(ctx, 420., 104.);
+                let modal = super::fluent::modal(
+                    ctx,
+                    Id::new("local-editor-close"),
+                    "Save changes before closing?",
+                    size,
+                    |ui| {
+                        ui.label(editor.path.display().to_string());
+                        if !editor.error.is_empty() {
+                            ui.colored_label(ui.visuals().error_fg_color, &editor.error);
+                        }
+                        ui.horizontal_wrapped(|ui| {
+                            save = ui.button("Save and close").clicked();
+                            if ui.button("Discard changes").clicked() {
+                                open = false;
+                            }
+                            let safe = ui.button("Keep editing");
+                            super::fluent::focus_on_entry(ui, &safe, ui.id());
+                            if safe.clicked() {
+                                editor.closing = false;
+                            }
+                        });
+                    },
+                );
+                if modal.should_close() {
+                    editor.closing = false;
+                    open = true;
+                    save = false;
+                }
+                if !editor.closing {
+                    editor.closing_app = false;
+                }
+            }
             if save {
                 match fs::write(&editor.path, &editor.text) {
                     Ok(()) => {
                         editor.dirty = false;
+                        open = !editor.closing;
+                        editor.error.clear();
                         self.message("File saved");
                     }
-                    Err(e) => self.message(e.to_string()),
+                    Err(e) => editor.error = e.to_string(),
                 }
             }
             if open {
                 self.editor = Some(editor);
-            } else if editor.dirty {
-                self.message("Closed the editor without saving changes.");
+            } else if editor.closing_app {
+                self.continue_window_close(ctx);
             }
         }
     }
@@ -942,7 +1067,8 @@ impl Workspace {
         let mut open = true;
         let mut save = false;
         let mut cancel = false;
-        Window::new("Configure SSH tunnel").open(&mut open).collapsible(false).default_width(520.).show(ctx,|ui|{let t=&mut self.tunnel_form;ui.horizontal(|ui|{for mode in ["Local","Remote","Dynamic"]{ui.selectable_value(&mut t.mode,mode.into(),mode);}});ui.label(RichText::new(match t.mode.as_str(){"Remote"=>"Listen on the SSH server and forward to a destination from your computer.","Dynamic"=>"Create a local SOCKS proxy through the SSH server.",_=>"Listen on your computer and reach a destination from the SSH server."}).color(muted(ui)).size(12.));Grid::new("tunnel_fields").num_columns(2).spacing([20.,11.]).show(ui,|ui|{field(ui,"Name",&mut t.name,"Tunnel name");field(ui,"SSH server",&mut t.host,"bastion.example.com");field(ui,"SSH username",&mut t.user,"");ui.label("SSH port");ui.add(DragValue::new(&mut t.ssh_port).range(1..=65535));ui.end_row();field(ui,"Private key",&mut t.key,"Optional key file");field(ui,"Listen address",&mut t.bind,"127.0.0.1");ui.label("Listen port");ui.add(DragValue::new(&mut t.local_port).range(1..=65535));ui.end_row();if t.mode!="Dynamic"{field(ui,"Destination",&mut t.destination,"localhost");ui.label("Destination port");ui.add(DragValue::new(&mut t.remote_port).range(1..=65535));ui.end_row();}});if !self.form_error.is_empty(){ui.colored_label(Color32::from_rgb(180,42,42),&self.form_error);}ui.horizontal(|ui|{cancel=ui.button("Cancel").clicked();save=primary(ui,"Save tunnel").clicked();});});
+        let size = fluent::dialog_size(ctx, 520., 138.);
+        fluent::modeless(ctx, Id::new("Configure SSH tunnel"), "Configure SSH tunnel", size).open(&mut open).collapsible(false).show(ctx,|ui|{fluent::dialog_body(ui,size,|ui|{let t=&mut self.tunnel_form;ui.horizontal(|ui|{for mode in ["Local","Remote","Dynamic"]{ui.selectable_value(&mut t.mode,mode.into(),mode);}});ui.label(RichText::new(match t.mode.as_str(){"Remote"=>"Listen on the SSH server and forward to a destination from your computer.","Dynamic"=>"Create a local SOCKS proxy through the SSH server.",_=>"Listen on your computer and reach a destination from the SSH server."}).color(muted(ui)).size(12.));Grid::new("tunnel_fields").num_columns(2).spacing([20.,11.]).show(ui,|ui|{let name=fluent::field(ui,"Name",&mut t.name,"Tunnel name",390.);fluent::focus_on_entry(ui,&name,ui.id());ui.end_row();field(ui,"SSH server",&mut t.host,"bastion.example.com");field(ui,"SSH username",&mut t.user,"");ui.label("SSH port");ui.add(DragValue::new(&mut t.ssh_port).range(1..=65535));ui.end_row();field(ui,"Private key",&mut t.key,"Optional key file");field(ui,"Listen address",&mut t.bind,"127.0.0.1");ui.label("Listen port");ui.add(DragValue::new(&mut t.local_port).range(1..=65535));ui.end_row();if t.mode!="Dynamic"{field(ui,"Destination",&mut t.destination,"localhost");ui.label("Destination port");ui.add(DragValue::new(&mut t.remote_port).range(1..=65535));ui.end_row();}});});if !self.form_error.is_empty(){ui.colored_label(super::fluent::palette(ui).error,&self.form_error);}ui.horizontal(|ui|{cancel=ui.button("Cancel").clicked();save=primary(ui,"Save tunnel").clicked();});});
         if !open || cancel {
             self.tunnel_open = false;
             self.form_error.clear();
@@ -1113,31 +1239,41 @@ impl Workspace {
         }
         let mut open = true;
         let mut save = false;
-        Window::new("Edit macro")
+        let size = fluent::dialog_size(ctx, 560., 130.);
+        let mut cancel = false;
+        fluent::modeless(ctx, Id::new("Edit macro"), "Edit macro", size)
             .open(&mut open)
-            .default_width(560.)
             .collapsible(false)
             .show(ctx, |ui| {
-                ui.label("Name");
-                ui.text_edit_singleline(&mut self.macro_form.name);
-                if let Some(script) = &mut self.macro_form.script {
-                    super::macro_events::edit_events(ui, script);
-                } else {
-                    ui.label("Text to send");
-                    ui.add(
-                        TextEdit::multiline(&mut self.macro_form.text)
-                            .font(TextStyle::Monospace)
-                            .desired_width(f32::INFINITY)
-                            .desired_rows(8),
-                    );
-                    ui.checkbox(
-                        &mut self.macro_form.append_enter,
-                        "Press Enter after sending",
-                    );
+                fluent::dialog_body(ui, size, |ui| {
+                    ui.label("Name");
+                    ui.text_edit_singleline(&mut self.macro_form.name);
+                    if let Some(script) = &mut self.macro_form.script {
+                        super::macro_events::edit_events(ui, script);
+                    } else {
+                        ui.label("Text to send");
+                        ui.add(
+                            TextEdit::multiline(&mut self.macro_form.text)
+                                .font(TextStyle::Monospace)
+                                .desired_width(f32::INFINITY)
+                                .desired_rows(8),
+                        );
+                        ui.checkbox(
+                            &mut self.macro_form.append_enter,
+                            "Press Enter after sending",
+                        );
+                    }
+                });
+                if !self.macro_error.is_empty() {
+                    ui.colored_label(ui.visuals().error_fg_color, &self.macro_error);
                 }
-                save = primary(ui, "Save macro").clicked();
+                ui.horizontal_wrapped(|ui| {
+                    save = primary(ui, "Save macro").clicked();
+                    cancel = ui.button("Cancel").clicked();
+                });
             });
-        if !open {
+        if !open || cancel {
+            self.macro_error.clear();
             self.macro_open = false;
         }
         if save {
@@ -1155,9 +1291,8 @@ impl Workspace {
                         .iter()
                         .any(|session| session.startup_macro.as_ref() == Some(&value.name))
                 {
-                    self.message(
-                        "Remove the old macro name from session startup before renaming it.",
-                    );
+                    self.macro_error =
+                        "Remove the old macro name from session startup before renaming it.".into();
                     return;
                 }
                 *value = self.macro_form.clone();
@@ -1165,11 +1300,12 @@ impl Workspace {
                 values.push(self.macro_form.clone());
             }
             if let Err(error) = super::macro_events::validate_library(&values) {
-                self.message(error);
+                self.macro_error = error;
                 return;
             }
             self.store.macros = values;
             self.persist();
+            self.macro_error.clear();
             self.macro_open = false;
         }
     }
@@ -1614,6 +1750,13 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
     t.history_offset = frame.inner;
     let id = Id::new(("terminal-input", t.id));
     let response = ui.interact(frame.response.rect, id, Sense::click());
+    if super::shortcuts::input_blocked(ui.ctx())
+        || !ui.memory(|m| m.allows_interaction(ui.layer_id()))
+    {
+        t.macro_state.terminal_focus(ui.ctx(), false);
+        t.route_mouse(ui.ctx(), &viewport, false, &[], ui.input(|i| i.modifiers));
+        return Vec::new();
+    }
     let pointer_events = ui.input(|i| i.events.clone());
     let pointer_press=pointer_events.iter().any(|event| matches!(event,Event::PointerButton{pos,pressed:true,..} if selection_viewport.cell(ui.ctx(),*pos).is_some()));
     if response.clicked() || clicked || pointer_press {

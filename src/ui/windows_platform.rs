@@ -125,11 +125,12 @@ impl State {
     }
    });
    if self.write_enabled && let Some(preview)=self.preview.clone(){
-    ui.separator();ui.label(format!("Confirm target: {:?}\\{} → {}",preview.path.hive,preview.path.key,if preview.name.is_empty(){"(Default)"}else{&preview.name}));
-    ui.label(format!("Before [{}]: {}",preview.expected.type_name(),format!("{:?}",preview.expected.edit_text().unwrap_or_else(|_|preview.expected.display()))));ui.label(format!("After [{}]: {}",preview.replacement.type_name(),format!("{:?}",preview.replacement.edit_text().unwrap_or_else(|_|preview.replacement.display()))));
+    crate::ui::fluent::surface(ui).show(ui, |ui| {ui.strong(format!("Confirm target: {:?}\\{} → {}",preview.path.hive,preview.path.key,if preview.name.is_empty(){"(Default)"}else{&preview.name}));
+    egui::ScrollArea::vertical().id_salt("registry-change-details").max_height(160.).show(ui, |ui| {ui.label(format!("Before [{}]: {}",preview.expected.type_name(),format!("{:?}",preview.expected.edit_text().unwrap_or_else(|_|preview.expected.display()))));ui.label(format!("After [{}]: {}",preview.replacement.type_name(),format!("{:?}",preview.replacement.edit_text().unwrap_or_else(|_|preview.replacement.display()))));});
     ui.label("Writing changes this value immediately. A changed value will be refused; refresh and preview again.");
     if ui.add_enabled(self.result.is_none(),egui::Button::new("Confirm write to this target and value")).clicked(){self.preview=None;self.start(move|cancel|{RegistryFs::write_confirmed(&preview,&cancel)?;Ok(ResultView::Message("Value written; refresh to read it again".into()))});}
     if ui.button("Discard preview").clicked(){self.preview=None;}
+    });
    }
   });
         ui.label(&self.message);

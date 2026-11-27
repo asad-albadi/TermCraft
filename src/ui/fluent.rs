@@ -345,6 +345,93 @@ pub(super) fn dialog_body<T>(
         .show(ui, content)
 }
 
+/// Request focus once when a dialog or challenge is shown. The caller supplies
+/// the challenge identity when consecutive challenges share the same widgets.
+pub(super) fn focus_on_entry(ui: &Ui, response: &Response, owner: Id) -> bool {
+    let available = response.enabled()
+        && !ui.is_sizing_pass()
+        && ui.memory(|m| m.allows_interaction(ui.layer_id()));
+    let frame = ui.ctx().cumulative_frame_nr();
+    let marker = owner.with((ui.ctx().viewport_id(), response.id, "entry-focus"));
+    let entering = ui.data_mut(|data| {
+        let previous = data.get_temp::<u64>(marker);
+        let new = previous.is_none_or(|previous| previous.saturating_add(1) < frame);
+        if available || !new {
+            data.insert_temp(marker, frame);
+        }
+        available && new
+    });
+    if entering {
+        response.request_focus();
+    }
+    entering
+}
+
+pub(super) fn select_name_on_entry(ui: &Ui, field: &Response, owner: Id, value: &str) {
+    if focus_on_entry(ui, field, owner)
+        && let Some(mut state) = TextEdit::load_state(ui.ctx(), field.id)
+    {
+        state
+            .cursor
+            .set_char_range(Some(egui::text::CCursorRange::two(
+                egui::text::CCursor::new(0),
+                egui::text::CCursor::new(value.chars().count()),
+            )));
+        state.store(ui.ctx(), field.id);
+    }
+}
+
+#[derive(Clone)]
+struct ModalOwner {
+    modal: Id,
+    invoker: Option<Id>,
+    pass: u64,
+}
+
+fn remember_modal_owner(ctx: &Context, modal: Id) {
+    let installed = Id::new("fluent-modal-focus-callback");
+    if !ctx.data(|data| data.get_temp::<bool>(installed).unwrap_or(false)) {
+        ctx.data_mut(|data| data.insert_temp(installed, true));
+        ctx.on_end_pass(
+            "restore dismissed dialog focus",
+            std::sync::Arc::new(|ui| {
+                let ctx = ui.ctx();
+                let key = Id::new(("fluent-modal-owners", ctx.viewport_id()));
+                let pass = ctx.cumulative_pass_nr();
+                let invoker = ctx.data_mut(|data| {
+                    let owners = data.get_temp_mut_or_default::<Vec<ModalOwner>>(key);
+                    let mut invoker = None;
+                    while owners.last().is_some_and(|owner| owner.pass != pass) {
+                        invoker = owners.pop().and_then(|owner| owner.invoker);
+                    }
+                    owners.retain(|owner| owner.pass == pass);
+                    invoker
+                });
+                if let Some(response) = invoker.and_then(|id| ctx.read_response(id))
+                    && response.enabled()
+                {
+                    response.request_focus();
+                }
+            }),
+        );
+    }
+    let key = Id::new(("fluent-modal-owners", ctx.viewport_id()));
+    let pass = ctx.cumulative_pass_nr();
+    let focus = ctx.memory(|m| m.focused());
+    ctx.data_mut(|data| {
+        let owners = data.get_temp_mut_or_default::<Vec<ModalOwner>>(key);
+        if let Some(owner) = owners.iter_mut().find(|owner| owner.modal == modal) {
+            owner.pass = pass;
+        } else {
+            owners.push(ModalOwner {
+                modal,
+                invoker: focus,
+                pass,
+            });
+        }
+    });
+}
+
 /// A blocking egui modal. The caller decides whether Escape/backdrop activate a
 /// safe dismissal and owns the focus and action semantics.
 pub(super) fn modal<T>(
@@ -354,13 +441,20 @@ pub(super) fn modal<T>(
     size: DialogSize,
     content: impl FnOnce(&mut Ui) -> T,
 ) -> ModalResponse<T> {
-    Modal::new(id)
+    remember_modal_owner(ctx, id);
+    let modal = Modal::new(id)
         .frame(Frame::window(&ctx.style_of(ctx.theme())))
         .show(ctx, |ui| {
             ui.set_width(size.width);
             ui.add(Label::new(RichText::new(title).size(DIALOG_TITLE).strong()).wrap());
             content(ui)
-        })
+        });
+    ctx.accesskit_node_builder(modal.response.id, |node| {
+        node.set_role(egui::accesskit::Role::Dialog);
+        node.set_modal();
+        node.set_label(title);
+    });
+    modal
 }
 
 /// A bounded modeless window. Put long content in `dialog_body` inside it.
@@ -732,6 +826,128 @@ mod tests {
             assert!(footer_rect.height() >= 32.);
             assert!(ctx.content_rect().contains_rect(footer_rect));
         }
+    }
+
+    #[test]
+    fn modal_keyboard_traversal_and_backdrop_keep_the_background_control_inactive() {
+        let ctx = Context::default();
+        let mut controls = [Id::NULL; 2];
+        let mut background = Rect::NOTHING;
+        let mut clicks = 0;
+        let mut draw = |events| {
+            let mut output = ctx.run_ui(
+                RawInput {
+                    screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(720., 480.))),
+                    events,
+                    ..Default::default()
+                },
+                |ui| {
+                    let behind = ui.button("Background");
+                    background = behind.rect;
+                    clicks += usize::from(behind.clicked());
+                    modal(
+                        ui.ctx(),
+                        Id::new("tab-trap"),
+                        "Confirm",
+                        dialog_size(ui.ctx(), 260., 100.),
+                        |ui| {
+                            let approve = ui.button("Approve");
+                            let reject = ui.button("Reject");
+                            controls = [approve.id, reject.id];
+                            focus_on_entry(ui, &reject, ui.id());
+                        },
+                    );
+                },
+            );
+            output.textures_delta.clear();
+            (controls, background, clicks)
+        };
+        draw(vec![]);
+        let (buttons, behind, _) = draw(vec![]);
+        assert_eq!(ctx.memory(|m| m.focused()), Some(buttons[1]));
+        for shift in [false, false, true, true] {
+            draw(vec![Event::Key {
+                key: Key::Tab,
+                physical_key: None,
+                pressed: true,
+                repeat: false,
+                modifiers: Modifiers {
+                    shift,
+                    ..Default::default()
+                },
+            }]);
+            draw(vec![Event::Key {
+                key: Key::Tab,
+                physical_key: None,
+                pressed: false,
+                repeat: false,
+                modifiers: Modifiers {
+                    shift,
+                    ..Default::default()
+                },
+            }]);
+            assert!(
+                ctx.memory(|m| m.focused())
+                    .is_some_and(|id| buttons.contains(&id))
+            );
+        }
+        for pressed in [true, false] {
+            let (_, _, clicks) = draw(vec![
+                Event::PointerMoved(behind.center()),
+                Event::PointerButton {
+                    pos: behind.center(),
+                    button: PointerButton::Primary,
+                    pressed,
+                    modifiers: Modifiers::NONE,
+                },
+            ]);
+            assert_eq!(clicks, 0);
+        }
+    }
+
+    #[test]
+    fn modal_accessibility_tree_names_the_dialog_and_masks_secret_fields() {
+        let ctx = Context::default();
+        ctx.enable_accesskit();
+        let mut secret = String::from("synthetic-test-value");
+        let mut update = None;
+        for _ in 0..2 {
+            let mut output = ctx.run_ui(RawInput::default(), |ui| {
+                modal(
+                    ui.ctx(),
+                    Id::new("auth-test"),
+                    "Sign in",
+                    dialog_size(ui.ctx(), 380., 100.),
+                    |ui| {
+                        let label = ui.label("Password");
+                        ui.add(TextEdit::singleline(&mut secret).password(true))
+                            .labelled_by(label.id);
+                        ui.button("Cancel").widget_info(|| {
+                            WidgetInfo::labeled(WidgetType::Button, true, "Cancel")
+                        });
+                    },
+                );
+            });
+            output.textures_delta.clear();
+            update = output.platform_output.accesskit_update;
+        }
+        let nodes = update.unwrap().nodes;
+        let (_, dialog) = nodes
+            .iter()
+            .find(|(_, node)| node.role() == egui::accesskit::Role::Dialog)
+            .unwrap();
+        assert!(dialog.is_modal());
+        assert_eq!(dialog.label(), Some("Sign in"));
+        let (_, password) = nodes
+            .iter()
+            .find(|(_, node)| node.role() == egui::accesskit::Role::PasswordInput)
+            .unwrap();
+        assert!(!password.labelled_by().is_empty());
+        assert!(
+            nodes
+                .iter()
+                .all(|(_, node)| !node.value().unwrap_or_default().contains(&secret))
+        );
     }
 
     #[test]
