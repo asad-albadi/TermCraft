@@ -101,6 +101,7 @@ jobs:
     env:
       MACOSX_DEPLOYMENT_TARGET: "14.0"
       RUST_TEST_THREADS: "4"
+      TERMCRAFT_REQUIRE_CHROMIUM: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
