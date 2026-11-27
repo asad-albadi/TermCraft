@@ -1,5 +1,6 @@
 import importlib.util
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 
@@ -28,12 +29,12 @@ class AppImageTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 appimage.verify_prefix(image, expected, len(prefix))
 
+    @unittest.skipUnless(sys.platform == "linux", "AppRun execution requires Linux")
     def test_apprun_preserves_cwd_literal_arguments_and_private_search_path(self):
         import json
         import os
         import shutil
         import subprocess
-        import sys
         with tempfile.TemporaryDirectory(prefix="App Image test ") as temp:
             appdir = Path(temp) / "package"
             binary = appdir / appimage.PORTABLE / "harbor-workspace"
@@ -99,6 +100,7 @@ class AppImageTests(unittest.TestCase):
                 sentinel.unlink()
 
 
+@unittest.skipUnless(sys.platform == "linux", "Produced AppImage inspection requires Linux")
 class ProducedImageTests(unittest.TestCase):
     """Release CI provides the real produced AppImage and independent core."""
     @classmethod
