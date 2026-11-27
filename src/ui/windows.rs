@@ -4,6 +4,64 @@ mod tests {
     use super::*;
     use crate::ui::terminal_review_tests::{captured, owned_workspace, raw_terminal};
     #[test]
+    fn detached_history_has_a_full_themed_surface_behind_it() {
+        use std::sync::{
+            Arc,
+            atomic::{AtomicBool, Ordering},
+        };
+        for theme in [Theme::Light, Theme::Dark] {
+            let (ctx, _root, mut workspace) = owned_workspace();
+            ctx.set_theme(theme);
+            let tab = raw_terminal(&mut workspace, "detached-history");
+            workspace.detach_terminal(tab);
+            let child = viewport_id(workspace.windows.window(tab));
+            let inspected = Arc::new(AtomicBool::new(false));
+            let rendered = inspected.clone();
+            ctx.set_embed_viewports(false);
+            Context::set_immediate_viewport_renderer(move |ctx, mut viewport| {
+                assert_eq!(viewport.ids.this, child);
+                let bounds = Rect::from_min_size(Pos2::ZERO, vec2(360., 260.));
+                let mut raw = RawInput {
+                    viewport_id: child,
+                    screen_rect: Some(bounds),
+                    ..Default::default()
+                };
+                raw.viewports.insert(
+                    child,
+                    egui::ViewportInfo {
+                        parent: Some(viewport.ids.parent),
+                        ..Default::default()
+                    },
+                );
+                let mut expected = Color32::TRANSPARENT;
+                let mut output = ctx.run_ui(raw, |ui| {
+                    expected = fluent::palette(ui).surface;
+                    (viewport.viewport_ui_cb)(ui);
+                });
+                output.textures_delta.clear();
+                let history = output
+                    .shapes
+                    .iter()
+                    .position(|shape| {
+                        matches!(&shape.shape,
+                    egui::Shape::Text(text) if text.galley.text().starts_with("History: "))
+                    })
+                    .expect("native child painted its own History status");
+                assert!(output.shapes[..history].iter().any(|shape| matches!(&shape.shape,
+                    egui::Shape::Rect(rect) if rect.fill == expected && rect.rect.contains_rect(bounds) && shape.clip_rect.contains_rect(bounds))),
+                    "detached client needs an opaque {theme:?} surface behind History");
+                rendered.store(true, Ordering::SeqCst);
+            });
+            let mut raw = RawInput::default();
+            raw.viewports.insert(child, egui::ViewportInfo::default());
+            ctx.run_ui(raw, |ui| workspace.detached_windows(ui.ctx()))
+                .textures_delta
+                .clear();
+            assert!(inspected.load(Ordering::SeqCst));
+        }
+    }
+
+    #[test]
     fn detached_minimum_keeps_rename_and_window_actions_reachable() {
         use crate::ui::gui_tests::{shell_frame, shell_pointer, shell_text_position};
         let (ctx, _root, mut workspace) = owned_workspace();
@@ -301,6 +359,7 @@ impl Workspace {
                 .unwrap_or(ids[0]);
             let title = self.terminal_title(active);
             ctx.show_viewport_immediate(viewport_id(window), ViewportBuilder::default().with_title(title).with_inner_size([960.,640.]).with_min_inner_size([360.,260.]), |ui, class| {
+                ui.painter().rect_filled(ui.max_rect(), 0., content(ui));
                 let child_ctx = ui.ctx().clone();
                 if class != ViewportClass::EmbeddedWindow && child_ctx.input(|i| i.viewport().close_requested()) {
                     child_ctx.send_viewport_cmd(ViewportCommand::CancelClose);
