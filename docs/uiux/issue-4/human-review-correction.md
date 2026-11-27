@@ -29,6 +29,12 @@ The controller directly inspected the simple SSH/RDP pages, full-width scroll vi
 
 ![Simple RDP form at 640×480](captures/human-correction/session-rdp-dark-compact.png)
 
-## Current review-ready Linux preview
+## Earlier native development preview
 
 Source `8c50a010f8aeb96cfc03ff2e5d6fc672b40241ff` incorporates the independent review's final wording correction. The local native development executable is `target/issue-4/specialist-probe/termcraft-human-review-ready`, SHA-256 `79e0988509923ef4809e0cc7e82d054077fd6174be451d8bc732289c907363bb`. This is a UI review preview with the development dependency limits above; it is not a replacement for current-source platform CI or distribution qualification. PR #8 remains draft and unmerged. Owner acceptance is still open.
+
+## Full CI read-only-state correction
+
+The first full Linux run at `e8347a2` found one missed UI case: the simplified shared-session heading no longer explicitly said read-only. That application target reported 274 passed, one failed and eight ignored. The CI/package runs at that head were cancelled and are not accepted replacement builds.
+
+Source `6e58b3c397313eb8c1aba49a8b0493f733ca1652` restores the concise “Shared sessions · read-only” heading. The test checks read-only, source name, cached/stale state and the shared session's name. The missing state was reproduced before the fix; nine covering cases passed after it, including shared-source cache/restart/no-overwrite and canceled credential/prompt guards. This set overlaps earlier focused checks. Current-source full CI and unsigned packages are being rerun after scoped review; owner acceptance remains open.
