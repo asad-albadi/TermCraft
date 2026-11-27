@@ -1,6 +1,5 @@
 {
   "date": "2026-11-27",
-  "native_environment": "Linux x86-64, Arch glibc 2.44, Xvfb :92 1920×1080, software GL, isolated UID and synthetic workspace. PNGs are original pixels from X11 import. WINIT_X11_SCALE_FACTOR selects UI scale. Native previews use current application source and a source-verified cached library with prior eframe adapter dependencies. They do not qualify the distribution or physical hardware.",
   "font_fixture": {
     "source": "Host-installed NotoSansCJK-Regular.ttc copied into isolated Linux system font directory solely for the positive glyph case. No OS face is distributed with TermCraft.",
     "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a"
@@ -18,6 +17,17 @@
     "native557": {
       "source": "5575601b0b1a2abb1640176c8a9f95b102c54130",
       "sha256": "5999cc5571d92c4e88e626e5c200dd955d522ce6c4ea58ddf80830fb548e9626"
+    },
+    "package_c2": {
+      "source": "c2dded603fcc5710dfee7e19ac60c728d552c3cf",
+      "sha256": "f2947218f63f487562bac3ba7f83b94816d21bca68295d20da9141e814559a49",
+      "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
+      "archive_sha256": "beaefc6cfe8795dddc26ff707a14327179c3b7081a01b5e2cfe27bc592917a5a",
+      "snapshot_sha256": "0ded66384780723684f3382cb2b427a79ba1f11b7626bf27fa33bfc50a00d2a2",
+      "workflow_run": 46023047742,
+      "native_job": 140587387520,
+      "artifact_id": 15210484989,
+      "environment": "Unprivileged Ubuntu 24.04.5 x86-64, Xvfb :93, software GL, native packaged executable, 100% scale. Original pixels extracted from the captured screen within measured native window bounds. Five synthetic .example.test bookmarks; remote endpoints never contacted."
     }
   },
   "baseline": "../before/manifest.json",
@@ -1022,6 +1032,72 @@
         "contrast_ratio": 15.62,
         "ink_pixels_at_least_4_5": 477
       }
+    },
+    {
+      "file": "package-session-light-100.png",
+      "environment": "package_c2",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920,
+        1080
+      ],
+      "sha256": "4ec4b8dc8ee32ce2995ef0d82660d46943a35f553251986975d4d4b6ab78d553",
+      "observation": "Packaged SSH session dialog at 1920×1080, explicit Light. Form still displays the grouped options, save checkbox and full action footer."
+    },
+    {
+      "file": "package-files-light-100-no-system-cjk.png",
+      "environment": "package_c2",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920,
+        1080
+      ],
+      "sha256": "43b17d192514669040b3425e9aeeff14fa3aefea059ec7e4ca50adb5698769ed",
+      "observation": "Diagnostic positive/negative pair: Ubuntu with no supported CJK system font. Actual selected filename displays three missing-Japanese-glyph boxes. Arabic glyphs are present. Compare the same filename after installing the Noto fixture in shots/full-hd/files-light.png."
+    },
+    {
+      "file": "package-detached-light-100.png",
+      "environment": "package_c2",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        360,
+        260
+      ],
+      "logical_size": [
+        360,
+        260
+      ],
+      "sha256": "806c9894f292c9b40b8ec509d268dd0c6fb645ed71a1b8251dbf3348bb67c9ee",
+      "observation": "Packaged 360×260 detached local terminal. History foreground (24,39,32) on (251,253,252) reaches 15.23:1; 243 ink pixels meet 4.5:1."
+    },
+    {
+      "file": "package-detached-dark-100.png",
+      "environment": "package_c2",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        360,
+        260
+      ],
+      "logical_size": [
+        360,
+        260
+      ],
+      "sha256": "0cd207782e4d404b0e8f131158cd301110d4b889f5a47b81cfcc9c9dbe002ebe",
+      "observation": "Packaged 360×260 detached local terminal. History foreground (234,242,237) on (19,25,23) reaches 15.62:1; 467 ink pixels meet 4.5:1."
     }
-  ]
+  ],
+  "development_environment": "Linux x86-64, Arch glibc 2.44, Xvfb :92 1920×1080, software GL, isolated UID and synthetic workspace. PNGs are original pixels from X11 import. WINIT_X11_SCALE_FACTOR selects UI scale. Native previews use current application source and a source-verified cached library with prior eframe adapter dependencies. They do not qualify the distribution or physical hardware.",
+  "packaged_full_hd_gallery": "../../../../shots/full-hd/capture-manifest.json"
 }

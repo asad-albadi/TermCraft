@@ -1,20 +1,24 @@
 {
   "captured_on": "2026-11-27",
   "platform": "Linux x86-64",
-  "source_commit": "6571b95a0489f350680c969b75617a0377254cd4",
-  "workflow_run": 45974136835,
+  "source_commit": "c2dded603fcc5710dfee7e19ac60c728d552c3cf",
+  "workflow_run": 46023047742,
   "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
-  "archive_sha256": "8d1d3a88e68cb7a9bfb351d977c3888f77fefbdbf5670c8d8cf7332aab02533f",
+  "archive_sha256": "beaefc6cfe8795dddc26ff707a14327179c3b7081a01b5e2cfe27bc592917a5a",
   "width": 1920,
   "height": 1080,
-  "scope": "Real app UI; isolated demo bookmarks; software-rendered X11; no remote connections",
+  "scope": "Ubuntu 24.04.5 x86-64, full packaged executable, Xvfb :93, software GL, 100% scale. Five disposable .example.test bookmarks; no remote connections. Installed Noto Sans CJK used for the positive file-gallery image.",
   "screenshots": {
-    "files-light.png": "9ff3d749af3c037207e44fb1b412c1698ffee7f08c83d36936651bf913a26a69",
-    "servers-light.png": "ae7112dbe13d8c742b95dba6a9ca39d45f5460e36bffd812b0cde9c6300da26b",
-    "settings-light.png": "28cd8f115f106e21bcbbf67fbaea3da3ae9e3b93a73965762617b4818c6a97c3",
-    "terminal-dark.png": "53917b06f6359158a32b9006a25aeec2f80a207ccd268f2a4441896153adf739",
-    "tools-dark.png": "9750c4941b85bb5488b533cb92848105b6a739594f48cef183ebdac95ff45fd3",
-    "workspace-dark.png": "2d53458fd27ac82fe389b54891785f1ec8e861aa8f1eb47fd4b3ff1a51680b0b",
-    "workspace-light.png": "ad46ce8e44135ce030c0efaade88c35c8917b907cda932fcf755bb16b989c744"
-  }
+    "workspace-light.png": "4e4f0c4886e1c781b912a282332187557be37f8f24a203b6ca1f1dd084d39c0e",
+    "workspace-dark.png": "a08e25424d84961b00cd2c1c1c4995deacc9e9c23c81c162a7c8a6b9891ce84f",
+    "terminal-dark.png": "5b12d6cd50d16fdd4ccd853743d4bdde1bfd6ca7ffbcc74184b91a57c05606e0",
+    "files-light.png": "37b5034bd1fc8d3480bc9f5f87e1573c82cc86b8afbcad26d2d21c9987809381",
+    "tools-dark.png": "f14c3f4ff480453b64d35f95b4e51f14facd5f3772053def196204d95fd3fab0",
+    "settings-light.png": "574dfe1a1575d1fb15f96aa190d23d3af6a8864d3a97ba5c7c20a042e1ffd678",
+    "servers-light.png": "aea02f70778d8bb5d3b644457abb361d4ed4c5f7f621426825cd7ff3613c0e36"
+  },
+  "native_job": 140587387520,
+  "artifact_id": 15210484989,
+  "executable_sha256": "f2947218f63f487562bac3ba7f83b94816d21bca68295d20da9141e814559a49",
+  "cjk_font_sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a"
 }
