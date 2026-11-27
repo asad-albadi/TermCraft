@@ -540,6 +540,30 @@ fn redirected_drives_reject_fifos_without_opening_a_blocking_stream() {
 }
 
 #[cfg(target_os = "linux")]
+pub(crate) fn isolated_allocation_test(name: &str) -> bool {
+    const CHILD: &str = "TERMCRAFT_ALLOCATION_TEST_CHILD";
+    if std::env::var(CHILD).as_deref() == Ok(name) {
+        return false;
+    }
+    // Other parallel tests spawn native workers. A fork briefly inherits every
+    // CLOEXEC descriptor, including independent handles for this file, until
+    // exec. Own the exclusive-cleanup fixture entirely inside one child so a
+    // correct lease refusal cannot make its allocation assertion flaky.
+    let output = std::process::Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", name, "--nocapture"])
+        .env(CHILD, name)
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "isolated {name} failed:\n{}\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    true
+}
+
+#[cfg(target_os = "linux")]
 #[test]
 fn allocation_reserves_space_without_extending_eof_and_validates_signed_lengths() {
     use std::os::unix::fs::MetadataExt;
@@ -583,6 +607,11 @@ fn allocation_reserves_space_without_extending_eof_and_validates_signed_lengths(
 #[cfg(target_os = "linux")]
 #[test]
 fn drive_allocation_is_released_on_last_remote_close_and_disconnect() {
+    if isolated_allocation_test(
+        "devices_tests::drive_allocation_is_released_on_last_remote_close_and_disconnect",
+    ) {
+        return;
+    }
     use std::os::unix::fs::MetadataExt;
     let root = tempfile::tempdir().unwrap();
     let path = root.path().join("file");
@@ -621,6 +650,11 @@ fn drive_allocation_is_released_on_last_remote_close_and_disconnect() {
 #[cfg(target_os = "linux")]
 #[test]
 fn drive_allocation_release_preserves_data_written_into_the_reservation() {
+    if isolated_allocation_test(
+        "devices_tests::drive_allocation_release_preserves_data_written_into_the_reservation",
+    ) {
+        return;
+    }
     use std::os::unix::fs::MetadataExt;
     let root = tempfile::tempdir().unwrap();
     let path = root.path().join("file");
@@ -656,6 +690,58 @@ fn drive_allocation_release_preserves_data_written_into_the_reservation() {
     expected.resize(8192, 0);
     expected.extend(b"end");
     assert_eq!(std::fs::read(&path).unwrap(), expected);
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn drive_allocation_release_keeps_the_tail_when_an_external_file_is_open() {
+    use std::os::unix::fs::MetadataExt;
+    for disconnect in [false, true] {
+        for writer in [false, true] {
+            let root = tempfile::tempdir().unwrap();
+            let path = root.path().join("file");
+            std::fs::write(&path, b"original").unwrap();
+            let mut b = backend(root.path(), false);
+            let id = value(&open(&mut b, "file", 0xc0000000, 1), 16);
+            assert_eq!(
+                value(&set_info(&mut b, id, 19, &1048576u64.to_le_bytes()), 12),
+                0
+            );
+            let external = std::fs::OpenOptions::new()
+                .read(true)
+                .write(writer)
+                .open(&path)
+                .unwrap();
+            if !disconnect {
+                assert_eq!(
+                    value(&b.process(&request(1, id, 3, 2, 0, &[0; 32])).unwrap(), 12),
+                    0
+                );
+            }
+            drop(b);
+            assert!(
+                std::fs::metadata(&path).unwrap().blocks() * 512 >= 1048576,
+                "cleanup must retain storage when an independent opener prevents exclusion"
+            );
+            assert_eq!(std::fs::read(&path).unwrap(), b"original");
+            // The still-open local writer can safely grow beyond the remote reservation.
+            if writer {
+                external.set_len(2097152).unwrap();
+                assert!(
+                    std::process::Command::new("/bin/sh")
+                        .args(["-c", "printf local >> \"$1\"", "rdp-fixture"])
+                        .arg(&path)
+                        .status()
+                        .unwrap()
+                        .success()
+                );
+                let content = std::fs::read(&path).unwrap();
+                assert_eq!(content.len(), 2097157);
+                assert_eq!(&content[..8], b"original");
+                assert_eq!(&content[2097152..], b"local");
+            }
+        }
+    }
 }
 
 #[cfg(target_os = "linux")]

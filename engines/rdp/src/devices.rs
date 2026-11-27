@@ -1,6 +1,9 @@
 //! RDP device redirection. Disk operations run on a bounded worker,
 //! confined to capability directory handles. No ambient path from the peer is opened.
 use crate::rdp_options::{DriveMapping, PrinterMapping, RdpOptions, SerialMapping};
+#[cfg(target_os = "linux")]
+#[path = "allocation_lease.rs"]
+mod allocation_lease;
 #[cfg(target_os = "macos")]
 #[path = "native_file_macos.rs"]
 mod native_file_macos;
@@ -116,6 +119,14 @@ struct Handle {
     pattern: String,
     reservation: Option<std::sync::Arc<Reservation>>,
 }
+#[cfg(target_os = "linux")]
+impl Drop for Handle {
+    fn drop(&mut self) {
+        // All independently opened remote files must close before the last
+        // shared reservation tries to acquire its exclusive cleanup lease.
+        self.file.take();
+    }
+}
 struct Reservation {
     file: File,
     top: std::sync::atomic::AtomicU64,
@@ -125,14 +136,16 @@ impl Reservation {
         #[cfg(target_os = "linux")]
         {
             use std::sync::atomic::Ordering;
-            let end = self.file.metadata().map_err(status)?.len();
             let top = self.top.load(Ordering::Acquire);
-            if top > end {
-                // ext4 clamps hole punching to EOF, leaving KEEP_SIZE extents
-                // beyond it allocated. Even a same-length truncate releases that
-                // tail without changing EOF or data written into the reservation.
-                self.file.set_len(end).map_err(status)?;
+            if top == 0 {
+                return Ok(());
             }
+            let Some(lease) = allocation_lease::Lease::acquire(&self.file) else {
+                // An independent reader/writer, unsupported filesystem, or
+                // unavailable notification setup makes reclamation optional.
+                return Ok(());
+            };
+            lease.release_tail(top).map_err(status)?;
             self.top.store(0, Ordering::Release);
         }
         Ok(())
@@ -351,12 +364,25 @@ impl Drives {
             .ok_or(0xc0000008u32)?;
         match major {
             2 => {
-                if let Some(reservation) = &h.reservation {
-                    if std::sync::Arc::strong_count(reservation) == 1 {
-                        reservation.release()?;
+                #[cfg(target_os = "linux")]
+                {
+                    let mut handle = self.handles.remove(&file).ok_or(INVALID)?;
+                    handle.file.take();
+                    if let Some(reservation) = &handle.reservation {
+                        if std::sync::Arc::strong_count(reservation) == 1 {
+                            reservation.release()?;
+                        }
                     }
                 }
-                self.handles.remove(&file);
+                #[cfg(not(target_os = "linux"))]
+                {
+                    if let Some(reservation) = &h.reservation {
+                        if std::sync::Arc::strong_count(reservation) == 1 {
+                            reservation.release()?;
+                        }
+                    }
+                    self.handles.remove(&file);
+                }
                 Ok(vec![0; 5])
             }
             3 | 4 => {
