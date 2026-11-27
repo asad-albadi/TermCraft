@@ -1,24 +1,28 @@
 {
   "captured_on": "2026-11-27",
   "platform": "Linux x86-64",
-  "source_commit": "c2dded603fcc5710dfee7e19ac60c728d552c3cf",
-  "workflow_run": 46023047742,
+  "source_commit": "9c6f10c23df3875a95b88d55748f470540080f58",
+  "workflow_run": 46037795885,
+  "native_job": 140637606384,
+  "artifact_id": 15218784955,
+  "artifact_name": "diagnostics-linux-amd64",
+  "qualification": "The archived core passed hosted X11, Wayland and lifecycle checks. An Alpine dependency pin blocked AppImage construction and the combined Linux candidate upload.",
   "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
-  "archive_sha256": "beaefc6cfe8795dddc26ff707a14327179c3b7081a01b5e2cfe27bc592917a5a",
+  "archive_sha256": "9a2fb17ee64fb47e985b34ab7e64eb4916596926cb212eda71f68306c6449ced",
+  "executable_sha256": "cf9405bba6c3bf659d712017e527ffe34c76b11bd6e1a12c35d8df6432d77fc5",
+  "snapshot_sha256": "7d841cfe88272e03fc45435ae69f96b376675e2f985109cacc6a34c3713e0964",
   "width": 1920,
   "height": 1080,
-  "scope": "Ubuntu 24.04.5 x86-64, full packaged executable, Xvfb :93, software GL, 100% scale. Five disposable .example.test bookmarks; no remote connections. Installed Noto Sans CJK used for the positive file-gallery image.",
+  "scope": "Ubuntu 24.04.5 x86-64, unsigned Linux archive, Xvfb :95, software GL, 100% scale. Five reserved .example.test bookmarks. No remote connections.",
   "screenshots": {
-    "workspace-light.png": "4e4f0c4886e1c781b912a282332187557be37f8f24a203b6ca1f1dd084d39c0e",
-    "workspace-dark.png": "a08e25424d84961b00cd2c1c1c4995deacc9e9c23c81c162a7c8a6b9891ce84f",
-    "terminal-dark.png": "5b12d6cd50d16fdd4ccd853743d4bdde1bfd6ca7ffbcc74184b91a57c05606e0",
-    "files-light.png": "37b5034bd1fc8d3480bc9f5f87e1573c82cc86b8afbcad26d2d21c9987809381",
-    "tools-dark.png": "f14c3f4ff480453b64d35f95b4e51f14facd5f3772053def196204d95fd3fab0",
-    "settings-light.png": "574dfe1a1575d1fb15f96aa190d23d3af6a8864d3a97ba5c7c20a042e1ffd678",
-    "servers-light.png": "aea02f70778d8bb5d3b644457abb361d4ed4c5f7f621426825cd7ff3613c0e36"
+    "workspace-light.png": "f37751f75795656fbde71ab46b4b47c2c313ca78ad8b535bc069a72c4bf35149",
+    "workspace-dark.png": "62ab08329d42d5fa36ad4b53f5a87b63e1b49222c6f362c940982d0a397e19a7",
+    "terminal-dark.png": "c262dbf134a0598ac2270aa85aab9b38bffa1b00693bb0606673620ffadabb26",
+    "files-light.png": "7697883d09174338bce59689ac96787a3e25569fc7fd86f7a79d357589e6e384",
+    "tools-dark.png": "556b8a2d550340b2d20685f35b000d9b57950c554664e68932be6b6183b86f11",
+    "settings-light.png": "daa4dfdc739f3d5fd0daefbb7557bbc9fd54f23f8310921251d174f1e6c485f6",
+    "servers-light.png": "1f4ebede6a866bba9a61c21b9ea6be5592fff6fdfed4c06db0967dc4eabc4d0f"
   },
-  "native_job": 140587387520,
-  "artifact_id": 15210484989,
-  "executable_sha256": "f2947218f63f487562bac3ba7f83b94816d21bca68295d20da9141e814559a49",
-  "cjk_font_sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a"
+  "cjk_font_sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+  "font_fixture": "Container-installed Noto Sans CJK for the files gallery. The package does not ship this font."
 }
