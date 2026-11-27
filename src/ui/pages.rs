@@ -2021,7 +2021,11 @@ fn field(ui: &mut Ui, label: &str, value: &mut String, hint: &str) {
 }
 pub(super) fn page_heading(ui: &mut Ui, title: &str, description: &str) {
     ui.add_space(20.);
-    ui.label(RichText::new(title).size(super::fluent::PAGE_TITLE).strong());
+    ui.label(
+        RichText::new(title)
+            .size(super::fluent::PAGE_TITLE)
+            .strong(),
+    );
     ui.label(RichText::new(description).color(muted(ui)));
     ui.add_space(20.);
 }
