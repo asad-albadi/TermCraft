@@ -2,7 +2,10 @@
 
 Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over Fluent 2. The boxes in the component sections record software disposition. Each corresponding route, retained behavior and level of evidence appears in the [validation record](validation.md). The verification section tracks independent gates. Human acceptance is outstanding. Feature parity remains 46/60.
 
-**Human review rejected the current build on 2026-11-27.** The previous checks below record technical work on that build, not acceptance. [Correction checklist](human-review-correction.md) is active: simplify session creation and terminal/sidebar controls, provide help on demand, fix viewport scrollbars and organize settings/games/detached layouts. The corrected implementation, scoped independent review and final three-platform CI/package checks are recorded in that checklist. Owner acceptance remains open.
+**Human review rejected an earlier build on 2026-11-27.** The previous checks below record technical work on that build, not acceptance. [Correction checklist](human-review-correction.md) is active: simplify session creation and terminal/sidebar controls, provide help on demand, fix viewport scrollbars and organize settings/games/detached layouts. The corrected implementation, scoped independent review and final three-platform CI/package checks are recorded in that checklist. Owner acceptance remains open.
+
+
+**Current pane refinement:** the owner approved the create/edit dialogs, then requested less clutter in the remote browser. UI source `db07f66` prioritizes files and compacts the neighboring narrow terminal. Current native CI at the test-only follow-up `8f121b2` passed all three platforms; the three UI package jobs passed and their downloaded hashes/source IDs were verified. [Current checklist and Linux launcher](human-review-correction.md#current-pane-refinement--ready-for-owner-review) · [Exact pane-build identities and limits](pane-builds.json). The earlier package workflow aggregate was skipped after obsolete test selectors failed; it is not called green. Owner pane approval and merge approval remain open.
 
 **Merge hold:** keep PR #8 open until the owner completes full human checks and explicitly approves merging.
 
@@ -136,3 +139,15 @@ The detached-client correction includes a real native-child regression and [Ligh
 - [ ] Owner completes the [corrected-build review](human-review-correction.md#owner-review-of-the-corrected-build) and explicitly approves merging PR #8.
 
 See [exact build identities](human-builds.json) and [final correction evidence](human-review-correction.md#final-automated-platform-checks). The one Mac vault-wait timeout, its unchanged-source successful rerun and the independent successful package regression are recorded there. This UI correction does not increase the recorded 46/60 feature-parity count.
+
+### Latest pane refinement (`db07f66`, test-only follow-up `8f121b2`)
+
+- [x] File list uses available pane height; setup/preferences/help are on demand.
+- [x] Fixed-size navigation prevents idle width drift; compact footer and narrow-terminal overflow fit their viewports.
+- [x] Actual row-menu target, raw-path safeguards, capability gates, overwrite visibility and active transfer cancellation retained.
+- [x] Original real-SSH native-drop privacy/upload assertions pass against the new controls.
+- [x] Twenty-one focused checks and current three-platform CI passed; all three package jobs passed and all six distribution hashes were verified.
+- [x] Linux launcher updated to the exact verified UI package; seven development capture identities and limitations recorded.
+- [ ] Owner accepts the refined panes and explicitly approves merging.
+
+Package and test source identities remain distinct in [pane-builds.json](pane-builds.json). This does not claim a successful aggregate release workflow or change the recorded 46/60 feature-parity count.

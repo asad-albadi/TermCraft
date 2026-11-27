@@ -1,5 +1,35 @@
 # Human-review correction — 2026-11-27
 
+## Current pane refinement — ready for owner review
+
+The owner approved the session create/edit dialogs and identified remaining clutter in the connected remote-files pane. Those dialogs are unchanged. The file pane now has a compact path/navigation row and Upload/Download/More strip, with shell integration, transfer preferences and guidance available on demand. Its file list takes the remaining height, with a small Downloads footer and a reserved right-edge scrollbar gutter. A narrow neighboring terminal moves Find/Reconnect into More to keep its status clear.
+
+- [x] Preserve the approved session create/edit dialogs.
+- [x] Prioritize file rows; remove permanent setup/instruction blocks and duplicate path/transport rows.
+- [x] Keep SFTP/SCP identity explicit; keep overwrite-on state, active transfer progress, capability gates and confirmations.
+- [x] Verify row-menu targets, path validation, file-drop boundaries, short-window geometry and stable idle panel width.
+- [x] Pass all 21 focused cases and current Linux, Windows x64 and Apple Silicon native CI.
+- [x] Pass all three native core package startup/lifecycle jobs and verify downloaded payload identities and hashes.
+- [x] Update the local Linux launcher to the verified pane-refinement package, preserving earlier runtimes.
+- [ ] Owner approves the refined panes and explicitly authorizes merging PR #8.
+
+Close the older application copy before running:
+
+```bash
+"/home/asad/.codex/worktrees/termcraft-issue-3/app/target/issue-4/run-latest-linux"
+```
+
+The app package identifies UI source `db07f66`. [Current native CI](https://github.com/asad-albadi/TermCraft/actions/runs/46059467626) passed all three platforms at `8f121b2`, which changes only one `#[cfg(test)]` fixture body: it now targets the Downloads footer and an actual file-list row instead of the removed instruction labels. Both original real-SSH assertions remain: a native drop on Downloads must not upload private data, while a drop on the file list must upload the exact bytes. All tracked repository bytes outside that test body are identical between those commits.
+
+[Build identities and qualification limits](pane-builds.json) keep package source and amended test source separate. The [Linux package job](https://github.com/asad-albadi/TermCraft/actions/runs/46057357806/job/140703065648), [Mac package job](https://github.com/asad-albadi/TermCraft/actions/runs/46057357806/job/140703065598) and [Windows package job](https://github.com/asad-albadi/TermCraft/actions/runs/46057357806/job/140703065568) all succeeded. The earlier workflow's Linux/Mac regression lanes failed the obsolete selectors, so its aggregate and publication were skipped. That workflow is **not** described as successful. Its valid UI packages are reused after the test-only correction, with current three-platform CI as separate evidence. This is unsigned core qualification for human UI review, not a new release assembly or optional-provider bundle.
+
+Linux archive SHA-256: `2ba3b60facec31a9c1166bb46dd96241020d3c83a123beee9fb6fffd82868d37`. Executable SHA-256: `cd4fc7e1c342692ee7320ea170692971457681ad82a8787478fd79c4a57049bb`. Four distribution hashes, 643 exact Git source inputs, 1,097 extracted files and matching archive-bound X11/Wayland/lifecycle evidence were verified after download. Mac and Windows distribution hashes and source IDs were also verified.
+
+[Seven native development previews](captures/pane-refinement/manifest.json) cover Light/Dark, Full HD, short and portrait windows and the More menu. These render the actual UI with an explicitly synthetic listing using cached pre-adapter dependencies; they are not live-SFTP, packaged-rendering, physical hardware or owner-acceptance evidence. Earlier screenshots retain their original provenance.
+
+PR #8 remains draft, open and unmerged. Owner visual, physical-platform and assistive-technology checks remain open. No merge, release or tag was made.
+
+
 The owner rejected the prior c2 UI as cluttered/inconsistent. Prior passing tests remain historical technical evidence, NOT human acceptance. PR8 draft; NEVER merge until explicit human approval. Scope is authorized continuation, no new permission milestones.
 
 ## Reference and correction design
@@ -12,7 +42,7 @@ C2 Main workspace: terminal gets one compact action row; move always-visible pro
 C3 Page layout: vertical scrollbar at right edge of its own full-width viewport, dedicated gutter with no content overlap. Readable content cap INSIDE full-width viewport, not enclosing ScrollArea natural-width shrink. Settings category navigation/equal-width organization and concise help. Games fills whole client background, responsive launcher grid rather than narrow 13-button column. Detached window compact reattach/overflow actions, native title for identity, history hidden by default. No changes to game logic, dirty guards, terminal renderer, identifiers, trust, credential storage.
 
 
-## Final automated platform checks
+## Previous platform checks (df5dbb8)
 
 Source `df5dbb8` passed [native CI on all three platforms](https://github.com/asad-albadi/TermCraft/actions/runs/46049020536). The [unsigned candidate workflow](https://github.com/asad-albadi/TermCraft/actions/runs/46049050604) separately passed all three regression lanes and all three native package jobs. The downloaded Linux, Windows x64 and Apple Silicon macOS distribution files match their candidate source IDs and SHA-256 inventories; [human-builds.json](human-builds.json) records those exact identities. The [combined inventory check](https://github.com/asad-albadi/TermCraft/actions/runs/46049050604/job/140691982468) passed, and publication was skipped. These are unsigned core builds, not new production optional-provider bundles.
 
@@ -20,7 +50,7 @@ The first standalone Mac attempt timed out at the original 20-second asynchronou
 
 No release or tag was created. PR #8 remains draft, open and unmerged. Owner visual, physical-device and assistive-technology acceptance is still outstanding.
 
-## Latest qualified Linux build
+## Previous qualified Linux build (df5dbb8)
 
 The final Linux candidate is source `df5dbb8e260e84aca2e25d7ae19c112233cab97f`, produced by [package job 140678056174](https://github.com/asad-albadi/TermCraft/actions/runs/46049050604/job/140678056174). Core startup on X11 and native Wayland, Debian/per-user lifecycle, the AppImage and corresponding-source checks passed. All four distribution hashes, 643 Git source inputs and 1,097 extracted package files were independently verified after downloading [artifact 15225052570](https://github.com/asad-albadi/TermCraft/actions/runs/46049050604/artifacts/15225052570).
 
@@ -28,15 +58,11 @@ The final Linux candidate is source `df5dbb8e260e84aca2e25d7ae19c112233cab97f`, 
 - Executable SHA-256: `ab2b02c1628a565bb0b1235197a06c2710527777a8210e8a42b366850891be46`.
 - AppImage SHA-256: `755edc4ff76b7195c68a1f787ebf06dd4f1cb175cefec82dae372616937b4703`.
 
-Close older TermCraft instances, then run the local launcher below. It opens the verified native archive, preserving the previous runtime directories and avoiding the separately documented host-specific AppImage Wayland compatibility problem.
-
-```bash
-"/home/asad/.codex/worktrees/termcraft-issue-3/app/target/issue-4/run-latest-linux"
-```
+This previous archive remains preserved. The launcher at the top of this document now points to the newer pane-refinement package, not this earlier binary. Both use the native archive to avoid the separately documented host-specific AppImage Wayland compatibility problem.
 
 The fourteen current gallery/correction images retain their actual `f599000` core identity. That source includes the same final UI; the Linux candidate above additionally contains the packaging inventory and test portability repairs. The screenshots have not been relabeled as captures of another binary.
 
-## Status
+## First correction status (historical)
 
 - [x] Simplify session creation and contextual help.
 - [x] Compact terminal, sidebar and detached controls.
@@ -101,15 +127,3 @@ Keep these unchecked until the owner has inspected the running app. Automated or
 - [ ] Light, Dark and System: controls, text, focus, hover and selection remain readable; explorer icons distinguish folders and file types.
 - [ ] Keyboard and safety: navigate the new-session form, dismiss nested dialogs and cancel closing active work without losing the session or draft.
 - [ ] Owner explicitly approves merging PR #8 after completing the checks.
-
-## Second human review: file-pane refinement
-
-The owner approved the session create/edit dialogs and identified remaining panel clutter, with the connected SSH/SFTP browser as the concrete example. Preserve those approved dialogs. This is a continuation of the existing approved compact-controls/contextual-help design, not a new subsystem or redesign.
-
-- [x] Reproduce the problem in a shorter real UI frame: file rows are pushed out by always-visible settings.
-- [x] Compact navigation and primary transfer actions; place shell setup, transfer preferences and guidance on demand.
-- [x] Give the file listing the remaining panel height; keep its scrollbar at the right edge.
-- [x] Verify pointer-driven row actions, raw-path targeting, capability gates, retained confirmations, path validation and narrow terminal overflow.
-- [ ] Inspect the final native pane layout and qualify the distribution.
-- [ ] Produce a current qualified Linux build and complete platform regressions.
-- [ ] Owner reviews the refined panes; merge hold remains.
