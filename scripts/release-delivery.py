@@ -1,0 +1,659 @@
+#!/usr/bin/env python3
+"""Collect, revalidate and deliver source-bound, unsigned desktop candidates."""
+
+import argparse
+import gzip
+import hashlib
+import importlib.util
+import json
+import math
+import os
+from pathlib import Path
+import plistlib
+import re
+import shutil
+import struct
+import subprocess
+import tarfile
+import tempfile
+import tomllib
+import zipfile
+import zlib
+
+from portable_archive import extract_tar, extract_zip
+
+
+ROOT = Path(__file__).resolve().parents[1]
+TARGETS = {
+    "linux": ("x86_64", "linux-amd64", ".tar.gz"),
+    "windows": ("x86_64", "windows-amd64", ".zip"),
+    "macos": ("aarch64", "macos-arm64", ".zip"),
+}
+MANIFESTS = {
+    "Cargo.toml": "harbor-workspace",
+    "engines/rdp/Cargo.toml": "termcraft-rdp-engine",
+    "engines/wayland/Cargo.toml": "termcraft-wayland-engine",
+}
+RUST = "1.96.1"
+SCOPE = "unsigned-core"
+VERSION = re.compile(r"(?:0|[1-9][0-9]{0,8})(?:\.(?:0|[1-9][0-9]{0,8})){2}")
+SHA1 = re.compile(r"[0-9a-f]{40}")
+SHA256 = re.compile(r"[0-9a-f]{64}")
+SAFE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,199}")
+REPO = re.compile(r"[A-Za-z0-9][A-Za-z0-9-]*/[A-Za-z0-9][A-Za-z0-9_.-]*")
+STARTUP_FILES = {"verification.json", "startup.png", "startup.log", "help.log",
+                 "rdp-helper.log", "rdp-session.log"}
+PENDING_GATES = ("linux-native-wayland", "two-version-lifecycle-linux",
+                 "two-version-lifecycle-macos", "two-version-lifecycle-windows")
+
+
+def load_sibling(name):
+    spec = importlib.util.spec_from_file_location(name, Path(__file__).with_name(name + ".py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+PACKAGER = load_sibling("package-release")
+DEBIAN = load_sibling("package-debian")
+
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+
+def unique_object(pairs):
+    value = {}
+    for key, item in pairs:
+        require(key not in value, f"Duplicate JSON key: {key}")
+        value[key] = item
+    return value
+
+
+def read_json(path):
+    return json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_object)
+
+
+def write_json(path, value):
+    with path.open("x", encoding="utf-8", newline="\n") as stream:
+        stream.write(json.dumps(value, indent=2, sort_keys=True) + "\n")
+
+
+def sha256(path):
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def package_versions(root):
+    versions = {}
+    for name, expected in MANIFESTS.items():
+        info = tomllib.loads((root / name).read_text(encoding="utf-8"))["package"]
+        value = info["version"]
+        require(info["name"] == expected and isinstance(value, str) and VERSION.fullmatch(value),
+                f"Invalid package name or version in {name}")
+        versions[expected] = value
+    return versions
+
+
+def publish_event(event, ref, version):
+    return bool(VERSION.fullmatch(version) and event == "push" and ref == f"refs/tags/v{version}")
+
+
+def version_for(root, event, ref):
+    version = package_versions(root)["harbor-workspace"]
+    require(event in {"push", "workflow_dispatch"}, "Unsupported release event")
+    if event == "push" or ref.startswith("refs/tags/"):
+        require(ref == f"refs/tags/v{version}", "Version tag must exactly match the application version")
+    return version
+
+
+def git(root, *args):
+    return subprocess.check_output(["git", "-C", str(root), *args])
+
+
+def verify_checkout(root, source, version):
+    require(SHA1.fullmatch(source), "Expected a lowercase 40-character source commit SHA")
+    require(git(root, "rev-parse", "HEAD").decode().strip() == source, "Source commit differs from checkout")
+    require(not git(root, "status", "--porcelain", "--untracked-files=no"), "Release checkout has tracked changes")
+    require(package_versions(root)["harbor-workspace"] == version, "Application version differs from preflight")
+
+
+def regular_entries(directory):
+    require(not directory.is_symlink() and directory.is_dir(), f"Expected owned directory: {directory}")
+    entries = {}
+    for path in directory.iterdir():
+        require(SAFE_NAME.fullmatch(path.name) and not path.is_symlink() and path.is_file(),
+                f"Unexpected file entry: {path.name}")
+        entries[path.name] = path
+    return entries
+
+
+def file_inventory(root, exclude=None):
+    files, links = {}, {}
+    for path in root.rglob("*"):
+        name = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            links[name] = os.readlink(path)
+        elif path.is_file() and path != exclude:
+            files[name] = sha256(path)
+    return files, links
+
+
+def portable_name(platform, version):
+    arch, _, extension = TARGETS[platform]
+    return f"TermCraft-{version}-{platform}-{arch}{extension}"
+
+
+def core_layout(root, package, files, links, manifest, platform, versions):
+    """Only the product, adjacent helpers, integration, policies and core notices."""
+    macos = platform == "macos"
+    resources = "Contents/Resources/" if macos else ""
+    binaries = "Contents/MacOS/" if macos else ""
+    suffix = ".exe" if platform == "windows" else ""
+    executables = ["harbor-workspace" + suffix, "termcraft-rdp-engine" + suffix]
+    originals = {
+        "LICENSE": "LICENSE", "PRIVACY.md": "PRIVACY.md", "CREDITS.md": "CREDITS.md",
+        "RUNTIME-MANIFEST.json": "packaging/runtime-manifest.json",
+        "build-source/Cargo.lock": "Cargo.lock",
+        "build-source/engines/rdp/Cargo.lock": "engines/rdp/Cargo.lock",
+        "README.txt": f"packaging/{platform}/README.txt",
+        **{path.as_posix(): path.as_posix() for path in PACKAGER.ASSETS},
+    }
+    novnc_root = root / "vendor/noVNC"
+    novnc = read_json(novnc_root / "SHA256SUMS.json")
+    for name in {*novnc, "SHA256SUMS.json"}:
+        originals[f"build-source/noVNC/{name}"] = f"vendor/noVNC/{name}"
+    generated = set()
+    if platform == "windows":
+        originals["install-per-user.ps1"] = "packaging/windows/install-per-user.ps1"
+        generated.add("TermCraft.ico")
+    else:
+        originals["desktop-integration.py"] = f"packaging/{platform}/desktop-integration.py"
+    if macos:
+        executables.append("termcraft-desktop-launcher")
+        generated.add("TermCraft.icns")
+        plist = plistlib.loads((root / "packaging/macos/Info.plist").read_bytes())
+        plist.update(CFBundleVersion=versions["harbor-workspace"], CFBundleShortVersionString=versions["harbor-workspace"])
+        require(plistlib.loads((package / "Contents/Info.plist").read_bytes()) == plist,
+                "macOS bundle metadata differs from the release identity")
+
+    for name, source in originals.items():
+        require(files.get(resources + name) == sha256(root / source), f"Missing or modified core file: {name}")
+
+    licenses = manifest["licenses"]
+    require(licenses["project"] == resources + "LICENSE" and licenses["credits"] == resources + "CREDITS.md"
+            and licenses["crate_notice_paths_relative_to"] == (resources.rstrip("/") or ".")
+            and isinstance(licenses["crates"], list) and licenses["crates"], "Missing core license declarations")
+    notices = set()
+    for crate in licenses["crates"]:
+        identifier = f"{crate['name']}-{crate['version']}"
+        require(SAFE_NAME.fullmatch(identifier), "Unsafe crate notice origin")
+        require(isinstance(crate["notice_paths"], list), "Invalid crate notice paths")
+        for name in crate["notice_paths"]:
+            parts = name.split("/")
+            require(name.startswith(f"licenses/crates/{identifier}/")
+                    and all(part and part not in {".", ".."} and "\\" not in part for part in parts)
+                    and resources + name in files and resources + name not in notices
+                    and (package / (resources + name)).stat().st_size > 0, "Unexpected or missing core crate notice")
+            notices.add(resources + name)
+    require(notices, "Missing core dependency notices")
+    allowed = {resources + name for name in originals.keys() | generated}
+    allowed |= notices | {binaries + name for name in executables}
+    if macos:
+        allowed.add("Contents/Info.plist")
+    require(not links and set(files) == allowed, "Archive contains missing or unexpected core payload entries")
+
+    runtime = read_json(root / "packaging/runtime-requirements.json")
+    for key in ("platform_requirements", "optional_native_providers"):
+        runtime[key] = runtime[key][platform]
+    if platform != "linux":
+        del runtime["linux_display_libraries"]
+    vnc = read_json(novnc_root / "UPSTREAM.json")
+    runtime.update(
+        artifact_declarations="RUNTIME-MANIFEST.json",
+        managed_vnc_browser={"release": vnc["release"], "source_url": vnc["source"],
+                             "source_archive_sha256": vnc["sha256"], "embedded_runtime": True,
+                             "source_and_notices": "build-source/noVNC"},
+        linked_libraries=manifest["runtime"]["linked_libraries"],
+    )
+    require(runtime == manifest["runtime"] and set(runtime["linked_libraries"]) == set(executables),
+            "Unsupported optional or missing core runtime declarations")
+    executable_hashes = set()
+    for name in executables:
+        image = package / (binaries + name)
+        try:
+            arch = PACKAGER.binary_arch(image, platform)
+        except (ValueError, subprocess.SubprocessError) as error:
+            raise ValueError(f"Invalid packaged executable {name}: {error}") from error
+        require(arch == TARGETS[platform][0], f"Incorrect packaged executable architecture: {name}")
+        if os.name != "nt":
+            require(image.stat().st_mode & 0o100, f"Missing executable permission: {name}")
+        executable_hashes.add(files[binaries + name])
+    require(len(executable_hashes) == len(executables), "Core executable entries must be distinct")
+
+
+def verify_portable(root, archive, platform, versions, inputs, work):
+    version = versions["harbor-workspace"]
+    expected = portable_name(platform, version)
+    require(archive.name == expected, "Unexpected portable artifact name")
+    stage = work / "portable"
+    (extract_tar if platform == "linux" else extract_zip)(archive, stage)
+    package = stage / ("TermCraft.app" if platform == "macos" else expected.removesuffix(TARGETS[platform][2]))
+    require(list(stage.iterdir()) == [package] and package.is_dir() and not package.is_symlink(),
+            "Unexpected portable archive root")
+    resources = package / "Contents/Resources" if platform == "macos" else package
+    manifest_path = resources / "PACKAGE-MANIFEST.json"
+    require(manifest_path.is_file() and not manifest_path.is_symlink(), "Missing regular package manifest")
+    manifest = read_json(manifest_path)
+    identity = (manifest["schema_version"], manifest["application"], manifest["version"], manifest["rdp_helper_version"],
+                manifest["profile"], manifest["platform"], manifest["architecture"], manifest["signing"])
+    require(identity == (1, "TermCraft", version, versions["termcraft-rdp-engine"], "release", platform,
+                         TARGETS[platform][0], "unsigned") and "wayland_helper_version" not in manifest,
+            "Unexpected release package identity")
+    files, links = file_inventory(package, exclude=manifest_path)
+    require(files == manifest["files"] and links == manifest.get("symlinks", {}),
+            "Portable archive files or symlinks differ from its manifest")
+    build = manifest["build"]
+    require(build["provenance"] == "local locked release build" and not build.get("gui_features")
+            and build["source_inputs"] == inputs and build["snapshot_sha256"] == PACKAGER.source_digest(inputs),
+            "Release build input hashes differ from the source checkout")
+    for tool in ("cargo", "rustc"):
+        require(re.fullmatch(rf"{tool} {re.escape(RUST)}(?: \([^\r\n]+\))?", build[tool]),
+                f"Unexpected release {tool} version")
+    identity = {key: build[key] for key in ("cargo", "rustc", "provenance", "snapshot_sha256")}
+    if platform == "macos":
+        value = build["macos"]
+        require(value["architecture"] == "aarch64" and value["deployment_target"] == "14.0"
+                and value["compiler"].strip() and value["sdk_version"].strip(), "Invalid macOS toolchain identity")
+        identity["macos"] = value
+    core_layout(root, package, files, links, manifest, platform, versions)
+    return {"name": manifest_path.relative_to(package).as_posix(),
+            "sha256": sha256(manifest_path), "schema": manifest["schema_version"], "build": identity}
+
+
+def png_observation(path):
+    """Read the app's 8-bit, noninterlaced RGB(A) PNG and check real color variance."""
+    require(path.stat().st_size <= 24_000_000, "Startup screenshot exceeds the evidence limit")
+    raw = path.read_bytes()
+    require(raw[:8] == b"\x89PNG\r\n\x1a\n", "Startup screenshot is not PNG")
+    offset, dimensions, data, complete = 8, None, bytearray(), False
+    while offset + 12 <= len(raw):
+        length, kind = struct.unpack_from(">I4s", raw, offset)
+        end = offset + length + 8
+        require(end + 4 <= len(raw), "Truncated startup PNG chunk")
+        value = raw[offset + 8:end]
+        require(zlib.crc32(kind + value) == struct.unpack_from(">I", raw, end)[0], "Invalid startup PNG CRC")
+        offset = end + 4
+        if kind == b"IHDR":
+            require(dimensions is None and offset == 33 and length == 13, "Invalid startup PNG header")
+            width, height, depth, color, compression, filt, interlace = struct.unpack(">IIBBBBB", value)
+            require(640 <= width <= 4096 and 400 <= height <= 4096 and width * height <= 8_400_000
+                    and depth == 8 and color in (2, 6) and compression == filt == interlace == 0,
+                    "Unsupported startup PNG dimensions or format")
+            dimensions = [width, height]
+            channels = 3 if color == 2 else 4
+        elif kind == b"IDAT":
+            require(dimensions is not None, "Missing startup PNG header")
+            data.extend(value)
+        elif kind == b"IEND":
+            complete = length == 0 and offset == len(raw)
+            break
+    require(complete and dimensions and data, "Incomplete startup PNG")
+    stride = width * channels
+    size = height * (stride + 1)
+    inflater = zlib.decompressobj()
+    pixels = inflater.decompress(data, size + 1)
+    require(len(pixels) == size and inflater.eof and not inflater.unused_data, "Invalid startup PNG pixel data")
+
+    sums, squares = [0] * 3, [0] * 3
+    previous = bytearray(stride)
+    for row_start in range(0, size, stride + 1):
+        mode = pixels[row_start]
+        require(mode <= 4, "Invalid startup PNG filter")
+        row = bytearray(pixels[row_start + 1:row_start + stride + 1])
+        if mode:
+            for i in range(stride):
+                a = row[i - channels] if i >= channels else 0
+                b = previous[i]
+                if mode == 1:
+                    prediction = a
+                elif mode == 2:
+                    prediction = b
+                elif mode == 3:
+                    prediction = (a + b) // 2
+                else:
+                    c = previous[i - channels] if i >= channels else 0
+                    pa, pb, pc = abs(b - c), abs(a - c), abs(a + b - 2 * c)
+                    prediction = a if pa <= min(pb, pc) else b if pb <= pc else c
+                row[i] = (row[i] + prediction) & 255
+        previous = row
+        alpha = row[3::4] if channels == 4 else None
+        blend = alpha is not None and alpha.count(255) != len(alpha)
+        for channel in range(3):
+            samples = row[channel::channels]
+            if blend:
+                samples = bytes(sample * opacity // 255 for sample, opacity in zip(samples, alpha))
+            sums[channel] += sum(samples)
+            squares[channel] += sum(n * n for n in samples)
+    count = width * height
+    require(max(math.sqrt(max(0, sq / count - (total / count) ** 2))
+                for sq, total in zip(squares, sums)) >= 2, "Startup screenshot is blank")
+    return dimensions
+
+
+def verify_startup(root, directory, archive, digest, platform, expected_backend=None):
+    entries = regular_entries(directory)
+    require(set(entries) == STARTUP_FILES, "Startup evidence is incomplete or has unexpected files")
+    observed = read_json(entries["verification.json"])
+    require(observed["archive"] == archive and observed["archive_sha256"] == digest
+            and observed["manifest_schema"] == 1 and observed["platform"] == platform
+            and observed["display_backend"] == (expected_backend or ("X11" if platform == "linux" else platform))
+            and observed["start_environment"] == "relocated package, empty PATH, isolated workspace, existing native display"
+            and observed["rdp_helper_wire_version"] == 1 and observed["rdp_helper_child_location_verified"] is True
+            and observed["rdp_session"] == "Received initial RDP negotiation on a loopback-only fixture; workspace preserved"
+            and observed["rdp_workspace"] == ("isolated LOCALAPPDATA/Harbor default"
+                                               if platform == "windows" else "explicit isolated workspace"),
+            "Startup observations do not match this archive, platform and helper checks")
+    expected_gl = read_json(root / "tests/windows-software-gl.json")["files"] if platform == "windows" else None
+    require(observed["windows_software_gl_fixture"] == expected_gl, "Unexpected startup graphics fixture")
+    require(png_observation(entries["startup.png"]) == observed["screen_size"], "Startup screenshot size mismatch")
+    packet = entries["rdp-helper.log"].read_bytes()
+    end = 5 + int.from_bytes(packet[1:5], "big")
+    require(len(packet) >= end and packet[:1] == b"\x01" and end > 5
+            and json.loads(packet[5:end]) == {"Ready": {"version": 1}},
+            "Startup RDP helper handshake is missing or invalid")
+    require(b"TermCraft remote workspace" in entries["help.log"].read_bytes(), "Missing packaged CLI startup result")
+    return {"observation": observed, "files": {name: sha256(path) for name, path in entries.items()}}
+
+
+def verify_candidate(root, source, version, platform, dist, startup, inputs):
+    require(platform in TARGETS and SHA1.fullmatch(source), "Invalid platform or candidate source commit")
+    versions = package_versions(root)
+    require(versions["harbor-workspace"] == version, "Candidate application version mismatch")
+    portable = portable_name(platform, version)
+    names = {portable}
+    if platform == "linux":
+        names.add(f"termcraft_{version}_amd64.deb")
+    entries = regular_entries(dist)
+    require(set(entries) == names, "Missing or unexpected candidate artifact filenames")
+    artifacts = {name: sha256(path) for name, path in entries.items()}
+    with tempfile.TemporaryDirectory(prefix="termcraft-verify-") as temporary:
+        work = Path(temporary).resolve()
+        manifest = verify_portable(root, entries[portable], platform, versions, inputs, work)
+        if platform == "linux":
+            # The repository builder emits a deterministic envelope including
+            # the portable payload and both internal manifests. Comparing it
+            # checks control metadata, launcher, policy copies and every byte.
+            deb = DEBIAN.package_debian(entries[portable], work / "deb")
+            require(sha256(deb) == artifacts[deb.name], "Debian package differs from its portable source or own manifest")
+            debian = {"name": deb.name, "portable_archive_sha256": artifacts[portable]}
+        else:
+            debian = None
+    observation = verify_startup(root, startup, portable, artifacts[portable], platform)
+    return {"schema": 1, "source_sha": source, "version": version, "package_versions": versions,
+            "scope": SCOPE, "platform": platform, "architecture": TARGETS[platform][0],
+            "artifacts": artifacts, "package_manifest": manifest, "debian": debian,
+            "checks_passed": ["portable-contents", "native-startup", *(["debian-portable-match"] if debian else [])],
+            "startup": observation}
+
+
+def stage_candidate(root, source, version, platform, dist, startup, output):
+    inputs = PACKAGER.source_inputs(root)
+    result = verify_candidate(root, source, version, platform, dist, startup, inputs)
+    output.mkdir(parents=True)
+    shutil.copytree(dist, output / "dist")
+    shutil.copytree(startup, output / "startup-evidence")
+    write_json(output / "candidate.json", result)
+    return result
+
+
+def git_source_archive(root, source, output):
+    with tempfile.TemporaryDirectory(prefix="termcraft-source-") as temporary:
+        tar = Path(temporary) / "tracked.tar"
+        subprocess.run(["git", "-C", str(root), "archive", "--format=tar",
+                        f"--prefix=TermCraft-source-{source}/", f"--output={tar}", source], check=True)
+        with tar.open("rb") as raw, output.open("xb") as file, gzip.GzipFile(filename="", mode="wb", fileobj=file, mtime=0) as compressed:
+            shutil.copyfileobj(raw, compressed)
+
+
+def checksum_text(artifacts):
+    return "".join(f"{digest}  {name}\n" for name, digest in sorted(artifacts.items()))
+
+
+def assemble(root, source, version, candidates, output, regression=None):
+    inventory = {}
+    for directory in candidates:
+        require(not directory.is_symlink(), "Candidate directory is a symlink")
+        path = directory / "candidate.json"
+        require(not path.is_symlink() and path.is_file(), "Missing regular candidate.json")
+        value = read_json(path)
+        platform = value["platform"]
+        require(platform in TARGETS and platform not in inventory,
+                "Expected exactly one inventory for each platform")
+        require(directory.name == f"candidate-{TARGETS[platform][1]}" and
+                {item.name for item in directory.iterdir()} == {"candidate.json", "dist", "startup-evidence"},
+                "Unexpected candidate artifact layout")
+        inventory[platform] = (value, directory)
+    require(set(inventory) == set(TARGETS), "Expected exactly one inventory for each platform")
+    artifacts = {}
+    inputs = PACKAGER.source_inputs(root)
+    for platform, (value, directory) in sorted(inventory.items()):
+        require(value["source_sha"] == source and value["version"] == version, "Candidate release source or version mismatch")
+        entries = regular_entries(directory / "dist")
+        require(set(entries) == set(value["artifacts"]) and all(
+            sha256(file) == value["artifacts"][name] for name, file in entries.items()),
+            f"Downloaded {platform} asset hashes differ from its inventory")
+        checked = verify_candidate(root, source, version, platform, directory / "dist",
+                                   directory / "startup-evidence", inputs)
+        require(value == checked, f"Downloaded {platform} candidate inventory does not match its content")
+        for name, digest in checked["artifacts"].items():
+            require(SAFE_NAME.fullmatch(name) and name not in artifacts, f"Unsafe or duplicate release asset: {name}")
+            artifacts[name] = digest
+
+    # Do not copy optional/runtime diagnostic outputs or raw runner logs into
+    # the public asset set. Their separately uploaded candidate evidence is
+    # identified by exact hash and preserved in the aggregate inventory.
+    output.mkdir(parents=True)
+    for value, directory in inventory.values():
+        for name, digest in value["artifacts"].items():
+            shutil.copyfile(directory / "dist" / name, output / name)
+            require(sha256(output / name) == digest, f"Candidate changed during assembly: {name}")
+    source_name = f"TermCraft-source-{source}.tar.gz"
+    git_source_archive(root, source, output / source_name)
+    artifacts[source_name] = sha256(output / source_name)
+    result = {
+        "schema": 1, "source_sha": source, "version": version, "scope": SCOPE,
+        "source": {"archive": source_name, "sha256": artifacts[source_name], "commit": source,
+                   "kind": "git archive of tracked project files", "project_license": "LICENSE",
+                   "credits": "CREDITS.md", "privacy": "PRIVACY.md",
+                   "rdp_source": "engines/rdp", "wayland_source": "engines/wayland",
+                   "notice": "Dependency locks and build-input hashes are not a plugin or dependency source bundle."},
+        "artifacts": artifacts, "platforms": {platform: value for platform, (value, _) in inventory.items()},
+        "checks_passed": ["three-platform-candidate-validation", *(["three-platform-regression"] if regression else [])],
+        "regression": regression,
+        "pending_gates": list(PENDING_GATES), "publication_ready": False,
+    }
+    write_json(output / "release-inventory.json", result)
+    checksum_entries = {**artifacts, "release-inventory.json": sha256(output / "release-inventory.json")}
+    (output / "SHA256SUMS").write_text(checksum_text(checksum_entries), encoding="ascii", newline="\n")
+    return result
+
+
+def publish(github, event, ref, version, source, ready, paths):
+    require(publish_event(event, ref, version) and SHA1.fullmatch(source) and ready is True,
+            "Public publication requires a qualified exact version tag and source commit")
+    expected = {}
+    for path in paths:
+        name = path.name
+        require(SAFE_NAME.fullmatch(name) and name not in expected and path.is_file() and not path.is_symlink(),
+                f"Unsafe or duplicate publication asset: {name}")
+        expected[name] = f"sha256:{sha256(path)}"
+    require(expected, "No release assets to publish")
+    tag = f"v{version}"
+    require(github.tag_commit(tag) == source, "Remote version tag points at another source commit")
+    release = github.release_for_tag(tag)
+    created = release is None
+    if created:
+        github.create_draft(tag, source, sorted(paths))
+        release = github.release_for_tag(tag)
+        require(release is not None and release["draft"] is True, "Expected the newly created draft release")
+
+    assets = {}
+    for asset in github.release_assets(release["id"]):
+        name, digest = asset["name"], asset["digest"]
+        require(SAFE_NAME.fullmatch(name) and name not in assets and asset["state"] == "uploaded"
+                and isinstance(digest, str) and digest.startswith("sha256:")
+                and SHA256.fullmatch(digest.removeprefix("sha256:")), "Existing release contains unverifiable assets")
+        assets[name] = digest
+    require(assets == expected, "Existing release asset names or hashes differ. No release assets were overwritten.")
+    if created:
+        require(github.tag_commit(tag) == source, "Remote version tag changed while preparing release")
+        github.publish_draft(release["id"])
+    else:
+        require(release["draft"] is False, "An existing draft is never published automatically on retry")
+
+
+class GitHub:
+    def __init__(self, repo):
+        require(REPO.fullmatch(repo), "Expected an explicit owner/repository")
+        self.repo = repo
+
+    def invoke(self, *args):
+        return subprocess.check_output(["gh", *args])
+
+    def api(self, path, *options):
+        return json.loads(self.invoke("api", "--hostname", "github.com", *options, f"repos/{self.repo}/{path}"))
+
+    def pages(self, path):
+        return (item for page in self.api(path, "--paginate", "--slurp") for item in page)
+
+    def tag_commit(self, tag):
+        ref = self.api(f"git/ref/tags/{tag}")
+        require(ref["ref"] == f"refs/tags/{tag}", "GitHub returned a different release ref")
+        obj = ref["object"]
+        for _ in range(8):
+            kind, sha = obj["type"], obj["sha"]
+            require(SHA1.fullmatch(sha), "Invalid GitHub tag target")
+            if kind == "commit":
+                return sha
+            require(kind == "tag", "Release tag does not resolve to a commit")
+            obj = self.api(f"git/tags/{sha}")["object"]
+        raise ValueError("Tag nesting depth exceeded")
+
+    def release_for_tag(self, tag):
+        # Listing includes drafts for the actor with contents:write. Treat API
+        # failures as failures, never infer a missing release from any error.
+        releases = [release for release in self.pages("releases?per_page=100") if release["tag_name"] == tag]
+        require(len(releases) <= 1, "Multiple GitHub releases use this tag")
+        return releases[0] if releases else None
+
+    def release_assets(self, identifier):
+        require(type(identifier) is int and identifier > 0, "Invalid release ID")
+        return self.pages(f"releases/{identifier}/assets?per_page=100")
+
+    def create_draft(self, tag, source, paths):
+        self.invoke("release", "create", tag, "--repo", f"github.com/{self.repo}", "--verify-tag", "--target", source,
+                    "--draft", "--title", f"TermCraft {tag}", "--notes",
+                    "Unsigned TermCraft core desktop packages. See release-inventory.json and SHA256SUMS "
+                    "for exact assets, scope and source. Optional runtime payloads are not included.",
+                    "--", *(str(path.resolve()) for path in paths))
+
+    def publish_draft(self, identifier):
+        require(type(identifier) is int and identifier > 0, "Invalid release ID")
+        result = self.api(f"releases/{identifier}", "--method", "PATCH", "--field", "draft=false")
+        require(result["draft"] is False, "GitHub did not publish the verified draft")
+
+
+def publication_files(directory, source, version):
+    entries = regular_entries(directory)
+    inventory = read_json(entries["release-inventory.json"])
+    require(inventory["scope"] == SCOPE and inventory["source_sha"] == source and inventory["version"] == version
+            and inventory["publication_ready"] is True and inventory["pending_gates"] == []
+            and set(PENDING_GATES).issubset(inventory["checks_passed"])
+            and {"three-platform-regression", "three-platform-candidate-validation"}.issubset(inventory["checks_passed"]),
+            "Release inventory is not publication-ready")
+    expected_assets = {portable_name(platform, version) for platform in TARGETS}
+    source_archive = f"TermCraft-source-{source}.tar.gz"
+    expected_assets |= {f"termcraft_{version}_amd64.deb", source_archive}
+    artifacts = inventory["artifacts"]
+    require(set(artifacts) == expected_assets and set(entries) == (expected_assets | {"release-inventory.json", "SHA256SUMS"})
+            and inventory["source"]["archive"] == source_archive and inventory["source"]["commit"] == source
+            and inventory["source"]["sha256"] == artifacts[source_archive],
+            "Downloaded publication assets do not match the release inventory")
+    require(all(SHA256.fullmatch(digest) and sha256(entries[name]) == digest for name, digest in artifacts.items()),
+            "Downloaded publication asset hashes differ")
+    checksums = {**artifacts, "release-inventory.json": sha256(entries["release-inventory.json"])}
+    require(entries["SHA256SUMS"].read_bytes() == checksum_text(checksums).encode("ascii"),
+            "Downloaded publication checksums differ")
+    return list(entries.values())
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, default=ROOT)
+    commands = parser.add_subparsers(dest="command", required=True)
+    for name in ("preflight", "inventory", "aggregate", "publish"):
+        command = commands.add_parser(name)
+        command.add_argument("--source", required=True)
+        if name in {"preflight", "publish"}:
+            command.add_argument("--event", required=True)
+            command.add_argument("--ref", required=True)
+        if name in {"inventory", "aggregate", "publish"}:
+            command.add_argument("--version", required=True)
+        if name in {"preflight", "aggregate"}:
+            command.add_argument("--github-output", type=Path)
+        if name in {"inventory", "aggregate", "publish"}:
+            command.add_argument("--output", type=Path, required=True)
+        if name == "inventory":
+            command.add_argument("--platform", choices=TARGETS, required=True)
+            command.add_argument("--dist", type=Path, required=True)
+            command.add_argument("--startup", type=Path, required=True)
+        if name == "aggregate":
+            command.add_argument("--candidates", type=Path, required=True)
+            command.add_argument("--regression-result", required=True)
+            command.add_argument("--run-id", required=True)
+            command.add_argument("--run-attempt", required=True)
+        if name == "publish":
+            command.add_argument("--repo", required=True)
+
+    args = parser.parse_args()
+    root = args.root.resolve()
+    try:
+        if args.command == "preflight":
+            version = version_for(root, args.event, args.ref)
+            verify_checkout(root, args.source, version)
+            result = {"version": version, "source_sha": args.source,
+                      "tag_publish_event": str(publish_event(args.event, args.ref, version)).lower()}
+        elif args.command == "inventory":
+            verify_checkout(root, args.source, args.version)
+            result = stage_candidate(root, args.source, args.version, args.platform, args.dist, args.startup, args.output)
+        elif args.command == "aggregate":
+            verify_checkout(root, args.source, args.version)
+            require(args.regression_result == "success" and all(re.fullmatch(r"[1-9][0-9]*", item)
+                    for item in (args.run_id, args.run_attempt)), "Required platform regression workflow did not succeed")
+            result = assemble(root, args.source, args.version, sorted(args.candidates.iterdir()), args.output,
+                              regression={"workflow": ".github/workflows/ci.yml", "result": args.regression_result,
+                                          "run_id": args.run_id, "run_attempt": args.run_attempt})
+        else:
+            # Recheck the event before trusting assembled inputs or contacting GitHub.
+            require(publish_event(args.event, args.ref, args.version), "Manual or mismatched tag publication is forbidden")
+            verify_checkout(root, args.source, args.version)
+            paths = publication_files(args.output, args.source, args.version)
+            publish(GitHub(args.repo), args.event, args.ref, args.version, args.source, True, paths)
+            return
+        if getattr(args, "github_output", None):
+            keys = ("version", "source_sha", "tag_publish_event") if args.command == "preflight" else ("publication_ready",)
+            with args.github_output.open("a", encoding="utf-8") as stream:
+                stream.writelines(f"{key}={str(result[key]).lower()}\n" for key in keys)
+        if args.command == "aggregate":
+            print("Validated unsigned startup-only assembly. Publication requires: " + ", ".join(result["pending_gates"]))
+        else:
+            print(f"{args.command}: {result['version']} from {result['source_sha']}")
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, tarfile.TarError, zipfile.BadZipFile,
+            subprocess.SubprocessError, zlib.error) as error:
+        parser.exit(1, f"Release {args.command} failed: {error}\n")
+
+
+if __name__ == "__main__":
+    main()

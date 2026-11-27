@@ -106,10 +106,9 @@ linking is available. Cargo configuration and Rust build-override environment
 variables from the live checkout do not apply. The native toolchain and
 system SDK come from the build machine.
 
-The CI workflow runs the Rust and packaging tests. The manually dispatched
-release workflow builds unsigned archive candidates for Linux x86-64,
-Windows x86-64, and Apple Silicon macOS (arm64). Intel macOS is outside the
-current support scope and is not a required build, artifact or approval gate. Linux startup uses a virtual
-X11 display. Windows and macOS GUI checks require a runner with an available
-desktop session. The workflow retains run artifacts and startup evidence.
-Signing, notarization, and publication are separate release actions.
+The [release workflow](../.github/workflows/release.yml) uses the full
+Linux x86-64, Windows x64 and Apple Silicon macOS regression matrix.
+Manual runs are read-only. Version-tag runs can assemble checked unsigned
+core candidates, but publication remains blocked until the required
+native lifecycle and Wayland checks are integrated. The [release guide](../docs/releases.md)
+describes the exact formats, evidence and publication policy.

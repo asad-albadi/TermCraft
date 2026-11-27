@@ -119,7 +119,7 @@ The internal executable name remains `harbor-workspace` for compatibility. Keep 
 
 ### Packages and GitHub Actions
 
-The repository includes [CI](.github/workflows/ci.yml) and a manually dispatched [release-artifact workflow](.github/workflows/release.yml). These definitions are a foundation, not a claim that every native job or release format is qualified. The manual workflow builds candidate unsigned artifacts; it does not currently provide PixelCraft-style coordinated, tag-triggered GitHub Release publishing.
+The [release workflow](.github/workflows/release.yml) builds unsigned core candidates for Linux x86-64 (portable archive and Debian package), Windows x64 (portable ZIP with per-user installer), and Apple Silicon macOS (app bundle ZIP). Manual runs are read-only. Version tags also run the coordinated checks, but public publication stays blocked pending native lifecycle and Wayland evidence. See the [release guide](docs/releases.md) for supported formats, checks, and how to keep your workspace when upgrading.
 
 Check the [Releases page](https://github.com/asad-albadi/TermCraft/releases) for assets actually published. Desktop release automation, platform installers and verification are tracked in the [roadmap](#status-and-roadmap). Availability must follow successful platform checks; planned formats are not advertised as downloadable builds.
 
