@@ -124,10 +124,10 @@ mod tests {
                 text(&shape.shape, &mut labels);
             }
         }
-        assert!(
-            labels.contains("Read-only") && labels.contains("stale"),
-            "{labels}"
-        );
+        let labels = labels.to_lowercase();
+        for required in ["read-only", "team", "cached", "stale", "shared office"] {
+            assert!(labels.contains(required), "missing {required} in {labels}");
+        }
     }
     struct PromptReader {
         auth: std::sync::Arc<dyn harbor_workspace::shared_network::SourceAuth>,
@@ -1162,7 +1162,7 @@ impl Workspace {
             return;
         }
         ui.separator();
-        ui.label("Shared sessions");
+        ui.label("Shared sessions · read-only");
         let configs: Vec<_> = self.store.shared_sources.iter().take(32).cloned().collect();
         let query = self.session_search.to_lowercase();
         let mut actions = Vec::new();
