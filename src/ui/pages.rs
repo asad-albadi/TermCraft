@@ -729,49 +729,25 @@ impl Workspace {
                     {
                         continue;
                     }
-                    let (_, r) = ui.allocate_space(vec2(ui.available_width(), 37.));
-                    let response = ui.interact(r, ui.id().with(&entry.path), Sense::click());
-                    let selected = self.files.selected.as_ref() == Some(&entry.path);
-                    let foreground =
-                        fluent::paint_control(ui, &response, r, selected, ControlKind::Flat);
-                    response.widget_info(|| {
-                        WidgetInfo::selected(
-                            WidgetType::SelectableLabel,
-                            response.enabled(),
-                            selected,
-                            &entry.name,
-                        )
-                    });
-                    if response.gained_focus() {
-                        response.scroll_to_me(None);
-                    }
-                    let response = response.fluent_hint(entry.path.display().to_string());
-                    draw_icon(
-                        ui.painter(),
-                        Rect::from_min_size(r.min + vec2(6., 9.), vec2(19., 19.)),
-                        if entry.dir { "folder" } else { "terminal" },
-                        if entry.dir { accent(ui) } else { muted(ui) },
-                    );
-                    paint_ellipsized(
-                        ui,
-                        r.left_center() + vec2(36., 0.),
-                        r.width() - 122.,
-                        &entry.name,
-                        foreground,
-                    );
-                    ui.painter().text(
-                        r.right_center() - vec2(12., 0.),
-                        Align2::RIGHT_CENTER,
-                        if entry.dir {
+                    let row = explorer::ExplorerRow {
+                        name: &entry.name,
+                        kind: entry.kind,
+                        path: entry.path.display().to_string(),
+                        bytes: (!entry.dir).then_some(entry.size),
+                        detail: if entry.dir {
                             "Folder".into()
                         } else {
                             size_text(entry.size)
                         },
-                        FontId::proportional(12.),
-                        muted(ui),
+                    };
+                    let response = row.show(
+                        ui,
+                        ui.id().with(&entry.path),
+                        self.files.selected.as_ref() == Some(&entry.path),
+                        37.,
+                        Sense::click(),
                     );
                     if response.clicked() {
-                        response.request_focus();
                         self.files.selected = Some(entry.path.clone());
                     }
                     if response.double_clicked() {

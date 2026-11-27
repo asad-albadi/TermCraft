@@ -24,6 +24,9 @@ mod desktop;
 mod desktop_gateway;
 #[cfg(test)]
 mod dialog_tests;
+mod explorer;
+#[cfg(test)]
+mod explorer_tests;
 mod fluent;
 mod ftp;
 mod ftp_settings;
@@ -516,6 +519,7 @@ struct Entry {
     name: String,
     path: PathBuf,
     dir: bool,
+    kind: explorer::FileType,
     size: u64,
 }
 struct FileView {
@@ -553,8 +557,19 @@ impl FileView {
             Ok(entries) => {
                 for ent in entries.flatten() {
                     if let Ok(m) = ent.metadata() {
+                        let name = ent.file_name().to_string_lossy().into_owned();
+                        let kind = if m.is_dir() {
+                            explorer::FileType::Folder
+                        } else if m.file_type().is_symlink() {
+                            explorer::FileType::Link
+                        } else if m.is_file() {
+                            explorer::FileType::from_name(&name)
+                        } else {
+                            explorer::FileType::File
+                        };
                         self.entries.push(Entry {
-                            name: ent.file_name().to_string_lossy().into(),
+                            name,
+                            kind,
                             path: ent.path(),
                             dir: m.is_dir(),
                             size: m.len(),
@@ -2569,6 +2584,113 @@ fn draw_icon(p: &Painter, r: Rect, kind: &str, color: Color32) {
             line((14., 8.), (20., 8.));
             line((8., 12.), (17., 12.));
             line((8., 16.), (17., 16.));
+        }
+        "file-blank" | "file-document" | "file-pdf" => {
+            p.add(PathShape::closed_line(
+                vec![q(5., 2.), q(14., 2.), q(20., 8.), q(20., 22.), q(5., 22.)],
+                stroke,
+            ));
+            line((14., 2.), (14., 8.));
+            line((14., 8.), (20., 8.));
+            if kind == "file-document" {
+                p.rect_stroke(
+                    Rect::from_min_max(q(8., 11.), q(16., 15.)),
+                    0.,
+                    stroke,
+                    StrokeKind::Inside,
+                );
+                line((8., 18.), (16., 18.));
+            } else if kind == "file-pdf" {
+                p.add(PathShape::line(
+                    vec![
+                        q(8., 18.),
+                        q(12., 10.),
+                        q(12., 14.),
+                        q(17., 16.),
+                        q(13., 16.),
+                        q(8., 18.),
+                    ],
+                    stroke,
+                ));
+            }
+        }
+        "file-code" => {
+            p.add(PathShape::line(
+                vec![q(8., 6.), q(3., 12.), q(8., 18.)],
+                stroke,
+            ));
+            p.add(PathShape::line(
+                vec![q(16., 6.), q(21., 12.), q(16., 18.)],
+                stroke,
+            ));
+            line((10., 20.), (14., 4.));
+        }
+        "file-image" => {
+            p.rect_stroke(
+                Rect::from_min_max(q(2., 3.), q(22., 21.)),
+                2.,
+                stroke,
+                StrokeKind::Inside,
+            );
+            p.circle_filled(q(8., 8.), r.width() * 0.085, color);
+            p.add(PathShape::line(
+                vec![
+                    q(4., 18.),
+                    q(9., 13.),
+                    q(12., 16.),
+                    q(16., 10.),
+                    q(20., 15.),
+                ],
+                stroke,
+            ));
+        }
+        "file-audio" => {
+            p.add(PathShape::line(
+                vec![q(8., 18.), q(8., 6.), q(19., 3.), q(19., 15.)],
+                stroke,
+            ));
+            p.circle_filled(q(5.5, 18.), r.width() * 0.13, color);
+            p.circle_filled(q(16.5, 15.), r.width() * 0.13, color);
+        }
+        "file-video" => {
+            p.rect_stroke(
+                Rect::from_min_max(q(2., 5.), q(22., 19.)),
+                2.,
+                stroke,
+                StrokeKind::Inside,
+            );
+            p.add(PathShape::closed_line(
+                vec![q(10., 8.), q(16., 12.), q(10., 16.)],
+                stroke,
+            ));
+        }
+        "file-archive" => {
+            p.rect_stroke(
+                Rect::from_min_max(q(3., 4.), q(21., 9.)),
+                1.,
+                stroke,
+                StrokeKind::Inside,
+            );
+            p.rect_stroke(
+                Rect::from_min_max(q(5., 9.), q(19., 21.)),
+                1.,
+                stroke,
+                StrokeKind::Inside,
+            );
+            line((9., 13.), (15., 13.));
+        }
+        "file-program" => {
+            p.rect_stroke(
+                Rect::from_min_max(q(2., 3.), q(22., 21.)),
+                2.,
+                stroke,
+                StrokeKind::Inside,
+            );
+            line((3., 8.), (21., 8.));
+            p.add(PathShape::closed_line(
+                vec![q(10., 11.), q(16., 14.), q(10., 17.)],
+                stroke,
+            ));
         }
         "desktop" => {
             p.rect_stroke(

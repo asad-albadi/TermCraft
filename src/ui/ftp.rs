@@ -1,4 +1,3 @@
-use super::fluent::FluentTooltip;
 use eframe::egui::{self, Button, Context, Id, ScrollArea, TextEdit, Ui};
 use harbor_workspace::{
     credentials::Secret,
@@ -320,34 +319,22 @@ impl State {
                         .selected
                         .as_ref()
                         .is_some_and(|selected| selected.path == entry.path);
-                    ui.horizontal(|ui| {
-                        let response = ui
-                            .add_sized(
-                                [(ui.available_width() - 90.).max(1.), row_height],
-                                Button::selectable(selected, &entry.display_name).truncate(),
-                            )
-                            .fluent_hint(entry.path.display());
-                        if response.clicked() || response.double_clicked() {
-                            self.selected = Some(entry.clone());
-                        }
-                        if response.double_clicked() && entry.kind == EntryKind::Directory {
-                            requested_path = Some(Ok(entry.path.clone()));
-                        }
-                        match entry.kind {
-                            EntryKind::Directory => {
-                                ui.small("Folder");
-                            }
-                            EntryKind::File => {
-                                if let Some(size) = entry.size {
-                                    ui.small(format!("{size} B"));
-                                }
-                            }
-                            EntryKind::Symlink => {
-                                ui.small("Link");
-                            }
-                            EntryKind::Other => {}
-                        }
-                    });
+                    let id = ui
+                        .id()
+                        .with(("ftp-entry", self.connection, entry.path.as_bytes()));
+                    let response = super::explorer::ExplorerRow::remote(entry).show(
+                        ui,
+                        id,
+                        selected,
+                        row_height,
+                        egui::Sense::click(),
+                    );
+                    if response.clicked() || response.double_clicked() {
+                        self.selected = Some(entry.clone());
+                    }
+                    if response.double_clicked() && entry.kind == EntryKind::Directory {
+                        requested_path = Some(Ok(entry.path.clone()));
+                    }
                 }
             });
         if let Some(path) = requested_path {

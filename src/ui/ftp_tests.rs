@@ -133,6 +133,22 @@ async fn open_owned_ftp_document(
 }
 
 #[tokio::test]
+async fn ftp_listing_draws_distinct_icons_for_directory_file_and_link() {
+    use crate::ui::explorer_tests::{REMOTE_LABELS, assert_distinct_icons, remote_samples};
+    let (_server, _root, ctx, mut w) = open_owned_ftp_document(FtpTlsMode::Plain).await;
+    ctx.enable_accesskit();
+    let ftp = w.tabs[0].ftp.as_mut().unwrap();
+    ftp.actor.as_mut().unwrap().browser.entries = remote_samples();
+    let draw = |ftp: &mut State| {
+        crate::ui::gui_tests::shell_frame(&ctx, egui::vec2(640., 900.), 1., vec![], |ui| {
+            ftp.browser(ui)
+        })
+    };
+    draw(ftp);
+    assert_distinct_icons(&draw(ftp), REMOTE_LABELS);
+}
+
+#[tokio::test]
 async fn ftp_small_wheel_steps_preserve_virtual_row_geometry_and_file_selection() {
     let (_server, _data, ctx, mut workspace) = open_owned_ftp_document(FtpTlsMode::Plain).await;
     let ftp = workspace.tabs[0].ftp.as_mut().unwrap();

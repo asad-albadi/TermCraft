@@ -929,31 +929,26 @@ impl Workspace {
                             .min_scrolled_height(32.)
                             .show(ui, |ui| {
                                 for entry in &browser.entries {
-                                    let marker = match entry.kind {
-                                        EntryKind::Directory => "▸",
-                                        EntryKind::Symlink => "↗",
-                                        _ => "·",
-                                    };
                                     let row_id =
                                         ui.id().with(("remote-entry", id, entry.path.as_bytes()));
+                                    let selected = tab
+                                        .transfer_ui
+                                        .selected
+                                        .as_ref()
+                                        .is_some_and(|row| row.path == entry.path);
                                     let response = ui
-                                        .scope_builder(UiBuilder::new().id(row_id), |ui| {
-                                            ui.add_enabled(
-                                                !browser.loading && tab.ssh_connected,
-                                                Button::new(format!(
-                                                    "{marker}  {}",
-                                                    entry.display_name
-                                                ))
-                                                .selected(
-                                                    tab.transfer_ui
-                                                        .selected
-                                                        .as_ref()
-                                                        .is_some_and(|row| row.path == entry.path),
+                                        .add_enabled_ui(
+                                            !browser.loading && tab.ssh_connected,
+                                            |ui| {
+                                                explorer::ExplorerRow::remote(entry).show(
+                                                    ui,
+                                                    row_id,
+                                                    selected,
+                                                    ui.spacing().interact_size.y,
+                                                    Sense::click_and_drag(),
                                                 )
-                                                .truncate()
-                                                .sense(Sense::click_and_drag()),
-                                            )
-                                        })
+                                            },
+                                        )
                                         .inner;
                                     response.dnd_set_drag_payload(RemoteDragPayload {
                                         connection: id,
@@ -961,7 +956,6 @@ impl Workspace {
                                         kind: entry.kind,
                                     });
                                     if response.clicked() {
-                                        response.request_focus();
                                         tab.transfer_ui.selected = Some(entry.clone());
                                     }
                                     if response.double_clicked()
@@ -978,11 +972,6 @@ impl Workspace {
                                     {
                                         navigate = Some(entry.path.clone());
                                     }
-                                    let path = entry.path.display();
-                                    response.fluent_hint(match entry.size {
-                                        Some(bytes) => format!("{path}\n{bytes} bytes"),
-                                        None => path,
-                                    });
                                 }
                                 if browser.entries.is_empty()
                                     && !browser.loading
@@ -1163,7 +1152,7 @@ mod transfer_tests {
         );
         let click_row = |workspace: &mut Workspace, time| {
             let output = draw(workspace, time, vec![]);
-            let position = shell_text_position(&output, "·  stale-entry");
+            let position = shell_text_position(&output, "stale-entry");
             for (pressed, offset) in [(true, 0.1), (false, 0.2)] {
                 draw(
                     workspace,
