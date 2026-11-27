@@ -167,13 +167,10 @@ impl Form {
     fn fields(&mut self, ui: &mut Ui) {
         fluent::settings_grid(ui, "configuration", |ui| {
             if self.protocol == ServiceProtocol::Telnet {
-                ui.label("Shell executable");
+                let label = ui.label("Shell executable");
                 ui.horizontal_wrapped(|ui| {
-                    ui.add(
-                        crate::ui::fluent::singleline(&mut self.executable)
-                            .hint_text("Absolute path")
-                            .desired_width(ui.available_width().clamp(1., 300.)),
-                    );
+                    fluent::text_input(ui, label.id, &mut self.executable, "Absolute path", 300.)
+                        .fluent_hint(&self.executable);
                     if ui.button("Browse").clicked() {
                         if let Some(path) = rfd::FileDialog::new().pick_file() {
                             self.executable = path.to_string_lossy().into_owned();
@@ -181,12 +178,10 @@ impl Form {
                     }
                 });
             } else {
-                ui.label("Shared folder");
+                let label = ui.label("Shared folder");
                 ui.horizontal_wrapped(|ui| {
-                    ui.add(
-                        crate::ui::fluent::singleline(&mut self.root)
-                            .desired_width(ui.available_width().clamp(1., 300.)),
-                    );
+                    fluent::text_input(ui, label.id, &mut self.root, "", 300.)
+                        .fluent_hint(&self.root);
                     if ui.button("Browse").clicked() {
                         if let Some(path) = rfd::FileDialog::new().pick_folder() {
                             self.root = path.to_string_lossy().into_owned();
@@ -195,11 +190,8 @@ impl Form {
                 });
             }
             ui.end_row();
-            ui.label("Listen address");
-            ui.add(
-                crate::ui::fluent::singleline(&mut self.bind)
-                    .desired_width(ui.available_width().clamp(1., 210.)),
-            );
+            let label = ui.label("Listen address");
+            fluent::text_input(ui, label.id, &mut self.bind, "", 210.);
             ui.end_row();
             ui.label("Network access");
             ui.checkbox(&mut self.allow_non_loopback, "Allow a non-loopback address");
@@ -219,11 +211,8 @@ impl Form {
             if self.protocol == ServiceProtocol::Telnet
                 || (self.protocol == ServiceProtocol::Ftp && !self.anonymous)
             {
-                ui.label("Username");
-                ui.add(
-                    crate::ui::fluent::singleline(&mut self.username)
-                        .desired_width(ui.available_width().clamp(1., 210.)),
-                );
+                let label = ui.label("Username");
+                fluent::text_input(ui, label.id, &mut self.username, "", 210.);
                 ui.end_row();
                 let label = ui.label("Password");
                 service_password_field(ui, &mut self.password, 210.).labelled_by(label.id);
@@ -332,6 +321,65 @@ pub(super) fn service_password_field(ui: &mut Ui, password: &mut String, width: 
 pub(super) mod tests {
     use super::*;
     use std::net::{TcpStream, UdpSocket};
+
+    #[test]
+    fn actual_service_fields_reference_their_labels_at_both_form_widths() {
+        use egui::accesskit::Role;
+        for width in [360., 820.] {
+            for service in ["HTTP", "FTP", "Telnet"] {
+                let (ctx, _root, mut w) = crate::ui::terminal_review_tests::owned_workspace();
+                ctx.enable_accesskit();
+                let mut form = Form::new(if service == "Telnet" {
+                    ServiceProtocol::Telnet
+                } else {
+                    ServiceProtocol::Ftp
+                });
+                form.anonymous = false;
+                form.password.push_str("test-secret");
+                let mut draw = || {
+                    crate::ui::gui_tests::shell_frame(&ctx, vec2(width, 1500.), 1., vec![], |ui| {
+                        if service == "HTTP" {
+                            w.servers_page(ui);
+                        } else {
+                            form.fields(ui);
+                        }
+                    })
+                };
+                draw();
+                let nodes = draw().platform_output.accesskit_update.unwrap().nodes;
+                let labels: &[&str] = match service {
+                    "HTTP" => &["Shared folder", "Listen address"],
+                    "FTP" => &["Shared folder", "Listen address", "Username", "Password"],
+                    _ => &["Shell executable", "Listen address", "Username", "Password"],
+                };
+                for &label in labels {
+                    let (id, _) = nodes
+                        .iter()
+                        .find(|(_, n)| {
+                            n.role() == Role::Label
+                                && (n.value() == Some(label) || n.label() == Some(label))
+                        })
+                        .unwrap();
+                    assert!(
+                        nodes.iter().any(|(_, n)| n.labelled_by().contains(id)
+                            && n.role()
+                                == if label == "Password" {
+                                    Role::PasswordInput
+                                } else {
+                                    Role::TextInput
+                                }),
+                        "{service} {label} at {width}"
+                    );
+                }
+                assert!(!nodes.iter().any(|(_, n)| {
+                    [n.value(), n.label()]
+                        .into_iter()
+                        .flatten()
+                        .any(|s| s.contains("test-secret"))
+                }));
+            }
+        }
+    }
 
     fn label_position(shape: &egui::epaint::Shape, value: &str) -> Option<Pos2> {
         match shape {

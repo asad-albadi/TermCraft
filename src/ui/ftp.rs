@@ -309,10 +309,11 @@ impl State {
         if let Some(error) = &actor.browser.error {
             ui.colored_label(ui.visuals().error_fg_color, error);
         }
+        let row_height = ui.spacing().interact_size.y;
         ScrollArea::vertical()
             .id_salt("ftp-list")
             .max_height((ui.available_height() * 0.45).clamp(36., 360.))
-            .show_rows(ui, 24.0, actor.browser.entries.len(), |ui, rows| {
+            .show_rows(ui, row_height, actor.browser.entries.len(), |ui, rows| {
                 for row in rows {
                     let entry = &actor.browser.entries[row];
                     let selected = self
@@ -322,7 +323,7 @@ impl State {
                     ui.horizontal(|ui| {
                         let response = ui
                             .add_sized(
-                                [(ui.available_width() - 90.).max(1.), 24.],
+                                [(ui.available_width() - 90.).max(1.), row_height],
                                 Button::selectable(selected, &entry.display_name).truncate(),
                             )
                             .fluent_hint(entry.path.display());

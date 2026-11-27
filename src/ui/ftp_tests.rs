@@ -133,6 +133,101 @@ async fn open_owned_ftp_document(
 }
 
 #[tokio::test]
+async fn ftp_small_wheel_steps_preserve_virtual_row_geometry_and_file_selection() {
+    let (_server, _data, ctx, mut workspace) = open_owned_ftp_document(FtpTlsMode::Plain).await;
+    let ftp = workspace.tabs[0].ftp.as_mut().unwrap();
+    ftp.actor.as_mut().unwrap().browser.entries = (0..120)
+        .map(|i| {
+            let name = format!("item-{i:03}.txt");
+            RemoteEntry {
+                path: RemotePath::from_bytes(format!("/{name}").into_bytes()).unwrap(),
+                display_name: name,
+                kind: EntryKind::File,
+                size: Some(5),
+            }
+        })
+        .collect();
+    let draw = |ftp: &mut State, events| {
+        let mut before = 0.;
+        let output =
+            crate::ui::gui_tests::shell_frame(&ctx, egui::vec2(640., 550.), 1., events, |ui| {
+                let id = ui.make_persistent_id(egui::IdSalt::new("ftp-list"));
+                before = egui::scroll_area::State::load(&ctx, id)
+                    .unwrap_or_default()
+                    .offset
+                    .y;
+                ftp.browser(ui);
+            });
+        (output, before)
+    };
+    let (first, _) = draw(ftp, vec![]);
+    let pos = crate::ui::gui_tests::shell_text_position(&first, "item-000.txt");
+    let next = crate::ui::gui_tests::shell_text_position(&first, "item-001.txt");
+    let stride = next.y - pos.y;
+    let mut clicked = false;
+    for _ in 0..80 {
+        let (frame, offset) = draw(
+            ftp,
+            vec![
+                Event::PointerMoved(next),
+                Event::MouseWheel {
+                    unit: egui::MouseWheelUnit::Point,
+                    delta: egui::vec2(0., -7.),
+                    phase: egui::TouchPhase::Move,
+                    modifiers: Modifiers::NONE,
+                },
+            ],
+        );
+        for shape in &frame.shapes {
+            let Shape::Text(t) = &shape.shape else {
+                continue;
+            };
+            let Some(index) = t
+                .galley
+                .text()
+                .strip_prefix("item-")
+                .and_then(|s| s.strip_suffix(".txt"))
+                .and_then(|s| s.parse::<usize>().ok())
+            else {
+                continue;
+            };
+            let center = t.pos + t.galley.size() * 0.5;
+            if !shape.clip_rect.contains(center) {
+                continue;
+            }
+            assert!(
+                (center.y - (pos.y + index as f32 * stride - offset)).abs() < 1.6,
+                "row {index}, offset {offset}, center {center:?}, stride {stride}"
+            );
+            if index == 10 && offset > 4. * stride && center.y > shape.clip_rect.top() + stride {
+                for down in [true, false] {
+                    draw(
+                        ftp,
+                        vec![
+                            Event::PointerMoved(center),
+                            crate::ui::gui_tests::shell_pointer(center, down),
+                        ],
+                    );
+                }
+                assert_eq!(
+                    ftp.selected.as_ref().unwrap().path.as_bytes(),
+                    b"/item-010.txt"
+                );
+                clicked = true;
+                break;
+            }
+        }
+        if clicked {
+            break;
+        }
+    }
+    assert!(
+        clicked,
+        "small wheel steps did not expose the intended filename"
+    );
+}
+
+#[tokio::test]
 async fn graphical_ftp_session_connects_opens_edits_and_guards_tab_close() {
     let (server, _data, ctx, mut workspace) = open_owned_ftp_document(FtpTlsMode::Explicit).await;
     workspace.store.preferences.confirm_session_close = true;

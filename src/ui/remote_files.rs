@@ -934,25 +934,34 @@ impl Workspace {
                                         EntryKind::Symlink => "↗",
                                         _ => "·",
                                     };
-                                    let response = ui.add_enabled(
-                                        !browser.loading && tab.ssh_connected,
-                                        Button::new(format!("{marker}  {}", entry.display_name))
-                                            .selected(
-                                                tab.transfer_ui
-                                                    .selected
-                                                    .as_ref()
-                                                    .is_some_and(|row| row.path == entry.path),
+                                    let row_id =
+                                        ui.id().with(("remote-entry", id, entry.path.as_bytes()));
+                                    let response = ui
+                                        .scope_builder(UiBuilder::new().id(row_id), |ui| {
+                                            ui.add_enabled(
+                                                !browser.loading && tab.ssh_connected,
+                                                Button::new(format!(
+                                                    "{marker}  {}",
+                                                    entry.display_name
+                                                ))
+                                                .selected(
+                                                    tab.transfer_ui
+                                                        .selected
+                                                        .as_ref()
+                                                        .is_some_and(|row| row.path == entry.path),
+                                                )
+                                                .truncate()
+                                                .sense(Sense::click_and_drag()),
                                             )
-                                            .truncate()
-                                            .sense(Sense::click_and_drag()),
-                                    );
-                                    let response = response.fluent_hint(entry.path.display());
+                                        })
+                                        .inner;
                                     response.dnd_set_drag_payload(RemoteDragPayload {
                                         connection: id,
                                         path: entry.path.clone(),
                                         kind: entry.kind,
                                     });
                                     if response.clicked() {
+                                        response.request_focus();
                                         tab.transfer_ui.selected = Some(entry.clone());
                                     }
                                     if response.double_clicked()
@@ -969,14 +978,11 @@ impl Workspace {
                                     {
                                         navigate = Some(entry.path.clone());
                                     }
-                                    response.fluent_hint(format!(
-                                        "{}\n{}",
-                                        entry.path.display(),
-                                        entry
-                                            .size
-                                            .map(|s| format!("{s} bytes"))
-                                            .unwrap_or_default()
-                                    ));
+                                    let path = entry.path.display();
+                                    response.fluent_hint(match entry.size {
+                                        Some(bytes) => format!("{path}\n{bytes} bytes"),
+                                        None => path,
+                                    });
                                 }
                                 if browser.entries.is_empty()
                                     && !browser.loading
@@ -1191,6 +1197,42 @@ mod transfer_tests {
                 .map(|entry| &entry.path),
             Some(&path),
             "The same visible row must be selectable when navigation completes"
+        );
+        let first_id = ctx
+            .memory(|m| m.focused())
+            .expect("clicked remote row should own keyboard focus");
+        let tab = &mut workspace.tabs[0];
+        tab.browser.as_mut().unwrap().entries.insert(
+            0,
+            RemoteEntry {
+                path: RemotePath::from_bytes(b"/old/inserted".to_vec()).unwrap(),
+                display_name: "inserted".into(),
+                kind: EntryKind::File,
+                size: None,
+            },
+        );
+        tab.transfer_ui.selected = None;
+        draw(&mut workspace, 1.5, vec![]);
+        assert!(ctx.read_response(first_id).is_some_and(|r| r.has_focus()));
+        draw(
+            &mut workspace,
+            1.6,
+            vec![Event::Key {
+                key: Key::Space,
+                physical_key: None,
+                pressed: true,
+                repeat: false,
+                modifiers: Modifiers::NONE,
+            }],
+        );
+        assert_eq!(
+            workspace.tabs[0]
+                .transfer_ui
+                .selected
+                .as_ref()
+                .map(|e| &e.path),
+            Some(&path),
+            "inserting a different row moved keyboard focus to another file"
         );
     }
     #[test]

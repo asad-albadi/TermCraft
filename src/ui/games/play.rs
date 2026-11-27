@@ -772,7 +772,7 @@ fn puzzle_options(ui: &mut Ui, play: &mut PlayState) {
         });
         if let Some(updated) = topology_update { draft = updated; }
         if let Err(error) = draft.validate() {
-            ui.colored_label(palette(2), error);
+            ui.colored_label(ui.visuals().error_fg_color, error);
         }
         ui.label("Your current board is kept if a new board cannot be made. Try another seed or simpler settings if generation cannot finish.");
         play.draft = Some(draft);
@@ -1322,6 +1322,14 @@ fn controls(ui: &mut Ui, play: &mut PlayState, id: GameId) {
         _ => {}
     });
 }
+fn numbered_swatch(ui: &Ui, colour: u8) -> egui::text::LayoutJob {
+    let mut label = egui::text::LayoutJob::default();
+    let font = TextStyle::Body.resolve(ui.style());
+    label.append("●", 0., TextFormat::simple(font.clone(), palette(colour)));
+    label.append(&format!(" {colour}"), 0., TextFormat::simple(font, ink(ui)));
+    label
+}
+
 fn palette(n: u8) -> Color32 {
     match n {
         1 => Color32::from_rgb(33, 160, 125),
@@ -1933,7 +1941,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                 ui.horizontal(|ui| {
                     ui.label(format!("{}:", i + 1));
                     for &c in &row.pegs {
-                        ui.colored_label(palette(c), format!("●{c}"));
+                        ui.label(numbered_swatch(ui, c));
                     }
                     ui.label(format!("{} exact · {} elsewhere", row.exact, row.misplaced));
                 });
@@ -1971,11 +1979,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
             ui.horizontal(|ui| {
                 ui.label("Paint colour:");
                 for c in 1..=4 {
-                    ui.selectable_value(
-                        &mut play.colour,
-                        c,
-                        RichText::new(format!("● {c}")).color(palette(c)),
-                    );
+                    ui.selectable_value(&mut play.colour, c, numbered_swatch(ui, c));
                 }
             });
             let labels = s
@@ -2782,6 +2786,98 @@ mod untangle_fix1_regression {
 #[cfg(all(test, unix))]
 mod options_ui_tests {
     use super::*;
+    #[test]
+    fn guess_history_map_choices_and_invalid_configuration_paint_readable_text() {
+        fn text_colors(output: &FullOutput, label: &str) -> (Color32, Color32) {
+            let text = output
+                .shapes
+                .iter()
+                .find_map(|s| match &s.shape {
+                    Shape::Text(t)
+                        if t.galley.text().replace(' ', "") == label.replace(' ', "") =>
+                    {
+                        Some(t)
+                    }
+                    _ => None,
+                })
+                .unwrap_or_else(|| panic!("missing {label}"));
+            let color = |section: &egui::text::LayoutSection| {
+                text.override_text_color.unwrap_or_else(|| {
+                    if section.format.color == Color32::PLACEHOLDER {
+                        text.fallback_color
+                    } else {
+                        section.format.color
+                    }
+                })
+            };
+            (
+                color(text.galley.job.sections.first().unwrap()),
+                color(text.galley.job.sections.last().unwrap()),
+            )
+        }
+        for theme in [Theme::Light, Theme::Dark] {
+            let ctx = Context::default();
+            fluent::setup(&ctx, true, false);
+            ctx.set_theme(theme);
+            let mut play = PlayState::default();
+            assert!(play.start_config(
+                7,
+                p::PuzzleConfig::Guess(p::GuessConfig {
+                    colours: 8,
+                    ..Default::default()
+                })
+            ));
+            for (slot, colour) in [5, 8, 3, 4].into_iter().enumerate() {
+                play.puzzle(p::PuzzleInput::Peg { slot, colour });
+            }
+            play.puzzle(p::PuzzleInput::Submit);
+            let draw = |play: &mut PlayState, options| {
+                crate::ui::gui_tests::shell_frame(&ctx, vec2(1100., 1000.), 1., vec![], |ui| {
+                    if options {
+                        puzzle_options(ui, play)
+                    } else {
+                        draw_scene(ui, play);
+                    }
+                })
+            };
+            let style = ctx.global_style();
+            let check = |frame: &FullOutput, label: &str, c| {
+                let (swatch, numeral) = text_colors(frame, label);
+                assert_eq!(swatch, palette(c));
+                assert_eq!(numeral, style.visuals.text_color(), "{theme:?}: {label}");
+                let luminance = |color: Color32| {
+                    let l = egui::Rgba::from(color);
+                    0.2126 * l.r() + 0.7152 * l.g() + 0.0722 * l.b()
+                };
+                for background in [style.visuals.panel_fill, style.visuals.selection.bg_fill] {
+                    let bg = luminance(background);
+                    let fg = luminance(numeral);
+                    assert!((bg.max(fg) + 0.05) / (bg.min(fg) + 0.05) >= 4.5);
+                }
+            };
+            let history = draw(&mut play, false);
+            check(&history, "●5", 5);
+            check(&history, "●8", 8);
+            play.start(GameId::Map, 7);
+            let choices = draw(&mut play, false);
+            for c in 1..=4 {
+                check(&choices, &format!("●{c}"), c);
+            }
+            play.start(GameId::Solo, 7);
+            let invalid = p::PuzzleConfig::SoloVariant(p::SoloVariantConfig {
+                base: Default::default(),
+                jigsaw: true,
+                killer: true,
+            });
+            let error = invalid.validate().unwrap_err();
+            play.draft = Some(invalid);
+            ctx.memory_mut(|m| m.set_everything_is_visible(true));
+            draw(&mut play, true);
+            let config = draw(&mut play, true);
+            assert_eq!(text_colors(&config, &error).1, style.visuals.error_fg_color);
+        }
+    }
+
     #[test]
     fn options_dynamic_guess_last_slot_and_atomic_failure() {
         let mut s = PlayState::default();
