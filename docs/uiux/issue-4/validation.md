@@ -1,5 +1,7 @@
 # Issue 4 integrated verification
 
+**Human-review correction active:** the owner rejected the previous UI as cluttered and inconsistent. Evidence below applies to the recorded earlier sources; it does not qualify the pending correction or establish human acceptance. See [active correction checklist](human-review-correction.md).
+
 Production UI source is `5575601`. The native package at `c2dded6` includes the subsequent test-only service-button correction. The 36ba3ba inventory and captures predate a focused detached-client contrast correction. Windows 11 desktop Fluent is the visual reference. The [screen inventory](screen-audit.md) and [dialog inventory](dialog-audit.md) record the original defects and point to each owning module. The tables below record the resulting changes, retained behaviors and evidence for those same routes. Native images and runtime identities are listed in [the capture manifest](captures/manifest.json).
 
 ## Evidence levels

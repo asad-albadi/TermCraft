@@ -53,3 +53,12 @@ The owner explicitly specified **Windows 11, not Windows 10**. The preference fo
 ### Command actions in dialog footers
 
 The current [Microsoft buttons guidance](https://learn.microsoft.com/en-us/windows/apps/design/controls/buttons) recommends a 120px minimum for short command labels and responsive resizing, wrapping or stacking for longer labels. A single safe dialog close action is right-aligned. [ContentDialog guidance](https://learn.microsoft.com/en-us/windows/apps/develop/ui/controls/dialogs-and-flyouts/dialogs) places the primary action leftmost, optional secondary action in the middle and safe close action rightmost. Apply these roles to app-owned dialog footers while retaining operation-specific safe defaults and input guards; navigation/command-bar tiles and inline icon actions are separate roles.
+
+
+## Human-review correction: session composition
+
+The owner rejected the prior implementation's density and scrolling on 2026-11-27. Initial reference research and automated layout tests had not established a simple session-creation experience.
+
+The correction directly inspected the [MobaXterm session-creation screenshot in NeSI's setup guide](https://docs.nesi.org.nz/Getting_Started/Accessing_the_HPCs/MobaXterm_Setup_Windows/) and checked the [official session documentation](https://mobaxterm.mobatek.net/documentation.html). The screenshot shows protocol choices across the top, a compact basic SSH row for host, optional username and port, with separate advanced, terminal, network and bookmark tabs. This supports a change in information organization, while TermCraft retains its Windows 11 styling and its existing connection/safety behavior. It is not evidence that a proposed TermCraft layout is already usable; native normal, ultrawide and compact previews and owner acceptance are still required.
+
+The owner's screenshots also expose naturally shrinking scroll viewports, permanently expanded explanatory text, redundant terminal controls and a games surface that does not occupy its window. The [correction checklist](human-review-correction.md) tracks these as reopened work.

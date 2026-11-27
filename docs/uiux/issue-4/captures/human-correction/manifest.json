@@ -1,0 +1,39 @@
+{
+  "source": "72db3f4078af03cca728a1853387165875a20dc2",
+  "binary_sha256": "3b02622cd359247287ddcbe83799653368f377489033ef174384c422599d75a0",
+  "environment": "Actual production UI native development preview on owned Arch Linux Xvfb :94, software GL, scale1, synthetic workspace; cached library/pre-adapter dependencies. Not packaged qualification or physical hardware/screenreader/owner acceptance.",
+  "captures": [
+    {
+      "file": "session-ssh-dark-fhd.png",
+      "sha256": "ff6f0e7d467f1bc26c811efad2c21d69aa8a3d1890cb82bb3ba188bee21f44d8"
+    },
+    {
+      "file": "session-rdp-dark-fhd.png",
+      "sha256": "f7cba3a4f6fca30a28970ebbe48d42cb625d5e7a25017745a0859cf8afe491dc"
+    },
+    {
+      "file": "session-rdp-dark-compact.png",
+      "sha256": "f1a0d9246b3de603143daa0d1644809a917344991defdb30d6d6c6a1676826fb"
+    },
+    {
+      "file": "settings-dark-ultrawide.png",
+      "sha256": "732a4d7bd89caef341cdef74c8d3d98fff8466448ba33b54d49fd04bdbdff9ad"
+    },
+    {
+      "file": "tools-dark-ultrawide.png",
+      "sha256": "471750853f685a78879e8e13c3bcc7dc09b56654c4169d58ebdd97de396f0550"
+    },
+    {
+      "file": "games-dark-ultrawide.png",
+      "sha256": "20ab9995d6fc3ddaee2da5e4f20fab1523b32945a65361cc7aa95344f3e7ff2a"
+    },
+    {
+      "file": "terminal-dark-fhd.png",
+      "sha256": "a1ba86cca66dff6f0c787d33ab6bbd8b2fc82c37175dc1336010dc9ba73cd511"
+    },
+    {
+      "file": "detached-dark-360.png",
+      "sha256": "c059f98a52a983b59d098213f25298ca035f23c29355c6f3dad1998529938cc1"
+    }
+  ]
+}
