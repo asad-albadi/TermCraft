@@ -1,6 +1,6 @@
 # Fluent 1 and remote-workspace UX research
 
-Research date: 2026-11-27. Direction explicitly selected by the owner: **Fluent Design 1 (Windows 10 / UWP)**, preserving TermCraft's existing layout, penguin and emerald identity. This supersedes issue #4's original Fluent 2 / Windows 11 references. It is a refinement pass, not a toolkit migration.
+Research date: 2026-11-27. Direction explicitly selected by the owner: **Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over Fluent 2**, preserving TermCraft's existing layout, penguin and emerald identity. Windows 11 is the explicit visual reference; the earlier inference that Fluent 1 required Windows 10/UWP geometry was corrected before dialog migration. It is a refinement pass, not a toolkit migration.
 
 ## Primary design references
 
@@ -19,7 +19,7 @@ Research date: 2026-11-27. Direction explicitly selected by the owner: **Fluent 
 | [Keyboard accessibility](https://learn.microsoft.com/en-us/windows/apps/design/accessibility/keyboard-accessibility) | Keyboard is a primary interaction: visible focus, reading-order traversal and reachable controls. Modal focus must not leak to remote terminal or desktop input. |
 | [Accessible text](https://learn.microsoft.com/en-us/windows/apps/design/accessibility/accessible-text-requirements) | Normal text must maintain at least 4.5:1 contrast. Add symbols/text to status; do not rely solely on color. |
 
-Some historical UWP design URLs now redirect to current Windows guidance. The historical 2017 references and UWP APIs establish the requested era; current layout/accessibility rules supplement them without substituting Fluent 2's rounded geometry or Mica styling.
+Some historical UWP design URLs now redirect to current Windows guidance. Historical 2017 references explain the first-generation lighting concepts only. The owner subsequently corrected the OS visual reference to Windows 11. Current Windows desktop geometry and material rules therefore govern the appearance; Windows 10 geometry is not the target. No Fluent 2 web-toolkit migration is involved.
 
 ## User feedback and requests
 
@@ -38,4 +38,8 @@ These are individual user reports and discussions, not prevalence measurements o
 
 ## Decisions
 
-Use sharp-to-subtly-rounded Fluent 1 geometry, compact readable controls, consistent semantic emerald colors, bounded modeless tools and real modal confirmations. Preserve the terminal content renderer and remote protocol behavior. Effects must never obscure text, weaken trust dialogs, delay input or run perpetual idle animation. Use a solid material fallback rather than introducing an unverified blur pipeline. Native permission dialogs/file pickers and remote desktop/browser content are platform/remote-owned; their app-owned surrounding controls remain in scope.
+Use Windows 11 desktop geometry (4px controls, 8px overlays, square docked edges), compact readable controls, consistent semantic emerald colors, bounded modeless tools and real modal confirmations. Preserve the terminal content renderer and remote protocol behavior. Effects must never obscure text, weaken trust dialogs, delay input or run perpetual idle animation. Use a solid material fallback rather than introducing an unverified blur pipeline. Native permission dialogs/file pickers and remote desktop/browser content are platform/remote-owned; their app-owned surrounding controls remain in scope.
+
+## Windows 11 clarification — owner correction
+
+The owner explicitly specified **Windows 11, not Windows 10**. The preference for Fluent 1 does not authorize substituting an older Windows 10 visual style. Apply [Windows 11 geometry](https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/geometry): 4px controls/backplates, 8px dialogs/flyouts, square touching/docked edges. Use current desktop [material roles](https://learn.microsoft.com/en-us/windows/apps/design/signature-experiences/materials): Mica for suitable long-lived backdrops, Acrylic for suitable transient surfaces, and Smoke for modal blocking. [Mica guidance](https://learn.microsoft.com/en-us/windows/apps/design/style/mica) explicitly includes solid fallbacks. Native backdrop integration is unavailable in the present egui rendering contract; preserve an honest solid fallback rather than calling a color tint Mica or Acrylic. Keep restrained input feedback, accessible focus and modern dialog composition.

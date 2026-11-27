@@ -12,7 +12,7 @@
 
 ## Global constraints
 
-- Linux x86-64, Windows x64, Apple Silicon macOS arm64 only. Fluent 1, not Fluent 2; preserve emerald/penguin identity and established organization.
+- Linux x86-64, Windows x64, Apple Silicon macOS arm64 only. Windows 11 desktop Fluent, retaining the owner’s preference over Fluent 2; preserve emerald/penguin identity and established organization.
 - Preserve terminal/remote input, trust/authentication, vault secrecy, cancellation, dirty/overwrite/recovery behavior, stable IDs and user settings.
 - Every Cargo invocation uses `CARGO_BUILD_JOBS=2`, locked dependencies and isolated user/test data.
 - No assertions weakened, prerequisites skipped as qualification, claims of unobserved native behavior, or parity-count increases.
@@ -42,7 +42,7 @@ Interfaces: expose documented theme setup, semantic colors, focused/hover/presse
 Files: src/ui.rs shell/sidebar/tabs, src/ui/{layout,windows,shared_sessions,session_groups,shortcuts}.rs where navigation/owner behavior lives.
 
 - [ ] Apply shared states to rail, command tiles, session rows, tabs/close and split chrome; accessible names and keyboard activation.
-- [ ] Responsive toolbars/sidebar/status and long-title behavior, preserving actual drag-only width persistence and close-hit separation.
+- [ ] Responsive toolbars/sidebar/status and long-title behavior, preserving actual drag-only width persistence and close-hit separation. Remove the redundant name/theme header per owner steering; integrate the theme picker into the existing menu row.
 - [ ] Real pointer/keyboard selection/press/disabled/close workflows and focused regressions, commit and review.
 
 ## Task 3 — All dialogs, protocol forms and safety ownership

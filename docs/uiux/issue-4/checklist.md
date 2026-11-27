@@ -1,6 +1,6 @@
 # Issue #4 component and acceptance checklist
 
-Fluent 1. Starting research and independent source inventories are complete; implementation and runtime evidence are tracked below. An unchecked entry is not accepted. Retained components require a recorded reason and evidence just as changed components do. Native OS-owned surfaces and unobserved hardware/assistive-technology results remain explicit. Overall parity46/60 is unchanged.
+Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over Fluent 2. Starting research and independent source inventories are complete; implementation and runtime evidence are tracked below. An unchecked entry is not accepted. Retained components require a recorded reason and evidence just as changed components do. Native OS-owned surfaces and unobserved hardware/assistive-technology results remain explicit. Overall parity46/60 is unchanged.
 
 **Merge hold:** keep PR #8 open until the owner completes full human checks and explicitly approves merging.
 
@@ -9,9 +9,9 @@ Fluent 1. Starting research and independent source inventories are complete; imp
 | Batch | Status | Evidence |
 | --- | --- | --- |
 | Research and complete source inventories | Complete | research.md, screen-audit.md, dialog-audit.md |
-| 1. Shared Fluent 1 foundation | Independently reviewed at3f7de8d | Six current component tests and one actual-model disk round-trip passed; full app/native verification remains pending CI |
-| 2. Shell/navigation/tabs/splits | In progress | Task1 helpers are the shared basis |
-| 3. Dialogs and protocol forms | Pending | Complete source inventory in dialog-audit.md |
+| 1. Shared foundation | Independently reviewed throughca444ba | Windows 11 geometry correction approved; six current component tests and one actual-model disk round-trip passed; native integration pending |
+| 2. Shell/navigation/tabs/splits | Independently reviewed atb77581a | Seventeen actual-source component tests, strict remote-pane loading/ready probe and app type check passed; dedicated name/theme bar removed |
+| 3. Dialogs and protocol forms | In progress | Complete source inventory in dialog-audit.md |
 | 4. Specialist pages and web shell | Pending | Complete source inventory in screen-audit.md |
 | 5. Integrated visual/interaction verification | Pending | Before captures in before/; no human/native-only acceptance claimed |
 
