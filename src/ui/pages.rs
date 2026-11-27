@@ -498,7 +498,7 @@ impl Workspace {
         if !self.tabs[self.active].error.is_empty() {
             Frame::new()
                 .fill(ui.visuals().widgets.hovered.bg_fill)
-                .corner_radius(5)
+                .corner_radius(super::fluent::CONTROL_RADIUS)
                 .inner_margin(12)
                 .show(ui, |ui| {
                     ui.label(&self.tabs[self.active].error);

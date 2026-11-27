@@ -8,7 +8,9 @@ pub(super) const CONTROL_HEIGHT: f32 = 32.;
 pub(super) const PAGE_TITLE: f32 = 28.;
 pub(super) const DIALOG_TITLE: f32 = 20.;
 const CHROME_MARGIN: i8 = 16;
-const RADIUS: CornerRadius = CornerRadius::same(2);
+// Windows 11 rounds in-page controls and floating surfaces at different scales.
+pub(super) const CONTROL_RADIUS: CornerRadius = CornerRadius::same(4);
+pub(super) const OVERLAY_RADIUS: CornerRadius = CornerRadius::same(8);
 const STYLE_SETTINGS: &str = "termcraft-fluent-style-settings";
 
 #[derive(Clone, Copy)]
@@ -127,8 +129,8 @@ pub(super) fn setup(ctx: &Context, reduced_motion: bool, high_contrast: bool) {
         visuals.window_fill = p.floating;
         visuals.extreme_bg_color = p.surface;
         visuals.faint_bg_color = p.control;
-        visuals.window_corner_radius = RADIUS;
-        visuals.menu_corner_radius = RADIUS;
+        visuals.window_corner_radius = OVERLAY_RADIUS;
+        visuals.menu_corner_radius = OVERLAY_RADIUS;
         visuals.window_stroke = Stroke::new(1., p.border);
         visuals.window_shadow = egui::epaint::Shadow {
             offset: [0, 4],
@@ -153,7 +155,7 @@ pub(super) fn setup(ctx: &Context, reduced_motion: bool, high_contrast: bool) {
             widget.weak_bg_fill = fill;
             widget.bg_stroke = Stroke::new(width, border);
             widget.fg_stroke.color = p.text;
-            widget.corner_radius = RADIUS;
+            widget.corner_radius = CONTROL_RADIUS;
             widget.expansion = 0.;
         }
         style.visuals = visuals;
@@ -240,7 +242,7 @@ pub(super) fn paint_control(
         let painter = ui.painter();
         painter.rect(
             rect,
-            RADIUS,
+            CONTROL_RADIUS,
             fill,
             Stroke::new(1., border),
             StrokeKind::Inside,
@@ -271,7 +273,7 @@ pub(super) fn paint_control(
         if enabled && response.has_focus() {
             painter.rect_stroke(
                 rect.shrink(2.),
-                RADIUS,
+                CONTROL_RADIUS - 2,
                 Stroke::new(2., if primary { text } else { p.focus }),
                 StrokeKind::Inside,
             );
@@ -308,7 +310,7 @@ pub(super) fn surface(ui: &Ui) -> Frame {
     Frame::new()
         .fill(p.surface)
         .stroke(Stroke::new(1., p.border))
-        .corner_radius(RADIUS)
+        .corner_radius(CONTROL_RADIUS)
         .inner_margin(CHROME_MARGIN)
 }
 
@@ -383,14 +385,25 @@ pub(super) fn field(
 ) -> Response {
     let label = ui.add(Label::new(label).wrap());
     let width = ui.available_width().min(preferred_width).max(1.);
-    ui.add(
-        TextEdit::singleline(value)
-            .hint_text(hint)
-            .desired_width(width)
-            .min_size(vec2(0., CONTROL_HEIGHT))
-            .margin(Margin::symmetric(8, 4)),
-    )
-    .labelled_by(label.id)
+    let response = ui
+        .add(
+            TextEdit::singleline(value)
+                .hint_text(hint)
+                .desired_width(width)
+                .min_size(vec2(0., CONTROL_HEIGHT))
+                .margin(Margin::symmetric(8, 4)),
+        )
+        .labelled_by(label.id);
+    if response.enabled() && response.has_focus() {
+        let underline = response.rect.shrink2(vec2(4., 2.));
+        if underline.is_positive() {
+            ui.painter().line_segment(
+                [underline.left_bottom(), underline.right_bottom()],
+                Stroke::new(2., palette(ui).focus),
+            );
+        }
+    }
+    response
 }
 
 #[cfg(test)]
