@@ -210,8 +210,9 @@ fn refused_mouse_release_is_retried_after_transport_admission_recovers() {
     use super::terminal_mouse::Viewport;
     let (ctx, root, mut w) = owned_workspace();
     let resume = root.path().join("resume-reader");
+    let trace = root.path().join("reader-progress");
     let program = format!(
-        "import os,sys,tty,time\ntty.setraw(0)\nos.write(1,b'\\x1b[?1000h\\x1b[?1006hREADY')\ndata=os.read(0,4096)\nos.write(1,b'PRESS_ACK')\nwhile not os.path.exists(sys.argv[1]): time.sleep(.001)\n{MOUSE_RELEASE_SCANNER}\nwhile True:\n data=os.read(0,32768)\n if not data: break\n if release_received(data): os.write(1,b'RELEASE_ACK')"
+        "import os,sys,tty,time\ntty.setraw(0)\nos.write(1,b'\\x1b[?1000h\\x1b[?1006hREADY')\ndata=os.read(0,4096)\nos.write(1,b'PRESS_ACK')\nwhile not os.path.exists(sys.argv[1]): time.sleep(.001)\n{MOUSE_RELEASE_SCANNER}\nreceived=0\nnext_trace=0\nwhile True:\n data=os.read(0,32768)\n if not data: break\n received+=len(data)\n released=release_received(data)\n now=time.monotonic()\n if released or now>=next_trace:\n  with open(sys.argv[2],'w') as trace: trace.write(str(received)+' '+data[-64:].hex())\n  next_trace=now+.05\n if released: os.write(1,b'RELEASE_ACK')"
     );
     w.start_with_launch(
         Session {
@@ -226,6 +227,7 @@ fn refused_mouse_release_is_retried_after_transport_admission_recovers() {
                 "-c".into(),
                 program.into(),
                 resume.to_str().unwrap().into(),
+                trace.to_str().unwrap().into(),
             ],
             directory: None,
         }),
@@ -275,16 +277,18 @@ fn refused_mouse_release_is_retried_after_transport_admission_recovers() {
     }
     // The background writer can dequeue its first item just after try_send reports Full.
     // Establish sustained kernel/queue backpressure before asserting refusal of the release.
+    // Queue admission is bounded by message count. Small messages exercise the
+    // same Full/retry path without putting a megabyte of unrelated bulk input
+    // ahead of the mouse event whose delivery this fixture needs to observe.
     let deadline = Instant::now() + Duration::from_secs(3);
     let mut full_samples = 0;
+    let mut accepted_filler = 0;
     while full_samples < 5 {
-        match w.tabs[0]
-            .process
-            .as_mut()
-            .unwrap()
-            .write(&vec![b'x'; 32768])
-        {
-            Ok(()) => full_samples = 0,
+        match w.tabs[0].process.as_mut().unwrap().write(&[b'x'; 1024]) {
+            Ok(()) => {
+                accepted_filler += 1024;
+                full_samples = 0;
+            }
             Err(error) => {
                 assert!(error.contains("queue full"));
                 full_samples += 1;
@@ -319,7 +323,9 @@ fn refused_mouse_release_is_retried_after_transport_admission_recovers() {
     }
     assert!(
         w.tabs[0].screen.plain().contains("RELEASE_ACK"),
-        "release ACK missing: pending={}, running={}, error={}, screen={:?}",
+        "release ACK missing: accepted_filler={}, reader_progress={:?}, pending={}, running={}, error={}, screen={:?}",
+        accepted_filler,
+        fs::read_to_string(&trace),
         w.tabs[0].pending_mouse.is_some(),
         w.tabs[0].running(),
         w.tabs[0].error,
