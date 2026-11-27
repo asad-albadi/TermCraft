@@ -108,7 +108,7 @@ A checked component has a recorded change or retention decision. Consult the val
 - [x] Current-source native Linux development visual captures and before/after comparisons
 - [x] Required Linux x86-64, Windows x64 and Apple Silicon macOS regression lanes at `c2dded6`
 - [x] Independent implementation reviews and final whole-branch source review. The optional-font correction in `36ba3ba` passed scoped review. The subsequent evidence review identified a detached History contrast defect. The correction and its native evidence passed scoped review at `5575601`.
-- [ ] Final evidence and platform-package review
+- [x] Final technical review approved the specification, code quality, distribution evidence and platform packages for `c2dded6`.
 - [ ] Human checks — owner explicitly required before merge
 
 
@@ -116,7 +116,7 @@ A checked component has a recorded change or retention decision. Consult the val
 
 The integrated Linux suite on `c2dded6` passed 61 production cases. The separate shared-component suite passed all ten cases. It used the existing pre-adapter graphics dependencies. The native screenshots cover the three theme selections and three real window scales on an isolated X11 display. The browser checks exercised the actual app-owned noVNC assets in Chromium. See the [capture manifest](captures/manifest.json) and [validation record](validation.md) for exact scope.
 
-[Run 46010039731](https://github.com/asad-albadi/TermCraft/actions/runs/46010039731) passed the earlier dialog source `eb439c9` on Linux x86-64, Windows x64 and Apple Silicon macOS. The [corrected CI run](https://github.com/asad-albadi/TermCraft/actions/runs/46023041969) passed on all three platforms. Linux and macOS native package jobs also passed in the [unsigned build](https://github.com/asad-albadi/TermCraft/actions/runs/46023047742). Windows package and aggregate validation are outstanding at this evidence update. The [preceding candidate build](https://github.com/asad-albadi/TermCraft/actions/runs/46018225239) for `36ba3ba` was canceled and supplied no accepted packages.
+[Run 46010039731](https://github.com/asad-albadi/TermCraft/actions/runs/46010039731) passed the earlier dialog source `eb439c9` on Linux x86-64, Windows x64 and Apple Silicon macOS. The [corrected CI run](https://github.com/asad-albadi/TermCraft/actions/runs/46023041969) passed on all three platforms. All three regression jobs, all three native package jobs and the aggregate inventory check passed in the [unsigned build](https://github.com/asad-albadi/TermCraft/actions/runs/46023047742). The [preceding candidate build](https://github.com/asad-albadi/TermCraft/actions/runs/46018225239) for `36ba3ba` was canceled and supplied no accepted packages.
 
 The detached-client correction includes a real native-child regression and [Light](captures/detached-light-100.png) and [Dark](captures/detached-dark-100.png) evidence at 360×260. The History label measured 15.23:1 and 15.62:1 respectively, up from 1.35:1 in the original System/Light capture.
 
