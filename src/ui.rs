@@ -582,6 +582,7 @@ pub struct Workspace {
     store: Store,
     store_path: PathBuf,
     store_ok: bool,
+    settings_load_error: Option<String>,
     packages: packages::State,
     plugins: plugins::State,
     page: Page,
@@ -731,9 +732,9 @@ impl Workspace {
         );
         ctx.set_fonts(fonts);
         let store_path = data_dir.join("workspace.json");
-        let (store, store_ok, status) = match Store::load(&store_path) {
-            Ok(s) => (s, true, "Ready".into()),
-            Err(e) => (Store::default(), false, e),
+        let (store, settings_load_error) = match Store::load(&store_path) {
+            Ok(store) => (store, None),
+            Err(error) => (Store::default(), Some(error)),
         };
         ctx.set_theme(theme_preference(store.preferences.appearance));
         fluent::setup(
@@ -746,7 +747,8 @@ impl Workspace {
             desktop_theme: None,
             store,
             store_path,
-            store_ok,
+            store_ok: settings_load_error.is_none(),
+            settings_load_error,
             packages: Default::default(),
             plugins: Default::default(),
             page: Page::Home,
@@ -808,9 +810,9 @@ impl Workspace {
             managed_cron: Default::default(),
             managed_ssh_iperf: Default::default(),
             managed_vnc: Default::default(),
-            status,
+            status: "Ready".into(),
             status_time: Instant::now(),
-            status_error: !store_ok,
+            status_error: false,
             quick_host: String::new(),
             quick_protocol: "SSH".into(),
             layout_state: harbor_workspace::workspace::layout::LayoutState::default(),
@@ -855,7 +857,7 @@ impl Workspace {
             return;
         }
         if !self.store_ok {
-            self.message(
+            self.error_message(
                 "Settings are damaged; export a backup before resetting them in Settings.",
             );
             return;
@@ -1252,25 +1254,6 @@ impl Workspace {
             )
     }
     fn top(&mut self, root: &mut Ui) {
-        Panel::top("title")
-            .frame(
-                Frame::new()
-                    .fill(mist(root))
-                    .inner_margin(Margin::symmetric(12, 6)),
-            )
-            .show(root, |ui| {
-                ui.horizontal(|ui| {
-                    ui.add(Image::new(&self.logo).fit_to_exact_size(vec2(24., 24.)));
-                    ui.label(
-                        RichText::new("TermCraft — Personal edition")
-                            .size(13.)
-                            .strong(),
-                    );
-                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        self.appearance_picker(ui);
-                    });
-                });
-            });
         Panel::top("menus")
             .frame(
                 Frame::new()
@@ -1279,133 +1262,140 @@ impl Workspace {
             )
             .show(root, |ui| {
                 egui::MenuBar::new().ui(ui, |ui| {
-                    ui.menu_button("Sessions", |ui| {
-                        if ui.button("New session").clicked() {
-                            self.new_session("SSH");
-                            ui.close();
-                        }
-                        if ui.button("Start local terminal").clicked() {
-                            self.local();
-                            ui.close();
-                        }
-                        ui.separator();
-                        if ui.button("SSH keys and agents…").clicked() {
-                            self.ssh_keys.open = true;
-                            ui.close();
-                        }
-                        if ui.button("Credential vault…").clicked() {
-                            self.credentials.open = true;
-                            ui.close();
-                        }
-                        if ui.button("Shared session sources…").clicked() {
-                            self.shared_sources.manager = true;
-                            ui.close();
-                        }
-                        if ui.button("Import MobaXterm sessions…").clicked() {
-                            self.choose_session_import(session_import::Format::Moba, ui.ctx());
-                            ui.close();
-                        }
-                        if ui.button("Import PuTTY sessions…").clicked() {
-                            self.choose_session_import(session_import::Format::Putty, ui.ctx());
-                            ui.close();
-                        }
-                        if ui.button("Saved sessions").clicked() {
-                            self.page = Page::Home;
-                            ui.close();
-                        }
-                        if ui.button("Local files").clicked() {
-                            self.page = Page::Files;
-                            ui.close();
-                        }
-                    });
-                    ui.menu_button("View", |ui| {
-                        if ui.button("Home tab").clicked() {
-                            self.page = Page::Home;
-                            ui.close();
-                        }
-                        if ui
-                            .checkbox(&mut self.store.preferences.sidebar_visible, "Show sidebar")
-                            .changed()
-                        {
-                            self.persist();
-                        }
-                        if ui
-                            .button(if self.windows.fullscreen(0) {
-                                "Restore main window"
-                            } else {
-                                "Fullscreen main window"
-                            })
-                            .clicked()
-                        {
-                            self.toggle_window_fullscreen(ui.ctx(), 0);
-                            ui.close();
-                        }
-                        if ui.button("Keyboard shortcuts…").clicked() {
-                            self.shortcut_editor_open = true;
-                            ui.close();
-                        }
-                        self.layout_picker(ui);
-                        self.broadcast_toggle(ui);
-                    });
-                    ui.menu_button("X server", |ui| {
-                        ui.label("Use an installed system X server.");
-                        if ui.button("X server settings").clicked() {
-                            self.page = Page::Servers;
-                            ui.close();
-                        }
-                    });
-                    ui.menu_button("Tools", |ui| {
-                        for (label, page) in [
-                            ("Network tools and plugins", Page::Tools),
-                            ("Servers", Page::Servers),
-                            ("SSH tunneling", Page::Tunnels),
-                            ("Local files", Page::Files),
-                        ] {
-                            if ui.button(label).clicked() {
-                                self.page = page;
+                    ui.horizontal_wrapped(|ui| {
+                        ui.menu_button("Sessions", |ui| {
+                            if ui.button("New session").clicked() {
+                                self.new_session("SSH");
                                 ui.close();
                             }
-                        }
-                    });
-                    ui.menu_button("Games", |ui| {
-                        self.games_menu(ui);
+                            if ui.button("Start local terminal").clicked() {
+                                self.local();
+                                ui.close();
+                            }
+                            ui.separator();
+                            if ui.button("SSH keys and agents…").clicked() {
+                                self.ssh_keys.open = true;
+                                ui.close();
+                            }
+                            if ui.button("Credential vault…").clicked() {
+                                self.credentials.open = true;
+                                ui.close();
+                            }
+                            if ui.button("Shared session sources…").clicked() {
+                                self.shared_sources.manager = true;
+                                ui.close();
+                            }
+                            if ui.button("Import MobaXterm sessions…").clicked() {
+                                self.choose_session_import(session_import::Format::Moba, ui.ctx());
+                                ui.close();
+                            }
+                            if ui.button("Import PuTTY sessions…").clicked() {
+                                self.choose_session_import(session_import::Format::Putty, ui.ctx());
+                                ui.close();
+                            }
+                            if ui.button("Saved sessions").clicked() {
+                                self.page = Page::Home;
+                                ui.close();
+                            }
+                            if ui.button("Local files").clicked() {
+                                self.page = Page::Files;
+                                ui.close();
+                            }
+                        });
+                        ui.menu_button("View", |ui| {
+                            if ui.button("Home tab").clicked() {
+                                self.page = Page::Home;
+                                ui.close();
+                            }
+                            if ui
+                                .checkbox(
+                                    &mut self.store.preferences.sidebar_visible,
+                                    "Show sidebar",
+                                )
+                                .changed()
+                            {
+                                self.persist();
+                            }
+                            if ui
+                                .button(if self.windows.fullscreen(0) {
+                                    "Restore main window"
+                                } else {
+                                    "Fullscreen main window"
+                                })
+                                .clicked()
+                            {
+                                self.toggle_window_fullscreen(ui.ctx(), 0);
+                                ui.close();
+                            }
+                            if ui.button("Keyboard shortcuts…").clicked() {
+                                self.shortcut_editor_open = true;
+                                ui.close();
+                            }
+                            self.layout_picker(ui);
+                            self.broadcast_toggle(ui);
+                        });
+                        ui.menu_button("X server", |ui| {
+                            ui.label("Use an installed system X server.");
+                            if ui.button("X server settings").clicked() {
+                                self.page = Page::Servers;
+                                ui.close();
+                            }
+                        });
+                        ui.menu_button("Tools", |ui| {
+                            for (label, page) in [
+                                ("Network tools and plugins", Page::Tools),
+                                ("Servers", Page::Servers),
+                                ("SSH tunneling", Page::Tunnels),
+                                ("Local files", Page::Files),
+                            ] {
+                                if ui.button(label).clicked() {
+                                    self.page = page;
+                                    ui.close();
+                                }
+                            }
+                        });
+                        ui.menu_button("Games", |ui| {
+                            self.games_menu(ui);
+                            ui.separator();
+                            self.screensaver_settings(ui);
+                        });
+                        ui.menu_button("Settings", |ui| {
+                            if ui.button("Configuration").clicked() {
+                                self.page = Page::Settings;
+                                ui.close();
+                            }
+                        });
+                        let macro_menu = if self.macro_recording() {
+                            "Macros · Recording"
+                        } else {
+                            "Macros"
+                        };
+                        ui.menu_button(macro_menu, |ui| {
+                            self.macro_controls(ui);
+                            if ui.button("Manage macros").clicked() {
+                                self.page = Page::Macros;
+                                ui.close();
+                            }
+                        });
+                        ui.menu_button("Help", |ui| {
+                            ui.label(RichText::new("TermCraft personal workspace").strong());
+                            if ui.button("Feature parity and known differences").clicked() {
+                                self.parity_open = true;
+                                ui.close();
+                            }
+                            ui.hyperlink_to(
+                                "Original documentation",
+                                "https://mobaxterm.mobatek.net/documentation.html",
+                            );
+                            ui.label("Create a Session to connect to a remote host.");
+                            ui.label("Double-click a saved session or focus it and press Enter.");
+                            ui.label(self.shortcut_hint(Action::NewSession, "New session"));
+                            ui.label(self.shortcut_hint(Action::NewTerminal, "New local terminal"));
+                            ui.separator();
+                            ui.label("System clients provide remote protocols and X11.");
+                        });
                         ui.separator();
-                        self.screensaver_settings(ui);
-                    });
-                    ui.menu_button("Settings", |ui| {
-                        if ui.button("Configuration").clicked() {
-                            self.page = Page::Settings;
-                            ui.close();
-                        }
-                    });
-                    let macro_menu = if self.macro_recording() {
-                        "Macros · Recording"
-                    } else {
-                        "Macros"
-                    };
-                    ui.menu_button(macro_menu, |ui| {
-                        self.macro_controls(ui);
-                        if ui.button("Manage macros").clicked() {
-                            self.page = Page::Macros;
-                            ui.close();
-                        }
-                    });
-                    ui.menu_button("Help", |ui| {
-                        ui.label(RichText::new("TermCraft personal workspace").strong());
-                        if ui.button("Feature parity and known differences").clicked() {
-                            self.parity_open = true;
-                            ui.close();
-                        }
-                        ui.hyperlink_to(
-                            "Original documentation",
-                            "https://mobaxterm.mobatek.net/documentation.html",
-                        );
-                        ui.label("Create a Session to connect to a remote host.");
-                        ui.label("Double-click a saved session or focus it and press Enter.");
-                        ui.label(self.shortcut_hint(Action::NewSession, "New session"));
-                        ui.label(self.shortcut_hint(Action::NewTerminal, "New local terminal"));
-                        ui.separator();
-                        ui.label("System clients provide remote protocols and X11.");
+                        self.appearance_picker(ui);
                     });
                 });
             });
@@ -1529,7 +1519,7 @@ impl Workspace {
             .show(root, |ui| {
                 ui.horizontal(|ui| {
                     let palette = fluent::palette(ui);
-                    let error = self.status_error || !self.store_ok;
+                    let error = self.status_error;
                     let text = if !error && self.status_time.elapsed() > Duration::from_secs(12) {
                         "Ready"
                     } else {
@@ -1554,6 +1544,10 @@ impl Workspace {
                                 .size(12.)
                                 .color(palette.secondary_text),
                         );
+                        if let Some(diagnostic) = &self.settings_load_error {
+                            ui.colored_label(palette.error, "Settings damaged")
+                                .on_hover_text(diagnostic);
+                        }
                         ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
                             ui.add(
                                 Label::new(RichText::new(text).size(12.).color(if error {
@@ -2249,7 +2243,14 @@ fn workspace_tab(
     let leading = if running.is_some() { 26. } else { 12. };
     let trailing = if closable { 38. } else { 12. };
     let width = (title_width + leading + trailing).clamp(76., 240.);
-    let (rect, response) = ui.allocate_exact_size(vec2(width, 38.), Sense::click());
+    let (_, rect) = ui.allocate_space(vec2(width, 38.));
+    // Terminal IDs start at one. Zero is reserved here for the Home tab.
+    let body = if id == 0 {
+        ui.id().with("home-tab")
+    } else {
+        ui.id().with(("terminal-tab", id))
+    };
+    let response = ui.interact(rect, body, Sense::click());
     let close_rect = Rect::from_center_size(
         pos2(rect.right() - 18., rect.center().y),
         Vec2::splat(fluent::CONTROL_HEIGHT),
@@ -2964,6 +2965,71 @@ mod gui_tests {
     }
 
     #[test]
+    fn theme_is_in_the_menu_band_and_keyboard_selectable_at_main_minimum() {
+        let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
+        let size = vec2(640., 480.);
+        let mut draw = |events| shell_frame(&ctx, size, 2., events, |ui| workspace.top(ui));
+        draw(vec![]);
+        let output = draw(vec![]);
+        let menu = shell_text_position(&output, "View");
+        let theme = shell_text_position(&output, "Theme");
+        for label in ["Games", "Macros", "Help", "Settings", "System"] {
+            let position = shell_text_position(&output, label);
+            assert!((position.y - menu.y).abs() < 8.);
+        }
+        assert!(theme.x > menu.x);
+        assert!((theme.y - menu.y).abs() < 8.);
+        assert!(menu.y < 40.);
+        assert!(egui::containers::panel::PanelState::load(&ctx, Id::new("title")).is_none());
+
+        for _ in 0..9 {
+            draw(vec![shell_key(Key::Tab, Modifiers::NONE)]);
+        }
+        draw(vec![shell_key(Key::Enter, Modifiers::NONE)]);
+        let popup = draw(vec![]);
+        shell_text_position(&popup, "Dark");
+        for _ in 0..4 {
+            draw(vec![shell_key(Key::Tab, Modifiers::NONE)]);
+        }
+        draw(vec![shell_key(Key::Enter, Modifiers::NONE)]);
+        assert_eq!(workspace.store.preferences.appearance, Appearance::Dark);
+        assert_eq!(ctx.theme(), Theme::Dark);
+    }
+
+    #[test]
+    fn damaged_settings_indicator_does_not_reclassify_normal_status_text() {
+        let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
+        workspace.store_ok = false;
+        workspace.settings_load_error = Some("Could not parse workspace settings".into());
+        workspace.message("Shortcut creation canceled.");
+        let size = vec2(640., 480.);
+        let draw =
+            |workspace: &mut Workspace| shell_frame(&ctx, size, 1., vec![], |ui| workspace.top(ui));
+        draw(&mut workspace);
+        let output = draw(&mut workspace);
+        let color = |text: &str| {
+            output
+                .shapes
+                .iter()
+                .find_map(|shape| match &shape.shape {
+                    egui::Shape::Text(shape) if shape.galley.text() == text => {
+                        Some(shape.galley.job.sections[0].format.color)
+                    }
+                    _ => None,
+                })
+                .unwrap()
+        };
+        assert_ne!(
+            color("Shortcut creation canceled."),
+            color("Settings damaged")
+        );
+        workspace.status_time = Instant::now() - Duration::from_secs(30);
+        let expired = draw(&mut workspace);
+        shell_text_position(&expired, "Ready");
+        shell_text_position(&expired, "Settings damaged");
+    }
+
+    #[test]
     fn commands_wrap_without_losing_exit_or_x_server_at_main_minimum() {
         for scale in [1., 1.5, 2.] {
             let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
@@ -3153,6 +3219,44 @@ mod gui_tests {
                 "session activation count; by keyboard = {by_keyboard}"
             );
         }
+    }
+
+    #[test]
+    fn tab_keyboard_menu_tracks_terminal_after_earlier_tab_is_removed() {
+        let ctx = Context::default();
+        fluent::setup(&ctx, true, false);
+        let mut target = None;
+        let mut draw = |ids: &[u64], events| {
+            let mut target_response = None;
+            shell_frame(&ctx, vec2(640., 480.), 1., events, |ui| {
+                ui.horizontal(|ui| {
+                    for &id in ids {
+                        let title = format!("Terminal {id}");
+                        let (response, _) = workspace_tab(ui, &title, false, Some(true), true, id);
+                        if id == 2 {
+                            target_response = Some(response.id);
+                        }
+                        context_actions(&response, |ui, focus_first| {
+                            if context_item(ui, "Rename tab…", focus_first) {
+                                target = Some(id);
+                                ui.close();
+                            }
+                        });
+                    }
+                });
+            });
+            target_response.unwrap()
+        };
+        let id = draw(&[1, 2, 3], vec![]);
+        ctx.memory_mut(|memory| memory.request_focus(id));
+        draw(&[1, 2, 3], vec![shell_key(Key::F10, Modifiers::SHIFT)]);
+        draw(&[1, 2, 3], vec![]);
+        assert!(Popup::is_id_open(&ctx, id.with("popup")));
+        assert_eq!(draw(&[2, 3], vec![]), id);
+        assert!(Popup::is_id_open(&ctx, id.with("popup")));
+        draw(&[2, 3], vec![shell_key(Key::Enter, Modifiers::NONE)]);
+        assert_eq!(target, Some(2));
+        assert!(ctx.memory(|memory| memory.has_focus(id)));
     }
 
     #[test]

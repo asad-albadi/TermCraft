@@ -1030,71 +1030,92 @@ mod transfer_tests {
     use harbor_workspace::remote_files::{RemoteEntry, transfer::TransferOperation};
     #[test]
     fn old_listing_rows_cannot_be_selected_during_navigation() {
-        fn find(shape: &egui::epaint::Shape) -> Option<Pos2> {
-            match shape {
-                egui::epaint::Shape::Text(t) if t.galley.text().contains("stale-entry") => {
-                    Some(t.pos + vec2(8., 5.))
-                }
-                egui::epaint::Shape::Vec(shapes) => shapes.iter().find_map(find),
-                _ => None,
-            }
-        }
-        let ctx = Context::default();
-        let mut workspace = Workspace::new_context(
-            &ctx,
-            None,
-            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/stale-selection-test"),
-        );
+        use crate::ui::{gui_tests::shell_text_position, terminal_review_tests::owned_workspace};
+        let (ctx, _root, mut workspace) = owned_workspace();
         workspace.start(Session {
             host: "127.0.0.1".into(),
             port: 1,
             ..Default::default()
         });
         let tab = &mut workspace.tabs[0];
+        // This test owns the listing state. A real worker must not update it during a frame.
+        drop(tab.ssh.take());
         tab.ssh_connected = true;
         let browser = tab.browser.as_mut().unwrap();
         browser.loading = true;
         browser.path = RemotePath::from_bytes(b"/old".to_vec()).unwrap();
+        let path = RemotePath::from_bytes(b"/old/stale-entry".to_vec()).unwrap();
         browser.entries = vec![RemoteEntry {
-            path: RemotePath::from_bytes(b"/old/stale-entry".to_vec()).unwrap(),
+            path: path.clone(),
             display_name: "stale-entry".into(),
             kind: EntryKind::File,
             size: Some(1),
         }];
         let screen = Some(Rect::from_min_size(Pos2::ZERO, vec2(1360., 1000.)));
-        let mut output = ctx.run_ui(
-            RawInput {
-                screen_rect: screen,
-                time: Some(0.),
-                ..Default::default()
-            },
-            |ui| workspace.render(ui),
-        );
-        let point = output.shapes.iter().find_map(|s| find(&s.shape)).unwrap();
-        output.textures_delta.clear();
-        for (pressed, time) in [(true, 0.1), (false, 0.2)] {
+        let draw = |workspace: &mut Workspace, time, events| {
             let mut output = ctx.run_ui(
                 RawInput {
                     screen_rect: screen,
                     time: Some(time),
-                    events: vec![
-                        Event::PointerMoved(point),
-                        Event::PointerButton {
-                            pos: point,
-                            button: PointerButton::Primary,
-                            pressed,
-                            modifiers: Modifiers::NONE,
-                        },
-                    ],
+                    events,
                     ..Default::default()
                 },
                 |ui| workspace.render(ui),
             );
             output.textures_delta.clear();
-        }
+            output
+        };
+        let output = draw(&mut workspace, 0., vec![]);
+        let heading = shell_text_position(&output, "Remote files");
+        draw(
+            &mut workspace,
+            0.1,
+            vec![
+                Event::PointerMoved(heading),
+                Event::MouseWheel {
+                    unit: MouseWheelUnit::Point,
+                    delta: vec2(0., -320.),
+                    phase: TouchPhase::Move,
+                    modifiers: Modifiers::NONE,
+                },
+            ],
+        );
+        let click_row = |workspace: &mut Workspace, time| {
+            let output = draw(workspace, time, vec![]);
+            let position = shell_text_position(&output, "·  stale-entry");
+            for (pressed, offset) in [(true, 0.1), (false, 0.2)] {
+                draw(
+                    workspace,
+                    time + offset,
+                    vec![
+                        Event::PointerMoved(position),
+                        Event::PointerButton {
+                            pos: position,
+                            button: PointerButton::Primary,
+                            pressed,
+                            modifiers: Modifiers::NONE,
+                        },
+                    ],
+                );
+            }
+        };
+        click_row(&mut workspace, 0.2);
+        let tab = &mut workspace.tabs[0];
+        assert!(tab.ssh_connected && tab.browser.as_ref().unwrap().loading);
         assert!(
-            workspace.tabs[0].transfer_ui.selected.is_none(),
+            tab.transfer_ui.selected.is_none(),
             "A stale listing row became the action target while navigating"
+        );
+        tab.browser.as_mut().unwrap().loading = false;
+        click_row(&mut workspace, 1.);
+        assert_eq!(
+            workspace.tabs[0]
+                .transfer_ui
+                .selected
+                .as_ref()
+                .map(|entry| &entry.path),
+            Some(&path),
+            "The same visible row must be selectable when navigation completes"
         );
     }
     #[test]

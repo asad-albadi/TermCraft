@@ -1276,8 +1276,8 @@ impl Workspace {
     }
     pub(super) fn appearance_picker(&mut self, ui: &mut Ui) {
         let mut appearance = self.store.preferences.appearance;
-        ComboBox::from_id_salt("appearance")
-            .width(100.)
+        ComboBox::from_label("Theme")
+            .width(72.)
             .selected_text(format!("{appearance:?}"))
             .show_ui(ui, |ui| {
                 for (value, label) in [
@@ -1353,10 +1353,7 @@ impl Workspace {
         ScrollArea::vertical().show(ui,|ui|{
             surface(ui).show(ui, |ui| {
                 ui.heading(RichText::new("Appearance").size(20.));
-                ui.horizontal_wrapped(|ui| {
-                    ui.label("Theme");
-                    self.appearance_picker(ui);
-                });
+                self.appearance_picker(ui);
                 let reduced_motion = ui.checkbox(
                     &mut self.store.preferences.reduced_motion,
                     "Reduce interface motion",
@@ -1375,7 +1372,7 @@ impl Workspace {
    surface(ui).show(ui,|ui|{ui.label(RichText::new("Sessions and backups").size(18.).strong());ui.label(RichText::new("Session settings, folders, tunnels and macros are stored locally. Exported backups contain hostnames and key-file paths, but no passwords.").color(muted(ui)));ui.horizontal(|ui|{
     if ui.button("Export workspace").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("termcraft-workspace.json").save_file(){match self.store.save(&p){Ok(())=>self.message("Workspace exported"),Err(e)=>self.message(e)}}}
     if ui.button("Import workspace").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Workspace JSON",&["json"]).pick_file(){match Store::load_bounded(&p, 16 * 1024 * 1024).and_then(|mut imported| { let mut macros = self.store.macros.clone(); macros.append(&mut imported.macros); super::macro_events::validate_library(&macros)?; imported.macros = macros; Ok(imported) }) { Ok(imported) => { self.store.sessions.extend(imported.sessions.into_iter().map(|mut session| {session.id=harbor_workspace::model::new_session_id();session})); self.store.tunnels.extend(imported.tunnels.into_iter().take(5_usize.saturating_sub(self.store.tunnels.len()))); self.store.macros = imported.macros; self.persist(); }, Err(error) => self.message(error) }}}
-   });if !self.store_ok{ui.colored_label(Color32::from_rgb(180,42,42),"The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.persist();},Err(e)=>self.message(e.to_string())}}}});
+   });if !self.store_ok{ui.colored_label(Color32::from_rgb(180,42,42),"The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.settings_load_error=None;self.persist();},Err(e)=>self.message(e.to_string())}}}});
    ui.add_space(17.);surface(ui).show(ui,|ui|{ui.label(RichText::new("About TermCraft").size(18.).strong());ui.label("An independently written Rust desktop remote workspace with a Fluent-inspired interface.");ui.label(RichText::new("Built with eframe/egui and OpenSSH. No original branding or bundled engines are reused.").size(12.).color(muted(ui)));ui.add_space(5.);ui.label(RichText::new("Original feature parity has not been established. Linux terminal operation is tested; Windows and macOS need platform validation. See Network tools for engine availability and known gaps.").size(12.).color(muted(ui)));});
   });
     }
