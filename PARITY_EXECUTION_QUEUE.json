@@ -1090,7 +1090,7 @@
     "date": "2026-11-27",
     "pr": 7,
     "reviewed_implementation_commit": "922bc49",
-    "status": "Implementation reviewed; final-source native qualification pending",
+    "status": "Whole-branch code review approved; final-source native qualification pending",
     "ci_run": 45962965162,
     "ci_source": "68df7d7",
     "ci_result": "success on all three platforms",
@@ -1100,6 +1100,9 @@
     "evidence": "docs/parity-evidence/release-automation/2026-11-27-p08.md",
     "implementation_checkpoints": 46,
     "strict_verified_complete": 0,
-    "publication": "No tag or public release created; manual dispatch never publishes"
+    "publication": "No tag or public release created; manual dispatch never publishes",
+    "final_code_review_commit": "a170a25",
+    "local_release_cases_passed": 34,
+    "publication_metadata": "Verified public summaries and raw evidence hashes only; unknown diagnostic fields excluded and covered at staging and assembly."
   }
 }
