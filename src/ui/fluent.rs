@@ -480,7 +480,7 @@ pub(super) fn form_row<T>(ui: &mut Ui, name: &str, controls: impl FnOnce(&mut Ui
             let label = ui
                 .allocate_ui_with_layout(
                     vec2(146., CONTROL_HEIGHT),
-                    egui::Layout::top_down(egui::Align::Min),
+                    egui::Layout::left_to_right(egui::Align::Center),
                     |ui| {
                         ui.set_width(146.);
                         ui.label(name)
@@ -524,6 +524,7 @@ pub(super) fn text_input(
             TextEdit::singleline(value)
                 .hint_text(hint)
                 .desired_width(width)
+                .vertical_align(egui::Align::Center)
                 .min_size(vec2(0., CONTROL_HEIGHT))
                 .margin(Margin::symmetric(8, 4)),
         )

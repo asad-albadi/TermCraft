@@ -272,6 +272,10 @@ fn real_session_rows_name_their_controls_and_allocate_readable_space() {
                 }
                 if width > 500. {
                     assert!(
+                        ((bounds.y0 + bounds.y1) - (field.y0 + field.y1)).abs() <= 2.,
+                        "{protocol}/{label}: {bounds:?} {field:?}"
+                    );
+                    assert!(
                         field.x0 >= bounds.x1 - 1.,
                         "{protocol}/{label}: {bounds:?} {field:?}"
                     );
