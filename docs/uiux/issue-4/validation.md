@@ -128,3 +128,8 @@ The actual unsigned Linux core archive from the verified package job ran under a
 ## Platform and acceptance limits
 
 The native file and directory pickers, OS permission prompts, window decorations and accessibility clients are platform-owned. Remote game/terminal/browser/desktop content and third-party noVNC bytes retain their respective renderers. Physical monitor DPI switching, actual screen-reader speech and focus handoff, OS permission decisions, independent endpoint interoperability and owner visual approval require their own evidence. No change to the recorded 46/60 feature parity. PR #8 remains subject to full human checks and fresh explicit merge approval.
+
+
+## Human-review correction platform verification
+
+The rejected c2 UI is superseded by the correction documented in [human-review-correction.md](human-review-correction.md). Full CI 46037789416 passed all three native jobs at `9c6f10c` (production/UI source `6e58b3c`). The duplicate Linux package regression passed 275 application UI cases but exposed the pre-existing scheduler snapshot race, addressed solely in the test fixture at `abd621e` with all original bounds preserved. Its scoped review and 30-repeat check passed; current-head full CI and native package completion are tracked separately. Published correction development captures retain their recorded source/binary identities and limitations.

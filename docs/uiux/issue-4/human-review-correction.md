@@ -38,3 +38,11 @@ Source `8c50a010f8aeb96cfc03ff2e5d6fc672b40241ff` incorporates the independent r
 The first full Linux run at `e8347a2` found one missed UI case: the simplified shared-session heading no longer explicitly said read-only. That application target reported 274 passed, one failed and eight ignored. The CI/package runs at that head were cancelled and are not accepted replacement builds.
 
 Source `6e58b3c397313eb8c1aba49a8b0493f733ca1652` restores the concise “Shared sessions · read-only” heading. The test checks read-only, source name, cached/stale state and the shared session's name. The missing state was reproduced before the fix; nine covering cases passed after it, including shared-source cache/restart/no-overwrite and canceled credential/prompt guards. This set overlaps earlier focused checks. Current-source full CI and unsigned packages are being rerun after scoped review; owner acceptance remains open.
+
+## Scheduler fixture synchronization
+
+The corrected application's full native CI at `9c6f10c` passed on Linux, Windows x64 and Apple Silicon: [run 46037789416](https://github.com/asad-albadi/TermCraft/actions/runs/46037789416). The duplicate Linux regression in the package workflow separately hit a pre-existing scheduler-test race; all 275 application UI cases passed there too.
+
+Test-only commit `abd621e` waits for the scheduler's published job status as well as the four child-process markers before asserting exactly two process-limit skips. It preserves the original one-second service lifetime, stopped-state, file-content and log-bound checks. Production scheduler and application code are unchanged. The updated fixture passed 30 scoped runs; the baseline also passed 30 locally, so the package CI log remains the observed failure. Scoped independent review approved the correction. Fresh full CI verifies the test-only commit.
+
+The unsigned native packages being built at `9c6f10c` contain every production/UI correction. They remain identified by that exact source revision; a subsequent test-only change does not relabel their identity. No failed aggregate run is described as green, and no release or merge is authorized.
