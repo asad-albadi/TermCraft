@@ -4,7 +4,9 @@ param(
     [string]$PreviousArchive,
     [string]$VaultFixture,
     [string]$SoftwareGlDirectory,
-    [switch]$UsePackageVersions
+    [switch]$UsePackageVersions,
+    [string]$QualificationState,
+    [string]$StageRecords
 )
 
 $ErrorActionPreference = 'Stop'
@@ -15,6 +17,10 @@ if ($UsePackageVersions -and !$PreviousArchive) {
 }
 if ($PreviousArchive) {
     $archives[0] = (Resolve-Path -LiteralPath $PreviousArchive).Path
+}
+if ($QualificationState -and (!$UsePackageVersions -or !$StageRecords -or !$SoftwareGlDirectory -or
+    $env:GITHUB_ACTIONS -cne 'true' -or $env:RUNNER_ENVIRONMENT -cne 'github-hosted')) {
+    throw 'Native qualification requires a disposable GitHub-hosted runner and both package versions.'
 }
 $scratch = New-Item -ItemType Directory -Path (Join-Path ([IO.Path]::GetTempPath()) ("TermCraft package " + [guid]::NewGuid().ToString('N')))
 $local = [Environment]::GetFolderPath('LocalApplicationData')
@@ -27,26 +33,43 @@ $installed = @()
 $appHashes = @()
 $archiveVersions = @()
 $workingData = Join-Path $scratch.FullName 'installed workspace'
-$null = New-Item -ItemType Directory -Path $workingData
-$config = Join-Path $workingData 'workspace.json'
-$userFile = Join-Path $workingData 'unrelated.txt'
-[IO.File]::WriteAllText($config, '{"sessions":[{"id":"upgrade-fixture","name":"Keep this session","protocol":"SSH","host":"example.test","port":22}],"preferences":{"appearance":"Dark"}}')
-[IO.File]::WriteAllText($userFile, 'keep this file across installs and uninstall')
-$userHash = (Get-FileHash -LiteralPath $userFile).Hash
-$vaultPath = Join-Path $workingData 'credentials.vault'
-$vaultHash = $null
+if (!$QualificationState) {
+    $null = New-Item -ItemType Directory -Path $workingData
+    $config = Join-Path $workingData 'workspace.json'
+    $userFile = Join-Path $workingData 'unrelated.txt'
+    [IO.File]::WriteAllText($config, '{"sessions":[{"id":"upgrade-fixture","name":"Keep this session","protocol":"SSH","host":"example.test","port":22}],"preferences":{"appearance":"Dark"}}')
+    [IO.File]::WriteAllText($userFile, 'keep this file across installs and uninstall')
+    $userHash = (Get-FileHash -LiteralPath $userFile).Hash
+    $vaultPath = Join-Path $workingData 'credentials.vault'
+    $vaultHash = $null
+    if ($VaultFixture) {
+        Copy-Item -LiteralPath (Resolve-Path -LiteralPath $VaultFixture).Path -Destination $vaultPath
+        $vaultHash = (Get-FileHash -LiteralPath $vaultPath).Hash
+    }
+}
 $softwareGl = @()
 if ($SoftwareGlDirectory) {
     $fixture = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'windows-software-gl.json') -Raw | ConvertFrom-Json
     $softwareGl = @($fixture.files.PSObject.Properties)
     $SoftwareGlDirectory = (Resolve-Path -LiteralPath $SoftwareGlDirectory).Path
 }
-if ($VaultFixture) {
-    Copy-Item -LiteralPath (Resolve-Path -LiteralPath $VaultFixture).Path -Destination $vaultPath
-    $vaultHash = (Get-FileHash -LiteralPath $vaultPath).Hash
+
+$records = [System.Collections.Generic.List[object]]::new()
+function Record-Stage {
+    param([string]$Name, [string]$Role, [hashtable]$Paths, [string]$Program)
+    if (!$QualificationState) { return }
+    $inputPath = Join-Path $scratch.FullName "$Name-paths.json"
+    $resultPath = Join-Path $scratch.FullName "$Name-result.json"
+    $Paths | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $inputPath -Encoding utf8
+    $options = if ($Program) { @('--program', $Program) } else { @() }
+    & python (Join-Path $PSScriptRoot '../scripts/package-native-lifecycle.py') windows-stage `
+        --state $QualificationState --name $Name --role $Role --paths $inputPath --result $resultPath @options
+    if ($LASTEXITCODE -ne 0) { throw "Qualification stage failed: $Name" }
+    $records.Add((Get-Content -LiteralPath $resultPath -Raw | ConvertFrom-Json))
 }
 
 function Assert-WorkspacePreserved {
+    if ($QualificationState) { return }
     $workspace = Get-Content -LiteralPath $config -Raw | ConvertFrom-Json
     $session = @($workspace.sessions)
     if ($session.Count -ne 1 -or $session[0].id -cne 'upgrade-fixture' -or
@@ -61,7 +84,53 @@ function Assert-WorkspacePreserved {
     }
 }
 
+function Start-Installed {
+    param([hashtable]$entry, [string]$Role, [string]$Name)
+    $installPath = $entry.Path
+    $program = Join-Path $installPath 'harbor-workspace.exe'
+    $shortcut = $shell.CreateShortcut($entry.Link)
+    if ($shortcut.TargetPath -ne $program -or $shortcut.WorkingDirectory -ne $installPath) {
+        throw 'Start menu shortcut differs from the installed target.'
+    }
+    $startup = Join-Path $scratch.FullName "$Name.png"
+    $added = @()
+    $oldDriver = $env:GALLIUM_DRIVER
+    try {
+        foreach ($dll in $softwareGl) {
+            $inputFile = Join-Path $SoftwareGlDirectory $dll.Name
+            $target = Join-Path $installPath $dll.Name
+            if ((Get-FileHash -LiteralPath $inputFile).Hash -ne $dll.Value) {
+                throw 'The software GL fixture DLL does not match its checksum.'
+            }
+            [IO.File]::Copy($inputFile, $target, $false)
+            $added += $target
+            if ((Get-FileHash -LiteralPath $target).Hash -ne $dll.Value) {
+                throw 'The staged software GL fixture DLL does not match its checksum.'
+            }
+        }
+        if ($softwareGl.Count) { $env:GALLIUM_DRIVER = 'llvmpipe' }
+        if ($QualificationState) {
+            Record-Stage $Name $Role @{
+                package = $entry.Path
+                registration = @{ target = $shortcut.TargetPath; working_directory = $shortcut.WorkingDirectory; shortcut = $entry.Link }
+            } $shortcut.TargetPath
+        } else {
+            $process = Start-Process -FilePath $program -ArgumentList ('--data-dir "{0}" --screenshot "{1}"' -f $workingData,$startup) -PassThru
+            if (!$process.WaitForExit(120000)) { $process.Kill(); throw 'Installed GUI timed out.' }
+            $exitCode = $process.ExitCode
+        }
+    } finally {
+        $env:GALLIUM_DRIVER = $oldDriver
+        foreach ($target in $added) { Remove-Item -LiteralPath $target }
+    }
+    if (!$QualificationState -and ($exitCode -ne 0 -or !(Test-Path -LiteralPath $startup -PathType Leaf) -or
+        (Get-Item -LiteralPath $startup).Length -lt 5000)) {
+        throw 'The installed GUI did not produce its startup screenshot.'
+    }
+}
+
 try {
+    $plans = @()
     foreach ($revision in 1, 2) {
         $expanded = Join-Path $scratch.FullName "version $revision"
         Expand-Archive -LiteralPath $archives[$revision - 1] -DestinationPath $expanded
@@ -85,8 +154,16 @@ try {
             throw 'Fixture install path is already occupied.'
         }
         $installer = Join-Path $root[0].FullName 'install-per-user.ps1'
-        & $installer -Action Install
-        $installed += @{ Installer = $installer; Path = $installPath; Link = $link }
+        $plans += @{ Installer = $installer; Path = $installPath; Link = $link; Manifest = $manifest }
+    }
+    foreach ($revision in 1, 2) {
+        $plan = $plans[$revision - 1]
+        $installPath = $plan.Path
+        $link = $plan.Link
+        $manifest = $plan.Manifest
+        # Track each attempted path only after confirming both KnownFolder destinations were vacant.
+        $installed += $plan
+        & $plan.Installer -Action Install
         $program = Join-Path $installPath 'harbor-workspace.exe'
         $shortcut = $shell.CreateShortcut($link)
         if ($shortcut.TargetPath -ne $program -or $shortcut.WorkingDirectory -ne $installPath) {
@@ -98,34 +175,11 @@ try {
             }
         }
         $appHashes += (Get-FileHash -LiteralPath $program).Hash
-        $startup = Join-Path $scratch.FullName "installed-startup-$revision.png"
-        $added = @()
-        $oldDriver = $env:GALLIUM_DRIVER
-        try {
-            foreach ($entry in $softwareGl) {
-                $inputFile = Join-Path $SoftwareGlDirectory $entry.Name
-                $target = Join-Path $installPath $entry.Name
-                if ((Get-FileHash -LiteralPath $inputFile).Hash -ne $entry.Value) {
-                    throw 'The software GL fixture DLL does not match its checksum.'
-                }
-                [IO.File]::Copy($inputFile, $target, $false)
-                $added += $target
-                if ((Get-FileHash -LiteralPath $target).Hash -ne $entry.Value) {
-                    throw 'The staged software GL fixture DLL does not match its checksum.'
-                }
-            }
-            if ($softwareGl.Count) { $env:GALLIUM_DRIVER = 'llvmpipe' }
-            & $program --data-dir $workingData --screenshot $startup
-        } finally {
-            $env:GALLIUM_DRIVER = $oldDriver
-            foreach ($target in $added) { Remove-Item -LiteralPath $target }
-        }
-        if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $startup -PathType Leaf) -or
-            (Get-Item -LiteralPath $startup).Length -lt 5000) {
-            throw 'The installed GUI did not produce its startup screenshot.'
-        }
+        $role = if ($revision -eq 1) { 'baseline' } else { 'candidate' }
+        Start-Installed $installed[-1] $role "windows-install-$role"
         Assert-WorkspacePreserved
     }
+
     if ($PreviousArchive -and $appHashes[0] -eq $appHashes[1]) {
         throw 'PreviousArchive must contain a distinct GUI executable.'
     }
@@ -173,27 +227,43 @@ try {
         }
     }
 
-    foreach ($entry in $installed) {
-        & $entry.Installer -Action Uninstall
-        if ((Test-Path -LiteralPath $entry.Path) -or (Test-Path -LiteralPath $entry.Link)) {
-            throw 'An installed version or Start menu shortcut remained after uninstall.'
-        }
+    $second = $installed[1]
+    & $first.Installer -Action Uninstall
+    if ((Test-Path -LiteralPath $first.Path) -or (Test-Path -LiteralPath $first.Link) -or
+        !(Test-Path -LiteralPath $second.Link) -or
+        (Get-FileHash -LiteralPath (Join-Path $second.Path 'harbor-workspace.exe')).Hash -ne $appHashes[1]) {
+        throw 'Removing the baseline did not preserve the installed candidate.'
     }
-    & $first.Installer -Action Install
-    if ((Get-FileHash -LiteralPath (Join-Path $first.Path 'harbor-workspace.exe')).Hash -ne $appHashes[0]) {
+    Record-Stage 'windows-remove-baseline' 'baseline' @{removed = @($first.Path, $first.Link); retained = @($second.Path, $second.Link)}
+    & $second.Installer -Action Uninstall
+    if ((Test-Path -LiteralPath $second.Path) -or (Test-Path -LiteralPath $second.Link)) {
+        throw 'The candidate or its Start menu shortcut remained after uninstall.'
+    }
+    Record-Stage 'windows-remove-candidate' 'candidate' @{removed = @($second.Path, $second.Link)}
+    & $second.Installer -Action Install
+    if ((Get-FileHash -LiteralPath (Join-Path $second.Path 'harbor-workspace.exe')).Hash -ne $appHashes[1]) {
         throw 'Reinstalled executable differs from the original package.'
     }
-    & $first.Installer -Action Uninstall
-    if ((Test-Path -LiteralPath $first.Path) -or (Test-Path -LiteralPath $first.Link)) {
+    Start-Installed $second 'candidate' 'windows-reinstall-candidate'
+    & $second.Installer -Action Uninstall
+    if ((Test-Path -LiteralPath $second.Path) -or (Test-Path -LiteralPath $second.Link)) {
         throw 'The reinstalled version or its shortcut remained after uninstall.'
+    }
+    Record-Stage 'windows-final-remove' 'candidate' @{removed = @($second.Path, $second.Link)}
+    if ($QualificationState) {
+        ConvertTo-Json -InputObject @($records.ToArray()) -Depth 20 | Set-Content -LiteralPath $StageRecords -Encoding utf8
     }
     Assert-WorkspacePreserved
     Write-Output 'Verified side-by-side installation, installed GUI startups, shortcuts, duplicate and unsafe-uninstall refusal, exact reinstall, workspace preservation, and uninstall.'
     Write-Output "Installed GUI SHA-256, in execution order: $($appHashes -join ', ')"
 } finally {
+    $cleanupErrors = @()
     foreach ($entry in $installed) {
-        if (Test-Path -LiteralPath $entry.Path) { & $entry.Installer -Action Uninstall }
+        if ((Test-Path -LiteralPath $entry.Path) -or (Test-Path -LiteralPath $entry.Link)) {
+            try { & $entry.Installer -Action Uninstall }
+            catch { $cleanupErrors += $_.Exception.Message }
+        }
     }
-    # Keep the extracted disposable fixture for diagnosis, without deleting user files.
-    Write-Output "Fixture directory: $($scratch.FullName)"
+    Remove-Item -LiteralPath $scratch.FullName -Recurse -Force
+    if ($cleanupErrors.Count) { throw "Independent installer cleanup failed: $cleanupErrors" }
 }

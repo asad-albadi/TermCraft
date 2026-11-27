@@ -2,7 +2,7 @@ import hashlib
 import importlib.util
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import shutil
 import stat
 import struct
@@ -68,7 +68,7 @@ class ReleaseDelivery(unittest.TestCase):
         scratch = tempfile.TemporaryDirectory()
         cls.addClassCleanup(scratch.cleanup)
         cls.fixture = Path(scratch.name) / "fixture"
-        for name in (*cls.release.PACKAGER.source_inputs(ROOT), "tests/windows-software-gl.json"):
+        for name in (*cls.release.PACKAGER.source_inputs(ROOT), "tests/windows-software-gl.json", "tests/package_workspace_fixture.rs"):
             target = cls.fixture / name
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(ROOT / name, target)
@@ -261,12 +261,132 @@ class ReleaseDelivery(unittest.TestCase):
             "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
             "windows_software_gl_fixture": json.loads((self.root / "tests/windows-software-gl.json").read_text())["files"] if platform == "windows" else None,
         })
+        if profile == "release" and not wrong_file:
+            self.native_evidence(platform, case, archive, json.loads((resources / "PACKAGE-MANIFEST.json").read_text()))
         return case, archive
+
+    def native_evidence(self, platform, case, archive, manifest):
+        """Construct test-only inputs to exercise the aggregate validators."""
+        lifecycle = case / "lifecycle-evidence"
+        lifecycle.mkdir()
+        r = self.release
+        old = r.previous_version(self.version)
+        fixture = {name: "5" * 64 for name in r.FIXTURE_FILES}
+        build = manifest["build"]
+        patch = {}
+        for name in ("Cargo.toml", "Cargo.lock"):
+            content = (self.root / name).read_bytes()
+            patch[name] = {"before": hashlib.sha256(content).hexdigest(),
+                           "after": hashlib.sha256(r.patched_version_bytes(name, content, self.version, old)).hexdigest()}
+        old_inputs = {**build["source_inputs"], **{name: item["after"] for name, item in patch.items()}}
+        old_snapshot = r.PACKAGER.source_digest(old_inputs)
+        app = r.app_member(platform)
+        old_manifest = lifecycle / "baseline-manifest.json"
+        write_json(old_manifest, {**manifest, "version": old, "files": {**manifest["files"], app: "6" * 64},
+                                  "build": {**build, "source_inputs": old_inputs, "snapshot_sha256": old_snapshot}})
+        roles = {
+            "baseline": {"archive": r.portable_name(platform, old), "archive_sha256": "7" * 64,
+                         "manifest_sha256": digest(old_manifest), "snapshot_sha256": old_snapshot,
+                         "app_sha256": "6" * 64, "version": old, "embedded_version": f"TermCraft {old}"},
+            "candidate": {"archive": archive.name, "archive_sha256": digest(archive),
+                          "manifest_sha256": digest(case / "tree" / ("TermCraft.app/Contents/Resources"
+                               if platform == "macos" else archive.name.removesuffix(r.TARGETS[platform][2]))
+                               / "PACKAGE-MANIFEST.json"),
+                          "snapshot_sha256": build["snapshot_sha256"], "app_sha256": manifest["files"][app],
+                          "version": self.version, "embedded_version": f"TermCraft {self.version}"},
+        }
+        debian = None
+        installations, removals = {}, {}
+        if platform == "linux":
+            debian = {role: {"name": f"termcraft_{info['version']}_amd64.deb", "version": info["version"],
+                             "sha256": digest(case / "dist" / self.debian_name) if role == "candidate" else "8" * 64}
+                      for role, info in roles.items()}
+            for name, role, _ in r.LIFECYCLE_STAGES[platform][:3]:
+                installations[name] = ("/opt/termcraft", ["/usr/bin/termcraft"],
+                                       {"target": "/usr/bin/termcraft", "version": roles[role]["version"]})
+            removals["deb-purge"] = {"removed": sorted(r.DEBIAN_PATHS)}
+            data = "/tmp/owned/data"
+            desktop = data + "/termcraft/desktop"
+            entry, receipt = data + "/applications/org.termcraft.TermCraft.desktop", desktop + "/owned.json"
+            installations["desktop-start-candidate"] = (desktop + "/payload", ["/usr/bin/python3", desktop + "/launch.py"],
+                                                         {"target": entry, "receipt": receipt})
+            canaries = {"mimeapps.list": "9" * 64, "unrelated.desktop": "a" * 64}
+            removals["desktop-remove"] = {
+                "removed": [entry, receipt, desktop + "/launch.py", desktop + "/payload/PACKAGE-MANIFEST.json",
+                            desktop + "/payload/harbor-workspace", data + "/icons/hicolor/256x256/apps/org.termcraft.TermCraft.png",
+                            data + "/mime/packages/org.termcraft.TermCraft.xml"],
+                "unrelated_before": canaries, "unrelated_after": canaries,
+            }
+        elif platform == "windows":
+            def start(role):
+                version = roles[role]["version"] + "-x86_64"
+                path = rf"C:\Users\runner\Local\Programs\TermCraft\{version}"
+                program = path + "\\" + app
+                shortcut = rf"C:\Users\runner\Start Menu\TermCraft {version}.lnk"
+                return path, [program], {"target": program, "working_directory": path, "shortcut": shortcut}
+            baseline, candidate = start("baseline"), start("candidate")
+            installations = {"windows-install-baseline": baseline, "windows-install-candidate": candidate,
+                             "windows-reinstall-candidate": candidate}
+            owned = lambda info: [info[0], info[2]["shortcut"]]
+            removals = {"windows-remove-baseline": {"removed": owned(baseline), "retained": owned(candidate)},
+                        "windows-remove-candidate": {"removed": owned(candidate)},
+                        "windows-final-remove": {"removed": owned(candidate)}}
+        else:
+            install = "/Users/runner/Applications/Owned/TermCraft.app"
+            move = "/Users/runner/Applications/Owned/Relocated 'QA' 100%.app"
+            receipt = "/tmp/owned/receipt.json"
+            for name, bundle in (("mac-install-baseline", install), ("mac-replace-candidate", install),
+                                 ("mac-relocate-candidate", move)):
+                installations[name] = (bundle, [bundle + "/Contents/MacOS/termcraft-desktop-launcher"],
+                                       {"target": bundle, "receipt": receipt})
+            removals["mac-unregister-remove"] = {"removed": [install, move, receipt], "unrelated_registrations": 1,
+                                                  "unrelated_before": "f" * 64, "unrelated_after": "f" * 64}
+        stages = []
+        pixels = png()
+        pure = PureWindowsPath if platform == "windows" else PurePosixPath
+        (lifecycle / "fixture-seed.log").write_bytes(r.FIXTURE_PROOF)
+        for name, role, starts in r.LIFECYCLE_STAGES[platform]:
+            stage = {"stage": name, "role": role, "preserved": fixture}
+            (lifecycle / f"{name}-fixture.log").write_bytes(r.FIXTURE_PROOF)
+            if starts:
+                path, launcher, registration = installations[name]
+                stage.update(paths={"package": path}, launcher=launcher, registration=registration,
+                             executable=str(pure(path) / app), app_sha256=roles[role]["app_sha256"],
+                             embedded_version=roles[role]["embedded_version"])
+                if name == "desktop-start-candidate":
+                    stage["paths"]["original_absent"] = "/tmp/owned/extracted-source"
+                for label in ("workspace", "malformed"):
+                    screenshot = f"{name}-{label}.png"
+                    (lifecycle / screenshot).write_bytes(pixels)
+                    (lifecycle / f"{name}-{label}.log").touch()
+                    stage[label] = {"name": screenshot, "sha256": digest(lifecycle / screenshot), "size": [640, 400]}
+            else:
+                stage["paths"] = removals[name]
+            stages.append(stage)
+        write_json(lifecycle / "verification.json", {
+            "schema": 1, "source_sha": self.source, "platform": platform, "architecture": r.TARGETS[platform][0],
+            "archive_sha256": digest(archive), "version": self.version, "roles": roles,
+            "private_version_patch": {"from": self.version, "to": old, "files": patch},
+            "debian": debian, "fixture_before": fixture, "stages": stages,
+            "fixture_source_sha256": digest(self.root / "tests/package_workspace_fixture.rs"),
+        })
+        if platform == "linux":
+            wayland = case / "wayland-evidence"
+            shutil.copytree(case / "startup-evidence", wayland)
+            obs = json.loads((wayland / "verification.json").read_text())
+            socket = "/tmp/private/termcraft-release-wayland"
+            obs.update(source_sha=self.source, display_backend="Wayland", weston={
+                "backend": "headless", "socket": socket, "pid": 42, "socket_inode": 1,
+                "runtime_mode": "0700", "display_absent": True, "wayland_socket_absent": True,
+            })
+            write_json(wayland / "verification.json", obs)
+            (wayland / "startup.log").write_text(f'37 connect(4, {{sa_family=AF_UNIX, sun_path="{socket}"}}, 44) = 0\n')
 
     def candidate(self, platform, **kwargs):
         case, archive = self.platform_bundle(platform, **kwargs)
         candidate = case / ("candidate-" + {"linux": "linux-amd64", "windows": "windows-amd64", "macos": "macos-arm64"}[platform])
-        self.release.stage_candidate(self.root, self.source, self.version, platform, case / "dist", case / "startup-evidence", candidate)
+        self.release.stage_candidate(self.root, self.source, self.version, platform, case / "dist", case / "startup-evidence", candidate,
+                                     case / "lifecycle-evidence", case / "wayland-evidence" if platform == "linux" else None)
         return candidate, archive
 
     def test_preflight_checks_all_three_package_versions_and_ref(self):
@@ -303,6 +423,35 @@ class ReleaseDelivery(unittest.TestCase):
         self.assertEqual(value["scope"], "unsigned-core")
         self.assertEqual(value["package_manifest"]["dependency_notices"]["crates"], 2)
         self.assertIn("locked-dependency-notices", value["checks_passed"])
+
+    def test_candidate_rejects_skipped_native_stages_and_wayland_without_socket_trace(self):
+        case, archive = self.platform_bundle("linux")
+        lifecycle, wayland = case / "lifecycle-evidence", case / "wayland-evidence"
+        verification = lifecycle / "verification.json"
+        value = json.loads(verification.read_text())
+        inputs = self.release.PACKAGER.source_inputs(self.root)
+        manifest_path = case / "tree" / archive.name.removesuffix(".tar.gz") / "PACKAGE-MANIFEST.json"
+        manifest = json.loads(manifest_path.read_text())
+        package_manifest = {"sha256": digest(manifest_path), "build": manifest["build"],
+                            "app_sha256": manifest["files"]["harbor-workspace"]}
+        artifacts = {archive.name: digest(archive), self.debian_name: digest(case / "dist" / self.debian_name)}
+        def verify():
+            return self.release.verify_native_evidence(self.root, lifecycle, wayland, "linux",
+                                                       self.source, self.version, artifacts, package_manifest, inputs)
+        self.assertIn("wayland", verify())
+        for changed, message in (
+            ({**value, "stages": value["stages"][:-1]}, "required stages"),
+            ({**value, "archive_sha256": "0" * 64}, "does not bind"),
+            ({**value, "fixture_before": {}}, "fixture"),
+            ({**value, "private_version_patch": {}}, "independently versioned"),
+        ):
+            write_json(verification, changed)
+            with self.assertRaisesRegex(ValueError, message):
+                verify()
+        write_json(verification, value)
+        (wayland / "startup.log").write_text("DISPLAY is gone and backend says Wayland")
+        with self.assertRaisesRegex(ValueError, "socket connection missing"):
+            verify()
 
     def test_candidate_rejects_unverified_policies_noncore_and_false_startup(self):
         for changes, message in [
@@ -402,6 +551,21 @@ class ReleaseDelivery(unittest.TestCase):
         for line in listed:
             expected, name = line.split("  ", 1)
             self.assertEqual(digest(out / name), expected)
+
+    def test_native_gates_and_regression_make_local_assembly_publication_eligible(self):
+        candidates = [self.candidate(platform)[0] for platform in ("linux", "windows", "macos")]
+        regression = {"workflow": ".github/workflows/ci.yml", "result": "success", "run_id": "123", "run_attempt": "1"}
+        out = self.work / "assembled"
+        value = self.release.assemble(self.root, self.source, self.version, candidates, out, regression=regression)
+        self.assertTrue(value["publication_ready"])
+        self.assertEqual(value["pending_gates"], [])
+        self.assertTrue(set(self.release.PENDING_GATES).issubset(value["checks_passed"]))
+        self.assertEqual(len(self.release.publication_files(out, self.source, self.version)), 7)
+        (candidates[0] / "wayland-evidence/verification.json").unlink()
+        withheld = self.work / "withheld"
+        with self.assertRaisesRegex(ValueError, "Startup evidence is incomplete"):
+            self.release.assemble(self.root, self.source, self.version, candidates, withheld, regression=regression)
+        self.assertFalse(withheld.exists())
 
     def test_aggregate_rejects_forged_notices_even_with_updated_download_hashes(self):
         candidates = [self.candidate(p)[0] for p in ("linux", "windows", "macos")]

@@ -8,7 +8,7 @@ import importlib.util
 import json
 import math
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import plistlib
 import re
 import shutil
@@ -56,11 +56,43 @@ def load_sibling(name):
 
 PACKAGER = load_sibling("package-release")
 DEBIAN = load_sibling("package-debian")
+STARTUP = load_sibling("package-check-startup")
 
 
 def require(condition, message):
     if not condition:
         raise ValueError(message)
+
+
+def previous_version(version):
+    require(VERSION.fullmatch(version), "Expected a canonical numeric candidate version")
+    components = list(map(int, version.split(".")))
+    for index in reversed(range(len(components))):
+        if components[index]:
+            components[index] -= 1
+            return ".".join(map(str, components))
+    raise ValueError("No supported version exists below 0.0.0")
+
+
+def patched_version_bytes(name, content, old, new):
+    import tomllib
+
+    if name == "Cargo.toml":
+        text = content.split(b"\n[", 2)
+        require(text[0].startswith(b"[package]\n") and
+                tomllib.loads(content.decode())["package"]["name"] == "harbor-workspace",
+                "Expected the root application package")
+        before = text[0]
+        suffix = b"\n[" + b"\n[".join(text[1:])
+        pattern = rb'(?m)^version = "' + re.escape(old.encode()) + rb'"$'
+    else:
+        require(name == "Cargo.lock", "Unexpected private version input")
+        before, suffix = content, b""
+        pattern = rb'(?m)(^\[\[package\]\]\nname = "harbor-workspace"\n)version = "' + re.escape(old.encode()) + rb'"$'
+    patched, count = re.subn(pattern, lambda m: (m[1] if m.lastindex else b"") +
+                             f'version = "{new}"'.encode(), before)
+    require(count == 1, f"Expected one application version entry in {name}")
+    return patched + suffix
 
 
 def unique_object(pairs):
@@ -277,6 +309,7 @@ def verify_portable(root, archive, platform, versions, inputs, work):
     core_layout(root, package, files, links, manifest, platform, versions, expected_notices)
     return {"name": manifest_path.relative_to(package).as_posix(),
             "sha256": sha256(manifest_path), "schema": manifest["schema_version"], "build": identity,
+            "app_sha256": files[app_member(platform)],
             "dependency_notices": {"sha256": PACKAGER.source_digest(expected_notices),
                                    "crates": len(expected_notices["crates"]),
                                    "files": len(expected_notices["files"])}}
@@ -377,7 +410,209 @@ def verify_startup(root, directory, archive, digest, platform, expected_backend=
     return {"observation": observed, "files": {name: sha256(path) for name, path in entries.items()}}
 
 
-def verify_candidate(root, source, version, platform, dist, startup, inputs):
+FIXTURE_FILES = {
+    "workspace/workspace.json", "workspace/credentials.vault", "workspace/unrelated.txt",
+    "workspace/remote-recovery/qualification/draft.txt",
+    "malformed workspace/workspace.json", "malformed workspace/credentials.vault",
+}
+FIXTURE_PROOF = (b"Package fixture verified: store, shortcuts, recovery, malformed originals, "
+                 b"vault plaintext exclusion and decryption.")
+LIFECYCLE_STAGES = {
+    "linux": (("deb-install-baseline", "baseline", True), ("deb-upgrade-candidate", "candidate", True),
+              ("deb-reinstall-candidate", "candidate", True), ("deb-purge", "candidate", False),
+              ("desktop-start-candidate", "candidate", True), ("desktop-remove", "candidate", False)),
+    "windows": (("windows-install-baseline", "baseline", True), ("windows-install-candidate", "candidate", True),
+                ("windows-remove-baseline", "baseline", False), ("windows-remove-candidate", "candidate", False),
+                ("windows-reinstall-candidate", "candidate", True), ("windows-final-remove", "candidate", False)),
+    "macos": (("mac-install-baseline", "baseline", True), ("mac-replace-candidate", "candidate", True),
+              ("mac-relocate-candidate", "candidate", True), ("mac-unregister-remove", "candidate", False)),
+}
+DEBIAN_PATHS = {"/opt/termcraft", "/usr/bin/termcraft", "/usr/share/applications/org.termcraft.TermCraft.desktop",
+                "/usr/share/pixmaps/termcraft.png", "/usr/share/doc/termcraft"}
+
+
+def app_member(platform):
+    return {"linux": "harbor-workspace", "windows": "harbor-workspace.exe",
+            "macos": "Contents/MacOS/harbor-workspace"}[platform]
+
+
+def verify_lifecycle_operations(platform, stages, roles):
+    def removal(name):
+        paths = stages[name]["paths"]["removed"]
+        require(isinstance(paths, list) and len(paths) == len(set(paths)), "Invalid lifecycle removal list")
+        return {str(PureWindowsPath(path)) if platform == "windows" else path for path in paths}
+
+    def package(name):
+        return stages[name]["paths"]["package"]
+
+    def registration(name):
+        return stages[name]["registration"]
+
+    if platform == "linux":
+        for name, role, _ in LIFECYCLE_STAGES["linux"][:3]:
+            require(package(name) == "/opt/termcraft" and stages[name]["launcher"] == ["/usr/bin/termcraft"]
+                    and registration(name) == {"target": "/usr/bin/termcraft", "version": roles[role]["version"]},
+                    "Debian installed version or launcher evidence differs")
+        require(removal("deb-purge") == DEBIAN_PATHS, "Debian purge does not cover owned package paths")
+        start, finish = stages["desktop-start-candidate"], stages["desktop-remove"]["paths"]
+        require(len(start["launcher"]) == 2, "Portable desktop launcher must use explicit argv")
+        posix = PurePosixPath
+        launcher = posix(start["launcher"][1])
+        data = launcher.parents[2]
+        started = posix(start["paths"]["package"])
+        require(launcher == data / "termcraft/desktop/launch.py"
+                and str(started) == str(launcher.parent / "payload")
+                and registration("desktop-start-candidate") == {
+                    "target": str(data / "applications/org.termcraft.TermCraft.desktop"),
+                    "receipt": str(launcher.parent / "owned.json")}
+                and posix(start["paths"]["original_absent"]).is_absolute()
+                and posix(start["paths"]["original_absent"]) != started
+                and {str(launcher), str(started / "PACKAGE-MANIFEST.json"), str(started / app_member("linux")),
+                     str(data / "icons/hicolor/256x256/apps/org.termcraft.TermCraft.png"),
+                     str(data / "mime/packages/org.termcraft.TermCraft.xml"),
+                     *registration("desktop-start-candidate").values()} <= removal("desktop-remove")
+                and finish["unrelated_before"] == finish["unrelated_after"]
+                and set(finish["unrelated_before"]) == {"mimeapps.list", "unrelated.desktop"}
+                and all(SHA256.fullmatch(value) for value in finish["unrelated_before"].values()),
+                "Portable desktop installation or removal evidence differs")
+    elif platform == "windows":
+        def owned(name, role):
+            path = PureWindowsPath(package(name))
+            shortcut = PureWindowsPath(registration(name)["shortcut"])
+            version = roles[role]["version"] + "-x86_64"
+            require(path.name == version and path.parent.name == "TermCraft" and path.parent.parent.name == "Programs"
+                    and shortcut.is_absolute() and shortcut.name == "TermCraft " + version + ".lnk"
+                    and PureWindowsPath(registration(name)["target"]) == path / app_member("windows")
+                    and PureWindowsPath(registration(name)["working_directory"]) == path
+                    and stages[name]["launcher"] == [registration(name)["target"]],
+                    "Installed Windows KnownFolder or Start menu observation differs")
+            return {str(path), str(shortcut)}
+
+        base = owned("windows-install-baseline", "baseline")
+        new = owned("windows-install-candidate", "candidate")
+        require(not base & new and base == removal("windows-remove-baseline")
+                and new == {str(PureWindowsPath(path)) for path in stages["windows-remove-baseline"]["paths"]["retained"]}
+                and new == removal("windows-remove-candidate") == owned("windows-reinstall-candidate", "candidate")
+                == removal("windows-final-remove"), "Windows side-by-side cleanup or reinstall differs")
+    else:
+        install, replace, relocate = ("mac-install-baseline", "mac-replace-candidate", "mac-relocate-candidate")
+        initial, final = PurePosixPath(package(install)), PurePosixPath(package(relocate))
+        receipt = registration(install)["receipt"]
+        for name in (install, replace, relocate):
+            require(registration(name) == {"target": package(name), "receipt": receipt}
+                    and stages[name]["launcher"] == [str(PurePosixPath(package(name)) / "Contents/MacOS/termcraft-desktop-launcher")],
+                    "macOS installed bundle or registration observation differs")
+        removed = stages["mac-unregister-remove"]["paths"]
+        require(initial == PurePosixPath(package(replace)) and initial != final and initial.parent == final.parent
+                and initial.name == "TermCraft.app" and final.suffix == ".app"
+                and all(char in final.name for char in (" ", "'", "%"))
+                and PurePosixPath(receipt).is_absolute()
+                and removal("mac-unregister-remove") == {str(initial), str(final), receipt}
+                and type(removed["unrelated_registrations"]) is int and removed["unrelated_registrations"] > 0
+                and SHA256.fullmatch(removed["unrelated_before"])
+                and removed["unrelated_before"] == removed["unrelated_after"],
+                "macOS relocation or LaunchServices cleanup evidence differs")
+
+
+def verify_native_evidence(root, lifecycle, wayland, platform, source, version, artifacts, manifest, inputs):
+    require(lifecycle is not None and lifecycle.is_dir() and not lifecycle.is_symlink(), "Lifecycle evidence is required")
+    entries = regular_entries(lifecycle)
+    portable = portable_name(platform, version)
+    value = read_json(entries["verification.json"])
+    require(value["schema"] == 1 and value["source_sha"] == source and value["platform"] == platform
+            and value["architecture"] == TARGETS[platform][0] and value["version"] == version
+            and value["archive_sha256"] == artifacts[portable]
+            and value["fixture_source_sha256"] == sha256(root / "tests/package_workspace_fixture.rs"),
+            "Lifecycle evidence does not bind the source, package and fixture")
+    roles = value["roles"]
+    baseline, candidate = roles["baseline"], roles["candidate"]
+    old = previous_version(version)
+    require(set(roles) == {"baseline", "candidate"} and candidate == {
+        "archive": portable, "archive_sha256": artifacts[portable], "version": version,
+        "snapshot_sha256": manifest["build"]["snapshot_sha256"], "manifest_sha256": manifest["sha256"],
+        "app_sha256": manifest["app_sha256"], "embedded_version": f"TermCraft {version}"},
+        "Lifecycle candidate differs from the verified archive")
+    manifest_old = read_json(entries["baseline-manifest.json"])
+    patch = {}
+    for name in ("Cargo.toml", "Cargo.lock"):
+        original = (root / name).read_bytes()
+        patched = patched_version_bytes(name, original, version, old)
+        patch[name] = {"before": hashlib.sha256(original).hexdigest(), "after": hashlib.sha256(patched).hexdigest()}
+    old_inputs = {**inputs, **{name: item["after"] for name, item in patch.items()}}
+    require(value["private_version_patch"] == {"from": version, "to": old, "files": patch}
+            and manifest_old["build"]["source_inputs"] == old_inputs
+            and manifest_old["build"]["snapshot_sha256"] == PACKAGER.source_digest(old_inputs)
+            and manifest_old["build"]["provenance"] == "local locked release build"
+            and manifest_old["profile"] == "release" and manifest_old["platform"] == platform
+            and manifest_old["architecture"] == TARGETS[platform][0] and manifest_old["signing"] == "unsigned"
+            and manifest_old["rdp_helper_version"] == package_versions(root)["termcraft-rdp-engine"]
+            and manifest_old["version"] == old and baseline == {
+                "archive": portable_name(platform, old), "archive_sha256": baseline["archive_sha256"], "version": old,
+                "snapshot_sha256": manifest_old["build"]["snapshot_sha256"],
+                "manifest_sha256": sha256(entries["baseline-manifest.json"]),
+                "app_sha256": manifest_old["files"][app_member(platform)], "embedded_version": f"TermCraft {old}"}
+            and all(SHA256.fullmatch(baseline[key]) and baseline[key] != candidate[key]
+                    for key in ("archive_sha256", "snapshot_sha256", "app_sha256")),
+            "Lifecycle baseline does not prove an independently versioned exact source")
+    if platform == "linux":
+        debian = value["debian"]
+        require(set(debian) == {"baseline", "candidate"} and all(
+            debian[role]["name"] == f"termcraft_{roles[role]['version']}_amd64.deb"
+            and debian[role]["version"] == roles[role]["version"]
+            and SHA256.fullmatch(debian[role]["sha256"]) for role in roles)
+            and debian["candidate"]["sha256"] == artifacts[debian["candidate"]["name"]]
+            and debian["baseline"]["sha256"] != debian["candidate"]["sha256"],
+            "Debian lifecycle does not match the candidate and lower version")
+    else:
+        require(value["debian"] is None and wayland is None, "Unexpected Linux lifecycle evidence")
+    expected_files = {"verification.json", "baseline-manifest.json", "fixture-seed.log"}
+    fixture = value["fixture_before"]
+    require(set(fixture) == FIXTURE_FILES and all(SHA256.fullmatch(digest) for digest in fixture.values())
+            and FIXTURE_PROOF in entries["fixture-seed.log"].read_bytes(), "Initial workspace/vault fixture is missing")
+    specs = LIFECYCLE_STAGES[platform]
+    require([(item["stage"], item["role"]) for item in value["stages"]] ==
+            [(name, role) for name, role, _ in specs], "Lifecycle required stages were skipped or reordered")
+    pure = PureWindowsPath if platform == "windows" else PurePosixPath
+    for (name, role, starts), stage in zip(specs, value["stages"], strict=True):
+        log = f"{name}-fixture.log"
+        expected_files.add(log)
+        require(log in entries and FIXTURE_PROOF in entries[log].read_bytes() and stage["preserved"] == fixture,
+                f"Lifecycle workspace, vault or recovery check missing or changed: {name}")
+        if starts:
+            launched = roles[role]
+            package = pure(stage["paths"]["package"])
+            require(package.is_absolute() and pure(stage["executable"]) == package / app_member(platform)
+                    and stage["app_sha256"] == launched["app_sha256"]
+                    and stage["embedded_version"] == launched["embedded_version"]
+                    and stage["launcher"] and all(pure(part).is_absolute() for part in stage["launcher"]),
+                    f"Lifecycle executing path or binary does not match the {role} package")
+            for label in ("workspace", "malformed"):
+                png = f"{name}-{label}.png"
+                expected_files.update((png, f"{name}-{label}.log"))
+                require(png in entries and stage[label] == {"name": png, "sha256": sha256(entries[png]),
+                                                            "size": png_observation(entries[png])},
+                        f"Lifecycle screenshot is absent or does not match: {name}/{label}")
+    require(set(entries) == expected_files, "Lifecycle evidence files are incomplete or excessive")
+    verify_lifecycle_operations(platform, {stage["stage"]: stage for stage in value["stages"]}, roles)
+    result = {"lifecycle": {"observation": value, "files": {name: sha256(path) for name, path in entries.items()}}}
+    if platform == "linux":
+        require(wayland is not None and wayland.is_dir(), "Native Wayland evidence is required")
+        check = verify_startup(root, wayland, portable, artifacts[portable], platform, expected_backend="Wayland")
+        obs = check["observation"]
+        weston = obs["weston"]
+        socket = weston["socket"]
+        trace = (wayland / "startup.log").read_bytes()
+        require(obs["source_sha"] == source and weston["backend"] == "headless"
+                and weston["display_absent"] is True and weston["wayland_socket_absent"] is True
+                and weston["runtime_mode"] == "0700" and type(weston["pid"]) is int and weston["pid"] > 1
+                and type(weston["socket_inode"]) is int and weston["socket_inode"] > 0
+                and PurePosixPath(socket).is_absolute() and PurePosixPath(socket).name == "termcraft-release-wayland"
+                and STARTUP.successful_wayland_connect(trace, socket), "Native Wayland provenance or actual Weston socket connection missing")
+        result["wayland"] = check
+    return result
+
+
+def verify_candidate(root, source, version, platform, dist, startup, inputs, lifecycle=None, wayland=None):
     require(platform in TARGETS and SHA1.fullmatch(source), "Invalid platform or candidate source commit")
     versions = package_versions(root)
     require(versions["harbor-workspace"] == version, "Candidate application version mismatch")
@@ -401,19 +636,23 @@ def verify_candidate(root, source, version, platform, dist, startup, inputs):
         else:
             debian = None
     observation = verify_startup(root, startup, portable, artifacts[portable], platform)
+    native = verify_native_evidence(root, lifecycle, wayland, platform, source, version, artifacts, manifest, inputs)
     return {"schema": 1, "source_sha": source, "version": version, "package_versions": versions,
             "scope": SCOPE, "platform": platform, "architecture": TARGETS[platform][0],
             "artifacts": artifacts, "package_manifest": manifest, "debian": debian,
             "checks_passed": ["portable-contents", "locked-dependency-notices", "native-startup", *(["debian-portable-match"] if debian else [])],
-            "startup": observation}
+            "startup": observation, **native}
 
 
-def stage_candidate(root, source, version, platform, dist, startup, output):
+def stage_candidate(root, source, version, platform, dist, startup, output, lifecycle=None, wayland=None):
     inputs = PACKAGER.source_inputs(root)
-    result = verify_candidate(root, source, version, platform, dist, startup, inputs)
+    result = verify_candidate(root, source, version, platform, dist, startup, inputs, lifecycle, wayland)
     output.mkdir(parents=True)
     shutil.copytree(dist, output / "dist")
     shutil.copytree(startup, output / "startup-evidence")
+    shutil.copytree(lifecycle, output / "lifecycle-evidence")
+    if wayland is not None:
+        shutil.copytree(wayland, output / "wayland-evidence")
     write_json(output / "candidate.json", result)
     return result
 
@@ -442,7 +681,8 @@ def assemble(root, source, version, candidates, output, regression=None):
         require(platform in TARGETS and platform not in inventory,
                 "Expected exactly one inventory for each platform")
         require(directory.name == f"candidate-{TARGETS[platform][1]}" and
-                {item.name for item in directory.iterdir()} == {"candidate.json", "dist", "startup-evidence"},
+                {item.name for item in directory.iterdir()} == ({"candidate.json", "dist", "startup-evidence", "lifecycle-evidence"} |
+                 ({"wayland-evidence"} if platform == "linux" else set())),
                 "Unexpected candidate artifact layout")
         inventory[platform] = (value, directory)
     require(set(inventory) == set(TARGETS), "Expected exactly one inventory for each platform")
@@ -455,12 +695,17 @@ def assemble(root, source, version, candidates, output, regression=None):
             sha256(file) == value["artifacts"][name] for name, file in entries.items()),
             f"Downloaded {platform} asset hashes differ from its inventory")
         checked = verify_candidate(root, source, version, platform, directory / "dist",
-                                   directory / "startup-evidence", inputs)
+                                   directory / "startup-evidence", inputs, directory / "lifecycle-evidence",
+                                   directory / "wayland-evidence" if platform == "linux" else None)
         require(value == checked, f"Downloaded {platform} candidate inventory does not match its content")
         for name, digest in checked["artifacts"].items():
             require(SAFE_NAME.fullmatch(name) and name not in artifacts, f"Unsafe or duplicate release asset: {name}")
             artifacts[name] = digest
 
+    regression_ok = (isinstance(regression, dict) and regression.get("result") == "success"
+                     and regression.get("workflow") == ".github/workflows/ci.yml"
+                     and all(re.fullmatch(r"[1-9][0-9]*", regression.get(key, ""))
+                             for key in ("run_id", "run_attempt")))
     # Do not copy optional/runtime diagnostic outputs or raw runner logs into
     # the public asset set. Their separately uploaded candidate evidence is
     # identified by exact hash and preserved in the aggregate inventory.
@@ -480,9 +725,10 @@ def assemble(root, source, version, candidates, output, regression=None):
                    "rdp_source": "engines/rdp", "wayland_source": "engines/wayland",
                    "notice": "Dependency locks and build-input hashes are not a plugin or dependency source bundle."},
         "artifacts": artifacts, "platforms": {platform: value for platform, (value, _) in inventory.items()},
-        "checks_passed": ["three-platform-candidate-validation", *(["three-platform-regression"] if regression else [])],
+        "checks_passed": ["three-platform-candidate-validation", *PENDING_GATES,
+                          *(["three-platform-regression"] if regression_ok else [])],
         "regression": regression,
-        "pending_gates": list(PENDING_GATES), "publication_ready": False,
+        "pending_gates": [] if regression_ok else ["three-platform-regression"], "publication_ready": regression_ok,
     }
     write_json(output / "release-inventory.json", result)
     checksum_entries = {**artifacts, "release-inventory.json": sha256(output / "release-inventory.json")}
@@ -619,6 +865,8 @@ def main():
             command.add_argument("--platform", choices=TARGETS, required=True)
             command.add_argument("--dist", type=Path, required=True)
             command.add_argument("--startup", type=Path, required=True)
+            command.add_argument("--lifecycle", type=Path, required=True)
+            command.add_argument("--wayland", type=Path)
         if name == "aggregate":
             command.add_argument("--candidates", type=Path, required=True)
             command.add_argument("--regression-result", required=True)
@@ -637,7 +885,7 @@ def main():
                       "tag_publish_event": str(publish_event(args.event, args.ref, version)).lower()}
         elif args.command == "inventory":
             verify_checkout(root, args.source, args.version)
-            result = stage_candidate(root, args.source, args.version, args.platform, args.dist, args.startup, args.output)
+            result = stage_candidate(root, args.source, args.version, args.platform, args.dist, args.startup, args.output, args.lifecycle, args.wayland)
         elif args.command == "aggregate":
             verify_checkout(root, args.source, args.version)
             require(args.regression_result == "success" and all(re.fullmatch(r"[1-9][0-9]*", item)
@@ -657,10 +905,10 @@ def main():
             with args.github_output.open("a", encoding="utf-8") as stream:
                 stream.writelines(f"{key}={str(result[key]).lower()}\n" for key in keys)
         if args.command == "aggregate":
-            print("Validated unsigned startup-only assembly. Publication requires: " + ", ".join(result["pending_gates"]))
+            print("Validated unsigned assembly with native lifecycle and Wayland evidence.")
         else:
             print(f"{args.command}: {result['version']} from {result['source_sha']}")
-    except (OSError, ValueError, KeyError, TypeError, AttributeError, tarfile.TarError, zipfile.BadZipFile,
+    except (OSError, ValueError, KeyError, TypeError, AttributeError, IndexError, tarfile.TarError, zipfile.BadZipFile,
             subprocess.SubprocessError, zlib.error) as error:
         parser.exit(1, f"Release {args.command} failed: {error}\n")
 

@@ -32,21 +32,37 @@ For version-tag runs, use a canonical `v<major>.<minor>.<patch>` matching
 the application Cargo version. Preflight also validates and records the RDP
 and Wayland Cargo package versions independently. Every successful assembly
 requires the three complete native regression jobs, native packages built
-with Rust 1.96.1 and startup evidence for all three platforms. It then
+with Rust 1.96.1, native startup and two-version lifecycle evidence on all
+three platforms, and a separate Linux native Wayland check. It then
 revalidates downloaded packages and assembles one set of checksums. Failed
 package jobs upload diagnostic evidence separately and never upload their
 unverified `dist` contents as candidates.
 
-A successful startup candidate proves that the relocated package ran with an
-isolated workspace and empty executable search path, produced a nonblank
-screenshot, and started its own RDP worker for a loopback negotiation without
-losing the saved session or preferences. Linux startup currently runs under
-Xvfb (X11). Windows uses a pinned software OpenGL fixture on the hosted
-runner. These observations don't prove hardware graphics or device coverage.
-The existing Windows installer smoke test is not evidence of a real
-two-version upgrade. Until two-version native install/upgrade/remove checks on
-all three platforms and Linux native Wayland startup are integrated, assembly
-records `publication_ready: false`.
+The qualification workflow requires a relocated portable package to run with
+an isolated workspace and empty executable search path, produce a nonblank
+screenshot, and start its own RDP worker for a loopback negotiation without
+losing the saved session or preferences. It runs the Linux package separately
+under Xvfb (X11) and a private Weston headless compositor (native Wayland,
+with no X11 fallback). Windows uses pinned software OpenGL. These are
+desktop and package checks, not hardware coverage.
+
+For lifecycle checks, the newer installed app must be the actual release
+candidate. The workflow builds a lower application version from the same
+commit in a separate private source tree, recording exactly what it changed.
+That baseline is neither a published release nor a public asset. Linux tests
+Debian installation, upgrade, reinstall and purge, plus a separate per-user
+portable desktop installation. Windows tests side-by-side KnownFolder
+installation, Start menu targets, reinstall and removal. Apple Silicon macOS
+tests replacement, relocation and targeted LaunchServices registration and
+removal. Each installed startup needs a fresh screenshot and workspace
+preservation evidence.
+
+The synthetic fixture verifies stored sessions, preferences, shortcuts,
+encrypted vault bytes and decryption through the Rust library, plus byte
+preservation of recovery and malformed originals. This is not a packaged GUI
+unlock, recovery restoration, Finder or Gatekeeper approval test. Only a
+hosted run with the required native checks and matching downloaded evidence
+can qualify a candidate.
 
 If publication becomes eligible, only a matching tag push can enter the
 final job with GitHub release write permission. The publisher checks the
@@ -64,7 +80,7 @@ Check the downloaded `SHA256SUMS` (for example, with
 `release-inventory.json` and the tracked project source archive. The
 inventory records the source commit, archive digests, Cargo package
 versions, toolchain strings, package manifest digests, terminal gate results,
-and hashes of the per-platform startup evidence. Each platform’s dependency
+and hashes of the per-platform startup, lifecycle and Linux Wayland evidence. Each platform’s dependency
 notice inventory is resolved again from the checkout’s locked Cargo graphs
 in the aggregate job. The manifest’s dependency identities, notice paths,
 and notice bytes must match that independent inventory. Raw evidence stays in
@@ -82,7 +98,8 @@ checksum is a reproducible-build claim.
 
 ## Keep workspace data
 
-Close the app before replacing it. Program files are separate from the
+Run the extracted executable with `--version` to read the version compiled
+into the app without opening a workspace. Close the app before replacing it. Program files are separate from the
 per-user Harbor workspace. The defaults are
 `${XDG_CONFIG_HOME:-$HOME/.config}/harbor` on Linux, `%LOCALAPPDATA%\Harbor`
 on Windows, and `~/Library/Application Support/Harbor` on macOS. Removing the owned program or registration

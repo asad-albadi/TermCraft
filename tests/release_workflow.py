@@ -46,6 +46,33 @@ class ReleaseWorkflowContract(unittest.TestCase):
             ])
             self.assertEqual(outputs.read_text().strip(), "MACOSX_DEPLOYMENT_TARGET=14.0")
 
+    def test_mac_ci_passes_the_browser_filename_before_lipo_verify_arch(self):
+        mac = workflow("ci.yml")["jobs"]["regression-macos-arm64"]
+        step = next(step for step in mac["steps"]
+                    if step.get("name") == "Verify Apple Silicon toolchain and owned endpoint prerequisites")
+        # Run the actual parsed prerequisite block through its browser gate.
+        block = step["run"].split("sw_vers", 1)[0]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            browser = root / "Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            browser.parent.mkdir(parents=True)
+            browser.touch(mode=0o755)
+            calls = root / "calls"
+            for name, code in {
+                "uname": "echo arm64",
+                "lipo": 'printf "%s\\n" "$@" > "$CALLS"; '
+                        'test "$#" -eq 3 && test "$1" = "$BROWSER" && '
+                        'test "$2" = -verify_arch && test "$3" = arm64',
+            }.items():
+                script = root / name
+                script.write_text("#!/bin/sh\n" + code + "\n")
+                script.chmod(0o755)
+            block = block.replace('"/Applications/', f'"{root}/absent/')
+            subprocess.run(["bash", "-euo", "pipefail", "-c", block], check=True,
+                           env={**os.environ, "HOME": str(root), "CALLS": str(calls), "BROWSER": str(browser),
+                                "PATH": f'{root}{os.pathsep}{os.environ["PATH"]}'})
+            self.assertEqual(calls.read_text().splitlines(), [str(browser), "-verify_arch", "arm64"])
+
     def test_release_dependencies_cover_all_native_runners_and_isolate_write_permission(self):
         release = workflow("release.yml")
         ci = workflow("ci.yml")

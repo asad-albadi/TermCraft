@@ -7,7 +7,9 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import shutil
+import signal
 import socket
 import subprocess
 import tempfile
@@ -59,14 +61,30 @@ def verify(root, manifest_path):
 
 
 def run(command, cwd, environment, log_path, timeout=120):
-    with log_path.open("xb") as log:
-        completed = subprocess.run(command, check=False, cwd=cwd, env=environment,
-                                   stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE, timeout=timeout)
-        log.write(completed.stdout)
-        log.write(completed.stderr)
-    completed.check_returncode()
-    return completed.stdout
+    with log_path.open("xb") as log, subprocess.Popen(
+        command, cwd=cwd, env=environment, stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=os.name == "posix",
+    ) as process:
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            # The macOS wrapper may still own a GUI child holding the pipes.
+            if os.name == "posix":
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            else:
+                process.kill()
+            stdout, stderr = process.communicate(timeout=10)
+            log.write(stdout)
+            log.write(stderr)
+            raise
+        log.write(stdout)
+        log.write(stderr)
+    if process.returncode:
+        raise subprocess.CalledProcessError(process.returncode, command, stdout, stderr)
+    return stdout
 
 
 def linux_rdp_helper_matches(image, expected_digest):
@@ -215,7 +233,13 @@ def rdp_session_probe(executable, helper, helper_digest, isolated, environment, 
         raise ValueError("RDP startup modified the saved workspace preferences.")
 
 
-def smoke(archive, evidence, display, software_gl=None):
+def successful_wayland_connect(trace, socket_path):
+    expected = re.escape(os.fsencode(socket_path))
+    pattern = rb'^[ \t]*[0-9]+ +connect\([0-9]+, \{sa_family=AF_UNIX, sun_path="' + expected + rb'"\}, [0-9]+\) += 0$'
+    return next((line for line in trace.splitlines() if re.fullmatch(pattern, line)), None)
+
+
+def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None):
     from PIL import Image, ImageStat
 
     evidence.mkdir(parents=True, exist_ok=False)
@@ -239,7 +263,7 @@ def smoke(archive, evidence, display, software_gl=None):
         executable = bindir / f"harbor-workspace{suffix}"
         helper = bindir / f"termcraft-rdp-engine{suffix}"
         environment = {
-            **os.environ, "PATH": "", "HOME": str(isolated), "USERPROFILE": str(isolated),
+            **(native_wayland["environment"] if native_wayland else os.environ), "PATH": "", "HOME": str(isolated), "USERPROFILE": str(isolated),
             "XDG_CONFIG_HOME": str(isolated / "config"), "XDG_DATA_HOME": str(isolated / "data"),
             "LOCALAPPDATA": str(isolated / "local"),
         }
@@ -249,6 +273,7 @@ def smoke(archive, evidence, display, software_gl=None):
         if display:
             environment["DISPLAY"] = display
             environment.pop("WAYLAND_DISPLAY", None)
+            environment.pop("WAYLAND_SOCKET", None)
         if software_gl is not None:
             if host != "windows" or manifest["architecture"] != "x86_64":
                 raise ValueError("This software GL fixture requires a Windows x64 package.")
@@ -275,8 +300,28 @@ def smoke(archive, evidence, display, software_gl=None):
                     raise ValueError("RDP helper returned an unexpected handshake.")
         screenshot = evidence / "startup.png"
         launcher = bindir / "termcraft-desktop-launcher" if host == "macos" else executable
-        run([launcher, "--data-dir", isolated / "workspace data", "--screenshot", screenshot],
-            isolated, environment, evidence / "startup.log")
+        launch = [launcher, "--data-dir", isolated / "workspace data", "--screenshot", screenshot]
+        if native_wayland:
+            socket_path = native_wayland["socket"]
+            tracer = shutil.which("strace")
+            if (host != "linux" or tracer is None or any(key in environment for key in ("DISPLAY", "WAYLAND_SOCKET"))
+                    or Path(environment["XDG_RUNTIME_DIR"]) / environment["WAYLAND_DISPLAY"] != socket_path):
+                raise ValueError("Native Wayland needs strace and the owned socket without X11 fallback")
+            trace = isolated / "wayland-connect.trace"
+            launch = [tracer, "--kill-on-exit", "-f", "-e", "trace=connect", "-s", "256", "-o", trace, *launch]
+        run(launch, isolated, environment, evidence / "startup.log")
+        wayland = {}
+        if native_wayland:
+            connected = successful_wayland_connect(trace.read_bytes(), socket_path)
+            if not connected:
+                raise ValueError("The screenshot process did not connect to the owned Weston socket")
+            with (evidence / "startup.log").open("ab") as output:
+                output.write(b"\n[successful native Wayland connect]\n" + connected + b"\n")
+            wayland = {"source_sha": native_wayland["source_sha"], "weston": {
+                "backend": "headless", "socket": str(socket_path), "pid": native_wayland["weston_pid"],
+                "socket_inode": native_wayland["socket_inode"], "runtime_mode": "0700",
+                "display_absent": True, "wayland_socket_absent": True,
+            }}
         with Image.open(screenshot) as image:
             stats = ImageStat.Stat(image.convert("RGB"))
             if image.width < 640 or image.height < 400 or max(stats.stddev) < 2:
@@ -286,6 +331,7 @@ def smoke(archive, evidence, display, software_gl=None):
         rdp_session_probe(executable, helper, helper_digest, isolated, environment, evidence,
                           software_gl is not None)
         (evidence / "verification.json").write_text(json.dumps({
+            **wayland,
             "archive": archive.name, "archive_sha256": sha256(archive),
             "manifest_schema": manifest["schema_version"], "platform": host,
             "display_backend": (

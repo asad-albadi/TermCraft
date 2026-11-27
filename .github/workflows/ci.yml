@@ -160,7 +160,7 @@ jobs:
             "$HOME/Applications/Chromium.app/Contents/MacOS/Chromium" \
             "$HOME/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"; do
             if [[ -x "$browser" ]]; then
-              lipo -verify_arch arm64 "$browser" && installed_browser="$browser" && break
+              lipo "$browser" -verify_arch arm64 && installed_browser="$browser" && break
             fi
           done
           test -n "${installed_browser:-}"

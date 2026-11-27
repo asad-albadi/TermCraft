@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       native_gui:
-        description: Require native GUI and RDP startup. Disabling this collects diagnostics only and blocks assembly.
+        description: Require native GUI, RDP and package lifecycle qualification. Disabling this blocks assembly.
         type: boolean
         default: true
       windows_x_fixture:
@@ -78,7 +78,7 @@ jobs:
             artifact: macos-arm64
             platform: macos
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 75
+    timeout-minutes: 110
     env:
       RELEASE_SOURCE: ${{ needs.preflight.outputs.source_sha }}
       RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
@@ -118,7 +118,7 @@ jobs:
           sudo apt-get "${termcraft_apt_options[@]}" update
           sudo apt-get "${termcraft_apt_options[@]}" install -y \
             binutils libx11-dev libxkbcommon-dev libxkbcommon-x11-0 \
-            libwayland-dev libegl1-mesa-dev libgl1-mesa-dev libgl1-mesa-dri xvfb xauth
+            libwayland-dev libegl1-mesa-dev libgl1-mesa-dev libgl1-mesa-dri xvfb xauth weston strace
       - if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -137,7 +137,7 @@ jobs:
           xcodebuild -version
           xcrun --sdk macosx --show-sdk-version
           cargo test --locked --manifest-path engines/rdp/Cargo.toml
-      - run: cargo test --locked --test package_manifest
+      - run: cargo test --locked --test package_manifest --test package_version
       - if: runner.os == 'Windows'
         run: cargo test --locked --test cli_dispatch --test credential_vault
       - name: Verify native input on the disposable Windows desktop
@@ -149,6 +149,7 @@ jobs:
         shell: bash
         run: |
           build_root=$(python -c 'import os, tempfile; print(tempfile.mkdtemp(prefix="termcraft-build-", dir=os.environ["RUNNER_TEMP"]))')
+          echo "TERMCRAFT_RELEASE_BUILD_ROOT=$build_root" >> "$GITHUB_ENV"
           python scripts/package-release.py --build-root "$build_root" --output dist
       - name: Build and verify the Linux Debian package
         if: runner.os == 'Linux'
@@ -170,6 +171,21 @@ jobs:
           archive=(dist/TermCraft-*.tar.gz)
           test "${#archive[@]}" -eq 1
           xvfb-run -a -s '-screen 0 1440x1024x24' bash -c 'python scripts/package-check-startup.py "$1" --display "$DISPLAY" --evidence startup-evidence' _ "${archive[0]}"
+      - name: Qualify the Linux archive on a private native Wayland compositor
+        if: runner.os == 'Linux' && (github.event_name == 'push' || inputs.native_gui)
+        shell: bash
+        run: |
+          archive=(dist/TermCraft-*.tar.gz)
+          test "${#archive[@]}" -eq 1
+          python scripts/package-check-wayland.py "${archive[0]}" --source "$RELEASE_SOURCE" \
+            --evidence wayland-evidence --weston-log diagnostics/weston.log
+      - name: Qualify Debian and per-user Linux desktop lifecycle
+        if: runner.os == 'Linux' && (github.event_name == 'push' || inputs.native_gui)
+        shell: bash
+        run: |
+          xvfb-run -a -s '-screen 0 1440x1024x24' python scripts/package-native-lifecycle.py qualify \
+            --platform linux --source "$RELEASE_SOURCE" --version "$RELEASE_VERSION" --dist dist \
+            --evidence lifecycle-evidence --build-root "$TERMCRAFT_RELEASE_BUILD_ROOT" --disposable-runner
       - name: Start the macOS archive on the native desktop
         if: runner.os == 'macOS' && (github.event_name == 'push' || inputs.native_gui)
         shell: bash
@@ -177,7 +193,14 @@ jobs:
           archive=(dist/TermCraft-*.zip)
           test "${#archive[@]}" -eq 1
           python scripts/package-check-startup.py "${archive[0]}" --evidence startup-evidence
-      - name: Start the Windows archive on the native desktop
+      - name: Qualify macOS install, replacement, relocation and removal
+        if: runner.os == 'macOS' && (github.event_name == 'push' || inputs.native_gui)
+        shell: bash
+        run: |
+          python scripts/package-native-lifecycle.py qualify --platform macos --source "$RELEASE_SOURCE" \
+            --version "$RELEASE_VERSION" --dist dist --evidence lifecycle-evidence \
+            --build-root "$TERMCRAFT_RELEASE_BUILD_ROOT" --disposable-runner
+      - name: Start the Windows archive and qualify the KnownFolder lifecycle
         if: runner.os == 'Windows' && (github.event_name == 'push' || inputs.native_gui)
         shell: pwsh
         run: |
@@ -194,7 +217,10 @@ jobs:
           if ($archive.Count -ne 1) { throw 'Expected exactly one Windows package.' }
           python scripts/package-check-startup.py $archive[0].FullName --evidence startup-evidence --windows-software-gl $softwareGl
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          ./tests/windows-package-lifecycle.ps1 -Archive $archive[0].FullName -SoftwareGlDirectory $softwareGl
+          python scripts/package-native-lifecycle.py qualify --platform windows --source $env:RELEASE_SOURCE `
+            --version $env:RELEASE_VERSION --dist dist --evidence lifecycle-evidence `
+            --build-root $env:TERMCRAFT_RELEASE_BUILD_ROOT --software-gl $softwareGl --disposable-runner
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify packaged Winspool worker with a disposable queue
         if: runner.os == 'Windows' && inputs.windows_printer_fixture
         shell: pwsh
@@ -212,15 +238,18 @@ jobs:
         run: |
           echo '::error::Native startup was disabled. This run is diagnostics only.'
           exit 1
-      - name: Verify packaged bytes and native startup evidence
+      - name: Verify packaged bytes and required native qualification evidence
         id: inventory
         shell: bash
         run: |
+          wayland=()
+          if [[ "$RELEASE_PLATFORM" == linux ]]; then wayland=(--wayland wayland-evidence); fi
           python scripts/release-delivery.py inventory --source "$RELEASE_SOURCE" --version "$RELEASE_VERSION" \
-            --platform "$RELEASE_PLATFORM" --dist dist --startup startup-evidence --output "candidate-$ARTIFACT"
+            --platform "$RELEASE_PLATFORM" --dist dist --startup startup-evidence \
+            --lifecycle lifecycle-evidence "${wayland[@]}" --output "candidate-$ARTIFACT"
         env:
           ARTIFACT: ${{ matrix.artifact }}
-      - name: Upload validated startup candidate
+      - name: Upload validated native candidate
         uses: actions/upload-artifact@v4
         with:
           name: candidate-${{ matrix.artifact }}
@@ -244,6 +273,8 @@ jobs:
           path: |
             diagnostics/
             startup-evidence/
+            lifecycle-evidence/
+            wayland-evidence/
           if-no-files-found: error
           overwrite: true
 
