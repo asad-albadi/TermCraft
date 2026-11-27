@@ -87,6 +87,34 @@ class AppImageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Incorrect pinned package"):
                 appimage.MATERIALS.libraries(inputs, work / "library-stage")
 
+    def test_fetch_rejects_cached_or_downloaded_source_from_the_wrong_archive(self):
+        from unittest import mock
+        import subprocess
+        fetcher = appimage.load("appimage_fetch", appimage.RECIPE / "fetch-inputs.py")
+        rows = (appimage.RECIPE / "runtime-inputs.tsv").read_text().splitlines()
+        pin, name, url = next(line.split() for line in rows if " zlib-" in line)
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            cached = work / name
+            cached.write_bytes(b"wrong archive")
+            with self.assertRaises(ValueError) as failure:
+                fetcher.fetch(work, (pin, name, url))
+            for detail in ["local cache", "13 bytes", pin, appimage.digest(cached)]:
+                self.assertIn(detail, str(failure.exception))
+            self.assertEqual(cached.read_bytes(), b"wrong archive")
+            cached.unlink()
+
+            def wrong_download(command):
+                Path(command[command.index("-o") + 1]).write_bytes(b"wrong archive")
+                return subprocess.CompletedProcess(command, 0)
+
+            with mock.patch.object(fetcher.subprocess, "run", side_effect=wrong_download):
+                with self.assertRaises(ValueError) as failure:
+                    fetcher.fetch(work, (pin, name, url))
+            self.assertIn(url, str(failure.exception))
+            self.assertFalse(cached.exists())
+            self.assertEqual(list(work.iterdir()), [])
+
     def test_existing_output_is_never_overwritten(self):
         with tempfile.TemporaryDirectory() as temp:
             out = Path(temp)

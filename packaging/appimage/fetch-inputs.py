@@ -17,13 +17,15 @@ def fetch(directory, row):
     sha, name, url = row
     target = directory / name
 
-    def verify(path):
+    def verify(path, origin):
         with path.open("rb") as stream:
-            if hashlib.file_digest(stream, "sha256").hexdigest() != sha:
-                raise ValueError("Build input checksum differs: " + name)
+            actual = hashlib.file_digest(stream, "sha256").hexdigest()
+            if actual != sha:
+                raise ValueError(f"Build input checksum differs: {name} from {origin}, "
+                                 f"{path.stat().st_size} bytes, expected {sha}, received {actual}")
 
     if target.exists():
-        verify(target)
+        verify(target, "local cache")
         return
     with tempfile.NamedTemporaryFile(dir=directory) as temporary:
         # Canonical mirrors retain many of these identical source files.
@@ -38,7 +40,7 @@ def fetch(directory, row):
                 break
         else:
             raise ValueError("Unable to fetch " + name)
-        verify(Path(temporary.name))
+        verify(Path(temporary.name), location)
         os.link(temporary.name, target)
 
 
