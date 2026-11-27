@@ -1,5 +1,7 @@
 # Fluent 1 and remote-workspace UX research
 
+This document records the starting review. The [integrated verification record](validation.md) gives the final disposition and evidence for these surfaces.
+
 Research date: 2026-11-27. Direction explicitly selected by the owner: **Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over Fluent 2**, preserving TermCraft's existing layout, penguin and emerald identity. Windows 11 is the explicit visual reference; the earlier inference that Fluent 1 required Windows 10/UWP geometry was corrected before dialog migration. It is a refinement pass, not a toolkit migration.
 
 ## Primary design references

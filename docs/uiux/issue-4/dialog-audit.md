@@ -1,5 +1,7 @@
 # Fluent 1 dialog audit
 
+This document records the starting review. The [integrated verification record](validation.md) gives the final disposition and evidence for these surfaces.
+
 Source review for issue 4. References identify the current implementation, including dialogs that render outside the root dialog dispatcher. The native session screenshot at `target/readme-capture/session-dark.png` is the existing reproducer. This audit did not launch the app or run Cargo.
 
 ## Shared implementation priorities

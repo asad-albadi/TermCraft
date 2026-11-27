@@ -1,5 +1,7 @@
 # TermCraft Fluent 1 screen audit
 
+This document records the starting review. The [integrated verification record](validation.md) gives the final disposition and evidence for these surfaces.
+
 Source review of the native egui application on issue-4-fluent-ux. Locations below identify the starting source, before the implementation batches. The defects are visible in the rendering or interaction code. Runtime inspection at minimum size, in a detached window, and at larger UI scale remains part of implementation verification.
 
 ## Shared controls and shell
