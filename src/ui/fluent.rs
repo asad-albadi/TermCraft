@@ -469,6 +469,36 @@ pub(super) fn modeless<'a>(ctx: &Context, id: Id, title: &'a str, size: DialogSi
         .constrain_to(ctx.content_rect())
 }
 
+/// Stack narrow rows. At desktop widths the label column has a fixed measure,
+/// so a paragraph or long hostname cannot change another field's geometry.
+pub(super) fn form_row<T>(ui: &mut Ui, name: &str, controls: impl FnOnce(&mut Ui, Id) -> T) -> T {
+    if ui.available_width() < 440. {
+        let label = ui.label(name);
+        controls(ui, label.id)
+    } else {
+        ui.horizontal_top(|ui| {
+            let label = ui
+                .allocate_ui_with_layout(
+                    vec2(146., CONTROL_HEIGHT),
+                    egui::Layout::top_down(egui::Align::Min),
+                    |ui| {
+                        ui.set_width(146.);
+                        ui.label(name)
+                    },
+                )
+                .inner;
+            ui.vertical(|ui| controls(ui, label.id)).inner
+        })
+        .inner
+    }
+}
+
+pub(super) fn form_text(ui: &mut Ui, name: &str, value: &mut String, hint: &str) -> Response {
+    form_row(ui, name, |ui, label| {
+        text_input(ui, label, value, hint, ui.available_width())
+    })
+}
+
 /// A labelled field that fits the current column and keeps a 32-point hit area.
 pub(super) fn field(
     ui: &mut Ui,
@@ -478,6 +508,16 @@ pub(super) fn field(
     preferred_width: f32,
 ) -> Response {
     let label = ui.add(Label::new(label).wrap());
+    text_input(ui, label.id, value, hint, preferred_width)
+}
+
+pub(super) fn text_input(
+    ui: &mut Ui,
+    label: Id,
+    value: &mut String,
+    hint: &str,
+    preferred_width: f32,
+) -> Response {
     let width = ui.available_width().min(preferred_width).max(1.);
     let response = ui
         .add(
@@ -487,7 +527,7 @@ pub(super) fn field(
                 .min_size(vec2(0., CONTROL_HEIGHT))
                 .margin(Margin::symmetric(8, 4)),
         )
-        .labelled_by(label.id);
+        .labelled_by(label);
     if response.enabled() && response.has_focus() {
         let underline = response.rect.shrink2(vec2(4., 2.));
         if underline.is_positive() {

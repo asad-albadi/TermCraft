@@ -262,7 +262,6 @@ impl Workspace {
                 .is_some_and(|(id, _)| self.windows.window(*id) == 0)
             || self.session_form.is_some()
             || self.pending_session_close.is_some()
-            || self.pending_remote_tab_close.is_some()
             || self
                 .tabs
                 .iter()
@@ -278,6 +277,7 @@ impl Workspace {
     }
     pub(super) fn shortcuts_blocked(&self) -> bool {
         self.blocking_input()
+            || self.pending_remote_tab_close.is_some()
             || self.title_editor.is_some()
             || self.shortcut_editor_open
             || self.highlight_editor.is_some()
@@ -289,7 +289,7 @@ impl Workspace {
         ctx.data_mut(|d| {
             d.insert_temp(
                 Id::new("termcraft-transport-blocked"),
-                self.blocking_input(),
+                (self.blocking_input(), self.pending_remote_tab_close),
             )
         });
         ctx.data_mut(|d| d.insert_temp(Id::new(BLOCKED), self.shortcuts_blocked()));
@@ -592,9 +592,9 @@ pub(super) fn is_application_key(key: Key, modifiers: Modifiers, p: &Preferences
         .is_some()
 }
 
-pub(super) fn input_blocked(ctx: &Context) -> bool {
-    ctx.data(|d| d.get_temp::<bool>(Id::new("termcraft-transport-blocked")))
-        .unwrap_or(false)
+pub(super) fn input_blocked(ctx: &Context, tab: u64) -> bool {
+    ctx.data(|d| d.get_temp::<(bool, Option<u64>)>(Id::new("termcraft-transport-blocked")))
+        .is_some_and(|(blocked, owner)| blocked || owner == Some(tab))
 }
 
 impl TerminalTab {

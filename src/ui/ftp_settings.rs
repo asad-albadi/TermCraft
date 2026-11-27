@@ -33,7 +33,7 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
         ui.small("Plain FTP sends credentials and data without encryption.");
     } else {
         ui.checkbox(&mut options.protect_data, "Encrypt data connections");
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Certificate authority");
             if ui.button("Choose PEM…").clicked() {
                 if let Some(path) = rfd::FileDialog::new().pick_file() {

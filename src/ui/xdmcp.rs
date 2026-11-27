@@ -179,7 +179,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 state.prefix = 24;
             }
         }
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Local interface IPv4");
             ui.text_edit_singleline(&mut state.interface);
             ui.label("Prefix");
@@ -196,7 +196,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 });
         ui.small("Broadcast sends at most three discovery packets on the network you choose, only when you click Discover. Advertisements are unauthenticated.");
     }
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         if state.pending.is_some() || state.resolving.is_some() {
             ui.spinner();
             if ui.button("Cancel discovery / resolution").clicked() {
@@ -297,7 +297,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             .map(|v| v.to_string())
             .unwrap_or_else(|| "None".into())
     ));
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         let mut automatic = s.xdmcp_options.display.is_none();
         if ui
             .checkbox(&mut automatic, "Automatic free display")
@@ -329,14 +329,14 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             options.clipboard_authority = None;
         }
     } else {
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Desktop size");
             ui.add(DragValue::new(&mut s.width).range(200..=8192));
             ui.label("×");
             ui.add(DragValue::new(&mut s.height).range(200..=8192));
             ui.checkbox(&mut s.xdmcp_options.fullscreen, "Full screen");
         });
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Monitor output");
             let mut monitor = s.xdmcp_options.monitor.clone().unwrap_or_default();
             let monitor_hint = if cfg!(all(windows, target_arch = "x86_64")) {
@@ -355,7 +355,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 }
             }
         });
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
         ui.label("Session keyboard");
         let keyboard = &mut s.xdmcp_options.keyboard;
         ui.add(TextEdit::singleline(keyboard).hint_text("Host keyboard").desired_width(120.0))
@@ -364,7 +364,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             keyboard.clear();
         }
     });
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             let windows = cfg!(all(windows, target_arch = "x86_64"));
             ui.label(if windows {
                 "Windows text clipboard"
@@ -406,7 +406,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
         }
         #[cfg(target_os = "linux")]
         if s.xdmcp_options.clipboard == ClipboardPolicy::Bidirectional {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.label("Selected local parent X11 display");
                 ui.text_edit_singleline(
                     s.xdmcp_options
@@ -420,7 +420,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 .as_ref()
                 .map(|p| p.to_string_lossy().into_owned())
                 .unwrap_or_default();
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.label("Parent Xauthority (blank: inherited)");
                 if ui.text_edit_singleline(&mut authority).changed() {
                     s.xdmcp_options.clipboard_authority = if authority.is_empty() {
@@ -438,7 +438,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             state.advertise = ip.to_string();
         }
     }
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         ui.label("Advertised local IPv4");
         ui.add(
             TextEdit::singleline(&mut state.advertise).hint_text(if native_macos {

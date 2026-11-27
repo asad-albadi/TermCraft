@@ -129,26 +129,39 @@ impl Workspace {
             },
             size,
             |ui| {
-                ScrollArea::both().id_salt("session-settings-body").max_width(size.width).max_height(size.body_height).auto_shrink([false,true]).show(ui, |ui| {
+                ScrollArea::vertical().id_salt("session-settings-body").max_width(size.width).max_height(size.body_height).auto_shrink([false,true]).show(ui, |ui| {
    ui.set_width((size.width-20.).max(1.));
    ui.label(RichText::new("Choose a connection").size(20.).strong());ui.add_space(7.);
    ui.horizontal_wrapped(|ui|{for p in PROTOCOLS{if ui.selectable_label(s.protocol==*p,*p).clicked(){s.protocol=(*p).into();s.port=protocol_port(p);if *p=="Mosh"&&self.editing.is_none(){s.mosh_provider=harbor_workspace::model::MoshProvider::Bundled;}if *p=="FTP"{s.ftp_options=harbor_workspace::protocols::ftp_actor::SessionOptions::embedded();}if *p=="Browser"{s.browser_options.embedded=true;if self.editing.is_none(){s.browser_options.runtime=harbor_workspace::browser::Runtime::BundledChromium;}}}}});ui.add_space(7.);ui.separator();
    ui.strong("Session details");
-   Grid::new("session_fields").num_columns(2).spacing([20.,13.]).show(ui,|ui|{
-    let name = fluent::field(ui,"Session name",&mut s.name,"Optional display name",390.); fluent::focus_on_entry(ui, &name, Id::new("session-form")); ui.end_row();field(ui,"Folder",&mut s.folder,"My sessions");
-   });
+   let name = fluent::form_text(ui,"Session name",&mut s.name,"Optional display name");
+   fluent::focus_on_entry(ui, &name, Id::new("session-form"));
+   fluent::form_text(ui,"Folder",&mut s.folder,"My sessions");
    ui.strong("Connection settings");
-   Grid::new("session-endpoint").num_columns(2).spacing([20.,13.]).show(ui,|ui|{
-    if s.protocol=="Local"{field(ui,"Shell executable",&mut s.command,"Use the system default");super::xserver::session_settings(ui,&mut s);ui.label("Start folder");ui.horizontal_wrapped(|ui|{ui.add(TextEdit::singleline(&mut s.directory).desired_width((size.width-230.).clamp(50.,330.)));if ui.small_button("Browse").clicked(){if let Some(p)=rfd::FileDialog::new().pick_folder(){s.directory=p.to_string_lossy().into();}}});ui.end_row();}
-    else if s.protocol=="Serial"{field(ui,"Device / COM port",&mut s.serial_device,if cfg!(windows){"COM3"}else{"/dev/ttyUSB0"});ui.label("Baud rate");ui.add(DragValue::new(&mut s.baud).range(50..=4_000_000));ui.end_row();super::serial_settings::session(ui,&mut s);}
-    else{field(ui,if s.protocol=="Browser"{"Website address"}else{"Remote host"},&mut s.host,if s.protocol=="Browser"{"https://example.com"}else{"Hostname or IP address"});if s.protocol!="Browser"{field(ui,"Username",&mut s.user,"Use the client default");ui.label("Port");ui.add(DragValue::new(&mut s.port).range(1..=65535));ui.end_row();}}
-   });
+   match s.protocol.as_str() {
+       "Local" => {
+           fluent::form_text(ui,"Shell executable",&mut s.command,"Use the system default");
+           super::xserver::session_settings(ui,&mut s);
+           session_path(ui, "Start folder", &mut s.directory, "", rfd::FileDialog::pick_folder);
+       }
+       "Serial" => {
+           fluent::form_text(ui,"Device / COM port",&mut s.serial_device,if cfg!(windows){"COM3"}else{"/dev/ttyUSB0"});
+           fluent::form_row(ui,"Baud rate",|ui,label| ui.add(DragValue::new(&mut s.baud).range(50..=4_000_000)).labelled_by(label));
+           super::serial_settings::session(ui,&mut s);
+       }
+       "Browser" => { fluent::form_text(ui,"Website address",&mut s.host,"https://example.com"); }
+       _ => {
+           fluent::form_text(ui,"Remote host",&mut s.host,"Hostname or IP address");
+           fluent::form_text(ui,"Username",&mut s.user,"Use the client default");
+           fluent::form_row(ui,"Port",|ui,label| ui.add(DragValue::new(&mut s.port).range(1..=65535)).labelled_by(label));
+       }
+   }
    if s.protocol=="FTP"{super::ftp_settings::session(ui,&mut s);}
-   if s.protocol=="Rsh"{Grid::new("rsh-command").num_columns(2).show(ui,|ui|{field(ui,"Remote command",&mut s.command,"Required command for Rsh");});}
+   if s.protocol=="Rsh"{fluent::form_text(ui,"Remote command",&mut s.command,"Required command for Rsh");}
    if matches!(s.protocol.as_str(),"Telnet"|"Rlogin"|"Rsh"){ui.small("Embedded transport. These protocols do not encrypt direct connections. Rlogin/Rsh require a permitted reserved local source port; Telnet can use the verified SSH gateway below.");}
    if s.protocol=="Mosh"{
        use harbor_workspace::model::MoshProvider;
-       ui.horizontal_wrapped(|ui|{ui.label("SSH port");ui.add(DragValue::new(&mut s.mosh_ssh_port).range(1..=65535));});
+       fluent::form_row(ui,"SSH port",|ui,label|ui.add(DragValue::new(&mut s.mosh_ssh_port).range(1..=65535)).labelled_by(label));
        ui.horizontal_wrapped(|ui|{
            ui.label("Mosh provider");
            ui.selectable_value(&mut s.mosh_provider,MoshProvider::Bundled,"Packaged client");
@@ -168,14 +181,34 @@ impl Workspace {
      if s.remote_backend==RemoteBackendKind::Scp {ui.label("Explicit SCP requires Python 3 on the POSIX remote host. Browsing, files, folders, entry management and editing depend on the live capability checks. No installed scp executable is needed.");}
     }
    }
-   if matches!(s.protocol.as_str(),"SSH"|"SFTP"|"Mosh"){ui.add_space(5.);CollapsingHeader::new("SSH options").default_open(true).show(ui,|ui|{Grid::new("ssh_options").num_columns(2).spacing([20.,10.]).show(ui,|ui|{
-    ui.label("Private key");ui.horizontal_wrapped(|ui|{ui.add(TextEdit::singleline(&mut s.key).hint_text("Optional key file").desired_width((size.width-230.).clamp(50.,330.)));if ui.small_button("Browse").clicked(){if let Some(p)=rfd::FileDialog::new().pick_file(){s.key=p.to_string_lossy().into();}}});ui.end_row();field(ui,"Jump host",&mut s.jump,"user@bastion:22");
-    if s.protocol=="SSH"{ui.label("SSH agent");ui.horizontal_wrapped(|ui|{ui.selectable_value(&mut s.agent_mode,AgentMode::System,"System");ui.selectable_value(&mut s.agent_mode,AgentMode::Disabled,"Disabled");if s.ssh_engine==SshEngine::Embedded{ui.selectable_value(&mut s.agent_mode,AgentMode::Owned,"TermCraft-owned");if cfg!(windows){ui.selectable_value(&mut s.agent_mode,AgentMode::Pageant,"Pageant");}}if ui.button("Manage keys…").clicked(){self.ssh_keys.open=true;}});ui.end_row();ui.label("An explicit private-key file takes precedence over agent identities.");ui.end_row();field(ui,"Remote command",&mut s.command,"Optional startup command");}if s.protocol=="SSH"{super::xserver::session_settings(ui,&mut s);}ui.label("Transfer");ui.checkbox(&mut s.compression,"Enable compression");ui.end_row();});});ui.label(RichText::new("Embedded SSH asks for credentials in Remote files. OpenSSH compatibility asks in the terminal. Passwords are saved only through the opt-in credential vault.").size(11.).color(muted(ui)));}
+   if matches!(s.protocol.as_str(),"SSH"|"SFTP"|"Mosh"){
+       ui.add_space(5.);
+       CollapsingHeader::new("SSH options").default_open(true).show(ui,|ui|{
+           session_path(ui, "Private key", &mut s.key, "Optional key file", rfd::FileDialog::pick_file);
+           fluent::form_text(ui,"Jump host",&mut s.jump,"user@bastion:22");
+           if s.protocol=="SSH" {
+               fluent::form_row(ui,"SSH agent",|ui,_|ui.horizontal_wrapped(|ui|{
+                   ui.selectable_value(&mut s.agent_mode,AgentMode::System,"System");
+                   ui.selectable_value(&mut s.agent_mode,AgentMode::Disabled,"Disabled");
+                   if s.ssh_engine==SshEngine::Embedded {
+                       ui.selectable_value(&mut s.agent_mode,AgentMode::Owned,"TermCraft-owned");
+                       if cfg!(windows){ui.selectable_value(&mut s.agent_mode,AgentMode::Pageant,"Pageant");}
+                   }
+                   if ui.button("Manage keys…").clicked(){self.ssh_keys.open=true;}
+               }));
+               ui.small("An explicit private-key file takes precedence over agent identities.");
+               fluent::form_text(ui,"Remote command",&mut s.command,"Optional startup command");
+               super::xserver::session_settings(ui,&mut s);
+           }
+           fluent::form_row(ui,"Transfer",|ui,label| ui.checkbox(&mut s.compression,"Enable compression").labelled_by(label));
+       });
+       ui.label(RichText::new("Embedded SSH asks for credentials in Remote files. OpenSSH compatibility asks in the terminal. Passwords are saved only through the opt-in credential vault.").size(12.).color(muted(ui)));
+   }
    if matches!(s.protocol.as_str(),"SSH"|"SFTP"|"Mosh"){super::ssh_options::session(ui,&mut s,&self.store.preferences.ssh_defaults);}
    if matches!(s.protocol.as_str(),"RDP"|"VNC"|"Telnet") {
        CollapsingHeader::new("SSH gateway").show(ui,|ui|{
-           field(ui,"Gateway chain",&mut s.jump,"user@bastion:22 (optional; comma-separated hops)");
-           if !s.jump.trim().is_empty(){field(ui,"Gateway private key",&mut s.key,"Optional local SSH key file");ui.small("The gateway is verified and authenticated separately. Desktop certificates and credentials remain bound to the target endpoint.");}
+           fluent::form_text(ui,"Gateway chain",&mut s.jump,"user@bastion:22 (optional; comma-separated hops)");
+           if !s.jump.trim().is_empty(){fluent::form_text(ui,"Gateway private key",&mut s.key,"Optional local SSH key file");ui.small("The gateway is verified and authenticated separately. Desktop certificates and credentials remain bound to the target endpoint.");}
        });
        if !s.jump.trim().is_empty(){super::ssh_options::session(ui,&mut s,&self.store.preferences.ssh_defaults);}
    }
@@ -1750,7 +1783,7 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
     t.history_offset = frame.inner;
     let id = Id::new(("terminal-input", t.id));
     let response = ui.interact(frame.response.rect, id, Sense::click());
-    if super::shortcuts::input_blocked(ui.ctx())
+    if super::shortcuts::input_blocked(ui.ctx(), t.id)
         || !ui.memory(|m| m.allows_interaction(ui.layer_id()))
     {
         t.macro_state.terminal_focus(ui.ctx(), false);
@@ -1769,7 +1802,9 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
     let focused = response.has_focus();
     t.macro_state.terminal_focus(
         ui.ctx(),
-        focused && ui.input(|input| input.focused) && !super::shortcuts::input_blocked(ui.ctx()),
+        focused
+            && ui.input(|input| input.focused)
+            && !super::shortcuts::input_blocked(ui.ctx(), t.id),
     );
     let mut outgoing = Vec::new();
     let can_send = t.ssh.is_none()
@@ -1833,7 +1868,7 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
         && !any_selection
         && can_send
         && !t.input_busy()
-        && !super::shortcuts::input_blocked(ui.ctx())
+        && !super::shortcuts::input_blocked(ui.ctx(), t.id)
     {
         let mut deferred_rejected = false;
         let mut application_text = false;
@@ -2155,6 +2190,26 @@ fn terminal_layout_profile(
     }
     (job, backgrounds)
 }
+pub(super) fn session_path(
+    ui: &mut Ui,
+    name: &str,
+    value: &mut String,
+    hint: &str,
+    pick: fn(rfd::FileDialog) -> Option<PathBuf>,
+) {
+    fluent::form_row(ui, name, |ui, label| {
+        ui.horizontal(|ui| {
+            let width = (ui.available_width() - 84.).max(1.);
+            fluent::text_input(ui, label, value, hint, width);
+            if ui.button("Browse").clicked()
+                && let Some(path) = pick(rfd::FileDialog::new())
+            {
+                *value = path.to_string_lossy().into_owned();
+            }
+        });
+    });
+}
+
 fn field(ui: &mut Ui, label: &str, value: &mut String, hint: &str) {
     super::fluent::field(ui, label, value, hint, 390.);
     ui.end_row();

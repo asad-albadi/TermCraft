@@ -19,7 +19,7 @@ pub(super) fn session(ui: &mut Ui, s: &mut Session) {
         });
         if s.vnc_options.security.encrypted() {
             ui.small("VeNCrypt verifies the server certificate and hostname before authentication. Anonymous TLS and security downgrades are refused.");
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.label("Certificate authority (optional)");
                 if ui.button("Choose PEM…").clicked() {
                     if let Some(path) = rfd::FileDialog::new().pick_file() {
@@ -54,7 +54,7 @@ pub(super) fn session(ui: &mut Ui, s: &mut Session) {
                 ui.selectable_value(&mut s.vnc_options.clipboard, policy, label);
             }
         });
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Keyboard");
             ui.selectable_value(
                 &mut s.vnc_options.keyboard,

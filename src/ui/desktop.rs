@@ -853,7 +853,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         ui.ctx().set_cursor_icon(CursorIcon::None);
     }
     let allowed = ui.is_enabled()
-        && !super::shortcuts::input_blocked(ui.ctx())
+        && !super::shortcuts::input_blocked(ui.ctx(), tab.id)
         && ui.memory(|memory| memory.allows_interaction(ui.layer_id()));
     let point_ctx = ui.ctx().clone();
     let layer = ui.layer_id();

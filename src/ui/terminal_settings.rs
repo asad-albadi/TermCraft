@@ -102,7 +102,7 @@ impl ProfileEditor {
     }
 }
 fn fonts(ui: &mut Ui, value: &mut TerminalFont) {
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         for (font, label) in [
             (TerminalFont::DejaVuSansMono, "DejaVu Sans Mono"),
             (TerminalFont::LiberationSans, "Liberation Sans"),
@@ -113,7 +113,7 @@ fn fonts(ui: &mut Ui, value: &mut TerminalFont) {
     });
 }
 fn encoding(ui: &mut Ui, value: &mut CharacterEncoding) {
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         for item in [
             CharacterEncoding::Utf8,
             CharacterEncoding::Windows1252,
@@ -124,7 +124,7 @@ fn encoding(ui: &mut Ui, value: &mut CharacterEncoding) {
     });
 }
 fn backspace(ui: &mut Ui, value: &mut BackspaceMapping) {
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         ui.selectable_value(value, BackspaceMapping::Delete, "DEL (0x7f)");
         ui.selectable_value(value, BackspaceMapping::ControlH, "Ctrl+H (0x08)");
     });
@@ -139,7 +139,7 @@ fn dimensions(ui: &mut Ui, value: &mut Dimensions) {
         };
     }
     if let Dimensions::Fixed { cols, rows } = value {
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Columns");
             ui.add(DragValue::new(cols).range(2..=500));
             ui.label("Rows");
@@ -148,23 +148,26 @@ fn dimensions(ui: &mut Ui, value: &mut Dimensions) {
     }
 }
 fn palette(ui: &mut Ui, value: &mut TerminalPalette) {
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         ui.label("Default text");
         ui.color_edit_button_srgb(&mut value.foreground);
         ui.label("Background");
         ui.color_edit_button_srgb(&mut value.background);
     });
-    Grid::new("ansi-palette").num_columns(8).show(ui, |ui| {
-        for (index, rgb) in value.ansi.iter_mut().enumerate() {
-            ui.vertical(|ui| {
-                ui.small(index.to_string());
-                ui.color_edit_button_srgb(rgb);
-            });
-            if index % 8 == 7 {
-                ui.end_row();
+    let columns = if ui.available_width() < 400. { 4 } else { 8 };
+    Grid::new("ansi-palette")
+        .num_columns(columns)
+        .show(ui, |ui| {
+            for (index, rgb) in value.ansi.iter_mut().enumerate() {
+                ui.vertical(|ui| {
+                    ui.small(index.to_string());
+                    ui.color_edit_button_srgb(rgb);
+                });
+                if index % columns == columns - 1 {
+                    ui.end_row();
+                }
             }
-        }
-    });
+        });
 }
 fn override_value<T: Clone>(
     ui: &mut Ui,

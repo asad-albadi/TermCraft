@@ -123,10 +123,12 @@ pub(super) fn settings(ui: &mut Ui, session: &mut Session) {
                 "Installed Chromium (compatibility)",
             );
         });
-        ui.horizontal(|ui| {
-            ui.label("Proxy endpoint");
-            ui.add(TextEdit::singleline(&mut options.proxy).hint_text("http://proxy.example:8080"));
-        });
+        fluent::form_text(
+            ui,
+            "Proxy endpoint",
+            &mut options.proxy,
+            "http://proxy.example:8080",
+        );
         #[cfg(windows)]
         ui.small("Requires a native 64-bit installation of Chrome or Chromium.");
         if !cfg!(any(target_os = "linux", target_os = "macos", windows)) {
@@ -141,7 +143,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         return;
     };
     let state = browser.handle.state();
-    let blocked = super::shortcuts::input_blocked(ui.ctx())
+    let blocked = super::shortcuts::input_blocked(ui.ctx(), tab.id)
         || !ui.memory(|m| m.allows_interaction(ui.layer_id()));
     if blocked || state.challenge.is_some() || !ui.is_enabled() || !ui.input(|input| input.focused)
     {

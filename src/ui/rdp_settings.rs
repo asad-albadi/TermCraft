@@ -5,10 +5,7 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
     ui.separator();
     ui.label(RichText::new("RDP settings").strong());
     let options = &mut session.rdp_options;
-    ui.horizontal(|ui| {
-        ui.label("Domain");
-        ui.text_edit_singleline(&mut options.domain);
-    });
+    fluent::form_text(ui, "Domain", &mut options.domain, "");
     ui.label("Clipboard · text only, maximum 8192 UTF-8 bytes");
     ui.horizontal_wrapped(|ui| {
         for (policy, label) in [
@@ -34,14 +31,14 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
             "Keep keyboard local",
         );
     });
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         ui.label("Keyboard layout ID (0 = engine default)");
         ui.add(DragValue::new(&mut options.keyboard_layout));
     });
     if embedded {
         ui.label("Security · verified TLS with NLA");
         ui.small("Legacy security and TLS graphical sign-in have no embedded provider.");
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Certificate authority (optional)");
             if ui.button("Choose PEM…").clicked() {
                 if let Some(path) = rfd::FileDialog::new().pick_file() {
@@ -71,7 +68,7 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
                         remove = Some(index);
                     }
                 });
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     let mut path = drive.path.display().to_string();
                     if ui
                         .add(
@@ -173,11 +170,11 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
         {
             ui.label(RichText::new("Redirected printer").strong());
             if let Some(mapping) = &mut options.printer_mapping {
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     ui.label("Local installed queue");
                     ui.text_edit_singleline(&mut mapping.queue);
                 });
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     ui.label("Windows driver name");
                     ui.text_edit_singleline(&mut mapping.driver);
                 });
@@ -201,7 +198,7 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session) {
             ui.checkbox(&mut options.smartcard, "Redirect smartcards");
         }
         if let Some(reader) = &mut options.smartcard_reader {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.label("Local PC/SC reader name");
                 ui.text_edit_singleline(reader);
             });
