@@ -2003,6 +2003,7 @@ dependencies = [
  "serde_json",
  "sha1",
  "sha2",
+ "skrifa",
  "smol_str",
  "subtle",
  "tar",

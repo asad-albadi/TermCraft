@@ -106,6 +106,45 @@ pub(super) fn palette(ui: &Ui) -> Palette {
 }
 
 fn install_fonts(ctx: &Context) {
+    #[cfg(windows)]
+    let directory =
+        std::env::var_os("WINDIR").map(|root| std::path::PathBuf::from(root).join("Fonts"));
+    #[cfg(windows)]
+    let segoe = directory.as_ref().and_then(|dir| {
+        Some([
+            std::fs::read(dir.join("segoeui.ttf")).ok()?,
+            std::fs::read(dir.join("seguisb.ttf")).ok()?,
+        ])
+    });
+    #[cfg(not(windows))]
+    let segoe = None;
+
+    #[cfg(windows)]
+    let candidates = directory
+        .into_iter()
+        .flat_map(|dir| ["YuGothR.ttc", "meiryo.ttc", "msyh.ttc"].map(|name| dir.join(name)));
+    #[cfg(target_os = "macos")]
+    let candidates = ["/System/Library/Fonts/PingFang.ttc"].into_iter();
+    #[cfg(target_os = "linux")]
+    let candidates = [
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
+    ]
+    .into_iter();
+    #[cfg(not(any(windows, target_os = "macos", target_os = "linux")))]
+    let candidates = std::iter::empty::<&str>();
+    install_interface_faces(
+        ctx,
+        segoe,
+        candidates.filter_map(|path| std::fs::read(path).ok()),
+    );
+}
+
+fn install_interface_faces(
+    ctx: &Context,
+    segoe: Option<[Vec<u8>; 2]>,
+    mut cjk_candidates: impl Iterator<Item = Vec<u8>>,
+) {
     use egui::{FontData, FontDefinitions, FontFamily};
     let mut fonts = FontDefinitions::default();
     fonts.font_data.insert(
@@ -153,13 +192,11 @@ fn install_fonts(ctx: &Context) {
             std::sync::Arc::new(FontData::from_static(bytes)),
         );
     }
-    // On Windows use the locally installed pair together when available.
-    // The application package contains only the redistributable Selawik faces.
-    #[cfg(windows)]
-    let system_faces = std::env::var_os("WINDIR").and_then(|root| {
-        let directory = std::path::PathBuf::from(root).join("Fonts");
-        let regular = std::fs::read(directory.join("segoeui.ttf")).ok()?;
-        let semibold = std::fs::read(directory.join("seguisb.ttf")).ok()?;
+    // epaint opens every registered face at index zero during context startup.
+    let usable = |bytes: &[u8]| skrifa::FontRef::from_index(bytes, 0).is_ok();
+    let segoe = segoe.filter(|pair| pair.iter().all(|bytes| usable(bytes)));
+    let has_segoe = segoe.is_some();
+    if let Some([regular, semibold]) = segoe {
         for (name, bytes) in [
             ("System Segoe UI", regular),
             ("System Segoe UI Semibold", semibold),
@@ -169,27 +206,8 @@ fn install_fonts(ctx: &Context) {
                 std::sync::Arc::new(FontData::from_owned(bytes)),
             );
         }
-        Some(())
-    });
-    // Use a locally installed CJK face when available. Collections use face zero.
-    #[cfg(target_os = "windows")]
-    let cjk = std::env::var_os("WINDIR").and_then(|root| {
-        let directory = std::path::PathBuf::from(root).join("Fonts");
-        ["YuGothR.ttc", "meiryo.ttc", "msyh.ttc"]
-            .iter()
-            .find_map(|name| std::fs::read(directory.join(name)).ok())
-    });
-    #[cfg(target_os = "macos")]
-    let cjk = std::fs::read("/System/Library/Fonts/PingFang.ttc").ok();
-    #[cfg(target_os = "linux")]
-    let cjk = [
-        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
-        "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
-    ]
-    .iter()
-    .find_map(|path| std::fs::read(path).ok());
-    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
-    let cjk: Option<Vec<u8>> = None;
+    }
+    let cjk = cjk_candidates.find(|bytes| usable(bytes));
     let has_cjk = cjk.is_some();
     if let Some(bytes) = cjk {
         fonts.font_data.insert(
@@ -199,8 +217,7 @@ fn install_fonts(ctx: &Context) {
     }
     let regular = fonts.families.get_mut(&FontFamily::Proportional).unwrap();
     regular.insert(0, "Selawik".into());
-    #[cfg(windows)]
-    if system_faces.is_some() {
+    if has_segoe {
         regular.insert(0, "System Segoe UI".into());
     }
     regular.push("terminal".into());
@@ -209,8 +226,7 @@ fn install_fonts(ctx: &Context) {
     }
     let mut semibold = regular.clone();
     semibold.insert(0, "Selawik Semibold".into());
-    #[cfg(windows)]
-    if system_faces.is_some() {
+    if has_segoe {
         semibold.insert(0, "System Segoe UI Semibold".into());
     }
     fonts
@@ -790,6 +806,85 @@ mod tests {
             });
         });
         output.textures_delta.clear();
+    }
+
+    #[test]
+    fn optional_faces_skip_invalid_bytes_and_preserve_family_order() {
+        let regular = include_bytes!("../../assets/Selawik.ttf").to_vec();
+        let semibold = include_bytes!("../../assets/Selawik-Semibold.ttf").to_vec();
+        let invalid = b"ttcf".to_vec();
+        let absent = Vec::new();
+        let cases = [
+            (
+                Some([regular.clone(), absent.clone()]),
+                vec![invalid.clone(), semibold.clone()],
+                false,
+                true,
+            ),
+            (
+                Some([invalid.clone(), semibold.clone()]),
+                vec![absent.clone(), invalid.clone()],
+                false,
+                false,
+            ),
+            (
+                Some([regular.clone(), semibold.clone()]),
+                vec![invalid.clone()],
+                true,
+                false,
+            ),
+            (None, vec![absent], false, false),
+        ];
+        for (pair, candidates, has_pair, has_cjk) in cases {
+            let ctx = Context::default();
+            install_interface_faces(&ctx, pair, candidates.into_iter());
+            let mut output = ctx.run_ui(Default::default(), |ui| {
+                ui.label("Workspace");
+                ui.fonts_mut(|fonts| {
+                    let defs = fonts.definitions();
+                    let normal = &defs.families[&egui::FontFamily::Proportional];
+                    let bold = &defs.families[&egui::FontFamily::Name("Interface Semibold".into())];
+                    assert_eq!(
+                        normal[0],
+                        if has_pair {
+                            "System Segoe UI"
+                        } else {
+                            "Selawik"
+                        }
+                    );
+                    assert_eq!(
+                        bold[0],
+                        if has_pair {
+                            "System Segoe UI Semibold"
+                        } else {
+                            "Selawik Semibold"
+                        }
+                    );
+                    for name in ["System Segoe UI", "System Segoe UI Semibold"] {
+                        assert_eq!(defs.font_data.contains_key(name), has_pair);
+                    }
+                    assert_eq!(defs.font_data.contains_key("System CJK"), has_cjk);
+                    if has_cjk {
+                        assert_eq!(
+                            defs.font_data["System CJK"].font.as_ref(),
+                            semibold.as_slice()
+                        );
+                        assert_eq!(normal.last().unwrap(), "System CJK");
+                        assert_eq!(bold.last().unwrap(), "System CJK");
+                    }
+                    assert_eq!(
+                        defs.families[&egui::FontFamily::Name("DejaVu Sans Mono".into())],
+                        ["terminal"]
+                    );
+                    assert_eq!(
+                        defs.families[&egui::FontFamily::Name("Liberation Sans".into())],
+                        ["interface"]
+                    );
+                    assert!(fonts.has_glyphs(&egui::FontId::proportional(14.), "ملف مثال"));
+                });
+            });
+            output.textures_delta.clear();
+        }
     }
 
     fn contrast(a: Color32, b: Color32) -> f32 {
