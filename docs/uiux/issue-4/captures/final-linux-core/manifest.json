@@ -1,0 +1,118 @@
+{
+  "captured_on": "2026-11-27",
+  "platform": "Linux x86-64",
+  "source_commit": "f599000ca3755490e1d2a1470a603ed033fb361b",
+  "workflow_run": 46042644335,
+  "native_job": 140654072032,
+  "artifact_id": 15221658469,
+  "artifact_name": "diagnostics-linux-amd64",
+  "qualification": "The core archive passed hosted X11, Wayland and desktop lifecycle checks. The job failed later AppImage corresponding-source validation. Its inventory record is now repaired and the complete format passed local finished-image tests; this core is not relabeled as a final candidate or green aggregate.",
+  "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
+  "archive_sha256": "1ac6a4322a26d638b139d01dae0b64a44c42c0b4ad5fd40bf451720e693e8a7f",
+  "executable_sha256": "081214f2ab3732a969de3ff7850e3bb4da55134135983624e1470926184beb92",
+  "snapshot_sha256": "ccc1e9ca836114a41df63bd3253381a0f9c83de1a8471b8f55a2e0e2db278344",
+  "width": 1920,
+  "height": 1080,
+  "scope": "Ubuntu 24.04.5 x86-64, unsigned Linux archive, Xvfb :96, software GL. Programmatic X11 scale overrides on one virtual display. Five reserved .example.test bookmarks with no remote connections.",
+  "captures": [
+    {
+      "file": "session-ssh-dark-fhd.png",
+      "sha256": "026daee457365141e7aaeb81a02a84a54c9c1a9ab282a8696c5fd05855d20c8a",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "scale_override": 1.0,
+      "observation": "SSH Connection shows host, username and port with the action row in view."
+    },
+    {
+      "file": "session-rdp-dark-fhd.png",
+      "sha256": "3fc434482ec8b22722659f3f800e9a7ce9903390a6f03d21d3e4bbbec600fb1d",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "scale_override": 1.0,
+      "observation": "RDP Connection shows host, username and port with security and display choices on separate tabs."
+    },
+    {
+      "file": "session-ssh-dark-150.png",
+      "sha256": "1b7e74cf136ed71b8f8cc3f8c91b135a41245f622ac39a69f16ee4410b820454",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1280.0,
+        720.0
+      ],
+      "scale_override": 1.5,
+      "observation": "SSH Connection at an X11 scale override of 150%."
+    },
+    {
+      "file": "session-ssh-dark-200.png",
+      "sha256": "3c8ec42bb8964ab81e54e755fad71e6a11a29ace9512636c6d006f66a4e85490",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        960.0,
+        540.0
+      ],
+      "scale_override": 2.0,
+      "observation": "SSH Connection at an X11 scale override of 200%."
+    },
+    {
+      "file": "tools-dark-scrollbar-hover.png",
+      "sha256": "f665d9ee183e15d8ddb8478c1a5ae53df0f45bc76b4db74f0d69dedc892d0e0b",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "scale_override": 1.0,
+      "observation": "Hover expands the thumb in its reserved right-edge gutter without shifting the Tools content."
+    },
+    {
+      "file": "tools-dark-scrollbar-drag.png",
+      "sha256": "708498983215cf6a9ea06dd7c7f4e33c86fd5c6b012f03f80fac4850d6fb71ad",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "scale_override": 1.0,
+      "observation": "Tools scrolled using the held scrollbar thumb in the gutter at the right edge of the full content viewport."
+    },
+    {
+      "file": "games-dark-fhd.png",
+      "sha256": "fe28c3d18c3de47c956bb0e617eeb6c05acfee3244fc1eff5fd6ef41df915f63",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "scale_override": 1.0,
+      "observation": "Native games catalog on the full client background with a centered launcher grid."
+    }
+  ],
+  "gallery_manifest": "../../../../../shots/full-hd/capture-manifest.json"
+}
