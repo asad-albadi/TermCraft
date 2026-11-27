@@ -1,6 +1,6 @@
 # Issue 4 integrated verification
 
-Production UI source is `36ba3ba`. Windows 11 desktop Fluent is the visual reference. The [screen inventory](screen-audit.md) and [dialog inventory](dialog-audit.md) record the original defects and point to each owning module. The tables below record the resulting changes, retained behaviors and evidence for those same routes. Native images and runtime identities are listed in [the capture manifest](captures/manifest.json).
+Production UI source is `5575601`. The 36ba3ba inventory and captures predate a focused detached-client contrast correction. Windows 11 desktop Fluent is the visual reference. The [screen inventory](screen-audit.md) and [dialog inventory](dialog-audit.md) record the original defects and point to each owning module. The tables below record the resulting changes, retained behaviors and evidence for those same routes. Native images and runtime identities are listed in [the capture manifest](captures/manifest.json).
 
 ## Evidence levels
 
@@ -14,7 +14,7 @@ A source disposition records what the implementation does. Production widget tes
 | Tools, Dark, 920×620, 100% | [Before](before/tools-dark-minimum.png) | [Opening sections](captures/tools-dark-920.png) and [bottom provider rows](captures/tools-dark-920-bottom.png) |
 | Compact SSH session, 640×480 | — | [Initial focus](captures/session-dark-640.png), [thumb hover](captures/scroll-hover-dark-640.png), [thumb dragged](captures/scroll-thumb-drag-dark-640.png), [Connect hover](captures/primary-hover-dark-640.png), [Connect held](captures/primary-held-dark-640.png) |
 | Real file lists and text editors | — | [Local selected filename](captures/files-system-100.png), [embedded SFTP](captures/ssh-listing-system-100.png), [FTP selected row](captures/ftp-selected-system-100.png), [SSH editor](captures/ssh-editor-system-100.png), [FTP dirty close](captures/ftp-dirty-close-system-100.png), [FTP operation result](captures/ftp-transfer-system-100.png) |
-| Ownership and responsive layout | — | [Child window at 360×260](captures/detached-system-100.png), [keys opened from SSH](captures/keys-nested-system-100.png), [SSH host verification](captures/ssh-trust-system-100.png), [SSH at 200%](captures/session-light-200.png) |
+| Ownership and responsive layout | — | [Detached Light](captures/detached-light-100.png) and [Dark](captures/detached-dark-100.png) at 360×260, [keys opened from SSH](captures/keys-nested-system-100.png), [SSH host verification](captures/ssh-trust-system-100.png), [SSH at 200%](captures/session-light-200.png) |
 | Owned web client | — | [Keyboard focus in Light](captures/web-light-focus.png), [pointer held in Dark](captures/web-dark-held.png) |
 
 Every published PNG is an original image at its recorded pixel size. Individual protocol and theme images, dimensions, source revisions, executable hashes and route descriptions appear in the [manifest](captures/manifest.json). System selected Light in this X11 fixture. The Linux development runtime includes a locally installed Noto font for the positive Japanese glyph case.
@@ -99,14 +99,20 @@ Every published PNG is an original image at its recorded pixel size. Individual 
 | More/Add event, combos and palette flyouts | Existing egui popup, scope IDs and host command semantics retained. Menu/window theme comes from Task 1/2. Individual OS popup placements and all physical-key navigation combinations were not measured. |
 | Native pickers and viewports | Existing OS chooser filters, asynchronous results and ownership retained. Native toolkits own permission/picker styling. The desktop test-only Owned overlay is untouched. |
 
-## Verification results on the corrected source
+## Verification results
 
-- The 55-case integrated Linux run passed with zero failures, ignores or filtered cases in 88.49 seconds. Its cases include all 13 session forms at three scales, 13 real game boards and save controls, real focused terminal input, nested prompts, actual loopback SSH/FTPS mixed-document handling, FTP scrolling, remote target guards and required Chromium interaction. The 10 shared component cases passed separately. These two counts overlap.
+- The 57-case integrated Linux run at `5575601` passed with zero failures, ignores or filtered cases in 122.34 seconds. Its cases include all 13 session forms at three scales, 13 real game boards and save controls, real focused terminal input, nested prompts, actual loopback SSH/FTPS mixed-document handling, FTP scrolling, remote target guards and required Chromium interaction. The 10 shared component cases were rerun and passed separately. These two counts overlap.
 - The optional-font regression supplies unreadable-as-a-font bytes, empty bytes, invalid members on either side of the Segoe pair, an invalid first CJK candidate followed by a usable one, and all-invalid candidates. Each case opens a real egui context and paints a label. The app and epaint both resolve the same locked `skrifa 0.44.0` parser. A malformed font cannot trigger the previously observed startup panic through this registration path.
 - The corrected UI test target type-checked and linked for the Linux development capture using cached pre-adapter dependencies. The pinned formatter and whitespace checks passed. [The production controls](../../../src/ui/fluent.rs), [form interaction tests](../../../src/ui/dialog_tests.rs), [explorer tests](../../../src/ui/explorer_tests.rs) and [FTP integration cases](../../../src/ui/ftp_tests.rs) contain the relevant code.
 - Chromium 157 exercised the shipped web shell at 320×480, including focus, hover, held press, disabled state, view-only default, narrow fit, forced colors and reduced motion. Measured Connect text contrast was 14.65:1 in Light and 12.71:1 in Dark. Both web packaging tests and the asset allowlist test passed. All nine staged assets matched source hashes across a 643-entry release source inventory. Redistributable Selawik Regular, Semibold and their OFL notice are listed in [CREDITS](../../../CREDITS.md).
 - The native FTP fixture used the app’s own service on loopback. The operation queue reached Finished after creating a disposable directory and its presence was verified independently. An unsaved editor close left its original file unchanged. A separate disposable OpenSSH endpoint authenticated with an ephemeral key and supplied an actual embedded SFTP listing and editor. These check the local interactions, not independent remote infrastructure.
-- [Three-platform CI](https://github.com/asad-albadi/TermCraft/actions/runs/46018221903) and [unsigned test packages](https://github.com/asad-albadi/TermCraft/actions/runs/46018225239) target `36ba3ba`. The predecessor candidate run was canceled. Physical Windows 11, macOS and Linux display, permission and assistive-technology checks remain open.
+- Three-platform CI and unsigned package checks for the corrected production source are pending at source freeze. [PR #8](https://github.com/asad-albadi/TermCraft/pull/8) tracks their results. The [candidate run for the prior source](https://github.com/asad-albadi/TermCraft/actions/runs/46018225239) was canceled. Physical Windows 11, macOS and Linux display, permission and assistive-technology checks remain open.
+
+### Detached History contrast
+
+At 360×260, the original System/Light child drew its History text against black. The brightest glyph pixel had only 1.35:1 contrast. The child now paints the resolved theme surface before drawing its controls. The terminal retains its own colors and input coordinates. The [diagnostic screenshot](captures/detached-system-100-before.png) remains associated with `36ba3ba`. Corrected [Light](captures/detached-light-100.png) and [Dark](captures/detached-dark-100.png) captures come from `5575601`.
+
+The History glyph pixels reached 15.23:1 in Light and 15.62:1 in Dark. In the same 158×18 pixel region, 243 Light and 477 Dark ink pixels reached 4.5:1, compared with zero in the diagnostic image. A regression renders the actual immediate child in both themes, locates its History text and checks that the full-client paint behind it uses the resolved surface.
 
 ## Platform and acceptance limits
 

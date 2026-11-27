@@ -14,6 +14,10 @@
       "source": "36ba3ba94a6fa40f9e78140bd07e7fcb4b6615cc",
       "browser": "Chromium 157.0.8103.38 Arch Linux",
       "route": "Application HTML, JavaScript, CSS and unchanged noVNC served into isolated Playwright browser context; no RFB endpoint."
+    },
+    "native557": {
+      "source": "5575601b0b1a2abb1640176c8a9f95b102c54130",
+      "sha256": "5999cc5571d92c4e88e626e5c200dd955d522ce6c4ea58ddf80830fb548e9626"
     }
   },
   "baseline": "../before/manifest.json",
@@ -707,7 +711,7 @@
       "observation": "Sudoku shared commands, current seed and Playing status over the real board at 150%."
     },
     {
-      "file": "detached-system-100.png",
+      "file": "detached-system-100-before.png",
       "environment": "native36",
       "theme": "system",
       "scale": 1,
@@ -720,7 +724,8 @@
         260.0
       ],
       "sha256": "0cf94567a3729fa4c01cb78a877c2f70632515b9ddb1dd9532c3f86c1f5c1b02",
-      "observation": "Detached local terminal at the native child minimum 360×260. Reattach and Rename remain visible."
+      "observation": "Observed failure on 36ba3ba. History text on black has only 1.35:1 contrast in the original 360×260 child. Kept as diagnostic evidence.",
+      "status": "diagnostic-before"
     },
     {
       "file": "ftp-loopback-system-100.png",
@@ -945,6 +950,78 @@
       ],
       "sha256": "f7b20f6dfa6bfb4e441be887da8a2fbf91a10e09758fe477c29a36f6ad9d900c",
       "observation": "Connect held in actual Chromium. Disconnected, View only checked, Disconnect disabled. 320×480 CSS viewport."
+    },
+    {
+      "file": "detached-light-100.png",
+      "environment": "native557",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        360,
+        260
+      ],
+      "logical_size": [
+        360,
+        260
+      ],
+      "sha256": "747af145525d74117d29ce8e9e89f55a921b880a9b772531c714aa718a867e3d",
+      "observation": "Corrected source: actual detached local terminal at its minimum. Readable History status and visible Reattach, Close, Fullscreen and Rename actions.",
+      "history_pixel_measurement": {
+        "region_xywh": [
+          0,
+          126,
+          158,
+          18
+        ],
+        "background": [
+          251,
+          253,
+          252
+        ],
+        "strongest_ink": [
+          24,
+          39,
+          32
+        ],
+        "contrast_ratio": 15.23,
+        "ink_pixels_at_least_4_5": 243
+      }
+    },
+    {
+      "file": "detached-dark-100.png",
+      "environment": "native557",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        360,
+        260
+      ],
+      "logical_size": [
+        360,
+        260
+      ],
+      "sha256": "95923bfe4a903966ff71e4a0d8c7bb6df3d8ed002361560600c248cacc8c697c",
+      "observation": "Corrected source: actual detached local terminal at its minimum. Readable History status and visible Reattach, Close, Fullscreen and Rename actions.",
+      "history_pixel_measurement": {
+        "region_xywh": [
+          0,
+          126,
+          158,
+          18
+        ],
+        "background": [
+          19,
+          25,
+          23
+        ],
+        "strongest_ink": [
+          234,
+          242,
+          237
+        ],
+        "contrast_ratio": 15.62,
+        "ink_pixels_at_least_4_5": 477
+      }
     }
   ]
 }

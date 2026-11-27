@@ -9,8 +9,8 @@ Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over 
 | Batch | Status | Evidence |
 | --- | --- | --- |
 | Research and complete source inventories | Complete | research.md, screen-audit.md, dialog-audit.md |
-| 1. Shared foundation | Independently reviewed throughca444ba | Windows 11 geometry correction approved; six current component tests and one actual-model disk round-trip passed; adapter-enabled matrix tracked below |
-| 2. Shell/navigation/tabs/splits | Independently reviewed atb77581a | Seventeen actual-source component tests, strict remote-pane loading/ready probe and app type check passed; dedicated name/theme bar removed |
+| 1. Shared foundation | Independently reviewed through `ca444ba` | Windows 11 geometry correction approved; six current component tests and one actual-model disk round-trip passed; adapter-enabled matrix tracked below |
+| 2. Shell/navigation/tabs/splits | Independently reviewed at `b77581a` | Seventeen actual-source component tests, strict remote-pane loading/ready probe and app type check passed; dedicated name/theme bar removed |
 | 3. Dialogs and protocol forms | Independently reviewed through acc3132 | Twenty-five focused production UI/PTY/protocol cases, eight shared components and actual SSH/Local native previews; readable aligned fields, accessible labels, scoped input ownership and safe recovery workflows |
 | 4. Specialist pages and web shell | Independently reviewed through 8f4e0ac | Forty-two focused production tests, actual Chromium appearance checks, native previews; folder/file-type icons in local, SSH/SFTP and FTP explorers |
 | 5. Integrated visual/interaction verification | Local evidence collected | [Validation record](validation.md), [original screenshots](captures/manifest.json) and [baseline](before/manifest.json). Hosted and human gates below |
@@ -107,13 +107,15 @@ A checked component has a recorded change or retention decision. Consult the val
 - [x] System/Light/Dark and 100/150/200% layout/capture coverage
 - [x] Current-source native Linux development visual captures and before/after comparisons
 - [ ] Required Linux/Windows/Apple Silicon regression lanes
-- [x] Independent implementation reviews and final whole-branch source review. The single Important optional-font issue was corrected in `36ba3ba` and its scoped review approved.
+- [x] Independent implementation reviews and final whole-branch source review. The optional-font correction in `36ba3ba` passed scoped review. The subsequent evidence review identified a detached History contrast defect. The correction and its native evidence passed scoped review at `5575601`.
 - [ ] Final evidence and platform-package review
 - [ ] Human checks — owner explicitly required before merge
 
 
 ### Current-source checks
 
-The integrated Linux suite on `36ba3ba` passed 55 production cases and all ten shared component cases. It used the existing pre-adapter graphics dependencies. The native screenshots cover the three theme selections and three real window scales on an isolated X11 display. The browser checks exercised the actual app-owned noVNC assets in Chromium. See the [capture manifest](captures/manifest.json) and [validation record](validation.md) for exact scope.
+The integrated Linux suite on `5575601` passed 57 production cases. The separate shared-component suite passed all ten cases. It used the existing pre-adapter graphics dependencies. The native screenshots cover the three theme selections and three real window scales on an isolated X11 display. The browser checks exercised the actual app-owned noVNC assets in Chromium. See the [capture manifest](captures/manifest.json) and [validation record](validation.md) for exact scope.
 
-[Run 46010039731](https://github.com/asad-albadi/TermCraft/actions/runs/46010039731) passed the earlier dialog source `eb439c9` on Linux x86-64, Windows x64 and Apple Silicon macOS. The current-source [three-platform CI](https://github.com/asad-albadi/TermCraft/actions/runs/46018221903) and [unsigned candidate build](https://github.com/asad-albadi/TermCraft/actions/runs/46018225239) target `36ba3ba`. An artifact or passing automated test does not complete the owner’s human checks.
+[Run 46010039731](https://github.com/asad-albadi/TermCraft/actions/runs/46010039731) passed the earlier dialog source `eb439c9` on Linux x86-64, Windows x64 and Apple Silicon macOS. At the `5575601` source freeze, the corrected three-platform CI and unsigned package checks are pending. Their results are tracked on [PR #8](https://github.com/asad-albadi/TermCraft/pull/8). The [preceding candidate build](https://github.com/asad-albadi/TermCraft/actions/runs/46018225239) for `36ba3ba` was canceled and supplied no accepted packages.
+
+The detached-client correction includes a real native-child regression and [Light](captures/detached-light-100.png) and [Dark](captures/detached-dark-100.png) evidence at 360×260. The History label measured 15.23:1 and 15.62:1 respectively, up from 1.35:1 in the original System/Light capture.
