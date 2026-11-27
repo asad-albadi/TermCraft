@@ -317,25 +317,52 @@ class ReleaseDelivery(unittest.TestCase):
             with self.subTest(changes=changes), self.assertRaisesRegex(ValueError, message):
                 self.candidate("linux" if changes.get("wrong_helper") else "windows", **changes)
 
-    def test_candidate_accepts_independent_helper_version(self):
-        self.root = self.work / "different-helper"
-        shutil.copytree(self.fixture, self.root)
-        self.rdp_version = "9.2.1" if self.version != "9.2.1" else "9.2.2"
-        manifest = self.root / "engines/rdp/Cargo.toml"
-        previous = tomllib.loads(manifest.read_text())["package"]["version"]
-        manifest.write_text(manifest.read_text().replace(f'version = "{previous}"', f'version = "{self.rdp_version}"', 1))
-        self.lock(self.root, "engines/rdp/Cargo.toml")
-        self.read_fixture_versions()
+    def set_manifest_version(self, path, version):
+        manifest = self.root / path
+        text = manifest.read_text()
+        previous = tomllib.loads(text)["package"]["version"]
+        manifest.write_text(text.replace(f'version = "{previous}"', f'version = "{version}"', 1))
+        self.lock(self.root, path)
+        return previous
+
+    def commit_fixture_versions(self, message):
         subprocess.run(["git", "-C", str(self.root), "-c", "user.name=Release Fixture",
                         "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false",
-                        "commit", "-qam", "Independent RDP version"], check=True)
-        self.source = subprocess.check_output(["git", "-C", str(self.root), "rev-parse", "HEAD"], text=True).strip()
+                        "commit", "-qam", message], check=True)
+        return subprocess.check_output(["git", "-C", str(self.root), "rev-parse", "HEAD"], text=True).strip()
+
+    def check_candidate_with_replacement_helper(self):
+        replacement = next(version for version in ("9.2.1", "9.2.2", "9.2.3")
+                           if version not in {self.version, self.rdp_version})
+        previous = self.set_manifest_version("engines/rdp/Cargo.toml", replacement)
+        self.read_fixture_versions()
+        self.assertEqual(self.rdp_version, replacement)
+        self.assertNotEqual(self.rdp_version, previous)
+        self.source = self.commit_fixture_versions("Independent RDP version")
         self.release.verify_checkout(self.root, self.source, self.version)
         candidate, _ = self.candidate("windows")
         packages = json.loads((candidate / "candidate.json").read_text())["package_versions"]
         self.assertEqual(packages["harbor-workspace"], self.version)
         self.assertEqual(packages["termcraft-rdp-engine"], self.rdp_version)
         self.assertNotEqual(packages["harbor-workspace"], packages["termcraft-rdp-engine"])
+
+    def test_candidate_accepts_independent_helper_version(self):
+        self.root = self.work / "different-helper"
+        shutil.copytree(self.fixture, self.root)
+        self.check_candidate_with_replacement_helper()
+
+    def test_candidate_accepts_existing_helper_at_preferred_replacement_version(self):
+        self.root = self.work / "existing-preferred-helper"
+        shutil.copytree(self.fixture, self.root)
+        self.set_manifest_version("Cargo.toml", "1.0.0")
+        self.set_manifest_version("engines/rdp/Cargo.toml", "9.2.1")
+        # A fixture starting at the collision already has a clean, committed
+        # checkout. Do not require an empty setup commit in that case either.
+        if subprocess.check_output(["git", "-C", str(self.root), "status", "--porcelain"]):
+            self.source = self.commit_fixture_versions("Set up version collision")
+        self.read_fixture_versions()
+        self.assertEqual((self.version, self.rdp_version), ("1.0.0", "9.2.1"))
+        self.check_candidate_with_replacement_helper()
 
     def test_candidate_rejects_consistently_forged_dependency_notices(self):
         for forgery in ("omission", "path", "bytes"):
