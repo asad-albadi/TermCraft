@@ -11,6 +11,15 @@ SPEC.loader.exec_module(appimage)
 
 
 class AppImageTests(unittest.TestCase):
+    def test_builder_pins_match_the_recorded_runtime_inventory(self):
+        import json
+        inventory = json.loads((appimage.RECIPE / "runtime-inventory.json").read_text())
+        self.assertEqual(
+            inventory.get("builder_packages_sha256"),
+            appimage.digest(appimage.RECIPE / "builder-packages.txt"),
+            "Rebuild the runtime and verify its complete inventory when builder pins change",
+        )
+
     def test_prefix_is_bound_to_bytes_length_and_squashfs(self):
         with tempfile.TemporaryDirectory() as temp:
             image = Path(temp) / "sample.AppImage"
