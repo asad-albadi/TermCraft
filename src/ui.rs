@@ -3775,6 +3775,7 @@ mod gui_tests {
         let server = remote_fixture::SshServer::start(true);
         let remote = server.root.join("remote-target");
         fs::create_dir(&remote).unwrap();
+        fs::write(remote.join("anchor"), b"owned remote anchor").unwrap();
         let local = server.root.join("local-drop-sentinel");
         fs::write(&local, b"private-fixture").unwrap();
         let mut config = server.config(99, true);
@@ -3798,19 +3799,20 @@ mod gui_tests {
             },
             |ui| workspace.render(ui),
         );
+        output.textures_delta.clear();
+        // Controls now live in a compact footer and the listing itself is the
+        // upload target. Keep both real native-drop assertions, using those
+        // visible regions instead of the removed instruction blocks.
         let point = output
             .shapes
             .iter()
-            .find_map(|shape| text_position(&shape.shape, "Local download folder"))
+            .find_map(|shape| text_position(&shape.shape, "Downloads"))
             .expect("Local download zone must be visible");
         let upload_point = output
             .shapes
             .iter()
-            .find_map(|shape| {
-                text_position(&shape.shape, "Drop local files or folders here to upload.")
-            })
+            .find_map(|shape| text_position(&shape.shape, "anchor"))
             .expect("Remote upload zone must be visible");
-        output.textures_delta.clear();
         let mut drop_output = ctx.run_ui(
             RawInput {
                 screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(1360., 1000.))),
