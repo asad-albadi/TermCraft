@@ -9,6 +9,7 @@ import os
 from pathlib import Path
 import platform
 import plistlib
+import secrets
 import shutil
 import subprocess
 import sys
@@ -76,10 +77,18 @@ def persistent(fixture_root):
     return {name: sha256(fixture_root / name) for name in DELIVERY.FIXTURE_FILES}
 
 
-def fixture(binary, root, mode, log):
+def fixture_input():
+    return [secrets.token_hex(32), secrets.token_hex(32)]
+
+
+def encode_fixture_input(values):
+    return json.dumps(values).encode("ascii")
+
+
+def fixture(binary, root, mode, log, values):
     output = STARTUP.run([binary, "--ignored", "--exact", "qualification_workspace", "--nocapture"],
                          root, {**os.environ, "PACKAGE_FIXTURE_ROOT": str(root),
-                                "PACKAGE_FIXTURE_MODE": mode}, log)
+                                "PACKAGE_FIXTURE_MODE": mode}, log, input_bytes=encode_fixture_input(values))
     require(DELIVERY.FIXTURE_PROOF in output, "Workspace fixture did not verify native library state")
     return persistent(root)
 
@@ -145,7 +154,8 @@ class Lifecycle:
     def __init__(self, evidence, work, fixtures, binary, environment, roles):
         self.evidence, self.work, self.fixtures = evidence, work, fixtures
         self.binary, self.environment, self.roles = binary, environment, roles
-        self.original = fixture(binary, fixtures, "seed", evidence / "fixture-seed.log")
+        self.fixture_values = fixture_input()
+        self.original = fixture(binary, fixtures, "seed", evidence / "fixture-seed.log", self.fixture_values)
         self.stages = []
 
     def stage(self, name, role, paths, *, program=None, launcher=None, registration=None):
@@ -159,15 +169,22 @@ class Lifecycle:
                             embedded_version=embedded_version(executable, initial["version"], self.environment),
                             registration=registration)
             for label, workspace in (("workspace", "workspace"), ("malformed", "malformed workspace")):
-                png = self.evidence / f"{name}-{label}.png"
-                require(not png.exists(), "Screenshot already exists")
-                STARTUP.run([*launcher, "--data-dir", self.fixtures / workspace, "--screenshot", png],
-                            Path(registration.get("working_directory", self.work)), self.environment,
-                            self.evidence / f"{name}-{label}.log")
+                stem = f"{name}-{label}"
+                png, output = self.evidence / f"{stem}.png", self.evidence / f"{stem}.log"
+                require(not os.path.lexists(png), "Screenshot already exists")
+                argv = [*launcher, "--data-dir", self.fixtures / workspace, "--screenshot", png]
+                STARTUP.run(argv, Path(registration.get("working_directory", self.work)), self.environment, output)
+                require(png.is_file() and not png.is_symlink(), "Launch did not create a regular screenshot")
                 observed[label] = {"name": png.name, "sha256": sha256(png),
                                    "size": DELIVERY.png_observation(png)}
+                write_json(self.evidence / f"{stem}-launch.json", {
+                    "stage": name, "role": role, "executable": str(executable),
+                    "executable_sha256": initial["app_sha256"], "argv": [str(part) for part in argv],
+                    "exit_code": 0, "screenshot_preexisting": False, "screenshot": observed[label],
+                    "output_sha256": sha256(output),
+                })
         check = self.evidence / f"{name}-fixture.log"
-        observed["preserved"] = fixture(self.binary, self.fixtures, "verify", check)
+        observed["preserved"] = fixture(self.binary, self.fixtures, "verify", check, self.fixture_values)
         require(observed["preserved"] == self.original, f"Persistent fixture changed at {name}")
         self.stages.append(observed)
 
@@ -309,7 +326,7 @@ def windows(life, args, archives):
             "-Archive", archives["candidate"], "-PreviousArchive", archives["baseline"],
             "-UsePackageVersions", "-SoftwareGlDirectory", args.software_gl,
             "-QualificationState", life.work / "windows-state.json", "-StageRecords", records,
-            timeout=1200)
+            input=encode_fixture_input(life.fixture_values), timeout=1200)
     life.stages.extend(read_json(records))
 
 
@@ -318,6 +335,7 @@ def windows_stage(args):
     lifecycle = object.__new__(Lifecycle)
     for name in ("evidence", "work", "fixtures", "binary"):
         setattr(lifecycle, name, Path(state[name]))
+    lifecycle.fixture_values = json.load(sys.stdin)
     lifecycle.environment = isolated_env(lifecycle.work)
     lifecycle.original, lifecycle.roles, lifecycle.stages = state["original"], state["roles"], []
     paths = read_json(args.paths)
@@ -386,7 +404,8 @@ def qualify(args):
             })
             windows(life, args, archives)
         write_json(args.evidence / "verification.json", {
-            "schema": 1, "source_sha": args.source, "platform": host, "architecture": DELIVERY.TARGETS[host][0],
+            "schema": 2, "source_sha": args.source, "platform": host, "architecture": DELIVERY.TARGETS[host][0],
+            "fixture_root": str(fixtures), "evidence_origin": str(args.evidence),
             "archive_sha256": roles["candidate"]["archive_sha256"], "version": args.version,
             "roles": roles, "private_version_patch": {"from": args.version, "to": old_version, "files": patch},
             "debian": debian, "fixture_before": life.original, "stages": life.stages,

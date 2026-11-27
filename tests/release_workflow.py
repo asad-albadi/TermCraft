@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import shlex
 import subprocess
 import tempfile
 import unittest
@@ -72,6 +73,14 @@ class ReleaseWorkflowContract(unittest.TestCase):
                            env={**os.environ, "HOME": str(root), "CALLS": str(calls), "BROWSER": str(browser),
                                 "PATH": f'{root}{os.pathsep}{os.environ["PATH"]}'})
             self.assertEqual(calls.read_text().splitlines(), [str(browser), "-verify_arch", "arm64"])
+
+    def test_linux_owned_wayland_installs_a_mesa_egl_runtime_provider(self):
+        release = workflow("release.yml")
+        step = next(step for step in release["jobs"]["package"]["steps"]
+                    if step.get("name") == "Install Linux package and startup prerequisites")
+        logical = step["run"].replace(chr(92) + chr(10), " ")
+        install = next(shlex.split(line) for line in logical.splitlines() if " install -y " in line)
+        self.assertTrue({"libegl-mesa0", "libgl1-mesa-dri", "weston", "strace"}.issubset(install), install)
 
     def test_release_dependencies_cover_all_native_runners_and_isolate_write_permission(self):
         release = workflow("release.yml")

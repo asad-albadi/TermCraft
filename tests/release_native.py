@@ -2,6 +2,7 @@ import importlib.util
 from pathlib import Path
 import os
 import subprocess
+import shutil
 import tempfile
 import sys
 import unittest
@@ -74,3 +75,31 @@ class NativeQualification(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
             self.assertIn(b"requires a disposable GitHub-hosted runner", result.stderr)
             self.assertFalse(output.exists())
+
+
+    @unittest.skipUnless(shutil.which("pwsh"), "requires PowerShell to run the standalone driver")
+    def test_standalone_windows_driver_refuses_before_resolving_paths_without_qualification_state(self):
+        env = {key: value for key, value in os.environ.items() if key not in {"GITHUB_ACTIONS", "RUNNER_ENVIRONMENT"}}
+        for extra in ([], ["-PreviousArchive", "nonexistent.zip", "-UsePackageVersions"]):
+            with self.subTest(extra=extra):
+                result = subprocess.run(["pwsh", "-NoProfile", "-File", ROOT / "tests/windows-package-lifecycle.ps1",
+                                         "-Archive", "standalone-archive-that-does-not-exist.zip", *extra],
+                                        env=env, capture_output=True, timeout=20)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(b"disposable GitHub-hosted Windows runner", result.stderr)
+                self.assertNotIn(b"Cannot find path", result.stderr)
+
+    def test_fixture_values_are_fresh_and_passed_only_by_pipe(self):
+        from unittest.mock import patch
+
+        n = native()
+        first, other = n.fixture_input(), n.fixture_input()
+        self.assertTrue(set(first).isdisjoint(other))
+        self.assertTrue(all(len(value) >= 32 for value in (*first, *other)))
+        with tempfile.TemporaryDirectory() as work:
+            with patch.object(n.STARTUP, "run", return_value=n.DELIVERY.FIXTURE_PROOF) as launch:
+                with patch.object(n, "persistent", return_value={}):
+                    n.fixture("fixture", Path(work), "verify", Path(work) / "log", first)
+                args, kwargs = launch.call_args
+                self.assertEqual(kwargs["input_bytes"], n.encode_fixture_input(first))
+                self.assertTrue(all(value not in repr(args) for value in first))

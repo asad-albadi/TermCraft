@@ -1,3 +1,4 @@
+import copy
 import hashlib
 import importlib.util
 import json
@@ -271,7 +272,15 @@ class ReleaseDelivery(unittest.TestCase):
         lifecycle.mkdir()
         r = self.release
         old = r.previous_version(self.version)
-        fixture = {name: "5" * 64 for name in r.FIXTURE_FILES}
+        def fixture_digest(value):
+            return hashlib.sha256(value.encode()).hexdigest()
+
+        fixture = {name: fixture_digest(name) for name in r.FIXTURE_FILES}
+        old_app = fixture_digest("private app image")
+        pure = PureWindowsPath if platform == "windows" else PurePosixPath
+        run_root = pure(r"C:\Windows\Temp\old-run" if platform == "windows" else "/tmp/old-run")
+        fixture_root = run_root / "fixtures"
+        evidence_origin = run_root / "ci-output/lifecycle-evidence"
         build = manifest["build"]
         patch = {}
         for name in ("Cargo.toml", "Cargo.lock"):
@@ -282,12 +291,12 @@ class ReleaseDelivery(unittest.TestCase):
         old_snapshot = r.PACKAGER.source_digest(old_inputs)
         app = r.app_member(platform)
         old_manifest = lifecycle / "baseline-manifest.json"
-        write_json(old_manifest, {**manifest, "version": old, "files": {**manifest["files"], app: "6" * 64},
+        write_json(old_manifest, {**manifest, "version": old, "files": {**manifest["files"], app: old_app},
                                   "build": {**build, "source_inputs": old_inputs, "snapshot_sha256": old_snapshot}})
         roles = {
-            "baseline": {"archive": r.portable_name(platform, old), "archive_sha256": "7" * 64,
+            "baseline": {"archive": r.portable_name(platform, old), "archive_sha256": fixture_digest("private portable archive"),
                          "manifest_sha256": digest(old_manifest), "snapshot_sha256": old_snapshot,
-                         "app_sha256": "6" * 64, "version": old, "embedded_version": f"TermCraft {old}"},
+                         "app_sha256": old_app, "version": old, "embedded_version": f"TermCraft {old}"},
             "candidate": {"archive": archive.name, "archive_sha256": digest(archive),
                           "manifest_sha256": digest(case / "tree" / ("TermCraft.app/Contents/Resources"
                                if platform == "macos" else archive.name.removesuffix(r.TARGETS[platform][2]))
@@ -299,7 +308,7 @@ class ReleaseDelivery(unittest.TestCase):
         installations, removals = {}, {}
         if platform == "linux":
             debian = {role: {"name": f"termcraft_{info['version']}_amd64.deb", "version": info["version"],
-                             "sha256": digest(case / "dist" / self.debian_name) if role == "candidate" else "8" * 64}
+                             "sha256": digest(case / "dist" / self.debian_name) if role == "candidate" else fixture_digest("private Debian archive")}
                       for role, info in roles.items()}
             for name, role, _ in r.LIFECYCLE_STAGES[platform][:3]:
                 installations[name] = ("/opt/termcraft", ["/usr/bin/termcraft"],
@@ -310,10 +319,11 @@ class ReleaseDelivery(unittest.TestCase):
             entry, receipt = data + "/applications/org.termcraft.TermCraft.desktop", desktop + "/owned.json"
             installations["desktop-start-candidate"] = (desktop + "/payload", ["/usr/bin/python3", desktop + "/launch.py"],
                                                          {"target": entry, "receipt": receipt})
-            canaries = {"mimeapps.list": "9" * 64, "unrelated.desktop": "a" * 64}
+            canaries = {name: fixture_digest(name) for name in ("mimeapps.list", "unrelated.desktop")}
             removals["desktop-remove"] = {
-                "removed": [entry, receipt, desktop + "/launch.py", desktop + "/payload/PACKAGE-MANIFEST.json",
-                            desktop + "/payload/harbor-workspace", data + "/icons/hicolor/256x256/apps/org.termcraft.TermCraft.png",
+                "removed": [entry, receipt, desktop + "/launch.py",
+                            *(desktop + "/payload/" + name for name in [*manifest["files"], "PACKAGE-MANIFEST.json"]),
+                            data + "/icons/hicolor/256x256/apps/org.termcraft.TermCraft.png",
                             data + "/mime/packages/org.termcraft.TermCraft.xml"],
                 "unrelated_before": canaries, "unrelated_after": canaries,
             }
@@ -340,10 +350,9 @@ class ReleaseDelivery(unittest.TestCase):
                 installations[name] = (bundle, [bundle + "/Contents/MacOS/termcraft-desktop-launcher"],
                                        {"target": bundle, "receipt": receipt})
             removals["mac-unregister-remove"] = {"removed": [install, move, receipt], "unrelated_registrations": 1,
-                                                  "unrelated_before": "f" * 64, "unrelated_after": "f" * 64}
+                                                  "unrelated_before": fixture_digest("registry"), "unrelated_after": fixture_digest("registry")}
         stages = []
         pixels = png()
-        pure = PureWindowsPath if platform == "windows" else PurePosixPath
         (lifecycle / "fixture-seed.log").write_bytes(r.FIXTURE_PROOF)
         for name, role, starts in r.LIFECYCLE_STAGES[platform]:
             stage = {"stage": name, "role": role, "preserved": fixture}
@@ -355,16 +364,27 @@ class ReleaseDelivery(unittest.TestCase):
                              embedded_version=roles[role]["embedded_version"])
                 if name == "desktop-start-candidate":
                     stage["paths"]["original_absent"] = "/tmp/owned/extracted-source"
-                for label in ("workspace", "malformed"):
-                    screenshot = f"{name}-{label}.png"
+                for label, dirname in (("workspace", "workspace"), ("malformed", "malformed workspace")):
+                    stem = f"{name}-{label}"
+                    screenshot = stem + ".png"
+                    output = lifecycle / (stem + ".log")
                     (lifecycle / screenshot).write_bytes(pixels)
-                    (lifecycle / f"{name}-{label}.log").touch()
+                    output.touch()  # A GUI is allowed to return no process output.
                     stage[label] = {"name": screenshot, "sha256": digest(lifecycle / screenshot), "size": [640, 400]}
+                    write_json(lifecycle / (stem + "-launch.json"), {
+                        "stage": name, "role": role, "executable": stage["executable"],
+                        "executable_sha256": stage["app_sha256"],
+                        "argv": [*launcher, "--data-dir", str(fixture_root / dirname),
+                                 "--screenshot", str(evidence_origin / screenshot)],
+                        "exit_code": 0, "screenshot_preexisting": False, "screenshot": stage[label],
+                        "output_sha256": digest(output),
+                    })
             else:
                 stage["paths"] = removals[name]
             stages.append(stage)
         write_json(lifecycle / "verification.json", {
-            "schema": 1, "source_sha": self.source, "platform": platform, "architecture": r.TARGETS[platform][0],
+            "schema": 2, "source_sha": self.source, "platform": platform, "architecture": r.TARGETS[platform][0],
+            "fixture_root": str(fixture_root), "evidence_origin": str(evidence_origin),
             "archive_sha256": digest(archive), "version": self.version, "roles": roles,
             "private_version_patch": {"from": self.version, "to": old, "files": patch},
             "debian": debian, "fixture_before": fixture, "stages": stages,
@@ -433,7 +453,8 @@ class ReleaseDelivery(unittest.TestCase):
         manifest_path = case / "tree" / archive.name.removesuffix(".tar.gz") / "PACKAGE-MANIFEST.json"
         manifest = json.loads(manifest_path.read_text())
         package_manifest = {"sha256": digest(manifest_path), "build": manifest["build"],
-                            "app_sha256": manifest["files"]["harbor-workspace"]}
+                            "app_sha256": manifest["files"]["harbor-workspace"],
+                            "linux_portable_files": [*manifest["files"], "PACKAGE-MANIFEST.json"]}
         artifacts = {archive.name: digest(archive), self.debian_name: digest(case / "dist" / self.debian_name)}
         def verify():
             return self.release.verify_native_evidence(self.root, lifecycle, wayland, "linux",
@@ -452,6 +473,60 @@ class ReleaseDelivery(unittest.TestCase):
         (wayland / "startup.log").write_text("DISPLAY is gone and backend says Wayland")
         with self.assertRaisesRegex(ValueError, "socket connection missing"):
             verify()
+
+    def test_inventory_rejects_sentinel_and_incomplete_native_launch_evidence(self):
+        case, _ = self.platform_bundle("linux")
+        lifecycle = case / "lifecycle-evidence"
+        verification = lifecycle / "verification.json"
+        original = json.loads(verification.read_text())
+        def reject(fragment):
+            output = Path(tempfile.mkdtemp(dir=case)) / "rejected"
+            with self.assertRaisesRegex(ValueError, fragment):
+                self.release.stage_candidate(self.root, self.source, self.version, "linux",
+                                             case / "dist", case / "startup-evidence", output,
+                                             lifecycle, case / "wayland-evidence")
+            self.assertFalse(output.exists())
+        for category in ("archive", "fixture", "helper", "extra"):
+            with self.subTest(category=category):
+                value = copy.deepcopy(original)
+                if category == "archive":
+                    value["roles"]["baseline"]["archive_sha256"] = "0" * 64
+                    message = "independently versioned"
+                elif category == "fixture":
+                    value["fixture_before"] = {key: "0" * 64 for key in value["fixture_before"]}
+                    for stage in value["stages"]:
+                        stage["preserved"] = value["fixture_before"]
+                    message = "fixture"
+                else:
+                    paths = value["stages"][-1]["paths"]["removed"]
+                    helper = next((path for path in paths if path.endswith("/termcraft-rdp-engine")), None)
+                    if category == "helper" and helper:
+                        paths.remove(helper)
+                    elif category == "extra":
+                        paths.append("/tmp/owned/data/applications/unrelated.desktop")
+                    message = "removal evidence"
+                write_json(verification, value)
+                reject(message)
+        write_json(verification, original)
+        (lifecycle / "deb-install-baseline-workspace-launch.json").unlink(missing_ok=True)
+        reject("launch record")
+
+    def test_aggregate_rejects_unbound_downloaded_launch_record(self):
+        candidates = [self.candidate(platform)[0] for platform in ("linux", "windows", "macos")]
+        windows = candidates[1]
+        record = windows / "lifecycle-evidence/windows-install-baseline-workspace-launch.json"
+        if record.exists():
+            value = json.loads(record.read_text())
+            value["argv"][-3] = r"C:\Users\runner\real-workspace"
+            write_json(record, value)
+        else:
+            record.touch()
+        inventory = windows / "candidate.json"
+        value = json.loads(inventory.read_text())
+        value["lifecycle"]["files"][record.name] = digest(record)
+        write_json(inventory, value)
+        with self.assertRaisesRegex(ValueError, "launch record"):
+            self.release.assemble(self.root, self.source, self.version, candidates, self.work / "rejected")
 
     def test_candidate_rejects_unverified_policies_noncore_and_false_startup(self):
         for changes, message in [

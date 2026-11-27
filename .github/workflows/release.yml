@@ -118,7 +118,7 @@ jobs:
           sudo apt-get "${termcraft_apt_options[@]}" update
           sudo apt-get "${termcraft_apt_options[@]}" install -y \
             binutils libx11-dev libxkbcommon-dev libxkbcommon-x11-0 \
-            libwayland-dev libegl1-mesa-dev libgl1-mesa-dev libgl1-mesa-dri xvfb xauth weston strace
+            libwayland-dev libegl1-mesa-dev libegl-mesa0 libgl1-mesa-dev libgl1-mesa-dri xvfb xauth weston strace
       - if: runner.os == 'Windows'
         shell: pwsh
         run: |

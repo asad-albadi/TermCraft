@@ -55,11 +55,14 @@ portable desktop installation. Windows tests side-by-side KnownFolder
 installation, Start menu targets, reinstall and removal. Apple Silicon macOS
 tests replacement, relocation and targeted LaunchServices registration and
 removal. Each installed startup needs a fresh screenshot and workspace
-preservation evidence.
+preservation evidence. A separate record binds the exact launch arguments,
+executable and newly created screenshot, even if the GUI emits no log text.
 
 The synthetic fixture verifies stored sessions, preferences, shortcuts,
 encrypted vault bytes and decryption through the Rust library, plus byte
-preservation of recovery and malformed originals. This is not a packaged GUI
+preservation of recovery and malformed originals. It also scans both owned
+workspaces for plaintext copies of the private, per-run synthetic values. This
+is not a packaged GUI
 unlock, recovery restoration, Finder or Gatekeeper approval test. Only a
 hosted run with the required native checks and matching downloaded evidence
 can qualify a candidate.

@@ -310,6 +310,7 @@ def verify_portable(root, archive, platform, versions, inputs, work):
     return {"name": manifest_path.relative_to(package).as_posix(),
             "sha256": sha256(manifest_path), "schema": manifest["schema_version"], "build": identity,
             "app_sha256": files[app_member(platform)],
+            **({"linux_portable_files": sorted([*files, "PACKAGE-MANIFEST.json"])} if platform == "linux" else {}),
             "dependency_notices": {"sha256": PACKAGER.source_digest(expected_notices),
                                    "crates": len(expected_notices["crates"]),
                                    "files": len(expected_notices["files"])}}
@@ -436,7 +437,12 @@ def app_member(platform):
             "macos": "Contents/MacOS/harbor-workspace"}[platform]
 
 
-def verify_lifecycle_operations(platform, stages, roles):
+def measured_sha256(value):
+    # Repeated-character placeholders are not observations of measured bytes.
+    return isinstance(value, str) and SHA256.fullmatch(value) is not None and len(set(value)) > 1
+
+
+def verify_lifecycle_operations(platform, stages, roles, manifest):
     def removal(name):
         paths = stages[name]["paths"]["removed"]
         require(isinstance(paths, list) and len(paths) == len(set(paths)), "Invalid lifecycle removal list")
@@ -467,13 +473,13 @@ def verify_lifecycle_operations(platform, stages, roles):
                     "receipt": str(launcher.parent / "owned.json")}
                 and posix(start["paths"]["original_absent"]).is_absolute()
                 and posix(start["paths"]["original_absent"]) != started
-                and {str(launcher), str(started / "PACKAGE-MANIFEST.json"), str(started / app_member("linux")),
+                and {str(launcher), *(str(started / name) for name in manifest["linux_portable_files"]),
                      str(data / "icons/hicolor/256x256/apps/org.termcraft.TermCraft.png"),
                      str(data / "mime/packages/org.termcraft.TermCraft.xml"),
-                     *registration("desktop-start-candidate").values()} <= removal("desktop-remove")
+                     *registration("desktop-start-candidate").values()} == removal("desktop-remove")
                 and finish["unrelated_before"] == finish["unrelated_after"]
                 and set(finish["unrelated_before"]) == {"mimeapps.list", "unrelated.desktop"}
-                and all(SHA256.fullmatch(value) for value in finish["unrelated_before"].values()),
+                and all(measured_sha256(value) for value in finish["unrelated_before"].values()),
                 "Portable desktop installation or removal evidence differs")
     elif platform == "windows":
         def owned(name, role):
@@ -509,7 +515,7 @@ def verify_lifecycle_operations(platform, stages, roles):
                 and PurePosixPath(receipt).is_absolute()
                 and removal("mac-unregister-remove") == {str(initial), str(final), receipt}
                 and type(removed["unrelated_registrations"]) is int and removed["unrelated_registrations"] > 0
-                and SHA256.fullmatch(removed["unrelated_before"])
+                and measured_sha256(removed["unrelated_before"])
                 and removed["unrelated_before"] == removed["unrelated_after"],
                 "macOS relocation or LaunchServices cleanup evidence differs")
 
@@ -519,7 +525,7 @@ def verify_native_evidence(root, lifecycle, wayland, platform, source, version, 
     entries = regular_entries(lifecycle)
     portable = portable_name(platform, version)
     value = read_json(entries["verification.json"])
-    require(value["schema"] == 1 and value["source_sha"] == source and value["platform"] == platform
+    require(value["schema"] == 2 and value["source_sha"] == source and value["platform"] == platform
             and value["architecture"] == TARGETS[platform][0] and value["version"] == version
             and value["archive_sha256"] == artifacts[portable]
             and value["fixture_source_sha256"] == sha256(root / "tests/package_workspace_fixture.rs"),
@@ -551,7 +557,7 @@ def verify_native_evidence(root, lifecycle, wayland, platform, source, version, 
                 "snapshot_sha256": manifest_old["build"]["snapshot_sha256"],
                 "manifest_sha256": sha256(entries["baseline-manifest.json"]),
                 "app_sha256": manifest_old["files"][app_member(platform)], "embedded_version": f"TermCraft {old}"}
-            and all(SHA256.fullmatch(baseline[key]) and baseline[key] != candidate[key]
+            and all(measured_sha256(baseline[key]) and baseline[key] != candidate[key]
                     for key in ("archive_sha256", "snapshot_sha256", "app_sha256")),
             "Lifecycle baseline does not prove an independently versioned exact source")
     if platform == "linux":
@@ -559,7 +565,7 @@ def verify_native_evidence(root, lifecycle, wayland, platform, source, version, 
         require(set(debian) == {"baseline", "candidate"} and all(
             debian[role]["name"] == f"termcraft_{roles[role]['version']}_amd64.deb"
             and debian[role]["version"] == roles[role]["version"]
-            and SHA256.fullmatch(debian[role]["sha256"]) for role in roles)
+            and measured_sha256(debian[role]["sha256"]) for role in roles)
             and debian["candidate"]["sha256"] == artifacts[debian["candidate"]["name"]]
             and debian["baseline"]["sha256"] != debian["candidate"]["sha256"],
             "Debian lifecycle does not match the candidate and lower version")
@@ -567,12 +573,18 @@ def verify_native_evidence(root, lifecycle, wayland, platform, source, version, 
         require(value["debian"] is None and wayland is None, "Unexpected Linux lifecycle evidence")
     expected_files = {"verification.json", "baseline-manifest.json", "fixture-seed.log"}
     fixture = value["fixture_before"]
-    require(set(fixture) == FIXTURE_FILES and all(SHA256.fullmatch(digest) for digest in fixture.values())
+    require(set(fixture) == FIXTURE_FILES and all(measured_sha256(digest) for digest in fixture.values())
             and FIXTURE_PROOF in entries["fixture-seed.log"].read_bytes(), "Initial workspace/vault fixture is missing")
     specs = LIFECYCLE_STAGES[platform]
     require([(item["stage"], item["role"]) for item in value["stages"]] ==
             [(name, role) for name, role, _ in specs], "Lifecycle required stages were skipped or reordered")
     pure = PureWindowsPath if platform == "windows" else PurePosixPath
+    fixture_root, evidence_origin = pure(value["fixture_root"]), pure(value["evidence_origin"])
+    require(fixture_root.is_absolute() and fixture_root.name == "fixtures" and evidence_origin.is_absolute()
+            and ".." not in fixture_root.parts and ".." not in evidence_origin.parts
+            and not (fixture_root == evidence_origin or fixture_root in evidence_origin.parents
+                     or evidence_origin in fixture_root.parents),
+            "Invalid workspace root or origin for lifecycle launch records")
     for (name, role, starts), stage in zip(specs, value["stages"], strict=True):
         log = f"{name}-fixture.log"
         expected_files.add(log)
@@ -586,14 +598,28 @@ def verify_native_evidence(root, lifecycle, wayland, platform, source, version, 
                     and stage["embedded_version"] == launched["embedded_version"]
                     and stage["launcher"] and all(pure(part).is_absolute() for part in stage["launcher"]),
                     f"Lifecycle executing path or binary does not match the {role} package")
-            for label in ("workspace", "malformed"):
-                png = f"{name}-{label}.png"
-                expected_files.update((png, f"{name}-{label}.log"))
+            for label, workspace_name in (("workspace", "workspace"), ("malformed", "malformed workspace")):
+                stem = f"{name}-{label}"
+                png, run_log, record = stem + ".png", stem + ".log", stem + "-launch.json"
+                expected_files.update((png, run_log, record))
                 require(png in entries and stage[label] == {"name": png, "sha256": sha256(entries[png]),
                                                             "size": png_observation(entries[png])},
                         f"Lifecycle screenshot is absent or does not match: {name}/{label}")
+                require(record in entries and run_log in entries, f"Missing lifecycle launch record or output: {stem}")
+                try:
+                    observed_launch = read_json(entries[record])
+                except ValueError as error:
+                    raise ValueError(f"Invalid lifecycle launch record: {stem}") from error
+                require(observed_launch == {
+                    "stage": name, "role": role,
+                    "executable": stage["executable"], "executable_sha256": launched["app_sha256"],
+                    "argv": [*stage["launcher"], "--data-dir", str(fixture_root / workspace_name),
+                             "--screenshot", str(evidence_origin / png)],
+                    "exit_code": 0, "screenshot_preexisting": False, "screenshot": stage[label],
+                    "output_sha256": sha256(entries[run_log]),
+                }, f"Lifecycle launch record does not bind executable, workspace and new screenshot: {stem}")
     require(set(entries) == expected_files, "Lifecycle evidence files are incomplete or excessive")
-    verify_lifecycle_operations(platform, {stage["stage"]: stage for stage in value["stages"]}, roles)
+    verify_lifecycle_operations(platform, {stage["stage"]: stage for stage in value["stages"]}, roles, manifest)
     result = {"lifecycle": {"observation": value, "files": {name: sha256(path) for name, path in entries.items()}}}
     if platform == "linux":
         require(wayland is not None and wayland.is_dir(), "Native Wayland evidence is required")

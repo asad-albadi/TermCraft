@@ -10,6 +10,9 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+if (!$IsWindows -or $env:GITHUB_ACTIONS -cne 'true' -or $env:RUNNER_ENVIRONMENT -cne 'github-hosted') {
+    throw 'This test driver requires a disposable GitHub-hosted Windows runner.'
+}
 $zip = (Resolve-Path -LiteralPath $Archive).Path
 $archives = @($zip, $zip)
 if ($UsePackageVersions -and !$PreviousArchive) {
@@ -18,9 +21,13 @@ if ($UsePackageVersions -and !$PreviousArchive) {
 if ($PreviousArchive) {
     $archives[0] = (Resolve-Path -LiteralPath $PreviousArchive).Path
 }
-if ($QualificationState -and (!$UsePackageVersions -or !$StageRecords -or !$SoftwareGlDirectory -or
-    $env:GITHUB_ACTIONS -cne 'true' -or $env:RUNNER_ENVIRONMENT -cne 'github-hosted')) {
-    throw 'Native qualification requires a disposable GitHub-hosted runner and both package versions.'
+$fixtureInput = $null
+if ($QualificationState) {
+    if (!$UsePackageVersions -or !$StageRecords -or !$SoftwareGlDirectory) {
+        throw 'Native qualification requires both package versions, result output and pinned graphics.'
+    }
+    $fixtureInput = [Console]::In.ReadToEnd()
+    if ([string]::IsNullOrWhiteSpace($fixtureInput)) { throw 'Missing private workspace fixture input.' }
 }
 $scratch = New-Item -ItemType Directory -Path (Join-Path ([IO.Path]::GetTempPath()) ("TermCraft package " + [guid]::NewGuid().ToString('N')))
 $local = [Environment]::GetFolderPath('LocalApplicationData')
@@ -62,7 +69,7 @@ function Record-Stage {
     $resultPath = Join-Path $scratch.FullName "$Name-result.json"
     $Paths | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $inputPath -Encoding utf8
     $options = if ($Program) { @('--program', $Program) } else { @() }
-    & python (Join-Path $PSScriptRoot '../scripts/package-native-lifecycle.py') windows-stage `
+    $fixtureInput | & python (Join-Path $PSScriptRoot '../scripts/package-native-lifecycle.py') windows-stage `
         --state $QualificationState --name $Name --role $Role --paths $inputPath --result $resultPath @options
     if ($LASTEXITCODE -ne 0) { throw "Qualification stage failed: $Name" }
     $records.Add((Get-Content -LiteralPath $resultPath -Raw | ConvertFrom-Json))

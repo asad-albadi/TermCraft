@@ -65,8 +65,9 @@ PowerShell installer with a versioned per-user program directory and Start
 menu shortcut. The [Windows x64 qualification checkpoint](../docs/parity-evidence/execution/2026-11-25-windows-native.md)
 covers an unsigned candidate's relocated startup and versioned installer
 smoke. For a local candidate, run `python scripts/package-check-startup.py <zip> --evidence <new-directory>`
-and `pwsh -File tests/windows-package-lifecycle.ps1 -Archive <zip>`.
-The installer test creates and removes uniquely named per-user versions.
+for portable startup. The separate installer test driver touches the real
+KnownFolders and runs only on disposable GitHub-hosted Windows.
+It is not a local upgrade command.
 On macOS, extract using Finder or `ditto` to preserve executable
 permissions. The bundles are unsigned. Move the app to the chosen Applications
 directory, and use the same location or a new versioned location for upgrades.

@@ -60,13 +60,14 @@ def verify(root, manifest_path):
     return host, manifest
 
 
-def run(command, cwd, environment, log_path, timeout=120):
+def run(command, cwd, environment, log_path, timeout=120, *, input_bytes=None):
     with log_path.open("xb") as log, subprocess.Popen(
-        command, cwd=cwd, env=environment, stdin=subprocess.DEVNULL,
+        command, cwd=cwd, env=environment,
+        stdin=subprocess.PIPE if input_bytes is not None else subprocess.DEVNULL,
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=os.name == "posix",
     ) as process:
         try:
-            stdout, stderr = process.communicate(timeout=timeout)
+            stdout, stderr = process.communicate(input=input_bytes, timeout=timeout)
         except subprocess.TimeoutExpired:
             # The macOS wrapper may still own a GUI child holding the pipes.
             if os.name == "posix":
