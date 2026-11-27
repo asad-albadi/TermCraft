@@ -64,7 +64,10 @@ Check the downloaded `SHA256SUMS` (for example, with
 `release-inventory.json` and the tracked project source archive. The
 inventory records the source commit, archive digests, Cargo package
 versions, toolchain strings, package manifest digests, terminal gate results,
-and hashes of the per-platform startup evidence. Raw evidence stays in
+and hashes of the per-platform startup evidence. Each platform’s dependency
+notice inventory is resolved again from the checkout’s locked Cargo graphs
+in the aggregate job. The manifest’s dependency identities, notice paths,
+and notice bytes must match that independent inventory. Raw evidence stays in
 the corresponding Actions candidate artifacts, not the public asset set.
 
 `TermCraft-source-<commit>.tar.gz` comes from `git archive` at that exact

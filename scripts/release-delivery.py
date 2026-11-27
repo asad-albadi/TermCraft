@@ -145,7 +145,21 @@ def portable_name(platform, version):
     return f"TermCraft-{version}-{platform}-{arch}{extension}"
 
 
-def core_layout(root, package, files, links, manifest, platform, versions):
+def canonical_crates(crates):
+    # Path ordering on Windows folds case, unlike PosixPath ordering.
+    return [{**crate, "notice_paths": sorted(crate["notice_paths"])} for crate in crates]
+
+
+def expected_dependency_notices(root, platform, work):
+    """Resolve both locked graphs from trusted sources, never the candidate."""
+    resources = work / "expected-notices"
+    crates = PACKAGER.cargo_notices(resources, TARGETS[platform][0], platform, root, None)
+    files, links = file_inventory(resources)
+    require(crates and files and not links, "Could not generate the locked dependency notice inventory")
+    return {"crates": canonical_crates(crates), "files": files}
+
+
+def core_layout(root, package, files, links, manifest, platform, versions, expected_notices):
     """Only the product, adjacent helpers, integration, policies and core notices."""
     macos = platform == "macos"
     resources = "Contents/Resources/" if macos else ""
@@ -185,21 +199,13 @@ def core_layout(root, package, files, links, manifest, platform, versions):
     require(licenses["project"] == resources + "LICENSE" and licenses["credits"] == resources + "CREDITS.md"
             and licenses["crate_notice_paths_relative_to"] == (resources.rstrip("/") or ".")
             and isinstance(licenses["crates"], list) and licenses["crates"], "Missing core license declarations")
-    notices = set()
-    for crate in licenses["crates"]:
-        identifier = f"{crate['name']}-{crate['version']}"
-        require(SAFE_NAME.fullmatch(identifier), "Unsafe crate notice origin")
-        require(isinstance(crate["notice_paths"], list), "Invalid crate notice paths")
-        for name in crate["notice_paths"]:
-            parts = name.split("/")
-            require(name.startswith(f"licenses/crates/{identifier}/")
-                    and all(part and part not in {".", ".."} and "\\" not in part for part in parts)
-                    and resources + name in files and resources + name not in notices
-                    and (package / (resources + name)).stat().st_size > 0, "Unexpected or missing core crate notice")
-            notices.add(resources + name)
-    require(notices, "Missing core dependency notices")
+    require(canonical_crates(licenses["crates"]) == expected_notices["crates"],
+            "Crates differ from the locked dependency notice inventory")
+    notices = {resources + name: digest for name, digest in expected_notices["files"].items()}
+    require(all(files.get(name) == digest for name, digest in notices.items()),
+            "Packaged dependency notice paths or hashes differ from resolved sources")
     allowed = {resources + name for name in originals.keys() | generated}
-    allowed |= notices | {binaries + name for name in executables}
+    allowed |= notices.keys() | {binaries + name for name in executables}
     if macos:
         allowed.add("Contents/Info.plist")
     require(not links and set(files) == allowed, "Archive contains missing or unexpected core payload entries")
@@ -267,9 +273,13 @@ def verify_portable(root, archive, platform, versions, inputs, work):
         require(value["architecture"] == "aarch64" and value["deployment_target"] == "14.0"
                 and value["compiler"].strip() and value["sdk_version"].strip(), "Invalid macOS toolchain identity")
         identity["macos"] = value
-    core_layout(root, package, files, links, manifest, platform, versions)
+    expected_notices = expected_dependency_notices(root, platform, work)
+    core_layout(root, package, files, links, manifest, platform, versions, expected_notices)
     return {"name": manifest_path.relative_to(package).as_posix(),
-            "sha256": sha256(manifest_path), "schema": manifest["schema_version"], "build": identity}
+            "sha256": sha256(manifest_path), "schema": manifest["schema_version"], "build": identity,
+            "dependency_notices": {"sha256": PACKAGER.source_digest(expected_notices),
+                                   "crates": len(expected_notices["crates"]),
+                                   "files": len(expected_notices["files"])}}
 
 
 def png_observation(path):
@@ -394,7 +404,7 @@ def verify_candidate(root, source, version, platform, dist, startup, inputs):
     return {"schema": 1, "source_sha": source, "version": version, "package_versions": versions,
             "scope": SCOPE, "platform": platform, "architecture": TARGETS[platform][0],
             "artifacts": artifacts, "package_manifest": manifest, "debian": debian,
-            "checks_passed": ["portable-contents", "native-startup", *(["debian-portable-match"] if debian else [])],
+            "checks_passed": ["portable-contents", "locked-dependency-notices", "native-startup", *(["debian-portable-match"] if debian else [])],
             "startup": observation}
 
 

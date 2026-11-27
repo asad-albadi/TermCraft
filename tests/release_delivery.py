@@ -1,13 +1,16 @@
 import hashlib
 import importlib.util
 import json
+import os
 from pathlib import Path
+import shutil
 import stat
 import struct
 import subprocess
 import sys
 import tarfile
 import tempfile
+import tomllib
 import unittest
 import zipfile
 import zlib
@@ -59,18 +62,70 @@ def executable(platform, marker):
 
 
 class ReleaseDelivery(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.release = load(SCRIPT)
+        scratch = tempfile.TemporaryDirectory()
+        cls.addClassCleanup(scratch.cleanup)
+        cls.fixture = Path(scratch.name) / "fixture"
+        for name in (*cls.release.PACKAGER.source_inputs(ROOT), "tests/windows-software-gl.json"):
+            target = cls.fixture / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / name, target)
+        # Exercise real Cargo metadata on a small path-only graph, independently
+        # of network access or the application's large native build.
+        for crate, license_text in {
+            "release-rdp": b"RDP-only fixture license",
+            "release-shared": b"Shared dependency license",
+            "release-windows": b"Windows-only fixture license",
+        }.items():
+            folder = cls.fixture / "vendor" / crate
+            (folder / "src").mkdir(parents=True)
+            (folder / "src/lib.rs").touch()
+            (folder / "Cargo.toml").write_text(
+                f'[package]\nname = "{crate}"\nversion = "1.0.0"\n'
+                'license = "MIT"\nrepository = "https://example.invalid/project"\n'
+            )
+            (folder / "LICENSE").write_bytes(license_text)
+
+        for path, name, dependency_root, extra in (
+            ("Cargo.toml", "harbor-workspace", "vendor",
+             '[target."cfg(windows)".dependencies]\nrelease-windows = {path = "vendor/release-windows"}\n'),
+            ("engines/rdp/Cargo.toml", "termcraft-rdp-engine", "../../vendor",
+             'release-rdp = {path = "../../vendor/release-rdp"}\n'),
+        ):
+            version = tomllib.loads((ROOT / path).read_text())["package"]["version"]
+            manifest = cls.fixture / path
+            manifest.write_text(f'[package]\nname = "{name}"\nversion = "{version}"\nedition = "2021"\n'
+                                f'[dependencies]\nrelease-shared = {{path = "{dependency_root}/release-shared"}}\n'
+                                + extra)
+            cls.lock(cls.fixture, path)
+        for command in (("init", "-q"), ("add", "."), ("-c", "user.name=Release Fixture", "-c",
+                         "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false",
+                         "commit", "-qm", "Locked release fixture")):
+            subprocess.run(["git", "-C", str(cls.fixture), *command], check=True)
+
+    @staticmethod
+    def lock(root, manifest):
+        subprocess.run(["cargo", "generate-lockfile", "--offline", "--manifest-path", str(root / manifest)],
+                       cwd=root, env={**os.environ, "CARGO_BUILD_JOBS": "2"}, check=True, capture_output=True)
+
     def setUp(self):
-        self.assertTrue(SCRIPT.is_file(), "Functional release delivery helper is not implemented")
-        self.release = load(SCRIPT)
         self.debian = load(ROOT / "scripts/package-debian.py")
-        self.tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self.tmp.cleanup)
-        self.work = Path(self.tmp.name)
-        self.source = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-        self.version = "0.1.0"
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.work = Path(tmp.name)
+        self.root = self.fixture
+        self.source = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=self.root, text=True).strip()
+        self.read_fixture_versions()
+
+    def read_fixture_versions(self):
+        self.version = tomllib.loads((self.root / "Cargo.toml").read_text())["package"]["version"]
+        self.rdp_version = tomllib.loads((self.root / "engines/rdp/Cargo.toml").read_text())["package"]["version"]
+        self.debian_name = f"termcraft_{self.version}_amd64.deb"
 
     def platform_bundle(self, platform, *, profile="release", blank=False, optional=False,
-                        wrong_file=False, wrong_helper=False, mismatched_startup=False):
+                        wrong_file=False, wrong_helper=False, mismatched_startup=False, notice_forgery=None):
         arch = "aarch64" if platform == "macos" else "x86_64"
         basename = f"TermCraft-{self.version}-{platform}-{arch}"
         case = Path(tempfile.mkdtemp(dir=self.work))
@@ -94,9 +149,9 @@ class ReleaseDelivery(unittest.TestCase):
             "build-source/engines/rdp/Cargo.lock": "engines/rdp/Cargo.lock",
             "README.txt": f"packaging/{platform}/README.txt",
         }
-        for src in (ROOT / "vendor/noVNC").rglob("*"):
+        for src in (self.root / "vendor/noVNC").rglob("*"):
             if src.is_file():
-                originals["build-source/noVNC/" + src.relative_to(ROOT / "vendor/noVNC").as_posix()] = src.relative_to(ROOT).as_posix()
+                originals["build-source/noVNC/" + src.relative_to(self.root / "vendor/noVNC").as_posix()] = src.relative_to(self.root).as_posix()
         for name in ("Interface.ttf", "Terminal.ttf", "Interface-LICENSE", "Terminal-LICENSE",
                      "termcraft-mascot.png", "termcraft-logo.png"):
             originals["assets/" + name] = "assets/" + name
@@ -108,27 +163,38 @@ class ReleaseDelivery(unittest.TestCase):
         if platform == "macos":
             import plistlib
             stage_file(root / "Contents/Info.plist", plistlib.dumps({
-                **plistlib.loads((ROOT / "packaging/macos/Info.plist").read_bytes()),
+                **plistlib.loads((self.root / "packaging/macos/Info.plist").read_bytes()),
                 "CFBundleVersion": self.version, "CFBundleShortVersionString": self.version,
             }))
             stage_file(resources / "TermCraft.icns", b"icon")
             programs.append("termcraft-desktop-launcher")
         for relative, source in originals.items():
-            stage_file(resources / relative, (ROOT / source).read_bytes())
+            stage_file(resources / relative, (self.root / source).read_bytes())
         for name in programs:
             machine = "linux-arm64" if wrong_helper and name.startswith("termcraft-rdp") else platform
             stage_file(binaries / name, executable(machine, name))
             (binaries / name).chmod(0o755)
-        notice = "licenses/crates/example-1.0.0/LICENSE"
-        stage_file(resources / notice, b"Example dependency license")
+        crates = []
+        fixture_notices = [("release-rdp", b"RDP-only fixture license"),
+                           ("release-shared", b"Shared dependency license")]
+        if platform == "windows":
+            fixture_notices.append(("release-windows", b"Windows-only fixture license"))
+        for name, data in fixture_notices:
+            if name == "release-shared" and notice_forgery == "omission":
+                continue
+            leaf = "arbitrary-payload.exe" if notice_forgery == "path" else "LICENSE"
+            notice = f"licenses/crates/{name}-1.0.0/{leaf}"
+            stage_file(resources / notice, b"Substituted notice" if notice_forgery == "bytes" else data)
+            crates.append({"name": name, "version": "1.0.0", "license": "MIT", "notice_paths": [notice],
+                           "source": "vendored in build source", "repository": "https://example.invalid/project"})
         if optional:
             stage_file(resources / "browser/unapproved/Chromium.exe", b"unapproved")
-        runtime = json.loads((ROOT / "packaging/runtime-requirements.json").read_text())
+        runtime = json.loads((self.root / "packaging/runtime-requirements.json").read_text())
         for key in ("platform_requirements", "optional_native_providers"):
             runtime[key] = runtime[key][platform]
         if platform != "linux":
             del runtime["linux_display_libraries"]
-        vnc = json.loads((ROOT / "vendor/noVNC/UPSTREAM.json").read_text())
+        vnc = json.loads((self.root / "vendor/noVNC/UPSTREAM.json").read_text())
         runtime.update(
             linked_libraries={name: {"libraries": ["libc.so.6"], "highest_required_glibc_symbol_version": "2.34"}
                               for name in programs},
@@ -138,7 +204,7 @@ class ReleaseDelivery(unittest.TestCase):
                 "embedded_runtime": True, "source_and_notices": "build-source/noVNC",
             },
         )
-        build_inputs = load(ROOT / "scripts/package-release.py").source_inputs(ROOT)
+        build_inputs = self.release.PACKAGER.source_inputs(self.root)
         build = {
             "provenance": "local locked release build",
             "snapshot_sha256": hashlib.sha256(json.dumps(build_inputs, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
@@ -149,13 +215,13 @@ class ReleaseDelivery(unittest.TestCase):
             build["macos"] = {"architecture": "aarch64", "deployment_target": "14.0", "compiler": "Apple clang", "sdk_version": "15.0"}
         write_json(resources / "PACKAGE-MANIFEST.json", dict(
             schema_version=1, application="TermCraft", version=self.version, profile=profile,
-            rdp_helper_version=self.version, platform=platform, architecture=arch, signing="unsigned",
+            rdp_helper_version=self.rdp_version, platform=platform, architecture=arch, signing="unsigned",
             runtime=runtime, files=files, build=build,
             licenses={
                 "project": (resources / "LICENSE").relative_to(root).as_posix(),
                 "credits": (resources / "CREDITS.md").relative_to(root).as_posix(),
                 "crate_notice_paths_relative_to": resources.relative_to(root).as_posix(),
-                "crates": [{"name": "example", "version": "1.0.0", "notice_paths": [notice]}],
+                "crates": crates,
             },
         ))
         if wrong_file:
@@ -193,14 +259,14 @@ class ReleaseDelivery(unittest.TestCase):
             "rdp_helper_child_location_verified": True,
             "rdp_workspace": "isolated LOCALAPPDATA/Harbor default" if platform == "windows" else "explicit isolated workspace",
             "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
-            "windows_software_gl_fixture": json.loads((ROOT / "tests/windows-software-gl.json").read_text())["files"] if platform == "windows" else None,
+            "windows_software_gl_fixture": json.loads((self.root / "tests/windows-software-gl.json").read_text())["files"] if platform == "windows" else None,
         })
         return case, archive
 
     def candidate(self, platform, **kwargs):
         case, archive = self.platform_bundle(platform, **kwargs)
         candidate = case / ("candidate-" + {"linux": "linux-amd64", "windows": "windows-amd64", "macos": "macos-arm64"}[platform])
-        self.release.stage_candidate(ROOT, self.source, self.version, platform, case / "dist", case / "startup-evidence", candidate)
+        self.release.stage_candidate(self.root, self.source, self.version, platform, case / "dist", case / "startup-evidence", candidate)
         return candidate, archive
 
     def test_preflight_checks_all_three_package_versions_and_ref(self):
@@ -229,12 +295,14 @@ class ReleaseDelivery(unittest.TestCase):
         destination, archive = self.candidate("linux")
         value = json.loads((destination / "candidate.json").read_text())
         self.assertEqual(value["artifacts"][archive.name], digest(archive))
-        self.assertEqual(value["artifacts"]["termcraft_0.1.0_amd64.deb"],
-                         digest(destination / "dist/termcraft_0.1.0_amd64.deb"))
+        self.assertEqual(value["artifacts"][self.debian_name],
+                         digest(destination / "dist" / self.debian_name))
         self.assertEqual(value["startup"]["observation"]["archive_sha256"], digest(archive))
         self.assertEqual(value["startup"]["files"]["startup.png"], digest(destination / "startup-evidence/startup.png"))
         self.assertEqual(value["source_sha"], self.source)
         self.assertEqual(value["scope"], "unsigned-core")
+        self.assertEqual(value["package_manifest"]["dependency_notices"]["crates"], 2)
+        self.assertIn("locked-dependency-notices", value["checks_passed"])
 
     def test_candidate_rejects_unverified_policies_noncore_and_false_startup(self):
         for changes, message in [
@@ -249,6 +317,31 @@ class ReleaseDelivery(unittest.TestCase):
             with self.subTest(changes=changes), self.assertRaisesRegex(ValueError, message):
                 self.candidate("linux" if changes.get("wrong_helper") else "windows", **changes)
 
+    def test_candidate_accepts_independent_helper_version(self):
+        self.root = self.work / "different-helper"
+        shutil.copytree(self.fixture, self.root)
+        self.rdp_version = "9.2.1" if self.version != "9.2.1" else "9.2.2"
+        manifest = self.root / "engines/rdp/Cargo.toml"
+        previous = tomllib.loads(manifest.read_text())["package"]["version"]
+        manifest.write_text(manifest.read_text().replace(f'version = "{previous}"', f'version = "{self.rdp_version}"', 1))
+        self.lock(self.root, "engines/rdp/Cargo.toml")
+        self.read_fixture_versions()
+        subprocess.run(["git", "-C", str(self.root), "-c", "user.name=Release Fixture",
+                        "-c", "user.email=fixture@example.invalid", "-c", "commit.gpgsign=false",
+                        "commit", "-qam", "Independent RDP version"], check=True)
+        self.source = subprocess.check_output(["git", "-C", str(self.root), "rev-parse", "HEAD"], text=True).strip()
+        self.release.verify_checkout(self.root, self.source, self.version)
+        candidate, _ = self.candidate("windows")
+        packages = json.loads((candidate / "candidate.json").read_text())["package_versions"]
+        self.assertEqual(packages["harbor-workspace"], self.version)
+        self.assertEqual(packages["termcraft-rdp-engine"], self.rdp_version)
+        self.assertNotEqual(packages["harbor-workspace"], packages["termcraft-rdp-engine"])
+
+    def test_candidate_rejects_consistently_forged_dependency_notices(self):
+        for forgery in ("omission", "path", "bytes"):
+            with self.subTest(forgery=forgery), self.assertRaisesRegex(ValueError, "dependency notice"):
+                self.candidate("windows", notice_forgery=forgery)
+
     def test_transparent_png_does_not_satisfy_startup(self):
         path = self.work / "startup.png"
         path.write_bytes(png(transparent=True))
@@ -260,14 +353,14 @@ class ReleaseDelivery(unittest.TestCase):
         deb = next((case / "dist").glob("*.deb"))
         deb.write_bytes(deb.read_bytes() + b"tampered")
         with self.assertRaisesRegex(ValueError, "Debian"):
-            self.release.stage_candidate(ROOT, self.source, self.version, "linux", case / "dist",
+            self.release.stage_candidate(self.root, self.source, self.version, "linux", case / "dist",
                                          case / "startup-evidence", case / "candidate")
         self.assertFalse((case / "candidate").exists())
 
     def test_aggregate_revalidates_all_platforms_and_emits_exact_tracked_source(self):
         candidates = [self.candidate(p)[0] for p in ("linux", "windows", "macos")]
         out = self.work / "assembled"
-        value = self.release.assemble(ROOT, self.source, self.version, candidates, out)
+        value = self.release.assemble(self.root, self.source, self.version, candidates, out)
         self.assertFalse(value["publication_ready"])
         self.assertEqual(set(value["platforms"]), {"linux", "macos", "windows"})
         source_file = out / value["source"]["archive"]
@@ -283,27 +376,46 @@ class ReleaseDelivery(unittest.TestCase):
             expected, name = line.split("  ", 1)
             self.assertEqual(digest(out / name), expected)
 
+    def test_aggregate_rejects_forged_notices_even_with_updated_download_hashes(self):
+        candidates = [self.candidate(p)[0] for p in ("linux", "windows", "macos")]
+        windows = candidates[1]
+        forged, archive = self.platform_bundle("windows", notice_forgery="path")
+        shutil.copyfile(archive, windows / "dist" / archive.name)
+        shutil.copytree(forged / "startup-evidence", windows / "startup-evidence", dirs_exist_ok=True)
+        inventory = windows / "candidate.json"
+        value = json.loads(inventory.read_text())
+        value["artifacts"][archive.name] = digest(archive)
+        value["startup"]["observation"] = json.loads((forged / "startup-evidence/verification.json").read_text())
+        value["startup"]["files"] = {file.name: digest(file) for file in (forged / "startup-evidence").iterdir()}
+        with zipfile.ZipFile(archive) as bundle:
+            manifest = next(name for name in bundle.namelist() if name.endswith("/PACKAGE-MANIFEST.json"))
+            value["package_manifest"]["sha256"] = hashlib.sha256(bundle.read(manifest)).hexdigest()
+        write_json(inventory, value)
+        with self.assertRaisesRegex(ValueError, "locked dependency notice"):
+            self.release.assemble(self.root, self.source, self.version, candidates, self.work / "assembled")
+        self.assertFalse((self.work / "assembled").exists())
+
     def test_aggregate_refuses_missing_duplicate_or_tampered_platform_inventory(self):
         candidates = [self.candidate(p)[0] for p in ("linux", "windows", "macos")]
         out = self.work / "assembled"
         for selected in (candidates[:2], [candidates[0], candidates[0], candidates[2]]):
             with self.assertRaisesRegex(ValueError, "exactly one"):
-                self.release.assemble(ROOT, self.source, self.version, selected, out)
+                self.release.assemble(self.root, self.source, self.version, selected, out)
         inventory = candidates[2] / "candidate.json"
         saved = json.loads(inventory.read_text())
         for change in (
-            {"version": "0.2.0"}, {"source_sha": "0" * 40},
-            {"artifacts": {"../escape": "0" * 64}}, {"artifacts": {"termcraft_0.1.0_amd64.deb": "0" * 64}},
+            {"version": self.version + ".1"}, {"source_sha": "0" * 40},
+            {"artifacts": {"../escape": "0" * 64}}, {"artifacts": {self.debian_name: "0" * 64}},
         ):
             with self.subTest(change=change):
                 write_json(inventory, {**saved, **change})
                 with self.assertRaises(ValueError):
-                    self.release.assemble(ROOT, self.source, self.version, candidates, out)
+                    self.release.assemble(self.root, self.source, self.version, candidates, out)
         write_json(inventory, saved)
         with next((candidates[2] / "dist").glob("*.zip")).open("ab") as file:
             file.write(b"extra bytes")
         with self.assertRaisesRegex(ValueError, "inventory"):
-            self.release.assemble(ROOT, self.source, self.version, candidates, out)
+            self.release.assemble(self.root, self.source, self.version, candidates, out)
         self.assertFalse(out.exists())
 
 
