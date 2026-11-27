@@ -128,13 +128,10 @@ impl Reservation {
             let end = self.file.metadata().map_err(status)?.len();
             let top = self.top.load(Ordering::Acquire);
             if top > end {
-                rustix::fs::fallocate(
-                    &self.file,
-                    rustix::fs::FallocateFlags::PUNCH_HOLE | rustix::fs::FallocateFlags::KEEP_SIZE,
-                    end,
-                    top - end,
-                )
-                .map_err(|e| status(e.into()))?;
+                // ext4 clamps hole punching to EOF, leaving KEEP_SIZE extents
+                // beyond it allocated. Even a same-length truncate releases that
+                // tail without changing EOF or data written into the reservation.
+                self.file.set_len(end).map_err(status)?;
             }
             self.top.store(0, Ordering::Release);
         }

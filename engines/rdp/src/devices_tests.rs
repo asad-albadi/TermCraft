@@ -619,6 +619,46 @@ fn drive_allocation_is_released_on_last_remote_close_and_disconnect() {
 }
 
 #[cfg(target_os = "linux")]
+#[test]
+fn drive_allocation_release_preserves_data_written_into_the_reservation() {
+    use std::os::unix::fs::MetadataExt;
+    let root = tempfile::tempdir().unwrap();
+    let path = root.path().join("file");
+    std::fs::write(&path, b"original").unwrap();
+    let mut b = backend(root.path(), false);
+    let id = value(&open(&mut b, "file", 0xc0000000, 1), 16);
+    assert_eq!(
+        value(&set_info(&mut b, id, 19, &1048576u64.to_le_bytes()), 12),
+        0
+    );
+    // Grow EOF into the reservation, ending in the middle of a filesystem block.
+    let mut body = Vec::new();
+    word(&mut body, 3);
+    body.extend(8192u64.to_le_bytes());
+    body.extend([0; 20]);
+    body.extend(b"end");
+    assert_eq!(
+        value(&b.process(&request(1, id, 2, 4, 0, &body)).unwrap(), 12),
+        0
+    );
+    assert!(std::fs::metadata(&path).unwrap().blocks() * 512 >= 1048576);
+    assert_eq!(
+        value(&b.process(&request(1, id, 3, 2, 0, &[0; 32])).unwrap(), 12),
+        0
+    );
+    let metadata = std::fs::metadata(&path).unwrap();
+    assert_eq!(metadata.len(), 8195, "release changed logical EOF");
+    assert!(
+        metadata.blocks() * 512 < 1048576,
+        "unused remote allocation leaked after writing and closing"
+    );
+    let mut expected = b"original".to_vec();
+    expected.resize(8192, 0);
+    expected.extend(b"end");
+    assert_eq!(std::fs::read(&path).unwrap(), expected);
+}
+
+#[cfg(target_os = "linux")]
 pub(crate) mod serial {
     use super::*;
     use crate::{
