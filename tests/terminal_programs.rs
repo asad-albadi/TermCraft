@@ -59,8 +59,26 @@ fn vim_redraw_resize_and_exit_restore_the_primary_screen() {
     });
     assert_eq!(screen.cell(0, 0).unwrap().text, "o");
     assert!(screen.row < screen.rows && screen.col < screen.cols);
+    let dimensions = root.path().join("vim-dimensions");
+    let query_dimensions = format!(
+        ":call writefile([printf('%dx%d', &columns, &lines)], '{}')\r",
+        dimensions.to_str().unwrap().replace('\'', "''")
+    );
+    // File text can arrive before Vim finishes startup. A real keyboard
+    // roundtrip acknowledges its command loop and initial PTY geometry before
+    // changing the size, rather than racing a queued 80x24 startup redraw.
+    process.write(query_dimensions.as_bytes()).unwrap();
+    wait(&mut process, &mut screen, |_| {
+        std::fs::read_to_string(&dimensions).is_ok_and(|value| value == "80x24\n")
+    });
     screen.resize(100, 30);
     process.resize(100, 30);
+    process.write(query_dimensions.as_bytes()).unwrap();
+    wait(&mut process, &mut screen, |_| {
+        std::fs::read_to_string(&dimensions).is_ok_and(|value| value == "100x30\n")
+    });
+    // Redraw only after Vim itself acknowledges the new size. The original
+    // bottom-row assertion still verifies actual terminal painting at 100x30.
     process.write(b"\x0c").unwrap();
     wait(&mut process, &mut screen, |s| {
         s.grid()[s.rows - 1]
@@ -79,6 +97,10 @@ fn vim_redraw_resize_and_exit_restore_the_primary_screen() {
     pump(&mut process, &mut screen);
     assert!(!screen.is_alternate());
     assert!(screen.plain().contains("primary-guard"));
+    assert_eq!(
+        std::fs::read(&path).unwrap(),
+        b"owned-vim-marker\nsecond line\n"
+    );
 }
 #[test]
 fn less_search_and_exit_restore_the_primary_screen() {

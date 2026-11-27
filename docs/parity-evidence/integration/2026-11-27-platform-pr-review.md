@@ -37,3 +37,11 @@ The first local all-target build failed before execution with an out-of-range de
 The second candidate (4ca75f9) includes the reviewed runner prerequisite and serial test repairs. Manual package run45923253954 is in progress; its macOS helper step passed. PR CI runs45923194474 (Windows branch) and45923239267 (combined branch) are in progress. The unavailable local non-incremental retry has no retained result after an environment refresh and is not counted as a pass.
 
 A full Apple Silicon workspace job is now required in CI, with explicit arm64 identity, SDK14 deployment floor, Rust1.96.1 and prepared locked RDP fixture graphs. Hardware/runtime opt-ins remain separate. Push CI is restricted to main; PR/manual checks remain, and superseded runs are cancelled by PR/ref group. This removes duplicate push/PR builds without removing the native regression gates. The new configuration changes no application source; native execution is still required.
+
+## Current hosted results
+
+- Windows branch4a88976: CI45923194474 passed Windows and Linux.
+- Combined application/package source4ca75f9: CI45923239267 passed Windows and Linux; manual package run45923253954 passed Linux, Windows and Apple Silicon package/startup checks.
+- CI-only follow-up12f2a4b: CI45924008758 passed Windows, failed an intermittent Linux Vim resize assertion and four Mac targets. Mac failures cover UI terminal/input fixtures, installed browser compatibility, unsupported SCP interpreter capability and serial output queue coverage. Issue2 now tracks the software follow-up; no merge is claimed.
+- Owner tasks are separated across terminal/SCP, Mac PTY/serial and browser diagnosis. No skipped tests, timeout inflation or unqualified hardware assertions are authorized as a substitute for fixes.
+- Initial ext4 allocation blocker is resolved in issue3 with its passing hosted evidence. Parity remains46/60; strict native/original closure is not claimed.

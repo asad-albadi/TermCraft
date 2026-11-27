@@ -340,8 +340,8 @@
         "S05"
       ],
       "dependency": "Remaining supported native desktop/manual, device, independent endpoint and production distribution fixtures.",
-      "remaining": "Complete hardware/manual device, admin-session and independent-endpoint acceptance. Linux allocation cleanup CI is under investigation.",
-      "validation_remaining": "Windows native helper36 and exact packaged endpoint11 checks; Apple Silicon helper54 and CUPS/PTY fixtures passed. Hosted Linux allocation cleanup still fails until integration fix is verified.",
+      "remaining": "The inherited ext4 allocation cleanup defect is repaired and passed hosted Ubuntu RDP checks. Remaining native device/admin-session, independent endpoint and original-workflow qualification and explicit POSIX API limitations remain open.",
+      "validation_remaining": "Windows and Linux regression CI run45923194474 passed. Scoped allocation cleanup has ext4/Btrfs and external-opener/break coverage; unsupported or contended leases retain allocation. Full combined Apple Silicon software regression failures are tracked in issue2; physical RDP devices and independent Windows Session Host acceptance remain open.",
       "evidence": [
         "docs/parity-evidence/execution/2026-11-25-windows-native.md",
         "docs/parity-evidence/D02/providers/host-full.log",
@@ -362,9 +362,11 @@
         "docs/parity-evidence/D02/windows-native-owner/fixture-FIX1/review.md",
         "docs/parity-evidence/D02/unix-extra-events/root-integration.json",
         "docs/parity-evidence/parallel-integration-local-completion-helper/result.json",
-        "https://github.com/asad-albadi/TermCraft/actions/runs/45636600121"
+        "https://github.com/asad-albadi/TermCraft/actions/runs/45636600121",
+        "docs/parity-evidence/D02/ext4-allocation/README.md",
+        "https://github.com/asad-albadi/TermCraft/actions/runs/45923194474"
       ],
-      "next_action": "Diagnose the first hosted Ubuntu24.04 CI allocation-cleanup failure linked in GitHub issue3. Establish whether implementation cleanup or a nonportable test assumption is wrong, fix with evidence, and rerun required checks. Native device/platform work remains separately dependent on supported hosts and hardware.",
+      "next_action": "Complete the remaining supported native device/admin and independent-endpoint qualification in issues1/2, retaining documented POSIX limitations. Continue the joint software regression fixes before merging platform PRs.",
       "platform_limitations": "Opened-object mutation and general POSIX COMMSTATUS/properties/modem events remain unavailable by design where no identity-safe native API exists. They are not marked implemented or assumed fixable by another Linux machine.",
       "native_dependency": "Native Windows/macOS RDP/redirection endpoints and physical printer, smartcard and serial fixtures. POSIX lacks the required opened-object rename/delete and general COMMSTATUS/properties/modem-event semantics; additional Linux hardware alone cannot supply missing OS APIs."
     },
@@ -1043,9 +1045,11 @@
       "macos_issue": "https://github.com/asad-albadi/TermCraft/issues/2",
       "ci_release_issue": "https://github.com/asad-albadi/TermCraft/issues/3",
       "initial_hosted_ci": "https://github.com/asad-albadi/TermCraft/actions/runs/45636600121",
-      "hosted_helper_passed": 81,
-      "hosted_helper_failed": 1,
-      "cause": "Unconfirmed; D02 investigation is actionable again. Prior local qualification is retained as historical evidence."
+      "hosted_helper_passed": 87,
+      "hosted_helper_failed": 0,
+      "cause": "Confirmed ext4 KEEP_SIZE allocation beyond EOF was not reclaimed by hole punch. Scoped write-lease cleanup and regression coverage are committed; hosted Windows-branch Linux CI passed in run45923194474. Full combined Apple Silicon CI remains actionable for separate terminal/browser/SCP/serial fixture failures, and Linux Vim resize needs deterministic synchronization.",
+      "verified_ci": "https://github.com/asad-albadi/TermCraft/actions/runs/45923194474",
+      "combined_ci_follow_up": "https://github.com/asad-albadi/TermCraft/actions/runs/45924008758"
     }
   },
   "supported_platform_scope": {

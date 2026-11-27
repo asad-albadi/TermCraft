@@ -163,6 +163,32 @@ impl Pipe {
         })
     }
 
+    #[cfg(test)]
+    pub(super) fn test_connection() -> (Self, UnixStream, UnixStream) {
+        let (writer, browser_reader) = UnixStream::pair().unwrap();
+        let (browser_writer, reader) = UnixStream::pair().unwrap();
+        reader
+            .set_read_timeout(Some(Duration::from_millis(30)))
+            .unwrap();
+        let process = Command::new("/bin/sleep")
+            .arg("60")
+            .process_group(0)
+            .spawn()
+            .unwrap();
+        (
+            Self {
+                process,
+                writer,
+                reader,
+                pending: Vec::new(),
+                _profile: tempfile::tempdir().unwrap(),
+                _runtime: None,
+            },
+            browser_writer,
+            browser_reader,
+        )
+    }
+
     pub(super) fn send(&mut self, message: &impl serde::Serialize) -> Result<(), String> {
         let mut bytes = zeroize::Zeroizing::new(
             serde_json::to_vec(message).map_err(|_| "Invalid browser command.")?,

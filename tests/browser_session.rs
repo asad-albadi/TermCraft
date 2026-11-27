@@ -52,9 +52,28 @@ fn chromium_available() -> bool {
             .expect("Native qualification requires the exact staged bundled Chromium");
         return true;
     }
-    let available = RuntimeCatalog::for_current_executable()
+    let provider = RuntimeCatalog::for_current_executable()
         .and_then(|catalog| catalog.resolve(ToolId::Browser))
-        .is_ok();
+        .and_then(|provider| provider.executable());
+    if let Ok(image) = &provider {
+        // Read version metadata without launching/prewarming Chrome before the
+        // cold-start assertion or creating any additional browser profile.
+        let plist = image.parent().unwrap().parent().unwrap().join("Info.plist");
+        let version = std::process::Command::new("/usr/libexec/PlistBuddy")
+            .args(["-c", "Print :CFBundleShortVersionString"])
+            .arg(plist)
+            .output();
+        eprintln!(
+            "macOS browser fixture image: {}; bundle version: {}",
+            image.display(),
+            version
+                .ok()
+                .filter(|output| output.status.success())
+                .map(|output| String::from_utf8_lossy(&output.stdout).trim().to_owned())
+                .unwrap_or_else(|| "unavailable".into())
+        );
+    }
+    let available = provider.is_ok();
     assert!(
         available || std::env::var_os("TERMCRAFT_REQUIRE_CHROMIUM").is_none(),
         "macOS browser qualification requires a native installed Chrome or Chromium"
@@ -179,8 +198,16 @@ fn chromium_renders_and_submits_browser_input() {
                 revision,
             })
             .unwrap();
+        let mut observed_geometry = None;
         wait_until(&session, || {
             session.take_frame().is_some_and(|frame| {
+                let geometry = (frame.size, frame.viewport_revision);
+                if observed_geometry != Some(geometry) {
+                    let pixel = (4 * (width * (height - 15) + width - 20)) as usize;
+                    eprintln!("resize {revision} wants {width}x{height}; observed {geometry:?}; button RGB {:?}",
+                        frame.rgba.get(pixel..pixel + 3));
+                    observed_geometry = Some(geometry);
+                }
                 if frame.size != [width, height] || frame.viewport_revision != revision {
                     return false;
                 }
@@ -377,6 +404,8 @@ fn wait_until(session: &Session, mut condition: impl FnMut() -> bool) {
     // Debug builds verify the complete 429MB bundle before starting Chromium.
     let startup_budget = if std::env::var_os("TERMCRAFT_TEST_BUNDLED_BROWSER").is_some() {
         60
+    } else if cfg!(target_os = "macos") && session.state().title.is_empty() {
+        35
     } else {
         18
     };

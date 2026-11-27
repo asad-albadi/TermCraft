@@ -1,0 +1,18 @@
+
+running 1 test
+test output_queue_tests::cancelling_full_serial_output_preserves_all_queued_payloads ... FAILED
+
+failures:
+
+---- output_queue_tests::cancelling_full_serial_output_preserves_all_queued_payloads stdout ----
+
+thread 'output_queue_tests::cancelling_full_serial_output_preserves_all_queued_payloads' (51495) panicked at /tmp/termcraft-serial-full-queue-mutant.rs:51:18:
+full serial queue trapped the cancelled reader: Timeout
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    output_queue_tests::cancelling_full_serial_output_preserves_all_queued_payloads
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.00s
+

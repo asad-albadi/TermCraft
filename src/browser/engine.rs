@@ -49,9 +49,10 @@ pub(super) fn run(
         navigation_request: None,
         buttons: 0,
     };
-    let startup_timeout = if mac_bundle {
-        // A private, freshly materialized macOS app can incur OS code checks
-        // before it reads its first CDP message. Bound just the cold start.
+    let startup_timeout = if cfg!(target_os = "macos") {
+        // Native macOS browser startup can precede pipe readiness, including
+        // installed Chrome. Bound only the first CDP transaction; subsequent
+        // requests retain REQUEST_TIMEOUT and every receive checks cancellation.
         Duration::from_secs(25)
     } else {
         REQUEST_TIMEOUT
@@ -467,21 +468,26 @@ impl Browser<'_> {
     }
 
     fn finish_macos_capture(&mut self) -> Result<(), String> {
-        // CDP temporarily changes the emulated view while capturing. Wait
-        // for restoration before changing its size or sending coordinates.
-        if self.screenshot_format == image::ImageFormat::Png {
-            while let Some(capture) = self.capture {
-                let Some(message) = self
-                    .pipe
-                    .receive(capture.deadline, &self.shared.cancelled)?
-                else {
-                    // Navigation can retire the renderer and its pending
-                    // request. Use the same deadline as the ordinary poll.
-                    self.capture = None;
-                    break;
-                };
-                self.event(&message)?;
-            }
+        if cfg!(target_os = "macos") {
+            self.finish_capture()?;
+        }
+        Ok(())
+    }
+
+    fn finish_capture(&mut self) -> Result<(), String> {
+        // CDP temporarily changes the emulated view while capturing, for both
+        // JPEG and PNG. Wait for restoration before sizing or sending input.
+        while let Some(capture) = self.capture {
+            let Some(message) = self
+                .pipe
+                .receive(capture.deadline, &self.shared.cancelled)?
+            else {
+                // Navigation can retire the renderer and its pending request.
+                // Use the same deadline as the ordinary poll.
+                self.capture = None;
+                break;
+            };
+            self.event(&message)?;
         }
         Ok(())
     }
@@ -740,5 +746,99 @@ impl Browser<'_> {
             } => self.finish_auth(challenge, credentials)?,
         }
         Ok(())
+    }
+}
+
+#[cfg(all(test, any(target_os = "linux", target_os = "macos")))]
+mod tests {
+    use super::*;
+    use std::{
+        io::Write,
+        sync::{Mutex, atomic::AtomicBool},
+    };
+
+    fn shared() -> Shared {
+        Shared {
+            state: Mutex::new(Default::default()),
+            frame: Mutex::new(None),
+            copy: Mutex::new(None),
+            cancelled: AtomicBool::new(false),
+        }
+    }
+
+    fn browser(
+        shared: &Shared,
+    ) -> (
+        Browser<'_>,
+        std::os::unix::net::UnixStream,
+        std::os::unix::net::UnixStream,
+    ) {
+        let (pipe, peer, commands) = Pipe::test_connection();
+        (
+            Browser {
+                pipe,
+                shared,
+                next: 1,
+                target: String::new(),
+                window: 0,
+                session: String::new(),
+                generation: 1,
+                size: [640, 480],
+                viewport_revision: 1,
+                main_frame: String::new(),
+                history: Vec::new(),
+                history_index: 0,
+                auth: None,
+                capture: Some(Capture {
+                    id: 42,
+                    deadline: Instant::now() + REQUEST_TIMEOUT,
+                    size: [640, 480],
+                    viewport_revision: 0,
+                }),
+                screenshot_format: image::ImageFormat::Jpeg,
+                navigation_request: None,
+                buttons: 0,
+            },
+            peer,
+            commands,
+        )
+    }
+
+    #[test]
+    fn capture_barrier_drains_jpeg_completion_before_changing_viewport() {
+        let shared = shared();
+        let (mut browser, mut peer, _commands) = browser(&shared);
+        // An old revision must be retired without publishing its pixels.
+        peer.write_all(b"{\"id\":42,\"result\":{}}\0").unwrap();
+        browser.finish_capture().unwrap();
+        assert!(
+            browser.capture.is_none(),
+            "JPEG captures also restore temporary metrics"
+        );
+        assert!(shared.frame.lock().unwrap().is_none());
+    }
+
+    #[test]
+    fn first_cdp_readiness_wait_observes_cancellation() {
+        let shared = shared();
+        let (mut browser, _peer, _commands) = browser(&shared);
+        shared.cancelled.store(true, Ordering::Release);
+        let error = browser
+            .call_with_timeout(
+                false,
+                "Target.getTargets",
+                json!({}),
+                Duration::from_secs(25),
+            )
+            .unwrap_err();
+        assert_eq!(error, "Browser closed.");
+    }
+
+    #[test]
+    fn capture_barrier_observes_cancellation_while_waiting_for_completion() {
+        let shared = shared();
+        let (mut browser, _peer, _commands) = browser(&shared);
+        shared.cancelled.store(true, Ordering::Release);
+        assert_eq!(browser.finish_capture().unwrap_err(), "Browser closed.");
     }
 }
