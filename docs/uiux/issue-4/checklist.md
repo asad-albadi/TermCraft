@@ -1,5 +1,7 @@
 # Issue #4 component and acceptance checklist
 
+**Current acceptance:** owner confirmed the RDP review works and completed manual checks, then authorized merge after the security/code review and fix loop. Earlier unchecked owner holds below are historical; [current review and dependency dispositions](premerge-review.md) supersede them. Final hosted CI must pass before merging.
+
 **RDP window movement and scrolling follow-up:** the owner reports the previous review works, with remaining motion lag. The new review enables non-AVC graphics and classic RemoteFX, and optimizes desktop pixel conversion. [Measurements, checks and remaining human acceptance](rdp-graphics.md). PR #8 remains draft/unmerged.
 
 **RDP latency correction:** sign-in is confirmed with a computer-qualified local account. The review now uses an optimized helper, bounded asynchronous frame output, dirty-region IPC and partial texture uploads. [Measurements, regression checks and remaining Windows acceptance](rdp-latency.md). Repeated display changes are covered by a stationary-pane regression; the owner must confirm the actual Windows symptoms are gone. PR #8 stays draft/unmerged.
@@ -143,7 +145,7 @@ A checked component has a recorded change or retention decision. Consult the val
 - [x] Required Linux x86-64, Windows x64 and Apple Silicon macOS regression lanes at `c2dded6`
 - [x] Independent implementation reviews and final whole-branch source review. The optional-font correction in `36ba3ba` passed scoped review. The subsequent evidence review identified a detached History contrast defect. The correction and its native evidence passed scoped review at `5575601`.
 - [x] Final technical review approved the specification, code quality, distribution evidence and platform packages for `c2dded6`.
-- [ ] Human checks — owner explicitly required before merge
+- [x] Human checks — owner confirmed manual testing and authorized merge after the review/fix loop
 
 
 ### Earlier implementation checks (`c2dded6`)
