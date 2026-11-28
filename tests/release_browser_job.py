@@ -59,29 +59,65 @@ class BrowserJob(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 implementation._private_profile(profile)
             api = c.WinDLL('advapi32', use_last_error=True)
-            get = api.GetNamedSecurityInfoW
-            get.argtypes = [w.LPWSTR, c.c_int, w.DWORD, c.c_void_p, c.c_void_p,
-                            c.c_void_p, c.c_void_p, c.POINTER(c.c_void_p)]
-            get.restype = w.DWORD
-            convert = api.ConvertSecurityDescriptorToStringSecurityDescriptorW
-            convert.argtypes = [c.c_void_p, w.DWORD, w.DWORD, c.POINTER(w.LPWSTR), c.c_void_p]
-            convert.restype = w.BOOL
             kernel = c.WinDLL('kernel32', use_last_error=True)
-            kernel.LocalFree.argtypes = [c.c_void_p]
-            kernel.LocalFree.restype = c.c_void_p
-            descriptor, text = c.c_void_p(), w.LPWSTR()
+
+            class Acl(c.Structure):
+                _fields_ = [('revision', w.BYTE), ('reserved', w.BYTE),
+                            ('size', w.WORD), ('count', w.WORD), ('reserved2', w.WORD)]
+
+            class AllowedAce(c.Structure):
+                _fields_ = [('type', w.BYTE), ('flags', w.BYTE),
+                            ('size', w.WORD), ('mask', w.DWORD), ('sid_start', w.DWORD)]
+
+            def bind(library, name, result, *arguments):
+                fn = getattr(library, name)
+                fn.restype, fn.argtypes = result, arguments
+                return fn
+
+            get = bind(api, 'GetNamedSecurityInfoW', w.DWORD, w.LPWSTR, c.c_int,
+                       w.DWORD, c.c_void_p, c.c_void_p, c.POINTER(c.c_void_p),
+                       c.c_void_p, c.POINTER(c.c_void_p))
+            control = bind(api, 'GetSecurityDescriptorControl', w.BOOL, c.c_void_p,
+                           c.POINTER(w.WORD), c.POINTER(w.DWORD))
+            get_ace = bind(api, 'GetAce', w.BOOL, c.c_void_p, w.DWORD, c.POINTER(c.c_void_p))
+            equal = bind(api, 'EqualSid', w.BOOL, c.c_void_p, c.c_void_p)
+            current = bind(kernel, 'GetCurrentProcess', w.HANDLE)
+            open_token = bind(api, 'OpenProcessToken', w.BOOL, w.HANDLE,
+                              w.DWORD, c.POINTER(w.HANDLE))
+            token_information = bind(api, 'GetTokenInformation', w.BOOL, w.HANDLE,
+                                     c.c_int, c.c_void_p, w.DWORD, c.POINTER(w.DWORD))
+            free = bind(kernel, 'LocalFree', c.c_void_p, c.c_void_p)
+            close = bind(kernel, 'CloseHandle', w.BOOL, w.HANDLE)
+            descriptor, dacl, token = c.c_void_p(), c.c_void_p(), w.HANDLE()
             try:
-                self.assertEqual(get(str(profile), 1, 4, None, None, None, None,
+                self.assertEqual(get(str(profile), 1, 4, None, None, c.byref(dacl), None,
                                      c.byref(descriptor)), 0)
-                self.assertTrue(convert(descriptor, 1, 4, c.byref(text), None))
-                self.assertTrue(text.value.startswith('D:P'), text.value)
-                self.assertEqual(text.value.count('(A;'), 1, text.value)
-                self.assertIn(';FA;;;S-1-', text.value)
+                self.assertTrue(dacl.value, 'A null DACL would grant unrestricted access')
+                flags, revision = w.WORD(), w.DWORD()
+                self.assertTrue(control(descriptor, c.byref(flags), c.byref(revision)))
+                self.assertTrue(flags.value & 0x1000, 'DACL must be protected from inheritance')
+                self.assertEqual(c.cast(dacl, c.POINTER(Acl)).contents.count, 1)
+                entry = c.c_void_p()
+                self.assertTrue(get_ace(dacl, 0, c.byref(entry)))
+                ace = c.cast(entry, c.POINTER(AllowedAce)).contents
+                self.assertEqual(ace.type, 0, 'Expected one access-allowed ACE')
+                self.assertEqual(ace.flags, 0x3, 'Only object/container inheritance is allowed')
+                self.assertEqual(ace.mask, 0x1f01ff, 'Current user needs FILE_ALL_ACCESS')
+                self.assertTrue(open_token(current(), 0x8, c.byref(token)))
+                length = w.DWORD()
+                token_information(token, 1, None, 0, c.byref(length))
+                self.assertGreater(length.value, 0)
+                user = c.create_string_buffer(length.value)
+                self.assertTrue(token_information(token, 1, user, length, c.byref(length)))
+                token_sid = c.cast(user, c.POINTER(c.c_void_p)).contents.value
+                ace_sid = entry.value + AllowedAce.sid_start.offset
+                self.assertTrue(equal(ace_sid, token_sid),
+                                'The sole allowed SID must equal the current token user')
             finally:
-                if text:
-                    kernel.LocalFree(c.cast(text, c.c_void_p))
+                if token:
+                    close(token)
                 if descriptor:
-                    kernel.LocalFree(descriptor)
+                    free(descriptor)
 
     @unittest.skipUnless(os.name == 'nt', 'Native Windows owned-process fixture')
     def test_timeout_reaps_owned_parent_and_descendant(self):
