@@ -1,5 +1,7 @@
 # Issue #4 component and acceptance checklist
 
+**RDP window movement and scrolling follow-up:** the owner reports the previous review works, with remaining motion lag. The new review enables non-AVC graphics and classic RemoteFX, and optimizes desktop pixel conversion. [Measurements, checks and remaining human acceptance](rdp-graphics.md). PR #8 remains draft/unmerged.
+
 **RDP latency correction:** sign-in is confirmed with a computer-qualified local account. The review now uses an optimized helper, bounded asynchronous frame output, dirty-region IPC and partial texture uploads. [Measurements, regression checks and remaining Windows acceptance](rdp-latency.md). Repeated display changes are covered by a stationary-pane regression; the owner must confirm the actual Windows symptoms are gone. PR #8 stays draft/unmerged.
 
 **Bundled browser review correction:** restored all 243 pinned Chromium files beside the current GUI/RDP helper and verified real renderer sandbox/cleanup. `TC-BROWSER-119` now identifies local runtime availability. [Evidence and unresolved Windows sign-in investigation](error-messages.md#bundled-browser-review-correction). No merge; owner checks remain open.

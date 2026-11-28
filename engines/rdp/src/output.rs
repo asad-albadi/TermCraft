@@ -298,3 +298,7 @@ mod tests {
         assert!(cursor.is_empty());
     }
 }
+
+#[cfg(test)]
+#[path = "graphics_tests.rs"]
+mod graphics_tests;

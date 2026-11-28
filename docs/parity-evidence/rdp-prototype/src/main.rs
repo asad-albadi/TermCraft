@@ -426,6 +426,7 @@ fn fixture() -> anyhow::Result<()> {
     let cursor = args.get(4).is_some_and(|s| s == "cursor");
     let resize = args.get(4).is_some_and(|s| s == "resize");
     let ignore_layout = args.get(4).is_some_and(|s| s == "ignore-layout");
+    let remotefx = args.get(4).is_some_and(|s| s == "remotefx");
     let shrink = args.get(4).is_some_and(|s| s == "shrink");
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
@@ -472,11 +473,18 @@ fn fixture() -> anyhow::Result<()> {
                     (!ignore_layout).then(Default::default),
                 );
                 let events = handler.0.clone();
+                let codecs = if remotefx {
+                    ironrdp::pdu::rdp::capability_sets::server_codecs_capabilities(&[])
+                        .expect("default RemoteFX server capability set")
+                } else {
+                    ironrdp::pdu::rdp::capability_sets::BitmapCodecs(vec![])
+                };
                 let mut server = server::RdpServer::builder()
                     .with_addr(address)
                     .with_hybrid(tokio_rustls::TlsAcceptor::from(tls), public)
                     .with_input_handler(handler.clone())
                     .with_display_handler(handler)
+                    .with_bitmap_codecs(codecs)
                     .with_cliprdr_factory(Some(Box::new(clipboard::Factory {
                         sender: None,
                         path: root.join("observations.txt"),

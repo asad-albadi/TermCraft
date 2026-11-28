@@ -1,10 +1,39 @@
 use ironrdp_displaycontrol::{client::DisplayControlClient, pdu::MonitorLayoutEntry};
 use ironrdp_dvc::DrdynvcClient;
 
-pub fn channel() -> DrdynvcClient {
-    DrdynvcClient::new().with_dynamic_channel_factory(ironrdp_displaycontrol::CHANNEL_NAME, || {
-        DisplayControlClient::new(|_| Ok(Vec::new()))
-    })
+use ironrdp_egfx::{
+    client::{GraphicsPipelineClient, GraphicsPipelineHandler},
+    pdu::{CapabilitiesV8Flags, CapabilitySet},
+};
+use std::sync::{
+    Arc,
+    atomic::{AtomicBool, Ordering},
+};
+#[derive(Default, Clone)]
+pub struct GraphicsReset(Arc<AtomicBool>);
+impl GraphicsReset {
+    pub fn take(&self) -> bool {
+        self.0.swap(false, Ordering::Relaxed)
+    }
+}
+impl GraphicsPipelineHandler for GraphicsReset {
+    fn capabilities(&self) -> Vec<CapabilitySet> {
+        vec![CapabilitySet::V8 {
+            flags: CapabilitiesV8Flags::SMALL_CACHE,
+        }]
+    }
+    fn on_reset_graphics(&mut self, _width: u32, _height: u32) {
+        self.0.store(true, Ordering::Relaxed);
+    }
+}
+pub fn channel(reset: GraphicsReset) -> DrdynvcClient {
+    DrdynvcClient::new()
+        .with_dynamic_channel_factory(ironrdp_displaycontrol::CHANNEL_NAME, || {
+            DisplayControlClient::new(|_| Ok(Vec::new()))
+        })
+        .with_dynamic_channel_factory(ironrdp_egfx::CHANNEL_NAME, move || {
+            GraphicsPipelineClient::new(Box::new(reset.clone()), None)
+        })
 }
 
 #[derive(Default)]
@@ -39,7 +68,7 @@ mod tests {
         use ironrdp_dvc::pdu::{CreateRequestPdu, DataPdu, DrdynvcDataPdu, DrdynvcServerPdu};
         use ironrdp_svc::SvcProcessor;
 
-        let mut client = channel();
+        let mut client = channel(Default::default());
         for id in [1, 2] {
             let open = DrdynvcServerPdu::Create(CreateRequestPdu::new(
                 id,

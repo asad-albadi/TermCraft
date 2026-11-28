@@ -2,7 +2,7 @@ use ironrdp_connector::{BitmapConfig, Config, Credentials, DesktopSize};
 use ironrdp_pdu::{
     gcc::{ConnectionType, KeyboardType},
     rdp::{
-        capability_sets::{BitmapCodecs, MajorPlatformType, RailSupportLevel},
+        capability_sets::{MajorPlatformType, RailSupportLevel, client_codecs_capabilities},
         client_info::{PerformanceFlags, TimezoneInfo},
     },
 };
@@ -42,7 +42,7 @@ pub fn connector(wire: &crate::wire::Config) -> Config {
         bitmap: Some(BitmapConfig {
             lossy_compression: false,
             color_depth: 32,
-            codecs: BitmapCodecs(vec![]),
+            codecs: client_codecs_capabilities(&[]).expect("default RemoteFX capability set"),
         }),
         dig_product_id: String::new(),
         client_dir: "TermCraft".into(),
@@ -69,7 +69,7 @@ pub fn connector(wire: &crate::wire::Config) -> Config {
         enable_server_pointer: true,
         pointer_software_rendering: true,
         multitransport_flags: None,
-        support_dyn_vc_gfx_protocol: false,
+        support_dyn_vc_gfx_protocol: true,
     }
 }
 
@@ -88,6 +88,25 @@ pub fn cluster(
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn advertises_classic_remotefx_and_dynamic_graphics_with_the_existing_color_policy() {
+        use ironrdp_pdu::rdp::capability_sets::{CodecProperty, RemoteFxContainer};
+        let wire: crate::wire::Config = serde_json::from_value(serde_json::json!({
+            "version": crate::wire::VERSION, "host": "localhost", "port": 3389,
+            "user": "fixture", "width": 640, "height": 480, "timeout_secs": 5
+        }))
+        .unwrap();
+        let config = super::connector(&wire);
+        assert!(config.support_dyn_vc_gfx_protocol);
+        let bitmap = config.bitmap.unwrap();
+        assert_eq!(bitmap.color_depth, 32);
+        assert!(!bitmap.lossy_compression);
+        assert!(bitmap.codecs.0.iter().any(|c| matches!(
+            c.property,
+            CodecProperty::RemoteFx(RemoteFxContainer::ClientContainer(_))
+        )));
+    }
+
     #[test]
     fn administrative_session_requests_console_without_advertising_redirects() {
         let options = crate::rdp_options::RdpOptions::default();

@@ -29,6 +29,74 @@ fn authenticate(session: &DesktopSession, id: u64) {
         .unwrap();
 }
 
+#[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
+fn classic_remotefx_decodes_the_server_tile_and_preserves_key_order() {
+    let server = rdp_server::Server::with_remotefx();
+    let mut session = DesktopSession::connect(server.config(8162)).unwrap();
+    until(&mut session, |session, event| match event {
+        DesktopEvent::Authentication { id, .. } => {
+            authenticate(session, id);
+            false
+        }
+        DesktopEvent::Frame(frame) => {
+            assert_eq!((frame.width, frame.height), (640, 480));
+            if frame.pixels[0] == 0 {
+                return false;
+            }
+            // The pinned RemoteFX encoder quantizes this uniform red by one.
+            // This distinguishes an actual RemoteFX frame from the exact bitmap fallback.
+            assert_eq!(frame.pixels[0], 254);
+            for row in frame.pixels.chunks_exact(640 * 4).take(64) {
+                for pixel in row[..64 * 4].chunks_exact(4) {
+                    assert!(pixel[0].abs_diff(255) <= 1 && pixel[1] <= 1 && pixel[2] <= 1);
+                    assert_eq!(pixel[3], 255);
+                }
+            }
+            assert_eq!(&frame.pixels[64 * 4..65 * 4], &[0, 0, 0, 255]);
+            true
+        }
+        DesktopEvent::Disconnected { message } => panic!("{message}"),
+        _ => false,
+    });
+    for pressed in [true, false] {
+        session
+            .send(DesktopInput::Key {
+                code: 30,
+                extended: false,
+                pressed,
+            })
+            .unwrap();
+    }
+    let end = Instant::now() + Duration::from_secs(3);
+    loop {
+        let observations = server.observations();
+        let keys: Vec<_> = observations
+            .lines()
+            .filter(|line| line.starts_with("key:"))
+            .collect();
+        if keys.len() >= 2 {
+            assert_eq!(
+                keys,
+                [
+                    "key:Pressed { code: 30, extended: false }",
+                    "key:Released { code: 30, extended: false }"
+                ]
+            );
+            break;
+        }
+        assert!(
+            Instant::now() < end,
+            "RemoteFX fixture did not receive both key transitions"
+        );
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    session.close();
+}
+
 #[cfg(windows)]
 #[test]
 #[ignore = "requires the native RDP software endpoint and OpenSSL"]

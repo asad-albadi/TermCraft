@@ -222,7 +222,8 @@ async fn connect(
         if let Some(cluster) = config::cluster(&config.options) {
             connector = connector.with_cluster_data(cluster);
         }
-        connector.attach_static_channel(display::channel());
+        let graphics_reset = display::GraphicsReset::default();
+        connector.attach_static_channel(display::channel(graphics_reset.clone()));
         devices::Channel::attach_with_smartcard(&mut connector, &config.options, &serial, &printer)
             .await?;
         let clip_actions = Arc::new(Mutex::new(std::collections::VecDeque::new()));
@@ -553,6 +554,7 @@ async fn connect(
                     })?,
                 }
             }
+            let previous_extent = (image.width(), image.height());
             let outputs = tokio::select! {
                 packet = reader.read_pdu() => {
                     let (action, mut data) = packet.map_err(|_| "RDP server closed its transport")?;
@@ -583,6 +585,21 @@ async fn connect(
                 },
                 _=tick.tick()=>{out.publish(&image,&mut damage,&mut revision)?;continue;}
             };
+            if graphics_reset.take() {
+                let extent = (image.width(), image.height());
+                wire::dimensions(extent.0, extent.1)?;
+                if extent != previous_extent {
+                    // A graphics reset can complete a requested layout without
+                    // a classic DeactivateAll / reactivation exchange.
+                    resize_in_flight = None;
+                    fit_locally = false;
+                    out.event(Event::Connected {
+                        width: extent.0,
+                        height: extent.1,
+                    })?;
+                }
+                damage = Damage::Full;
+            }
             for output in outputs {
                 match output {
                     ActiveStageOutput::ResponseFrame(bytes) => {

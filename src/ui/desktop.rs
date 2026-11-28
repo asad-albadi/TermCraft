@@ -1,4 +1,5 @@
 use super::*;
+mod image;
 mod resize;
 use harbor_workspace::desktop::{DesktopEvent, DesktopInput, DesktopSession, Frame, TrustDecision};
 use harbor_workspace::macros::Action as MacroInput;
@@ -38,9 +39,10 @@ impl RemoteCursor {
             width,
             height,
             hotspot,
-            image: Some(ColorImage::from_rgba_unmultiplied(
+            image: Some(image::from_rgba(
                 [width as usize, height as usize],
                 &pixels,
+                false,
             )),
             texture: None,
         }))
@@ -861,9 +863,10 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
                 let start = (y * usize::from(frame.width) + usize::from(rect.x)) * 4;
                 pixels.extend_from_slice(&frame.pixels[start..start + usize::from(rect.width) * 4]);
             }
-            let image = ColorImage::from_rgba_unmultiplied(
+            let image = image::from_rgba(
                 [rect.width as usize, rect.height as usize],
                 &pixels,
+                state.protocol == "RDP",
             );
             texture.set_partial(
                 [rect.x as usize, rect.y as usize],
@@ -872,9 +875,10 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
             );
         } else {
             state.texture_damage = None;
-            let image = ColorImage::from_rgba_unmultiplied(
+            let image = image::from_rgba(
                 [frame.width as usize, frame.height as usize],
                 &frame.pixels,
+                state.protocol == "RDP",
             );
             if let Some(texture) = &mut state.texture {
                 texture.set(image, TextureOptions::LINEAR);
