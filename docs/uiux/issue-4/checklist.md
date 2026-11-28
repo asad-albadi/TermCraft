@@ -1,5 +1,7 @@
 # Issue #4 component and acceptance checklist
 
+**Bundled browser review correction:** restored all 243 pinned Chromium files beside the current GUI/RDP helper and verified real renderer sandbox/cleanup. `TC-BROWSER-119` now identifies local runtime availability. [Evidence and unresolved Windows sign-in investigation](error-messages.md#bundled-browser-review-correction). No merge; owner checks remain open.
+
 **RDP sign-in diagnostic correction:** remote desktops now display failures once, retain safe stage/SSPI/NTSTATUS details, and distinguish explicit rejection, account policy, transport and desktop setup failures. [Follow-up and remaining Windows retry](error-messages.md#rdp-sign-in-follow-up). The actual reported Windows cause is not yet established; human retry remains open. No merge.
 
 **Games and remote desktop follow-up:** all thirteen boards now center and fit both window dimensions. Embedded desktops default to Inherit pane size, retain fixed resolution, negotiate supported remote resizing, and reduce local input/frame batching. [Behavior, validation and review command](games-and-desktop-resizing.md). PR #8 remains draft and unmerged pending owner human checks.

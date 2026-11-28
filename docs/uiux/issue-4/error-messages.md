@@ -28,7 +28,7 @@ Existing connection forms, tabs, panels and confirmation flows retain their orga
 | `116` | Invalid settings/input reported by the operation |
 | `117` | Remote-file version conflict |
 | `118` | Network/route unavailable |
-| `119` | Local RDP helper missing from the application build |
+| `119` | Local bundled component unavailable (RDP helper or verified browser runtime) |
 | `120` | Local RDP helper exists but cannot start |
 | `121` | RDP server explicitly rejected sign-in |
 | `122` | RDP sign-in blocked by an account/server policy |
@@ -169,3 +169,14 @@ Use a plain username with the separate Domain field, or leave Domain blank when 
 The Windows host failure remains undiagnosed until the updated helper observes a retry. The wrong-password test validates the diagnostic path and does not prove that the owner's password was wrong. Close the older app, run the current review launcher and reconnect. If it still fails, open the code and copy its technical details. PR #8 remains draft and unmerged.
 
 Final local checks: 11 real UI/input/ownership tests, 11 catalogue/redaction tests and 8 independent RDP/helper checks passed, including failed-password stage/status, successful sign-in, ordered input through resizing, ignored-resize fallback, certificate changes and shutdown. Six helper unit tests passed separately. Final native Wayland startup and protected-dialog checks passed. [Review component and source identities](rdp-signin-review-build.json).
+
+
+## Bundled browser review correction
+
+The local review refresh carried the GUI and RDP helper but omitted the browser resource directory. Its failure was local; changing the website address could not repair it. The review now includes the exact pinned Chromium tree (243 file hashes verified against the compiled manifest), notices and the unchanged current RDP helper. `TC-BROWSER-119` identifies the provider's unavailable/damaged-runtime result and directs the user to a complete local build. Verification and sandbox requirements remain enforced; there is no silent provider substitution.
+
+Current checks: 12 catalogue/redaction tests, 9 UI/input/vault tests and the native bundled-renderer namespace/seccomp/private-profile cleanup qualification all passed. The RDP UI test now enters the synthetic password through the focused widget using both text and paste events before submitting it, instead of assigning its internal value. Native Linux startup passed. [Current review source/component identities](browser-review-build.json).
+
+Keep the browser tree and RDP helper alongside the GUI on future review refreshes. The stable local review launcher selects the new payload; older directories remain intact. The new directory covers these two providers, not every production runtime.
+
+The owner's real Windows rejection remains under investigation. Nine same-identity, same-certificate comparisons across earlier/current helper revisions passed on an owned endpoint; they do not qualify the owner's Windows host. For a local account, the account domain is the Windows computer name rather than the network workgroup. Existing event4625's target account/domain and SubStatus can distinguish failures without guessing the password. [Microsoft event4625 field reference](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4625).

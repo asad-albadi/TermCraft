@@ -1541,15 +1541,23 @@ mod tests {
                 }
             }
             if !signed_in {
-                if let Some(Form::Credentials { password, .. }) =
-                    &mut w.tabs[0].desktop.as_mut().unwrap().form
-                {
-                    *password = Zeroizing::new("fixture-password".into());
+                if matches!(
+                    w.tabs[0].desktop.as_ref().unwrap().form,
+                    Some(Form::Credentials { .. })
+                ) {
                     if let Some(position) = output
                         .shapes
                         .iter()
                         .find_map(|shape| text(&shape.shape, "Connect securely"))
                     {
+                        // Exercise the real focused password field and both entry paths,
+                        // rather than assigning the form value behind the widget.
+                        let mut typed = paint(&ctx, &mut w, vec![Event::Text("fixture-".into())]);
+                        typed.textures_delta.clear();
+                        let mut pasted = paint(&ctx, &mut w, vec![Event::Paste("password".into())]);
+                        pasted.textures_delta.clear();
+                        assert!(matches!(&w.tabs[0].desktop.as_ref().unwrap().form,
+                            Some(Form::Credentials {password,..}) if password.as_str()=="fixture-password"));
                         output.textures_delta.clear();
                         click(&ctx, &mut w, position);
                         signed_in = true;

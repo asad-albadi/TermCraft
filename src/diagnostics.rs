@@ -227,6 +227,14 @@ impl Diagnostic {
                 "RDP sign-in or desktop setup did not complete.",
                 "This older helper did not report the failing stage. Retry with the current complete TermCraft build and copy the new error details; this message alone does not prove that the password is wrong.",
             )
+        } else if context == Context::Browser
+            && lower.starts_with("the selected bundled chromium runtime is unavailable or damaged")
+        {
+            (
+                "119",
+                "The bundled browser runtime is unavailable.",
+                "Use a complete TermCraft build containing its verified Chromium runtime. This is a local runtime problem; reinstall the browser payload if verification fails.",
+            )
         } else if contains(&[
             "host key mismatch",
             "host key has changed",
@@ -472,6 +480,16 @@ pub fn sanitize(raw: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn bundled_browser_failure_is_local_runtime_not_a_website_problem() {
+        let d = Diagnostic::new(
+            Context::Browser,
+            "The selected bundled Chromium runtime is unavailable or damaged",
+        );
+        assert_eq!(d.code, "TC-BROWSER-119");
+        assert!(d.next_step.contains("complete TermCraft build"));
+        assert!(!d.next_step.contains("address"));
+    }
     #[test]
     fn rdp_signin_failure_codes_distinguish_rejection_from_setup() {
         for (message, suffix) in [
