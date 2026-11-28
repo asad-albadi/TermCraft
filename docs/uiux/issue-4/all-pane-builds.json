@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "ui_source_commit": "05a22340204c69fa3c82cbc48daf05768bc0cac7",
+  "ci": {
+    "run_id": 46102916112,
+    "url": "https://github.com/asad-albadi/TermCraft/actions/runs/46102916112",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "regression",
+        "id": 140849182847,
+        "conclusion": "success"
+      },
+      {
+        "name": "regression-windows-x64",
+        "id": 140849183072,
+        "conclusion": "success"
+      },
+      {
+        "name": "regression-macos-arm64",
+        "id": 140849183090,
+        "conclusion": "success"
+      }
+    ]
+  },
+  "unsigned_candidate_workflow": {
+    "run_id": 46102912942,
+    "url": "https://github.com/asad-albadi/TermCraft/actions/runs/46102912942",
+    "conclusion": "success",
+    "aggregate": "success",
+    "publish": "skipped (manual branch run; no release/tag)",
+    "windows_x_fixture": "skipped (not requested)",
+    "jobs": [
+      {
+        "name": "preflight",
+        "id": 140849175362,
+        "conclusion": "success"
+      },
+      {
+        "name": "package (macos-15, macos-arm64, macos)",
+        "id": 140849238424,
+        "conclusion": "success"
+      },
+      {
+        "name": "package (windows-2025, windows-amd64, windows)",
+        "id": 140849238441,
+        "conclusion": "success"
+      },
+      {
+        "name": "package (ubuntu-24.04, linux-amd64, linux)",
+        "id": 140849238447,
+        "conclusion": "success"
+      },
+      {
+        "name": "regression / regression",
+        "id": 140849238588,
+        "conclusion": "success"
+      },
+      {
+        "name": "regression / regression-windows-x64",
+        "id": 140849238619,
+        "conclusion": "success"
+      },
+      {
+        "name": "regression / regression-macos-arm64",
+        "id": 140849238632,
+        "conclusion": "success"
+      },
+      {
+        "name": "windows-x-fixture",
+        "id": 140849239486,
+        "conclusion": "skipped"
+      },
+      {
+        "name": "aggregate",
+        "id": 140855411823,
+        "conclusion": "success"
+      },
+      {
+        "name": "publish",
+        "id": 140855740545,
+        "conclusion": "skipped"
+      }
+    ]
+  },
+  "platforms": {
+    "linux-amd64": {
+      "archive_sha256": "7764e228faf45f9e9edb411b6fa73d0eaab31c313605a93eafa9503786fc2938",
+      "snapshot_sha256": "8fdc337797b680225d83ae0ee5818d1bae59808f9a766c51d5fe7dbd87d29825",
+      "source_inputs": 646,
+      "package_files": 1097,
+      "dist_hashes": {
+        "TermCraft-0.1.0-linux-x86_64-AppImage-source.tar.gz": "f4ba10c3f6091b5de66daa1aacce5cddbf1c07f59c24f1b821885f049e73286b",
+        "TermCraft-0.1.0-linux-x86_64.AppImage": "01633f21169396ef33fbaa0087552212dcb67d68623e5f3676ef13d5a0f6da99",
+        "TermCraft-0.1.0-linux-x86_64.tar.gz": "7764e228faf45f9e9edb411b6fa73d0eaab31c313605a93eafa9503786fc2938",
+        "termcraft_0.1.0_amd64.deb": "354c0e38fbc885a79d536e1c8df04f34decec11d7cf293cfe4e76e097ea6a943"
+      },
+      "artifact_id": 15246857366,
+      "artifact_zip_sha256": "417f7e1e93b41f394b0a3b59c977577dde32cb31c444bb97f90a2aa35c1d5e00",
+      "app_sha256": "76cb76ae53a561ee677c570fe262125d9db8c073eae6bdc4c3126032d23dfc34"
+    },
+    "windows-amd64": {
+      "archive_sha256": "13f0cf2e445534138d7e00b976ae7374397bfd924cb465c812cd1d00b5fdc155",
+      "snapshot_sha256": "8fdc337797b680225d83ae0ee5818d1bae59808f9a766c51d5fe7dbd87d29825",
+      "source_inputs": 646,
+      "package_files": 995,
+      "dist_hashes": {
+        "TermCraft-0.1.0-windows-x86_64.zip": "13f0cf2e445534138d7e00b976ae7374397bfd924cb465c812cd1d00b5fdc155"
+      },
+      "artifact_id": 15247440498,
+      "artifact_zip_sha256": "4019eb81edc01a5aff19b1751b6c9e64253529cafc351f452e26fb60c077045d",
+      "app_sha256": "d7209a1e18912acbfa39f154af27612ac7deafa81156f7f683fc60ee3d6be091"
+    },
+    "macos-arm64": {
+      "archive_sha256": "5655f6f8513a2ead52a23551f1992af7a1a3a5d41ae1f294d9aa01f80f396707",
+      "snapshot_sha256": "8fdc337797b680225d83ae0ee5818d1bae59808f9a766c51d5fe7dbd87d29825",
+      "source_inputs": 646,
+      "package_files": 990,
+      "dist_hashes": {
+        "TermCraft-0.1.0-macos-aarch64.zip": "5655f6f8513a2ead52a23551f1992af7a1a3a5d41ae1f294d9aa01f80f396707"
+      },
+      "artifact_id": 15246069954,
+      "artifact_zip_sha256": "eb0361a0f216bb3e1a250bb27fd18bb496a4b44f5766b17104169b9f49fca680",
+      "app_sha256": "ad12a1fdaf6589a704c4bd1cb75ca5794f75505cc45f6f3f53ed1bcc0989c136"
+    }
+  },
+  "linux_archive_bound_evidence": [
+    "startup-evidence/verification.json",
+    "wayland-evidence/verification.json",
+    "lifecycle-evidence/verification.json"
+  ],
+  "protected_session_dialogs": {
+    "base": "ae287913db0868fc56045ba1b26638e8656a44ce",
+    "session_page_prefix_sha256": "e9bbe20286e25c3ad4467bbb7814e6a59dd12c34bc3815d55471108d2727f72d",
+    "protected_files": {
+      "src/ui/ssh_options.rs": "e04d539da748b1497dea4ff7f56a5351af225dd29215ef18557e747dfdfd8497",
+      "src/ui/rdp_settings.rs": "e156fef3b608fa21464dc18b7665eb04943630b7db7133afa10cc66834a0a25a",
+      "src/ui/vnc_settings.rs": "a50140f4d4ff135ce15f99465f30ade797e1f607fc98b20d84cdec597ecf3c7b",
+      "src/ui/serial_settings.rs": "3e7e8c360171a87020e64c55ff03aaf48618a016025c7e0a0413bbb96aa0d768",
+      "src/ui/ftp_settings.rs": "21d94710cf059b2214a4ad5af33566acc90a369a03aaafc42fa5a81d7cb6e71d",
+      "src/ui/xdmcp.rs": "0c54f6f76f560a71d30ab556415746cde253fcd70375c8723689b4111549f0fc",
+      "src/ui/terminal_settings.rs": "a2ade2ff67d40b3e2a5ad46f4e8fcad53fb474e238497642ed4cda6b13d3c5c8",
+      "src/ui/fluent.rs": "c9c38eeb4524a511ae615bfa57a202e4bf97a7e230be50fbf02483e0a36ed782"
+    }
+  },
+  "native_previews": "captures/unified-workspace/manifest.json",
+  "qualification_scope": [
+    "All three native CI jobs and all three unsigned core package jobs passed at the exact UI source revision.",
+    "All six downloaded distribution payload hashes, all 646 Git build inputs per platform and every manifest file were verified.",
+    "Linux additionally verifies startup, Wayland and lifecycle records bound to its exact archive hash.",
+    "Windows/Mac archive checks were static on Linux; native execution belongs to their hosted package jobs.",
+    "These are unsigned core review candidates, not production release/signing/provider/hardware acceptance.",
+    "Native development previews retain their separate cached-dependency and sample-data limitations."
+  ],
+  "owner_acceptance": "pending; PR #8 remains draft and unmerged",
+  "superseded_cancelled_runs": [
+    46100227684,
+    46100232997
+  ],
+  "feature_parity": "unchanged: 46/60"
+}

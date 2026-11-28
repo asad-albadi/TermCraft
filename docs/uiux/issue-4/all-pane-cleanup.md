@@ -2,6 +2,16 @@
 
 Continue the approved issue #4 design: everyday actions and data first, clear task sections, aligned forms, details/help on demand, full-width scroll viewports with content clearance. Preserve all behavior, trust/credential decisions, active-operation cancellation and pending-work protection. The owner explicitly approved session create/edit dialogs; their implementation and shared styling are protected. PR #8 stays draft and unmerged until full human checks and explicit approval.
 
+**Current delivery:** UI source `05a2234` passed all three [platform CI jobs](https://github.com/asad-albadi/TermCraft/actions/runs/46102916112), all three unsigned package jobs and aggregate checks in [the candidate workflow](https://github.com/asad-albadi/TermCraft/actions/runs/46102912942). All six distribution payload hashes, each platform’s 646 Git build inputs and every manifest file were verified. Linux startup, Wayland and lifecycle records bind to its exact archive hash. [Complete build identities and limits](all-pane-builds.json) · [Current native previews](captures/unified-workspace/README.md). Owner acceptance remains open.
+
+Run the current Linux review build after closing an older build:
+
+```bash
+"/home/asad/.codex/worktrees/termcraft-issue-3/app/target/issue-4/run-latest-linux"
+```
+
+The launcher now points to a newly extracted, verified `05a2234` runtime. Previous runtimes are preserved.
+
 ## Working inventory
 
 - [x] Home, menu/command bands, navigation rail and saved-session sidebar.
@@ -21,7 +31,7 @@ Continue the approved issue #4 design: everyday actions and data first, clear ta
 - [x] Game catalog/play/options, idle screen and detached windows.
 - [x] Vault, key/agent, shared-source, import, shortcuts and highlighting/profile managers: inspect and retain already-clean protected workflows.
 - [x] Verify protected session dialog sources remain unchanged.
-- [ ] Focused interaction checks, native visual review and consolidated platform validation.
+- [x] Focused interaction checks, native visual review and consolidated platform validation.
 - [ ] Owner completes human checks; no merge before explicit approval.
 
 A checked inventory entry must record either a concrete correction or an inspected retention decision below. Runtime, synthetic-layout and actual endpoint evidence remain distinct.
@@ -64,3 +74,10 @@ The earlier `efddce1` build runs `46100227684` and `46100232997` were cancelled 
 The final local follow-ups passed **11/11** for the combined-bar/last-browser-close/keyboard/sidebar checks and **8/8** for detached-window actions and transport ownership. An additional run with `TERMCRAFT_REQUIRE_CHROMIUM=1` passed **11/11**, including real Chromium input, redirect/draft reconciliation, queue saturation, resize/capture rejection and last-tab close; this uses the installed owned-test Chromium rather than a production package. The resize fixture now targets DOM pixel 289 directly after the toolbar made the canvas origin pixel-aligned; exact DOM coordinates, viewport widths, stale-input rejection and capture/release counts remain asserted.
 
 Native inspection at 640×480 exposed the horizontal tab scrollbar increasing the bar from 46 to 61 points when a long connection title overflowed. A long-title regression reproduced the 61-point failure before the fix. Tab strips now retain scrolling and keyboard navigation without reserving another chrome row; selection scrolls into view. The regression and surrounding interaction checks passed, and the native minimum-window preview now shows the single 46-point bar. Detached tabs and commands also share one row, with browser/desktop/compatibility SFTP controls available in the correct window’s menu. Full hosted platform/package qualification remains the next gate; no merge is authorized.
+
+
+## Final package qualification
+
+The three native candidate jobs, all three repeated regression lanes and the aggregate job passed at `05a2234`. Publication was intentionally skipped for the manual branch run; no release or tag was created. Linux’s 1,097, Windows’s 995 and Apple Silicon’s 990 manifest files were verified against the downloaded archives, together with their shared 646-input Git source snapshot. The Mac manifest is located inside `Contents/Resources`, and its file inventory is rooted at the `.app` bundle; static audit uses that actual bundle root. This verification changes no packaged bytes. [Exact hashes and job identities](all-pane-builds.json).
+
+The Linux review launcher was atomically changed to the new qualified runtime after these checks. Its target executable hash matches the archive. Existing binaries, data and profiles were preserved. Native development previews remain explicitly separate from package qualification. The owned capture container was restored to its initial stopped state. The only remaining acceptance gate for this UI work is the owner’s human review and explicit merge approval; PR #8 remains draft and unmerged.

@@ -1,5 +1,8 @@
 # Human-review correction — 2026-11-27
 
+**Latest owner-directed pass:** [all remaining panes, the single combined bar, the shared SFTP sidebar and icons](all-pane-cleanup.md), source `05a2234`. The approved session create/edit dialogs remain unchanged. [Current native previews](captures/unified-workspace/README.md). All three source-platform CI jobs, all three unsigned package jobs and aggregate verification passed. [Verified build identities](all-pane-builds.json) and the [current Linux command](all-pane-cleanup.md) are available. Historical entries below retain their own source/build identities. Owner human checks and explicit merge approval remain open.
+
+
 ## Current pane refinement — ready for owner review
 
 The owner approved the session create/edit dialogs and identified remaining clutter in the connected remote-files pane. Those dialogs are unchanged. The file pane now has a compact path/navigation row and Upload/Download/More strip, with shell integration, transfer preferences and guidance available on demand. Its file list takes the remaining height, with a small Downloads footer and a reserved right-edge scrollbar gutter. A narrow neighboring terminal moves Find/Reconnect into More to keep its status clear.
@@ -127,3 +130,13 @@ Keep these unchecked until the owner has inspected the running app. Automated or
 - [ ] Light, Dark and System: controls, text, focus, hover and selection remain readable; explorer icons distinguish folders and file types.
 - [ ] Keyboard and safety: navigate the new-session form, dismiss nested dialogs and cancel closing active work without losing the session or draft.
 - [ ] Owner explicitly approves merging PR #8 after completing the checks.
+
+
+## Owner review of the combined bar and shared sidebar
+
+- [ ] One top row at normal and small sizes: app commands, connection tabs, theme, Find/Reconnect and the appropriate connection menu remain reachable.
+- [ ] SFTP opens as a tab in the existing left sidebar; switching to Sessions and back preserves the connection, directory and selection.
+- [ ] Tools, services, local/remote files, macros, tunnels, settings and document editors feel as clear as the approved session dialogs; secondary details stay on demand.
+- [ ] Command/protocol/file icons, hover, pressed/focus states and tooltips remain clear in Light, Dark and System.
+- [ ] Browser and detached-window navigation work without losing input or drafts; destructive actions and pending work remain protected.
+- [ ] Owner completes the full checks and explicitly approves merging PR #8.
