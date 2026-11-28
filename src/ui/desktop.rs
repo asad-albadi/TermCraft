@@ -1,4 +1,6 @@
 use super::*;
+mod image;
+mod resize;
 use harbor_workspace::desktop::{DesktopEvent, DesktopInput, DesktopSession, Frame, TrustDecision};
 use harbor_workspace::macros::Action as MacroInput;
 use std::{
@@ -37,9 +39,10 @@ impl RemoteCursor {
             width,
             height,
             hotspot,
-            image: Some(ColorImage::from_rgba_unmultiplied(
+            image: Some(image::from_rgba(
                 [width as usize, height as usize],
                 &pixels,
+                false,
             )),
             texture: None,
         }))
@@ -137,6 +140,8 @@ pub(super) struct State {
     pub frame: Option<Arc<Frame>>,
     texture: Option<TextureHandle>,
     texture_revision: u64,
+    texture_damage: Option<harbor_workspace::desktop::framebuffer::DamageRect>,
+    texture_full_pending: bool,
     pub form: Option<Form>,
     pub remember: Option<String>,
     focused: bool,
@@ -150,9 +155,13 @@ pub(super) struct State {
     clipboard: ClipboardState,
     options: harbor_workspace::desktop::rdp_options::RdpOptions,
     pub canvas_rect: Option<Rect>,
+    inherit_pane: bool,
+    fixed_size: (u32, u32),
+    pane_resize: resize::PaneResize,
 }
 impl State {
-    pub fn new(handle: DesktopSession, session: &Session) -> Self {
+    pub fn new(mut handle: DesktopSession, session: &Session) -> Self {
+        handle.set_partial_frames(true);
         Self {
             handle,
             protocol: session.protocol.clone(),
@@ -168,6 +177,8 @@ impl State {
             frame: None,
             texture: None,
             texture_revision: 0,
+            texture_damage: None,
+            texture_full_pending: true,
             form: None,
             remember: None,
             focused: false,
@@ -188,7 +199,36 @@ impl State {
                 session.rdp_options.clone()
             },
             canvas_rect: None,
+            inherit_pane: session.desktop_size_mode
+                == harbor_workspace::model::DesktopSizeMode::InheritPane,
+            fixed_size: (session.width, session.height),
+            pane_resize: Default::default(),
         }
+    }
+    fn accept_frame(&mut self, frame: Arc<Frame>) -> bool {
+        let changed = self
+            .frame
+            .as_ref()
+            .is_none_or(|old| old.revision != frame.revision);
+        self.frame = Some(frame);
+        self.texture_damage = None;
+        self.texture_full_pending = true;
+        changed
+    }
+    fn accept_patch(
+        &mut self,
+        patch: harbor_workspace::desktop::framebuffer::FramePatch,
+    ) -> Result<(), String> {
+        let frame = self
+            .frame
+            .as_mut()
+            .ok_or("Desktop damage arrived before its full framebuffer")?;
+        patch.apply(Arc::make_mut(frame))?;
+        self.texture_damage = Some(
+            self.texture_damage
+                .map_or(patch.rect, |old| old.union(patch.rect)),
+        );
+        Ok(())
     }
     pub fn poll(&mut self) -> bool {
         self.flush_macro_release();
@@ -201,13 +241,11 @@ impl State {
                     self.error.clear();
                     self.message = format!("Connected · {}", self.protocol);
                 }
-                DesktopEvent::Frame(frame) => {
-                    changed |= self
-                        .frame
-                        .as_ref()
-                        .is_none_or(|old| old.revision != frame.revision);
-                    self.frame = Some(frame);
-                }
+                DesktopEvent::Frame(frame) => changed |= self.accept_frame(frame),
+                DesktopEvent::FramePatch(patch) => match self.accept_patch(patch) {
+                    Ok(()) => changed = true,
+                    Err(error) => self.error = error,
+                },
                 DesktopEvent::Certificate {
                     id,
                     fingerprint,
@@ -596,25 +634,15 @@ impl Workspace {
 }
 pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     let state = tab.desktop.as_mut().unwrap();
-    ui.horizontal(|ui| {
-        ui.label(RichText::new(&state.message).strong());
-        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-            ui.small(format!("{} · embedded display", tab.session.protocol));
-        });
-    });
-    if state.options.clipboard != harbor_workspace::desktop::rdp_options::ClipboardPolicy::Disabled
-    {
-        ui.horizontal(|ui| {
-            state.clipboard.controls(ui);
-            ui.small(if state.clipboard.ready {
-                "Text clipboard ready · paste with Ctrl+V in the desktop"
-            } else {
-                "Waiting for server clipboard channel…"
-            });
-        });
-    }
     if !state.error.is_empty() {
-        ui.colored_label(ui.visuals().error_fg_color, &state.error);
+        crate::ui::errors::show(
+            ui,
+            crate::ui::errors::protocol(&tab.session.protocol),
+            &state.error,
+        );
+        if !state.connected && state.form.is_none() && state.handle.is_finished() {
+            return;
+        }
     }
     let mut answer = None;
     let mut vault_use = false;
@@ -661,7 +689,9 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
                             decision: TrustDecision::Remember,
                         });
                     }
-                    if ui.button("Reject").clicked() {
+                    let reject = ui.button("Reject");
+                    super::fluent::focus_on_entry(ui, &reject, Id::new((tab.id, *id)));
+                    if reject.clicked() {
                         answer = Some(DesktopInput::Trust {
                             id: *id,
                             decision: TrustDecision::Reject,
@@ -789,6 +819,24 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     }
     let available = ui.available_size().max(vec2(1., 1.));
     let (rect, _) = ui.allocate_exact_size(available, Sense::hover());
+    if state.connected && state.form.is_none() && !tab.session.view_only {
+        let now = Instant::now();
+        let (width, height, density) = if state.inherit_pane {
+            (rect.width(), rect.height(), ui.ctx().pixels_per_point())
+        } else {
+            (state.fixed_size.0 as f32, state.fixed_size.1 as f32, 1.)
+        };
+        if let Some((width, height)) = state.pane_resize.observe(width, height, density, now) {
+            // A full bounded input queue is retried; resizing never displaces key releases.
+            if state
+                .handle
+                .send(DesktopInput::Resize { width, height })
+                .is_ok()
+            {
+                state.pane_resize.sent((width, height), now);
+            }
+        }
+    }
     ui.painter()
         .rect_filled(rect, 0., ui.visuals().extreme_bg_color);
     let Some(frame) = state.frame.clone() else {
@@ -799,24 +847,51 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
             FontId::proportional(15.),
             ui.visuals().weak_text_color(),
         );
-        ui.ctx().request_repaint_after(Duration::from_millis(50));
+        ui.ctx().request_repaint_after(Duration::from_millis(16));
         return;
     };
     if state.texture.is_none() || state.texture_revision != frame.revision {
-        let image = ColorImage::from_rgba_unmultiplied(
-            [frame.width as usize, frame.height as usize],
-            &frame.pixels,
-        );
-        if let Some(texture) = &mut state.texture {
-            texture.set(image, TextureOptions::LINEAR);
+        let damage = if state.texture_full_pending {
+            None
         } else {
-            state.texture = Some(ui.ctx().load_texture(
-                format!("rdp-desktop-{}", tab.id),
+            state.texture_damage.take()
+        };
+        if let (Some(texture), Some(rect)) = (&mut state.texture, damage) {
+            let mut pixels =
+                Vec::with_capacity(usize::from(rect.width) * usize::from(rect.height) * 4);
+            for y in usize::from(rect.y)..usize::from(rect.y + rect.height) {
+                let start = (y * usize::from(frame.width) + usize::from(rect.x)) * 4;
+                pixels.extend_from_slice(&frame.pixels[start..start + usize::from(rect.width) * 4]);
+            }
+            let image = image::from_rgba(
+                [rect.width as usize, rect.height as usize],
+                &pixels,
+                state.protocol == "RDP",
+            );
+            texture.set_partial(
+                [rect.x as usize, rect.y as usize],
                 image,
                 TextureOptions::LINEAR,
-            ));
+            );
+        } else {
+            state.texture_damage = None;
+            let image = image::from_rgba(
+                [frame.width as usize, frame.height as usize],
+                &frame.pixels,
+                state.protocol == "RDP",
+            );
+            if let Some(texture) = &mut state.texture {
+                texture.set(image, TextureOptions::LINEAR);
+            } else {
+                state.texture = Some(ui.ctx().load_texture(
+                    format!("rdp-desktop-{}", tab.id),
+                    image,
+                    TextureOptions::LINEAR,
+                ));
+            }
         }
         state.texture_revision = frame.revision;
+        state.texture_full_pending = false;
     }
     let scale = (rect.width() / frame.width as f32).min(rect.height() / frame.height as f32);
     let remote = Rect::from_center_size(
@@ -851,10 +926,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         ui.ctx().set_cursor_icon(CursorIcon::None);
     }
     let allowed = ui.is_enabled()
-        && !ui
-            .ctx()
-            .data(|data| data.get_temp::<bool>(Id::new("termcraft-shortcuts-blocked")))
-            .unwrap_or(false)
+        && !super::shortcuts::input_blocked(ui.ctx(), tab.id)
         && ui.memory(|memory| memory.allows_interaction(ui.layer_id()));
     let point_ctx = ui.ctx().clone();
     let layer = ui.layer_id();
@@ -885,7 +957,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     } else {
         ui.input(|i| i.events.clone())
     };
-    for event in events {
+    for event in coalesce_pointer_motion(events) {
         match event {
             Event::PointerMoved(position)
                 if allowed
@@ -1100,8 +1172,25 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
             }
         }
     }
-    ui.ctx().request_repaint_after(Duration::from_millis(50));
+    ui.ctx().request_repaint_after(Duration::from_millis(16));
 }
+// Keep the latest motion in each uninterrupted run; never move a button/key event
+// across motion. This prevents high-polling mice from filling the ordered queue.
+fn coalesce_pointer_motion(events: Vec<Event>) -> Vec<Event> {
+    let mut result = Vec::with_capacity(events.len());
+    for event in events {
+        if matches!(event, Event::PointerMoved(_))
+            && result
+                .last()
+                .is_some_and(|last| matches!(last, Event::PointerMoved(_)))
+        {
+            result.pop();
+        }
+        result.push(event);
+    }
+    result
+}
+
 fn point(rect: Rect, frame: &Frame, position: Pos2) -> (u16, u16) {
     (
         ((position.x - rect.left()) / rect.width() * frame.width as f32)
@@ -1279,6 +1368,171 @@ mod tests {
         fullscreen
     }
     #[test]
+    fn replacement_frame_then_patch_before_paint_requires_full_texture_upload() {
+        use harbor_workspace::desktop::framebuffer::{DamageRect, FramePatch};
+        let (ctx, root, mut w) = owned_workspace();
+        crate::ui::terminal_review_tests::raw_terminal(&mut w, "texture fixture");
+        let session = Session {
+            protocol: "RDP".into(),
+            host: "localhost".into(),
+            view_only: true,
+            ..Default::default()
+        };
+        let handle = DesktopSession::connect(harbor_workspace::desktop::DesktopConfig::new(
+            9201,
+            session.clone(),
+            root.path().join("absent-texture-helper"),
+        ))
+        .unwrap();
+        w.tabs[0].process = None;
+        w.tabs[0].session = session.clone();
+        let mut state = State::new(handle, &session);
+        state.connected = true;
+        state.accept_frame(Arc::new(Frame {
+            width: 2,
+            height: 2,
+            revision: 1,
+            pixels: vec![255, 0, 0, 255].repeat(4),
+        }));
+        w.tabs[0].desktop = Some(state);
+        let draw = |w: &mut Workspace| {
+            ctx.run_ui(
+                RawInput {
+                    screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(800., 600.))),
+                    ..Default::default()
+                },
+                |ui| view(ui, &mut w.tabs[0]),
+            )
+        };
+        let mut initial = draw(&mut w);
+        initial.textures_delta.clear();
+        let state = w.tabs[0].desktop.as_mut().unwrap();
+        state.accept_frame(Arc::new(Frame {
+            width: 4,
+            height: 4,
+            revision: 2,
+            pixels: vec![0, 255, 0, 255].repeat(16),
+        }));
+        let patch = |revision| FramePatch {
+            width: 4,
+            height: 4,
+            revision,
+            rect: DamageRect {
+                x: 1,
+                y: 1,
+                width: 1,
+                height: 1,
+            },
+            pixels: vec![255, 0, 0, 255],
+        };
+        state.accept_patch(patch(3)).unwrap();
+        let mut full = draw(&mut w);
+        assert!(
+            full.textures_delta
+                .set
+                .iter()
+                .flat_map(|(_, d)| d)
+                .any(|d| {
+                    let egui::ImageData::Color(image) = &d.image;
+                    d.pos.is_none()
+                        && image.size == [4, 4]
+                        && image.pixels[0] == Color32::GREEN
+                        && image.pixels[5] == Color32::RED
+                })
+        );
+        full.textures_delta.clear();
+        w.tabs[0]
+            .desktop
+            .as_mut()
+            .unwrap()
+            .accept_patch(patch(4))
+            .unwrap();
+        let mut partial = draw(&mut w);
+        assert!(
+            partial
+                .textures_delta
+                .set
+                .iter()
+                .flat_map(|(_, d)| d)
+                .any(|d| {
+                    let egui::ImageData::Color(image) = &d.image;
+                    d.pos == Some([1, 1]) && image.size == [1, 1]
+                })
+        );
+        partial.textures_delta.clear();
+    }
+    #[test]
+    fn failed_desktop_connection_paints_one_error_without_waiting_message() {
+        let (ctx, root, mut w) = owned_workspace();
+        crate::ui::terminal_review_tests::raw_terminal(&mut w, "error fixture");
+        let session = Session {
+            protocol: "RDP".into(),
+            host: "localhost".into(),
+            ..Default::default()
+        };
+        let config = harbor_workspace::desktop::DesktopConfig::new(
+            9101,
+            session.clone(),
+            root.path().join("absent-rdp-helper"),
+        );
+        w.tabs[0].process = None;
+        w.tabs[0].session = session.clone();
+        w.tabs[0].desktop = Some(State::new(
+            DesktopSession::connect(config).unwrap(),
+            &session,
+        ));
+        let end = Instant::now() + Duration::from_secs(3);
+        while w.tabs[0].desktop.as_ref().unwrap().error.is_empty() {
+            w.tabs[0].poll();
+            assert!(Instant::now() < end);
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        let diagnostic = harbor_workspace::diagnostics::Diagnostic::new(
+            harbor_workspace::diagnostics::Context::Rdp,
+            &w.tabs[0].error,
+        );
+        let mut first = paint(&ctx, &mut w, vec![]);
+        first.textures_delta.clear();
+        let mut out = paint(&ctx, &mut w, vec![]);
+        assert_eq!(
+            out.shapes
+                .iter()
+                .filter(|s| text(&s.shape, &diagnostic.code).is_some())
+                .count(),
+            1
+        );
+        assert!(
+            !out.shapes
+                .iter()
+                .any(|s| text(&s.shape, "Waiting for the remote desktop…").is_some())
+        );
+        out.textures_delta.clear();
+    }
+    #[test]
+    fn remote_motion_coalescing_preserves_button_and_key_boundaries() {
+        let button = Event::PointerButton {
+            pos: pos2(2., 2.),
+            button: PointerButton::Primary,
+            pressed: true,
+            modifiers: Modifiers::NONE,
+        };
+        let events = coalesce_pointer_motion(vec![
+            Event::PointerMoved(pos2(1., 1.)),
+            Event::PointerMoved(pos2(2., 2.)),
+            button.clone(),
+            Event::PointerMoved(pos2(3., 3.)),
+            Event::PointerMoved(pos2(4., 4.)),
+            Event::Text("a".into()),
+            Event::PointerMoved(pos2(5., 5.)),
+        ]);
+        assert_eq!(events.len(), 5);
+        assert_eq!(events[0], Event::PointerMoved(pos2(2., 2.)));
+        assert_eq!(events[1], button);
+        assert_eq!(events[2], Event::PointerMoved(pos2(4., 4.)));
+        assert_eq!(events[3], Event::Text("a".into()));
+        assert_eq!(events[4], Event::PointerMoved(pos2(5., 5.)));
+    }
+    #[test]
     fn real_rdp_vault_save_use_delete_and_session_fullscreen() {
         let server = fixture::Server::start();
         let _ = fixture::engine_binary();
@@ -1438,15 +1692,23 @@ mod tests {
                 }
             }
             if !signed_in {
-                if let Some(Form::Credentials { password, .. }) =
-                    &mut w.tabs[0].desktop.as_mut().unwrap().form
-                {
-                    *password = Zeroizing::new("fixture-password".into());
+                if matches!(
+                    w.tabs[0].desktop.as_ref().unwrap().form,
+                    Some(Form::Credentials { .. })
+                ) {
                     if let Some(position) = output
                         .shapes
                         .iter()
                         .find_map(|shape| text(&shape.shape, "Connect securely"))
                     {
+                        // Exercise the real focused password field and both entry paths,
+                        // rather than assigning the form value behind the widget.
+                        let mut typed = paint(&ctx, &mut w, vec![Event::Text("fixture-".into())]);
+                        typed.textures_delta.clear();
+                        let mut pasted = paint(&ctx, &mut w, vec![Event::Paste("password".into())]);
+                        pasted.textures_delta.clear();
+                        assert!(matches!(&w.tabs[0].desktop.as_ref().unwrap().form,
+                            Some(Form::Credentials {password,..}) if password.as_str()=="fixture-password"));
                         output.textures_delta.clear();
                         click(&ctx, &mut w, position);
                         signed_in = true;
@@ -1456,7 +1718,10 @@ mod tests {
             for (_, deltas) in &output.textures_delta.set {
                 for delta in deltas {
                     let egui::ImageData::Color(image) = &delta.image;
-                    if image.size == [640, 480] && image.pixels[0] == Color32::RED {
+                    if image.pixels.first() == Some(&Color32::RED)
+                        && (image.size == [640, 480]
+                            || (delta.pos == Some([0, 0]) && image.size == [64, 64]))
+                    {
                         painted = true;
                     }
                 }
@@ -1751,6 +2016,37 @@ mod tests {
                 .unwrap()
                 .contains("fixture-password")
         );
+        let prior_layouts = server
+            .observations()
+            .lines()
+            .filter(|s| s.starts_with("client_resize:"))
+            .count();
+        let mut partial = false;
+        for _ in 0..60 {
+            let mut out = paint_size(&ctx, &mut w, vec![], resized);
+            for (_, deltas) in &out.textures_delta.set {
+                for delta in deltas {
+                    let egui::ImageData::Color(image) = &delta.image;
+                    partial |= delta.pos.is_some() && image.size == [64, 64];
+                }
+            }
+            assert!(w.tabs[0].desktop.as_ref().unwrap().error.is_empty());
+            out.textures_delta.clear();
+            std::thread::sleep(Duration::from_millis(16));
+        }
+        assert!(
+            partial,
+            "ordinary bitmap changes must update only their texture region"
+        );
+        assert!(
+            server
+                .observations()
+                .lines()
+                .filter(|s| s.starts_with("client_resize:"))
+                .count()
+                <= prior_layouts + 1,
+            "a stationary pane repeatedly renegotiated its display"
+        );
         w.force_close_tab(0);
     }
 }
@@ -1805,5 +2101,26 @@ mod cursor_tests {
         let rect = cursor.rect(pos2(100., 200.), 2.);
         assert_eq!(rect.min, pos2(94., 196.));
         assert_eq!(rect.size(), vec2(16., 12.));
+    }
+}
+
+pub(super) fn toolbar(ui: &mut Ui, tab: &mut TerminalTab) {
+    let Some(state) = &mut tab.desktop else {
+        return;
+    };
+    ui.horizontal_wrapped(|ui| {
+        ui.label(fluent::emphasized(ui.ctx(), RichText::new(&state.message)));
+        ui.small(format!("{} · embedded display", tab.session.protocol));
+    });
+    if state.options.clipboard != harbor_workspace::desktop::rdp_options::ClipboardPolicy::Disabled
+    {
+        ui.horizontal_wrapped(|ui| {
+            state.clipboard.controls(ui);
+            ui.small(if state.clipboard.ready {
+                "Text clipboard ready"
+            } else {
+                "Waiting for server clipboard channel…"
+            }).on_hover_text("Paste with Ctrl+V in the desktop. Clipboard directions follow the saved session settings.");
+        });
     }
 }

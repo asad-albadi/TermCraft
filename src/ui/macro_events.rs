@@ -224,7 +224,7 @@ impl Workspace {
             return;
         };
         if let Err(error) = self.queue_named_macro(id, &name) {
-            self.message(format!("Startup macro: {error}"));
+            self.error_in(errors::Domain::Macro, format!("Startup macro: {error}"));
         }
     }
 
@@ -313,7 +313,7 @@ impl Workspace {
             let id = self.tabs[index].id;
             if let Err(error) = self.poll_macro(index, ctx) {
                 self.cancel_macro(id);
-                self.message(error);
+                self.error_in(errors::Domain::Macro, error);
             }
         }
     }
@@ -521,7 +521,7 @@ impl Workspace {
         {
             match self.start_macro_recording(self.active) {
                 Ok(()) => self.page = Page::Terminal,
-                Err(error) => self.message(error),
+                Err(error) => self.error_in(errors::Domain::Macro, error),
             }
             ui.close();
         }
@@ -554,7 +554,7 @@ impl Workspace {
     pub(super) fn finish_macro_recording(&mut self, index: usize) {
         let capture = std::mem::take(self.tabs[index].capture());
         if let Some(error) = capture.error {
-            self.message(error);
+            self.error_in(errors::Domain::Macro, error);
         }
         if let Some(recorder) = capture.recorder {
             self.macro_form = Macro {
@@ -614,7 +614,7 @@ pub(super) fn edit_events(ui: &mut Ui, script: &mut Script) {
                             timeout_millis,
                         } => {
                             ui.label("Wait for terminal output");
-                            ui.add(TextEdit::singleline(pattern).desired_width(140.));
+                            ui.add(crate::ui::fluent::singleline(pattern).desired_width(140.));
                             timeout_control(ui, timeout_millis);
                         }
                         Step::WaitFocus { timeout_millis } => {
@@ -623,19 +623,19 @@ pub(super) fn edit_events(ui: &mut Ui, script: &mut Script) {
                         }
                         Step::Call { name } => {
                             ui.label("Call macro");
-                            ui.add(TextEdit::singleline(name).desired_width(140.));
+                            ui.add(crate::ui::fluent::singleline(name).desired_width(140.));
                         }
                     }
                     if ui
                         .add_enabled(index > 0, Button::new("↑"))
-                        .on_hover_text("Move event up")
+                        .fluent_hint("Move event up")
                         .clicked()
                     {
                         swap = Some((index - 1, index));
                     }
                     if ui
                         .add_enabled(index + 1 < count, Button::new("↓"))
-                        .on_hover_text("Move event down")
+                        .fluent_hint("Move event down")
                         .clicked()
                     {
                         swap = Some((index, index + 1));

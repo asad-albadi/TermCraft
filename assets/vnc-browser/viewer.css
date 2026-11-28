@@ -1,1 +1,58 @@
-html,body{height:100%;margin:0;font:16px system-ui;background:#15231d;color:#e2f0e8}body{display:flex;flex-direction:column}header{padding:12px 20px}h1{font-size:20px;margin:0}p{font-size:14px}form{display:flex;gap:16px;align-items:center;flex-wrap:wrap}input,button{font:inherit}button{padding:5px 12px}main{flex:1;min-height:0;overflow:hidden}a{color:#8fe0ae}
+:root {
+  color-scheme: light dark;
+  --surface: #fbfdfc;
+  --text: #182720;
+  --control: #f5f9f7;
+  --border: #71867a;
+  --accent: #006448;
+  --hover: #e2f0e8;
+  --press: #d2e5db;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #131917;
+    --text: #eaf2ed;
+    --control: #202c26;
+    --border: #82998e;
+    --accent: #77e3b6;
+    --hover: #263b31;
+    --press: #2f453a;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  color: var(--text);
+  font: 1rem/1.45 "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+}
+header { flex: 0 1 auto; max-height: 70%; overflow: auto; padding: 12px clamp(12px, 3vw, 28px); }
+h1 { font-size: 1.25rem; font-weight: 600; margin: 0; }
+p { margin: 8px 0; overflow-wrap: anywhere; }
+form, label { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+form { gap: 8px 16px; }
+input, button { font: inherit; max-width: 100%; accent-color: var(--accent); }
+input[type=password], button {
+  background: var(--control);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  min-height: 32px;
+  padding: 3px 12px;
+}
+input[type=password] { width: 12rem; }
+button:enabled:hover { background: var(--hover); }
+button:enabled:active { background: var(--press); }
+button:disabled { opacity: .55; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a { color: var(--accent); }
+main { flex: 1; min-height: 0; overflow: hidden; }
+@media (forced-colors: active) {
+  :focus-visible { outline-color: Highlight; }
+  button:disabled { color: GrayText; opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  button { transition: background-color 100ms ease-out; }
+}

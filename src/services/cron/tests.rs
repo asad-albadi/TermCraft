@@ -280,7 +280,13 @@ fn concurrency_cap_and_service_lifetime_are_real_process_bounds() {
     let mut config = CronServiceConfig::new(path);
     config.lifetime = Some(Duration::from_secs(1));
     let id = supervisor.start_cron(config).unwrap();
-    wait(|| std::fs::read(dir.path().join("starts")).is_ok_and(|v| v.len() == 4));
+    wait(|| {
+        // Children can write their markers before the scheduler publishes the new snapshot.
+        std::fs::read(dir.path().join("starts")).is_ok_and(|v| v.len() == 4)
+            && supervisor.status(id).unwrap().cron.is_some_and(|cron| {
+                cron.jobs.len() == 6 && cron.jobs.iter().all(|job| job.last_event != "Waiting")
+            })
+    });
     let status = supervisor.status(id).unwrap();
     let jobs = &status.cron.as_ref().unwrap().jobs;
     assert_eq!(

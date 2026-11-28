@@ -1802,7 +1802,17 @@ mod tests {
                     Ok(0)
                 );
             }
-            let replies = serial.ready();
+            let mut replies = serial.ready();
+            if disconnect {
+                // A parallel worker can briefly inherit the PTY master between
+                // fork and exec. Wait for actual hangup, as the device worker does.
+                let deadline = Instant::now() + Duration::from_secs(2);
+                while replies.is_empty() && Instant::now() < deadline {
+                    std::thread::sleep(Duration::from_millis(1));
+                    replies.extend(serial.ready());
+                }
+            }
+            // Explicit remote close must still retire synchronously.
             assert_eq!(replies.len(), 1);
             assert_eq!(u32_at(&replies[0], 8), Ok(3));
             assert_eq!(
@@ -1810,6 +1820,7 @@ mod tests {
                 Ok(if disconnect { DISCONNECTED } else { CANCELLED })
             );
             assert!(!serial.has_pending());
+            assert!(serial.ready().is_empty(), "wait completed more than once");
         }
     }
 

@@ -26,6 +26,8 @@ PACKAGES = (Path("Cargo.toml"), Path("engines/rdp/Cargo.toml"))
 PROJECT_POLICIES = tuple(Path(name) for name in ("LICENSE", "PRIVACY.md", "CREDITS.md"))
 MACOS_GUIDE = Path("packaging/macos/README.txt")
 ASSETS = tuple(Path("assets") / name for name in (
+    "JetBrainsMonoNerdFontMono-Regular.ttf", "JetBrainsMono-OFL.txt", "NerdFonts-LICENSE",
+    "Selawik.ttf", "Selawik-Semibold.ttf", "Selawik-LICENSE",
     "Interface.ttf", "Terminal.ttf", "Interface-LICENSE", "Terminal-LICENSE",
     "termcraft-mascot.png", "termcraft-logo.png",
 ))

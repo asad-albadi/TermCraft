@@ -1,0 +1,55 @@
+{
+  "source": "db07f667504e12c225ee03f5fa55862a9b3bc36c",
+  "binary_sha256": "3497fea356f5a2be638428d0721a25fe5f8a889f7446055d9be91bd585b40bca",
+  "environment": "Owned isolated Arch Linux container; Xvfb :98 1920x1440 framebuffer; software GL; scale 1; actual native eframe rendering.",
+  "qualification": "Development layout proof only. Uses verified cached pre-adapter dependencies and a separate ignored source copy that injects a synthetic listing. No live SSH/SFTP endpoint, current distribution, physical GPU/DPI, assistive-technology or owner acceptance qualification.",
+  "fixture": "Thirty synthetic project directories. Reserved server.example.test display identity; SSH handle is immediately dropped. The Disconnected terminal status reflects the absence of a live transport. Production UI source is unchanged by the capture injector.",
+  "production_sources": {
+    "src/ui/remote_files.rs": "f09d951010c31c5ba14310cb7758ba6037088fe96b51fe4d0f86ce962fd89da4",
+    "src/ui/pages.rs": "dbc8db729202b64665df1f2d0798bcb3e191d03dc2e3983d800024ba2ef14655"
+  },
+  "captures": [
+    {
+      "file": "remote-files-dark-actions-short.png",
+      "width": 1024,
+      "height": 640,
+      "sha256": "407c44207f6b13ca9230f189e62e4293ce364795c69acfb969ccac82795c4eb0"
+    },
+    {
+      "file": "remote-files-dark-fhd.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "844dd2b6293dd0aa1bf22b321fbb988f74392f78c5a90f3b6ada7beba70cf877"
+    },
+    {
+      "file": "remote-files-dark-portrait.png",
+      "width": 1009,
+      "height": 1350,
+      "sha256": "5010fce440408be6e4e6ff28ff99dfcd8bd2a03a09bf418bcfc108f97dbc9ff3"
+    },
+    {
+      "file": "remote-files-dark-short.png",
+      "width": 1024,
+      "height": 640,
+      "sha256": "e64643d002ef67f424dfe7fab64650842090fc4d9c87f5bd70b9128f049a1a00"
+    },
+    {
+      "file": "remote-files-light-fhd.png",
+      "width": 1920,
+      "height": 1080,
+      "sha256": "818827c221e980208255232277c5112759c30c63c94b286a587a5f3c890fbca7"
+    },
+    {
+      "file": "remote-files-light-portrait.png",
+      "width": 1009,
+      "height": 1350,
+      "sha256": "4ee877cc0062748b62a6041cbeddffdf5f34f026b8ccdc61563915c65f7b493c"
+    },
+    {
+      "file": "remote-files-light-short.png",
+      "width": 1024,
+      "height": 640,
+      "sha256": "22bf6aa35a3d702b9b78fcb0343f1d1b9bd36f5c647d08ab298c385be30cef17"
+    }
+  ]
+}

@@ -21,6 +21,7 @@ fn state() -> Arc<Mutex<State>> {
         cursor: None,
         frame_revision: 0,
         frame: None,
+        rdp_frames: Default::default(),
         challenge: None,
         connected: false,
         dimensions: (1, 1),
@@ -579,4 +580,127 @@ async fn vencrypt_bad_trust_hostname_and_rotated_certificate_prevent_authenticat
             "authentication was exposed before TLS verification: {failure}"
         );
     }
+}
+
+#[tokio::test]
+async fn resize_waits_for_advertisement_and_preserves_screen_identity() {
+    let (client, mut server) = tokio::io::duplex(4096);
+    let (queue, rx) = input_channel();
+    let (tx, _events) = mpsc::sync_channel(32);
+    let observed = state();
+    let fixture = async {
+        init(&mut server).await;
+        queue
+            .try_send(DesktopInput::Resize {
+                width: 8,
+                height: 6,
+            })
+            .unwrap();
+        // A server limited to standard RFB must never receive type 251.
+        let pointer = DesktopInput::Pointer {
+            x: 1,
+            y: 2,
+            button: None,
+            pressed: false,
+        };
+        queue.try_send(pointer).unwrap();
+        assert_eq!(bytes(&mut server, 6).await.unwrap(), [5, 0, 0, 1, 0, 2]);
+
+        let initial = [
+            1, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 4, 0, 3, 0x80, 0, 0, 1,
+        ];
+        update(&mut server, 0, 0, 4, 3, -308, &initial).await;
+        assert_eq!(
+            bytes(&mut server, 10).await.unwrap(),
+            update_request(4, 3, true)
+        );
+        let request = [
+            251, 0, 0, 8, 0, 6, 1, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 8, 0, 6, 0x80, 0, 0, 1,
+        ];
+        assert_eq!(bytes(&mut server, request.len()).await.unwrap(), request);
+        assert_eq!(observed.lock().unwrap().dimensions, (4, 3));
+
+        for width in [9, 10, 0] {
+            queue
+                .try_send(DesktopInput::Resize { width, height: 7 })
+                .unwrap();
+        }
+        queue
+            .try_send(DesktopInput::Pointer {
+                x: 2,
+                y: 2,
+                button: None,
+                pressed: false,
+            })
+            .unwrap();
+        // The in-flight request blocks additional resize writes, without blocking input.
+        assert_eq!(bytes(&mut server, 6).await.unwrap(), [5, 0, 0, 2, 0, 2]);
+        // Decline fields beyond status are undefined and must not change the frame.
+        update(&mut server, 1, 3, 0, 0, -308, &[0; 4]).await;
+        assert_eq!(
+            bytes(&mut server, 10).await.unwrap(),
+            update_request(4, 3, true)
+        );
+        assert_eq!(observed.lock().unwrap().dimensions, (4, 3));
+
+        let packet = bytes(&mut server, request.len()).await.unwrap();
+        assert_eq!(&packet[..8], &[251, 0, 0, 10, 0, 7, 1, 0]);
+        let mut accepted = initial;
+        accepted[13] = 10;
+        accepted[15] = 7;
+        update(&mut server, 1, 0, 10, 7, -308, &accepted).await;
+        assert_eq!(
+            bytes(&mut server, 10).await.unwrap(),
+            update_request(10, 7, true)
+        );
+        assert_eq!(observed.lock().unwrap().dimensions, (10, 7));
+        // A resized RFB framebuffer is invalidated server-side and repainted even
+        // though the client request must be incremental after ExtendedDesktopSize.
+        update(&mut server, 0, 0, 10, 7, 0, &[0, 255, 0, 0].repeat(70)).await;
+        assert_eq!(
+            bytes(&mut server, 10).await.unwrap(),
+            update_request(10, 7, true)
+        );
+        let frame = observed.lock().unwrap().frame.clone().unwrap();
+        assert!(
+            frame
+                .pixels
+                .chunks_exact(4)
+                .all(|pixel| pixel == [0, 255, 0, 255])
+        );
+        queue.try_send(DesktopInput::Close).unwrap();
+    };
+    let session = session();
+    let (result, ()) = tokio::time::timeout(Duration::from_secs(3), async {
+        tokio::join!(run(client, &session, rx, tx, observed.clone(), 2), fixture)
+    })
+    .await
+    .unwrap();
+    assert!(result.is_ok(), "{result:?}");
+}
+
+#[tokio::test]
+async fn input_wakeups_are_retained_through_empty_queue_and_drop() {
+    use futures::FutureExt;
+    let (queue, rx) = input_channel();
+    assert!(rx.control.ready.notified().now_or_never().is_none());
+    queue.try_send(DesktopInput::Close).unwrap();
+    assert!(rx.control.ready.notified().now_or_never().is_some());
+    assert!(matches!(
+        rx.rx.try_recv().unwrap().input,
+        DesktopInput::Close
+    ));
+    assert!(matches!(rx.rx.try_recv(), Err(mpsc::TryRecvError::Empty)));
+
+    queue.try_send(DesktopInput::ReleaseAll).unwrap();
+    assert!(rx.control.ready.notified().now_or_never().is_some());
+    assert!(rx.control.release.load(Ordering::Acquire));
+    assert!(matches!(rx.rx.try_recv(), Err(mpsc::TryRecvError::Empty)));
+
+    drop(queue);
+    assert!(rx.control.ready.notified().now_or_never().is_some());
+    assert!(matches!(
+        rx.rx.try_recv(),
+        Err(mpsc::TryRecvError::Disconnected)
+    ));
 }

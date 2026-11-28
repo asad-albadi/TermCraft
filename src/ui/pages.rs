@@ -7,7 +7,10 @@ fn runtime_providers(ui: &mut Ui) {
 
     let refresh = ui
         .horizontal(|ui| {
-            ui.label(RichText::new("Runtime providers").size(18.).strong());
+            ui.label(crate::ui::fluent::emphasized(
+                ui.ctx(),
+                RichText::new("Runtime providers").size(18.),
+            ));
             ui.button("Refresh").clicked()
         })
         .inner;
@@ -100,7 +103,7 @@ fn runtime_providers(ui: &mut Ui) {
             .show(ui, |ui| {
                 for (name, label, detail) in rows {
                     ui.label(*name);
-                    ui.label(label).on_hover_text(detail);
+                    ui.label(label).fluent_hint(detail);
                     ui.end_row();
                 }
             });
@@ -109,88 +112,517 @@ fn runtime_providers(ui: &mut Ui) {
     }
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(super) enum SettingsCategory {
+    Appearance,
+    Terminal,
+    Safety,
+    Storage,
+    About,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub(super) enum SessionSection {
+    Connection,
+    Advanced,
+    Security,
+    Display,
+    Redirection,
+    Terminal,
+    Network,
+    Bookmark,
+}
+
+impl SessionSection {
+    const ALL: [Self; 8] = [
+        Self::Connection,
+        Self::Advanced,
+        Self::Security,
+        Self::Display,
+        Self::Redirection,
+        Self::Network,
+        Self::Terminal,
+        Self::Bookmark,
+    ];
+    fn label(self) -> &'static str {
+        match self {
+            Self::Connection => "Connection",
+            Self::Advanced => "Advanced",
+            Self::Security => "Security",
+            Self::Display => "Display & input",
+            Self::Redirection => "Redirection",
+            Self::Network => "Network",
+            Self::Terminal => "Terminal",
+            Self::Bookmark => "Bookmark",
+        }
+    }
+    fn available(self, protocol: &str) -> bool {
+        match self {
+            Self::Connection | Self::Bookmark => true,
+            Self::Advanced => matches!(
+                protocol,
+                "SSH" | "Serial" | "Mosh" | "FTP" | "VNC" | "Browser" | "XDMCP" | "Local"
+            ),
+            Self::Security | Self::Display | Self::Redirection => protocol == "RDP",
+            Self::Network => matches!(protocol, "SSH" | "SFTP" | "Mosh" | "Telnet" | "RDP" | "VNC"),
+            Self::Terminal => protocol != "Browser",
+        }
+    }
+    fn choices(&mut self, ui: &mut Ui, protocol: &str) {
+        for section in Self::ALL
+            .into_iter()
+            .filter(|section| section.available(protocol))
+        {
+            ui.selectable_value(self, section, section.label());
+        }
+    }
+}
+
+fn protocol_choices(ui: &mut Ui, current: &str) -> Option<&'static str> {
+    let mut chosen = None;
+    ui.horizontal_wrapped(|ui| {
+        for protocol in PROTOCOLS {
+            if icons::tile(
+                ui,
+                &protocol.to_ascii_lowercase(),
+                protocol,
+                protocol,
+                Some(current == *protocol),
+            )
+            .clicked()
+            {
+                chosen = Some(*protocol);
+            }
+        }
+    });
+    chosen
+}
+
 impl Workspace {
+    fn session_navigation(&mut self, ui: &mut Ui, s: &mut Session, size: fluent::DialogSize) {
+        use SessionSection::*;
+        let compact = ui.ctx().content_rect().height() < 550. && size.width < 840.;
+        let chosen = if compact {
+            let mut chosen = None;
+            ui.horizontal(|ui| {
+                ui.label("Protocol");
+                ui.menu_button(&s.protocol, |ui| {
+                    ui.set_width(size.width.min(360.) - 24.);
+                    chosen = protocol_choices(ui, &s.protocol);
+                    if chosen.is_some() {
+                        ui.close();
+                    }
+                });
+                ComboBox::from_id_salt("session-section")
+                    .selected_text(self.session_section.label())
+                    .show_ui(ui, |ui| {
+                        self.session_section.choices(ui, &s.protocol);
+                    });
+            });
+            chosen
+        } else {
+            protocol_choices(ui, &s.protocol)
+        };
+        if let Some(protocol) = chosen
+            && s.protocol != protocol
+        {
+            self.session_section = Connection;
+            s.protocol = protocol.into();
+            s.port = protocol_port(protocol);
+            if protocol == "Mosh" && self.editing.is_none() {
+                s.mosh_provider = harbor_workspace::model::MoshProvider::Bundled;
+            }
+            if protocol == "FTP" {
+                s.ftp_options = harbor_workspace::protocols::ftp_actor::SessionOptions::embedded();
+            }
+            if protocol == "Browser" {
+                s.browser_options.embedded = true;
+                if self.editing.is_none() {
+                    s.browser_options.runtime = harbor_workspace::browser::Runtime::BundledChromium;
+                }
+            }
+        }
+        if !compact {
+            ui.separator();
+            ui.horizontal_wrapped(|ui| self.session_section.choices(ui, &s.protocol));
+        }
+        ui.separator();
+    }
+    fn session_fields(&mut self, ui: &mut Ui, s: &mut Session, section: SessionSection) {
+        use SessionSection::*;
+        ui.set_width(ui.available_width());
+        if section == Bookmark {
+            fluent::form_text(ui, "Session name", &mut s.name, "Optional display name");
+            fluent::form_text(ui, "Folder", &mut s.folder, "My sessions");
+        }
+        if section == Connection {
+            match s.protocol.as_str() {
+                "Local" => {
+                    fluent::form_text(
+                        ui,
+                        "Shell executable",
+                        &mut s.command,
+                        "Use the system default",
+                    );
+                    session_path(
+                        ui,
+                        "Start folder",
+                        &mut s.directory,
+                        "",
+                        rfd::FileDialog::pick_folder,
+                    );
+                }
+                "Serial" => {
+                    fluent::form_text(
+                        ui,
+                        "Device / COM port",
+                        &mut s.serial_device,
+                        if cfg!(windows) {
+                            "COM3"
+                        } else {
+                            "/dev/ttyUSB0"
+                        },
+                    );
+                    fluent::form_row(ui, "Baud rate", |ui, label| {
+                        ui.add(DragValue::new(&mut s.baud).range(50..=4_000_000))
+                            .labelled_by(label)
+                    });
+                }
+                "Browser" => {
+                    fluent::form_text(ui, "Website address", &mut s.host, "https://example.com");
+                }
+                _ => {
+                    let host =
+                        fluent::form_text(ui, "Remote host", &mut s.host, "Hostname or IP address");
+                    fluent::focus_on_entry(ui, &host, Id::new("session-form"));
+                    fluent::form_text(ui, "Username", &mut s.user, "Use the client default");
+                    fluent::form_row(ui, "Port", |ui, label| {
+                        ui.add(DragValue::new(&mut s.port).range(1..=65535))
+                            .labelled_by(label)
+                    });
+                }
+            }
+
+            if s.protocol == "Rsh" {
+                fluent::form_text(
+                    ui,
+                    "Remote command",
+                    &mut s.command,
+                    "Required command for Rsh",
+                );
+            }
+            if s.protocol == "Telnet" {
+                ui.small("Direct Telnet connections are unencrypted. To configure an SSH gateway, open Network and select SSH gateway.");
+            } else if matches!(s.protocol.as_str(), "Rlogin" | "Rsh") {
+                ui.small("Direct connections are unencrypted. This protocol requires a permitted reserved local source port.");
+            }
+        }
+        if section == Advanced && s.protocol == "FTP" {
+            super::ftp_settings::session(ui, s);
+        }
+        if section == Advanced && s.protocol == "Local" {
+            super::xserver::session_settings(ui, s);
+        }
+        if section == Advanced && s.protocol == "Serial" {
+            super::serial_settings::session(ui, s);
+        }
+        if section == Advanced && s.protocol == "Mosh" {
+            use harbor_workspace::model::MoshProvider;
+            fluent::form_row(ui, "SSH port", |ui, label| {
+                ui.add(DragValue::new(&mut s.mosh_ssh_port).range(1..=65535))
+                    .labelled_by(label)
+            });
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Mosh provider");
+                ui.selectable_value(
+                    &mut s.mosh_provider,
+                    MoshProvider::Bundled,
+                    "Packaged client",
+                );
+                ui.selectable_value(
+                    &mut s.mosh_provider,
+                    MoshProvider::System,
+                    "Installed client",
+                );
+            });
+            if s.mosh_provider == MoshProvider::Bundled {
+                ui.small("Requires the Arch Linux x86-64 Mosh payload, system OpenSSH and Perl, and UDP access to the Mosh server.");
+            } else {
+                ui.small("Uses the system Mosh installation and system OpenSSH.");
+            }
+        }
+        if section == Advanced && s.protocol == "SSH" {
+            ui.horizontal_wrapped(|ui| {
+                ui.label("SSH engine");
+                ui.selectable_value(
+                    &mut s.ssh_engine,
+                    SshEngine::Embedded,
+                    "Embedded + remote files",
+                );
+                ui.selectable_value(
+                    &mut s.ssh_engine,
+                    SshEngine::OpenSsh,
+                    "OpenSSH compatibility",
+                );
+            });
+            if s.ssh_engine == SshEngine::OpenSsh {
+                ui.label("Uses installed OpenSSH configuration. Graphical remote files are unavailable in this mode.");
+            } else {
+                use harbor_workspace::remote_files::capabilities::RemoteBackendKind;
+                ui.horizontal_wrapped(|ui| {
+                    ui.label("Remote files");
+                    ui.selectable_value(
+                        &mut s.remote_backend,
+                        RemoteBackendKind::Sftp,
+                        "SFTP (default)",
+                    );
+                    ui.selectable_value(
+                        &mut s.remote_backend,
+                        RemoteBackendKind::Scp,
+                        "SCP compatibility",
+                    );
+                });
+                if s.remote_backend == RemoteBackendKind::Scp {
+                    ui.small("SCP requires Python 3 on the remote host.");
+                }
+            }
+        }
+        if section == Network && matches!(s.protocol.as_str(), "SSH" | "SFTP" | "Mosh") {
+            ui.add_space(5.);
+            CollapsingHeader::new("SSH options")
+                .default_open(true)
+                .show(ui, |ui| {
+                    session_path(
+                        ui,
+                        "Private key",
+                        &mut s.key,
+                        "Optional key file",
+                        rfd::FileDialog::pick_file,
+                    );
+                    fluent::form_text(ui, "Jump host", &mut s.jump, "user@bastion:22");
+                    if s.protocol == "SSH" {
+                        fluent::form_row(ui, "SSH agent", |ui, _| {
+                            ui.horizontal_wrapped(|ui| {
+                                ui.selectable_value(&mut s.agent_mode, AgentMode::System, "System");
+                                ui.selectable_value(
+                                    &mut s.agent_mode,
+                                    AgentMode::Disabled,
+                                    "Disabled",
+                                );
+                                if s.ssh_engine == SshEngine::Embedded {
+                                    ui.selectable_value(
+                                        &mut s.agent_mode,
+                                        AgentMode::Owned,
+                                        "TermCraft-owned",
+                                    );
+                                    if cfg!(windows) {
+                                        ui.selectable_value(
+                                            &mut s.agent_mode,
+                                            AgentMode::Pageant,
+                                            "Pageant",
+                                        );
+                                    }
+                                }
+                                if ui.button("Manage keys…").clicked() {
+                                    self.ssh_keys.open = true;
+                                }
+                            })
+                        });
+                        ui.small(
+                            "An explicit private-key file takes precedence over agent identities.",
+                        );
+                        fluent::form_text(
+                            ui,
+                            "Remote command",
+                            &mut s.command,
+                            "Optional startup command",
+                        );
+                        super::xserver::session_settings(ui, s);
+                    }
+                    fluent::form_row(ui, "Transfer", |ui, label| {
+                        ui.checkbox(&mut s.compression, "Enable compression")
+                            .labelled_by(label)
+                    });
+                });
+            ui.menu_button("Credential help",|ui|{ui.label("Embedded SSH asks for credentials in Remote files. OpenSSH asks in the terminal. Saving passwords requires opting into the credential vault.");});
+        }
+        if section == Network && matches!(s.protocol.as_str(), "SSH" | "SFTP" | "Mosh") {
+            super::ssh_options::session(ui, s, &self.store.preferences.ssh_defaults);
+        }
+        if section == Network && matches!(s.protocol.as_str(), "RDP" | "VNC" | "Telnet") {
+            CollapsingHeader::new("SSH gateway").show(ui,|ui|{
+           fluent::form_text(ui,"Gateway chain",&mut s.jump,"user@bastion:22 (optional; comma-separated hops)");
+           if !s.jump.trim().is_empty(){fluent::form_text(ui,"Gateway private key",&mut s.key,"Optional local SSH key file");ui.small("The gateway is verified and authenticated separately. Desktop certificates and credentials remain bound to the target endpoint.");}
+       });
+            if !s.jump.trim().is_empty() {
+                super::ssh_options::session(ui, s, &self.store.preferences.ssh_defaults);
+            }
+        }
+        if section == Security && s.protocol == "RDP" {
+            use harbor_workspace::model::DesktopEngine;
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Desktop engine");
+                ui.selectable_value(
+                    &mut s.desktop_engine,
+                    DesktopEngine::Embedded,
+                    if cfg!(debug_assertions) {
+                        "Development helper"
+                    } else {
+                        "Packaged helper"
+                    },
+                );
+                ui.selectable_value(
+                    &mut s.desktop_engine,
+                    DesktopEngine::External,
+                    "Installed client",
+                );
+            });
+        }
+        if (section == Display
+            && s.protocol == "RDP"
+            && s.desktop_engine == harbor_workspace::model::DesktopEngine::Embedded)
+            || (section == Advanced && s.protocol == "VNC" && s.vnc_options.embedded)
+        {
+            use harbor_workspace::model::DesktopSizeMode;
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Desktop size");
+                ui.selectable_value(&mut s.desktop_size_mode, DesktopSizeMode::InheritPane, "Inherit pane size")
+                    .fluent_hint("Follow the pane in physical pixels when the server supports resizing. View-only connections fit the existing desktop.");
+                ui.selectable_value(&mut s.desktop_size_mode, DesktopSizeMode::Fixed, "Fixed resolution");
+            });
+            if s.desktop_size_mode == DesktopSizeMode::Fixed {
+                ui.horizontal_wrapped(|ui| {
+                    ui.add(DragValue::new(&mut s.width).range(200..=8192));
+                    ui.label("×");
+                    ui.add(DragValue::new(&mut s.height).range(200..=8192));
+                });
+            }
+        }
+        if section == Display
+            && s.protocol == "RDP"
+            && s.desktop_engine == harbor_workspace::model::DesktopEngine::External
+        {
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Desktop size");
+                ui.add(DragValue::new(&mut s.width).range(200..=8192));
+                ui.label("×");
+                ui.add(DragValue::new(&mut s.height).range(200..=8192));
+            });
+        }
+        if s.protocol == "RDP" && matches!(section, Security | Display | Redirection) {
+            super::rdp_settings::session(ui, s, section);
+        }
+        if section == Advanced && s.protocol == "VNC" {
+            super::vnc_settings::session(ui, s);
+        }
+
+        if (section == Display && s.protocol == "RDP")
+            || (section == Advanced && s.protocol == "VNC")
+        {
+            ui.horizontal_wrapped(|ui| {
+                ui.checkbox(&mut s.fullscreen, "Full screen")
+                    .fluent_hint("Enter fullscreen when the connected desktop is first displayed.");
+                ui.checkbox(&mut s.view_only, "View only");
+            });
+            ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. Server resizing depends on remote support. The view always fits proportionally."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. Server resizing depends on remote support. The view always fits proportionally."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));
+        }
+        if section == Advanced && s.protocol == "Browser" {
+            super::web_browser::settings(ui, s);
+        }
+        if s.protocol == "XDMCP" {
+            if section == Advanced {
+                super::xdmcp::settings(ui, s, &mut self.xdmcp_discovery);
+            } else {
+                super::xdmcp::sync_editor(s, &mut self.xdmcp_discovery);
+            }
+        } else {
+            self.xdmcp_discovery.end_editor();
+        }
+        if section == Terminal && super::macro_events::supported_session(s) {
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Startup macro");
+                ComboBox::from_id_salt("startup-macro")
+                    .selected_text(s.startup_macro.as_deref().unwrap_or("None"))
+                    .show_ui(ui, |ui| {
+                        ui.selectable_value(&mut s.startup_macro, None, "None");
+                        for value in &self.store.macros {
+                            ui.selectable_value(
+                                &mut s.startup_macro,
+                                Some(value.name.clone()),
+                                &value.name,
+                            );
+                        }
+                    });
+            });
+        }
+        if section == Terminal && s.protocol != "Browser" {
+            CollapsingHeader::new("Terminal profile overrides").show(ui,|ui|{ui.small("Checked options apply when you open this saved session. Unchecked options inherit the global profile.");super::terminal_settings::overrides(ui,&mut s.terminal,&self.store.preferences.terminal_settings());});
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Keyword highlighting");
+                ui.selectable_value(&mut s.highlight_enabled, None, "Global setting");
+                ui.selectable_value(&mut s.highlight_enabled, Some(true), "On");
+                ui.selectable_value(&mut s.highlight_enabled, Some(false), "Off");
+            });
+        }
+    }
     pub(super) fn session_dialog(&mut self, ctx: &Context) {
         let Some(mut s) = self.session_form.take() else {
             self.xdmcp_discovery.end_editor();
             return;
         };
-        let mut open = true;
         let mut cancel = false;
         let mut connect = false;
         let mut save = false;
-        Window::new(if self.editing.is_some(){"Edit session"}else{"New session"}).id(Id::new("session-form")).open(&mut open).collapsible(false).resizable(false).vscroll(true).max_height(650.).default_width(650.).show(ctx,|ui|{
-   ui.label(RichText::new("Choose a connection").size(20.).strong());ui.add_space(7.);
-   ui.horizontal_wrapped(|ui|{for p in PROTOCOLS{if ui.selectable_label(s.protocol==*p,*p).clicked(){s.protocol=(*p).into();s.port=protocol_port(p);if *p=="Mosh"&&self.editing.is_none(){s.mosh_provider=harbor_workspace::model::MoshProvider::Bundled;}if *p=="FTP"{s.ftp_options=harbor_workspace::protocols::ftp_actor::SessionOptions::embedded();}if *p=="Browser"{s.browser_options.embedded=true;if self.editing.is_none(){s.browser_options.runtime=harbor_workspace::browser::Runtime::BundledChromium;}}}}});ui.add_space(7.);ui.separator();
-   Grid::new("session_fields").num_columns(2).spacing([20.,13.]).show(ui,|ui|{
-    field(ui,"Session name",&mut s.name,"Optional display name");field(ui,"Folder",&mut s.folder,"My sessions");
-    if s.protocol=="Local"{field(ui,"Shell executable",&mut s.command,"Use the system default");super::xserver::session_settings(ui,&mut s);ui.label("Start folder");ui.horizontal(|ui|{ui.add(TextEdit::singleline(&mut s.directory).desired_width(330.));if ui.small_button("Browse").clicked(){if let Some(p)=rfd::FileDialog::new().pick_folder(){s.directory=p.to_string_lossy().into();}}});ui.end_row();}
-    else if s.protocol=="Serial"{field(ui,"Device / COM port",&mut s.serial_device,if cfg!(windows){"COM3"}else{"/dev/ttyUSB0"});ui.label("Baud rate");ui.add(DragValue::new(&mut s.baud).range(50..=4_000_000));ui.end_row();super::serial_settings::session(ui,&mut s);}
-    else{field(ui,if s.protocol=="Browser"{"Website address"}else{"Remote host"},&mut s.host,if s.protocol=="Browser"{"https://example.com"}else{"Hostname or IP address"});if s.protocol!="Browser"{field(ui,"Username",&mut s.user,"Use the client default");ui.label("Port");ui.add(DragValue::new(&mut s.port).range(1..=65535));ui.end_row();}}
-   });
-   if s.protocol=="FTP"{super::ftp_settings::session(ui,&mut s);}
-   if s.protocol=="Rsh"{Grid::new("rsh-command").num_columns(2).show(ui,|ui|{field(ui,"Remote command",&mut s.command,"Required command for Rsh");});}
-   if matches!(s.protocol.as_str(),"Telnet"|"Rlogin"|"Rsh"){ui.small("Embedded transport. These protocols do not encrypt direct connections. Rlogin/Rsh require a permitted reserved local source port; Telnet can use the verified SSH gateway below.");}
-   if s.protocol=="Mosh"{
-       use harbor_workspace::model::MoshProvider;
-       ui.horizontal(|ui|{ui.label("SSH port");ui.add(DragValue::new(&mut s.mosh_ssh_port).range(1..=65535));});
-       ui.horizontal_wrapped(|ui|{
-           ui.label("Mosh provider");
-           ui.selectable_value(&mut s.mosh_provider,MoshProvider::Bundled,"Packaged client");
-           ui.selectable_value(&mut s.mosh_provider,MoshProvider::System,"Installed client");
-       });
-       if s.mosh_provider==MoshProvider::Bundled {
-           ui.small("Requires the Arch Linux x86-64 Mosh payload, system OpenSSH and Perl, and UDP access to the Mosh server.");
-       } else {
-           ui.small("Uses the system Mosh installation and system OpenSSH.");
-       }
-   }
-   if s.protocol=="SSH" {
-    ui.horizontal(|ui|{ui.label("SSH engine");ui.selectable_value(&mut s.ssh_engine,SshEngine::Embedded,"Embedded + remote files");ui.selectable_value(&mut s.ssh_engine,SshEngine::OpenSsh,"OpenSSH compatibility");});
-    if s.ssh_engine==SshEngine::OpenSsh {ui.label("Uses installed OpenSSH configuration. Graphical remote files are unavailable in this mode.");}
-    else { use harbor_workspace::remote_files::capabilities::RemoteBackendKind;
-     ui.horizontal_wrapped(|ui|{ui.label("Remote files");ui.selectable_value(&mut s.remote_backend,RemoteBackendKind::Sftp,"SFTP (default)");ui.selectable_value(&mut s.remote_backend,RemoteBackendKind::Scp,"SCP compatibility");});
-     if s.remote_backend==RemoteBackendKind::Scp {ui.label("Explicit SCP requires Python 3 on the POSIX remote host. Browsing, files, folders, entry management and editing depend on the live capability checks. No installed scp executable is needed.");}
-    }
-   }
-   if matches!(s.protocol.as_str(),"SSH"|"SFTP"|"Mosh"){ui.add_space(5.);CollapsingHeader::new("SSH options").default_open(true).show(ui,|ui|{Grid::new("ssh_options").num_columns(2).spacing([20.,10.]).show(ui,|ui|{
-    ui.label("Private key");ui.horizontal(|ui|{ui.add(TextEdit::singleline(&mut s.key).hint_text("Optional key file").desired_width(330.));if ui.small_button("Browse").clicked(){if let Some(p)=rfd::FileDialog::new().pick_file(){s.key=p.to_string_lossy().into();}}});ui.end_row();field(ui,"Jump host",&mut s.jump,"user@bastion:22");
-    if s.protocol=="SSH"{ui.label("SSH agent");ui.horizontal_wrapped(|ui|{ui.selectable_value(&mut s.agent_mode,AgentMode::System,"System");ui.selectable_value(&mut s.agent_mode,AgentMode::Disabled,"Disabled");if s.ssh_engine==SshEngine::Embedded{ui.selectable_value(&mut s.agent_mode,AgentMode::Owned,"TermCraft-owned");if cfg!(windows){ui.selectable_value(&mut s.agent_mode,AgentMode::Pageant,"Pageant");}}if ui.button("Manage keys…").clicked(){self.ssh_keys.open=true;}});ui.end_row();ui.label("An explicit private-key file takes precedence over agent identities.");ui.end_row();field(ui,"Remote command",&mut s.command,"Optional startup command");}if s.protocol=="SSH"{super::xserver::session_settings(ui,&mut s);}ui.label("Transfer");ui.checkbox(&mut s.compression,"Enable compression");ui.end_row();});});ui.label(RichText::new("Embedded SSH asks for credentials in Remote files. OpenSSH compatibility asks in the terminal. Passwords are saved only through the opt-in credential vault.").size(11.).color(muted(ui)));}
-   if matches!(s.protocol.as_str(),"SSH"|"SFTP"|"Mosh"){super::ssh_options::session(ui,&mut s,&self.store.preferences.ssh_defaults);}
-   if matches!(s.protocol.as_str(),"RDP"|"VNC"|"Telnet") {
-       CollapsingHeader::new("SSH gateway").show(ui,|ui|{
-           field(ui,"Gateway chain",&mut s.jump,"user@bastion:22 (optional; comma-separated hops)");
-           if !s.jump.trim().is_empty(){field(ui,"Gateway private key",&mut s.key,"Optional local SSH key file");ui.small("The gateway is verified and authenticated separately. Desktop certificates and credentials remain bound to the target endpoint.");}
-       });
-       if !s.jump.trim().is_empty(){super::ssh_options::session(ui,&mut s,&self.store.preferences.ssh_defaults);}
-   }
-   if s.protocol=="RDP" {use harbor_workspace::model::DesktopEngine;ui.horizontal_wrapped(|ui|{ui.label("Desktop engine");ui.selectable_value(&mut s.desktop_engine,DesktopEngine::Embedded,if cfg!(debug_assertions){"Development helper"}else{"Packaged helper"});ui.selectable_value(&mut s.desktop_engine,DesktopEngine::External,"Installed client");});ui.horizontal(|ui|{ui.label("Desktop size");ui.add(DragValue::new(&mut s.width).range(200..=8192));ui.label("×");ui.add(DragValue::new(&mut s.height).range(200..=8192));});}
-   if s.protocol=="RDP" {super::rdp_settings::session(ui,&mut s);}
-   if s.protocol=="VNC" {super::vnc_settings::session(ui,&mut s);}
-
-   if matches!(s.protocol.as_str(),"RDP"|"VNC"){ui.horizontal(|ui|{ui.checkbox(&mut s.fullscreen,"Full screen").on_hover_text("Enter fullscreen when the connected desktop is first displayed.");ui.checkbox(&mut s.view_only,"View only");});ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. The view fits server dimensions; server-driven resize is supported."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. The view fits the negotiated desktop."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));}
-   if s.protocol=="Browser"{super::web_browser::settings(ui,&mut s);}
-   if s.protocol=="XDMCP"{super::xdmcp::settings(ui,&mut s,&mut self.xdmcp_discovery);}else{self.xdmcp_discovery.end_editor();}
-   if super::macro_events::supported_session(&s) {
-       ui.horizontal(|ui| {
-           ui.label("Startup macro");
-           ComboBox::from_id_salt("startup-macro")
-               .selected_text(s.startup_macro.as_deref().unwrap_or("None"))
-               .show_ui(ui, |ui| {
-                   ui.selectable_value(&mut s.startup_macro, None, "None");
-                   for value in &self.store.macros {
-                       ui.selectable_value(&mut s.startup_macro, Some(value.name.clone()), &value.name);
-                   }
-               });
-       });
-   }
-   if s.protocol!="Browser"{
-   CollapsingHeader::new("Terminal profile overrides").show(ui,|ui|{super::terminal_settings::overrides(ui,&mut s.terminal,&self.store.preferences.terminal_settings());});
-   ui.horizontal(|ui|{ui.label("Keyword highlighting");ui.selectable_value(&mut s.highlight_enabled,None,"Global setting");ui.selectable_value(&mut s.highlight_enabled,Some(true),"On");ui.selectable_value(&mut s.highlight_enabled,Some(false),"Off");});
-   }
-   ui.add_space(8.);ui.checkbox(&mut self.save_session,"Save this session");if !self.form_error.is_empty(){ui.colored_label(Color32::from_rgb(180,42,42),&self.form_error);}ui.separator();ui.horizontal(|ui|{save=ui.button("Save only").clicked();ui.with_layout(Layout::right_to_left(Align::Center),|ui|{connect=primary(ui,"Connect").clicked();cancel=ui.button("Cancel").clicked();});});
-  });
-        if !open || cancel {
+        let footer_extra = if ctx.content_rect().width() < 424. {
+            40.
+        } else {
+            0.
+        };
+        let size = super::fluent::dialog_size(ctx, 940., 182. + footer_extra);
+        let response = super::fluent::modal(
+            ctx,
+            Id::new("session-form"),
+            if self.editing.is_some() {
+                "Edit session"
+            } else {
+                "New session"
+            },
+            size,
+            |ui| {
+                let navigation_start = ui.cursor().top();
+                self.session_navigation(ui, &mut s, size);
+                let section = self.session_section;
+                let nav_height = ui.cursor().top() - navigation_start;
+                ScrollArea::vertical()
+                    .id_salt(("session-settings-body", section))
+                    .max_height((size.body_height - nav_height).max(1.))
+                    .auto_shrink([false, true])
+                    .show(ui, |ui| {
+                        self.session_fields(ui, &mut s, section);
+                    });
+                ui.add_space(8.);
+                ui.checkbox(&mut self.save_session, "Save this session");
+                if !self.form_error.is_empty() {
+                    crate::ui::errors::show(
+                        ui,
+                        crate::ui::errors::Domain::Session,
+                        &self.form_error,
+                    );
+                }
+                ui.separator();
+                let [launch, store, safe] =
+                    fluent::dialog_actions(ui, ["Connect", "Save only", "Cancel"], Some(0));
+                connect = launch.clicked();
+                save = store.clicked();
+                cancel = safe.clicked();
+            },
+        );
+        if cancel
+            || (!self.ssh_keys.open
+                && response.is_top_modal
+                && !response.any_popup_open
+                && ctx.input_mut(|i| i.consume_key(Modifiers::NONE, Key::Escape)))
+        {
             self.xdmcp_discovery.end_editor();
             return;
         }
@@ -297,140 +729,15 @@ impl Workspace {
             return;
         }
         self.active = self.active.min(self.tabs.len() - 1);
-        if self.tabs[self.active].session.protocol == "SSH" {
-            let tab = &mut self.tabs[self.active];
-            if let Some(browser) = &mut tab.browser {
-                ui.checkbox(&mut browser.visible, "Remote files");
-            } else {
-                ui.label(RichText::new("OpenSSH compatibility mode · graphical remote files are unavailable. Use the saved session’s companion SFTP action for transfers.").color(muted(ui)).size(12.));
-            }
-        }
-        if let Some(read) = &self.clipboard_read {
-            let title = self
-                .tabs
-                .iter()
-                .find(|t| t.id == read.source)
-                .map(|t| t.session.title())
-                .unwrap_or_else(|| "closed terminal".into());
-            let mut cancel = false;
-            ui.horizontal(|ui| {
-                ui.label(format!("Reading clipboard for {title}…"));
-                cancel = ui.button("Cancel clipboard read").clicked();
-            });
-            if cancel {
-                self.clipboard_read = None;
-            }
-        }
-        let mut layout_toggle = false;
-        let mut duplicate = false;
-        let mut reconnect = false;
-        let mut cancel_startup = false;
-        let mut save_output = false;
-        let mut log = false;
-        let mut copy = false;
-        let mut clear = false;
-        ui.horizontal(|ui| {
-            let t = &mut self.tabs[self.active];
-            ui.label(RichText::new(t.session.title()).size(17.).strong());
-            ui.label(
-                RichText::new(format!(
-                    "{} · {} · {}s",
-                    t.session.protocol,
-                    if t.terminal_starting() {
-                        "Starting"
-                    } else if t.running() {
-                        "Running"
-                    } else {
-                        "Disconnected"
-                    },
-                    t.started.elapsed().as_secs()
-                ))
-                .color(muted(ui))
-                .size(12.),
-            );
-            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                ui.menu_button("More", |ui| {
-                    if t.session.protocol != "Browser" {
-                        copy = ui.button("Copy terminal output").clicked();
-                        save_output = ui.button("Save output to file").clicked();
-                        clear = ui.button("Clear screen").clicked();
-                        log = ui
-                            .button(if t.log.is_some() {
-                                "Stop live logging"
-                            } else {
-                                "Start live logging"
-                            })
-                            .clicked();
-                    }
-                    duplicate = ui.button("Duplicate session").clicked();
-                });
-                if t.terminal_starting() {
-                    cancel_startup = ui.button("Cancel startup").clicked();
-                } else {
-                    reconnect = ui.button("Reconnect").clicked();
-                }
-                if t.session.protocol != "Browser" && ui.button("Find").clicked() {
-                    t.search_open = !t.search_open;
-                }
-                layout_toggle = ui.button("Toggle split").clicked();
-            });
-        });
-        if layout_toggle {
-            self.toggle_layout();
-        }
-        if cancel_startup {
-            let tab = &mut self.tabs[self.active];
-            if tab.pending_portable.take().is_some() {
-                tab.connection_status = "Portable Unix startup cancelled".into();
-            } else {
-                tab.pending_mosh = None;
-                tab.connection_status = "Mosh startup cancelled".into();
-            }
-        }
-        if reconnect {
-            self.reconnect_active();
-        }
-        if duplicate {
-            let s = self.tabs[self.active].session.clone();
-            let launch = self.tabs[self.active].launch.clone();
-            self.start_with_launch(s, launch);
-        }
-        if clear {
-            self.tabs[self.active].screen.clear();
-        }
-        if copy {
-            ui.ctx().copy_text(self.tabs[self.active].screen.plain());
-        }
-        if save_output {
-            if let Some(path) = rfd::FileDialog::new()
-                .set_file_name("terminal-output.txt")
-                .save_file()
-            {
-                match fs::write(path, self.tabs[self.active].screen.plain()) {
-                    Ok(()) => self.message("Terminal output saved"),
-                    Err(e) => self.message(e.to_string()),
-                }
-            }
-        }
-        if log {
-            let t = &mut self.tabs[self.active];
-            if t.log.is_some() {
-                t.log = None;
-            } else if let Some(path) = rfd::FileDialog::new()
-                .set_file_name("session.log")
-                .save_file()
-            {
-                match fs::OpenOptions::new().create(true).append(true).open(path) {
-                    Ok(f) => t.log = Some(f),
-                    Err(e) => self.message(e.to_string()),
-                }
-            }
-        }
         if self.tabs[self.active].session.protocol == "XDMCP" {
             let tab = &mut self.tabs[self.active];
             ui.label(&tab.connection_status);
             if !tab.error.is_empty() {
-                ui.colored_label(Color32::RED, &tab.error);
+                crate::ui::errors::show(
+                    ui,
+                    crate::ui::errors::protocol(&tab.session.protocol),
+                    &tab.error,
+                );
             }
             if tab
                 .xdmcp
@@ -444,64 +751,19 @@ impl Workspace {
             ui.small("The remote desktop opens in its own owned X display window. Closing this session stops only that display.");
             return;
         }
+        self.connection_commands(ui);
         self.tabs[self.active].search_ui(ui);
-        if self.tabs[self.active].session.protocol == "SFTP" {
-            let mut upload = false;
-            let mut download = false;
-            let mut list = false;
-            ui.horizontal(|ui| {
-                upload = ui.button("Upload file…").clicked();
-                download = ui.button("Download path").clicked();
-                ui.add(
-                    TextEdit::singleline(&mut self.tabs[self.active].remote_path)
-                        .hint_text("Remote file or directory")
-                        .desired_width(260.),
-                );
-                list = ui.button("List files").clicked();
-            });
-            if list {
-                self.tabs[self.active].send_generated_command(b"ls -la\n");
-            }
-            if upload {
-                if let Some(path) = rfd::FileDialog::new().pick_file() {
-                    match connection::sftp_quote_path(&path) {
-                        Ok(q) => {
-                            let mut command = b"put -p ".to_vec();
-                            command.extend(q);
-                            command.push(b'\n');
-                            self.tabs[self.active].send_generated_command(&command);
-                        }
-                        Err(e) => self.message(e),
-                    }
-                }
-            }
-            if download {
-                let remote = self.tabs[self.active].remote_path.clone();
-                if !remote.is_empty() {
-                    if let Some(dest) = rfd::FileDialog::new().pick_folder() {
-                        match (
-                            connection::sftp_quote(&remote),
-                            connection::sftp_quote_path(&dest),
-                        ) {
-                            (Ok(r), Ok(d)) => {
-                                let mut command = format!("get -pR {r} ").into_bytes();
-                                command.extend(d);
-                                command.push(b'\n');
-                                self.tabs[self.active].send_generated_command(&command);
-                            }
-                            (Err(e), _) | (_, Err(e)) => self.message(e),
-                        }
-                    }
-                }
-            }
-        }
-        if !self.tabs[self.active].error.is_empty() {
+        if !self.tabs[self.active].error.is_empty() && self.tabs[self.active].desktop.is_none() {
             Frame::new()
                 .fill(ui.visuals().widgets.hovered.bg_fill)
-                .corner_radius(5)
+                .corner_radius(super::fluent::CONTROL_RADIUS)
                 .inner_margin(12)
                 .show(ui, |ui| {
-                    ui.label(&self.tabs[self.active].error);
+                    crate::ui::errors::show(
+                        ui,
+                        crate::ui::errors::protocol(&self.tabs[self.active].session.protocol),
+                        &self.tabs[self.active].error,
+                    );
                 });
         }
         if !self.tabs[self.active].running() {
@@ -517,29 +779,7 @@ impl Workspace {
                 }
             }
         }
-        if self.tabs[self.active].session.protocol != "Browser" {
-            CollapsingHeader::new("Terminal profile for this tab").show(ui, |ui| {
-                ui.small(
-                    "Changes here affect this open tab. Edit the saved session to keep its overrides.",
-                );
-                super::terminal_settings::overrides(
-                    ui,
-                    &mut self.tabs[self.active].session.terminal,
-                    &self.store.preferences.terminal_settings(),
-                );
-            });
-            ui.horizontal(|ui| {
-                ui.label("Keyword highlighting");
-                let session = &mut self.tabs[self.active].session;
-                ui.selectable_value(&mut session.highlight_enabled, None, "Global");
-                ui.selectable_value(&mut session.highlight_enabled, Some(true), "On");
-                ui.selectable_value(&mut session.highlight_enabled, Some(false), "Off");
-            });
-        }
-        ui.horizontal(|ui| {
-            self.layout_picker(ui);
-        });
-        if self.tabs[self.active].session.protocol != "Browser" {
+        if self.broadcast && self.tabs[self.active].session.protocol != "Browser" {
             self.broadcast_targets_ui(ui);
         }
         let preferences = self.store.preferences.clone();
@@ -549,15 +789,67 @@ impl Workspace {
         }
         self.collect_terminal_requests(ui.ctx());
     }
+    pub(super) fn sftp_compatibility_commands(&mut self, ui: &mut Ui, index: usize) {
+        if self.tabs[index].session.protocol == "SFTP" {
+            let mut upload = false;
+            let mut download = false;
+            let mut list = false;
+            ui.horizontal(|ui| {
+                upload = ui.button("Upload file…").clicked();
+                download = ui.button("Download path").clicked();
+                ui.add(
+                    crate::ui::fluent::singleline(&mut self.tabs[index].remote_path)
+                        .hint_text("Remote file or directory")
+                        .desired_width(260.),
+                );
+                list = ui.button("List files").clicked();
+            });
+            if list {
+                self.tabs[index].send_generated_command(b"ls -la\n");
+            }
+            if upload {
+                if let Some(path) = rfd::FileDialog::new().pick_file() {
+                    match connection::sftp_quote_path(&path) {
+                        Ok(q) => {
+                            let mut command = b"put -p ".to_vec();
+                            command.extend(q);
+                            command.push(b'\n');
+                            self.tabs[index].send_generated_command(&command);
+                        }
+                        Err(e) => self.error_in(errors::Domain::Transfer, e),
+                    }
+                }
+            }
+            if download {
+                let remote = self.tabs[index].remote_path.clone();
+                if !remote.is_empty() {
+                    if let Some(dest) = rfd::FileDialog::new().pick_folder() {
+                        match (
+                            connection::sftp_quote(&remote),
+                            connection::sftp_quote_path(&dest),
+                        ) {
+                            (Ok(r), Ok(d)) => {
+                                let mut command = format!("get -pR {r} ").into_bytes();
+                                command.extend(d);
+                                command.push(b'\n');
+                                self.tabs[index].send_generated_command(&command);
+                            }
+                            (Err(e), _) | (_, Err(e)) => self.error_in(errors::Domain::Transfer, e),
+                        }
+                    }
+                }
+            }
+        }
+    }
     pub(super) fn files_page(&mut self, ui: &mut Ui) {
-        page_heading(
-            ui,
-            "Local files",
-            "Browse your computer. Open, edit, copy, and organize files.",
-        );
+        ui.heading("Local files");
         let mut go = false;
-        ui.horizontal(|ui| {
-            if ui.button("↑").on_hover_text("Parent folder").clicked() {
+        ui.horizontal_wrapped(|ui| {
+            let parent = ui.button("↑").fluent_hint("Parent folder");
+            parent.widget_info(|| {
+                WidgetInfo::labeled(WidgetType::Button, parent.enabled(), "Parent folder")
+            });
+            if parent.clicked() {
                 if let Some(p) = self.files.path.parent() {
                     self.files.path = p.into();
                     self.files.refresh();
@@ -568,12 +860,13 @@ impl Workspace {
                 self.files.refresh();
             }
             let r = ui.add_sized(
-                [ui.available_width() - 180., 34.],
-                TextEdit::singleline(&mut self.files.path_text),
+                [(ui.available_width() - 140.).clamp(96., 640.), 34.],
+                crate::ui::fluent::singleline(&mut self.files.path_text),
             );
+            r.widget_info(|| WidgetInfo::labeled(WidgetType::TextEdit, r.enabled(), "Folder path"));
             go = r.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
             go |= ui.button("Go").clicked();
-            if ui.button("Browse…").clicked() {
+            if icons::action(ui, "Browse…").clicked() {
                 if let Some(p) = rfd::FileDialog::new()
                     .set_directory(&self.files.path)
                     .pick_folder()
@@ -592,14 +885,17 @@ impl Workspace {
                 self.files.error = "That folder does not exist or cannot be opened.".into();
             }
         }
-        ui.horizontal(|ui|{if ui.button("Refresh").clicked(){self.files.refresh();}if ui.button("New folder").clicked(){self.files.show_new=true;self.files.new_name.clear();}if ui.add_enabled(self.files.selected.is_some(),Button::new("Copy")).clicked(){self.files.clipboard=self.files.selected.clone();}
+        ui.horizontal_wrapped(|ui|{if icons::action(ui,"Refresh").clicked(){self.files.refresh();}if icons::action(ui,"New folder").clicked(){self.files.show_new=true;self.files.new_name.clear();}ui.menu_button("More",|ui|{if ui.add_enabled(self.files.selected.is_some(),Button::new("Copy")).clicked(){self.files.clipboard=self.files.selected.clone();}
    if ui.add_enabled(self.files.clipboard.is_some(),Button::new("Paste copy")).clicked(){if let Some(from)=&self.files.clipboard{if from.is_file(){let to=self.files.path.join(from.file_name().unwrap());if to.exists(){self.files.error="A file with that name already exists. Rename it before copying.".into();}else{match copy_new_file(from,&to){Ok(_)=>self.files.refresh(),Err(e)=>self.files.error=e.to_string()}}}else{self.files.error="Folder copying is not supported yet. Open the system file manager for this operation.".into();}}}
-   if ui.add_enabled(self.files.selected.is_some(),Button::new("Rename")).clicked(){self.rename_file=self.files.selected.clone();self.rename_text=self.rename_file.as_ref().unwrap().file_name().unwrap().to_string_lossy().into();}
+   if ui.add_enabled(self.files.selected.is_some(),Button::new("Rename")).clicked(){self.files.error.clear();self.rename_file=self.files.selected.clone();self.rename_text=self.rename_file.as_ref().unwrap().file_name().unwrap().to_string_lossy().into();}
    if ui.add_enabled(self.files.selected.is_some(),Button::new("Delete")).clicked(){self.delete_file=self.files.selected.clone();}
-   ui.with_layout(Layout::right_to_left(Align::Center),|ui|{ui.add(TextEdit::singleline(&mut self.files.query).hint_text("Filter files").desired_width(170.));});});
+   }); ui.add(crate::ui::fluent::singleline(&mut self.files.query).hint_text("Filter files").desired_width(170.));});
         if self.files.show_new {
-            ui.horizontal(|ui| {
-                ui.add(TextEdit::singleline(&mut self.files.new_name).hint_text("Folder name"));
+            ui.horizontal_wrapped(|ui| {
+                ui.add(
+                    crate::ui::fluent::singleline(&mut self.files.new_name)
+                        .hint_text("Folder name"),
+                );
                 if ui.button("Create").clicked() {
                     if valid_filename(&self.files.new_name) {
                         match fs::create_dir(self.files.path.join(&self.files.new_name)) {
@@ -620,7 +916,7 @@ impl Workspace {
             });
         }
         if !self.files.error.is_empty() {
-            ui.colored_label(Color32::from_rgb(180, 42, 42), &self.files.error);
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Files, &self.files.error);
         }
         ui.separator();
         let mut open = None;
@@ -645,43 +941,23 @@ impl Workspace {
                     {
                         continue;
                     }
-                    let (r, response) =
-                        ui.allocate_exact_size(vec2(ui.available_width(), 37.), Sense::click());
-                    let selected = self.files.selected.as_ref() == Some(&entry.path);
-                    if selected || response.hovered() {
-                        ui.painter().rect_filled(
-                            r,
-                            4.,
-                            if selected {
-                                ui.visuals().selection.bg_fill
-                            } else {
-                                mist(ui)
-                            },
-                        );
-                    }
-                    draw_icon(
-                        ui.painter(),
-                        Rect::from_min_size(r.min + vec2(6., 9.), vec2(19., 19.)),
-                        if entry.dir { "folder" } else { "terminal" },
-                        if entry.dir { accent(ui) } else { muted(ui) },
-                    );
-                    ui.painter().text(
-                        r.min + vec2(36., 18.),
-                        Align2::LEFT_CENTER,
-                        &entry.name,
-                        FontId::proportional(14.),
-                        ink(ui),
-                    );
-                    ui.painter().text(
-                        r.right_center() - vec2(12., 0.),
-                        Align2::RIGHT_CENTER,
-                        if entry.dir {
+                    let row = explorer::ExplorerRow {
+                        name: &entry.name,
+                        kind: entry.kind,
+                        path: entry.path.display().to_string(),
+                        bytes: (!entry.dir).then_some(entry.size),
+                        detail: if entry.dir {
                             "Folder".into()
                         } else {
                             size_text(entry.size)
                         },
-                        FontId::proportional(12.),
-                        muted(ui),
+                    };
+                    let response = row.show(
+                        ui,
+                        ui.id().with(&entry.path),
+                        self.files.selected.as_ref() == Some(&entry.path),
+                        37.,
+                        Sense::click(),
                     );
                     if response.clicked() {
                         self.files.selected = Some(entry.path.clone());
@@ -689,12 +965,12 @@ impl Workspace {
                     if response.double_clicked() {
                         open = Some(entry.clone());
                     }
-                    response.context_menu(|ui| {
-                        if ui.button("Open").clicked() {
+                    context_actions(&response, |ui, focus_first| {
+                        if context_item(ui, "Open", focus_first) {
                             open = Some(entry.clone());
                             ui.close();
                         }
-                        if !entry.dir && ui.button("Edit as text").clicked() {
+                        if !entry.dir && icons::action(ui, "Edit as text").clicked() {
                             edit = Some(entry.path.clone());
                             ui.close();
                         }
@@ -713,37 +989,81 @@ impl Workspace {
                 edit = Some(e.path);
             }
         }
+        if edit.is_some() && self.editor.as_ref().is_some_and(|editor| editor.dirty) {
+            self.message("Save or close the current document before opening another file.");
+            edit = None;
+        }
         if let Some(p) = edit {
             match fs::metadata(&p) {
                 Ok(m) if m.len() <= 2_000_000 => match fs::read_to_string(&p) {
                     Ok(text) => {
                         self.editor = Some(Editor {
+                            closing: false,
+                            closing_app: false,
+                            error: String::new(),
                             path: p,
                             text,
                             dirty: false,
                         })
                     }
-                    Err(_) => self.message("This file is not UTF-8 text. Use Open in system app."),
+                    Err(_) => self.error_in(
+                        errors::Domain::Files,
+                        "This file is not UTF-8 text. Use Open in system app.",
+                    ),
                 },
-                _ => self
-                    .message("This file is too large for the text editor. Use Open in system app."),
+                _ => self.error_in(
+                    errors::Domain::Files,
+                    "This file is too large for the text editor. Use Open in system app.",
+                ),
             }
         }
         if let Some(p) = system {
             if let Err(e) = connection::open_path(&p) {
-                self.message(e);
+                self.error_in(errors::Domain::Files, e);
             }
         }
     }
+    pub(super) fn confirm_local_document_exit(&mut self, ctx: &Context) -> bool {
+        let Some(editor) = self.editor.as_mut().filter(|editor| editor.dirty) else {
+            return false;
+        };
+        editor.closing = true;
+        editor.closing_app = true;
+        self.allow_session_exit = false;
+        self.allow_remote_exit = false;
+        ctx.send_viewport_cmd(ViewportCommand::CancelClose);
+        ctx.send_viewport_cmd(ViewportCommand::Minimized(false));
+        ctx.send_viewport_cmd(ViewportCommand::Visible(true));
+        ctx.send_viewport_cmd(ViewportCommand::Focus);
+        true
+    }
+
     pub(super) fn file_dialogs(&mut self, ctx: &Context) {
         if let Some(p) = self.delete_file.clone() {
             let mut cancel = false;
             let mut delete = false;
-            Window::new("Delete this item?").collapsible(false).resizable(false).show(ctx,|ui|{ui.label(p.file_name().unwrap_or_default().to_string_lossy());ui.label("This permanently removes the item. Only empty folders can be deleted here.");ui.horizontal(|ui|{cancel=ui.button("Cancel").clicked();delete=ui.button("Delete permanently").clicked();});});
+            let size = super::fluent::dialog_size(ctx, 410., 102.);
+            let modal = super::fluent::modal(
+                ctx,
+                Id::new("delete-local-item"),
+                "Delete this item?",
+                size,
+                |ui| {
+                    super::fluent::dialog_body(ui, size, |ui| {
+                        ui.label(p.display().to_string());
+                        ui.label("This permanently removes the item. Only empty folders can be deleted here.");
+                    });
+                    let [remove, safe] =
+                        fluent::dialog_actions(ui, ["Delete permanently", "Cancel"], None);
+                    delete = remove.clicked();
+                    fluent::focus_on_entry(ui, &safe, ui.id());
+                    cancel = safe.clicked();
+                },
+            );
+            cancel |= modal.should_close();
             if cancel {
                 self.delete_file = None;
-            }
-            if delete {
+            } else if delete {
                 let result = if p.is_dir() {
                     fs::remove_dir(p)
                 } else {
@@ -759,56 +1079,72 @@ impl Workspace {
         if let Some(p) = self.rename_file.clone() {
             let mut cancel = false;
             let mut rename = false;
-            Window::new("Rename item")
-                .collapsible(false)
-                .resizable(false)
-                .show(ctx, |ui| {
-                    ui.text_edit_singleline(&mut self.rename_text);
-                    ui.horizontal(|ui| {
-                        cancel = ui.button("Cancel").clicked();
-                        rename = primary(ui, "Rename").clicked();
-                    });
-                });
-            if cancel {
+            let size = fluent::dialog_size(ctx, 420., 110.);
+            let modal = fluent::modal(ctx, Id::new("Rename item"), "Rename item", size, |ui| {
+                let field = fluent::field(
+                    ui,
+                    "New name",
+                    &mut self.rename_text,
+                    "File name",
+                    size.width,
+                );
+                fluent::select_name_on_entry(ui, &field, ui.id(), &self.rename_text);
+                if !self.files.error.is_empty() {
+                    crate::ui::errors::show(
+                        ui,
+                        crate::ui::errors::Domain::Files,
+                        &self.files.error,
+                    );
+                }
+                let [commit, safe] = fluent::dialog_actions(ui, ["Rename", "Cancel"], Some(0));
+                rename = commit.clicked();
+                cancel = safe.clicked();
+            });
+            if cancel || modal.should_close() {
                 self.rename_file = None;
-            }
-            if rename {
+            } else if rename {
                 if valid_filename(&self.rename_text) {
                     let dest = p.parent().unwrap().join(&self.rename_text);
                     if dest.exists() {
                         self.files.error = "An item with that name already exists.".into();
                     } else {
                         match fs::rename(p, dest) {
-                            Ok(()) => self.files.refresh(),
+                            Ok(()) => {
+                                self.rename_file = None;
+                                self.files.refresh();
+                            }
                             Err(e) => self.files.error = e.to_string(),
                         }
                     }
                 } else {
                     self.files.error = "Enter a single file name.".into();
                 }
-                self.rename_file = None;
             }
         }
         if let Some(mut editor) = self.editor.take() {
             let mut open = true;
             let mut save = false;
-            Window::new(format!(
-                "{}{}",
-                editor
-                    .path
-                    .file_name()
-                    .unwrap_or_default()
-                    .to_string_lossy(),
-                if editor.dirty { " *" } else { "" }
-            ))
-            .id(Id::new("text-editor"))
+            let size = fluent::dialog_size(ctx, 850., 130.);
+            fluent::modeless(
+                ctx,
+                Id::new("text-editor"),
+                if editor.dirty {
+                    "Text editor · Unsaved"
+                } else {
+                    "Text editor"
+                },
+                size,
+            )
             .open(&mut open)
-            .default_size([850., 580.])
             .show(ctx, |ui| {
-                ui.horizontal(|ui| {
+                ui.label(editor.path.display().to_string());
+                ui.horizontal_wrapped(|ui| {
                     save = primary(ui, "Save file").clicked();
                     ui.label(RichText::new("UTF-8 text").color(muted(ui)));
                 });
+                if !editor.error.is_empty() {
+                    crate::ui::errors::show(ui, crate::ui::errors::Domain::Files, &editor.error);
+                }
                 ScrollArea::both().show(ui, |ui| {
                     let response = ui.add(
                         TextEdit::multiline(&mut editor.text)
@@ -820,120 +1156,198 @@ impl Workspace {
                     editor.dirty |= response.changed();
                 });
             });
+            if !open && editor.dirty {
+                editor.closing = true;
+                open = true;
+            }
+            if editor.closing {
+                let size = super::fluent::dialog_size(ctx, 420., 104.);
+                let modal = super::fluent::modal(
+                    ctx,
+                    Id::new("local-editor-close"),
+                    "Save changes before closing?",
+                    size,
+                    |ui| {
+                        ui.label(editor.path.display().to_string());
+                        if !editor.error.is_empty() {
+                            crate::ui::errors::show(
+                                ui,
+                                crate::ui::errors::Domain::Files,
+                                &editor.error,
+                            );
+                        }
+                        ui.horizontal_wrapped(|ui| {
+                            save = ui.button("Save and close").clicked();
+                            if ui.button("Discard changes").clicked() {
+                                open = false;
+                            }
+                            let safe = ui.button("Keep editing");
+                            super::fluent::focus_on_entry(ui, &safe, ui.id());
+                            if safe.clicked() {
+                                editor.closing = false;
+                            }
+                        });
+                    },
+                );
+                if modal.should_close() {
+                    editor.closing = false;
+                    open = true;
+                    save = false;
+                }
+                if !editor.closing {
+                    editor.closing_app = false;
+                }
+            }
             if save {
                 match fs::write(&editor.path, &editor.text) {
                     Ok(()) => {
                         editor.dirty = false;
+                        open = !editor.closing;
+                        editor.error.clear();
                         self.message("File saved");
                     }
-                    Err(e) => self.message(e.to_string()),
+                    Err(e) => editor.error = e.to_string(),
                 }
             }
             if open {
                 self.editor = Some(editor);
-            } else if editor.dirty {
-                self.message("Closed the editor without saving changes.");
+            } else if editor.closing_app {
+                self.continue_window_close(ctx);
             }
         }
     }
     pub(super) fn tunnels_page(&mut self, ui: &mut Ui) {
-        page_heading(
-            ui,
-            "SSH tunnels",
-            "Forward a local port, expose a remote port, or create a SOCKS proxy.",
-        );
-        ui.horizontal(|ui| {
-            if primary(ui, "+  New tunnel").clicked() {
-                if self.store.tunnels.len() >= 5 {
-                    self.message(
-                        "Five saved tunnels reached. Edit or remove an existing tunnel first.",
-                    );
-                } else {
-                    self.tunnel_form = Tunnel::default();
-                    self.tunnel_editing = None;
-                    self.tunnel_open = true;
-                }
-            }
-            ui.label(
-                RichText::new(format!("{} / 5 saved", self.store.tunnels.len()))
-                    .color(muted(ui))
-                    .size(12.),
-            );
-        });
-        ui.add_space(14.);
-        if self.store.tunnels.is_empty() {
-            empty_state(
+        fluent::page_scroll(ui, "tunnels_page", |ui| {
+            page_heading(
                 ui,
-                "link",
-                "No tunnels yet",
-                "Create a tunnel to reach a database, service, or private network over SSH.",
+                "SSH tunnels",
+                "Forward a local port, expose a remote port, or create a SOCKS proxy.",
             );
-        }
-        let mut run = None;
-        let mut edit = None;
-        let mut remove = None;
-        for (i, t) in self.store.tunnels.iter().enumerate() {
-            surface(ui).show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    icon(ui, "link", 25., accent(ui));
-                    ui.vertical(|ui| {
-                        ui.label(RichText::new(&t.name).size(16.).strong());
-                        ui.label(
-                            RichText::new(format!(
-                                "{}  {}:{}  →  {}:{}  via {}",
-                                t.mode, t.bind, t.local_port, t.destination, t.remote_port, t.host
-                            ))
-                            .color(muted(ui))
-                            .size(12.),
+            ui.horizontal_wrapped(|ui| {
+                if primary(ui, "+  New tunnel").clicked() {
+                    if self.store.tunnels.len() >= 5 {
+                        self.message(
+                            "Five saved tunnels reached. Edit or remove an existing tunnel first.",
                         );
-                    });
-                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        if ui.button("Remove").clicked() {
-                            remove = Some(i);
-                        }
-                        if ui.button("Edit").clicked() {
-                            edit = Some(i);
-                        }
-                        if primary(ui, "Start").clicked() {
-                            run = Some(t.clone());
-                        }
+                    } else {
+                        self.tunnel_form = Tunnel::default();
+                        self.tunnel_editing = None;
+                        self.tunnel_open = true;
+                    }
+                }
+                ui.label(
+                    RichText::new(format!("{} / 5 saved", self.store.tunnels.len()))
+                        .color(muted(ui))
+                        .size(12.),
+                );
+            });
+            ui.add_space(14.);
+            if self.store.tunnels.is_empty() {
+                empty_state(
+                    ui,
+                    "link",
+                    "No tunnels yet",
+                    "Create a tunnel to reach a database, service, or private network over SSH.",
+                );
+            }
+            let mut run = None;
+            let mut edit = None;
+            let mut remove = None;
+            for (i, t) in self.store.tunnels.iter().enumerate() {
+                surface(ui).show(ui, |ui| {
+                    ui.horizontal_wrapped(|ui| {
+                        icon(ui, "link", 25., accent(ui));
+                        ui.allocate_ui_with_layout(
+                            vec2((ui.available_width() - 230.).max(80.), 52.),
+                            Layout::top_down(Align::Min),
+                            |ui| {
+                                ui.add(
+                                    Label::new(crate::ui::fluent::emphasized(
+                                        ui.ctx(),
+                                        RichText::new(&t.name).size(16.),
+                                    ))
+                                    .truncate(),
+                                )
+                                .on_hover_text(&t.name);
+                                ui.add(
+                                    Label::new(
+                                        RichText::new(format!(
+                                            "{}  {}:{}  →  {}:{}  via {}",
+                                            t.mode,
+                                            t.bind,
+                                            t.local_port,
+                                            t.destination,
+                                            t.remote_port,
+                                            t.host
+                                        ))
+                                        .color(muted(ui))
+                                        .size(12.),
+                                    )
+                                    .truncate(),
+                                )
+                                .on_hover_text(format!(
+                                    "{} {}:{} → {}:{} via {}",
+                                    t.mode,
+                                    t.bind,
+                                    t.local_port,
+                                    t.destination,
+                                    t.remote_port,
+                                    t.host
+                                ));
+                            },
+                        );
+                        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                            ui.menu_button("More", |ui| {
+                                if icons::action(ui, "Remove").clicked() {
+                                    remove = Some(i);
+                                    ui.close();
+                                }
+                                if icons::action(ui, "Edit").clicked() {
+                                    edit = Some(i);
+                                    ui.close();
+                                }
+                            });
+                            if primary(ui, "Start").clicked() {
+                                run = Some(t.clone());
+                            }
+                        });
                     });
                 });
-            });
-            ui.add_space(5.);
-        }
-        if let Some(i) = edit {
-            self.tunnel_form = self.store.tunnels[i].clone();
-            self.tunnel_editing = Some(i);
-            self.tunnel_open = true;
-        }
-        if let Some(i) = remove {
-            self.store.tunnels.remove(i);
-            self.persist();
-        }
-        if let Some(t) = run {
-            match t.args() {
-                Ok(args) => {
-                    let s = Session {
-                        name: format!("Tunnel: {}", t.name),
-                        host: t.host.clone(),
-                        protocol: "SSH".into(),
-                        ..Default::default()
-                    };
-                    self.start_with_launch(
-                        s,
-                        Some(connection::Launch {
-                            rdp_profile: None,
-                            program: "ssh".into(),
-                            args,
-                            directory: None,
-                        }),
-                    );
-                    self.tabs[self.active].screen.feed(b"SSH tunnel\r\nAuthenticate below if requested. Keep this tab open to keep forwarding active.\r\n");
-                }
-                Err(e) => self.message(e),
+                ui.add_space(5.);
             }
-        }
+            if let Some(i) = edit {
+                self.tunnel_form = self.store.tunnels[i].clone();
+                self.tunnel_editing = Some(i);
+                self.tunnel_open = true;
+            }
+            if let Some(i) = remove {
+                self.store.tunnels.remove(i);
+                self.persist();
+            }
+            if let Some(t) = run {
+                match t.args() {
+                    Ok(args) => {
+                        let s = Session {
+                            name: format!("Tunnel: {}", t.name),
+                            host: t.host.clone(),
+                            protocol: "SSH".into(),
+                            ..Default::default()
+                        };
+                        self.start_with_launch(
+                            s,
+                            Some(connection::Launch {
+                                rdp_profile: None,
+                                program: "ssh".into(),
+                                args,
+                                directory: None,
+                            }),
+                        );
+                        self.tabs[self.active].screen.feed(b"SSH tunnel\r\nAuthenticate below if requested. Keep this tab open to keep forwarding active.\r\n");
+                    }
+                    Err(e) => self.error_in(errors::Domain::Tunnel, e),
+                }
+            }
+        });
     }
     pub(super) fn tunnel_dialog(&mut self, ctx: &Context) {
         if !self.tunnel_open {
@@ -942,7 +1356,8 @@ impl Workspace {
         let mut open = true;
         let mut save = false;
         let mut cancel = false;
-        Window::new("Configure SSH tunnel").open(&mut open).collapsible(false).default_width(520.).show(ctx,|ui|{let t=&mut self.tunnel_form;ui.horizontal(|ui|{for mode in ["Local","Remote","Dynamic"]{ui.selectable_value(&mut t.mode,mode.into(),mode);}});ui.label(RichText::new(match t.mode.as_str(){"Remote"=>"Listen on the SSH server and forward to a destination from your computer.","Dynamic"=>"Create a local SOCKS proxy through the SSH server.",_=>"Listen on your computer and reach a destination from the SSH server."}).color(muted(ui)).size(12.));Grid::new("tunnel_fields").num_columns(2).spacing([20.,11.]).show(ui,|ui|{field(ui,"Name",&mut t.name,"Tunnel name");field(ui,"SSH server",&mut t.host,"bastion.example.com");field(ui,"SSH username",&mut t.user,"");ui.label("SSH port");ui.add(DragValue::new(&mut t.ssh_port).range(1..=65535));ui.end_row();field(ui,"Private key",&mut t.key,"Optional key file");field(ui,"Listen address",&mut t.bind,"127.0.0.1");ui.label("Listen port");ui.add(DragValue::new(&mut t.local_port).range(1..=65535));ui.end_row();if t.mode!="Dynamic"{field(ui,"Destination",&mut t.destination,"localhost");ui.label("Destination port");ui.add(DragValue::new(&mut t.remote_port).range(1..=65535));ui.end_row();}});if !self.form_error.is_empty(){ui.colored_label(Color32::from_rgb(180,42,42),&self.form_error);}ui.horizontal(|ui|{cancel=ui.button("Cancel").clicked();save=primary(ui,"Save tunnel").clicked();});});
+        let size = fluent::dialog_size(ctx, 520., 138.);
+        fluent::modeless(ctx, Id::new("Configure SSH tunnel"), "Configure SSH tunnel", size).open(&mut open).collapsible(false).show(ctx,|ui|{fluent::dialog_body(ui,size,|ui|{let t=&mut self.tunnel_form;ui.horizontal(|ui|{for mode in ["Local","Remote","Dynamic"]{ui.selectable_value(&mut t.mode,mode.into(),mode);}});ui.label(RichText::new(match t.mode.as_str(){"Remote"=>"Listen on the SSH server and forward to a destination from your computer.","Dynamic"=>"Create a local SOCKS proxy through the SSH server.",_=>"Listen on your computer and reach a destination from the SSH server."}).color(muted(ui)).size(12.));fluent::settings_grid(ui, "tunnel_fields", |ui|{let name=fluent::field(ui,"Name",&mut t.name,"Tunnel name",390.);fluent::focus_on_entry(ui,&name,ui.id());ui.end_row();field(ui,"SSH server",&mut t.host,"bastion.example.com");field(ui,"SSH username",&mut t.user,"");ui.label("SSH port");ui.add(DragValue::new(&mut t.ssh_port).range(1..=65535));ui.end_row();field(ui,"Private key",&mut t.key,"Optional key file");field(ui,"Listen address",&mut t.bind,"127.0.0.1");ui.label("Listen port");ui.add(DragValue::new(&mut t.local_port).range(1..=65535));ui.end_row();if t.mode!="Dynamic"{field(ui,"Destination",&mut t.destination,"localhost");ui.label("Destination port");ui.add(DragValue::new(&mut t.remote_port).range(1..=65535));ui.end_row();}});});if !self.form_error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Tunnel, &self.form_error);}ui.horizontal(|ui|{cancel=ui.button("Cancel").clicked();save=primary(ui,"Save tunnel").clicked();});});
         if !open || cancel {
             self.tunnel_open = false;
             self.form_error.clear();
@@ -964,147 +1379,173 @@ impl Workspace {
         }
     }
     pub(super) fn macros_page(&mut self, ui: &mut Ui) {
-        page_heading(
-            ui,
-            "Macros",
-            "Record and replay input in your terminal or embedded desktop.",
-        );
-        ui.horizontal_wrapped(|ui| {
-            if primary(ui, "New text macro").clicked() {
-                self.macro_form = Macro {
-                    append_enter: true,
-                    ..Macro::default()
-                };
-                self.macro_editing = None;
-                self.macro_open = true;
-            }
-            if ui.button("New event macro").clicked() {
-                self.macro_form = Macro {
-                    script: Some(harbor_workspace::macros::Script {
-                        version: 1,
-                        events: Vec::new(),
-                    }),
-                    ..Macro::default()
-                };
-                self.macro_editing = None;
-                self.macro_open = true;
-            }
-            self.macro_controls(ui);
-            if ui.button("Import").clicked() {
-                if let Some(path) = rfd::FileDialog::new()
-                    .add_filter("Macro JSON", &["json"])
-                    .pick_file()
-                {
-                    match super::macro_events::read_import(&path).and_then(|imported| {
-                        let mut values = self.store.macros.clone();
-                        values.extend(imported);
-                        super::macro_events::validate_library(&values)?;
-                        Ok(values)
-                    }) {
-                        Ok(values) => {
-                            self.store.macros = values;
-                            self.persist();
-                        }
-                        Err(error) => self.message(error),
+        fluent::page_scroll(ui, "macros_page", |ui| {
+            page_heading(
+                ui,
+                "Macros",
+                "Record and replay input in your terminal or embedded desktop.",
+            );
+            ui.horizontal_wrapped(|ui| {
+                ui.menu_button("New macro", |ui| {
+                    if ui.button("New text macro").clicked() {
+                        self.macro_form = Macro {
+                            append_enter: true,
+                            ..Macro::default()
+                        };
+                        self.macro_editing = None;
+                        self.macro_open = true;
                     }
+                    if ui.button("New event macro").clicked() {
+                        self.macro_form = Macro {
+                            script: Some(harbor_workspace::macros::Script {
+                                version: 1,
+                                events: Vec::new(),
+                            }),
+                            ..Macro::default()
+                        };
+                        self.macro_editing = None;
+                        self.macro_open = true;
+                    }
+                });
+                self.macro_controls(ui);
+                ui.menu_button("Library", |ui| {
+                    if icons::action(ui, "Import").clicked() {
+                        if let Some(path) = rfd::FileDialog::new()
+                            .add_filter("Macro JSON", &["json"])
+                            .pick_file()
+                        {
+                            match super::macro_events::read_import(&path).and_then(|imported| {
+                                let mut values = self.store.macros.clone();
+                                values.extend(imported);
+                                super::macro_events::validate_library(&values)?;
+                                Ok(values)
+                            }) {
+                                Ok(values) => {
+                                    self.store.macros = values;
+                                    self.persist();
+                                }
+                                Err(error) => self.error_in(errors::Domain::Macro, error),
+                            }
+                        }
+                    }
+                    if icons::action(ui, "Export").clicked() {
+                        if let Some(path) = rfd::FileDialog::new()
+                            .set_file_name("macros.json")
+                            .save_file()
+                        {
+                            let result = serde_json::to_vec_pretty(&self.store.macros)
+                                .map_err(|error| error.to_string())
+                                .and_then(|bytes| {
+                                    fs::write(path, bytes).map_err(|error| error.to_string())
+                                });
+                            match result {
+                                Ok(()) => self.message("Macros exported."),
+                                Err(error) => self.error_in(errors::Domain::Macro, error),
+                            }
+                        }
+                    }
+                });
+            });
+            ui.add_space(12.);
+            if self.store.macros.is_empty() {
+                empty_state(
+                    ui,
+                    "macro",
+                    "No saved macros",
+                    "Create a macro or record input from a connected session.",
+                );
+            }
+            let mut edit = None;
+            let mut remove = None;
+            let mut run = None;
+            for (index, value) in self.store.macros.iter().enumerate() {
+                surface(ui).show(ui, |ui| {
+                    ui.horizontal_wrapped(|ui| {
+                        icon(ui, "macro", 24., accent(ui));
+                        ui.allocate_ui_with_layout(
+                            vec2((ui.available_width() - 230.).max(80.), 52.),
+                            Layout::top_down(Align::Min),
+                            |ui| {
+                                ui.add(
+                                    Label::new(
+                                        crate::ui::fluent::emphasized(
+                                            ui.ctx(),
+                                            RichText::new(&value.name),
+                                        )
+                                        .size(16.),
+                                    )
+                                    .truncate(),
+                                )
+                                .on_hover_text(&value.name);
+                                let description = value.script.as_ref().map_or_else(
+                                    || value.text.lines().next().unwrap_or("").to_owned(),
+                                    |script| format!("{} events", script.events.len()),
+                                );
+                                ui.add(
+                                    Label::new(
+                                        RichText::new(description).size(12.).color(muted(ui)),
+                                    )
+                                    .truncate(),
+                                );
+                            },
+                        );
+                        ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+                            ui.menu_button("More", |ui| {
+                                if icons::action(ui, "Remove").clicked() {
+                                    remove = Some(index);
+                                    ui.close();
+                                }
+                                if icons::action(ui, "Edit").clicked() {
+                                    edit = Some(index);
+                                    ui.close();
+                                }
+                            });
+                            if ui
+                                .add_enabled(
+                                    self.tabs.get(self.active).is_some_and(|tab| {
+                                        super::macro_events::supported_session(&tab.session)
+                                    }),
+                                    Button::new("Run in active tab"),
+                                )
+                                .clicked()
+                            {
+                                run = Some(value.clone());
+                            }
+                        });
+                    });
+                });
+                ui.add_space(5.);
+            }
+            if let Some(index) = edit {
+                self.macro_form = self.store.macros[index].clone();
+                self.macro_editing = Some(index);
+                self.macro_open = true;
+            }
+            if let Some(index) = remove {
+                let name = &self.store.macros[index].name;
+                let attached = self
+                    .store
+                    .sessions
+                    .iter()
+                    .any(|session| session.startup_macro.as_ref() == Some(name));
+                let mut values = self.store.macros.clone();
+                values.remove(index);
+                if attached {
+                    self.message("Remove this macro from session startup before deleting it.");
+                } else if let Err(error) = super::macro_events::validate_library(&values) {
+                    self.error_in(errors::Domain::Macro, error);
+                } else {
+                    self.store.macros = values;
+                    self.persist();
                 }
             }
-            if ui.button("Export").clicked() {
-                if let Some(path) = rfd::FileDialog::new()
-                    .set_file_name("macros.json")
-                    .save_file()
-                {
-                    let result = serde_json::to_vec_pretty(&self.store.macros)
-                        .map_err(|error| error.to_string())
-                        .and_then(|bytes| {
-                            fs::write(path, bytes).map_err(|error| error.to_string())
-                        });
-                    match result {
-                        Ok(()) => self.message("Macros exported."),
-                        Err(error) => self.message(error),
-                    }
+            if let Some(value) = run {
+                match self.queue_macro(self.tabs[self.active].id, &value) {
+                    Ok(()) => self.page = Page::Terminal,
+                    Err(error) => self.error_in(errors::Domain::Macro, error),
                 }
             }
         });
-        ui.add_space(12.);
-        if self.store.macros.is_empty() {
-            empty_state(
-                ui,
-                "macro",
-                "No saved macros",
-                "Create a macro or record input from a connected session.",
-            );
-        }
-        let mut edit = None;
-        let mut remove = None;
-        let mut run = None;
-        for (index, value) in self.store.macros.iter().enumerate() {
-            surface(ui).show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    icon(ui, "macro", 24., accent(ui));
-                    ui.vertical(|ui| {
-                        ui.label(RichText::new(&value.name).strong().size(16.));
-                        let description = value.script.as_ref().map_or_else(
-                            || value.text.lines().next().unwrap_or("").to_owned(),
-                            |script| format!("{} events", script.events.len()),
-                        );
-                        ui.add(
-                            Label::new(RichText::new(description).size(12.).color(muted(ui)))
-                                .truncate(),
-                        );
-                    });
-                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        if ui.button("Remove").clicked() {
-                            remove = Some(index);
-                        }
-                        if ui.button("Edit").clicked() {
-                            edit = Some(index);
-                        }
-                        if ui
-                            .add_enabled(
-                                self.tabs.get(self.active).is_some_and(|tab| {
-                                    super::macro_events::supported_session(&tab.session)
-                                }),
-                                Button::new("Run in active tab"),
-                            )
-                            .clicked()
-                        {
-                            run = Some(value.clone());
-                        }
-                    });
-                });
-            });
-            ui.add_space(5.);
-        }
-        if let Some(index) = edit {
-            self.macro_form = self.store.macros[index].clone();
-            self.macro_editing = Some(index);
-            self.macro_open = true;
-        }
-        if let Some(index) = remove {
-            let name = &self.store.macros[index].name;
-            let attached = self
-                .store
-                .sessions
-                .iter()
-                .any(|session| session.startup_macro.as_ref() == Some(name));
-            let mut values = self.store.macros.clone();
-            values.remove(index);
-            if attached {
-                self.message("Remove this macro from session startup before deleting it.");
-            } else if let Err(error) = super::macro_events::validate_library(&values) {
-                self.message(error);
-            } else {
-                self.store.macros = values;
-                self.persist();
-            }
-        }
-        if let Some(value) = run {
-            match self.queue_macro(self.tabs[self.active].id, &value) {
-                Ok(()) => self.page = Page::Terminal,
-                Err(error) => self.message(error),
-            }
-        }
     }
 
     pub(super) fn macro_dialog(&mut self, ctx: &Context) {
@@ -1113,31 +1554,45 @@ impl Workspace {
         }
         let mut open = true;
         let mut save = false;
-        Window::new("Edit macro")
+        let size = fluent::dialog_size(ctx, 560., 130.);
+        let mut cancel = false;
+        fluent::modeless(ctx, Id::new("Edit macro"), "Edit macro", size)
             .open(&mut open)
-            .default_width(560.)
             .collapsible(false)
             .show(ctx, |ui| {
-                ui.label("Name");
-                ui.text_edit_singleline(&mut self.macro_form.name);
-                if let Some(script) = &mut self.macro_form.script {
-                    super::macro_events::edit_events(ui, script);
-                } else {
-                    ui.label("Text to send");
-                    ui.add(
-                        TextEdit::multiline(&mut self.macro_form.text)
-                            .font(TextStyle::Monospace)
-                            .desired_width(f32::INFINITY)
-                            .desired_rows(8),
-                    );
-                    ui.checkbox(
-                        &mut self.macro_form.append_enter,
-                        "Press Enter after sending",
+                fluent::dialog_body(ui, size, |ui| {
+                    ui.label("Name");
+                    ui.add(crate::ui::fluent::singleline(&mut self.macro_form.name));
+                    if let Some(script) = &mut self.macro_form.script {
+                        super::macro_events::edit_events(ui, script);
+                    } else {
+                        ui.label("Text to send");
+                        ui.add(
+                            TextEdit::multiline(&mut self.macro_form.text)
+                                .font(TextStyle::Monospace)
+                                .desired_width(f32::INFINITY)
+                                .desired_rows(8),
+                        );
+                        ui.checkbox(
+                            &mut self.macro_form.append_enter,
+                            "Press Enter after sending",
+                        );
+                    }
+                });
+                if !self.macro_error.is_empty() {
+                    crate::ui::errors::show(
+                        ui,
+                        crate::ui::errors::Domain::Macro,
+                        &self.macro_error,
                     );
                 }
-                save = primary(ui, "Save macro").clicked();
+                ui.horizontal_wrapped(|ui| {
+                    save = primary(ui, "Save macro").clicked();
+                    cancel = ui.button("Cancel").clicked();
+                });
             });
-        if !open {
+        if !open || cancel {
+            self.macro_error.clear();
             self.macro_open = false;
         }
         if save {
@@ -1155,9 +1610,8 @@ impl Workspace {
                         .iter()
                         .any(|session| session.startup_macro.as_ref() == Some(&value.name))
                 {
-                    self.message(
-                        "Remove the old macro name from session startup before renaming it.",
-                    );
+                    self.macro_error =
+                        "Remove the old macro name from session startup before renaming it.".into();
                     return;
                 }
                 *value = self.macro_form.clone();
@@ -1165,29 +1619,54 @@ impl Workspace {
                 values.push(self.macro_form.clone());
             }
             if let Err(error) = super::macro_events::validate_library(&values) {
-                self.message(error);
+                self.macro_error = error;
                 return;
             }
             self.store.macros = values;
             self.persist();
+            self.macro_error.clear();
             self.macro_open = false;
         }
     }
     pub(super) fn tools_page(&mut self, ui: &mut Ui) {
-        self.portable_packages_section(ui);
-        self.plugins_section(ui);
+        ui.heading("Tools");
+        ui.horizontal_wrapped(|ui| {
+            for &(category, label) in tools::Category::ALL {
+                ui.selectable_value(&mut self.tools_category, category, label);
+            }
+        });
         ui.separator();
-        self.tools.render(ui);
-        ui.separator();
-        page_heading(
-            ui,
-            "Network tools",
-            "Inspect a host, test reachability, and manage your local client tools.",
-        );
+        self.tools.poll(ui);
+        let category = self.tools_category;
+        fluent::page_scroll(ui, &format!("tools-{category:?}"), |ui| match category {
+            tools::Category::Network => {
+                self.network_tools(ui);
+                self.tools.network(ui);
+            }
+            tools::Category::Files => self.tools.files(ui),
+            tools::Category::Packages => self.portable_packages_section(ui),
+            tools::Category::Plugins => self.plugins_section(ui),
+            tools::Category::Runtime => {
+                ui.horizontal_wrapped(|ui| {
+                    if ui.button("SSH keys and agents…").clicked() {
+                        self.ssh_keys.open = true;
+                    }
+                    if ui.button("X server settings").clicked() {
+                        self.page = Page::Servers;
+                        self.servers_category = servers::Section::Xserver;
+                    }
+                });
+                runtime_providers(ui);
+            }
+            #[cfg(windows)]
+            tools::Category::Windows => self.tools.windows(ui),
+        });
+    }
+    fn network_tools(&mut self, ui: &mut Ui) {
         surface(ui).show(ui, |ui| {
-            ui.horizontal(|ui| {
-                ui.label("Host");
-                ui.add(TextEdit::singleline(&mut self.diagnostic_host).desired_width(280.));
+            ui.horizontal_wrapped(|ui| {
+                let host_label = ui.label("Host");
+                fluent::text_input(ui, host_label.id, &mut self.diagnostic_host, "", 280.);
                 if ui.button("DNS lookup").clicked() {
                     let host = self.diagnostic_host.clone();
                     if let Err(e) = validate_host(&host) {
@@ -1251,10 +1730,6 @@ impl Workspace {
                 );
             }
         });
-        ui.add_space(16.);
-        ui.columns(2,|cols|{surface(&cols[0]).show(&mut cols[0],|ui|{ui.label(RichText::new("SSH keys").size(17.).strong());ui.label(RichText::new("Create or import key bundles, inspect fingerprints, and manage system or TermCraft-owned agent identities.").color(muted(ui)));if ui.button("SSH keys and agents…").clicked(){self.ssh_keys.open=true;}});surface(&cols[1]).show(&mut cols[1],|ui|{ui.label(RichText::new("X11 display").size(17.).strong());let display=std::env::var("DISPLAY").unwrap_or_else(|_|"No DISPLAY configured".into());ui.label(RichText::new(display).monospace());ui.label(RichText::new("SSH can forward X11 to an available display. Start a packaged Xwayland display in Servers on supported installations.").color(muted(ui)));});});
-        ui.add_space(18.);
-        runtime_providers(ui);
     }
     pub(super) fn start_tool(&mut self, name: &str, program: &str, args: Vec<String>) {
         let program = connection::find_program(program)
@@ -1276,8 +1751,9 @@ impl Workspace {
     }
     pub(super) fn appearance_picker(&mut self, ui: &mut Ui) {
         let mut appearance = self.store.preferences.appearance;
-        ComboBox::from_id_salt("appearance")
-            .width(100.)
+        let label = ui.label("Theme");
+        ComboBox::from_id_salt("appearance-theme")
+            .width(72.)
             .selected_text(format!("{appearance:?}"))
             .show_ui(ui, |ui| {
                 for (value, label) in [
@@ -1287,7 +1763,9 @@ impl Workspace {
                 ] {
                     ui.selectable_value(&mut appearance, value, label);
                 }
-            });
+            })
+            .response
+            .labelled_by(label.id);
         if appearance != self.store.preferences.appearance {
             self.store.preferences.appearance = appearance;
             self.apply_appearance(ui.ctx());
@@ -1295,69 +1773,193 @@ impl Workspace {
         }
     }
     pub(super) fn settings_page(&mut self, ui: &mut Ui) {
-        page_heading(
-            ui,
-            "Workspace settings",
-            "Make the terminal yours and keep a portable copy of your connections.",
-        );
-        if ui.button("Configure global terminal profile").clicked() {
-            self.terminal_profile_editor = Some(
-                super::terminal_settings::ProfileEditor::from_preferences(&self.store.preferences),
-            );
-        }
-        ui.label("Paste and session safety");
-        ui.checkbox(
-            &mut self.store.preferences.paste.confirm_multiline,
-            "Confirm multiline paste",
-        );
-        ui.horizontal(|ui| {
-            ui.label("Delay between pasted lines");
-            ui.add(
-                DragValue::new(&mut self.store.preferences.paste.line_delay_ms)
-                    .range(0..=5000)
-                    .suffix(" ms"),
-            );
+        use SettingsCategory::*;
+        fluent::page_scroll(ui, "settings_page", |ui| {
+            ui.heading("Workspace settings");
+            ui.add_space(8.);
+            ui.horizontal_wrapped(|ui| {
+                for (category, label) in [
+                    (Appearance, "Appearance"),
+                    (Terminal, "Terminal"),
+                    (Safety, "Input & safety"),
+                    (Storage, "Sessions & backups"),
+                    (About, "About"),
+                ] {
+                    ui.selectable_value(&mut self.settings_category, category, label);
+                }
+            });
+            ui.separator();
+            if self.settings_category == Terminal {
+                if ui.button("Configure global terminal profile").clicked() {
+                    self.terminal_profile_editor =
+                        Some(super::terminal_settings::ProfileEditor::from_preferences(
+                            &self.store.preferences,
+                        ));
+                }
+            }
+            if self.settings_category == Safety {
+                surface(ui).show(ui, |ui| {
+                    ui.set_min_width(ui.available_width());
+                    ui.label(fluent::emphasized(
+                        ui.ctx(),
+                        RichText::new("Paste and session safety").size(18.),
+                    ));
+                    ui.checkbox(
+                        &mut self.store.preferences.paste.confirm_multiline,
+                        "Confirm multiline paste",
+                    );
+                    ui.horizontal_wrapped(|ui| {
+                        ui.label("Delay between pasted lines");
+                        ui.add(
+                            DragValue::new(&mut self.store.preferences.paste.line_delay_ms)
+                                .range(0..=5000)
+                                .suffix(" ms"),
+                        );
+                    });
+                    ui.checkbox(
+                        &mut self.store.preferences.confirm_session_close,
+                        "Confirm closing active sessions",
+                    );
+                });
+                ui.add_space(12.);
+                surface(ui).show(ui, |ui| {
+                ui.set_min_width(ui.available_width());
+                ui.label(fluent::emphasized(ui.ctx(),RichText::new("Clipboard and selection").size(18.)));
+                ui.checkbox(
+                    &mut self.store.preferences.clipboard.copy_on_select,
+                    "Copy selection automatically on release",
+                );
+                ui.horizontal_wrapped(|ui| {
+                    ui.label("Right click");
+                    ui.selectable_value(
+                        &mut self.store.preferences.clipboard.right_click,
+                        RightClickBehavior::ContextMenu,
+                        "Context menu",
+                    );
+                    ui.selectable_value(
+                        &mut self.store.preferences.clipboard.right_click,
+                        RightClickBehavior::Paste,
+                        "Paste (Shift-right-click for menu)",
+                    );
+                });
+                ui.horizontal_wrapped(|ui| {
+                    ui.label("Word delimiters");
+                    ui.add(crate::ui::fluent::singleline(
+                        &mut self.store.preferences.clipboard.word_delimiters,
+                    ));
+                });
+                ui.menu_button("Selection help",|ui|{ui.label("Alt-drag selects a rectangle. Ctrl+Shift+C copies. Ctrl+Shift+V pastes. Hold Shift to select while a terminal program uses the mouse.");});
+                });
+                ui.add_space(12.);
+                if primary(ui, "Save preferences").clicked() {
+                    self.persist();
+                }
+            }
+            if self.settings_category == Terminal {
+                if ui.button("Configure terminal highlighting").clicked() {
+                    self.highlight_editor = Some(super::highlighting::Editor::from_preferences(
+                        &self.store.preferences,
+                    ));
+                }
+            }
+            if self.settings_category == Appearance {
+                surface(ui).show(ui, |ui| {
+                    ui.set_min_width(ui.available_width());
+                    ui.label(fluent::emphasized(
+                        ui.ctx(),
+                        RichText::new("Appearance").size(18.),
+                    ));
+                    self.appearance_picker(ui);
+                    let reduced_motion = ui.checkbox(
+                        &mut self.store.preferences.reduced_motion,
+                        "Reduce interface transitions",
+                    );
+                    let high_contrast = ui.checkbox(
+                        &mut self.store.preferences.high_contrast,
+                        "Increase interface contrast",
+                    );
+                    if reduced_motion.changed() || high_contrast.changed() {
+                        self.apply_appearance(ui.ctx());
+                        self.persist();
+                    }
+                });
+            }
+            if self.settings_category == Terminal {
+                surface(ui).show(ui, |ui| {
+                    ui.set_min_width(ui.available_width());
+                    ui.label(crate::ui::fluent::emphasized(
+                        ui.ctx(),
+                        RichText::new("Terminal").size(18.),
+                    ));
+                    fluent::settings_grid(ui, "prefs", |ui| {
+                        ui.label("Scrollback lines");
+                        ui.add(
+                            DragValue::new(&mut self.store.preferences.scrollback)
+                                .range(100..=360000),
+                        );
+                        ui.end_row();
+                        ui.label("History memory");
+                        ui.label("128 MiB per terminal").on_hover_text("Older lines expire when either the line limit or memory limit is reached.");
+                        ui.end_row();
+                        ui.label("SSH keepalive interval");
+                        ui.add(
+                            DragValue::new(&mut self.store.preferences.ssh_defaults.keepalive_secs)
+                                .range(1..=86400)
+                                .suffix("s"),
+                        );
+                        ui.end_row();
+                        ui.label("SSH connect timeout");
+                        ui.add(
+                            DragValue::new(
+                                &mut self.store.preferences.ssh_defaults.connect_timeout_secs,
+                            )
+                            .range(1..=3600)
+                            .suffix("s"),
+                        );
+                        ui.end_row();
+                        field(
+                            ui,
+                            "Default shell executable",
+                            &mut self.store.preferences.shell,
+                            "Use the system default",
+                        );
+                        field(
+                            ui,
+                            "Download folder",
+                            &mut self.store.preferences.downloads,
+                            "Folder path",
+                        );
+                    });
+                    if primary(ui, "Save preferences").clicked() {
+                        self.persist();
+                    }
+                });
+            }
+            if self.settings_category == Storage {
+                surface(ui).show(ui,|ui|{ui.set_min_width(ui.available_width());ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Sessions and backups").size(18.)));ui.label(RichText::new("Session settings, folders, tunnels and macros are stored locally. Exported backups contain hostnames and key-file paths, but no passwords.").color(muted(ui)));ui.horizontal_wrapped(|ui|{
+    if icons::action(ui,"Export workspace").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("termcraft-workspace.json").save_file(){match self.store.save(&p){Ok(())=>self.message("Workspace exported"),Err(e)=>self.error_in(errors::Domain::Settings,e)}}}
+    if icons::action(ui,"Import workspace").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Workspace JSON",&["json"]).pick_file(){match Store::load_bounded(&p, 16 * 1024 * 1024).and_then(|mut imported| { let mut macros = self.store.macros.clone(); macros.append(&mut imported.macros); super::macro_events::validate_library(&macros)?; imported.macros = macros; Ok(imported) }) { Ok(imported) => { self.store.sessions.extend(imported.sessions.into_iter().map(|mut session| {session.id=harbor_workspace::model::new_session_id();session})); self.store.tunnels.extend(imported.tunnels.into_iter().take(5_usize.saturating_sub(self.store.tunnels.len()))); self.store.macros = imported.macros; self.persist(); }, Err(error) => self.error_in(errors::Domain::Settings,error) }}}
+   });if !self.store_ok{crate::ui::errors::show(ui, crate::ui::errors::Domain::Settings, "The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.settings_load_error=None;self.persist();},Err(e)=>self.error_in(errors::Domain::Settings,e.to_string())}}}});
+            }
+            if self.settings_category == About {
+                surface(ui).show(ui,|ui|{ui.set_min_width(ui.available_width());ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("About TermCraft").size(18.)));ui.label("An independently written Rust desktop remote workspace with a Fluent-inspired interface.");ui.label(RichText::new("Built with eframe/egui and OpenSSH. No original branding or bundled engines are reused.").size(12.).color(muted(ui)));ui.add_space(5.);ui.label(RichText::new("Feature and platform qualification is tracked in the project checklists. See Tools → Runtime for engine availability.").size(12.).color(muted(ui)));});
+            }
         });
-        ui.checkbox(
-            &mut self.store.preferences.confirm_session_close,
-            "Confirm closing active sessions",
-        );
-        ui.label("Terminal clipboard and selection");
-        ui.checkbox(
-            &mut self.store.preferences.clipboard.copy_on_select,
-            "Copy selection automatically on release",
-        );
-        ui.horizontal(|ui| {
-            ui.label("Right click");
-            ui.selectable_value(
-                &mut self.store.preferences.clipboard.right_click,
-                RightClickBehavior::ContextMenu,
-                "Context menu",
-            );
-            ui.selectable_value(
-                &mut self.store.preferences.clipboard.right_click,
-                RightClickBehavior::Paste,
-                "Paste (Shift-right-click for menu)",
-            );
-        });
-        ui.horizontal(|ui| {
-            ui.label("Word delimiters");
-            ui.text_edit_singleline(&mut self.store.preferences.clipboard.word_delimiters);
-        });
-        ui.small("Alt-drag selects a rectangle. Ctrl+Shift+C copies; Ctrl+Shift+V pastes. Hold Shift to select when a terminal program uses the mouse. Save preferences below to keep these options.");
-        if ui.button("Configure terminal highlighting").clicked() {
-            self.highlight_editor = Some(super::highlighting::Editor::from_preferences(
-                &self.store.preferences,
-            ));
-        }
-        ScrollArea::vertical().show(ui,|ui|{surface(ui).show(ui,|ui|{ui.label(RichText::new("Terminal").size(18.).strong());Grid::new("prefs").num_columns(2).spacing([24.,17.]).show(ui,|ui|{ui.label("Scrollback lines");ui.add(DragValue::new(&mut self.store.preferences.scrollback).range(100..=360000));ui.end_row();ui.label("History memory");ui.label("128 MiB per terminal; older lines expire when either limit is reached");ui.end_row();ui.label("SSH keepalive interval");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.keepalive_secs).range(1..=86400).suffix("s"));ui.end_row();ui.label("SSH connect timeout");ui.add(DragValue::new(&mut self.store.preferences.ssh_defaults.connect_timeout_secs).range(1..=3600).suffix("s"));ui.end_row();ui.label("Appearance");self.appearance_picker(ui);ui.end_row();field(ui,"Default shell executable",&mut self.store.preferences.shell,"Use the system default");field(ui,"Download folder",&mut self.store.preferences.downloads,"Folder path");});if primary(ui,"Save preferences").clicked(){self.persist();}});ui.add_space(17.);
-   surface(ui).show(ui,|ui|{ui.label(RichText::new("Sessions and backups").size(18.).strong());ui.label(RichText::new("Session settings, folders, tunnels and macros are stored locally. Exported backups contain hostnames and key-file paths, but no passwords.").color(muted(ui)));ui.horizontal(|ui|{
-    if ui.button("Export workspace").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("termcraft-workspace.json").save_file(){match self.store.save(&p){Ok(())=>self.message("Workspace exported"),Err(e)=>self.message(e)}}}
-    if ui.button("Import workspace").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Workspace JSON",&["json"]).pick_file(){match Store::load_bounded(&p, 16 * 1024 * 1024).and_then(|mut imported| { let mut macros = self.store.macros.clone(); macros.append(&mut imported.macros); super::macro_events::validate_library(&macros)?; imported.macros = macros; Ok(imported) }) { Ok(imported) => { self.store.sessions.extend(imported.sessions.into_iter().map(|mut session| {session.id=harbor_workspace::model::new_session_id();session})); self.store.tunnels.extend(imported.tunnels.into_iter().take(5_usize.saturating_sub(self.store.tunnels.len()))); self.store.macros = imported.macros; self.persist(); }, Err(error) => self.message(error) }}}
-   });if !self.store_ok{ui.colored_label(Color32::from_rgb(180,42,42),"The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.persist();},Err(e)=>self.message(e.to_string())}}}});
-   ui.add_space(17.);surface(ui).show(ui,|ui|{ui.label(RichText::new("About TermCraft").size(18.).strong());ui.label("An independently written Rust desktop remote workspace with a Fluent-inspired interface.");ui.label(RichText::new("Built with eframe/egui and OpenSSH. No original branding or bundled engines are reused.").size(12.).color(muted(ui)));ui.add_space(5.);ui.label(RichText::new("Original feature parity has not been established. Linux terminal operation is tested; Windows and macOS need platform validation. See Network tools for engine availability and known gaps.").size(12.).color(muted(ui)));});
-  });
     }
+}
+pub(super) fn history_status(ui: &mut Ui, t: &TerminalTab) {
+    let stats = t.screen.stats();
+    ui.small(format!(
+        "History: {} lines · {:.1} / {} MiB{}",
+        t.screen.history().len(),
+        stats.history_bytes as f64 / (1024. * 1024.),
+        stats.history_budget / (1024 * 1024),
+        if stats.discarded_lines > 0 {
+            format!(" · {} older lines expired", stats.discarded_lines)
+        } else {
+            String::new()
+        }
+    ));
 }
 pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -> Vec<u8> {
     if t.session.protocol == "Browser" && t.session.browser_options.embedded {
@@ -1371,7 +1973,11 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
     if t.gateway.is_some() && t.desktop.is_none() && t.process.is_none() && t.legacy.is_none() {
         ui.label(&t.connection_status);
         if !t.error.is_empty() {
-            ui.colored_label(ui.visuals().error_fg_color, &t.error);
+            crate::ui::errors::show(
+                ui,
+                crate::ui::errors::protocol(&t.session.protocol),
+                &t.error,
+            );
         }
         super::remote_files::authentication_ui(ui, t);
         return Vec::new();
@@ -1387,8 +1993,9 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
     t.apply_terminal_preferences(p);
     t.highlights.update(&p.highlight_rules);
     if let Some(error) = &t.highlights.error {
-        ui.colored_label(
-            ui.visuals().error_fg_color,
+        crate::ui::errors::show(
+            ui,
+            crate::ui::errors::Domain::Session,
             format!("Highlight settings rejected; retaining the previous valid rules: {error}"),
         );
     }
@@ -1408,18 +2015,6 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
             t.codec.errors()
         ));
     }
-    let stats = t.screen.stats();
-    ui.small(format!(
-        "History: {} lines · {:.1} / {} MiB{}",
-        t.screen.history().len(),
-        stats.history_bytes as f64 / (1024. * 1024.),
-        stats.history_budget / (1024 * 1024),
-        if stats.discarded_lines > 0 {
-            format!(" · {} older lines expired", stats.discarded_lines)
-        } else {
-            String::new()
-        }
-    ));
     let scroll_action = super::shortcuts::terminal_actions(ui, t, p);
     let height = ui.available_height().max(150.);
     let font = FontId::new(
@@ -1442,6 +2037,7 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
         t.screen.resize(cols, rows);
         t.resize_transport();
     }
+    let cursor_on = super::terminal_cursor::visible(ui, t, p);
     let dark = ui.visuals().dark_mode;
     let palette = if dark {
         &t.terminal_settings.dark_palette
@@ -1576,7 +2172,7 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
                     clicked |= label.clicked();
                     hovered |= label.hovered();
                     any_selection |= label.dragged();
-                    if index == hist + t.screen.row && t.screen.cursor_visible && t.running() {
+                    if index == hist + t.screen.row && cursor_on {
                         let cursor = Rect::from_min_size(
                             label.rect.min
                                 + vec2(t.screen.col.min(t.screen.cols - 1) as f32 * cell_width, 0.),
@@ -1596,6 +2192,13 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
     t.history_offset = frame.inner;
     let id = Id::new(("terminal-input", t.id));
     let response = ui.interact(frame.response.rect, id, Sense::click());
+    if super::shortcuts::input_blocked(ui.ctx(), t.id)
+        || !ui.memory(|m| m.allows_interaction(ui.layer_id()))
+    {
+        t.macro_state.terminal_focus(ui.ctx(), false);
+        t.route_mouse(ui.ctx(), &viewport, false, &[], ui.input(|i| i.modifiers));
+        return Vec::new();
+    }
     let pointer_events = ui.input(|i| i.events.clone());
     let pointer_press=pointer_events.iter().any(|event| matches!(event,Event::PointerButton{pos,pressed:true,..} if selection_viewport.cell(ui.ctx(),*pos).is_some()));
     if response.clicked() || clicked || pointer_press {
@@ -1608,7 +2211,9 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
     let focused = response.has_focus();
     t.macro_state.terminal_focus(
         ui.ctx(),
-        focused && ui.input(|input| input.focused) && !super::shortcuts::input_blocked(ui.ctx()),
+        focused
+            && ui.input(|input| input.focused)
+            && !super::shortcuts::input_blocked(ui.ctx(), t.id),
     );
     let mut outgoing = Vec::new();
     let can_send = t.ssh.is_none()
@@ -1672,7 +2277,7 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
         && !any_selection
         && can_send
         && !t.input_busy()
-        && !super::shortcuts::input_blocked(ui.ctx())
+        && !super::shortcuts::input_blocked(ui.ctx(), t.id)
     {
         let mut deferred_rejected = false;
         let mut application_text = false;
@@ -1962,7 +2567,8 @@ fn terminal_layout_profile(
         let measured = measure.is_some();
         if let Some(measure) = &mut measure {
             let known_monospace = font.family == FontFamily::Monospace
-                || font.family == FontFamily::Name("DejaVu Sans Mono".into());
+                || font.family == FontFamily::Name("DejaVu Sans Mono".into())
+                || font.family == FontFamily::Name("JetBrains Mono Nerd Font".into());
             if !c.text.is_ascii() || c.text.len() != 1 || !known_monospace {
                 advance = measure(&c.text, &cell_font);
                 let target = cell_width * c.width.max(1) as f32;
@@ -1994,18 +2600,36 @@ fn terminal_layout_profile(
     }
     (job, backgrounds)
 }
+pub(super) fn session_path(
+    ui: &mut Ui,
+    name: &str,
+    value: &mut String,
+    hint: &str,
+    pick: fn(rfd::FileDialog) -> Option<PathBuf>,
+) {
+    fluent::form_row(ui, name, |ui, label| {
+        ui.horizontal(|ui| {
+            let width = (ui.available_width() - 84.).max(1.);
+            fluent::text_input(ui, label, value, hint, width);
+            if ui.button("Browse").clicked()
+                && let Some(path) = pick(rfd::FileDialog::new())
+            {
+                *value = path.to_string_lossy().into_owned();
+            }
+        });
+    });
+}
+
 fn field(ui: &mut Ui, label: &str, value: &mut String, hint: &str) {
-    ui.label(label);
-    ui.add(
-        TextEdit::singleline(value)
-            .hint_text(hint)
-            .desired_width(390.),
-    );
+    super::fluent::field(ui, label, value, hint, 390.);
     ui.end_row();
 }
 pub(super) fn page_heading(ui: &mut Ui, title: &str, description: &str) {
     ui.add_space(20.);
-    ui.label(RichText::new(title).size(27.).strong());
+    ui.label(fluent::emphasized(
+        ui.ctx(),
+        RichText::new(title).size(fluent::PAGE_TITLE),
+    ));
     ui.label(RichText::new(description).color(muted(ui)));
     ui.add_space(20.);
 }
@@ -2014,7 +2638,10 @@ fn empty_state(ui: &mut Ui, kind: &str, title: &str, description: &str) {
     ui.vertical_centered(|ui| {
         icon(ui, kind, 42., accent(ui));
         ui.add_space(10.);
-        ui.label(RichText::new(title).size(21.).strong());
+        ui.label(crate::ui::fluent::emphasized(
+            ui.ctx(),
+            RichText::new(title).size(21.),
+        ));
         ui.add_space(5.);
         ui.label(RichText::new(description).color(muted(ui)));
     });

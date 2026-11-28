@@ -1,0 +1,23 @@
+{
+  "source_commit": "6571b95a0489f350680c969b75617a0377254cd4",
+  "equivalent_app_source_at_issue_base": "3059bac10b0ef39479a3286a07fa0124175064d1",
+  "platform": "Linux x86-64 X11, disposable Ubuntu, software rendering",
+  "date": "2026-11-27",
+  "scope": "Actual app pointer workflows in isolated empty workspace; no remote endpoints; physical GPU and other platforms not observed",
+  "captures": {
+    "session-light-100.png": {
+      "sha256": "95463112a8f48e5a95705bfb6c0ba7528fdec8b446913be752a5e64e1478c47e",
+      "viewport": [
+        1920,
+        1080
+      ]
+    },
+    "tools-dark-minimum.png": {
+      "sha256": "082d777262ec62d34b09b43d7f85b32cb08355bbfdf814c78998ee084b29ff4d",
+      "viewport": [
+        920,
+        620
+      ]
+    }
+  }
+}

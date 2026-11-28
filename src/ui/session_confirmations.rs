@@ -271,7 +271,7 @@ impl Workspace {
         }
     }
     pub(super) fn request_window_session_close(&mut self, ctx: &Context) {
-        if self.intercept_game_exit(ctx) {
+        if self.intercept_game_exit(ctx) || self.confirm_local_document_exit(ctx) {
             return;
         }
         let mut controller = CloseController::default();
@@ -294,6 +294,13 @@ impl Workspace {
             return;
         }
         if ctx.input(|i| i.viewport().close_requested()) && self.intercept_game_exit(ctx) {
+            return;
+        }
+        if ctx.input(|i| i.viewport().close_requested())
+            && !self.pending_remote_exit
+            && !self.remote_documents_block_close(None)
+            && self.confirm_local_document_exit(ctx)
+        {
             return;
         }
         if ctx.input(|i| i.viewport().close_requested())
@@ -355,6 +362,9 @@ impl Workspace {
                     ctx.send_viewport_cmd(ViewportCommand::CancelClose);
                     return;
                 }
+                if self.confirm_local_document_exit(ctx) {
+                    return;
+                }
                 self.allow_session_exit = true;
                 ctx.send_viewport_cmd(ViewportCommand::Close);
             }
@@ -393,7 +403,10 @@ impl Workspace {
         ids.sort_unstable();
         ids.dedup();
         if after.len > MAX_AFTER_PASTE {
-            self.message("Too much typed input followed the paste; the paste was cancelled.");
+            self.error_in(
+                errors::Domain::Clipboard,
+                "Too much typed input followed the paste; the paste was cancelled.",
+            );
             return;
         }
         if self.pending_paste.is_some() {
@@ -405,11 +418,14 @@ impl Workspace {
             .filter_map(|id| self.tabs.iter().find(|t| t.id == *id))
             .collect();
         if targets.len() != ids.len() {
-            self.message("Paste cancelled: an original target has closed.");
+            self.error_in(
+                errors::Domain::Clipboard,
+                "Paste cancelled: an original target has closed.",
+            );
             return;
         }
         if targets.len() > 1 && targets.iter().any(|t| !t.broadcast_allowed()) {
-            self.message("Paste cancelled: compatibility clients require private input because their authentication is not observable.");
+            self.error_in(errors::Domain::Clipboard,"Paste cancelled: compatibility clients require private input because their authentication is not observable.");
             return;
         }
         if targets.is_empty()
@@ -419,7 +435,7 @@ impl Workspace {
                     || t.ssh.is_some() && (!t.ssh_connected || t.auth.is_some())
             })
         {
-            self.message("Paste was not started: every target must be connected and ready, with no paste already active.");
+            self.error_in(errors::Domain::Clipboard,"Paste was not started: every target must be connected and ready, with no paste already active.");
             return;
         }
         if text
@@ -428,7 +444,8 @@ impl Workspace {
             .saturating_mul(targets.len())
             > 16 * 1024 * 1024
         {
-            self.message(
+            self.error_in(
+                errors::Domain::Clipboard,
                 "Paste target batch exceeds 16 MiB. Select fewer targets or paste less text.",
             );
             return;
@@ -441,7 +458,7 @@ impl Workspace {
                 .encode(&text)
                 .and_then(|_| after.validate_for(tab))
             {
-                self.message(error);
+                self.error_in(errors::Domain::Clipboard, error);
                 return;
             }
             let settings = harbor_workspace::terminal::paste::PasteSettings {
@@ -455,7 +472,7 @@ impl Workspace {
                     jobs.push((tab.id, c));
                 }
                 PasteDecision::Reject(error) => {
-                    self.message(error);
+                    self.error_in(errors::Domain::Clipboard, error);
                     return;
                 }
             }
@@ -537,37 +554,78 @@ impl Workspace {
         if let Some(pending) = &self.pending_paste {
             let mut approve = false;
             let mut cancel = false;
-            Window::new("Confirm multiline paste").id(Id::new("paste-confirmation")).collapsible(false).show(ctx,|ui|{
-                ui.label(format!("Send this text to {} original terminal target(s)? Newlines can execute commands.",pending.jobs.len()));
-                for (id,_) in &pending.jobs {if let Some(tab)=self.tabs.iter().find(|t|t.id==*id){ui.label(self.confirmation_target(tab.id));}}
-                if let Some((_,paste))=pending.jobs.first(){ScrollArea::vertical().max_height(180.).show(ui,|ui|{ui.label(RichText::new(paste.preview()).monospace());});}
-                ui.horizontal(|ui|{approve=primary(ui,"Paste to these targets").clicked();cancel=ui.button("Cancel paste").clicked();});
-            });
+            let size = super::fluent::dialog_size(ctx, 480., 114.);
+            let response = super::fluent::modal(
+                ctx,
+                Id::new("paste-confirmation"),
+                "Confirm multiline paste",
+                size,
+                |ui| {
+                    super::fluent::dialog_body(ui, size, |ui| {
+                        ui.label(format!("Send this text to {} original terminal target(s)? Newlines can execute commands.", pending.jobs.len()));
+                        for (id, _) in &pending.jobs {
+                            if self.tabs.iter().any(|tab| tab.id == *id) {
+                                ui.label(self.confirmation_target(*id));
+                            }
+                        }
+                        if let Some((_, paste)) = pending.jobs.first() {
+                            ui.label(RichText::new(paste.preview()).monospace());
+                        }
+                    });
+                    let [send, safe] = fluent::dialog_actions(
+                        ui,
+                        ["Paste to these targets", "Cancel paste"],
+                        Some(1),
+                    );
+                    approve = send.clicked();
+                    fluent::focus_on_entry(ui, &safe, ui.id());
+                    cancel = safe.clicked();
+                },
+            );
+            cancel |= response.should_close();
             if approve || cancel {
-                self.resolve_paste(approve);
+                self.resolve_paste(approve && !cancel);
             }
+            return;
         }
         if let Some(pending) = &self.pending_session_close {
             let mut approve = false;
             let mut cancel = false;
-            Window::new(if matches!(pending.target,CloseTarget::Reconnect(_)){"Reconnect active session?"}else{"Close active sessions?"})
-                .id(Id::new("active-session-close"))
-                .collapsible(false)
-                .show(ctx, |ui| {
-                    ui.label(if matches!(pending.target,CloseTarget::Reconnect(_)){"Reconnect terminates the current process or connection before starting a new session."}else{"Closing terminates the session processes and connections."});
-                    for tab in self.tabs.iter().filter(|t| match pending.target {
-                        CloseTarget::Window => t.running(),
-                        CloseTarget::Tab(id) | CloseTarget::Reconnect(id) => t.id == id,
-                    }) {
-                        ui.label(self.confirmation_target(tab.id));
-                    }
-                    ui.horizontal(|ui| {
-                        approve = ui.button("Close sessions").clicked();
-                        cancel = primary(ui, "Keep sessions open").clicked();
+            let reconnect = matches!(pending.target, CloseTarget::Reconnect(_));
+            let size = super::fluent::dialog_size(ctx, 480., 114.);
+            let response = super::fluent::modal(
+                ctx,
+                Id::new("active-session-close"),
+                if reconnect {
+                    "Reconnect active session?"
+                } else {
+                    "Close active sessions?"
+                },
+                size,
+                |ui| {
+                    super::fluent::dialog_body(ui, size, |ui| {
+                        ui.label(if matches!(pending.target,CloseTarget::Reconnect(_)){"Reconnect terminates the current process or connection before starting a new session."}else{"Closing terminates the session processes and connections."});
+                        for tab in self.tabs.iter().filter(|t| match pending.target {
+                            CloseTarget::Window => t.running(),
+                            CloseTarget::Tab(id) | CloseTarget::Reconnect(id) => t.id == id,
+                        }) {
+                            ui.label(self.confirmation_target(tab.id));
+                        }
                     });
-                });
+                    let labels = if reconnect {
+                        ["Reconnect session", "Stay connected"]
+                    } else {
+                        ["Close sessions", "Keep sessions open"]
+                    };
+                    let [confirm, safe] = fluent::dialog_actions(ui, labels, Some(1));
+                    approve = confirm.clicked();
+                    fluent::focus_on_entry(ui, &safe, ui.id());
+                    cancel = safe.clicked();
+                },
+            );
+            cancel |= response.should_close();
             if approve || cancel {
-                self.resolve_session_close(approve, ctx);
+                self.resolve_session_close(approve && !cancel, ctx);
             }
         }
     }

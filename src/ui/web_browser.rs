@@ -123,10 +123,12 @@ pub(super) fn settings(ui: &mut Ui, session: &mut Session) {
                 "Installed Chromium (compatibility)",
             );
         });
-        ui.horizontal(|ui| {
-            ui.label("Proxy endpoint");
-            ui.add(TextEdit::singleline(&mut options.proxy).hint_text("http://proxy.example:8080"));
-        });
+        fluent::form_text(
+            ui,
+            "Proxy endpoint",
+            &mut options.proxy,
+            "http://proxy.example:8080",
+        );
         #[cfg(windows)]
         ui.small("Requires a native 64-bit installation of Chrome or Chromium.");
         if !cfg!(any(target_os = "linux", target_os = "macos", windows)) {
@@ -137,11 +139,14 @@ pub(super) fn settings(ui: &mut Ui, session: &mut Session) {
 
 pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     let Some(browser) = &mut tab.web_browser else {
-        ui.colored_label(ui.visuals().error_fg_color, &tab.error);
+        crate::ui::errors::show(ui, crate::ui::errors::Domain::Browser, &tab.error);
         return;
     };
     let state = browser.handle.state();
-    if state.challenge.is_some() || !ui.is_enabled() || !ui.input(|input| input.focused) {
+    let blocked = super::shortcuts::input_blocked(ui.ctx(), tab.id)
+        || !ui.memory(|m| m.allows_interaction(ui.layer_id()));
+    if blocked || state.challenge.is_some() || !ui.is_enabled() || !ui.input(|input| input.focused)
+    {
         browser.release_pointer(PointerRelease::Cancel);
     }
     if !state.closed {
@@ -168,52 +173,8 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     if let Some(text) = browser.handle.take_copy() {
         ui.ctx().copy_text(text);
     }
-    let address_id = ui.make_persistent_id(("website-address", tab.id));
-    if !browser.address_dirty {
-        browser.address.clone_from(&state.address);
-    }
-    ui.add_enabled_ui(!state.closed, |ui| {
-        ui.horizontal(|ui| {
-            if ui
-                .add_enabled(state.can_back, Button::new("Back"))
-                .clicked()
-            {
-                browser.send(Command::History(-1));
-            }
-            if ui
-                .add_enabled(state.can_forward, Button::new("Forward"))
-                .clicked()
-            {
-                browser.send(Command::History(1));
-            }
-            if state.loading {
-                if ui.button("Stop").clicked() {
-                    browser.send(Command::Stop);
-                }
-            } else if ui.button("Reload").clicked() {
-                browser.send(Command::Reload);
-            }
-            let response = ui.add(
-                TextEdit::singleline(&mut browser.address)
-                    .id(address_id)
-                    .char_limit(8192)
-                    .desired_width((ui.available_width() - 45.).max(90.)),
-            );
-            browser.address_dirty |= response.changed();
-            let go = ui.button("Go");
-            let submit = go.clicked()
-                || (response.lost_focus() && ui.input(|input| input.key_pressed(Key::Enter)));
-            if submit {
-                browser.send(Command::Navigate(browser.address.clone()));
-            }
-            if submit || (!response.has_focus() && !go.is_pointer_button_down_on()) {
-                browser.address_dirty = false;
-                browser.address.clone_from(&state.address);
-            }
-        });
-    });
     if let Some(error) = browser.input_error {
-        ui.add(Label::new(error).truncate());
+        crate::ui::errors::show(ui, crate::ui::errors::Domain::Browser, error);
     } else if state.loading {
         ui.horizontal(|ui| {
             ui.spinner();
@@ -223,7 +184,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         ui.add(Label::new(&state.title).truncate());
     }
     if let Some(error) = &state.error {
-        ui.colored_label(ui.visuals().error_fg_color, error);
+        crate::ui::errors::show(ui, crate::ui::errors::Domain::Browser, error);
     }
     if let Some(notice) = &state.notice {
         ui.small(notice);
@@ -244,7 +205,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         let auth = browser.auth.as_mut().unwrap();
         let command = ui
             .group(|ui| {
-                ui.label(if challenge.proxy {
+                ui.strong(if challenge.proxy {
                     "Proxy authentication"
                 } else {
                     "Website authentication"
@@ -254,17 +215,24 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
                     (&mut auth.username, "Username", false),
                     (&mut auth.password, "Password", true),
                 ] {
-                    let mut output = TextEdit::singleline(&mut **value)
+                    let mut output = crate::ui::fluent::singleline(&mut **value)
                         .id_salt((tab.id, challenge.id, hint))
                         .hint_text(hint)
                         .password(password)
                         .char_limit(if password { 4096 } else { 1024 })
                         .show(ui);
+                    if !password {
+                        super::fluent::focus_on_entry(
+                            ui,
+                            &output.response,
+                            egui::Id::new((tab.id, challenge.id)),
+                        );
+                    }
                     // Keep the challenge fields out of egui's cross-frame undo history.
                     output.state.clear_undoer();
                     output.state.store(ui.ctx(), output.response.id);
                 }
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     let send = ui.button("Sign in").clicked();
                     let cancel = ui.button("Cancel").clicked();
                     (send || cancel).then(|| Command::Auth {
@@ -334,7 +302,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
             frame,
         });
     }
-    if state.challenge.is_some() || state.closed || !ui.is_enabled() {
+    if blocked || state.challenge.is_some() || state.closed || !ui.is_enabled() {
         return;
     }
     if response.clicked() || response.drag_started() {
@@ -558,3 +526,63 @@ fn key_code(name: &str, key: Key) -> String {
 ))]
 #[path = "web_browser_tests.rs"]
 mod tests;
+
+pub(super) fn toolbar(ui: &mut Ui, tab: &mut TerminalTab) {
+    let Some(browser) = &mut tab.web_browser else {
+        return;
+    };
+    let state = browser.handle.state();
+    let address_id = ui.make_persistent_id(("website-address", tab.id));
+    if !browser.address_dirty {
+        browser.address.clone_from(&state.address);
+    }
+    ui.add_enabled_ui(!state.closed, |ui| {
+        ui.horizontal(|ui| {
+            if ui
+                .add_enabled_ui(state.can_back, |ui| {
+                    super::icons::button(ui, "back", "Back", false)
+                })
+                .inner
+                .clicked()
+            {
+                browser.send(Command::History(-1));
+            }
+            if ui
+                .add_enabled_ui(state.can_forward, |ui| {
+                    super::icons::button(ui, "forward", "Forward", false)
+                })
+                .inner
+                .clicked()
+            {
+                browser.send(Command::History(1));
+            }
+            if state.loading {
+                if super::icons::button(ui, "disconnect", "Stop", false).clicked() {
+                    browser.send(Command::Stop);
+                }
+            } else if super::icons::button(ui, "refresh", "Reload", false).clicked() {
+                browser.send(Command::Reload);
+            }
+            let response = ui.add(
+                crate::ui::fluent::singleline(&mut browser.address)
+                    .id(address_id)
+                    .char_limit(8192)
+                    .desired_width((ui.available_width() - 62.).max(1.)),
+            );
+            response.widget_info(|| {
+                WidgetInfo::labeled(WidgetType::TextEdit, response.enabled(), "Website address")
+            });
+            browser.address_dirty |= response.changed();
+            let go = ui.button("Go");
+            let submit = go.clicked()
+                || (response.lost_focus() && ui.input(|input| input.key_pressed(Key::Enter)));
+            if submit {
+                browser.send(Command::Navigate(browser.address.clone()));
+            }
+            if submit || (!response.has_focus() && !go.is_pointer_button_down_on()) {
+                browser.address_dirty = false;
+                browser.address.clone_from(&state.address);
+            }
+        });
+    });
+}

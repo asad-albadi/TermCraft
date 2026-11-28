@@ -8,7 +8,15 @@ Dependencies: eframe/egui (MIT OR Apache-2.0), serde and serde_json (MIT OR Apac
 
 The supplied executable is used only as investigation evidence. The original program and product names belong to their owners. No affiliation is claimed.
 
-Interface typography: Liberation Sans (SIL Open Font License 1.1) and DejaVu Sans Mono (Bitstream Vera/DejaVu license); full license texts are included beside the font assets. These are system-font copies, not assets extracted from the original.
+The Windows interface uses the installed Segoe UI regular and semibold pair when available. The cross-platform interface uses the unmodified Selawik Regular and Semibold faces from Microsoft, licensed under the SIL Open Font License 1.1. The license is included in `assets/Selawik-LICENSE`. Both files come from the [Selawik 1.01 release](https://github.com/microsoft/Selawik/releases/tag/1.01).
+
+| File | SHA-256 |
+| --- | --- |
+| Upstream Selawik_Release.zip | 3f62c51e05e3b5a1e6241cf92a371f0be2ea1183aa87b30718bbd40832a8d423 |
+| Selawik.ttf (selawk.ttf) | e9d98518d8ac2817782a9a382430463a2e0793ea68350b695bb727d9a830ee1c |
+| Selawik-Semibold.ttf (selawksb.ttf) | 0a9e9d0549a10f24bef9b3a29e06fe6e0b5c21e7a784c503b048a307841a7783 |
+
+Fallback and terminal typography: Liberation Sans (SIL Open Font License 1.1) and DejaVu Sans Mono (Bitstream Vera/DejaVu license); full license texts are included beside the font assets. These are system-font copies, not assets extracted from the original.
 
 Embedded SSH/SFTP dependencies: russh (Apache-2.0), russh-sftp (MIT), tokio (MIT), zeroize (Apache-2.0 OR MIT), hmac, sha1 and sha2 (MIT OR Apache-2.0). Exact versions and transitive packages are recorded in Cargo.lock.
 
@@ -48,3 +56,9 @@ noVNC 1.7.0 by the noVNC authors, primarily Mozilla Public License 2.0; its inco
 Local original-package inspection uses zip 9.8.2 (MIT) and lzma-rs 0.3.0 (MIT), with CRC/crc-catalog (MIT OR Apache-2.0), typed-path (MIT OR Apache-2.0), constant_time_eq (CC0-1.0 OR MIT-0 OR Apache-2.0), and zeroize_derive (MIT OR Apache-2.0) as pinned in Cargo.lock. These independently implemented codecs decode user-selected archive bytes; original packages, executables, DLLs and other vendor assets are not bundled. Dependency source and licenses are recorded under `docs/parity-evidence/legacy-package-import/`.
 
 The optional Linux XDMCP clipboard engine derives from X.Org Xephyr 21.1.26 with a small session-readiness patch and xtrans 1.6.0 headers. Its pinned build inputs, patch, rebuild script and notices are recorded in `packaging/x11/xdmcp/readiness`; it is distinct from the unchanged stock Xephyr used when the host keyboard is inherited and clipboard is disabled. Native platform qualification is not inferred from this Linux build.
+
+Terminal coding font: JetBrains Mono Nerd Font Mono Regular, from Nerd Fonts v3.4.0 (upstream revision `fa7b859994228a9c8759f99c55a8d31ee92a1b5e`). The unmodified patched font is bundled under SIL OFL 1.1 with `assets/JetBrainsMono-OFL.txt` and the upstream `assets/NerdFonts-LICENSE`. The Mono variant supplies fixed-width Powerline/Nerd Font symbols used by modern shell prompts. Existing explicitly selected terminal faces are retained and gain this glyph fallback.
+
+| Font asset | SHA-256 |
+| --- | --- |
+| JetBrainsMonoNerdFontMono-Regular.ttf | f01031f40e48dc29e1112e6b0b0450a2c6cd097f3f35cfff05c55cb311f8034c |

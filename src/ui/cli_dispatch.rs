@@ -238,7 +238,10 @@ impl Workspace {
                 break;
             };
             if let Err(error) = self.dispatch_action(request.action, ctx) {
-                self.message(format!("Launch request {} failed: {error}", request.id));
+                self.error_in(
+                    errors::Domain::CommandLine,
+                    format!("Launch request {} failed: {error}", request.id),
+                );
             }
         }
         self.poll_macros(ctx);

@@ -29,6 +29,74 @@ fn authenticate(session: &DesktopSession, id: u64) {
         .unwrap();
 }
 
+#[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
+fn classic_remotefx_decodes_the_server_tile_and_preserves_key_order() {
+    let server = rdp_server::Server::with_remotefx();
+    let mut session = DesktopSession::connect(server.config(8162)).unwrap();
+    until(&mut session, |session, event| match event {
+        DesktopEvent::Authentication { id, .. } => {
+            authenticate(session, id);
+            false
+        }
+        DesktopEvent::Frame(frame) => {
+            assert_eq!((frame.width, frame.height), (640, 480));
+            if frame.pixels[0] == 0 {
+                return false;
+            }
+            // The pinned RemoteFX encoder quantizes this uniform red by one.
+            // This distinguishes an actual RemoteFX frame from the exact bitmap fallback.
+            assert_eq!(frame.pixels[0], 254);
+            for row in frame.pixels.chunks_exact(640 * 4).take(64) {
+                for pixel in row[..64 * 4].chunks_exact(4) {
+                    assert!(pixel[0].abs_diff(255) <= 1 && pixel[1] <= 1 && pixel[2] <= 1);
+                    assert_eq!(pixel[3], 255);
+                }
+            }
+            assert_eq!(&frame.pixels[64 * 4..65 * 4], &[0, 0, 0, 255]);
+            true
+        }
+        DesktopEvent::Disconnected { message } => panic!("{message}"),
+        _ => false,
+    });
+    for pressed in [true, false] {
+        session
+            .send(DesktopInput::Key {
+                code: 30,
+                extended: false,
+                pressed,
+            })
+            .unwrap();
+    }
+    let end = Instant::now() + Duration::from_secs(3);
+    loop {
+        let observations = server.observations();
+        let keys: Vec<_> = observations
+            .lines()
+            .filter(|line| line.starts_with("key:"))
+            .collect();
+        if keys.len() >= 2 {
+            assert_eq!(
+                keys,
+                [
+                    "key:Pressed { code: 30, extended: false }",
+                    "key:Released { code: 30, extended: false }"
+                ]
+            );
+            break;
+        }
+        assert!(
+            Instant::now() < end,
+            "RemoteFX fixture did not receive both key transitions"
+        );
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    session.close();
+}
+
 #[cfg(windows)]
 #[test]
 #[ignore = "requires the native RDP software endpoint and OpenSSL"]
@@ -131,6 +199,229 @@ fn rdp_frame_updates_render_inside_workspace() {
     );
     session.close();
 }
+#[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
+fn unsuccessful_nla_reports_a_safe_sign_in_diagnostic_before_desktop_setup() {
+    let server = rdp_server::Server::start();
+    let mut session = DesktopSession::connect(server.config(8144)).unwrap();
+    let mut submitted = false;
+    until(&mut session, |session, event| match event {
+        DesktopEvent::Authentication { id, .. } => {
+            session
+                .send(DesktopInput::Authenticate {
+                    id,
+                    user: "fixture-user".into(),
+                    password: harbor_workspace::credentials::Secret::new(
+                        "intentionally-incorrect-test-password",
+                    ),
+                    domain: String::new(),
+                })
+                .unwrap();
+            submitted = true;
+            false
+        }
+        DesktopEvent::Connected { .. } | DesktopEvent::Frame(_) => {
+            panic!("Incorrect password opened a desktop")
+        }
+        DesktopEvent::Disconnected { message } => {
+            assert!(submitted);
+            assert_eq!(
+                message,
+                "RDP sign-in rejected (CredSSP, SSPI InvalidToken 0x80090308, NTSTATUS 0xC007030C)"
+            );
+            true
+        }
+        _ => false,
+    });
+}
+#[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
+fn client_resize_negotiates_and_returns_a_pane_sized_frame() {
+    let server = rdp_server::Server::start();
+    let mut session = DesktopSession::connect(server.config(8141)).unwrap();
+    until(&mut session, |session, event| match event {
+        DesktopEvent::Authentication { id, .. } => {
+            authenticate(session, id);
+            false
+        }
+        DesktopEvent::Frame(frame) => {
+            (frame.width, frame.height) == (640, 480)
+                && frame.pixels.get(..4) == Some(&[255, 0, 0, 255])
+        }
+        DesktopEvent::Disconnected { message } => panic!("{message}"),
+        _ => false,
+    });
+    session
+        .send(DesktopInput::Resize {
+            width: 934,
+            height: 578,
+        })
+        .unwrap();
+    until(&mut session, |_, event| match event {
+        DesktopEvent::Frame(frame) => {
+            (frame.width, frame.height) == (934, 578)
+                && frame.pixels.len() == 934 * 578 * 4
+                && frame.pixels.get(..4) == Some(&[255, 0, 0, 255])
+        }
+        DesktopEvent::Disconnected { message } => panic!("{message}"),
+        _ => false,
+    });
+    assert!(
+        server
+            .observations()
+            .lines()
+            .any(|line| line == "client_resize:934x578")
+    );
+    session.close();
+}
+#[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
+fn input_during_client_resize_remains_ordered_across_reactivation() {
+    let server = rdp_server::Server::start();
+    let mut session = DesktopSession::connect(server.config(8142)).unwrap();
+    until(&mut session, |session, event| match event {
+        DesktopEvent::Authentication { id, .. } => {
+            authenticate(session, id);
+            false
+        }
+        DesktopEvent::Frame(frame) => frame.pixels.get(..4) == Some(&[255, 0, 0, 255]),
+        DesktopEvent::Disconnected { message } => panic!("{message}"),
+        _ => false,
+    });
+    session
+        .send(DesktopInput::Resize {
+            width: 822,
+            height: 461,
+        })
+        .unwrap();
+    let mut expected = Vec::new();
+    for code in 30..50 {
+        for (key, pressed) in [(29, true), (code, true), (code, false), (29, false)] {
+            session
+                .send(DesktopInput::Key {
+                    code: key,
+                    extended: false,
+                    pressed,
+                })
+                .unwrap();
+            expected.push(format!(
+                "key:{} {{ code: {key}, extended: false }}",
+                if pressed { "Pressed" } else { "Released" }
+            ));
+        }
+        std::thread::sleep(Duration::from_millis(3));
+    }
+    until(&mut session, |_, event| match event {
+        DesktopEvent::Frame(frame) => {
+            (frame.width, frame.height) == (822, 461)
+                && frame.pixels.get(..4) == Some(&[255, 0, 0, 255])
+        }
+        DesktopEvent::Disconnected { message } => panic!("{message}"),
+        _ => false,
+    });
+    let deadline = Instant::now() + Duration::from_secs(3);
+    loop {
+        let observations = server.observations();
+        let keys: Vec<_> = observations
+            .lines()
+            .filter(|line| line.starts_with("key:"))
+            .collect();
+        if keys.len() >= expected.len() {
+            assert_eq!(keys, expected);
+            break;
+        }
+        assert!(Instant::now() < deadline, "missing keys: {observations}");
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    session.close();
+}
+
+#[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
+fn ignored_client_resize_resumes_queued_input_on_original_desktop() {
+    let server = rdp_server::Server::ignoring_client_resize();
+    let mut session = DesktopSession::connect(server.config(8143)).unwrap();
+    until(&mut session, |session, event| match event {
+        DesktopEvent::Authentication { id, .. } => {
+            authenticate(session, id);
+            false
+        }
+        DesktopEvent::Frame(frame) => frame.pixels.get(..4) == Some(&[255, 0, 0, 255]),
+        DesktopEvent::Disconnected { message } => panic!("{message}"),
+        _ => false,
+    });
+    session
+        .send(DesktopInput::Resize {
+            width: 822,
+            height: 461,
+        })
+        .unwrap();
+    session
+        .send(DesktopInput::Text { value: "q".into() })
+        .unwrap();
+    let deadline = Instant::now() + Duration::from_secs(3);
+    let mut local_fit = false;
+    loop {
+        for event in session.poll() {
+            match event {
+                DesktopEvent::Status { message } => {
+                    local_fit |= message.contains("fitting the view locally")
+                }
+                DesktopEvent::Frame(frame) => assert_eq!((frame.width, frame.height), (640, 480)),
+                DesktopEvent::Disconnected { message } => panic!("{message}"),
+                _ => {}
+            }
+        }
+        let seen = server.observations();
+        if local_fit
+            && seen.contains("client_resize:822x461")
+            && seen.contains("key:UnicodeReleased(113)")
+        {
+            break;
+        }
+        assert!(Instant::now() < deadline, "input did not resume: {seen}");
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    session
+        .send(DesktopInput::Resize {
+            width: 924,
+            height: 540,
+        })
+        .unwrap();
+    session
+        .send(DesktopInput::Text { value: "r".into() })
+        .unwrap();
+    let deadline = Instant::now() + Duration::from_secs(3);
+    loop {
+        let seen = server.observations();
+        assert!(
+            !seen.contains("client_resize:924x540"),
+            "ignored endpoint received a second resize"
+        );
+        if seen.contains("key:UnicodeReleased(114)") {
+            break;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "local fitting interrupted later input"
+        );
+        std::thread::sleep(Duration::from_millis(5));
+    }
+    session.close();
+}
+
 #[test]
 #[cfg_attr(
     windows,

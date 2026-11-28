@@ -30,14 +30,16 @@ impl RemoteEditor {
         }
         let mut open = true;
         let mut remove = false;
-        Window::new(format!("{}{} — Remote editor", if dirty { "● " } else { "" }, self.path.display()))
-            .id(Id::new(("remote-editor", self.id))).open(&mut open)
-            .default_size([740., 520.]).show(ctx, |ui| {
-                ui.label(&self.endpoint);
-                if ui.button("Compare recovery in active SSH session…").clicked() { self.recover_requested = true; }
-                ui.label(self.path.display());
-                ui.small("UTF-8 text · 2 MiB limit · local recovery snapshots are retained");
-                ui.label(match &status {
+        let size = fluent::dialog_size(ctx, 740., 155.);
+        fluent::modeless(ctx, Id::new(("remote-editor", self.id)), if dirty { "SSH editor · Unsaved" } else { "SSH editor" }, size)
+            .open(&mut open).show(ctx, |ui| {
+                ScrollArea::vertical().id_salt(("ssh-document-details",self.id)).max_height(size.body_height*0.45).show(ui, |ui| {
+                ui.label(self.path.display()).on_hover_text(&self.endpoint);
+                match &status {
+                    DocumentStatus::Failed(message)=>{crate::ui::errors::show(ui,crate::ui::errors::Domain::Transfer,message);},
+                    DocumentStatus::Indeterminate(message)=>{crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,message);},
+                    DocumentStatus::Conflict=>{crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,"The remote file changed. Compare your edits with the remote version before choosing whether to replace it.");},
+                    _=>{                ui.label(match &status {
                     DocumentStatus::Opening => "Opening…",
                     DocumentStatus::Ready => "Ready",
                     DocumentStatus::Recovering => "Writing local recovery snapshot…",
@@ -49,18 +51,26 @@ impl RemoteEditor {
                     DocumentStatus::Cancelled => "Operation cancelled. A save may already have reached the server; compare the remote version before retrying. Local recovery is retained.",
                     DocumentStatus::Disconnected => "This connection ended. Your saved recovery copy is on this computer. Open the file again after reconnecting; compare your edits before saving.",
                     DocumentStatus::Failed(message) => message,
-                });
+                });},
+                }
+                let (remote_recovery, warning) = self.document.recovery_details();
+                ui.menu_button("Document details", |ui| {
+                ui.set_max_width(340.);
+                ui.label(&self.endpoint);
+                ui.small("UTF-8 text · 2 MiB limit · local recovery snapshots are retained");
+                if ui.button("Compare recovery in active SSH session…").clicked() { self.recover_requested = true; ui.close(); }
                 if let Some(path) = &recovery {
                     ui.horizontal_wrapped(|ui| {
                         ui.small(format!("Recovery: {}", path.display()));
                         if ui.small_button("Copy path").clicked() { ui.ctx().copy_text(path.display().to_string()); }
                     });
                 }
-                let (remote_recovery, warning) = self.document.recovery_details();
                 if let Some(path) = remote_recovery { ui.small(format!("Remote staging recovery: {}", path.display())); }
-                if let Some(warning) = warning { ui.colored_label(ui.visuals().warn_fg_color, warning); }
-                if let Some(error) = &self.error { ui.colored_label(Color32::LIGHT_RED, error); }
-                ui.horizontal(|ui| {
+                });
+                if let Some(warning) = warning { crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,warning); }
+                if let Some(error) = &self.error { crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error); }
+                });
+                ui.horizontal_wrapped(|ui| {
                     if status.busy() && status != DocumentStatus::Committing && ui.button("Cancel operation").clicked() { self.document.cancel_operation(); }
                     if ui.add_enabled(self.loaded && !status.busy(), Button::new("Save")).clicked() {
                         self.error = self.document.save(SavePolicy::VerifyUnchanged).err();
@@ -69,25 +79,18 @@ impl RemoteEditor {
                 });
                 if self.replace_confirm {
                     ui.label("Replace the currently observed remote file with your edited text? A new remote change detected during upload still stops the save.");
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         if ui.add_enabled(!status.busy(), Button::new("Confirm replacement")).clicked() {
                             self.error = self.document.save(SavePolicy::Overwrite).err(); self.replace_confirm = false;
                         }
                         if ui.button("Cancel replacement").clicked() { self.replace_confirm = false; }
                     });
                 }
-                ScrollArea::both().id_salt(("remote-editor-text", self.id)).show(ui, |ui| {
-                    if ui.add_enabled(self.loaded, TextEdit::multiline(&mut self.text).id(Id::new(("remote-editor-text-field", self.id))).font(TextStyle::Monospace).desired_width(f32::INFINITY).desired_rows(20)).changed() {
-                        if let Err(error) = self.document.set_text(&self.text) {
-                            self.error = Some(error); self.text = self.document.snapshot().text;
-                        }
-                    }
-                });
                 if self.closing {
                     if { let (status, dirty, _) = self.document.details(); !dirty && !status.busy() } { remove = true; }
                     else {
                         ui.separator(); ui.label("Save changes before closing this remote document?");
-                        ui.horizontal(|ui| {
+                        ui.horizontal_wrapped(|ui| {
                             if ui.add_enabled(!status.busy(), Button::new("Save and close")).clicked() {
                                 self.error = self.document.request_close(CloseDecision::Save).err();
                             }
@@ -98,6 +101,13 @@ impl RemoteEditor {
                         });
                     }
                 }
+                ScrollArea::both().id_salt(("remote-editor-text", self.id)).show(ui, |ui| {
+                    if ui.add_enabled(self.loaded, TextEdit::multiline(&mut self.text).id(Id::new(("remote-editor-text-field", self.id))).font(TextStyle::Monospace).desired_width(f32::INFINITY).desired_rows(20)).changed() {
+                        if let Err(error) = self.document.set_text(&self.text) {
+                            self.error = Some(error); self.text = self.document.snapshot().text;
+                        }
+                    }
+                });
             });
         if !open {
             let (current_status, current_dirty, _) = self.document.details();
@@ -163,7 +173,7 @@ impl Workspace {
             });
         match result {
             Ok(editor) => self.remote_editors.push(editor),
-            Err(error) => self.message(error),
+            Err(error) => self.error_in(errors::Domain::Transfer, error),
         }
     }
     fn ftp_documents_block_close(&self, connection: Option<u64>) -> bool {
@@ -257,12 +267,15 @@ impl Workspace {
             .can_import_from(&self.remote_editors[source].document);
         let mut import = false;
         let mut cancel = false;
-        Window::new("Compare recovery with freshly opened remote file").id(Id::new("remote-editor-import")).collapsible(false).show(ctx, |ui| {
-            ui.label(&self.remote_editors[source].endpoint);
-            ui.label(&self.remote_editors[target].endpoint);
+        let size = fluent::dialog_size(ctx, 510., 116.);
+        fluent::modeless(ctx, Id::new("remote-editor-import"), "Compare recovered edits", size).collapsible(false).show(ctx, |ui| {
+            fluent::dialog_body(ui, size, |ui| {
+            ui.label(format!("Recovery source: {}", self.remote_editors[source].endpoint));
+            ui.label(format!("Current connection: {}", self.remote_editors[target].endpoint));
             if permitted { ui.label("The authenticated SSH endpoint, verified server keys, username, gateway and path match. Review both editor windows before importing. Import copies your text into the fresh editor; Save is a separate action."); }
             else { ui.label("The authenticated endpoints or verified server keys do not match, a document did not open successfully, or the destination has unsaved edits. Recovery cannot be imported into this connection."); }
-            ui.horizontal(|ui| { import = ui.add_enabled(permitted, Button::new("Import recovered edits")).clicked(); cancel = ui.button("Cancel import").clicked(); });
+            });
+            ui.horizontal_wrapped(|ui| { import = ui.add_enabled(permitted, Button::new("Import recovered edits")).clicked(); cancel = ui.button("Cancel import").clicked(); });
         });
         if import {
             let (target_editor, source_editor) = if target < source {
@@ -346,24 +359,27 @@ impl Workspace {
         let mut cancel = false;
         let ftp_pending = self.ftp_documents_block_close(connection);
         if self.ssh_documents_block_close(connection) {
-            Window::new("Remote documents have unsaved or pending work").id(Id::new("remote-documents-close"))
+            let size = fluent::dialog_size(ctx, 560., 155.);
+            fluent::modeless(ctx, Id::new("remote-documents-close"), "Remote documents have unsaved or pending work", size)
             .collapsible(false).show(ctx, |ui| {
+                let mut busy = false;
+                fluent::dialog_body(ui, size, |ui| {
                 ui.label("Save the documents below or explicitly discard their edits before closing this connection or app. Failed and conflicting saves keep this prompt open.");
                 if ftp_pending {
                     ui.label("Use each FTP editor's close controls for its pending document.");
                 }
-                let mut busy = false;
                 for editor in self.remote_editors.iter().filter(|e| connection.is_none_or(|id| e.connection == id)) {
                     let (status, dirty, _) = editor.document.details(); busy |= status.busy();
                     ui.label(format!("{} · {:?}{}", editor.path.display(), status, if dirty { " · unsaved" } else { "" }));
                 }
-                ui.horizontal(|ui| {
+                });
+                ui.horizontal_wrapped(|ui| {
                     if ui.add_enabled(!busy, Button::new("Save all and close")).clicked() {
                         let mut errors = Vec::new();
                         for editor in self.remote_editors.iter_mut().filter(|e| connection.is_none_or(|id| e.connection == id)) {
                             if editor.document.details().1 { if let Err(e) = editor.document.save(SavePolicy::VerifyUnchanged) { errors.push(e); } }
                         }
-                        if !errors.is_empty() { self.message(errors.join("; ")); }
+                        if !errors.is_empty() { self.error_in(errors::Domain::Transfer,errors.join("; ")); }
                     }
                     discard = ui.add_enabled(!busy, Button::new("Discard edits and close")).clicked();
                     cancel = ui.button("Cancel close").clicked();

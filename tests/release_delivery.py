@@ -167,7 +167,9 @@ class ReleaseDelivery(unittest.TestCase):
         for src in (self.root / "vendor/noVNC").rglob("*"):
             if src.is_file():
                 originals["build-source/noVNC/" + src.relative_to(self.root / "vendor/noVNC").as_posix()] = src.relative_to(self.root).as_posix()
-        for name in ("Interface.ttf", "Terminal.ttf", "Interface-LICENSE", "Terminal-LICENSE",
+        for name in ("Selawik.ttf", "Selawik-Semibold.ttf", "Selawik-LICENSE",
+                     "Interface.ttf", "Terminal.ttf", "Interface-LICENSE", "Terminal-LICENSE",
+                     "JetBrainsMonoNerdFontMono-Regular.ttf", "JetBrainsMono-OFL.txt", "NerdFonts-LICENSE",
                      "termcraft-mascot.png", "termcraft-logo.png"):
             originals["assets/" + name] = "assets/" + name
         if platform == "windows":
@@ -266,7 +268,7 @@ class ReleaseDelivery(unittest.TestCase):
         evidence.mkdir()
         (evidence / "startup.png").write_bytes(png(blank))
         (evidence / "help.log").write_bytes(b"TermCraft remote workspace\n")
-        ready = b'{"Ready":{"version":1}}'
+        ready = b'{"Ready":{"version":2}}'
         (evidence / "rdp-helper.log").write_bytes(b"\1" + len(ready).to_bytes(4, "big") + ready)
         (evidence / "startup.log").touch()
         (evidence / "rdp-session.log").touch()
@@ -274,7 +276,7 @@ class ReleaseDelivery(unittest.TestCase):
             "archive": archive.name, "archive_sha256": "0" * 64 if mismatched_startup else digest(archive),
             "manifest_schema": 1, "platform": platform,
             "display_backend": "X11" if platform == "linux" else platform,
-            "screen_size": [640, 400], "rdp_helper_wire_version": 1,
+            "screen_size": [640, 400], "rdp_helper_wire_version": 2,
             "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
             "rdp_helper_child_location_verified": True,
             "rdp_workspace": "isolated LOCALAPPDATA/Harbor default" if platform == "windows" else "explicit isolated workspace",

@@ -7,6 +7,9 @@ publish = false
 
 [dependencies]
 cap-std = "=4.0.3"
+ironrdp-egfx = "=0.5.0"
+ironrdp-dvc = "=0.10.0"
+ironrdp-displaycontrol = "=0.10.0"
 ironrdp-svc = "=0.10.0"
 ironrdp-connector = "=0.12.0"
 ironrdp-cliprdr = "=0.9.0"

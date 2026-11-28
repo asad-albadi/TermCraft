@@ -11,6 +11,19 @@ SPEC.loader.exec_module(appimage)
 
 
 class AppImageTests(unittest.TestCase):
+    def test_builder_pins_match_the_recorded_runtime_inventory(self):
+        import hashlib
+        import json
+        inventory = json.loads((appimage.RECIPE / "runtime-inventory.json").read_text())
+        # Windows checkouts may use CRLF; the Linux builder consumes LF pin text.
+        # Corresponding-source verification still checks the actual file bytes.
+        pins = (appimage.RECIPE / "builder-packages.txt").read_text(encoding="utf-8")
+        self.assertEqual(
+            inventory.get("builder_packages_sha256"),
+            hashlib.sha256(pins.encode("utf-8")).hexdigest(),
+            "Rebuild the runtime and verify its complete inventory when builder pins change",
+        )
+
     def test_prefix_is_bound_to_bytes_length_and_squashfs(self):
         with tempfile.TemporaryDirectory() as temp:
             image = Path(temp) / "sample.AppImage"

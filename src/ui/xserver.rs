@@ -117,6 +117,10 @@ impl Drop for Worker {
 }
 
 impl State {
+    pub(super) fn active(&self) -> bool {
+        self.worker.is_some() || self.display.is_some()
+    }
+
     pub(super) fn for_context(ctx: &Context) -> Self {
         Self {
             context: Some(ctx.clone()),
@@ -401,29 +405,31 @@ fn transfer_clipboard(
 
 pub(super) fn session_settings(ui: &mut Ui, session: &mut Session) {
     let local = session.protocol == "Local";
-    ui.label("X11");
-    ui.checkbox(
-        &mut session.x11,
-        if local {
-            "Select an X display"
-        } else {
-            "Trusted X11 forwarding"
-        },
-    );
-    ui.end_row();
+    fluent::form_row(ui, "X11", |ui, label| {
+        ui.checkbox(
+            &mut session.x11,
+            if local {
+                "Select an X display"
+            } else {
+                "Trusted X11 forwarding"
+            },
+        )
+        .labelled_by(label)
+    });
     if session.protocol == "SSH" {
         use harbor_workspace::x11::remote_environment::{DesktopPreset, RemoteEnvironment};
-        ui.label("Remote desktop");
         let mut mode = match session.remote_environment {
             RemoteEnvironment::None => 0,
             RemoteEnvironment::Preset(_) => 1,
             RemoteEnvironment::Custom(_) => 2,
         };
         let before = mode;
-        ui.horizontal(|ui| {
-            ui.selectable_value(&mut mode, 0, "None");
-            ui.selectable_value(&mut mode, 1, "Desktop preset");
-            ui.selectable_value(&mut mode, 2, "Custom command");
+        fluent::form_row(ui, "Remote desktop", |ui, _| {
+            ui.horizontal_wrapped(|ui| {
+                ui.selectable_value(&mut mode, 0, "None");
+                ui.selectable_value(&mut mode, 1, "Desktop preset");
+                ui.selectable_value(&mut mode, 2, "Custom command");
+            })
         });
         if mode != before {
             session.remote_environment = match mode {
@@ -432,33 +438,30 @@ pub(super) fn session_settings(ui: &mut Ui, session: &mut Session) {
                 _ => RemoteEnvironment::None,
             };
         }
-        ui.end_row();
         match &mut session.remote_environment {
             RemoteEnvironment::Preset(preset) => {
-                ui.label("Desktop environment");
-                egui::ComboBox::from_id_salt("remote-desktop-preset")
-                    .selected_text(preset.label())
-                    .show_ui(ui, |ui| {
-                        for value in DesktopPreset::ALL {
-                            ui.selectable_value(preset, value, value.label());
-                        }
-                    });
-                ui.end_row();
+                fluent::form_row(ui, "Desktop environment", |ui, label| {
+                    egui::ComboBox::from_id_salt("remote-desktop-preset")
+                        .selected_text(preset.label())
+                        .show_ui(ui, |ui| {
+                            for value in DesktopPreset::ALL {
+                                ui.selectable_value(preset, value, value.label());
+                            }
+                        })
+                        .response
+                        .labelled_by(label)
+                });
+
                 ui.label("Requires dbus-run-session and the selected desktop installed on the remote host. GNOME requires an X11-capable installation.");
-                ui.end_row();
             }
             RemoteEnvironment::Custom(command) => {
-                ui.label("Remote command");
-                ui.text_edit_singleline(command);
-                ui.end_row();
+                fluent::form_text(ui, "Remote command", command, "Desktop startup command");
                 ui.label("Runs once per connection in a separate SSH channel. Enter a full desktop startup command; a single X application is not a full desktop.");
-                ui.end_row();
             }
             RemoteEnvironment::None => {}
         }
         if !session.remote_environment.is_none() {
             ui.label("Requires Embedded SSH and trusted X11 forwarding. Desktop compatibility depends on the remote host and selected display.");
-            ui.end_row();
         }
     }
     if !session.x11 {
@@ -466,25 +469,23 @@ pub(super) fn session_settings(ui: &mut Ui, session: &mut Session) {
     }
     if !local {
         ui.label("Trusted programs share access to the selected X display.");
-        ui.end_row();
     }
-    ui.label("X display");
-    ui.horizontal_wrapped(|ui| {
-        let owned_supported =
-            owned_x11_supported() && (local || session.ssh_engine == SshEngine::Embedded);
-        ui.add_enabled_ui(owned_supported, |ui| {
-            ui.selectable_value(&mut session.x11_source, XDisplaySource::Owned, "TermCraft");
-        });
-        ui.selectable_value(&mut session.x11_source, XDisplaySource::System, "System");
+    fluent::form_row(ui, "X display", |ui, _| {
+        ui.horizontal_wrapped(|ui| {
+            let owned_supported =
+                owned_x11_supported() && (local || session.ssh_engine == SshEngine::Embedded);
+            ui.add_enabled_ui(owned_supported, |ui| {
+                ui.selectable_value(&mut session.x11_source, XDisplaySource::Owned, "TermCraft");
+            });
+            ui.selectable_value(&mut session.x11_source, XDisplaySource::System, "System");
+        })
     });
-    ui.end_row();
     if session.x11_source == XDisplaySource::Owned {
         ui.label(if !local && session.ssh_engine != SshEngine::Embedded {
             "The TermCraft display requires Embedded SSH."
         } else {
             "Starts the private display on demand."
         });
-        ui.end_row();
     }
 }
 
@@ -567,7 +568,7 @@ impl Workspace {
             if tab.error.is_empty() {
                 self.queue_startup_macro(id);
             } else {
-                self.message(self.tabs[index].error.clone());
+                self.error_in(errors::Domain::X11, self.tabs[index].error.clone());
             }
         }
     }
@@ -585,7 +586,7 @@ impl Workspace {
     }
     pub(super) fn xserver_card(&mut self, ui: &mut Ui) {
         surface(ui).show(ui, |ui| {
-            ui.label(RichText::new("X11 server").size(18.).strong());
+            ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("X11 server").size(18.)));
             if !owned_x11_supported() {
                 ui.label("A managed X11 server is unavailable on this platform.");
                 return;
@@ -637,9 +638,9 @@ impl Workspace {
                                 macos_display_snapshot(ui, report);
                                 #[cfg(not(target_os = "macos"))]
                                 ui.label(format!("Screen {}×{} · resolution change {}", report.dimensions[0], report.dimensions[1], if report.randr_change.is_some() { "verified with event; initial size restored" } else { "unavailable or unverified" }));
-                                for error in &report.errors { ui.colored_label(Color32::from_rgb(200, 120, 50), error); }
+                                for error in &report.errors { crate::ui::errors::warning(ui, crate::ui::errors::Domain::X11, error); }
                             }
-                            Err(error) => { ui.label(format!("Graphics capability check failed: {error}")); }
+                            Err(error) => { crate::ui::errors::show(ui,crate::ui::errors::Domain::X11,format!("Graphics capability check failed: {error}")); }
                         }
                     }
                     ui.label(format!(
@@ -648,7 +649,7 @@ impl Workspace {
                     ));
                     if ui
                         .button("Copy client environment")
-                        .on_hover_text("Paste before an X application command to use this display.")
+                        .fluent_hint("Paste before an X application command to use this display.")
                         .clicked()
                     {
                         let path = display
@@ -668,7 +669,7 @@ impl Workspace {
                                 ("Copy X11 text to macOS", ClipboardDirection::ToMac),
                             ] {
                                 if ui.add_enabled(!state.clipboard_pending, egui::Button::new(label))
-                                    .on_hover_text("Transfer UTF-8 clipboard text once, up to 64 KiB.")
+                                    .fluent_hint("Transfer UTF-8 clipboard text once, up to 64 KiB.")
                                     .clicked()
                                 {
                                     match worker.request_clipboard(direction, &state.clipboard_reader) {
@@ -700,7 +701,7 @@ impl Workspace {
             if cfg!(target_os = "macos") {
                 ui.label("Windowed display. macOS chooses the monitor.");
             } else {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.label("Display mode");
                 ComboBox::from_id_salt("xserver_display_mode")
                     .selected_text(match state.options.display_mode {
@@ -722,7 +723,7 @@ impl Workspace {
             });
             ui.label(RichText::new("The compositor chooses the monitor.").color(muted(ui)));
             }
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 if ui.button("Choose bundle folder").clicked()
                     && let Some(root) = rfd::FileDialog::new().pick_folder()
                 {
@@ -739,7 +740,7 @@ impl Workspace {
                 state.start(ui.ctx());
             }
             if let Some(error) = &state.error {
-                ui.colored_label(ui.visuals().error_fg_color, error);
+                crate::ui::errors::show(ui, crate::ui::errors::Domain::X11, error);
             }
         });
     }

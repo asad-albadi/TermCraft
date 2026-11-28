@@ -1,35 +1,37 @@
 use super::*;
 pub(super) fn session(ui: &mut Ui, s: &mut Session) {
-    ui.label("Data bits");
-    ui.add(DragValue::new(&mut s.serial_line.data_bits).range(5..=8));
-    ui.end_row();
-    ui.label("Parity");
-    ui.horizontal(|ui| {
-        use harbor_workspace::serial::Parity;
-        for (p, label) in [
-            (Parity::None, "None"),
-            (Parity::Even, "Even"),
-            (Parity::Odd, "Odd"),
-        ] {
-            ui.selectable_value(&mut s.serial_line.parity, p, label);
-        }
+    fluent::form_row(ui, "Data bits", |ui, label| {
+        ui.add(DragValue::new(&mut s.serial_line.data_bits).range(5..=8))
+            .labelled_by(label)
     });
-    ui.end_row();
-    ui.label("Stop bits");
-    ui.add(DragValue::new(&mut s.serial_line.stop_bits).range(1..=2));
-    ui.end_row();
-    ui.label("Flow control");
-    ui.horizontal_wrapped(|ui| {
-        use harbor_workspace::serial::FlowControl;
-        for (flow, label) in [
-            (FlowControl::None, "None"),
-            (FlowControl::Software, "XON/XOFF"),
-            (FlowControl::Hardware, "RTS/CTS"),
-        ] {
-            ui.selectable_value(&mut s.serial_line.flow_control, flow, label);
-        }
+    fluent::form_row(ui, "Parity", |ui, _| {
+        ui.horizontal_wrapped(|ui| {
+            use harbor_workspace::serial::Parity;
+            for (p, label) in [
+                (Parity::None, "None"),
+                (Parity::Even, "Even"),
+                (Parity::Odd, "Odd"),
+            ] {
+                ui.selectable_value(&mut s.serial_line.parity, p, label);
+            }
+        })
     });
-    ui.end_row();
+    fluent::form_row(ui, "Stop bits", |ui, label| {
+        ui.add(DragValue::new(&mut s.serial_line.stop_bits).range(1..=2))
+            .labelled_by(label)
+    });
+    fluent::form_row(ui, "Flow control", |ui, _| {
+        ui.horizontal_wrapped(|ui| {
+            use harbor_workspace::serial::FlowControl;
+            for (flow, label) in [
+                (FlowControl::None, "None"),
+                (FlowControl::Software, "XON/XOFF"),
+                (FlowControl::Hardware, "RTS/CTS"),
+            ] {
+                ui.selectable_value(&mut s.serial_line.flow_control, flow, label);
+            }
+        })
+    });
 }
 #[cfg(test)]
 mod tests {
@@ -52,9 +54,7 @@ mod tests {
         };
         for target in ["Even", "RTS/CTS"] {
             let render = |ui: &mut Ui, s: &mut Session| {
-                Grid::new("serial-test")
-                    .num_columns(2)
-                    .show(ui, |ui| session(ui, s));
+                session(ui, s);
             };
             let mut output = ctx.run_ui(
                 RawInput {

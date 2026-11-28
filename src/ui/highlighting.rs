@@ -78,24 +78,26 @@ impl Workspace {
         let mut open = true;
         let mut save = false;
         let mut cancel = false;
-        Window::new("Terminal highlighting").id(Id::new("highlight-rules")).open(&mut open).default_width(610.).show(ctx,|ui|{
+        let size = fluent::dialog_size(ctx, 610., 148.);
+        fluent::modeless(ctx, Id::new("highlight-rules"), "Terminal highlighting", size).open(&mut open).show(ctx,|ui|{
+            let mut remove=None;
+            fluent::dialog_body(ui,size,|ui|{
             ui.checkbox(&mut editor.enabled,"Enable globally (sessions can override)");
             ui.label("Higher priority wins; the first rule wins ties. Search and selection draw above keyword colors. Unmatched text keeps application colors.");
             ui.small("Up to 16 rules, 256 bytes per pattern. Each visible row matches its first 8 KiB, up to 128 matches per rule. Regular expressions use Rust regex syntax without look-around or backreferences.");
-            let mut remove=None;
-            ScrollArea::vertical().max_height(430.).show(ui,|ui|{
+
                 for (index,rule) in editor.rules.iter_mut().enumerate() {
                     ui.push_id(index,|ui|{ui.group(|ui|{
                         ui.horizontal(|ui|{ui.checkbox(&mut rule.enabled,"Enabled");ui.label("Priority");ui.add(DragValue::new(&mut rule.precedence));if ui.small_button("Remove").clicked(){remove=Some(index);}});
                         ui.horizontal(|ui|{ui.selectable_value(&mut rule.kind,HighlightMatch::Literal,"Literal");ui.selectable_value(&mut rule.kind,HighlightMatch::Regex,"Regular expression");ui.checkbox(&mut rule.case_sensitive,"Match case");});
                         ui.add(TextEdit::singleline(&mut rule.pattern).desired_width(f32::INFINITY).char_limit(256));
-                        ui.columns(2,|cols|{style(&mut cols[0],"Light appearance",&mut rule.light);style(&mut cols[1],"Dark appearance",&mut rule.dark);});
+                        if ui.available_width() < 440. {style(ui,"Light appearance",&mut rule.light);style(ui,"Dark appearance",&mut rule.dark);} else {ui.columns(2,|cols|{style(&mut cols[0],"Light appearance",&mut rule.light);style(&mut cols[1],"Dark appearance",&mut rule.dark);});}
                     });});
                 }
             });
             if let Some(index)=remove {editor.rules.remove(index);}
             if ui.add_enabled(editor.rules.len()<MAX_RULES,Button::new("Add rule")).clicked(){editor.rules.push(HighlightRule::default());}
-            if !editor.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&editor.error);}
+            if !editor.error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Highlight, &editor.error);}
             ui.horizontal(|ui|{save=primary(ui,"Save highlighting").clicked();cancel=ui.button("Cancel").clicked();});
         });
         if save {

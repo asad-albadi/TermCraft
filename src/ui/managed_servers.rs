@@ -44,11 +44,23 @@ impl Default for ManagedServers {
 }
 
 impl ManagedServers {
-    pub(super) fn cards(&mut self, ui: &mut Ui) {
-        for form in &mut self.forms {
+    pub(super) fn card(&mut self, ui: &mut Ui, protocol: ServiceProtocol) {
+        if let Some(form) = self.forms.iter_mut().find(|form| form.protocol == protocol) {
             form.card(ui, &self.supervisor);
-            ui.add_space(17.);
         }
+    }
+    pub(super) fn active(&self, protocol: ServiceProtocol) -> bool {
+        self.forms
+            .iter()
+            .find(|form| form.protocol == protocol)
+            .and_then(|form| form.id)
+            .and_then(|id| self.supervisor.status(id))
+            .is_some_and(|s| {
+                matches!(
+                    s.state,
+                    ServiceState::Starting | ServiceState::Running | ServiceState::Stopping
+                )
+            })
     }
 }
 
@@ -100,8 +112,8 @@ impl Form {
         };
         ui.push_id(name, |ui| {
             surface(ui).show(ui, |ui| {
-                ui.horizontal(|ui| {
-                    ui.label(RichText::new(title).size(18.).strong());
+                ui.horizontal_wrapped(|ui| {
+                    ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new(title).size(18.)));
                     ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                         dot(ui, if state == ServiceState::Running { accent(ui) } else { muted(ui) });
                         ui.label(match state {
@@ -114,15 +126,21 @@ impl Form {
                     });
                 });
                 ui.label(RichText::new(match self.protocol {
+                    ServiceProtocol::Ftp => "Credentials and files are sent without encryption.",
+                    ServiceProtocol::Nfs => "Clients share your account’s file access without password authentication or encryption.",
+                    ServiceProtocol::Tftp => "No authentication or encryption. Downloads are available to permitted clients.",
+                    _ => "Unencrypted shell access with your account’s permissions.",
+                }).color(ui.visuals().warn_fg_color));
+                ui.menu_button("Service details",|ui| { ui.set_max_width(330.); ui.label(match self.protocol {
                     ServiceProtocol::Ftp => "Clients sign in to browse or transfer files. FTP sends credentials and files in clear text.",
                     ServiceProtocol::Nfs => "NFSv3 /share over TCP. Use this port for both NFS and MOUNT; no portmapper. AUTH_SYS and anonymous clients share your account’s access without a password or encryption.",
                     ServiceProtocol::Tftp => "Clients can download files without signing in. Uploads are optional. Use octet mode.",
                     _ => "Signed-in clients can use the selected shell with your workspace account’s permissions. Telnet sends credentials and shell traffic in clear text.",
-                }).color(muted(ui)));
+                }); });
                 ui.add_space(5.);
                 ui.add_enabled_ui(!busy, |ui| self.fields(ui));
                 if let Some(address) = status.as_ref().and_then(|status| status.address).filter(|_| state == ServiceState::Running) {
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         ui.label(RichText::new(address.to_string()).monospace());
                         if ui.button("Copy address").clicked() {
                             ui.ctx().copy_text(address.to_string());
@@ -130,7 +148,7 @@ impl Form {
                     });
                 }
                 if let Some(error) = self.error.as_ref().or_else(|| status.as_ref().and_then(|status| status.error.as_ref())) {
-                    ui.colored_label(ui.visuals().error_fg_color, error);
+                    crate::ui::errors::show(ui, crate::ui::errors::Domain::Server, error);
                 }
                 if busy {
                     ui.ctx().request_repaint_after(Duration::from_millis(125));
@@ -165,86 +183,81 @@ impl Form {
     }
 
     fn fields(&mut self, ui: &mut Ui) {
-        Grid::new("configuration")
-            .num_columns(2)
-            .spacing([16., 8.])
-            .show(ui, |ui| {
-                if self.protocol == ServiceProtocol::Telnet {
-                    ui.label("Shell executable");
-                    ui.horizontal(|ui| {
-                        ui.add(
-                            TextEdit::singleline(&mut self.executable)
-                                .hint_text("Absolute path")
-                                .desired_width(300.),
-                        );
-                        if ui.button("Browse").clicked() {
-                            if let Some(path) = rfd::FileDialog::new().pick_file() {
-                                self.executable = path.to_string_lossy().into_owned();
-                            }
+        fluent::settings_grid(ui, "configuration", |ui| {
+            if self.protocol == ServiceProtocol::Telnet {
+                let label = ui.label("Shell executable");
+                ui.horizontal(|ui| {
+                    let width = (ui.available_width() - 90.).clamp(40., 300.);
+                    fluent::text_input(ui, label.id, &mut self.executable, "Absolute path", width)
+                        .fluent_hint(&self.executable);
+                    if ui.button("Browse").clicked() {
+                        if let Some(path) = rfd::FileDialog::new().pick_file() {
+                            self.executable = path.to_string_lossy().into_owned();
                         }
-                    });
-                } else {
-                    ui.label("Shared folder");
-                    ui.horizontal(|ui| {
-                        ui.add(TextEdit::singleline(&mut self.root).desired_width(300.));
-                        if ui.button("Browse").clicked() {
-                            if let Some(path) = rfd::FileDialog::new().pick_folder() {
-                                self.root = path.to_string_lossy().into_owned();
-                            }
-                        }
-                    });
-                }
-                ui.end_row();
-                ui.label("Listen address");
-                ui.add(TextEdit::singleline(&mut self.bind).desired_width(210.));
-                ui.end_row();
-                ui.label("Network access");
-                ui.checkbox(&mut self.allow_non_loopback, "Allow a non-loopback address");
-                ui.end_row();
-                if self.protocol == ServiceProtocol::Ftp {
-                    ui.label("Access");
-                    if ui
-                        .checkbox(&mut self.anonymous, "Allow anonymous sign-in (read-only)")
-                        .changed()
-                        && self.anonymous
-                    {
-                        self.allow_write = false;
-                        self.password.zeroize();
                     }
-                    ui.end_row();
-                }
-                if self.protocol == ServiceProtocol::Telnet
-                    || (self.protocol == ServiceProtocol::Ftp && !self.anonymous)
+                });
+            } else {
+                let label = ui.label("Shared folder");
+                ui.horizontal(|ui| {
+                    let width = (ui.available_width() - 90.).clamp(40., 300.);
+                    fluent::text_input(ui, label.id, &mut self.root, "", width)
+                        .fluent_hint(&self.root);
+                    if ui.button("Browse").clicked() {
+                        if let Some(path) = rfd::FileDialog::new().pick_folder() {
+                            self.root = path.to_string_lossy().into_owned();
+                        }
+                    }
+                });
+            }
+            ui.end_row();
+            let label = ui.label("Listen address");
+            fluent::text_input(ui, label.id, &mut self.bind, "", 210.);
+            ui.end_row();
+            ui.label("Network access");
+            ui.checkbox(&mut self.allow_non_loopback, "Allow a non-loopback address");
+            ui.end_row();
+            if self.protocol == ServiceProtocol::Ftp {
+                ui.label("Access");
+                if ui
+                    .checkbox(&mut self.anonymous, "Allow anonymous sign-in (read-only)")
+                    .changed()
+                    && self.anonymous
                 {
-                    ui.label("Username");
-                    ui.add(TextEdit::singleline(&mut self.username).desired_width(210.));
-                    ui.end_row();
-                    ui.label("Password");
-                    service_password_field(ui, &mut self.password, 210.);
-                    ui.end_row();
+                    self.allow_write = false;
+                    self.password.zeroize();
                 }
-                if self.protocol != ServiceProtocol::Telnet && !self.anonymous {
-                    ui.label("Permissions");
-                    ui.checkbox(
-                        &mut self.allow_write,
-                        match self.protocol {
-                            ServiceProtocol::Ftp => "Allow uploads, renames and deletes",
-                            ServiceProtocol::Nfs => {
-                                "Allow writes, replacement, renames and deletes"
-                            }
-                            _ => "Allow uploads",
-                        },
-                    );
-                    ui.end_row();
-                }
-                ui.label("Stop after");
-                ui.add(
-                    DragValue::new(&mut self.lifetime)
-                        .range(0..=86400)
-                        .suffix(" seconds (0 = until stopped)"),
+                ui.end_row();
+            }
+            if self.protocol == ServiceProtocol::Telnet
+                || (self.protocol == ServiceProtocol::Ftp && !self.anonymous)
+            {
+                let label = ui.label("Username");
+                fluent::text_input(ui, label.id, &mut self.username, "", 210.);
+                ui.end_row();
+                let label = ui.label("Password");
+                service_password_field(ui, &mut self.password, 210.).labelled_by(label.id);
+                ui.end_row();
+            }
+            if self.protocol != ServiceProtocol::Telnet && !self.anonymous {
+                ui.label("Permissions");
+                ui.checkbox(
+                    &mut self.allow_write,
+                    match self.protocol {
+                        ServiceProtocol::Ftp => "Allow uploads, renames and deletes",
+                        ServiceProtocol::Nfs => "Allow writes, replacement, renames and deletes",
+                        _ => "Allow uploads",
+                    },
                 );
                 ui.end_row();
-            });
+            }
+            ui.label("Stop after");
+            ui.add(
+                DragValue::new(&mut self.lifetime)
+                    .range(0..=86400)
+                    .suffix(" seconds (0 = until stopped)"),
+            );
+            ui.end_row();
+        });
     }
 
     fn start(&mut self, supervisor: &ServiceSupervisor) {
@@ -310,10 +323,10 @@ pub(super) fn service_password_field(ui: &mut Ui, password: &mut String, width: 
         state.clear_undoer();
         state.store(ui.ctx(), id);
     }
-    let response = TextEdit::singleline(password)
+    let response = crate::ui::fluent::singleline(password)
         .id(id)
         .password(true)
-        .desired_width(width)
+        .desired_width(width.min(ui.available_width()).max(1.))
         .show(ui)
         .response
         .response;
@@ -328,6 +341,65 @@ pub(super) fn service_password_field(ui: &mut Ui, password: &mut String, width: 
 pub(super) mod tests {
     use super::*;
     use std::net::{TcpStream, UdpSocket};
+
+    #[test]
+    fn actual_service_fields_reference_their_labels_at_both_form_widths() {
+        use egui::accesskit::Role;
+        for width in [360., 820.] {
+            for service in ["HTTP", "FTP", "Telnet"] {
+                let (ctx, _root, mut w) = crate::ui::terminal_review_tests::owned_workspace();
+                ctx.enable_accesskit();
+                let mut form = Form::new(if service == "Telnet" {
+                    ServiceProtocol::Telnet
+                } else {
+                    ServiceProtocol::Ftp
+                });
+                form.anonymous = false;
+                form.password.push_str("test-secret");
+                let mut draw = || {
+                    crate::ui::gui_tests::shell_frame(&ctx, vec2(width, 1500.), 1., vec![], |ui| {
+                        if service == "HTTP" {
+                            w.servers_page(ui);
+                        } else {
+                            form.fields(ui);
+                        }
+                    })
+                };
+                draw();
+                let nodes = draw().platform_output.accesskit_update.unwrap().nodes;
+                let labels: &[&str] = match service {
+                    "HTTP" => &["Shared folder", "Listen address"],
+                    "FTP" => &["Shared folder", "Listen address", "Username", "Password"],
+                    _ => &["Shell executable", "Listen address", "Username", "Password"],
+                };
+                for &label in labels {
+                    let (id, _) = nodes
+                        .iter()
+                        .find(|(_, n)| {
+                            n.role() == Role::Label
+                                && (n.value() == Some(label) || n.label() == Some(label))
+                        })
+                        .unwrap();
+                    assert!(
+                        nodes.iter().any(|(_, n)| n.labelled_by().contains(id)
+                            && n.role()
+                                == if label == "Password" {
+                                    Role::PasswordInput
+                                } else {
+                                    Role::TextInput
+                                }),
+                        "{service} {label} at {width}"
+                    );
+                }
+                assert!(!nodes.iter().any(|(_, n)| {
+                    [n.value(), n.label()]
+                        .into_iter()
+                        .flatten()
+                        .any(|s| s.contains("test-secret"))
+                }));
+            }
+        }
+    }
 
     fn label_position(shape: &egui::epaint::Shape, value: &str) -> Option<Pos2> {
         match shape {
@@ -359,15 +431,51 @@ pub(super) mod tests {
     }
 
     pub(in crate::ui) fn click(ctx: &Context, workspace: &mut Workspace, label: &str) {
+        // Set this lifecycle fixture's selected service. Separate pointer tests
+        // exercise the service chooser itself and preserve drafts across views.
+        use super::super::servers::Section;
+        workspace.servers_category = if label.contains("SSH / SFTP") {
+            Section::Ssh
+        } else if label.contains("TFTP") {
+            Section::Tftp
+        } else if label.contains("FTP") {
+            Section::Ftp
+        } else if label.contains("NFS") {
+            Section::Nfs
+        } else if label.contains("Telnet") {
+            Section::Telnet
+        } else if label.contains("VNC") {
+            Section::Vnc
+        } else if label.contains("Iperf") {
+            Section::Iperf
+        } else {
+            workspace.servers_category
+        };
+        ctx.enable_accesskit();
         let target = |output: &FullOutput| {
+            let update = output.platform_output.accesskit_update.as_ref()?;
+            let (_, node) = update.nodes.iter().find(|(_, node)| {
+                node.role() == egui::accesskit::Role::Button
+                    && node.label() == Some(label)
+                    && !node.is_disabled()
+            })?;
+            let button = node.bounds()?;
+            let bounds = Rect::from_min_max(
+                pos2(button.x0 as f32, button.y0 as f32),
+                pos2(button.x1 as f32, button.y1 as f32),
+            );
             output.shapes.iter().find_map(|shape| {
-                label_position(&shape.shape, label).filter(|point| shape.clip_rect.contains(*point))
+                let visible = bounds.intersect(shape.clip_rect);
+                label_position(&shape.shape, label).filter(|point| visible.contains(*point))?;
+                Some(visible)
             })
         };
+        // The first pass measures the service grids. Use their arranged bounds.
+        frame(ctx, workspace, vec![]);
         let mut output = frame(ctx, workspace, vec![]);
-        let mut pos = target(&output);
+        let mut button = target(&output);
         for offset in [-700., -700., 700., 700., 700.] {
-            if pos.is_some() {
+            if button.is_some() {
                 break;
             }
             frame(
@@ -387,9 +495,9 @@ pub(super) mod tests {
             for _ in 0..40 {
                 output = frame(ctx, workspace, vec![]);
             }
-            pos = target(&output);
+            button = target(&output);
         }
-        let pos = pos.unwrap_or_else(|| {
+        let button = button.unwrap_or_else(|| {
             let labels: Vec<_> = output
                 .shapes
                 .iter()
@@ -400,7 +508,13 @@ pub(super) mod tests {
                 .collect();
             panic!("Servers UI did not paint {label}. Painted text: {labels:?}")
         });
-        frame(ctx, workspace, vec![Event::PointerMoved(pos)]);
+        let pos = button.center();
+        let hovered = frame(ctx, workspace, vec![Event::PointerMoved(pos)]);
+        assert_eq!(
+            target(&hovered),
+            Some(button),
+            "{label} moved before pointer press"
+        );
         for pressed in [true, false] {
             frame(
                 ctx,
@@ -646,6 +760,12 @@ pub(super) mod tests {
         click(&ctx, &mut work, "Start FTP server");
         let first = wait_state(&ctx, &mut work, 0, ServiceState::Running);
         assert!(TcpStream::connect(first).is_ok());
+        work.servers_category = super::super::servers::Section::Http;
+        frame(&ctx, &mut work, vec![]);
+        assert!(
+            TcpStream::connect(first).is_ok(),
+            "Switching service views stopped the live listener"
+        );
         click(&ctx, &mut work, "Stop FTP server");
         assert_eq!(wait_state(&ctx, &mut work, 0, ServiceState::Stopped), first);
         assert!(TcpStream::connect(first).is_err());

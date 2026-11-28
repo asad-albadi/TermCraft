@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "source_commit": "05a22340204c69fa3c82cbc48daf05768bc0cac7",
+  "source_rust_files_verified": 297,
+  "source_rust_snapshot_sha256": "8b3198860fbc10af0a26a10f04e239a1042b89b9aa706b228334e96ad2bb7c23",
+  "toolchain": "Rust 1.96.1",
+  "dependencies": "verified local pre-native-adapter cache; not a full native-adapter qualification",
+  "framebuffer": [
+    1920,
+    1440
+  ],
+  "application_binary_sha256": "3b3d2513522f52210894920e95ba4985e9671d2f9a7d41b7675e65178d56a431",
+  "ssh_fixture_binary_sha256": "59f19f4a536e3b998649530ba46b7dfdebed15c0872b5429b0ed9263c39482fa",
+  "fixture_source_delta": "Only src/ui.rs render hook plus an appended one-time synthetic listing seeder; all other Rust sources match source_commit exactly. Synthetic hosts and filenames, no live SSH endpoint.",
+  "images": [
+    {
+      "file": "home-dark-fhd.png",
+      "sha256": "c0e20b10dc23592e6562271242daa544dc5b03eef783ed0a8e1722c1c3a8c4c2",
+      "size": [
+        1920,
+        1080
+      ],
+      "theme": "Dark",
+      "state": "unmodified application with synthetic saved bookmarks"
+    },
+    {
+      "file": "home-light-fhd.png",
+      "sha256": "c153db31ebf88d7a82cf79a9c8552242468525eeb04162870c16e1dc07ab1ac8",
+      "size": [
+        1920,
+        1080
+      ],
+      "theme": "Light",
+      "state": "unmodified application with synthetic saved bookmarks"
+    },
+    {
+      "file": "tools-dark-fhd.png",
+      "sha256": "530aa6fc1d1ff81c796ce88ab4fd82f07ac749106fb3c1dbbe76f7419f5af74a",
+      "size": [
+        1920,
+        1080
+      ],
+      "theme": "Dark",
+      "state": "unmodified application with synthetic saved bookmarks"
+    },
+    {
+      "file": "settings-dark-fhd.png",
+      "sha256": "fac453e1f8365047e602b948aa47a0b689e9c3951eb4ea2806ec650b938a900f",
+      "size": [
+        1920,
+        1080
+      ],
+      "theme": "Dark",
+      "state": "unmodified application with synthetic saved bookmarks"
+    },
+    {
+      "file": "ssh-dark-fhd.png",
+      "sha256": "8153effce249addb5e63e929f6669bf9879814192394d62ee307401280c83413",
+      "size": [
+        1920,
+        1080
+      ],
+      "theme": "Dark",
+      "state": "synthetic SSH layout fixture"
+    },
+    {
+      "file": "ssh-light-fhd.png",
+      "sha256": "e424de70f9e1c4acceb64ce9a5bff39801c1de29e2461dab7667d2f55bcd83b6",
+      "size": [
+        1920,
+        1080
+      ],
+      "theme": "Light",
+      "state": "synthetic SSH layout fixture"
+    },
+    {
+      "file": "ssh-dark-short.png",
+      "sha256": "15d45c95bba0d84c7c7dbce668dd32b622487c101770b2e3df38873747b82477",
+      "size": [
+        1024,
+        640
+      ],
+      "theme": "Dark",
+      "state": "synthetic SSH layout fixture"
+    },
+    {
+      "file": "ssh-light-short.png",
+      "sha256": "0672b7f25bbc0f097a86b6d77a14c716524876ebef0df593cf51687c16e1b996",
+      "size": [
+        1024,
+        640
+      ],
+      "theme": "Light",
+      "state": "synthetic SSH layout fixture"
+    },
+    {
+      "file": "ssh-dark-minimum.png",
+      "sha256": "6a2957d34eb13b167663fa6fa993b6f3f2430ffa203bc1612a38d2bf1be50040",
+      "size": [
+        640,
+        480
+      ],
+      "theme": "Dark",
+      "state": "synthetic SSH layout fixture"
+    },
+    {
+      "file": "sessions-tab-dark-fhd.png",
+      "sha256": "bcd87335c2f5930419e0cd28eb0387ff49a852964755ce9bb28e600aeda44986",
+      "size": [
+        1920,
+        1080
+      ],
+      "theme": "Dark",
+      "state": "synthetic SSH layout fixture"
+    },
+    {
+      "file": "ssh-actions-dark-short.png",
+      "sha256": "483598aeef313ebed514289a628c5cb23694839256f6d61b8064776be11a01df",
+      "size": [
+        1024,
+        640
+      ],
+      "theme": "Dark",
+      "state": "synthetic SSH layout fixture"
+    }
+  ],
+  "limits": [
+    "Actual native X11 application pixels, not AI mockups or reconstructed widgets.",
+    "Unmodified app pages use synthetic saved bookmarks. SSH/sidebar images inject clearly labelled sample listing state into the production UI.",
+    "Not release/package, live SSH, physical GPU, DPI, accessibility-client or owner acceptance evidence. Hosted CI and archive-bound package qualification are separate."
+  ],
+  "owner_acceptance": "pending; PR8 remains draft and unmerged"
+}

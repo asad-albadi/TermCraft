@@ -1,0 +1,1103 @@
+{
+  "date": "2026-11-27",
+  "font_fixture": {
+    "source": "Host-installed NotoSansCJK-Regular.ttc copied into isolated Linux system font directory solely for the positive glyph case. No OS face is distributed with TermCraft.",
+    "sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a"
+  },
+  "builds": {
+    "native36": {
+      "source": "36ba3ba94a6fa40f9e78140bd07e7fcb4b6615cc",
+      "sha256": "b708cb929e734ee980a6fb203ed0daf5df0a0bddd514611120a85213e1c4322a"
+    },
+    "web36": {
+      "source": "36ba3ba94a6fa40f9e78140bd07e7fcb4b6615cc",
+      "browser": "Chromium 157.0.8103.38 Arch Linux",
+      "route": "Application HTML, JavaScript, CSS and unchanged noVNC served into isolated Playwright browser context; no RFB endpoint."
+    },
+    "native557": {
+      "source": "5575601b0b1a2abb1640176c8a9f95b102c54130",
+      "sha256": "5999cc5571d92c4e88e626e5c200dd955d522ce6c4ea58ddf80830fb548e9626"
+    },
+    "package_c2": {
+      "source": "c2dded603fcc5710dfee7e19ac60c728d552c3cf",
+      "sha256": "f2947218f63f487562bac3ba7f83b94816d21bca68295d20da9141e814559a49",
+      "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
+      "archive_sha256": "beaefc6cfe8795dddc26ff707a14327179c3b7081a01b5e2cfe27bc592917a5a",
+      "snapshot_sha256": "0ded66384780723684f3382cb2b427a79ba1f11b7626bf27fa33bfc50a00d2a2",
+      "workflow_run": 46023047742,
+      "native_job": 140587387520,
+      "artifact_id": 15210484989,
+      "environment": "Unprivileged Ubuntu 24.04.5 x86-64, Xvfb :93, software GL, native packaged executable, 100% scale. Original pixels extracted from the captured screen within measured native window bounds. Five synthetic .example.test bookmarks; remote endpoints never contacted."
+    }
+  },
+  "baseline": "../before/manifest.json",
+  "captures": [
+    {
+      "file": "home-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "2ec8b656f26b7ea85d53e0543b01bf69619c48ce1634b5e835dbbeccc9ab0478",
+      "observation": "Home after setting the indicated menu appearance; System resolved to Light on this isolated display."
+    },
+    {
+      "file": "home-light-100.png",
+      "environment": "native36",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "8ba0dae7d19862f7ee43e4ba400d3f33fdbc9a97ea8be5d26e86769b2ae06ab0",
+      "observation": "Home after setting the indicated menu appearance; System resolved to Light on this isolated display."
+    },
+    {
+      "file": "home-dark-100.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "49694e4cac7fbff8bd998ae1e8b77abcd9df3b4067f1b22189fb09145f45c511",
+      "observation": "Home after setting the indicated menu appearance; System resolved to Light on this isolated display."
+    },
+    {
+      "file": "home-system-150.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1.5,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1280.0,
+        720.0
+      ],
+      "sha256": "7a9a18fd2f44e67b680430e633078afd398850b38de38a1ed8a7d9daf8067bc0",
+      "observation": "Home after setting the indicated menu appearance; System resolved to Light on this isolated display."
+    },
+    {
+      "file": "home-light-150.png",
+      "environment": "native36",
+      "theme": "light",
+      "scale": 1.5,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1280.0,
+        720.0
+      ],
+      "sha256": "6dc0d3acfa8180d3f453086b23f37ec45952aae7ec74cdada67acaef681b93a2",
+      "observation": "Home after setting the indicated menu appearance; System resolved to Light on this isolated display."
+    },
+    {
+      "file": "home-dark-150.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1.5,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1280.0,
+        720.0
+      ],
+      "sha256": "4eb37d75a0be39f63d637d0059836e50cd4f412d040f050b399fe91450f8ec48",
+      "observation": "Home after setting the indicated menu appearance; System resolved to Light on this isolated display."
+    },
+    {
+      "file": "home-system-200.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 2,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        960.0,
+        540.0
+      ],
+      "sha256": "7b6d275a6d08f7d2760a9582adff85a5c612128e56f00da425a0394320db7d9c",
+      "observation": "Home after setting the indicated menu appearance; System resolved to Light on this isolated display."
+    },
+    {
+      "file": "home-light-200.png",
+      "environment": "native36",
+      "theme": "light",
+      "scale": 2,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        960.0,
+        540.0
+      ],
+      "sha256": "5941bb3d5849abbcc113b03801df570e88995224caaf011a85786afeb6ac327e",
+      "observation": "Home after setting the indicated menu appearance; System resolved to Light on this isolated display."
+    },
+    {
+      "file": "home-dark-200.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 2,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        960.0,
+        540.0
+      ],
+      "sha256": "dda6d53ff44813e427de6f5a490b47698e25acd7f913d79571553a6edd00b92b",
+      "observation": "Home after setting the indicated menu appearance; System resolved to Light on this isolated display."
+    },
+    {
+      "file": "form-ssh-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "4991ce4cac814edaf064ac0fdccf0c84bd72a5083620c4676b2c4bd18d101399",
+      "observation": "New session, SSH connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-telnet-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "095b4735f34a756fbd8da98e606eeba65193c5ae656ce9bd91b2029c82992974",
+      "observation": "New session, TELNET connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-rsh-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "37887316fbc934aa5f4b17e43b4aad84c4aac86dfe0d7360cd3c1a7647fedbde",
+      "observation": "New session, RSH connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-rlogin-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "b7106af9f7c89a0a6f5e8a71bb4213dbf424d1588cf02a8d692ac6fba81ce665",
+      "observation": "New session, RLOGIN connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-rdp-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "798e6b93e4657a4f044749943e5c9690bf529dc20eb4376abb5d3c7f72158790",
+      "observation": "New session, RDP connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-vnc-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "e186b0fc6292e0c8fd0a639db361fcd06827744febe2c13b9a0f4e94d98598da",
+      "observation": "New session, VNC connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-ftp-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "36b56a8f605e850008523da3b547770317e4dcc9699284a0488e62322d5cd308",
+      "observation": "New session, FTP connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-sftp-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "999b19a008f3dbe97084e1eb77764ed5e172ac0d72b3b9ab5f22bb5f2300f29e",
+      "observation": "New session, SFTP connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-serial-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "f7266d830742baa5127f37693bcf982d19a11c1217328088f1f16c320dad9aa4",
+      "observation": "New session, SERIAL connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-local-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "8eaa4a0ff4787ee4aa08e6ad0f37bef9897beae7472bf8c0b2c1a2ea06b24a3a",
+      "observation": "New session, LOCAL connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-mosh-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "2335f3d6a41179d1f4bab49ce08f30b6a751a9bf3e9281c9d594a1994299144d",
+      "observation": "New session, MOSH connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-browser-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "469c68e2b6b334114f3ae27bc46026b3faca24be333027eb025fa40a081bea05",
+      "observation": "New session, BROWSER connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "form-xdmcp-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "f36b7450572ddc6b12c5e4d60b31728b49650a44052ee50392150702b655e6bc",
+      "observation": "New session, XDMCP connection selected through the actual protocol picker; bounded settings and persistent actions."
+    },
+    {
+      "file": "session-light-100.png",
+      "environment": "native36",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "daa81d0f82e11863377f3eadf3b870c7801d7e7a50b3b093ac186ed0f6f3a9f9",
+      "observation": "Open new SSH session, default options and three actions. Pair with ../before/session-light-100.png."
+    },
+    {
+      "file": "session-dark-150.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1.5,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1280.0,
+        720.0
+      ],
+      "sha256": "a15a15715ba1c394d43de33f0bb310d557d70cbf609cab34ea9cd697d5a6812e",
+      "observation": "Dark SSH form, 150% UI scale. Header and footer and bounded scroll body."
+    },
+    {
+      "file": "session-light-200.png",
+      "environment": "native36",
+      "theme": "light",
+      "scale": 2,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        960.0,
+        540.0
+      ],
+      "sha256": "157b6c3ea365505fa7a1659df7576944c5da267c58d76e7d9d15e508a34574d5",
+      "observation": "Light SSH form, 200% UI scale. Header, scroll body, Save option and footer fit in 960×540 logical points."
+    },
+    {
+      "file": "files-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "0eb52bca6937dedcfb7d44561e4ceb1e88a852ea2d78a5e91627a5c907ba0958",
+      "observation": "Local files, original private filename fixture. Selected mixed Arabic and Japanese name, visible focused-row border, distinct icon and size column. Installed Noto supplies 日本語."
+    },
+    {
+      "file": "files-lower-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "47af549f83c014360cb3e22c8920d4d0d24e4d7321cfbbe0e22cbf294b807401",
+      "observation": "Scroll local listing to lower entries including uppercase PNG, PDF, audio, script and generic unknown file. Fixture contents never opened."
+    },
+    {
+      "file": "servers-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "9b63b7260bd552c240782aff58e26a7b365fe9a418ee07147a8082944f17febe",
+      "observation": "Servers page, stopped HTTP and FTP controls and explicit bind/upload defaults."
+    },
+    {
+      "file": "tunnels-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "c5ee1638037c1b39f486405205ea260fd7405888037e1237e6b1fc4309e912a5",
+      "observation": "Tunneling command opens the empty SSH tunnels page and its create action."
+    },
+    {
+      "file": "macros-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "98ac7479f82b3f7bd5f4b9c24f735d9afd8582a34498684108df191310ee9c63",
+      "observation": "Macros menu opens the manager, with recording and editing actions."
+    },
+    {
+      "file": "settings-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "3845de8bd9d5e024b3939b3dfac468c225eee094e3a0dce8cd0b2c9a66ede0e8",
+      "observation": "Workspace settings profile scope, multiline paste, close protection, clipboard choices and appearance preferences."
+    },
+    {
+      "file": "keys-nested-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "7fd54319e6fe7260b9d324da26614fb16947603f869ffa74e696689cc4afd3d7",
+      "observation": "Manage keys from the SSH draft. Child manager over dimmed parent and workspace, with a visible Close action."
+    },
+    {
+      "file": "vault-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "322b1afd5eb311f045da1c6c2047050183720ba2591965bb586cdc607fdc6675",
+      "observation": "Sessions menu opens the standalone credential vault in an empty disposable workspace."
+    },
+    {
+      "file": "ssh-advanced-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "3c7598ef9018f157bf77abd7fc503141402117e43a25a74e8bfc52c3fe16c0b6",
+      "observation": "Expand Advanced SSH and proxy settings and scroll within the SSH form while keeping the footer visible."
+    },
+    {
+      "file": "tools-dark-920.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        920,
+        620
+      ],
+      "logical_size": [
+        920.0,
+        620.0
+      ],
+      "sha256": "7463f69f17fcd069083764da73b21e78ca6b7f6763016dba0ec97f7e3d8db352",
+      "observation": "Dark Tools page at 920×620, comparable to ../before/tools-dark-minimum.png."
+    },
+    {
+      "file": "tools-dark-920-bottom.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        920,
+        620
+      ],
+      "logical_size": [
+        920.0,
+        620.0
+      ],
+      "sha256": "e3f44e4799fd754b19c25958b5a5e6c13b4c6de1af74644c69b5b9007644ea6f",
+      "observation": "Actual pointer wheel scroll to the final runtime provider rows at 920×620."
+    },
+    {
+      "file": "session-dark-640.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        640,
+        480
+      ],
+      "logical_size": [
+        640.0,
+        480.0
+      ],
+      "sha256": "a929e14654e52a6cf70dab5e1d89c4a0523348f4e24235d1d3c1237a2dc811b6",
+      "observation": "Main at 640×480, SSH text field focused. The scroll body and three actions fit."
+    },
+    {
+      "file": "scroll-hover-dark-640.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        640,
+        480
+      ],
+      "logical_size": [
+        640.0,
+        480.0
+      ],
+      "sha256": "9797c9da58c0847dfa985580d5c208ae0635dfe16562cfeb053bfa231a99263f",
+      "observation": "Native pointer over the SSH form scrollbar thumb at the minimum main window."
+    },
+    {
+      "file": "scroll-thumb-drag-dark-640.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        640,
+        480
+      ],
+      "logical_size": [
+        640.0,
+        480.0
+      ],
+      "sha256": "20c2dc58596bbb3cd114e138c1add4192af54e6437f0167e306d4b38576a85dd",
+      "observation": "Pointer held while dragging the thumb down; advanced settings and startup macro become visible while footer stays fixed."
+    },
+    {
+      "file": "primary-hover-dark-640.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        640,
+        480
+      ],
+      "logical_size": [
+        640.0,
+        480.0
+      ],
+      "sha256": "863ccfa8b8a2f715393fbdb419380f70c4e3d24a10d1d777dec540f5317c85a5",
+      "observation": "Pointer hover over Connect in the scrolled compact SSH form."
+    },
+    {
+      "file": "primary-held-dark-640.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        640,
+        480
+      ],
+      "logical_size": [
+        640.0,
+        480.0
+      ],
+      "sha256": "fc609a8b9e8bdc7ae510b965a0a5034eefb32dc340626de2d22594a2f85edeff",
+      "observation": "Held primary mouse button on Connect. Pointer released outside the control so the form remains open."
+    },
+    {
+      "file": "games-dark-150.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1.5,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1280.0,
+        720.0
+      ],
+      "sha256": "45406250eada2aa8a473bbc6cd23e746c23a4cd07e6d66d8be64d64e9d65184d",
+      "observation": "Games catalog in dark appearance, 150% scale."
+    },
+    {
+      "file": "game-options-dark-150.png",
+      "environment": "native36",
+      "theme": "dark",
+      "scale": 1.5,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1280.0,
+        720.0
+      ],
+      "sha256": "51ba3e564b90ef30e460787babd57a6481128be824f0e5dbd820977a94717c14",
+      "observation": "Sudoku shared commands, current seed and Playing status over the real board at 150%."
+    },
+    {
+      "file": "detached-system-100-before.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        360,
+        260
+      ],
+      "logical_size": [
+        360.0,
+        260.0
+      ],
+      "sha256": "0cf94567a3729fa4c01cb78a877c2f70632515b9ddb1dd9532c3f86c1f5c1b02",
+      "observation": "Observed failure on 36ba3ba. History text on black has only 1.35:1 contrast in the original 360×260 child. Kept as diagnostic evidence.",
+      "status": "diagnostic-before"
+    },
+    {
+      "file": "ftp-loopback-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "a88fabb7ea7b8650dad6e35bc604aba1a22e2baf7f26c67108f66c7fa6a052c6",
+      "observation": "App-owned FTP service on loopback within a network-isolated container. Listing copies of the disposable filename fixtures plus a separate editor folder."
+    },
+    {
+      "file": "ftp-selected-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "ff3d7f0ddd5e7eec57b15c38d072dadf3281dc806039643ab9207ba6d9422772",
+      "observation": "Pointer selection of a mixed-script FTP row with type icon, name, size and contextual actions."
+    },
+    {
+      "file": "ftp-editor-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "4eaa557452ab9e56043fda35744cc9765698295e8e782b85e6722ea300497084",
+      "observation": "Loopback FTP opens the separate disposable editor/reader.txt document. Editor and selection remain visible."
+    },
+    {
+      "file": "ftp-dirty-close-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "ebdc47e3aa01ea2dd3f35a2725776eac48b28745a3d44b02ab13d0b8267aefd1",
+      "observation": "Typing into the disposable FTP document then requesting close exposes Save, Discard and Keep editing. Server contents unchanged."
+    },
+    {
+      "file": "ssh-trust-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "f9953c855fc711843cc0abe9329daf4e9d86bb035324188171022ce576684314",
+      "observation": "Fresh disposable loopback OpenSSH endpoint presents its actual host fingerprint and safe Cancel focus. Verified against the public key before using Trust once."
+    },
+    {
+      "file": "ftp-transfer-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "be2da0c59aa2573615fbc11f517beeb1a799e599a5b28b0537ac96902fdcb757",
+      "observation": "Create folder review submitted on the private FTP service. File operations shows Finished; an independent filesystem check found the new directory in the disposable root."
+    },
+    {
+      "file": "ssh-listing-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "9a777fa730b253ce42458483e77687f6e17114e26671ced53b20b48f3a37222d",
+      "observation": "Authenticated embedded SFTP panel against a disposable local OpenSSH endpoint. Actual diagram.svg selected, with raw name, icon and size alongside the terminal."
+    },
+    {
+      "file": "ssh-editor-system-100.png",
+      "environment": "native36",
+      "theme": "system",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "sha256": "8ea25de4ca6e0ebff0ad1ff74e91d1f14c057c6d906cd63371f109d14474150e",
+      "observation": "Double-click a dedicated disposable text document in the embedded SFTP panel. Its modeless editor shows Ready, full remote path, recovery location and original contents."
+    },
+    {
+      "file": "web-light-focus.png",
+      "environment": "web36",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        320,
+        480
+      ],
+      "logical_size": [
+        320.0,
+        480.0
+      ],
+      "sha256": "78ab3b05118cbf68aaedc1f0d42c1c3e6a567a922a29a295d1a2e42ec363455a",
+      "observation": "Connect focus in actual Chromium. Disconnected, View only checked, Disconnect disabled. 320×480 CSS viewport."
+    },
+    {
+      "file": "web-light-hover.png",
+      "environment": "web36",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        320,
+        480
+      ],
+      "logical_size": [
+        320.0,
+        480.0
+      ],
+      "sha256": "bbe922defe4a471131ec6703fdf2a30068dcccdbd8cba85d9bca33dfdee8c590",
+      "observation": "Connect hover in actual Chromium. Disconnected, View only checked, Disconnect disabled. 320×480 CSS viewport."
+    },
+    {
+      "file": "web-light-held.png",
+      "environment": "web36",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        320,
+        480
+      ],
+      "logical_size": [
+        320.0,
+        480.0
+      ],
+      "sha256": "862a6d66d37eb252404a638fbcf0fcf4e49a06c8c20ba9fa651fc244034834e2",
+      "observation": "Connect held in actual Chromium. Disconnected, View only checked, Disconnect disabled. 320×480 CSS viewport."
+    },
+    {
+      "file": "web-dark-focus.png",
+      "environment": "web36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        320,
+        480
+      ],
+      "logical_size": [
+        320.0,
+        480.0
+      ],
+      "sha256": "30feef78e736739dc80f6fd2685e708fe2ae062fb403b6b03eb08e03ec04c323",
+      "observation": "Connect focus in actual Chromium. Disconnected, View only checked, Disconnect disabled. 320×480 CSS viewport."
+    },
+    {
+      "file": "web-dark-hover.png",
+      "environment": "web36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        320,
+        480
+      ],
+      "logical_size": [
+        320.0,
+        480.0
+      ],
+      "sha256": "84119bce55dbe2491be2e2533c49c257da17e3d90af9c03169f490b9fc4f5701",
+      "observation": "Connect hover in actual Chromium. Disconnected, View only checked, Disconnect disabled. 320×480 CSS viewport."
+    },
+    {
+      "file": "web-dark-held.png",
+      "environment": "web36",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        320,
+        480
+      ],
+      "logical_size": [
+        320.0,
+        480.0
+      ],
+      "sha256": "f7b20f6dfa6bfb4e441be887da8a2fbf91a10e09758fe477c29a36f6ad9d900c",
+      "observation": "Connect held in actual Chromium. Disconnected, View only checked, Disconnect disabled. 320×480 CSS viewport."
+    },
+    {
+      "file": "detached-light-100.png",
+      "environment": "native557",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        360,
+        260
+      ],
+      "logical_size": [
+        360,
+        260
+      ],
+      "sha256": "747af145525d74117d29ce8e9e89f55a921b880a9b772531c714aa718a867e3d",
+      "observation": "Corrected source: actual detached local terminal at its minimum. Readable History status and visible Reattach, Close, Fullscreen and Rename actions.",
+      "history_pixel_measurement": {
+        "region_xywh": [
+          0,
+          126,
+          158,
+          18
+        ],
+        "background": [
+          251,
+          253,
+          252
+        ],
+        "strongest_ink": [
+          24,
+          39,
+          32
+        ],
+        "contrast_ratio": 15.23,
+        "ink_pixels_at_least_4_5": 243
+      }
+    },
+    {
+      "file": "detached-dark-100.png",
+      "environment": "native557",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        360,
+        260
+      ],
+      "logical_size": [
+        360,
+        260
+      ],
+      "sha256": "95923bfe4a903966ff71e4a0d8c7bb6df3d8ed002361560600c248cacc8c697c",
+      "observation": "Corrected source: actual detached local terminal at its minimum. Readable History status and visible Reattach, Close, Fullscreen and Rename actions.",
+      "history_pixel_measurement": {
+        "region_xywh": [
+          0,
+          126,
+          158,
+          18
+        ],
+        "background": [
+          19,
+          25,
+          23
+        ],
+        "strongest_ink": [
+          234,
+          242,
+          237
+        ],
+        "contrast_ratio": 15.62,
+        "ink_pixels_at_least_4_5": 477
+      }
+    },
+    {
+      "file": "package-session-light-100.png",
+      "environment": "package_c2",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920,
+        1080
+      ],
+      "sha256": "4ec4b8dc8ee32ce2995ef0d82660d46943a35f553251986975d4d4b6ab78d553",
+      "observation": "Packaged SSH session dialog at 1920×1080, explicit Light. Form still displays the grouped options, save checkbox and full action footer."
+    },
+    {
+      "file": "package-files-light-100-no-system-cjk.png",
+      "environment": "package_c2",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920,
+        1080
+      ],
+      "sha256": "43b17d192514669040b3425e9aeeff14fa3aefea059ec7e4ca50adb5698769ed",
+      "observation": "Diagnostic positive/negative pair: Ubuntu with no supported CJK system font. Actual selected filename displays three missing-Japanese-glyph boxes. Arabic glyphs are present. Compare the same filename after installing the Noto fixture in shots/full-hd/files-light.png."
+    },
+    {
+      "file": "package-detached-light-100.png",
+      "environment": "package_c2",
+      "theme": "light",
+      "scale": 1,
+      "physical_px": [
+        360,
+        260
+      ],
+      "logical_size": [
+        360,
+        260
+      ],
+      "sha256": "806c9894f292c9b40b8ec509d268dd0c6fb645ed71a1b8251dbf3348bb67c9ee",
+      "observation": "Packaged 360×260 detached local terminal. History foreground (24,39,32) on (251,253,252) reaches 15.23:1; 243 ink pixels meet 4.5:1."
+    },
+    {
+      "file": "package-detached-dark-100.png",
+      "environment": "package_c2",
+      "theme": "dark",
+      "scale": 1,
+      "physical_px": [
+        360,
+        260
+      ],
+      "logical_size": [
+        360,
+        260
+      ],
+      "sha256": "0cd207782e4d404b0e8f131158cd301110d4b889f5a47b81cfcc9c9dbe002ebe",
+      "observation": "Packaged 360×260 detached local terminal. History foreground (234,242,237) on (19,25,23) reaches 15.62:1; 467 ink pixels meet 4.5:1."
+    }
+  ],
+  "development_environment": "Linux x86-64, Arch glibc 2.44, Xvfb :92 1920×1080, software GL, isolated UID and synthetic workspace. PNGs are original pixels from X11 import. WINIT_X11_SCALE_FACTOR selects UI scale. Native previews use current application source and a source-verified cached library with prior eframe adapter dependencies. They do not qualify the distribution or physical hardware.",
+  "packaged_full_hd_gallery": "../../../../shots/full-hd/capture-manifest.json"
+}

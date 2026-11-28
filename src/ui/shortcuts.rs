@@ -251,23 +251,47 @@ mod tests {
 use harbor_workspace::workspace::shortcuts::{Action, FocusContext, KeyChord};
 const BLOCKED: &str = "termcraft-shortcuts-blocked";
 impl Workspace {
-    pub(super) fn shortcuts_blocked(&self) -> bool {
+    fn blocking_dialog(&self) -> bool {
         self.shared_modal()
             || self.vault_modal()
             || self.ssh_keys.open
             || self.session_import.is_some()
-            || self.shortcut_editor_open
-            || self.shortcut_capture.is_some()
+            || self
+                .title_editor
+                .as_ref()
+                .is_some_and(|(id, _)| self.windows.window(*id) == 0)
             || self.session_form.is_some()
-            || self.title_editor.is_some()
-            || self.highlight_editor.is_some()
-            || self.terminal_profile_editor.is_some()
             || self.pending_session_close.is_some()
-            || self.pending_remote_tab_close.is_some()
+            || self
+                .tabs
+                .iter()
+                .any(|tab| tab.transfer_ui.blocking_action())
+            || self.delete_file.is_some()
+            || self.rename_file.is_some()
+            || self.editor.as_ref().is_some_and(|editor| editor.closing)
             || self.pending_paste.is_some()
             || self.pending_remote_exit
     }
+    fn blocking_input(&self) -> bool {
+        self.blocking_dialog() || self.shortcut_capture.is_some()
+    }
+    pub(super) fn shortcuts_blocked(&self) -> bool {
+        self.blocking_input()
+            || self.pending_remote_tab_close.is_some()
+            || self.title_editor.is_some()
+            || self.shortcut_editor_open
+            || self.highlight_editor.is_some()
+            || self.terminal_profile_editor.is_some()
+            || self.macro_open
+            || self.tunnel_open
+    }
     pub(super) fn set_shortcut_context(&self, ctx: &Context) {
+        ctx.data_mut(|d| {
+            d.insert_temp(
+                Id::new("termcraft-transport-blocked"),
+                (self.blocking_input(), self.pending_remote_tab_close),
+            )
+        });
         ctx.data_mut(|d| d.insert_temp(Id::new(BLOCKED), self.shortcuts_blocked()));
     }
     fn shortcut_focus(&self, ctx: &Context) -> FocusContext {
@@ -432,7 +456,9 @@ impl Workspace {
         if !self.shortcut_editor_open {
             return;
         }
-        if let Some(action) = self.shortcut_capture {
+        if let Some(action) = self.shortcut_capture
+            && !self.blocking_dialog()
+        {
             let event = ctx.input(|i| {
                 i.events.iter().find_map(|e| {
                     if let Event::Key {
@@ -470,13 +496,15 @@ impl Workspace {
             }
         }
         let mut open = true;
-        Window::new("Keyboard shortcuts").open(&mut open).default_width(600.).vscroll(true).show(ctx,|ui| {
+        let size = fluent::dialog_size(ctx, 600., 220.);
+        let mut close = false;
+        fluent::modeless(ctx, Id::new("Keyboard shortcuts"), "Keyboard shortcuts", size).open(&mut open).show(ctx,|ui| {
             ui.label("Changes save immediately. Terminal history shortcuts scroll locally. Text fields, authentication and remote desktop capture suppress application actions.");
             ui.small("Native clipboard events keep their platform meaning. Command means Ctrl on Windows/Linux and Cmd on macOS.");
             if let Some(action)=self.shortcut_capture {ui.label(format!("Press a new shortcut for {}",action.label()));if ui.button("Cancel key capture").clicked(){self.shortcut_capture=None;}}
-            if let Err(error)=self.store.preferences.shortcuts.validate(){ui.colored_label(ui.visuals().error_fg_color,error.0);}
-            if !self.shortcut_error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&self.shortcut_error);}
-            Grid::new("shortcut-bindings").num_columns(4).show(ui,|ui| {
+            if let Err(error)=self.store.preferences.shortcuts.validate(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Shortcut, error.0);}
+            if !self.shortcut_error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Shortcut, &self.shortcut_error);}
+            fluent::dialog_body(ui,size,|ui|{Grid::new("shortcut-bindings").num_columns(4).show(ui,|ui| {
                 for action in Action::ALL {
                     ui.label(action.label());
                     let label=self.store.preferences.shortcuts.bindings.iter().find(|b|b.action==action).map(|b|b.chord.label()).unwrap_or_else(||"Unbound".into());
@@ -486,9 +514,11 @@ impl Workspace {
                     ui.end_row();
                 }
             });
+            });
             if ui.button("Restore default shortcuts").clicked(){self.store.preferences.shortcuts=Default::default();self.shortcut_capture=None;self.shortcut_error.clear();self.persist();}
+            close=ui.button("Close").clicked();
         });
-        if !open {
+        if close || !open {
             self.shortcut_editor_open = false;
             self.shortcut_capture = None;
         }
@@ -562,9 +592,9 @@ pub(super) fn is_application_key(key: Key, modifiers: Modifiers, p: &Preferences
         .is_some()
 }
 
-pub(super) fn input_blocked(ctx: &Context) -> bool {
-    ctx.data(|d| d.get_temp::<bool>(Id::new(BLOCKED)))
-        .unwrap_or(false)
+pub(super) fn input_blocked(ctx: &Context, tab: u64) -> bool {
+    ctx.data(|d| d.get_temp::<(bool, Option<u64>)>(Id::new("termcraft-transport-blocked")))
+        .is_some_and(|(blocked, owner)| blocked || owner == Some(tab))
 }
 
 impl TerminalTab {
@@ -587,7 +617,7 @@ impl TerminalTab {
                 self.screen.search_count(&self.search)
             };
             ui.label(format!("{count} matches"));
-            if ui.small_button("×").on_hover_text("Close search").clicked() {
+            if ui.small_button("×").fluent_hint("Close search").clicked() {
                 self.search_open = false;
                 ui.memory_mut(|m| m.request_focus(Id::new(("terminal-input", self.id))));
             }

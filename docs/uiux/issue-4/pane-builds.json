@@ -1,0 +1,54 @@
+{
+  "package_ui_source": "db07f667504e12c225ee03f5fa55862a9b3bc36c",
+  "current_test_source": "8f121b2372be809e057de655f2459c7795adeec2",
+  "ci_run": "https://github.com/asad-albadi/TermCraft/actions/runs/46059467626",
+  "ci_result": "success on all three platforms",
+  "package_workflow_run": "https://github.com/asad-albadi/TermCraft/actions/runs/46057357806",
+  "package_job_results": "All three native package jobs succeeded.",
+  "package_workflow_result": "failure: its older Linux/macOS regression lanes used the obsolete drop-control selectors. Corrected in the test-only follow-up above.",
+  "aggregate_result": "skipped; not described as successful",
+  "publication_result": "skipped; no release, tag or merge authorized",
+  "scope": "Unsigned core packages for UI human review, not production optional-provider bundles or complete release-assembly qualification.",
+  "production_code_equivalence": {
+    "package_ui_source": "db07f667504e12c225ee03f5fa55862a9b3bc36c",
+    "test_source": "8f121b2372be809e057de655f2459c7795adeec2",
+    "only_changed_file": "src/ui.rs",
+    "only_changed_scope": "#[cfg(test)] mod gui_tests::native_drop_on_local_zone_does_not_upload",
+    "all_bytes_outside_this_test_function_identical": true,
+    "assertions": "Private local-zone drop must not upload; listing drop must upload to the real owned SSH endpoint with exact bytes. Both retained and passed locally in the 21-case suite.",
+    "limits": "Package provenance remains db07f66, not relabeled as the amended test source. The original package workflow aggregate remains blocked by the obsolete test selector; it is not called successful."
+  },
+  "owner_acceptance": "Pending for the refined pane; session create/edit visual approval retained. PR #8 stays draft, open and unmerged.",
+  "packages": {
+    "linux-amd64": {
+      "artifact_id": 15228361451,
+      "job_id": 140703065648,
+      "artifacts": {
+        "TermCraft-0.1.0-linux-x86_64-AppImage-source.tar.gz": "f4ba10c3f6091b5de66daa1aacce5cddbf1c07f59c24f1b821885f049e73286b",
+        "TermCraft-0.1.0-linux-x86_64.AppImage": "40c29af48d24e7a317c8a49f0bd2a6d3841f9a88c71b10d66ce44049236da756",
+        "TermCraft-0.1.0-linux-x86_64.tar.gz": "2ba3b60facec31a9c1166bb46dd96241020d3c83a123beee9fb6fffd82868d37",
+        "termcraft_0.1.0_amd64.deb": "37f421f84c55568ad03c1987ca25a39baa801c91ca7c61e38e63760152319418"
+      },
+      "app_sha256": "cd4fc7e1c342692ee7320ea170692971457681ad82a8787478fd79c4a57049bb",
+      "source_snapshot_sha256": "4ab38ca85f45bdb07d2e464592c95e85c924aa405c9f44ea5536af16b30b5a2b"
+    },
+    "macos-arm64": {
+      "artifact_id": 15228452540,
+      "job_id": 140703065598,
+      "artifacts": {
+        "TermCraft-0.1.0-macos-aarch64.zip": "a196bd343e7ade9addc2917efca7028ab098f2c0e9e7d2ea952d9edfa344cac6"
+      },
+      "app_sha256": "c77d6ddf8cbab6a89eaad882e979544e4777bbcdd0efe06de1ee2b1fc40edda4",
+      "source_snapshot_sha256": "4ab38ca85f45bdb07d2e464592c95e85c924aa405c9f44ea5536af16b30b5a2b"
+    },
+    "windows-amd64": {
+      "artifact_id": 15228472883,
+      "job_id": 140703065568,
+      "artifacts": {
+        "TermCraft-0.1.0-windows-x86_64.zip": "a707769e28b1dbbb91404efdea6c0c7912fdba353e60a037b9f6d6c6c2d94177"
+      },
+      "app_sha256": "cdfc0b52f6c282ee173c23813114ad3f5af1255debb2443a2567e032c91e79cd",
+      "source_snapshot_sha256": "4ab38ca85f45bdb07d2e464592c95e85c924aa405c9f44ea5536af16b30b5a2b"
+    }
+  }
+}

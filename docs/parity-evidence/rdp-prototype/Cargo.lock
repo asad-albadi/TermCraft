@@ -2877,6 +2877,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "ironrdp",
+ "ironrdp-displaycontrol",
  "ironrdp-tokio",
  "rustls",
  "tempfile",

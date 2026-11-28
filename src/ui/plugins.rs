@@ -134,7 +134,7 @@ impl State {
 
     fn render(&mut self, ui: &mut Ui, registry: PluginRegistry) {
         self.poll(ui.ctx());
-        ui.collapsing("Plugins", |ui| {
+        ui.push_id("plugin-manager", |ui| {
             if !matches!((std::env::consts::OS, std::env::consts::ARCH), ("linux" | "windows", "x86_64")) {
                 ui.label("TermCraft plugins are available on x86-64 Linux and Windows.");
                 return;
@@ -146,11 +146,11 @@ impl State {
             if let Some(result) = &self.status {
                 match result {
                     Ok(status) => { ui.label(status); }
-                    Err(error) => { ui.colored_label(ui.visuals().error_fg_color, error); }
+                    Err(error) => { crate::ui::errors::show(ui, crate::ui::errors::Domain::Plugin, error); }
                 }
             }
             if let Some(job) = &self.job {
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     ui.spinner();
                     let cancelling = job.cancelled.load(Ordering::Acquire);
                     ui.label(if cancelling { "Cancelling…" } else { job.label });
@@ -160,7 +160,7 @@ impl State {
                 });
                 return;
             }
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 if ui.button("Inspect plugin bundle…").clicked() {
                     self.review = None;
                     self.approval = None;
@@ -181,14 +181,14 @@ impl State {
             ui.label("Select a .termcraft-plugin.json manifest. Keep its matching .tar.gz archive alongside it.");
 
             if let Some(review) = self.review.clone() {
-                ui.group(|ui| {
+                fluent::surface(ui).show(ui, |ui| {
                     let manifest = review.manifest().clone();
                     ui.strong(format!("{} {}", manifest.id, manifest.version));
                     ui.label(format!("Plugin protocol {} · {} {}", manifest.host_protocol, manifest.platform, manifest.architecture));
                     ui.label(format!("Entrypoints · {}", manifest.entrypoints.join(", ")));
                     ui.label("Requested permission · Native execution with full access to your account.");
                     ui.label(format!("Release SHA-256 · {}", review.release_digest()));
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         let update = self.items.iter().any(|item| item.manifest.id == manifest.id);
                         let label = if update { "Install update disabled" } else { "Install disabled" };
                         if ui.button(label).clicked() {
@@ -206,11 +206,11 @@ impl State {
             if self.job.is_some() { return; }
 
             if let Some(approval) = self.approval.clone() {
-                ui.group(|ui| {
+                fluent::surface(ui).show(ui, |ui| {
                     ui.strong(format!("Enable {} {}?", approval.manifest.id, approval.manifest.version));
                     ui.label("This native plugin runs as you. It can access your files, credentials and network and start other programs. Grant access only to code you trust.");
                     ui.label(format!("Release SHA-256 · {}", approval.release_digest));
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         if ui.button("Grant full account access and enable").clicked() {
                             self.approval = None;
                             self.start(ui, registry.clone(), "Enabling plugin…", false, move |registry, _| {
@@ -239,7 +239,7 @@ impl State {
     fn render_item(&mut self, ui: &mut Ui, registry: &PluginRegistry, item: InstalledPlugin) {
         let id = item.manifest.id.clone();
         ui.group(|ui| {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 let status = if item.enabled { "Enabled" } else { "Disabled" };
                 ui.strong(format!("{id} {} · {status}", item.manifest.version));
                 if item.enabled {
@@ -475,6 +475,7 @@ int main(void) {
             }),
         );
         workspace.page = Page::Tools;
+        workspace.tools_category = super::super::tools::Category::Plugins;
         let plugin_root = workspace.store_path.with_file_name("plugins");
         let registry = PluginRegistry::new(plugin_root.clone());
         // Supply the result of the native picker/inspection boundary; every

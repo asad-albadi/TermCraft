@@ -13,6 +13,7 @@ pub struct Client {
     child: Child,
     input: ChildStdin,
     events: mpsc::Receiver<(u8, zeroize::Zeroizing<Vec<u8>>)>,
+    canvas: Option<(u16, u16, u64)>,
 }
 impl Client {
     pub fn connect(server: &super::rdp_server::Server) -> Self {
@@ -36,6 +37,7 @@ impl Client {
             child,
             input,
             events,
+            canvas: None,
         };
         client.send(wire::Input::Configure(wire::Config {
             version: wire::VERSION,
@@ -67,10 +69,32 @@ impl Client {
                 .events
                 .recv_timeout(Duration::from_secs(3))
                 .expect("RDP helper ended");
-            if kind == 2 {
-                if u16::from_be_bytes(bytes[..2].try_into().unwrap()) == width
-                    && u16::from_be_bytes(bytes[2..4].try_into().unwrap()) == height
-                {
+            if kind == 2 || kind == 3 {
+                let header = if kind == 2 { 12 } else { 20 };
+                assert!(bytes.len() >= header, "Truncated desktop frame header");
+                let word = |at| u16::from_be_bytes(bytes[at..at + 2].try_into().unwrap());
+                let extent = (word(0), word(2));
+                let revision = u64::from_be_bytes(bytes[4..12].try_into().unwrap());
+                let payload = if kind == 2 {
+                    assert_ne!(revision, 0, "Missing full-frame revision");
+                    wire::dimensions(extent.0, extent.1).unwrap()
+                } else {
+                    let (cw, ch, previous) = self.canvas.expect("Patch has no baseline");
+                    assert_eq!(extent, (cw, ch), "Patch changed the canvas");
+                    assert_eq!(
+                        Some(revision),
+                        previous.checked_add(1),
+                        "Patch revision gap"
+                    );
+                    wire::patch_bounds(cw, ch, word(12), word(14), word(16), word(18)).unwrap()
+                };
+                assert_eq!(
+                    bytes.len(),
+                    header + payload,
+                    "Invalid frame payload length"
+                );
+                self.canvas = Some((extent.0, extent.1, revision));
+                if extent == (width, height) {
                     return;
                 }
             } else {

@@ -124,10 +124,10 @@ mod tests {
                 text(&shape.shape, &mut labels);
             }
         }
-        assert!(
-            labels.contains("Read-only") && labels.contains("stale"),
-            "{labels}"
-        );
+        let labels = labels.to_lowercase();
+        for required in ["read-only", "team", "cached", "stale", "shared office"] {
+            assert!(labels.contains(required), "missing {required} in {labels}");
+        }
     }
     struct PromptReader {
         auth: std::sync::Arc<dyn harbor_workspace::shared_network::SourceAuth>,
@@ -323,6 +323,40 @@ mod tests {
             assert!(Instant::now() < end);
             std::thread::sleep(Duration::from_millis(5));
         }
+        // A nested vault dismissal must return to the unanswered challenge.
+        let draw = |w: &mut Workspace, events| {
+            super::super::gui_tests::shell_frame(&ctx, vec2(950., 660.), 1., events, |ui| {
+                w.shared_sessions_windows(ui.ctx());
+                w.credential_windows(ui.ctx());
+            })
+        };
+        draw(&mut w, vec![]);
+        draw(&mut w, vec![]);
+        w.credentials.open = true;
+        draw(&mut w, vec![]);
+        draw(&mut w, vec![]);
+        draw(
+            &mut w,
+            vec![Event::Key {
+                key: Key::Escape,
+                physical_key: None,
+                pressed: true,
+                repeat: false,
+                modifiers: Modifiers::NONE,
+            }],
+        );
+        assert!(!w.credentials.open);
+        assert!(w.has_shared_prompt());
+        assert_eq!(
+            w.shared_sources
+                .forms
+                .front()
+                .unwrap()
+                .request
+                .challenge
+                .owner,
+            60001
+        );
         let form = w.shared_sources.forms.front().unwrap();
         let old = super::super::credentials::Destination::Shared {
             source: id.clone(),
@@ -986,11 +1020,14 @@ impl Workspace {
             return;
         }
         if let Err(error) = config.validate() {
-            self.message(error);
+            self.error_in(errors::Domain::Shared, error);
             return;
         }
         if self.store.shared_sources.len() >= 32 {
-            self.message("At most 32 shared sources can be active");
+            self.error_in(
+                errors::Domain::Shared,
+                "At most 32 shared sources can be active",
+            );
             return;
         }
         let id = config.id.clone();
@@ -1118,19 +1155,17 @@ impl Workspace {
                     self.persist();
                 }
             }
-            Err(error) => self.message(error),
+            Err(error) => self.error_in(errors::Domain::Shared, error),
         }
     }
 }
 impl Workspace {
     pub(super) fn shared_session_tree(&mut self, ui: &mut Ui) {
+        if self.store.shared_sources.is_empty() {
+            return;
+        }
         ui.separator();
-        ui.horizontal(|ui| {
-            ui.label(RichText::new("Read-only shared sources").strong());
-            if ui.small_button("Manage…").clicked() {
-                self.shared_sources.manager = true;
-            }
-        });
+        ui.label("Shared sessions · read-only");
         let configs: Vec<_> = self.store.shared_sources.iter().take(32).cloned().collect();
         let query = self.session_search.to_lowercase();
         let mut actions = Vec::new();
@@ -1144,10 +1179,9 @@ impl Workspace {
                 .default_open(true)
                 .show(ui, |ui| {
                     if !r.error.is_empty() {
-                        ui.add(Label::new(&r.error).truncate())
-                            .on_hover_text(&r.error);
+                        crate::ui::errors::show(ui, crate::ui::errors::Domain::Shared, &r.error);
                     }
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         if ui
                             .add_enabled(r.job.is_none(), Button::new("Refresh"))
                             .clicked()
@@ -1189,36 +1223,34 @@ impl Workspace {
                         ScrollArea::vertical()
                             .id_salt(("shared-rows", &cfg.id))
                             .max_height(240.)
-                            .show_rows(ui, 26., r.rows.len(), |ui, range| {
+                            .show_rows(ui, fluent::CONTROL_HEIGHT, r.rows.len(), |ui, range| {
                                 for row in range {
                                     let entry = &snapshot.entries[r.rows[row]];
                                     ui.push_id((&cfg.id, &entry.id), |ui| {
-                                        let label = ui
-                                            .add(
-                                                Label::new(entry.session.title())
-                                                    .truncate()
-                                                    .sense(Sense::click()),
-                                            )
-                                            .on_hover_text(format!(
-                                                "Read-only · {} · {}:{} · {}",
-                                                entry.session.protocol,
-                                                entry.session.host,
-                                                entry.session.port,
-                                                entry.session.folder
-                                            ));
-                                        if label.double_clicked() {
+                                        let detail = format!(
+                                            "Read-only · {} · {}:{} · {}",
+                                            entry.session.protocol,
+                                            entry.session.host,
+                                            entry.session.port,
+                                            entry.session.folder,
+                                        );
+                                        let (row, activate) = super::saved_session_row(
+                                            ui,
+                                            &entry.id,
+                                            &entry.session.title(),
+                                            &detail,
+                                        );
+                                        if activate {
                                             actions.push((cfg.id.clone(), entry.id.clone(), 2));
                                         }
-                                        label.context_menu(|ui| {
+                                        super::context_actions(&row, |ui, focus_first| {
                                             ui.label("Read-only source definition");
-                                            if ui
-                                                .button(if entry.requires_review {
-                                                    "Review and connect…"
-                                                } else {
-                                                    "Connect"
-                                                })
-                                                .clicked()
-                                            {
+                                            let connect = if entry.requires_review {
+                                                "Review and connect…"
+                                            } else {
+                                                "Connect"
+                                            };
+                                            if super::context_item(ui, connect, focus_first) {
                                                 actions.push((cfg.id.clone(), entry.id.clone(), 2));
                                                 ui.close();
                                             }
@@ -1269,21 +1301,26 @@ impl Workspace {
         let mut remove = None;
         let mut add = false;
         let mut manager = self.shared_sources.manager;
-        Window::new("Shared session sources").open(&mut manager).default_width(680.).show(ctx,|ui|{
+        let size = fluent::dialog_size(ctx, 680., 145.);
+        let mut close_manager = false;
+        fluent::modeless(ctx, Id::new("Shared session sources"), "Shared session sources", size).open(&mut manager).show(ctx,|ui|{
    ui.label("Shared definitions remain separate and read-only. Copying creates an independent local session.");
    ui.add_enabled_ui(!self.import_applying(),|ui|{
-    add=ui.button("Add shared source…").clicked();
+    fluent::dialog_body(ui, size, |ui| {
     for cfg in &self.store.shared_sources {
      let saving=self.shared_sources.runtime.get(&cfg.id).and_then(|r|r.job.as_ref()).is_some_and(|j|j.kind==Kind::Save);
-     ui.push_id(&cfg.id,|ui|{ui.horizontal(|ui|{
+     ui.push_id(&cfg.id,|ui|{ui.horizontal_wrapped(|ui|{
       ui.label(&cfg.name);if ui.add_enabled(!saving,Button::new("Refresh")).clicked(){refresh=Some(cfg.id.clone());}
       if ui.add_enabled(!saving,Button::new("Edit…")).clicked(){edit=Some(cfg.clone());}
       if ui.add_enabled(!saving,Button::new("Remove source")).clicked(){remove=Some(cfg.id.clone());}
-     });if let Some(r)=self.shared_sources.runtime.get(&cfg.id){ui.label(&r.status);if !r.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&r.error);}}});
+     });if let Some(r)=self.shared_sources.runtime.get(&cfg.id){ui.label(&r.status);if !r.error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Shared, &r.error);}}});
     }
    });
+   add = ui.button("Add shared source…").clicked();
+   });
+   close_manager = ui.button("Close").clicked();
   });
-        self.shared_sources.manager = manager;
+        self.shared_sources.manager = manager && !close_manager;
         if add {
             self.shared_sources.draft = Some(Draft {
                 id: None,
@@ -1353,7 +1390,10 @@ impl Workspace {
         }) {
             drop(cleanup);
         } else {
-            self.message("Source removed; its private cache cleanup could not start.");
+            self.error_in(
+                errors::Domain::Shared,
+                "Source removed; its private cache cleanup could not start.",
+            );
         }
     }
     fn shared_source_draft(&mut self, ctx: &Context) {
@@ -1362,13 +1402,23 @@ impl Workspace {
         };
         let mut save = false;
         let mut cancel = false;
-        let response=Modal::new(Id::new("shared-source-setup")).show(ctx,|ui|{
-   ui.set_min_width(580.);ui.heading(if draft.id.is_some(){"Edit shared source"}else{"Add shared source"});
-   ui.add_enabled_ui(!self.import_applying(),|ui|{
-    field(ui,"Name",&mut draft.name,"Team sessions");
-    ui.horizontal(|ui|{ui.selectable_value(&mut draft.kind,SourceKind::File,"Shared file");ui.selectable_value(&mut draft.kind,SourceKind::Https,"HTTPS");ui.selectable_value(&mut draft.kind,SourceKind::Sftp,"SFTP");});
+        let size = fluent::dialog_size(ctx, 580., 120.);
+        let response = fluent::modal(
+            ctx,
+            Id::new("shared-source-setup"),
+            if draft.id.is_some() {
+                "Edit shared source"
+            } else {
+                "Add shared source"
+            },
+            size,
+            |ui| {
+                fluent::dialog_body(ui, size, |ui| {
+                    ui.add_enabled_ui(!self.import_applying(),|ui|{
+    let name = field(ui,"Name",&mut draft.name,"Team sessions"); fluent::focus_on_entry(ui, &name, ui.id());
+    ui.horizontal_wrapped(|ui|{ui.selectable_value(&mut draft.kind,SourceKind::File,"Shared file");ui.selectable_value(&mut draft.kind,SourceKind::Https,"HTTPS");ui.selectable_value(&mut draft.kind,SourceKind::Sftp,"SFTP");});
     match draft.kind {
-     SourceKind::File=>{ui.horizontal(|ui|{ui.add(TextEdit::singleline(&mut draft.text).hint_text("Shared file path").desired_width(420.));if ui.button("Browse…").clicked(){if let Some(path)=rfd::FileDialog::new().pick_file(){if let Some(text)=path.to_str(){draft.text=text.to_owned();}else{draft.error="This source path cannot be stored as portable text; choose a UTF-8 path.".into();}}}});},
+     SourceKind::File=>{ui.horizontal_wrapped(|ui|{ui.add(TextEdit::singleline(&mut draft.text).hint_text("Shared file path").desired_width((size.width-110.).max(1.)));if ui.button("Browse…").clicked(){if let Some(path)=rfd::FileDialog::new().pick_file(){if let Some(text)=path.to_str(){draft.text=text.to_owned();}else{draft.error="This source path cannot be stored as portable text; choose a UTF-8 path.".into();}}}});},
      SourceKind::Https=>{field(ui,"HTTPS URL",&mut draft.text,"https://example.com/sessions.json");ui.small("Use a URL without embedded credentials, query or fragment. Sign-in prompts are private; certificates are verified and redirects are refused.");},
      SourceKind::Sftp=>{
       ComboBox::from_id_salt("shared-ssh-profile").selected_text(self.store.sessions.iter().find(|s|s.id==draft.session).map(Session::title).unwrap_or_else(||"Choose saved embedded SSH profile".into())).show_ui(ui,|ui|{
@@ -1376,11 +1426,18 @@ impl Workspace {
       });field(ui,"Remote file",&mut draft.text,"/path/to/sessions.json");ui.small("Uses the embedded SSH trust/sign-in engine and SFTP only; no shell or login command is started.");
      }
     }
-    ui.horizontal(|ui|{ui.label("Format");ui.selectable_value(&mut draft.format,SharedFormat::Workspace,"TermCraft JSON");ui.selectable_value(&mut draft.format,SharedFormat::Moba,"Moba SSH");ui.selectable_value(&mut draft.format,SharedFormat::Putty,"PuTTY SSH .reg");});
-    if !draft.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&draft.error);}
-    save=ui.button("Save and refresh").clicked();
-   });cancel=ui.button("Cancel").clicked();
-  });
+    ui.horizontal_wrapped(|ui|{ui.label("Format");ui.selectable_value(&mut draft.format,SharedFormat::Workspace,"TermCraft JSON");ui.selectable_value(&mut draft.format,SharedFormat::Moba,"Moba SSH");ui.selectable_value(&mut draft.format,SharedFormat::Putty,"PuTTY SSH .reg");});
+    if !draft.error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Shared, &draft.error);}
+   });
+                });
+                ui.horizontal_wrapped(|ui| {
+                    save = ui
+                        .add_enabled(!self.import_applying(), Button::new("Save and refresh"))
+                        .clicked();
+                    cancel = ui.button("Cancel").clicked();
+                });
+            },
+        );
         if response.should_close() {
             cancel = true;
         }
@@ -1427,50 +1484,63 @@ impl Workspace {
         let mut answer = None;
         let mut cancel = false;
         let mut use_saved = false;
-        let response = Modal::new(Id::new("shared-source-sign-in")).show(ctx, |ui| {
-            ui.set_min_width(520.);
-            ui.heading("Shared source sign-in");
-            let c = &form.request.challenge;
-            ScrollArea::vertical()
-                .id_salt("shared-auth-fields")
-                .max_height(420.)
-                .show(ui, |ui| {
-                    ui.label(&c.title);
-                    if let Some(endpoint) = &c.endpoint {
-                        ui.label(endpoint);
-                    }
-                    for (index, prompt) in c.prompts.iter().enumerate() {
-                        ui.add(Label::new(&prompt.label).truncate())
-                            .on_hover_text(&prompt.label);
-                        super::remote_files::auth_field_scoped(
-                            ui,
-                            "shared-source-auth",
-                            c.owner,
-                            c.answer_id,
-                            index,
-                            prompt,
-                            &mut form.values[index],
-                        );
-                    }
-                });
-            if let Some(credential)=&c.credential{ui.horizontal_wrapped(|ui|{
+        let size = fluent::dialog_size(ctx, 520., 180.);
+        let response = fluent::modal(
+            ctx,
+            Id::new("shared-source-sign-in"),
+            "Shared source sign-in",
+            size,
+            |ui| {
+                let c = &form.request.challenge;
+                ScrollArea::vertical()
+                    .id_salt("shared-auth-fields")
+                    .max_height(size.body_height)
+                    .show(ui, |ui| {
+                        ui.label(&c.title);
+                        if let Some(endpoint) = &c.endpoint {
+                            ui.label(endpoint);
+                        }
+                        for (index, prompt) in c.prompts.iter().enumerate() {
+                            let label = ui
+                                .add(Label::new(&prompt.label).wrap())
+                                .fluent_hint(&prompt.label);
+                            super::remote_files::auth_field_scoped(
+                                ui,
+                                "shared-source-auth",
+                                c.owner,
+                                c.answer_id,
+                                index,
+                                prompt,
+                                &mut form.values[index],
+                            )
+                            .labelled_by(label.id);
+                        }
+                    });
+                if let Some(credential) = &c.credential {
+                    ui.horizontal_wrapped(|ui|{
                 if credential.reference.is_some(){use_saved=ui.button("Use saved credential").clicked();}
-                ui.checkbox(&mut form.save_in_vault,"Save entered value in vault").on_hover_text("Unlock the vault first. Saving does not wait for authentication success.");
-            });}
-            ui.horizontal(|ui| {
-                if c.host_key {
-                    if ui.button("Trust once").clicked() {
-                        answer = Some(Some(TrustDecision::Once));
-                    }
-                    if ui.button("Trust and remember").clicked() {
-                        answer = Some(Some(TrustDecision::Remember));
-                    }
-                } else if ui.button("Continue").clicked() {
-                    answer = Some(None);
-                }
-                cancel = ui.button("Cancel refresh").clicked();
+                ui.checkbox(&mut form.save_in_vault,"Save entered value in vault").fluent_hint("Unlock the vault first. Saving does not wait for authentication success.");
             });
-        });
+                }
+                ui.horizontal_wrapped(|ui| {
+                    if c.host_key {
+                        if ui.button("Trust once").clicked() {
+                            answer = Some(Some(TrustDecision::Once));
+                        }
+                        if ui.button("Trust and remember").clicked() {
+                            answer = Some(Some(TrustDecision::Remember));
+                        }
+                    } else if ui.button("Continue").clicked() {
+                        answer = Some(None);
+                    }
+                    let safe = ui.button("Cancel refresh");
+                    if c.host_key {
+                        fluent::focus_on_entry(ui, &safe, Id::new((c.owner, c.answer_id)));
+                    }
+                    cancel = safe.clicked();
+                });
+            },
+        );
         cancel |= response.should_close();
         let source = form.source.clone();
         let owner = form.request.challenge.owner;
@@ -1527,13 +1597,8 @@ impl Workspace {
     }
 }
 
-fn field(ui: &mut Ui, label: &str, value: &mut String, hint: &str) {
-    ui.label(label);
-    ui.add(
-        TextEdit::singleline(value)
-            .hint_text(hint)
-            .desired_width(460.),
-    );
+fn field(ui: &mut Ui, label: &str, value: &mut String, hint: &str) -> Response {
+    fluent::field(ui, label, value, hint, 460.)
 }
 
 impl Workspace {

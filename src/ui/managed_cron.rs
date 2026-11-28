@@ -128,6 +128,19 @@ pub(super) struct ManagedCron {
     error: Option<String>,
 }
 impl ManagedCron {
+    pub(super) fn active(&self) -> bool {
+        self.worker
+            .as_ref()
+            .and_then(|w| w.snapshot.try_lock().ok())
+            .and_then(|s| s.status.clone())
+            .is_some_and(|s| {
+                matches!(
+                    s.state,
+                    ServiceState::Starting | ServiceState::Running | ServiceState::Stopping
+                )
+            })
+    }
+
     fn send(&mut self, action: Action) {
         if self.worker.as_ref().unwrap().send.try_send(action).is_err() {
             self.error = Some("Scheduler is busy; try again shortly.".into());
@@ -195,15 +208,15 @@ impl ManagedCron {
         });
         ui.ctx().request_repaint_after(Duration::from_millis(250));
         surface(ui).show(ui, |ui| {
-            ui.label(RichText::new("Cron scheduled commands").size(18.).strong());
-            ui.label("Runs only while this scheduler and workspace are open. Jobs run with your account’s full permissions. Stop cancels active jobs; closing the app stops scheduling.");
+            ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Cron scheduled commands").size(18.)));
+            ui.colored_label(ui.visuals().warn_fg_color,"Jobs run with your account’s permissions while this workspace is open.");
             if let Some(status) = &snapshot.status {
                 ui.label(format!("Scheduler: {:?}", status.state));
                 if let Some(error) = &status.error {
-                    ui.colored_label(Color32::from_rgb(210, 65, 65), error);
+                    crate::ui::errors::show(ui, crate::ui::errors::Domain::Scheduler, error);
                 }
             }
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 if busy {
                     if ui.button("Stop scheduler / cancel jobs").clicked() {
                         self.send(Action::Stop);
@@ -218,13 +231,13 @@ impl ManagedCron {
                 }
             });
             ui.add_enabled_ui(!busy, |ui| {
-                ui.horizontal(|ui| {
+                ui.horizontal_wrapped(|ui| {
                     ui.label("Timezone");
                     ui.selectable_value(&mut self.timezone, CronTimezone::Utc, "UTC");
                     ui.selectable_value(&mut self.timezone, CronTimezone::SystemLocal, "System local");
                 });
-                ui.small("Five fields: minute hour day month weekday. Supports *, lists, ranges, steps, JAN–DEC and SUN–SAT. Sunday = 0 or 7; day and weekday use OR when neither starts with *. No @aliases, seconds, ?, L, W, #, or inline environment settings.");
-                ui.small("Missed minutes are skipped; restart checks the current minute once. A recorded attempt is never replayed after clock rollback. Local DST gaps are skipped; repeated local minutes can run twice at their distinct UTC instants. No overlap per job; at most 4 concurrent commands / 32 jobs.");
+                ui.menu_button("Schedule help", |ui| { ui.set_max_width(340.); ui.small("Five fields: minute hour day month weekday. Supports *, lists, ranges, steps, JAN–DEC and SUN–SAT. Sunday = 0 or 7; day and weekday use OR when neither starts with *. No @aliases, seconds, ?, L, W, #, or inline environment settings."); });
+                ui.menu_button("Scheduling behavior", |ui| { ui.set_max_width(340.); ui.small("Missed minutes are skipped; restart checks the current minute once. A recorded attempt is never replayed after clock rollback. Local DST gaps are skipped; repeated local minutes can run twice at their distinct UTC instants. No overlap per job; at most 4 concurrent commands / 32 jobs."); });
                 ui.horizontal_wrapped(|ui| {
                     for i in 0..self.jobs.len() {
                         if ui.selectable_label(self.selected == Some(i), &self.jobs[i].id).clicked() {
@@ -235,21 +248,21 @@ impl ManagedCron {
                         self.reset_editor();
                     }
                 });
-                Grid::new("cron-job-form").num_columns(2).show(ui, |ui| {
+                fluent::settings_grid(ui, "cron-job-form", |ui| {
                     ui.label("Job name");
-                    ui.text_edit_singleline(&mut self.name);
+                    ui.add(crate::ui::fluent::singleline(&mut self.name));
                     ui.end_row();
                     ui.label("Schedule");
-                    ui.text_edit_singleline(&mut self.expression);
+                    ui.add(crate::ui::fluent::singleline(&mut self.expression));
                     ui.end_row();
                     ui.label("Executable (absolute path)");
-                    ui.text_edit_singleline(&mut self.program);
+                    ui.add(crate::ui::fluent::singleline(&mut self.program));
                     ui.end_row();
                     ui.label("Arguments (one per line)");
                     ui.add(TextEdit::multiline(&mut self.arguments).desired_rows(3));
                     ui.end_row();
                     ui.label("Working folder (absolute path)");
-                    ui.text_edit_singleline(&mut self.directory);
+                    ui.add(crate::ui::fluent::singleline(&mut self.directory));
                     ui.end_row();
                     ui.label("Maximum runtime");
                     ui.add(DragValue::new(&mut self.seconds).range(1..=86400).suffix(" seconds"));
@@ -258,8 +271,9 @@ impl ManagedCron {
                     ui.checkbox(&mut self.enabled, "Allow scheduled runs");
                     ui.end_row();
                 });
-                ui.small("Commands and arguments are saved locally. Keep passwords and tokens out of arguments; use your command’s secure credential store. Output is discarded. Scripts require an explicitly chosen interpreter and script argument.");
-                ui.horizontal(|ui| {
+                ui.small("Keep passwords and tokens out of saved command arguments.");
+                ui.menu_button("Command help", |ui| { ui.set_max_width(340.); ui.small("Commands and arguments are saved locally. Keep passwords and tokens out of arguments; use your command’s secure credential store. Output is discarded. Scripts require an explicitly chosen interpreter and script argument."); });
+                ui.horizontal_wrapped(|ui| {
                     if ui.button("Save job and timezone").clicked() {
                         let job = CronJob {
                             id: self.name.clone(), schedule: self.expression.clone(), enabled: self.enabled,
@@ -288,7 +302,7 @@ impl ManagedCron {
                 }
             }
             for error in [&self.error, &snapshot.error].into_iter().flatten() {
-                ui.colored_label(Color32::from_rgb(210, 65, 65), error);
+                crate::ui::errors::show(ui, crate::ui::errors::Domain::Scheduler, error);
             }
         });
     }

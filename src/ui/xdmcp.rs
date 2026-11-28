@@ -101,7 +101,10 @@ impl State {
         }
     }
 }
-pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
+pub(super) fn sync_editor(
+    s: &mut Session,
+    state: &mut State,
+) -> (HostRequest, Option<std::net::SocketAddr>) {
     if state.session_id.as_deref() != Some(s.id.as_str()) {
         state.end_editor();
         *state = State {
@@ -125,20 +128,6 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             ..Default::default()
         };
     }
-    ui.horizontal_wrapped(|ui| {
-        ui.label("Query mode");
-        ui.selectable_value(&mut s.xdmcp_options.mode, QueryMode::Direct, "Direct");
-        ui.selectable_value(
-            &mut s.xdmcp_options.mode,
-            QueryMode::Indirect,
-            "Indirect chooser",
-        );
-        ui.selectable_value(
-            &mut s.xdmcp_options.mode,
-            QueryMode::Broadcast,
-            "Broadcast discovery",
-        );
-    });
     let fingerprint = format!(
         "{}:{}:{:?}:{:?}",
         s.host, s.port, s.xdmcp_options.mode, s.xdmcp_options.discovery_network
@@ -170,6 +159,25 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     if s.xdmcp_options.selected_endpoint != endpoint && !bound {
         s.xdmcp_options.selected_endpoint = None;
     }
+    (request, endpoint)
+}
+
+pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
+    ui.horizontal_wrapped(|ui| {
+        ui.label("Query mode");
+        ui.selectable_value(&mut s.xdmcp_options.mode, QueryMode::Direct, "Direct");
+        ui.selectable_value(
+            &mut s.xdmcp_options.mode,
+            QueryMode::Indirect,
+            "Indirect chooser",
+        );
+        ui.selectable_value(
+            &mut s.xdmcp_options.mode,
+            QueryMode::Broadcast,
+            "Broadcast discovery",
+        );
+    });
+    let (request, endpoint) = sync_editor(s, state);
     if s.xdmcp_options.mode == QueryMode::Broadcast {
         if state.interface.is_empty() {
             if let Some(network) = s.xdmcp_options.discovery_network {
@@ -179,9 +187,9 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 state.prefix = 24;
             }
         }
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Local interface IPv4");
-            ui.text_edit_singleline(&mut state.interface);
+            ui.add(crate::ui::fluent::singleline(&mut state.interface));
             ui.label("Prefix");
             ui.add(DragValue::new(&mut state.prefix).range(16..=30));
         });
@@ -196,7 +204,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 });
         ui.small("Broadcast sends at most three discovery packets on the network you choose, only when you click Discover. Advertisements are unauthenticated.");
     }
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         if state.pending.is_some() || state.resolving.is_some() {
             ui.spinner();
             if ui.button("Cancel discovery / resolution").clicked() {
@@ -288,7 +296,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
         }
     }
     if !state.error.is_empty() {
-        ui.colored_label(Color32::from_rgb(180, 42, 42), &state.error);
+        crate::ui::errors::show(ui, crate::ui::errors::Domain::X11, &state.error);
     }
     ui.small(format!(
         "Selected endpoint: {}",
@@ -297,7 +305,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             .map(|v| v.to_string())
             .unwrap_or_else(|| "None".into())
     ));
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         let mut automatic = s.xdmcp_options.display.is_none();
         if ui
             .checkbox(&mut automatic, "Automatic free display")
@@ -329,14 +337,14 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             options.clipboard_authority = None;
         }
     } else {
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Desktop size");
             ui.add(DragValue::new(&mut s.width).range(200..=8192));
             ui.label("×");
             ui.add(DragValue::new(&mut s.height).range(200..=8192));
             ui.checkbox(&mut s.xdmcp_options.fullscreen, "Full screen");
         });
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Monitor output");
             let mut monitor = s.xdmcp_options.monitor.clone().unwrap_or_default();
             let monitor_hint = if cfg!(all(windows, target_arch = "x86_64")) {
@@ -345,7 +353,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 "Default; e.g. HDMI-1"
             };
             if ui
-                .add(TextEdit::singleline(&mut monitor).hint_text(monitor_hint))
+                .add(crate::ui::fluent::singleline(&mut monitor).hint_text(monitor_hint))
                 .changed()
             {
                 s.xdmcp_options.monitor = if monitor.is_empty() {
@@ -355,16 +363,16 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 }
             }
         });
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
         ui.label("Session keyboard");
         let keyboard = &mut s.xdmcp_options.keyboard;
-        ui.add(TextEdit::singleline(keyboard).hint_text("Host keyboard").desired_width(120.0))
-            .on_hover_text("Enter an installed XKB layout ID, such as us, de, or fr. Leave empty to inherit the host keyboard.");
+        ui.add(crate::ui::fluent::singleline(keyboard).hint_text("Host keyboard").desired_width(120.0))
+            .fluent_hint("Enter an installed XKB layout ID, such as us, de, or fr. Leave empty to inherit the host keyboard.");
         if !keyboard.is_empty() && ui.button("Use host keyboard").clicked() {
             keyboard.clear();
         }
     });
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             let windows = cfg!(all(windows, target_arch = "x86_64"));
             ui.label(if windows {
                 "Windows text clipboard"
@@ -406,7 +414,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
         }
         #[cfg(target_os = "linux")]
         if s.xdmcp_options.clipboard == ClipboardPolicy::Bidirectional {
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.label("Selected local parent X11 display");
                 ui.text_edit_singleline(
                     s.xdmcp_options
@@ -420,9 +428,12 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
                 .as_ref()
                 .map(|p| p.to_string_lossy().into_owned())
                 .unwrap_or_default();
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 ui.label("Parent Xauthority (blank: inherited)");
-                if ui.text_edit_singleline(&mut authority).changed() {
+                if ui
+                    .add(crate::ui::fluent::singleline(&mut authority))
+                    .changed()
+                {
                     s.xdmcp_options.clipboard_authority = if authority.is_empty() {
                         None
                     } else {
@@ -438,10 +449,10 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
             state.advertise = ip.to_string();
         }
     }
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         ui.label("Advertised local IPv4");
         ui.add(
-            TextEdit::singleline(&mut state.advertise).hint_text(if native_macos {
+            crate::ui::fluent::singleline(&mut state.advertise).hint_text(if native_macos {
                 "Automatic route address"
             } else {
                 "Reachable non-loopback local IPv4"
@@ -450,7 +461,11 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     });
     s.xdmcp_options.advertise_address = state.advertise.parse().ok();
     if !state.advertise.is_empty() && s.xdmcp_options.advertise_address.is_none() {
-        ui.colored_label(Color32::RED, "Enter a valid local IPv4 address");
+        crate::ui::errors::show(
+            ui,
+            crate::ui::errors::Domain::X11,
+            "Enter a valid local IPv4 address",
+        );
     }
     if cfg!(all(windows, target_arch = "x86_64")) {
         ui.checkbox(
@@ -634,18 +649,18 @@ mod tests {
             address,
         );
         let generation = w.xdmcp_discovery.generation;
-        let output = frame(&mut w, input(vec![]));
-        let title = text_pos(&output.shapes, "New session");
-        let rect = ctx
-            .memory(|memory| memory.area_rect(Id::new("session-form")))
-            .unwrap();
-        let close = pos2(rect.right() - 16., title.y);
-        let _ = frame(&mut w, pointer(close, true));
-        let _ = frame(&mut w, pointer(close, false));
-        assert!(
-            w.session_form.is_none(),
-            "Window X did not close the editor"
+        let _ = frame(&mut w, input(vec![]));
+        let _ = frame(
+            &mut w,
+            input(vec![egui::Event::Key {
+                key: egui::Key::Escape,
+                physical_key: None,
+                pressed: true,
+                repeat: false,
+                modifiers: egui::Modifiers::NONE,
+            }]),
         );
+        assert!(w.session_form.is_none(), "Escape did not cancel the editor");
         let mut original = session;
         original.xdmcp_options.selected_endpoint = Some(address);
         w.session_form = Some(original);
@@ -694,11 +709,7 @@ mod tests {
         let frame = |w: &mut Workspace, input| test_frame(&ctx, input, |_| w.session_dialog(&ctx));
         let _ = frame(&mut w, input(vec![]));
         let output = frame(&mut w, input(vec![]));
-        let title = text_pos(&output.shapes, "New session");
-        let rect = ctx
-            .memory(|memory| memory.area_rect(Id::new("session-form")))
-            .unwrap();
-        let close = pos2(rect.right() - 16., title.y);
+        let close = text_pos(&output.shapes, "Cancel");
         let _ = frame(&mut w, pointer(close, true));
         // A numeric answer is ready synchronously, making the DNS-to-UDP
         // handoff deterministic without leaving a system resolver behind.
@@ -734,6 +745,40 @@ mod tests {
         let (n, _) = socket.recv_from(&mut packet).unwrap();
         assert_eq!(&packet[..n], &[0, 1, 0, 2, 0, 1, 0]);
         w.xdmcp_discovery.end_editor();
+    }
+
+    #[test]
+    fn switching_editor_sections_retains_only_current_xdmcp_candidates() {
+        use crate::ui::pages::SessionSection::{Advanced, Bookmark, Connection};
+        let (ctx, _root, mut w) = crate::ui::terminal_review_tests::owned_workspace();
+        w.open_session_form(hostname_session());
+        let render =
+            |w: &mut Workspace| test_frame(&ctx, input(vec![]), |_| w.session_dialog(&ctx));
+        render(&mut w);
+        let endpoint = "127.0.0.1:1177".parse().unwrap();
+        seed_candidates(
+            w.session_form.as_mut().unwrap(),
+            &mut w.xdmcp_discovery,
+            endpoint,
+        );
+        let generation = w.xdmcp_discovery.generation;
+        for section in [Advanced, Bookmark, Connection] {
+            w.session_section = section;
+            render(&mut w);
+            assert_eq!(w.xdmcp_discovery.generation, generation);
+            assert_eq!(
+                w.session_form
+                    .as_ref()
+                    .unwrap()
+                    .xdmcp_options
+                    .selected_endpoint,
+                Some(endpoint)
+            );
+            assert!(w.xdmcp_discovery.pending.is_none() && w.xdmcp_discovery.resolving.is_none());
+        }
+        w.session_form.as_mut().unwrap().host = "different.invalid".into();
+        render(&mut w);
+        assert!(w.xdmcp_discovery.resolved.is_empty() && w.xdmcp_discovery.selection.is_none());
     }
 
     #[test]

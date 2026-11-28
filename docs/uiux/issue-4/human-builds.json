@@ -1,0 +1,43 @@
+{
+  "source_sha": "df5dbb8e260e84aca2e25d7ae19c112233cab97f",
+  "ci_run": "https://github.com/asad-albadi/TermCraft/actions/runs/46049020536",
+  "package_run": "https://github.com/asad-albadi/TermCraft/actions/runs/46049050604",
+  "qualification_scope": "Unsigned core packages and their automated native startup/lifecycle checks; not production optional-provider bundles or physical/human acceptance.",
+  "owner_acceptance": "Pending; PR #8 remains draft, open and unmerged.",
+  "capture_provenance": "Current fourteen UI/gallery originals remain identified as the f599000 full-adapter core. They are not relabeled as df5dbb8 captures.",
+  "packages": {
+    "linux-amd64": {
+      "artifact_id": 15225052570,
+      "job_id": 140678056174,
+      "artifacts": {
+        "TermCraft-0.1.0-linux-x86_64-AppImage-source.tar.gz": "f4ba10c3f6091b5de66daa1aacce5cddbf1c07f59c24f1b821885f049e73286b",
+        "TermCraft-0.1.0-linux-x86_64.AppImage": "755edc4ff76b7195c68a1f787ebf06dd4f1cb175cefec82dae372616937b4703",
+        "TermCraft-0.1.0-linux-x86_64.tar.gz": "b54927c430c2afb602f8215051511894419010a9870b766c79a81cda581e932d",
+        "termcraft_0.1.0_amd64.deb": "d239e49d0c4e73cd63eab2a41e5c7e164f0f51cc1729eff670ed1bbef737be29"
+      },
+      "app_sha256": "ab2b02c1628a565bb0b1235197a06c2710527777a8210e8a42b366850891be46",
+      "source_snapshot_sha256": "1d48476024299c73fc787d1320e607c946f5c1e085c1657591a7d55d8a884f48"
+    },
+    "macos-arm64": {
+      "artifact_id": 15225710420,
+      "job_id": 140678056123,
+      "artifacts": {
+        "TermCraft-0.1.0-macos-aarch64.zip": "93f87e258e584698bdc5cb7d8cd9e2fcdcdac4fcb49de50d01a96b312cdfcd75"
+      },
+      "app_sha256": "83ea211750bfe392e54e877b3fdaf781d9bb8f39d096799287665951b30c305b",
+      "source_snapshot_sha256": "1d48476024299c73fc787d1320e607c946f5c1e085c1657591a7d55d8a884f48"
+    },
+    "windows-amd64": {
+      "artifact_id": 15225397772,
+      "job_id": 140678056226,
+      "artifacts": {
+        "TermCraft-0.1.0-windows-x86_64.zip": "19b8855e7a716021584ebff0c263153fe010bb90ebc5e0725a3f35dc88320ed5"
+      },
+      "app_sha256": "b222c6cb9fa6d69d0a6af6abb22b2fea03a11ef13a3cffe2fcb25efc1f0a13a8",
+      "source_snapshot_sha256": "1d48476024299c73fc787d1320e607c946f5c1e085c1657591a7d55d8a884f48"
+    }
+  },
+  "aggregate_job": 140691982468,
+  "aggregate_result": "success",
+  "publication_result": "skipped"
+}

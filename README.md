@@ -127,7 +127,7 @@ RUSTUP_TOOLCHAIN=1.96.1 ./scripts/run-dev.sh
 
 Rust 1.96.1 is the verified Linux toolchain. Release packaging tools require Python 3.11 or newer. Builds need a native C/C++ toolchain and the platform development libraries used by eframe/egui and the selected providers. A graphical desktop and working OpenGL drivers are required. Tests also need their documented endpoint fixtures; some Linux tests require OpenSSH tools and a C compiler. See [development notes](DESIGN.md) and the [validation evidence](PARITY_PROGRESS.md).
 
-The development script builds both the GUI and its independently locked RDP helper. After dependencies have been downloaded, set `TERMCRAFT_OFFLINE=1` to use Cargo's cache.
+The development script builds both the GUI and its independently locked RDP helper. When relocating a development review build, keep the matching `termcraft-rdp-engine` beside the GUI; the app prefers that adjacent helper before the source-tree fallback. After dependencies have been downloaded, set `TERMCRAFT_OFFLINE=1` to use Cargo's cache.
 
 For a native release build:
 
@@ -166,6 +166,10 @@ Sessions, tunnels, macros and preferences are saved locally. Earlier Harbor conf
 Use `--data-dir /path/to/workspace` to choose an independent workspace. Eligible credentials can be saved through the optional encrypted vault; ordinary logs, recordings and remote-editor recovery snapshots are not all encrypted. Recovery copies can remain after an editor closes. Browser pages, remote connections, sharing services, plugins and external programs have their own data-access implications.
 
 Read the [privacy policy](PRIVACY.md) for network activity, credentials, retained files and deletion details.
+
+## Troubleshooting
+
+Application errors include a stable `TC-…` code. Select the code for a suggested next step, technical details and **Copy error details**. Recognized credentials are redacted from reports. See the [error-code guide](docs/uiux/issue-4/error-messages.md).
 
 ## Development
 

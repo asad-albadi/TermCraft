@@ -1,3 +1,4 @@
+pub mod diagnostics;
 pub mod model;
 pub use model::{protocol_port, ssh_arguments};
 #[cfg(test)]

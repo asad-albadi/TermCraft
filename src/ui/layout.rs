@@ -117,7 +117,13 @@ impl Workspace {
                     pos, pressed: true, ..
                 } if ui.ctx().layer_id_at(*pos) == Some(ui.layer_id()) => panes
                     .iter()
-                    .find(|pane| pane.rect.contains(*pos))
+                    .find(|pane| {
+                        let close = Rect::from_min_size(
+                            pane.rect.right_top() - vec2(fluent::CONTROL_HEIGHT, 0.),
+                            Vec2::splat(fluent::CONTROL_HEIGHT),
+                        );
+                        pane.rect.contains(*pos) && (panes.len() == 1 || !close.contains(*pos))
+                    })
                     .map(|pane| pane.id),
                 _ => None,
             })
@@ -158,22 +164,32 @@ impl Workspace {
             );
             child.set_clip_rect(pane.rect.intersect(ui.clip_rect()));
             child.spacing_mut().item_spacing = vec2(4., 4.);
-            child.horizontal(|ui| {
-                ui.label(
-                    RichText::new(self.terminal_title(pane.id))
-                        .strong()
-                        .color(if selected { accent(ui) } else { ink(ui) }),
+            if panes.len() > 1 {
+                child.allocate_ui_with_layout(
+                    vec2(child.available_width(), fluent::CONTROL_HEIGHT),
+                    Layout::right_to_left(Align::Center),
+                    |ui| {
+                        let title = self.terminal_title(pane.id);
+                        let (_, close_button) = ui.allocate_exact_size(
+                            Vec2::splat(fluent::CONTROL_HEIGHT),
+                            Sense::click(),
+                        );
+                        if paint_close(ui, close_button, &title).clicked() {
+                            close = Some(pane.id);
+                        }
+                        ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
+                            ui.add(
+                                Label::new(
+                                    crate::ui::fluent::emphasized(ui.ctx(), RichText::new(&title))
+                                        .color(if selected { accent(ui) } else { ink(ui) }),
+                                )
+                                .truncate(),
+                            )
+                            .fluent_hint(&title);
+                        });
+                    },
                 );
-                ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                    if ui
-                        .small_button("×")
-                        .on_hover_text("Close this terminal")
-                        .clicked()
-                    {
-                        close = Some(pane.id);
-                    }
-                });
-            });
+            }
             let bytes = super::pages::terminal_view(&mut child, &mut self.tabs[index], p);
             if pane.rect.intersect(ui.clip_rect()).is_positive() {
                 self.mark_painted_terminal(ui.ctx(), pane.id, 0);
@@ -181,15 +197,17 @@ impl Workspace {
             if !bytes.is_empty() {
                 emitted.push((pane.id, bytes));
             }
-            ui.painter().rect_stroke(
-                pane.rect,
-                0.,
-                Stroke::new(
-                    if selected { 1.5 } else { 1. },
-                    if selected { accent(ui) } else { line(ui) },
-                ),
-                StrokeKind::Inside,
-            );
+            if panes.len() > 1 {
+                ui.painter().rect_stroke(
+                    pane.rect,
+                    0.,
+                    Stroke::new(
+                        if selected { 1.5 } else { 1. },
+                        if selected { accent(ui) } else { line(ui) },
+                    ),
+                    StrokeKind::Inside,
+                );
+            }
         }
         let mut save = false;
         for divider in tree.dividers(bounds) {
@@ -200,7 +218,7 @@ impl Workspace {
             );
             response
                 .clone()
-                .on_hover_cursor(if divider.axis == Orientation::Horizontal {
+                .on_hover_and_drag_cursor(if divider.axis == Orientation::Horizontal {
                     CursorIcon::ResizeHorizontal
                 } else {
                     CursorIcon::ResizeVertical

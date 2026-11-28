@@ -9,6 +9,10 @@ use harbor_workspace::{
 fn old_store_inherits_terminal_defaults() {
     let store: Store = serde_json::from_str(r#"{"preferences":{}}"#).unwrap();
     let settings = store.preferences.terminal_settings();
+    assert_eq!(settings.font_family, TerminalFont::JetBrainsMonoNerd);
+    let explicit: TerminalSettings =
+        serde_json::from_str(r#"{"font_family":"DejaVuSansMono"}"#).unwrap();
+    assert_eq!(explicit.font_family, TerminalFont::DejaVuSansMono);
     assert_eq!(settings.font_size, 14.);
     assert_eq!(settings.encoding, CharacterEncoding::Utf8);
     let old: Preferences = serde_json::from_str(r#"{"font_size":19.0}"#).unwrap();

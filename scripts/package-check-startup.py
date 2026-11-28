@@ -487,7 +487,7 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None, 
                 if len(result) < 5 or result[0] != 1:
                     raise ValueError("RDP helper returned no control packet.")
                 end = 5 + int.from_bytes(result[1:5], "big")
-                if json.loads(result[5:end]) != {"Ready": {"version": 1}}:
+                if json.loads(result[5:end]) != {"Ready": {"version": 2}}:
                     raise ValueError("RDP helper returned an unexpected handshake.")
         screenshot = evidence / "startup.png"
         launcher = bindir / "termcraft-desktop-launcher" if host == "macos" else executable
@@ -543,7 +543,7 @@ def smoke(archive, evidence, display, software_gl=None, *, native_wayland=None, 
                 "Wayland" if environment.get("WAYLAND_DISPLAY") else "X11"
             ) if host == "linux" else host,
             "start_environment": "relocated package, empty PATH, isolated workspace, existing native display",
-            "screen_size": size, "rdp_helper_wire_version": 1,
+            "screen_size": size, "rdp_helper_wire_version": 2,
             "rdp_session": "Received initial RDP negotiation on a loopback-only fixture; workspace preserved",
             "rdp_workspace": (
                 "isolated LOCALAPPDATA/Harbor default" if host == "windows" else "explicit isolated workspace"

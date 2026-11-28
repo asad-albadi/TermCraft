@@ -1,20 +1,28 @@
 {
   "captured_on": "2026-11-27",
   "platform": "Linux x86-64",
-  "source_commit": "6571b95a0489f350680c969b75617a0377254cd4",
-  "workflow_run": 45974136835,
+  "source_commit": "f599000ca3755490e1d2a1470a603ed033fb361b",
+  "workflow_run": 46042644335,
+  "native_job": 140654072032,
+  "artifact_id": 15221658469,
+  "artifact_name": "diagnostics-linux-amd64",
+  "qualification": "The core archive passed hosted X11, Wayland and desktop lifecycle checks. The job failed later AppImage corresponding-source validation. Its inventory record is now repaired and the complete format passed local finished-image tests; this core is not relabeled as a final candidate or green aggregate.",
   "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
-  "archive_sha256": "8d1d3a88e68cb7a9bfb351d977c3888f77fefbdbf5670c8d8cf7332aab02533f",
+  "archive_sha256": "1ac6a4322a26d638b139d01dae0b64a44c42c0b4ad5fd40bf451720e693e8a7f",
+  "executable_sha256": "081214f2ab3732a969de3ff7850e3bb4da55134135983624e1470926184beb92",
+  "snapshot_sha256": "ccc1e9ca836114a41df63bd3253381a0f9c83de1a8471b8f55a2e0e2db278344",
   "width": 1920,
   "height": 1080,
-  "scope": "Real app UI; isolated demo bookmarks; software-rendered X11; no remote connections",
+  "scope": "Ubuntu 24.04.5 x86-64, unsigned Linux archive, Xvfb :96, software GL, 100% scale. Five reserved .example.test bookmarks. No remote connections.",
   "screenshots": {
-    "files-light.png": "9ff3d749af3c037207e44fb1b412c1698ffee7f08c83d36936651bf913a26a69",
-    "servers-light.png": "ae7112dbe13d8c742b95dba6a9ca39d45f5460e36bffd812b0cde9c6300da26b",
-    "settings-light.png": "28cd8f115f106e21bcbbf67fbaea3da3ae9e3b93a73965762617b4818c6a97c3",
-    "terminal-dark.png": "53917b06f6359158a32b9006a25aeec2f80a207ccd268f2a4441896153adf739",
-    "tools-dark.png": "9750c4941b85bb5488b533cb92848105b6a739594f48cef183ebdac95ff45fd3",
-    "workspace-dark.png": "2d53458fd27ac82fe389b54891785f1ec8e861aa8f1eb47fd4b3ff1a51680b0b",
-    "workspace-light.png": "ad46ce8e44135ce030c0efaade88c35c8917b907cda932fcf755bb16b989c744"
-  }
+    "workspace-light.png": "f37751f75795656fbde71ab46b4b47c2c313ca78ad8b535bc069a72c4bf35149",
+    "workspace-dark.png": "62ab08329d42d5fa36ad4b53f5a87b63e1b49222c6f362c940982d0a397e19a7",
+    "terminal-dark.png": "c262dbf134a0598ac2270aa85aab9b38bffa1b00693bb0606673620ffadabb26",
+    "files-light.png": "5d10e5ec8d8641a1646e4c38628a4fdbf5d85dc29f0666ac2effc9ec47bc16cf",
+    "tools-dark.png": "a2cd7935310484b5712c7e062847818cc4c99bdc878a982090a8a9496149a0b8",
+    "settings-light.png": "daa4dfdc739f3d5fd0daefbb7557bbc9fd54f23f8310921251d174f1e6c485f6",
+    "servers-light.png": "7cbfa6ad3cc5f76e2e25b38b5d9a5df238b8e201ed8507da702b8c07735a3486"
+  },
+  "cjk_font_sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+  "font_fixture": "Container-installed Noto Sans CJK for the files gallery. The package does not ship this font."
 }

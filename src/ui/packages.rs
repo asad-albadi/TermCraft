@@ -81,7 +81,7 @@ impl State {
             {
                 Ok(items) => items.iter().find(|item| item.id == recommended.id),
                 Err(error) => {
-                    ui.colored_label(ui.visuals().error_fg_color, error.to_string());
+                    crate::ui::errors::show(ui, crate::ui::errors::Domain::Package, error.to_string());
                     return;
                 }
             };
@@ -124,7 +124,7 @@ impl State {
                     };
                     ui.ctx().request_repaint();
                 } else {
-                    ui.horizontal(|ui| {
+                    ui.horizontal_wrapped(|ui| {
                         ui.spinner();
                         ui.label(match self.progress {
                             Some(Progress::Verifying) => "Verifying package…",
@@ -203,15 +203,15 @@ impl State {
                 }
             });
             if let Some((release, archive, repair)) = self.archive.as_ref() {
-                ui.separator();
-                ui.label(format!(
+                let dismissed = fluent::surface(ui).show(ui,|ui| {
+                ui.strong(format!(
                     "BusyBox {} · {}",
                     release.version,
                     archive.display()
                 ));
                 ui.monospace(&release.sha256);
-                let dismissed = ui
-                    .horizontal(|ui| {
+                ui
+                    .horizontal_wrapped(|ui| {
                         if ui.button("Confirm package operation").clicked() {
                             self.job = Some(if *repair {
                                 manager.repair(release.clone(), archive.clone())
@@ -223,7 +223,8 @@ impl State {
                             ui.button("Cancel selection").clicked()
                         }
                     })
-                    .inner;
+                    .inner
+                }).inner;
                 if dismissed {
                     self.archive = None;
                 }
@@ -458,6 +459,7 @@ mod tests {
             Ok((process, launch))
         }));
         workspace.page = Page::Tools;
+        workspace.tools_category = super::super::tools::Category::Packages;
         click_text(&ctx, &mut workspace, "Portable Unix");
         click_text(&ctx, &mut workspace, "Open Unix terminal");
         let portable = workspace.active;

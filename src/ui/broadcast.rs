@@ -252,7 +252,11 @@ impl Workspace {
                 ),
                 |ui| {
                     for (id, error) in &self.broadcast_report.failed {
-                        ui.label(format!("Terminal {id}: {error}"));
+                        crate::ui::errors::show(
+                            ui,
+                            crate::ui::errors::Domain::Session,
+                            format!("Terminal {id}: {error}"),
+                        );
                     }
                 },
             );

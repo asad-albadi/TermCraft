@@ -1,4 +1,4 @@
-//! RFB 3.3/3.7/3.8 transport. Raw, CopyRect, Hextile, DesktopSize, cursor and extended clipboard.
+//! RFB 3.3/3.7/3.8 transport. Raw, CopyRect, Hextile, desktop resize, cursor and clipboard.
 //! Classic security is an explicit opt-in, never selected as a TLS fallback.
 use super::*;
 use serde::{Deserialize, Serialize};
@@ -67,6 +67,7 @@ pub(super) fn connect(config: DesktopConfig) -> Result<DesktopSession, String> {
         cursor: None,
         frame_revision: 0,
         frame: None,
+        rdp_frames: Default::default(),
         challenge: None,
         connected: false,
         dimensions: (1, 1),
@@ -103,6 +104,9 @@ pub(super) fn connect(config: DesktopConfig) -> Result<DesktopSession, String> {
                                 .map_err(|_| "VNC connection timed out")?
                                 .map_err(|_| "Could not connect to the VNC endpoint")?
                             };
+                            stream
+                                .set_nodelay(true)
+                                .map_err(|_| "Could not configure VNC TCP latency")?;
                             run(
                                 stream,
                                 &config.session,
@@ -136,6 +140,7 @@ pub(super) fn connect(config: DesktopConfig) -> Result<DesktopSession, String> {
         finished,
         closed: false,
         notified: false,
+        partial_frames: false,
         vnc: true,
         clipboard: options.clipboard,
         keyboard: options.keyboard,
@@ -292,7 +297,7 @@ async fn handshake(
         ],
     )
     .await?;
-    let mut encodings = vec![1, encoding::HEXTILE, 0, -223];
+    let mut encodings = vec![1, encoding::HEXTILE, 0, -223, EXTENDED_DESKTOP_SIZE];
     if !session.view_only {
         encodings.push(encoding::CURSOR);
     }
@@ -312,6 +317,60 @@ fn update_request(w: u16, h: u16, incremental: bool) -> Vec<u8> {
     p.extend(h.to_be_bytes());
     p
 }
+const EXTENDED_DESKTOP_SIZE: i32 = -308;
+const SCREEN_BYTES: usize = 16;
+
+#[derive(Default)]
+struct ResizeState {
+    screen: Option<[u8; SCREEN_BYTES]>,
+    desired: Option<(u16, u16)>,
+    pending: bool,
+    prohibited: bool,
+}
+
+impl ResizeState {
+    fn update(&mut self, reason: u16, status: u16, size: (u16, u16), screens: &[u8]) {
+        if reason == 1 {
+            self.pending = false;
+            if status != 0 {
+                // The remaining fields are undefined on failure. Preserve the current layout.
+                self.prohibited |= status == 1;
+                return;
+            }
+        }
+        // Resizing a single full-frame screen preserves its identity and flags.
+        // Leave multihead and partial-screen layouts alone.
+        self.screen = <[u8; SCREEN_BYTES]>::try_from(screens)
+            .ok()
+            .filter(|screen| {
+                screen[4..8] == [0; 4]
+                    && screen[8..10] == size.0.to_be_bytes()
+                    && screen[10..12] == size.1.to_be_bytes()
+            });
+    }
+
+    fn take_packet(&mut self, current: (u16, u16)) -> Option<[u8; 8 + SCREEN_BYTES]> {
+        if self.pending || self.prohibited {
+            return None;
+        }
+        let mut screen = self.screen?;
+        let (width, height) = self.desired.take()?;
+        if (width, height) == current {
+            return None;
+        }
+        let mut packet = [0; 8 + SCREEN_BYTES];
+        packet[0] = 251;
+        packet[2..4].copy_from_slice(&width.to_be_bytes());
+        packet[4..6].copy_from_slice(&height.to_be_bytes());
+        packet[6] = 1;
+        screen[8..10].copy_from_slice(&width.to_be_bytes());
+        screen[10..12].copy_from_slice(&height.to_be_bytes());
+        packet[8..].copy_from_slice(&screen);
+        self.pending = true;
+        Some(packet)
+    }
+}
+
 async fn run<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     stream: S,
     session: &Session,
@@ -354,6 +413,7 @@ async fn run<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
     let writer = tokio::sync::Mutex::new(writer);
     // Serialize peer clipboard actions and local clipboard uploads with the writer.
     let clipboard = Mutex::new(clipboard::Clipboard::default());
+    let resize = Mutex::new(ResizeState::default());
     let read = async {
         let mut frame = Frame {
             width,
@@ -370,6 +430,7 @@ async fn run<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
                         return Err("VNC update has too many rectangles".into());
                     }
                     let mut resized = false;
+                    let mut resize_advertised = false;
                     let mut changed = false;
                     let mut cursor = None;
                     for _ in 0..count {
@@ -377,6 +438,31 @@ async fn run<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
                         let val = |i| u16::from_be_bytes([r[i], r[i + 1]]);
                         let (x, y, w, h) = (val(0), val(2), val(4), val(6));
                         let enc = i32::from_be_bytes(r[8..12].try_into().unwrap());
+                        if enc == EXTENDED_DESKTOP_SIZE {
+                            // RFB invalidates the old pixels on a size change. The server
+                            // repaints on the next incremental request; a full request here
+                            // would solicit another ExtendedDesktopSize rectangle.
+                            let header = bytes(&mut reader, 4).await?;
+                            let screens =
+                                bytes(&mut reader, usize::from(header[0]) * SCREEN_BYTES).await?;
+                            if x != 1 || y == 0 {
+                                let length = wire::dimensions(w, h)?;
+                                if (w, h) != (frame.width, frame.height) {
+                                    frame.pixels = vec![0; length];
+                                    frame.width = w;
+                                    frame.height = h;
+                                    changed = true;
+                                }
+                            }
+                            resize.lock().unwrap_or_else(|p| p.into_inner()).update(
+                                x,
+                                y,
+                                (w, h),
+                                &screens,
+                            );
+                            resize_advertised = true;
+                            continue;
+                        }
                         if enc == -223 {
                             if x != 0 || y != 0 {
                                 return Err("Invalid VNC DesktopSize origin".into());
@@ -427,6 +513,9 @@ async fn run<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
                         &update_request(frame.width, frame.height, !resized),
                     )
                     .await?;
+                    if resize_advertised && !session.view_only {
+                        rx.control.ready.notify_one();
+                    }
                 }
                 2 => {} // Bell carries no payload.
                 3 => {
@@ -480,6 +569,7 @@ async fn run<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
         let mut buttons = 0u8;
         let mut point = (0u16, 0u16);
         loop {
+            let input = rx.rx.try_recv();
             if rx.control.release.swap(false, Ordering::AcqRel) {
                 let mut writer = writer.lock().await;
                 for key in std::mem::take(&mut held) {
@@ -490,7 +580,15 @@ async fn run<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
                     send(&mut *writer, &pointer_packet(point, 0)).await?;
                 }
             }
-            match rx.rx.try_recv() {
+            let current = state.lock().unwrap_or_else(|p| p.into_inner()).dimensions;
+            let packet = resize
+                .lock()
+                .unwrap_or_else(|p| p.into_inner())
+                .take_packet(current);
+            if let Some(packet) = packet {
+                send(&mut *writer.lock().await, &packet).await?;
+            }
+            match input {
                 Ok(value) => {
                     if value.epoch != rx.control.epoch.load(Ordering::Acquire) {
                         continue;
@@ -597,7 +695,12 @@ async fn run<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
                                 out.extend(pointer_packet(point, buttons));
                             }
                         }
-                        DesktopInput::Resize { .. } => {} // Canvas scales locally. Server DesktopSize is supported.
+                        DesktopInput::Resize { width, height } => {
+                            if !session.view_only && wire::dimensions(*width, *height).is_ok() {
+                                resize.lock().unwrap_or_else(|p| p.into_inner()).desired =
+                                    Some((*width, *height));
+                            }
+                        }
                         DesktopInput::ReleaseAll => {
                             for key in std::mem::take(&mut held) {
                                 out.extend(key_packet(key, false));
@@ -614,7 +717,8 @@ async fn run<S: AsyncRead + AsyncWrite + Unpin + Send + 'static>(
                     }
                 }
                 Err(mpsc::TryRecvError::Disconnected) => return Ok(()),
-                Err(_) => tokio::time::sleep(Duration::from_millis(10)).await,
+                // A notification sent before this await is retained as a permit.
+                Err(mpsc::TryRecvError::Empty) => rx.control.ready.notified().await,
             }
         }
     };

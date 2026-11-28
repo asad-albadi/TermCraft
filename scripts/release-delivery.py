@@ -398,7 +398,7 @@ def verify_startup(root, directory, archive, digest, platform, expected_backend=
             and observed["manifest_schema"] == 1 and observed["platform"] == platform
             and observed["display_backend"] == backend
             and observed["start_environment"] == "relocated package, empty PATH, isolated workspace, existing native display"
-            and observed["rdp_helper_wire_version"] == 1 and observed["rdp_helper_child_location_verified"] is True
+            and observed["rdp_helper_wire_version"] == 2 and observed["rdp_helper_child_location_verified"] is True
             and observed["rdp_session"] == "Received initial RDP negotiation on a loopback-only fixture; workspace preserved"
             and observed["rdp_workspace"] == ("isolated LOCALAPPDATA/Harbor default"
                                                if platform == "windows" else "explicit isolated workspace"),
@@ -410,14 +410,14 @@ def verify_startup(root, directory, archive, digest, platform, expected_backend=
     packet = entries["rdp-helper.log"].read_bytes()
     end = 5 + int.from_bytes(packet[1:5], "big")
     require(len(packet) >= end and packet[:1] == b"\x01" and end > 5
-            and json.loads(packet[5:end]) == {"Ready": {"version": 1}},
+            and json.loads(packet[5:end]) == {"Ready": {"version": 2}},
             "Startup RDP helper handshake is missing or invalid")
     require(b"TermCraft remote workspace" in entries["help.log"].read_bytes(), "Missing packaged CLI startup result")
     # Raw observations are private input for backend-specific checks only. The
     # inventory gets an explicit summary plus hashes of the original evidence.
     summary = {"archive": archive, "archive_sha256": digest, "platform": platform,
                "display_backend": backend, "screen_size": screen_size,
-               "rdp_helper_wire_version": 1, "rdp_helper_child_location_verified": True}
+               "rdp_helper_wire_version": 2, "rdp_helper_child_location_verified": True}
     return observed, {"observation": summary, "files": {name: sha256(path) for name, path in entries.items()}}
 
 

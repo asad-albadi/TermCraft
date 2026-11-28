@@ -4,6 +4,96 @@ use harbor_workspace::games::{
     GameId, GameInput, GameOutcome, GameRegistry, GameScene, GameSession, puzzles as p,
     terminal as t,
 };
+fn game_actions(ui: &mut Ui, play: &mut PlayState, close: &mut bool) {
+    if ui.button("Close (Esc)").clicked() {
+        *close = true;
+    }
+    if play.session.is_some()
+        && ui
+            .add_enabled(!play.files.busy(), egui::Button::new("Save…"))
+            .clicked()
+    {
+        play.files.start(play.session.clone(), ui.ctx().clone());
+    }
+    if ui
+        .add_enabled(!play.files.busy(), egui::Button::new("Load…"))
+        .clicked()
+    {
+        play.request_file_action(FileAction::Load, ui.ctx());
+    }
+    if play.files.busy() {
+        ui.spinner();
+        ui.label("Game file in progress…");
+    }
+    if play.files.dirty() {
+        ui.label("Unsaved changes");
+    }
+    if play.session.is_some()
+        && ui
+            .button(if play.launcher {
+                "Resume game"
+            } else {
+                "Library"
+            })
+            .clicked()
+    {
+        play.launcher = !play.launcher;
+    }
+}
+
+fn game_catalog(ui: &mut Ui, play: &mut PlayState) {
+    use GameId::*;
+    let width = ui.available_width();
+    let gap = ui.spacing().item_spacing.x;
+    let columns = (((width + gap) / (220. + gap)).floor() as usize).clamp(1, 4);
+    let tile_width = (width - gap * (columns - 1) as f32) / columns as f32;
+    for row in GameRegistry::catalog().chunks(columns) {
+        ui.horizontal(|ui| {
+            for spec in row {
+                let description = match spec.id {
+                    Soliterm => "Freecell and Klondike",
+                    Termwalk => "Connect servers to a router",
+                    Ctris => "Stack and clear falling blocks",
+                    Sudoku => "Complete the number grid",
+                    Nimesweeper => "Flag mines and clear safe cells",
+                    Ninvaders => "Defend against incoming waves",
+                    Greed => "Trace a path through digits",
+                    Netwalk => "Rotate tiles to connect the net",
+                    Mines => "Locate the hidden mines",
+                    Solo => "Solve a number-placement puzzle",
+                    Guess => "Deduce the hidden colour code",
+                    Map => "Colour neighbouring regions",
+                    Untangle => "Separate crossing lines",
+                };
+                let (rect, response) =
+                    ui.allocate_exact_size(vec2(tile_width, 78.), Sense::click());
+                let foreground =
+                    fluent::paint_control(ui, &response, rect, false, ControlKind::Standard);
+                ui.painter().text(
+                    rect.left_top() + vec2(14., 15.),
+                    Align2::LEFT_TOP,
+                    spec.label,
+                    FontId::proportional(18.),
+                    foreground,
+                );
+                ui.painter().text(
+                    rect.left_top() + vec2(14., 44.),
+                    Align2::LEFT_TOP,
+                    description,
+                    FontId::proportional(13.),
+                    muted(ui),
+                );
+                response.widget_info(|| {
+                    WidgetInfo::labeled(WidgetType::Button, response.enabled(), spec.label)
+                });
+                if response.clicked() {
+                    play.request_file_action(FileAction::Start(spec.id, 1), ui.ctx());
+                }
+            }
+        });
+    }
+}
+
 pub(in crate::ui) struct PlayState {
     files: Files,
     exit_ready: bool,
@@ -283,18 +373,25 @@ impl PlayState {
     fn file_confirmation(&mut self, ctx: &Context) {
         if let Some(prompt) = &self.files.prompt {
             let mut decision = None;
-            let modal = egui::Modal::new(Id::new("game_file_replace")).show(ctx, |ui| {
-                ui.heading("Replace saved game?");
-                ui.label(format!("Replace {} with this game?", prompt.path.display()));
-                ui.horizontal(|ui| {
-                    if ui.button("Keep existing file").clicked() {
-                        decision = Some(false);
-                    }
-                    if ui.button("Replace file").clicked() {
+            let size = fluent::dialog_size(ctx, 460., 112.);
+            let modal = fluent::modal(
+                ctx,
+                Id::new("game_file_replace"),
+                "Replace saved game?",
+                size,
+                |ui| {
+                    ui.label(format!("Replace {} with this game?", prompt.path.display()));
+                    let [replace, safe] =
+                        fluent::dialog_actions(ui, ["Replace file", "Keep existing file"], None);
+                    if replace.clicked() {
                         decision = Some(true);
                     }
-                });
-            });
+                    fluent::focus_on_entry(ui, &safe, ui.id());
+                    if safe.clicked() {
+                        decision = Some(false);
+                    }
+                },
+            );
             if modal.should_close() {
                 decision = Some(false);
             }
@@ -310,15 +407,25 @@ impl PlayState {
         }
         let mut discard = false;
         let mut cancel = false;
-        egui::Modal::new(Id::new("game_file_discard")).show(ctx, |ui| {
-            ui.heading("Unsaved game changes");
-            ui.label("Continuing discards changes to this game. Save first to keep them.");
-            ui.horizontal(|ui| {
-                discard = ui.button("Discard changes and continue").clicked();
-                cancel = ui.button("Keep playing").clicked();
-            });
-        });
-        if cancel {
+        let size = fluent::dialog_size(ctx, 460., 112.);
+        let modal = fluent::modal(
+            ctx,
+            Id::new("game_file_discard"),
+            "Unsaved game changes",
+            size,
+            |ui| {
+                ui.label("Continuing discards changes to this game. Save first to keep them.");
+                let [lose, safe] = fluent::dialog_actions(
+                    ui,
+                    ["Discard changes and continue", "Keep playing"],
+                    None,
+                );
+                discard = lose.clicked();
+                fluent::focus_on_entry(ui, &safe, ui.id());
+                cancel = safe.clicked();
+            },
+        );
+        if cancel || modal.should_close() {
             self.files.pending = None;
         }
         if discard {
@@ -755,7 +862,7 @@ fn puzzle_options(ui: &mut Ui, play: &mut PlayState) {
         });
         if let Some(updated) = topology_update { draft = updated; }
         if let Err(error) = draft.validate() {
-            ui.colored_label(palette(2), error);
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Game, error);
         }
         ui.label("Your current board is kept if a new board cannot be made. Try another seed or simpler settings if generation cannot finish.");
         play.draft = Some(draft);
@@ -876,7 +983,7 @@ impl Workspace {
         ctx.request_repaint();
         true
     }
-    fn continue_game_window_close(&mut self, ctx: &Context) {
+    pub(in crate::ui) fn continue_window_close(&mut self, ctx: &Context) {
         if self.remote_documents_block_close(None) {
             self.begin_ftp_document_close(None);
             self.pending_remote_exit = true;
@@ -906,6 +1013,8 @@ impl Workspace {
         if current == ViewportId::ROOT && ui.ctx().input(|i| i.viewport().close_requested()) {
             self.intercept_game_exit(ui.ctx());
         }
+        let pending_session_decision =
+            self.pending_session_close.is_some() || self.pending_paste.is_some();
         let play = &mut self.games.play;
         if current == ViewportId::ROOT {
             if let Some(session) = play.files.poll(&mut play.message) {
@@ -980,6 +1089,9 @@ impl Workspace {
         if !play.is_open() {
             return false;
         }
+        if pending_session_decision {
+            return true;
+        }
         let events = ui.ctx().input(|i| i.events.clone());
         if events.iter().any(|e| {
             matches!(
@@ -1005,29 +1117,43 @@ impl Workspace {
         // An editor may release focus while consuming Enter. Remember ownership
         // before widgets run as well as after, so that finishing an edit cannot
         // submit a Guess or trigger a board shortcut in the same frame.
+        let solve_owned_keys = play.solve_confirm;
         let widgets_owned_keys = egui::Popup::is_any_open(ui.ctx())
             || ui
                 .ctx()
                 .memory(|m| m.focused().is_some_and(|id| Some(id) != play.board_focus));
         let mut close = false;
-        ScrollArea::both().id_salt("games_surface").show(ui,|ui|{Frame::new().fill(content(ui)).inner_margin(16.).show(ui,|ui|{
+        ui.painter()
+            .rect_filled(ui.available_rect_before_wrap(), 0., content(ui));
+        ScrollArea::vertical().auto_shrink([false,false]).id_salt("games_surface").show(ui,|ui|{Frame::new().fill(content(ui)).inner_margin(16.).show(ui,|ui|{
             if play.files.confirming(){ui.disable();}
-            ui.horizontal(|ui|{
-                ui.image((self.logo.id(),vec2(28.,28.)));
-                ui.heading(play.session.as_ref().filter(|_|!play.launcher).map_or("Games",|s|s.spec().label));
-                if ui.button("Close (Esc)").clicked(){close=true;}
-                if ui.add_enabled(play.session.is_some()&&!play.files.busy(),egui::Button::new("Save…")).clicked(){play.files.start(play.session.clone(),ui.ctx().clone());}
-                if ui.add_enabled(!play.files.busy(),egui::Button::new("Load…")).clicked(){play.request_file_action(FileAction::Load,ui.ctx());}
-                if play.files.busy(){ui.spinner();ui.label("Game file in progress…");}
-                if play.files.dirty(){ui.label("Unsaved changes");}
-                if play.session.is_some()&&ui.button(if play.launcher{"Resume game"}else{"Library"}).clicked(){play.launcher=!play.launcher;}
-            });
             if play.launcher {
-                ui.label("Choose a game. Terminal sessions continue in the background.");
-                for spec in GameRegistry::catalog(){if ui.button(spec.label).clicked(){play.request_file_action(FileAction::Start(spec.id,1),ui.ctx());}}
-            }else if let Some(s)=&play.session {
+                let width=ui.available_width().min(1160.);
+                ui.add_space((ui.ctx().content_rect().height()*0.07).clamp(4.,72.));
+                ui.vertical_centered(|ui|{
+                    ui.allocate_ui_with_layout(vec2(width,0.),Layout::top_down(Align::Min),|ui|{
+                        ui.set_width(width);
+                        ui.horizontal_wrapped(|ui|{
+                            ui.image((self.logo.id(),vec2(34.,34.)));
+                            ui.heading(fluent::emphasized(ui.ctx(),RichText::new("Games").size(28.)));
+                            if width>680. {
+                                ui.with_layout(Layout::right_to_left(Align::Center),|ui| game_actions(ui,play,&mut close));
+                            }else{game_actions(ui,play,&mut close);}
+                        });
+                        ui.add_space(12.);
+                        game_catalog(ui, play);
+                    });
+                });
+            }else{
+                ui.horizontal_wrapped(|ui|{
+                    ui.image((self.logo.id(),vec2(28.,28.)));
+                    if let Some(s)=&play.session {ui.heading(fluent::emphasized(ui.ctx(),RichText::new(s.spec().label)));}
+                    game_actions(ui,play,&mut close);
+                });
+            }
+            if !play.launcher && let Some(s)=&play.session {
                 let(id,seed,outcome)=(s.id(),s.seed(),s.outcome());
-                ui.horizontal(|ui|{
+                ui.horizontal_wrapped(|ui|{
                     if ui.button("New game").clicked(){play.request_file_action(FileAction::New,ui.ctx());}
                     if ui.button("Reset").clicked(){play.request_file_action(FileAction::Reset,ui.ctx());}
                     if ui.add_enabled(play.session.as_ref().unwrap().can_undo(),egui::Button::new("Undo")).clicked(){if play.session.as_mut().unwrap().undo(){play.files.changed();}}
@@ -1037,7 +1163,7 @@ impl Workspace {
                     ui.label(format!("Seed {seed} · {outcome:?}"));
                 });
                 if play.session.as_ref().unwrap().assisted(){ui.strong("Assisted — solution revealed");}
-                if play.solve_confirm {ui.horizontal_wrapped(|ui|{ui.label(if id==GameId::Guess {"Give up and reveal the code? This marks the game assisted."}else{"Reveal the solution? This marks the game assisted."});if ui.button("Reveal solution").clicked(){match play.session.as_mut().unwrap().solve(){Ok(changed)=>{if changed{play.files.changed();}play.message.clear();},Err(e)=>play.message=player_error(e)};play.solve_confirm=false;}if ui.button("Cancel").clicked(){play.solve_confirm=false;}});}
+                if play.solve_confirm {fluent::surface(ui).show(ui, |ui| {ui.horizontal_wrapped(|ui|{ui.label(if id==GameId::Guess {"Give up and reveal the code? This marks the game assisted."}else{"Reveal the solution? This marks the game assisted."});if ui.button("Reveal solution").clicked(){match play.session.as_mut().unwrap().solve(){Ok(changed)=>{if changed{play.files.changed();}play.message.clear();},Err(e)=>play.message=player_error(e)};play.solve_confirm=false;}let safe = ui.button("Cancel"); fluent::focus_on_entry(ui,&safe,ui.id()); if safe.clicked() || (!play.files.confirming() && ui.ctx().memory(|m|m.top_modal_layer().is_none()) && ui.input_mut(|i|i.consume_key(Modifiers::NONE,Key::Escape))) {play.solve_confirm=false;}});});}
                 puzzle_options(ui,play);
                 ui.horizontal_wrapped(|ui|{match id {
                     GameId::Soliterm=>{ui.label("New game variant:");ui.selectable_value(&mut play.variant,0,"Freecell");ui.selectable_value(&mut play.variant,1,"Klondike");ui.add(egui::Slider::new(&mut play.passes,1..=20).text("passes"));},
@@ -1050,7 +1176,10 @@ _=>{}}});
                 controls(ui,play,id);
                 ScrollArea::both().show(ui,|ui|{draw_scene(ui,play);});
                 if outcome!=GameOutcome::Playing{ui.strong("Game finished — Undo, Reset or New game to continue.");}
-                if !play.message.is_empty(){ui.label(RichText::new(&play.message).color(Color32::from_rgb(215,120,55)));}
+                if !play.message.is_empty(){
+                    if play.message.starts_with("Game saved") || play.message.starts_with("Game loaded") || play.message.starts_with("Earlier game state saved") {ui.label(&play.message);}
+                    else {crate::ui::errors::warning(ui,crate::ui::errors::Domain::Game,&play.message);}
+                }
             }
         });});
         // Let focused controls and popups consume their events first. Only the
@@ -1059,7 +1188,12 @@ _=>{}}});
             || ui
                 .ctx()
                 .memory(|m| m.focused().is_some_and(|id| Some(id) != play.board_focus));
-        if !widgets_owned_keys && !widgets_own_keys && !play.files.confirming() {
+        if !solve_owned_keys
+            && !play.solve_confirm
+            && !widgets_owned_keys
+            && !widgets_own_keys
+            && !play.files.confirming()
+        {
             let keys = ui.ctx().input(|i| i.events.clone());
             for event in keys {
                 if let Event::Key {
@@ -1120,7 +1254,7 @@ _=>{}}});
         play.file_confirmation(ui.ctx());
         let exit_ready = std::mem::take(&mut play.exit_ready);
         if exit_ready {
-            self.continue_game_window_close(ui.ctx());
+            self.continue_window_close(ui.ctx());
         }
         ui.ctx().input_mut(|i| i.events.clear());
         // Polling remains bounded and active while terminal rendering is suspended.
@@ -1294,6 +1428,14 @@ fn controls(ui: &mut Ui, play: &mut PlayState, id: GameId) {
         _ => {}
     });
 }
+fn numbered_swatch(ui: &Ui, colour: u8) -> egui::text::LayoutJob {
+    let mut label = egui::text::LayoutJob::default();
+    let font = TextStyle::Body.resolve(ui.style());
+    label.append("●", 0., TextFormat::simple(font.clone(), palette(colour)));
+    label.append(&format!(" {colour}"), 0., TextFormat::simple(font, ink(ui)));
+    label
+}
+
 fn palette(n: u8) -> Color32 {
     match n {
         1 => Color32::from_rgb(33, 160, 125),
@@ -1333,6 +1475,26 @@ fn board_keyboard_focus(ui: &Ui, play: &mut PlayState, response: &egui::Response
         )
     });
 }
+// Boards consume the visible remainder of the game surface. The enclosing
+// scroll areas may offer unbounded content height, so intersect their clip.
+fn fitted_board_rect(available: Rect, proportions: Vec2) -> Rect {
+    let scale = (available.width() / proportions.x)
+        .min(available.height() / proportions.y)
+        .max(0.);
+    Rect::from_center_size(available.center(), proportions * scale)
+}
+fn allocate_board(ui: &mut Ui, proportions: Vec2, sense: Sense) -> (Rect, Response) {
+    let offered = ui.available_rect_before_wrap();
+    let extent = offered
+        .max
+        .min(ui.clip_rect().max)
+        .max(offered.min + vec2(1., 1.));
+    let available = Rect::from_min_max(offered.min, extent);
+    let (id, _) = ui.allocate_space(available.size());
+    let rect = fitted_board_rect(available, proportions);
+    let response = ui.interact(rect, id, sense);
+    (rect, response)
+}
 fn board(
     ui: &mut Ui,
     play: &mut PlayState,
@@ -1341,20 +1503,18 @@ fn board(
     labels: &[String],
     colours: &[Color32],
 ) -> Option<(usize, PointerButton)> {
-    board_with_minimum(ui, play, (w, h), labels, colours, 24.)
+    board_grid(ui, play, (w, h), labels, colours)
 }
-fn board_with_minimum(
+fn board_grid(
     ui: &mut Ui,
     play: &mut PlayState,
     dimensions: (usize, usize),
     labels: &[String],
     colours: &[Color32],
-    minimum: f32,
 ) -> Option<(usize, PointerButton)> {
     let (w, h) = dimensions;
-    let size = (ui.available_width().min(880.) / w as f32).clamp(minimum, 38.);
-    let (rect, response) =
-        ui.allocate_exact_size(vec2(size * w as f32, size * h as f32), egui::Sense::click());
+    let (rect, response) = allocate_board(ui, vec2(w as f32, h as f32), Sense::click());
+    let size = rect.width() / w as f32;
     play.board = Some(rect);
     board_keyboard_focus(ui, play, &response);
     for i in 0..w * h {
@@ -1362,25 +1522,30 @@ fn board_with_minimum(
             rect.min + vec2((i % w) as f32 * size, (i / w) as f32 * size),
             vec2(size, size),
         );
-        ui.painter().rect_filled(
-            r.shrink(1.),
-            2.,
-            colours.get(i).copied().unwrap_or(palette(0)),
-        );
+        let fill = colours.get(i).copied().unwrap_or(palette(0));
+        ui.painter().rect_filled(r.shrink(1.), 2., fill);
+        let linear = egui::Rgba::from(fill);
+        let luminance = 0.2126 * linear.r() + 0.7152 * linear.g() + 0.0722 * linear.b();
+        // Equal black and white WCAG contrast occurs at sqrt(.0525) - .05.
+        let foreground = if luminance > 0.179 {
+            Color32::BLACK
+        } else {
+            Color32::WHITE
+        };
         if let Some(label) = labels.get(i) {
             ui.painter().text(
                 r.center(),
                 Align2::CENTER_CENTER,
                 label,
-                FontId::monospace((size * 0.50).max(9.)),
-                Color32::WHITE,
+                FontId::monospace(size * 0.50),
+                foreground,
             );
         }
         if i == play.selected {
             ui.painter().rect_stroke(
                 r.shrink(1.),
                 1.,
-                Stroke::new(2., Color32::from_rgb(100, 245, 180)),
+                Stroke::new(2., foreground),
                 StrokeKind::Inside,
             );
         }
@@ -1634,6 +1799,31 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
             }
         }
         GameScene::Puzzle(p::PuzzleScene::Solo(s)) => {
+            let topology = match play.session.as_ref().and_then(GameSession::configuration) {
+                Some(p::PuzzleConfig::SoloVariant(c)) => solo_variant_name(c),
+                _ => "Regular",
+            };
+            ui.label(format!(
+                "{topology} Solo{}",
+                if s.diagonal {
+                    " · both long diagonals"
+                } else {
+                    ""
+                }
+            ));
+            if !s.cages.is_empty() {
+                ui.label("White outlines mark regions. Orange cages contain distinct digits adding to their small sum.");
+            }
+            ui.label(format!(
+                "Difficulty: {:?}{} · {}",
+                s.certificate.achieved,
+                if s.certificate.easier_fallback {
+                    " (simpler than requested)"
+                } else {
+                    ""
+                },
+                symmetry_name(s.symmetry)
+            ));
             let labels = s
                 .digits
                 .iter()
@@ -1656,16 +1846,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                     }
                 })
                 .collect::<Vec<_>>();
-            // Cages need a top strip for sums and room for pencil notes.
-            // The surrounding scroll area keeps this legible on narrow views.
-            board_with_minimum(
-                ui,
-                play,
-                (s.width, s.height),
-                &labels,
-                &colours,
-                if s.cages.is_empty() { 24. } else { 38. },
-            );
+            board_grid(ui, play, (s.width, s.height), &labels, &colours);
             let r = play.board.unwrap();
             let size = r.width() / s.width as f32;
             if !s.cages.is_empty() {
@@ -1700,10 +1881,12 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                                 vec2((slot % cols) as f32 + 0.5, (slot / cols) as f32 + 0.5)
                                     * (size / cols as f32)
                             } else {
-                                vec2(4., 14.)
+                                vec2(4., 14.) * (size / 38.).min(1.)
                                     + vec2(
-                                        ((slot % cols) as f32 + 0.5) * ((size - 8.) / cols as f32),
-                                        ((slot / cols) as f32 + 0.5) * ((size - 16.) / cols as f32),
+                                        ((slot % cols) as f32 + 0.5)
+                                            * ((size - 8. * (size / 38.).min(1.)) / cols as f32),
+                                        ((slot / cols) as f32 + 0.5)
+                                            * ((size - 16. * (size / 38.).min(1.)) / cols as f32),
                                     )
                             };
                         ui.painter().text(
@@ -1713,7 +1896,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                             FontId::monospace(if s.cages.is_empty() {
                                 size / cols as f32 * 0.7
                             } else {
-                                (size - 16.) / cols as f32 * 0.85
+                                (size - 16. * (size / 38.).min(1.)) / cols as f32 * 0.85
                             }),
                             Color32::WHITE,
                         );
@@ -1750,7 +1933,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                     let right = x + 1 == s.width || !cage.cells.contains(&(i + 1));
                     let bottom = y + 1 == s.height || !cage.cells.contains(&(i + s.width));
                     let left = x == 0 || !cage.cells.contains(&i.saturating_sub(1));
-                    let inset = 4.;
+                    let inset = 4. * (size / 38.).min(1.);
                     // Offset each contour edge inward. Concave corners extend
                     // into the neighbouring cell so every cage stays closed.
                     let has = |dx: isize, dy: isize| {
@@ -1810,14 +1993,14 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                 if let Some(&anchor) = cage.cells.iter().min() {
                     let pos = r.min
                         + vec2(
-                            (anchor % s.width) as f32 * size + 6.,
-                            (anchor / s.width) as f32 * size + 5.,
+                            (anchor % s.width) as f32 * size + 6. * (size / 38.).min(1.),
+                            (anchor / s.width) as f32 * size + 5. * (size / 38.).min(1.),
                         );
                     ui.painter().text(
                         pos,
                         Align2::LEFT_TOP,
                         cage.sum.to_string(),
-                        FontId::monospace(9.),
+                        FontId::monospace(9. * (size / 38.).min(1.)),
                         palette(2),
                     );
                 }
@@ -1835,31 +2018,6 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                     }
                 }
             }
-            let topology = match play.session.as_ref().and_then(GameSession::configuration) {
-                Some(p::PuzzleConfig::SoloVariant(c)) => solo_variant_name(c),
-                _ => "Regular",
-            };
-            ui.label(format!(
-                "{topology} Solo{}",
-                if s.diagonal {
-                    " · both long diagonals"
-                } else {
-                    ""
-                }
-            ));
-            if !s.cages.is_empty() {
-                ui.label("White outlines mark regions. Orange cages contain distinct digits adding to their small sum.");
-            }
-            ui.label(format!(
-                "Difficulty: {:?}{} · {}",
-                s.certificate.achieved,
-                if s.certificate.easier_fallback {
-                    " (simpler than requested)"
-                } else {
-                    ""
-                },
-                symmetry_name(s.symmetry)
-            ));
         }
         GameScene::Terminal(t::TerminalScene::Sudoku(s)) => {
             let labels = s
@@ -1900,7 +2058,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                 ui.horizontal(|ui| {
                     ui.label(format!("{}:", i + 1));
                     for &c in &row.pegs {
-                        ui.colored_label(palette(c), format!("●{c}"));
+                        ui.label(numbered_swatch(ui, c));
                     }
                     ui.label(format!("{} exact · {} elsewhere", row.exact, row.misplaced));
                 });
@@ -1938,11 +2096,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
             ui.horizontal(|ui| {
                 ui.label("Paint colour:");
                 for c in 1..=4 {
-                    ui.selectable_value(
-                        &mut play.colour,
-                        c,
-                        RichText::new(format!("● {c}")).color(palette(c)),
-                    );
+                    ui.selectable_value(&mut play.colour, c, numbered_swatch(ui, c));
                 }
             });
             let labels = s
@@ -1995,8 +2149,9 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
             }
         }
         GameScene::Puzzle(p::PuzzleScene::Untangle(s)) => {
-            let side = ui.available_width().min(520.).max(150.);
-            let (rect, response) = ui.allocate_exact_size(vec2(side, side), egui::Sense::drag());
+            let (rect, response) = allocate_board(ui, vec2(1., 1.), Sense::drag());
+            let side = rect.width();
+            let point_radius = (9. * side / 520.).max(4.);
             play.board = Some(rect);
             board_keyboard_focus(ui, play, &response);
             let pos = |x: i32, y: i32| {
@@ -2030,7 +2185,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                         .vertices
                         .iter()
                         .enumerate()
-                        .filter(|(_, v)| pos(v.0, v.1).distance(p) < 20.)
+                        .filter(|(_, v)| pos(v.0, v.1).distance(p) < point_radius.max(20.))
                         .min_by(|a, b| {
                             pos(a.1.0, a.1.1)
                                 .distance(p)
@@ -2067,7 +2222,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
             for (i, &(x, y)) in vertices.iter().enumerate() {
                 ui.painter().circle_filled(
                     pos(x, y),
-                    9.,
+                    point_radius,
                     if Some(i) == play.dragging || i == play.selected {
                         palette(5)
                     } else {
@@ -2161,53 +2316,82 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
             if ui.button("Draw from stock").clicked() {
                 play.terminal(t::TerminalInput::Draw)
             }
-            ui.horizontal(|ui| {
-                for i in 0..4 {
-                    if ui
-                        .button(format!(
-                            "Reserve {}: {}",
-                            i + 1,
-                            s.reserve[i].map_or("—".into(), card)
-                        ))
-                        .clicked()
-                    {
-                        pile_select(play, t::CardPile::Reserve(i))
-                    }
-                }
-            });
-            ui.horizontal(|ui| {
-                for i in 0..4 {
-                    if ui
-                        .button(format!("Foundation {}: {}", i + 1, s.foundations[i]))
-                        .clicked()
-                    {
-                        pile_select(play, t::CardPile::Foundation(i))
-                    }
-                }
-            });
-            if ui
-                .button(format!(
-                    "Waste: {}",
-                    s.waste.last().copied().map_or("—".into(), card)
-                ))
-                .clicked()
-            {
-                pile_select(play, t::CardPile::Waste)
-            }
             ui.add(egui::Slider::new(&mut play.count, 1..=13).text("Cards to move"));
             ui.label(format!("Selected source: {:?}. Keyboard pile {}: reserves 1–4, foundations 5–8, waste 9, columns 10 onward. Select a destination pile; click source again to clear.",play.source,play.selected+1));
-            ui.horizontal_top(|ui| {
-                for (i, column) in s.tableau.iter().enumerate() {
-                    ui.vertical(|ui| {
-                        if ui.button(format!("Column {}", i + 1)).clicked() {
-                            pile_select(play, t::CardPile::Tableau(i))
-                        }
-                        for &c in column {
-                            ui.label(card(c));
-                        }
-                    });
+            let columns = s.tableau.len().max(8) as f32;
+            let rows = s.tableau.iter().map(Vec::len).max().unwrap_or(0) as f32;
+            let design = vec2(columns * 110., 148. + rows * 24.);
+            let (rect, response) = allocate_board(ui, design, Sense::click());
+            play.board = Some(rect);
+            board_keyboard_focus(ui, play, &response);
+            let scale = rect.width() / design.x;
+            let pile_rect = |x: f32, y: f32, height: f32| {
+                Rect::from_min_size(rect.min + vec2(x, y) * scale, vec2(106., height) * scale)
+            };
+            let pile_button =
+                |ui: &mut Ui, play: &mut PlayState, r: Rect, label: String, pile: t::CardPile| {
+                    let selected = play.source == Some(pile);
+                    if ui
+                        .put(
+                            r,
+                            egui::Button::new(RichText::new(label).size(12. * scale))
+                                .selected(selected),
+                        )
+                        .clicked()
+                    {
+                        pile_select(play, pile);
+                    }
+                };
+            for i in 0..4 {
+                pile_button(
+                    ui,
+                    play,
+                    pile_rect(i as f32 * 110., 0., 52.),
+                    format!(
+                        "Reserve {}: {}",
+                        i + 1,
+                        s.reserve[i].map_or("—".into(), card)
+                    ),
+                    t::CardPile::Reserve(i),
+                );
+                pile_button(
+                    ui,
+                    play,
+                    pile_rect((i + 4) as f32 * 110., 0., 52.),
+                    format!("Foundation {}: {}", i + 1, s.foundations[i]),
+                    t::CardPile::Foundation(i),
+                );
+            }
+            pile_button(
+                ui,
+                play,
+                pile_rect(0., 60., 46.),
+                format!(
+                    "Waste: {}",
+                    s.waste.last().copied().map_or("—".into(), card)
+                ),
+                t::CardPile::Waste,
+            );
+            for (i, column) in s.tableau.iter().enumerate() {
+                pile_button(
+                    ui,
+                    play,
+                    pile_rect(i as f32 * 110., 116., 28.),
+                    format!("Column {}", i + 1),
+                    t::CardPile::Tableau(i),
+                );
+                for (j, &c) in column.iter().enumerate() {
+                    let r = pile_rect(i as f32 * 110., 148. + j as f32 * 24., 22.);
+                    ui.painter().rect_filled(r, 2. * scale, palette(0));
+                    ui.painter().text(
+                        r.center(),
+                        Align2::CENTER_CENTER,
+                        card(c),
+                        FontId::monospace(16. * scale),
+                        ink(ui),
+                    );
                 }
-            });
+            }
         }
     }
 }
@@ -2483,6 +2667,7 @@ mod tests {
         Context::set_immediate_viewport_renderer(move |ctx, mut viewport| {
             let mut raw = RawInput {
                 viewport_id: viewport.ids.this,
+                events: vec![Event::Text("blocked".into())],
                 screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(960., 640.))),
                 ..Default::default()
             };
@@ -2504,14 +2689,19 @@ mod tests {
         });
         let mut raw = RawInput::default();
         raw.viewports.insert(child, egui::ViewportInfo::default());
-        let mut out = ctx.run_ui(raw, |ui| w.detached_windows(ui.ctx()));
+        let mut out = ctx.run_ui(raw.clone(), |ui| w.detached_windows(ui.ctx()));
         assert!(
             out.viewport_output[&child]
                 .commands
                 .contains(&ViewportCommand::CancelClose)
         );
         out.textures_delta.clear();
+        ctx.run_ui(raw, |ui| w.detached_windows(ui.ctx()))
+            .textures_delta
+            .clear();
         assert!(seen.load(Ordering::SeqCst));
+        w.tabs[0].poll();
+        assert!(crate::ui::terminal_review_tests::captured(&w.tabs[0]).is_empty());
         assert!(w.window_close_prompt.contains(&window));
         assert!(!w.games.play.is_open());
         assert_eq!(w.games.play.session.as_ref().unwrap().scene(), saved);
@@ -2563,6 +2753,166 @@ mod tests {
         );
     }
 
+    #[test]
+    fn large_untangle_points_accept_drag_from_their_visible_edge() {
+        let ctx = Context::default();
+        let mut play = PlayState::default();
+        play.start(GameId::Untangle, 1);
+        let draw = |play: &mut PlayState, events| {
+            let mut out = ctx.run_ui(
+                RawInput {
+                    screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(5000., 3000.))),
+                    events,
+                    ..Default::default()
+                },
+                |ui| draw_scene(ui, play),
+            );
+            out.textures_delta.clear();
+        };
+        draw(&mut play, vec![]);
+        draw(&mut play, vec![]);
+        let GameScene::Puzzle(p::PuzzleScene::Untangle(scene)) =
+            play.session.as_ref().unwrap().scene()
+        else {
+            panic!()
+        };
+        let r = play.board.unwrap();
+        let (x, y) = scene.vertices[0];
+        let center = r.min
+            + vec2(
+                x as f32 / scene.extent as f32 * r.width(),
+                y as f32 / scene.extent as f32 * r.height(),
+            );
+        let edge = center + vec2(30., 0.);
+        assert!(30. < 9. * r.width() / 520.);
+        draw(&mut play, vec![Event::PointerMoved(edge)]);
+        draw(
+            &mut play,
+            vec![
+                Event::PointerButton {
+                    pos: edge,
+                    button: PointerButton::Primary,
+                    pressed: true,
+                    modifiers: Modifiers::NONE,
+                },
+                Event::PointerMoved(edge + vec2(15., 0.)),
+            ],
+        );
+        assert_eq!(play.dragging, Some(0));
+    }
+    #[test]
+    fn game_board_fit_uses_both_axes_and_centers_without_fixed_caps() {
+        for size in [vec2(320., 480.), vec2(1600., 900.), vec2(1200., 240.)] {
+            let available = Rect::from_min_size(pos2(37., 51.), size);
+            for aspect in [
+                vec2(9., 9.),
+                vec2(30., 16.),
+                vec2(10., 20.),
+                vec2(880., 340.),
+            ] {
+                let r = fitted_board_rect(available, aspect);
+                assert!(r.is_finite() && available.contains_rect(r));
+                assert!(r.center().distance(available.center()) < 0.001);
+                assert!((r.width() / r.height() - aspect.x / aspect.y).abs() < 0.001);
+                assert!((r.width() - size.x).abs() < 0.001 || (r.height() - size.y).abs() < 0.001);
+            }
+        }
+        let r = fitted_board_rect(
+            Rect::from_min_size(Pos2::ZERO, vec2(1600., 900.)),
+            vec2(9., 9.),
+        );
+        assert_eq!(r.size(), vec2(900., 900.));
+    }
+    #[test]
+    fn all_game_boards_fit_visible_width_and_height_including_cards_and_untangle() {
+        for spec in GameRegistry::catalog() {
+            let ctx = Context::default();
+            let mut play = PlayState::default();
+            play.start(spec.id, 1);
+            let saved = play.session.as_ref().unwrap().save_bytes().unwrap();
+            for size in [vec2(480., 600.), vec2(1600., 1000.), vec2(1200., 400.)] {
+                let mut out = ctx.run_ui(
+                    RawInput {
+                        screen_rect: Some(Rect::from_min_size(Pos2::ZERO, size)),
+                        ..Default::default()
+                    },
+                    |ui| draw_scene(ui, &mut play),
+                );
+                out.textures_delta.clear();
+                let r = play
+                    .board
+                    .expect("every game exposes its active board bounds");
+                assert!(r.is_finite() && r.is_positive(), "{:?}: {r:?}", spec.id);
+                assert!(
+                    r.left() >= -0.01
+                        && r.top() >= -0.01
+                        && r.right() <= size.x + 0.01
+                        && r.bottom() <= size.y + 0.01,
+                    "{:?}: {r:?} in {size:?}",
+                    spec.id
+                );
+                assert!(
+                    (r.center().x - size.x / 2.).abs() < 1.,
+                    "{:?}: {r:?}",
+                    spec.id
+                );
+                assert_eq!(
+                    play.session.as_ref().unwrap().save_bytes().unwrap(),
+                    saved,
+                    "resizing must not change game/save state"
+                );
+            }
+        }
+    }
+    #[test]
+    fn fitted_soliterm_pile_buttons_still_transfer_cards_with_pointer() {
+        let ctx = Context::default();
+        let mut play = PlayState::default();
+        play.start(GameId::Soliterm, 1);
+        let original = play.session.as_ref().unwrap().scene();
+        let size = vec2(1200., 800.);
+        let render = |play: &mut PlayState, events| {
+            let mut out = ctx.run_ui(
+                RawInput {
+                    screen_rect: Some(Rect::from_min_size(Pos2::ZERO, size)),
+                    events,
+                    ..Default::default()
+                },
+                |ui| draw_scene(ui, play),
+            );
+            out.textures_delta.clear();
+        };
+        render(&mut play, vec![]);
+        let board = play.board.unwrap();
+        let scale = board.width() / 880.;
+        for (x, y) in [(53., 130.), (53., 26.)] {
+            let pos = board.min + vec2(x, y) * scale;
+            render(
+                &mut play,
+                vec![
+                    Event::PointerMoved(pos),
+                    Event::PointerButton {
+                        pos,
+                        button: PointerButton::Primary,
+                        pressed: true,
+                        modifiers: Modifiers::NONE,
+                    },
+                ],
+            );
+            render(
+                &mut play,
+                vec![Event::PointerButton {
+                    pos,
+                    button: PointerButton::Primary,
+                    pressed: false,
+                    modifiers: Modifiers::NONE,
+                }],
+            );
+        }
+        assert_ne!(play.session.as_ref().unwrap().scene(), original);
+        assert!(play.session.as_mut().unwrap().undo());
+        assert_eq!(play.session.as_ref().unwrap().scene(), original);
+    }
     #[test]
     fn cards_keyboard_source_and_destination_apply_a_real_transfer() {
         let mut play = PlayState::default();
@@ -2743,6 +3093,98 @@ mod untangle_fix1_regression {
 #[cfg(all(test, unix))]
 mod options_ui_tests {
     use super::*;
+    #[test]
+    fn guess_history_map_choices_and_invalid_configuration_paint_readable_text() {
+        fn text_colors(output: &FullOutput, label: &str) -> (Color32, Color32) {
+            let text = output
+                .shapes
+                .iter()
+                .find_map(|s| match &s.shape {
+                    Shape::Text(t)
+                        if t.galley.text().replace(' ', "") == label.replace(' ', "") =>
+                    {
+                        Some(t)
+                    }
+                    _ => None,
+                })
+                .unwrap_or_else(|| panic!("missing {label}"));
+            let color = |section: &egui::text::LayoutSection| {
+                text.override_text_color.unwrap_or_else(|| {
+                    if section.format.color == Color32::PLACEHOLDER {
+                        text.fallback_color
+                    } else {
+                        section.format.color
+                    }
+                })
+            };
+            (
+                color(text.galley.job.sections.first().unwrap()),
+                color(text.galley.job.sections.last().unwrap()),
+            )
+        }
+        for theme in [Theme::Light, Theme::Dark] {
+            let ctx = Context::default();
+            fluent::setup(&ctx, true, false);
+            ctx.set_theme(theme);
+            let mut play = PlayState::default();
+            assert!(play.start_config(
+                7,
+                p::PuzzleConfig::Guess(p::GuessConfig {
+                    colours: 8,
+                    ..Default::default()
+                })
+            ));
+            for (slot, colour) in [5, 8, 3, 4].into_iter().enumerate() {
+                play.puzzle(p::PuzzleInput::Peg { slot, colour });
+            }
+            play.puzzle(p::PuzzleInput::Submit);
+            let draw = |play: &mut PlayState, options| {
+                crate::ui::gui_tests::shell_frame(&ctx, vec2(1100., 1000.), 1., vec![], |ui| {
+                    if options {
+                        puzzle_options(ui, play)
+                    } else {
+                        draw_scene(ui, play);
+                    }
+                })
+            };
+            let style = ctx.global_style();
+            let check = |frame: &FullOutput, label: &str, c| {
+                let (swatch, numeral) = text_colors(frame, label);
+                assert_eq!(swatch, palette(c));
+                assert_eq!(numeral, style.visuals.text_color(), "{theme:?}: {label}");
+                let luminance = |color: Color32| {
+                    let l = egui::Rgba::from(color);
+                    0.2126 * l.r() + 0.7152 * l.g() + 0.0722 * l.b()
+                };
+                for background in [style.visuals.panel_fill, style.visuals.selection.bg_fill] {
+                    let bg = luminance(background);
+                    let fg = luminance(numeral);
+                    assert!((bg.max(fg) + 0.05) / (bg.min(fg) + 0.05) >= 4.5);
+                }
+            };
+            let history = draw(&mut play, false);
+            check(&history, "●5", 5);
+            check(&history, "●8", 8);
+            play.start(GameId::Map, 7);
+            let choices = draw(&mut play, false);
+            for c in 1..=4 {
+                check(&choices, &format!("●{c}"), c);
+            }
+            play.start(GameId::Solo, 7);
+            let invalid = p::PuzzleConfig::SoloVariant(p::SoloVariantConfig {
+                base: Default::default(),
+                jigsaw: true,
+                killer: true,
+            });
+            let error = invalid.validate().unwrap_err();
+            play.draft = Some(invalid);
+            ctx.memory_mut(|m| m.set_everything_is_visible(true));
+            draw(&mut play, true);
+            let config = draw(&mut play, true);
+            assert_eq!(text_colors(&config, &error).1, style.visuals.error_fg_color);
+        }
+    }
+
     #[test]
     fn options_dynamic_guess_last_slot_and_atomic_failure() {
         let mut s = PlayState::default();
@@ -3580,11 +4022,17 @@ mod options_ui_tests {
             expected
         );
         assert_eq!(painted_lines(&out, Stroke::new(1.5, palette(5))).len(), 36);
-        assert!(
-            painted_texts(&out)
+        let metadata = painted_texts(&out);
+        for label in ["Jigsaw", "Difficulty:"] {
+            let (position, _) = metadata
                 .iter()
-                .any(|(_, t)| t.contains("Jigsaw"))
-        );
+                .find(|(_, text)| text.contains(label))
+                .unwrap();
+            assert!(
+                position.y >= 0. && position.y < r.top(),
+                "{label} stays visible above the fitted board"
+            );
+        }
         assert!(
             !play
                 .session
@@ -3617,8 +4065,8 @@ mod options_ui_tests {
         assert!(compact_play.start_config(0, advanced_preset("3x3 Killer")));
         let _compact = painted_scene(&mut compact_play, 220.);
         assert!(
-            compact_play.board.unwrap().width() / 9. >= 38.,
-            "cages retain readable sums and notes through horizontal scrolling"
+            compact_play.board.unwrap().width() <= 220.,
+            "cage boards fit the available width"
         );
         let lines = painted_lines(&out, Stroke::new(1.2, palette(2)));
         let texts = painted_texts(&out);
@@ -4020,6 +4468,43 @@ mod options_ui_tests {
         click(ctx, w, pos, PointerButton::Primary, vec2(1200., 1000.));
     }
     #[test]
+    fn narrow_game_actions_wrap_and_help_remains_clickable() {
+        let (ctx, _root, mut w) = crate::ui::terminal_review_tests::owned_workspace();
+        w.games.play.start(GameId::Guess, 7);
+        for scale in [1., 1.5, 2.] {
+            let size = vec2(360., 560.);
+            let draw = |w: &mut Workspace, events| {
+                crate::ui::gui_tests::shell_frame(&ctx, size, scale, events, |ui| {
+                    w.games_frame(ui);
+                })
+            };
+            draw(&mut w, vec![]);
+            let out = draw(&mut w, vec![]);
+            let mut positions = Vec::new();
+            for label in ["Save…", "Load…", "New game", "Undo", "Redo", "Help"] {
+                let pos = crate::ui::gui_tests::shell_text_position(&out, label);
+                assert!(Rect::from_min_size(Pos2::ZERO, size).contains(pos));
+                positions.push(pos);
+            }
+            let pos = *positions.last().unwrap();
+            assert!(pos.y > positions[0].y);
+            let before = w.games.play.help;
+            draw(
+                &mut w,
+                vec![
+                    Event::PointerMoved(pos),
+                    crate::ui::gui_tests::shell_pointer(pos, true),
+                ],
+            );
+            draw(
+                &mut w,
+                vec![crate::ui::gui_tests::shell_pointer(pos, false)],
+            );
+            assert_ne!(w.games.play.help, before);
+        }
+    }
+
+    #[test]
     fn save_ui_actual_all_thirteen_controls_and_save_snapshot_during_chooser() {
         use std::sync::{Arc, Mutex, mpsc};
         let (ctx, dir, mut w) = crate::ui::terminal_review_tests::owned_workspace();
@@ -4261,6 +4746,41 @@ mod options_ui_tests {
         assert!(
             ctx.input(|i| i.events.is_empty() && i.keys_down.is_empty() && !i.pointer.any_down())
         );
+    }
+    #[test]
+    fn actual_game_escape_keeps_dirty_game_and_does_not_play_the_queued_move() {
+        let (ctx, _dir, mut w) = crate::ui::terminal_review_tests::owned_workspace();
+        w.games.play.start(GameId::Netwalk, 5);
+        w.games.play.puzzle(p::PuzzleInput::Rotate {
+            cell: 0,
+            clockwise: true,
+        });
+        let before = w.games.play.session.as_ref().unwrap().save_bytes().unwrap();
+        w.games.play.request_file_action(FileAction::Close, &ctx);
+        assert!(w.games.play.files.pending.is_some());
+        frame(&ctx, &mut w, vec![], vec2(1200., 1000.));
+        label_position(&ctx, &mut w, "Keep playing");
+        frame(
+            &ctx,
+            &mut w,
+            vec![
+                Event::Key {
+                    key: Key::Escape,
+                    physical_key: None,
+                    pressed: true,
+                    repeat: false,
+                    modifiers: Modifiers::NONE,
+                },
+                Event::Text("x".into()),
+            ],
+            vec2(1200., 1000.),
+        );
+        assert!(w.games.play.files.pending.is_none());
+        assert_eq!(
+            w.games.play.session.as_ref().unwrap().save_bytes().unwrap(),
+            before
+        );
+        assert!(w.games.play.files.dirty());
     }
     #[test]
     fn save_ui_actual_discard_resets_creates_and_closes() {

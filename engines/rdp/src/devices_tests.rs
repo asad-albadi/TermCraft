@@ -775,14 +775,35 @@ pub(crate) mod serial {
             },
             0
         );
+        let (master, slave) = unsafe { (File::from_raw_fd(master), File::from_raw_fd(slave)) };
+        // openpty has no portable atomic CLOEXEC option. Own both descriptors
+        // immediately and prevent parallel native-worker execs retaining them.
+        // Hangup tests still allow the brief concurrent fork-before-exec window.
+        for file in [&master, &slave] {
+            let flags = unsafe { libc::fcntl(file.as_raw_fd(), libc::F_GETFD) };
+            assert!(flags >= 0);
+            assert_eq!(
+                unsafe { libc::fcntl(file.as_raw_fd(), libc::F_SETFD, flags | libc::FD_CLOEXEC) },
+                0
+            );
+        }
         let path = unsafe { std::ffi::CStr::from_ptr(path.as_ptr()) };
         let path = PathBuf::from(path.to_str().unwrap());
-        let (master, slave) = unsafe { (File::from_raw_fd(master), File::from_raw_fd(slave)) };
         assert_eq!(
             unsafe { libc::fcntl(master.as_raw_fd(), libc::F_SETFL, libc::O_NONBLOCK) },
             0
         );
         (master, slave, path)
+    }
+
+    #[test]
+    fn owned_pty_descriptors_are_closed_on_exec() {
+        let (master, slave, _) = pty();
+        for file in [&master, &slave] {
+            let flags = unsafe { libc::fcntl(file.as_raw_fd(), libc::F_GETFD) };
+            assert!(flags >= 0);
+            assert_ne!(flags & libc::FD_CLOEXEC, 0);
+        }
     }
 
     fn start(path: PathBuf, read_only: bool) -> Channel {

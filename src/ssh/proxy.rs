@@ -35,8 +35,13 @@ async fn tcp(host: &str, port: u16, timeout: Duration) -> Result<TcpStream, Stri
         TcpStream::connect((host.trim_start_matches('[').trim_end_matches(']'), port)),
     )
     .await
-    .map_err(|_| "TCP connection timed out")?
-    .map_err(|_| "TCP connection failed".into())
+    .map_err(|_| {
+        format!(
+            "TCP connection to {host}:{port} timed out after {} seconds",
+            timeout.as_secs()
+        )
+    })?
+    .map_err(|error| format!("TCP connection to {host}:{port} failed: {error}"))
 }
 async fn credentials(
     stream: &mut TcpStream,

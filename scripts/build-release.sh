@@ -60,7 +60,7 @@ with tempfile.TemporaryDirectory(prefix=".termcraft-local-build-", dir=bindir) a
         "profile": "local-build", "signing": "unsigned",
         "platform": system, "architecture": architecture,
         "version": versions[0], "rdp_helper_version": versions[1],
-        "rdp_helper_wire_version": 1,
+        "rdp_helper_wire_version": 2,
         "build": {"provenance": provenance}, "files": files,
     }
     declaration_file = temporary / manifest.name

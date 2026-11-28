@@ -47,22 +47,33 @@ impl Default for ManagedVnc {
     }
 }
 impl ManagedVnc {
+    pub(super) fn active(&self) -> bool {
+        self.id
+            .and_then(|id| self.supervisor.status(id))
+            .is_some_and(|s| {
+                matches!(
+                    s.state,
+                    ServiceState::Starting | ServiceState::Running | ServiceState::Stopping
+                )
+            })
+    }
+
     pub(super) fn card(&mut self, ui: &mut Ui) {
         ui.add_space(17.);
         surface(ui).show(ui,|ui|{
-            ui.label(RichText::new("VNC desktop sharing server").size(18.).strong());
+            ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("VNC desktop sharing server").size(18.)));
             ui.label("Share an explicitly selected display. Classic VNC uses weak password authentication and does not encrypt screen contents or input. Use an SSH tunnel on untrusted networks.");
             let status=self.id.and_then(|id|self.supervisor.status(id));
             let busy=status.as_ref().is_some_and(|s|matches!(s.state,ServiceState::Starting|ServiceState::Running|ServiceState::Stopping));
             ui.add_enabled_ui(!busy,|ui|{
-                Grid::new("managed-vnc-form").num_columns(2).show(ui,|ui|{
-                    #[cfg(target_os="linux")]{ui.label("Display source");ui.horizontal(|ui|{ui.selectable_value(&mut self.wayland,false,"Explicit X11 display");ui.selectable_value(&mut self.wayland,true,"Wayland portal selection");});ui.end_row();if self.wayland {ui.label("Permission");ui.label("Start opens your desktop permission dialog. Select one screen or window. Stop cancels sharing.");ui.end_row();}else{ui.label("X11 display");ui.add(TextEdit::singleline(&mut self.display).hint_text("Explicit display, e.g. :2"));ui.end_row();ui.label("Xauthority file (optional)");ui.text_edit_singleline(&mut self.authority);ui.end_row();}}
+                fluent::settings_grid(ui, "managed-vnc-form", |ui|{
+                    #[cfg(target_os="linux")]{ui.label("Display source");ui.horizontal_wrapped(|ui|{ui.selectable_value(&mut self.wayland,false,"Explicit X11 display");ui.selectable_value(&mut self.wayland,true,"Wayland portal selection");});ui.end_row();if self.wayland {ui.label("Permission");ui.label("Start opens your desktop permission dialog. Select one screen or window. Stop cancels sharing.");ui.end_row();}else{ui.label("X11 display");ui.add(crate::ui::fluent::singleline(&mut self.display).hint_text("Explicit display, e.g. :2"));ui.end_row();ui.label("Xauthority file (optional)");ui.add(crate::ui::fluent::singleline(&mut self.authority));ui.end_row();}}
                     #[cfg(windows)]{ui.label("Display source");ui.label("Primary display on the current Windows desktop");ui.end_row();}
                     #[cfg(target_os="macos")]{ui.label("Display source");ui.add(DragValue::new(&mut self.macos_display_id).prefix("Display ID ").range(0..=u32::MAX));ui.end_row();}
-                    ui.label("Listen address");ui.text_edit_singleline(&mut self.bind);ui.end_row();
+                    ui.label("Listen address");ui.add(crate::ui::fluent::singleline(&mut self.bind));ui.end_row();
                     ui.label("Browser viewer");ui.checkbox(&mut self.browser,"Enable HTTP browser viewer (unencrypted)");ui.end_row();
-                    if self.browser {ui.label("Browser listen address");ui.text_edit_singleline(&mut self.browser_bind);ui.end_row();}
-                    ui.label("VNC password");super::managed_servers::service_password_field(ui,&mut self.password,210.);ui.end_row();
+                    if self.browser {ui.label("Browser listen address");ui.add(crate::ui::fluent::singleline(&mut self.browser_bind));ui.end_row();}
+                    let label=ui.label("VNC password");super::managed_servers::service_password_field(ui,&mut self.password,210.).labelled_by(label.id);ui.end_row();
                     ui.label("Access");ui.checkbox(&mut self.control,"Allow remote keyboard and pointer (view-only by default)");ui.end_row();
                     ui.label("Clipboard");
                     #[cfg(target_os="macos")]ui.checkbox(&mut self.clipboard,"Share my global macOS clipboard (viewers receive only)");
@@ -72,13 +83,13 @@ impl ManagedVnc {
                     ui.label("Stop after");ui.add(DragValue::new(&mut self.lifetime).range(0..=86400).suffix(" seconds (0 = until stopped)"));ui.end_row();
                 });
                 #[cfg(target_os="macos")]ui.small("macOS 14 or later. Display ID 0 selects the primary display when Start is clicked; another ID selects only that display. Capture is limited to 5 frames/second. Start may request Screen Recording permission; remote control also requires Accessibility permission. Approve permissions yourself in macOS. The optional clipboard belongs to your entire macOS session.");
-                ui.small("Password: 1–8 printable ASCII bytes. Clipboard is limited to 8 KiB text and disabled by default. Browser viewer uses bundled noVNC, shares this server’s password/access, and stops with it. HTTPS is not available on this listener. Wayland sharing requires a desktop portal and PipeWire; permission is requested only when you start this source. One controlling client at a time; view-only servers allow multiple viewers.");
+                ui.menu_button("Viewer and clipboard help", |ui| { ui.set_max_width(340.); ui.small("Password: 1–8 printable ASCII bytes. Clipboard is limited to 8 KiB text and disabled by default. Browser viewer uses bundled noVNC, shares this server’s password/access, and stops with it. HTTPS is not available on this listener. Wayland sharing requires a desktop portal and PipeWire; permission is requested only when you start this source. One controlling client at a time; view-only servers allow multiple viewers."); });
             });
             if let Some(s)=status {
                 ui.label(format!("{:?}",s.state));
                 if s.state==ServiceState::Running {if let Some(address)=s.address{ui.monospace(address.to_string());}}
                 if s.state==ServiceState::Running { if let Some(mut address)=s.browser_address { if address.ip().is_unspecified() { address.set_ip(if address.is_ipv4() { std::net::Ipv4Addr::LOCALHOST.into() } else { std::net::Ipv6Addr::LOCALHOST.into() }); } let url=format!("http://{address}/");ui.hyperlink_to(&url,&url);ui.small("Use this listener’s literal interface IP for access from another computer. Custom hostnames and reverse proxy origins are not accepted."); } }
-                if let Some(error)=s.error{ui.colored_label(ui.visuals().error_fg_color,error);}
+                if let Some(error)=s.error{crate::ui::errors::show(ui, crate::ui::errors::Domain::Vnc, error);}
                 if busy {ui.ctx().request_repaint_after(Duration::from_millis(50));if ui.button("Stop VNC server").clicked(){let _=self.supervisor.stop(s.id);}}
             }
             if !busy&&ui.button("Start VNC server").clicked(){
@@ -94,7 +105,7 @@ impl ManagedVnc {
                     self.supervisor.begin_vnc(config)
                 })();self.password.zeroize();match result{Ok(id)=>{self.id=Some(id);self.error=None},Err(e)=>self.error=Some(e)}
             }
-            if let Some(error)=&self.error{ui.colored_label(ui.visuals().error_fg_color,error);}
+            if let Some(error)=&self.error{crate::ui::errors::show(ui, crate::ui::errors::Domain::Vnc, error);}
         });
     }
 }

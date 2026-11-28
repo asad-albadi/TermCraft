@@ -1,4 +1,4 @@
-use eframe::egui::{self, Button, Context, Id, ScrollArea, TextEdit, Ui, Window};
+use eframe::egui::{self, Button, Context, Id, ScrollArea, TextEdit, Ui};
 use harbor_workspace::{
     credentials::Secret,
     protocols::{
@@ -30,6 +30,7 @@ pub(super) struct State {
     dialog: Option<mpsc::Receiver<Option<Pending>>>,
     editor: Option<Editor>,
     recovery_candidate: Option<RemoteDocument>,
+    comparison_dismissed: bool,
     generation: u64,
     close_cancelled: bool,
     message: Option<String>,
@@ -88,6 +89,7 @@ impl State {
             dialog: None,
             editor: None,
             recovery_candidate: None,
+            comparison_dismissed: false,
             generation: 0,
             close_cancelled: false,
             message: None,
@@ -162,6 +164,7 @@ impl State {
             Ok(actor) => {
                 self.actor = Some(actor);
                 self.generation = self.generation.wrapping_add(1);
+                self.comparison_dismissed = false;
                 self.recovery_candidate = None;
                 self.pending = None;
                 self.dialog = None;
@@ -210,8 +213,9 @@ impl State {
     pub(super) fn document_window(&mut self, ctx: &Context) {
         if let Some(editor) = &mut self.editor {
             let closing = editor.closing;
-            if editor.show(ctx, self.connection) {
+            if editor.show(ctx, self.connection, &mut self.comparison_dismissed) {
                 self.editor = None;
+                self.comparison_dismissed = false;
                 self.recovery_candidate = None;
             } else if closing && !editor.closing {
                 self.close_cancelled = true;
@@ -248,9 +252,11 @@ impl State {
             });
         }
         if self.actor.as_ref().is_none_or(FtpWorkspace::closed) {
-            ui.horizontal(|ui| {
-                ui.label("Password");
-                let field = ui.add(TextEdit::singleline(&mut *self.password).password(true));
+            ui.horizontal_wrapped(|ui| {
+                let label = ui.label("Password");
+                let field = ui
+                    .add(crate::ui::fluent::singleline(&mut *self.password).password(true))
+                    .labelled_by(label.id);
                 if let Some(mut state) = TextEdit::load_state(ui.ctx(), field.id) {
                     state.clear_undoer();
                     TextEdit::store_state(ui.ctx(), field.id, state);
@@ -263,7 +269,7 @@ impl State {
             self.disconnect();
         }
         if let Some(error) = &self.message {
-            ui.colored_label(ui.visuals().error_fg_color, error);
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error);
         }
         if self.actor.as_ref().is_some_and(FtpWorkspace::ready) {
             self.browser(ui);
@@ -276,122 +282,132 @@ impl State {
     }
 
     fn browser(&mut self, ui: &mut Ui) {
-        let actor = self.actor.as_mut().unwrap();
+        let actor = self.actor.as_ref().unwrap();
         let page_path = actor.browser.path.clone();
+        let available = !actor.browser.loading
+            && actor.browser.error.is_none()
+            && self.pending.is_none()
+            && self.dialog.is_none();
         let mut requested_path = None;
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             if ui.button("Up").clicked() {
                 requested_path = Some(Ok(page_path.parent()));
             }
             if ui.button("Refresh").clicked() {
                 requested_path = Some(Ok(page_path.clone()));
             }
-            let address =
-                ui.add(TextEdit::singleline(&mut self.address).hint_text("Absolute remote path"));
+            let address = ui.add_sized(
+                [(ui.available_width() - 52.).clamp(90., 640.), 32.],
+                crate::ui::fluent::singleline(&mut self.address).hint_text("Absolute remote path"),
+            );
             if ui.button("Go").clicked()
                 || address.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter))
             {
                 requested_path = Some(RemotePath::from_bytes(self.address.as_bytes().to_vec()));
             }
         });
-        ui.small(page_path.display());
+        let selected = self.selected.clone();
+        ui.add_enabled_ui(available, |ui| {
+            ui.horizontal_wrapped(|ui| {
+                if super::icons::action(ui, "Upload…").clicked() {
+                    self.file_dialog(None, page_path.clone(), false);
+                }
+                if let Some(entry) = &selected {
+                    let folder = entry.kind == EntryKind::Directory;
+                    if ui
+                        .button(if folder {
+                            "Download folder…"
+                        } else {
+                            "Download…"
+                        })
+                        .clicked()
+                    {
+                        self.file_dialog(Some(entry.clone()), entry.path.parent(), folder);
+                    }
+                    if entry.kind == EntryKind::File
+                        && ui
+                            .add_enabled(self.editor.is_none(), Button::new("Edit…"))
+                            .clicked()
+                    {
+                        self.edit(entry.path.clone());
+                    }
+                }
+                ui.menu_button("More", |ui| {
+                    if super::icons::action(ui, "Upload folder…").clicked() {
+                        self.file_dialog(None, page_path.clone(), true);
+                        ui.close();
+                    }
+                    if super::icons::action(ui, "New folder…").clicked() {
+                        self.pending = Some(Pending::Mkdir {
+                            directory: page_path.clone(),
+                            name: String::new(),
+                        });
+                        ui.close();
+                    }
+                    if let Some(entry) = &selected {
+                        if super::icons::action(ui, "Rename…").clicked() {
+                            self.pending = Some(Pending::Rename {
+                                source: entry.path.clone(),
+                                name: String::new(),
+                            });
+                            ui.close();
+                        }
+                        if super::icons::action(ui, "Delete…").clicked() {
+                            self.pending = Some(Pending::Delete {
+                                path: entry.path.clone(),
+                                directory: entry.kind == EntryKind::Directory,
+                                contents: false,
+                                typed: String::new(),
+                            });
+                            ui.close();
+                        }
+                    }
+                });
+            });
+        });
+        let actor = self.actor.as_mut().unwrap();
         if actor.browser.loading {
             ui.spinner();
         }
         if let Some(error) = &actor.browser.error {
-            ui.colored_label(ui.visuals().error_fg_color, error);
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error);
         }
+        let reserve = if self.pending.is_some() { 220. } else { 0. }
+            + if self.transfers.is_empty() { 0. } else { 175. };
+        let row_height = ui.spacing().interact_size.y;
         ScrollArea::vertical()
             .id_salt("ftp-list")
-            .max_height(360.)
-            .show_rows(ui, 24.0, actor.browser.entries.len(), |ui, rows| {
+            .auto_shrink([false, false])
+            .max_height((ui.available_height() - reserve).max(36.))
+            .show_rows(ui, row_height, actor.browser.entries.len(), |ui, rows| {
                 for row in rows {
                     let entry = &actor.browser.entries[row];
                     let selected = self
                         .selected
                         .as_ref()
                         .is_some_and(|selected| selected.path == entry.path);
-                    ui.horizontal(|ui| {
-                        let response = ui.selectable_label(selected, &entry.display_name);
-                        if response.clicked() || response.double_clicked() {
-                            self.selected = Some(entry.clone());
-                        }
-                        if response.double_clicked() && entry.kind == EntryKind::Directory {
-                            requested_path = Some(Ok(entry.path.clone()));
-                        }
-                        match entry.kind {
-                            EntryKind::Directory => {
-                                ui.small("Folder");
-                            }
-                            EntryKind::File => {
-                                if let Some(size) = entry.size {
-                                    ui.small(format!("{size} B"));
-                                }
-                            }
-                            EntryKind::Symlink => {
-                                ui.small("Link");
-                            }
-                            EntryKind::Other => {}
-                        }
-                    });
+                    let id = ui
+                        .id()
+                        .with(("ftp-entry", self.connection, entry.path.as_bytes()));
+                    let response = super::explorer::ExplorerRow::remote(entry).show(
+                        ui,
+                        id,
+                        selected,
+                        row_height,
+                        egui::Sense::click(),
+                    );
+                    if response.clicked() || response.double_clicked() {
+                        self.selected = Some(entry.clone());
+                    }
+                    if response.double_clicked() && entry.kind == EntryKind::Directory {
+                        requested_path = Some(Ok(entry.path.clone()));
+                    }
                 }
             });
         if let Some(path) = requested_path {
             self.message = path.and_then(|path| actor.navigate(path)).err();
             self.selected = None;
         }
-        let available = !actor.browser.loading
-            && actor.browser.error.is_none()
-            && self.pending.is_none()
-            && self.dialog.is_none();
-        let selected = self.selected.clone();
-        ui.add_enabled_ui(available, |ui| {
-            ui.horizontal_wrapped(|ui| {
-                if ui.button("Upload…").clicked() {
-                    self.file_dialog(None, page_path.clone(), false);
-                }
-                if ui.button("Upload folder…").clicked() {
-                    self.file_dialog(None, page_path.clone(), true);
-                }
-                if ui.button("New folder…").clicked() {
-                    self.pending = Some(Pending::Mkdir {
-                        directory: page_path,
-                        name: String::new(),
-                    });
-                }
-                if let Some(entry) = selected {
-                    if entry.kind == EntryKind::File {
-                        if ui.button("Download…").clicked() {
-                            self.file_dialog(Some(entry.clone()), entry.path.parent(), false);
-                        }
-                        if ui
-                            .add_enabled(self.editor.is_none(), Button::new("Edit…"))
-                            .clicked()
-                        {
-                            self.edit(entry.path.clone());
-                        }
-                    }
-                    if entry.kind == EntryKind::Directory && ui.button("Download folder…").clicked()
-                    {
-                        self.file_dialog(Some(entry.clone()), entry.path.parent(), true);
-                    }
-                    if ui.button("Rename…").clicked() {
-                        self.pending = Some(Pending::Rename {
-                            source: entry.path.clone(),
-                            name: String::new(),
-                        });
-                    }
-                    if ui.button("Delete…").clicked() {
-                        self.pending = Some(Pending::Delete {
-                            path: entry.path,
-                            directory: entry.kind == EntryKind::Directory,
-                            contents: false,
-                            typed: String::new(),
-                        });
-                    }
-                }
-            });
-        });
     }
 
     fn edit(&mut self, path: RemotePath) {
@@ -416,6 +432,9 @@ impl State {
     }
 
     fn recovery_window(&mut self, ctx: &Context) {
+        if self.comparison_dismissed {
+            return;
+        }
         let Some(source) = &mut self.editor else {
             return;
         };
@@ -432,9 +451,10 @@ impl State {
 
         let mut import = false;
         let mut cancel = false;
-        Window::new("Compare FTP edits after reconnecting")
-            .id(Id::new(("ftp-recovery", self.connection)))
+        let size = super::fluent::dialog_size(ctx, 520., 130.);
+        super::fluent::modeless(ctx, Id::new(("ftp-recovery", self.connection)), "Compare FTP edits", size)
             .show(ctx, |ui| {
+                super::fluent::dialog_body(ui, size, |ui| {
                 ui.label(source.path.display());
                 if actor.certificate_fingerprint().is_none() {
                     ui.label("This connection has no verified certificate. Use the retained local copy to compare edits manually.");
@@ -454,13 +474,14 @@ impl State {
                     } else {
                         ui.label("The verified endpoint or open file does not match the original. Your edits remain in the original editor.");
                     }
-                    cancel = ui.button("Cancel comparison").clicked();
                 } else if ui.button("Open the current server version").clicked() {
                     match actor.open_document(source.path.clone(), self.recovery_root.clone()) {
                         Ok(document) => self.recovery_candidate = Some(document),
                         Err(error) => self.message = Some(error),
                     }
                 }
+                });
+                cancel = ui.button("Cancel comparison").clicked();
             });
         if import && let Some(mut target) = self.recovery_candidate.take() {
             match target.import_recovery_from(&source.document) {
@@ -475,6 +496,7 @@ impl State {
             }
         }
         if cancel {
+            self.comparison_dismissed = true;
             self.recovery_candidate = None;
         }
     }
@@ -607,7 +629,9 @@ impl State {
                     if ui.add_enabled(ready, Button::new("Skip existing")).clicked() { chosen = Some(ConflictPolicy::Skip); }
                     if ui.add_enabled(ready, Button::new("Allow replacing existing file")).clicked() { chosen = Some(ConflictPolicy::Overwrite); }
                 }
-                dismiss = ui.button("Cancel").clicked();
+                let safe = ui.button("Cancel");
+                if matches!(pending, Pending::Delete { .. }) { super::fluent::focus_on_entry(ui, &safe, ui.id()); }
+                dismiss = safe.clicked();
             });
         });
         if let Some(policy) = chosen {
@@ -778,7 +802,7 @@ struct Editor {
 }
 
 impl Editor {
-    fn show(&mut self, ctx: &Context, connection: u64) -> bool {
+    fn show(&mut self, ctx: &Context, connection: u64, comparison_dismissed: &mut bool) -> bool {
         let (status, dirty, recovery) = self.document.details();
         if !self.loaded && status == DocumentStatus::Ready {
             self.text = self.document.snapshot().text;
@@ -786,10 +810,16 @@ impl Editor {
         }
         let mut open = true;
         let mut remove = self.closing && !dirty && !status.busy();
-        Window::new(format!("{}{} · FTP editor", if dirty { "● " } else { "" }, self.path.display()))
-            .id(Id::new(("ftp-editor", connection))).open(&mut open).default_size([660., 440.])
-            .show(ctx, |ui| {
-                ui.label(match &status {
+        let size = super::fluent::dialog_size(ctx, 660., 155.);
+        super::fluent::modeless(ctx, Id::new(("ftp-editor",connection)), if dirty { "FTP editor · Unsaved" } else { "FTP editor" }, size)
+            .open(&mut open).show(ctx, |ui| {
+                ScrollArea::vertical().id_salt(("ftp-document-details",connection)).max_height(size.body_height*0.45).show(ui, |ui| {
+                ui.label(self.path.display());
+                match &status {
+                    DocumentStatus::Failed(message)=>{crate::ui::errors::show(ui,crate::ui::errors::Domain::Transfer,message);},
+                    DocumentStatus::Indeterminate(message)=>{crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,message);},
+                    DocumentStatus::Conflict=>{crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,"The remote file changed. Compare your edits with the remote version before choosing whether to replace it.");},
+                    _=>{                ui.label(match &status {
                     DocumentStatus::Opening => "Opening…",
                     DocumentStatus::Ready => "Ready",
                     DocumentStatus::Recovering => "Saving a local recovery copy…",
@@ -800,18 +830,24 @@ impl Editor {
                     DocumentStatus::Conflict => "The remote file changed. Your edits are still in this window.",
                     DocumentStatus::Cancelled => "Operation cancelled.",
                     DocumentStatus::Disconnected => "Connection ended. Local recovery is available.",
-                });
-                if let Some(path) = recovery {
+                });},
+                }
+                let (staging, warning) = self.document.recovery_details();
+                ui.menu_button("Document details", |ui| {
+                ui.set_max_width(340.);
+                ui.small("FTP checks whether the file changed before publishing. The server controls replacement and file permissions.");
+                if let Some(path) = &recovery {
                     ui.horizontal_wrapped(|ui| {
                         ui.small(format!("Local recovery: {}", path.display()));
                         if ui.small_button("Copy path").clicked() { ui.ctx().copy_text(path.display().to_string()); }
                     });
                 }
-                let (staging, warning) = self.document.recovery_details();
                 if let Some(path) = staging { ui.small(format!("Remote staging: {}", path.display())); }
-                if let Some(warning) = warning { ui.colored_label(ui.visuals().warn_fg_color, warning); }
-                if let Some(error) = &self.error { ui.colored_label(ui.visuals().error_fg_color, error); }
-                ui.small("FTP checks whether the file changed before publishing. The server controls replacement and file permissions.");
+                });
+                if let Some(warning) = warning { crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,warning); }
+                if let Some(error) = &self.error { crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error); }
+                });
+                if *comparison_dismissed && ui.button("Compare retained FTP edits…").clicked() { *comparison_dismissed = false; }
                 ui.horizontal_wrapped(|ui| {
                     if ui.add_enabled(self.loaded && dirty && !status.busy(), Button::new("Save")).clicked() {
                         self.error = self.document.save(SavePolicy::VerifyUnchanged).err();

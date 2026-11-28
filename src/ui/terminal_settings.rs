@@ -20,7 +20,7 @@ impl TerminalTab {
         self.terminal_settings = settings;
     }
     pub(super) fn resize_transport(&mut self) {
-        if let Some(legacy) = &self.legacy {
+        if let Some(legacy) = self.legacy.as_ref().filter(|legacy| !legacy.is_finished()) {
             if let Err(error) = legacy.resize(self.screen.cols as u16, self.screen.rows as u16) {
                 self.error = error;
             }
@@ -28,7 +28,7 @@ impl TerminalTab {
         if let Some(process) = &self.process {
             process.resize(self.screen.cols as u16, self.screen.rows as u16);
         }
-        if let Some(ssh) = &self.ssh {
+        if let Some(ssh) = self.ssh.as_ref().filter(|ssh| !ssh.is_finished()) {
             if let Err(error) = ssh.try_send(harbor_workspace::ssh::ConnectionCommand::Resize {
                 cols: self.screen.cols as u32,
                 rows: self.screen.rows as u32,
@@ -53,6 +53,7 @@ impl TerminalTab {
 }
 pub(super) fn font_family(font: TerminalFont) -> FontFamily {
     match font {
+        TerminalFont::JetBrainsMonoNerd => FontFamily::Name("JetBrains Mono Nerd Font".into()),
         TerminalFont::DejaVuSansMono => FontFamily::Name("DejaVu Sans Mono".into()),
         TerminalFont::LiberationSans => FontFamily::Name("Liberation Sans".into()),
         TerminalFont::MonospaceFallback => FontFamily::Monospace,
@@ -102,8 +103,9 @@ impl ProfileEditor {
     }
 }
 fn fonts(ui: &mut Ui, value: &mut TerminalFont) {
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         for (font, label) in [
+            (TerminalFont::JetBrainsMonoNerd, "JetBrains Mono Nerd Font"),
             (TerminalFont::DejaVuSansMono, "DejaVu Sans Mono"),
             (TerminalFont::LiberationSans, "Liberation Sans"),
             (TerminalFont::MonospaceFallback, "Monospace fallback"),
@@ -113,7 +115,7 @@ fn fonts(ui: &mut Ui, value: &mut TerminalFont) {
     });
 }
 fn encoding(ui: &mut Ui, value: &mut CharacterEncoding) {
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         for item in [
             CharacterEncoding::Utf8,
             CharacterEncoding::Windows1252,
@@ -124,7 +126,7 @@ fn encoding(ui: &mut Ui, value: &mut CharacterEncoding) {
     });
 }
 fn backspace(ui: &mut Ui, value: &mut BackspaceMapping) {
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         ui.selectable_value(value, BackspaceMapping::Delete, "DEL (0x7f)");
         ui.selectable_value(value, BackspaceMapping::ControlH, "Ctrl+H (0x08)");
     });
@@ -139,7 +141,7 @@ fn dimensions(ui: &mut Ui, value: &mut Dimensions) {
         };
     }
     if let Dimensions::Fixed { cols, rows } = value {
-        ui.horizontal(|ui| {
+        ui.horizontal_wrapped(|ui| {
             ui.label("Columns");
             ui.add(DragValue::new(cols).range(2..=500));
             ui.label("Rows");
@@ -148,23 +150,26 @@ fn dimensions(ui: &mut Ui, value: &mut Dimensions) {
     }
 }
 fn palette(ui: &mut Ui, value: &mut TerminalPalette) {
-    ui.horizontal(|ui| {
+    ui.horizontal_wrapped(|ui| {
         ui.label("Default text");
         ui.color_edit_button_srgb(&mut value.foreground);
         ui.label("Background");
         ui.color_edit_button_srgb(&mut value.background);
     });
-    Grid::new("ansi-palette").num_columns(8).show(ui, |ui| {
-        for (index, rgb) in value.ansi.iter_mut().enumerate() {
-            ui.vertical(|ui| {
-                ui.small(index.to_string());
-                ui.color_edit_button_srgb(rgb);
-            });
-            if index % 8 == 7 {
-                ui.end_row();
+    let columns = if ui.available_width() < 400. { 4 } else { 8 };
+    Grid::new("ansi-palette")
+        .num_columns(columns)
+        .show(ui, |ui| {
+            for (index, rgb) in value.ansi.iter_mut().enumerate() {
+                ui.vertical(|ui| {
+                    ui.small(index.to_string());
+                    ui.color_edit_button_srgb(rgb);
+                });
+                if index % columns == columns - 1 {
+                    ui.end_row();
+                }
             }
-        }
-    });
+        });
 }
 fn override_value<T: Clone>(
     ui: &mut Ui,
@@ -254,15 +259,17 @@ impl Workspace {
         let mut open = true;
         let mut save = false;
         let mut cancel = false;
-        Window::new("Global terminal profile").id(Id::new("global-terminal-profile")).open(&mut open).default_width(680.).show(ctx,|ui|{
-            ScrollArea::vertical().max_height(530.).show(ui,|ui|{
+        let size = fluent::dialog_size(ctx, 680., 148.);
+        fluent::modeless(ctx, Id::new("global-terminal-profile"), "Global terminal profile", size).open(&mut open).show(ctx,|ui|{
+            fluent::dialog_body(ui,size,|ui|{
+                ui.small("Saving updates new and open terminals wherever the option inherits the global profile.");
                 ui.label("Font family (bundled fonts and configured fallback)");fonts(ui,&mut editor.settings.font_family);ui.add(Slider::new(&mut editor.settings.font_size,8.0..=32.).suffix(" px"));
                 ui.label("Character encoding");encoding(ui,&mut editor.settings.encoding);ui.small("Other encodings, UTF-16/stateful control encodings and arbitrary OS font discovery are not supported. Encoding changes affect new bytes; retained output and raw logs are preserved. An encoding change waits for a running paste to finish.");
                 ui.label("Backspace sends");backspace(ui,&mut editor.settings.backspace);dimensions(ui,&mut editor.settings.dimensions);
                 ui.push_id("light",|ui|{CollapsingHeader::new("Light palette").show(ui,|ui|palette(ui,&mut editor.settings.light_palette));});ui.push_id("dark",|ui|{CollapsingHeader::new("Dark palette").show(ui,|ui|palette(ui,&mut editor.settings.dark_palette));});
             });
-            if !editor.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&editor.error);}
-            ui.horizontal(|ui|{save=primary(ui,"Save global profile").clicked();cancel=ui.button("Cancel").clicked();});
+            if !editor.error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Session, &editor.error);}
+            ui.horizontal_wrapped(|ui|{save=primary(ui,"Save global profile").clicked();cancel=ui.button("Cancel").clicked();});
         });
         if save {
             match editor.apply(&mut self.store.preferences) {

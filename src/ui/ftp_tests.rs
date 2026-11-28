@@ -49,7 +49,13 @@ fn find(shapes: &[egui::epaint::ClippedShape], label: &str) -> Option<Pos2> {
     shapes
         .iter()
         .filter_map(|shape| position(&shape.shape, label))
-        .max_by(|left, right| left.y.total_cmp(&right.y))
+        .max_by(|left, right| {
+            if label == "Connect" {
+                left.x.total_cmp(&right.x)
+            } else {
+                left.y.total_cmp(&right.y)
+            }
+        })
 }
 
 fn click(workspace: &mut Workspace, ctx: &Context, position: Pos2) {
@@ -86,10 +92,11 @@ async fn wait_for_text(workspace: &mut Workspace, ctx: &Context, label: &str) ->
     }
 }
 
-#[tokio::test]
-async fn graphical_ftp_session_connects_opens_edits_and_guards_tab_close() {
+async fn open_owned_ftp_document(
+    tls: FtpTlsMode,
+) -> (fixture::Endpoint, tempfile::TempDir, Context, Workspace) {
     let server = fixture::Endpoint::start(fixture::ServerOptions {
-        tls: FtpTlsMode::Explicit,
+        tls,
         ..Default::default()
     })
     .await;
@@ -106,6 +113,8 @@ async fn graphical_ftp_session_connects_opens_edits_and_guards_tab_close() {
         port: options.port,
         user: options.username,
         ftp_options: SessionOptions {
+            tls,
+            protect_data: options.protect_data,
             certificate_authority: options.certificate_authority,
             ..SessionOptions::embedded()
         },
@@ -126,6 +135,123 @@ async fn graphical_ftp_session_connects_opens_edits_and_guards_tab_close() {
     click(&mut workspace, &ctx, edit);
     let document = wait_for_text(&mut workspace, &ctx, "Fixture original text").await;
     click(&mut workspace, &ctx, document);
+    (server, data, ctx, workspace)
+}
+
+#[tokio::test]
+async fn ftp_listing_draws_distinct_icons_for_directory_file_and_link() {
+    use crate::ui::explorer_tests::{REMOTE_LABELS, assert_distinct_icons, remote_samples};
+    let (_server, _root, ctx, mut w) = open_owned_ftp_document(FtpTlsMode::Plain).await;
+    ctx.enable_accesskit();
+    let ftp = w.tabs[0].ftp.as_mut().unwrap();
+    ftp.actor.as_mut().unwrap().browser.entries = remote_samples();
+    let draw = |ftp: &mut State| {
+        crate::ui::gui_tests::shell_frame(&ctx, egui::vec2(640., 900.), 1., vec![], |ui| {
+            ftp.browser(ui)
+        })
+    };
+    draw(ftp);
+    assert_distinct_icons(&draw(ftp), REMOTE_LABELS);
+}
+
+#[tokio::test]
+async fn ftp_small_wheel_steps_preserve_virtual_row_geometry_and_file_selection() {
+    let (_server, _data, ctx, mut workspace) = open_owned_ftp_document(FtpTlsMode::Plain).await;
+    let ftp = workspace.tabs[0].ftp.as_mut().unwrap();
+    ftp.actor.as_mut().unwrap().browser.entries = (0..120)
+        .map(|i| {
+            let name = format!("item-{i:03}.txt");
+            RemoteEntry {
+                path: RemotePath::from_bytes(format!("/{name}").into_bytes()).unwrap(),
+                display_name: name,
+                kind: EntryKind::File,
+                size: Some(5),
+            }
+        })
+        .collect();
+    let draw = |ftp: &mut State, events| {
+        let mut before = 0.;
+        let output =
+            crate::ui::gui_tests::shell_frame(&ctx, egui::vec2(640., 550.), 1., events, |ui| {
+                let id = ui.make_persistent_id(egui::IdSalt::new("ftp-list"));
+                before = egui::scroll_area::State::load(&ctx, id)
+                    .unwrap_or_default()
+                    .offset
+                    .y;
+                ftp.browser(ui);
+            });
+        (output, before)
+    };
+    let (first, _) = draw(ftp, vec![]);
+    let pos = crate::ui::gui_tests::shell_text_position(&first, "item-000.txt");
+    let next = crate::ui::gui_tests::shell_text_position(&first, "item-001.txt");
+    let stride = next.y - pos.y;
+    let mut clicked = false;
+    for _ in 0..80 {
+        let (frame, offset) = draw(
+            ftp,
+            vec![
+                Event::PointerMoved(next),
+                Event::MouseWheel {
+                    unit: egui::MouseWheelUnit::Point,
+                    delta: egui::vec2(0., -7.),
+                    phase: egui::TouchPhase::Move,
+                    modifiers: Modifiers::NONE,
+                },
+            ],
+        );
+        for shape in &frame.shapes {
+            let Shape::Text(t) = &shape.shape else {
+                continue;
+            };
+            let Some(index) = t
+                .galley
+                .text()
+                .strip_prefix("item-")
+                .and_then(|s| s.strip_suffix(".txt"))
+                .and_then(|s| s.parse::<usize>().ok())
+            else {
+                continue;
+            };
+            let center = t.pos + t.galley.size() * 0.5;
+            if !shape.clip_rect.contains(center) {
+                continue;
+            }
+            assert!(
+                (center.y - (pos.y + index as f32 * stride - offset)).abs() < 1.6,
+                "row {index}, offset {offset}, center {center:?}, stride {stride}"
+            );
+            if index == 10 && offset > 4. * stride && center.y > shape.clip_rect.top() + stride {
+                for down in [true, false] {
+                    draw(
+                        ftp,
+                        vec![
+                            Event::PointerMoved(center),
+                            crate::ui::gui_tests::shell_pointer(center, down),
+                        ],
+                    );
+                }
+                assert_eq!(
+                    ftp.selected.as_ref().unwrap().path.as_bytes(),
+                    b"/item-010.txt"
+                );
+                clicked = true;
+                break;
+            }
+        }
+        if clicked {
+            break;
+        }
+    }
+    assert!(
+        clicked,
+        "small wheel steps did not expose the intended filename"
+    );
+}
+
+#[tokio::test]
+async fn graphical_ftp_session_connects_opens_edits_and_guards_tab_close() {
+    let (server, _data, ctx, mut workspace) = open_owned_ftp_document(FtpTlsMode::Explicit).await;
     workspace.store.preferences.confirm_session_close = true;
     workspace.close_tab(0);
     assert!(workspace.pending_session_close.is_some());
@@ -233,4 +359,105 @@ fn ftp_confirmation_carries_the_source_kind_into_transfer_jobs() {
         download(true).operation(ConflictPolicy::Ask),
         Ok(TransferOperation::DownloadFolder { .. })
     ));
+}
+
+#[tokio::test]
+async fn unverified_ftp_recovery_can_be_dismissed_and_reopened_without_losing_edits() {
+    let (server, _data, ctx, mut workspace) = open_owned_ftp_document(FtpTlsMode::Plain).await;
+    render(&mut workspace, &ctx, vec![Event::Text(" retained".into())]);
+    let ftp = workspace.tabs[0].ftp.as_mut().unwrap();
+    let original = ftp.editor.as_ref().unwrap().document.snapshot().text;
+    assert!(original.contains("retained"));
+    ftp.disconnect();
+    wait_for_text(&mut workspace, &ctx, "Connect").await;
+    let ftp = workspace.tabs[0].ftp.as_mut().unwrap();
+    ftp.password
+        .push_str(server.options().password.unwrap().expose());
+    ftp.connect();
+    let cancel = wait_for_text(&mut workspace, &ctx, "Cancel comparison").await;
+    click(&mut workspace, &ctx, cancel);
+    let shapes = render(&mut workspace, &ctx, vec![]);
+    assert!(find(&shapes, "Cancel comparison").is_none());
+    assert_eq!(
+        workspace.tabs[0]
+            .ftp
+            .as_ref()
+            .unwrap()
+            .editor
+            .as_ref()
+            .unwrap()
+            .document
+            .snapshot()
+            .text,
+        original
+    );
+    let reopen = wait_for_text(&mut workspace, &ctx, "Compare retained FTP edits…").await;
+    click(&mut workspace, &ctx, reopen);
+    wait_for_text(&mut workspace, &ctx, "Cancel comparison").await;
+    assert_eq!(
+        server.read_file("/fixture-note.txt").unwrap(),
+        b"Fixture original text"
+    );
+}
+
+#[cfg(unix)]
+#[tokio::test]
+async fn mixed_ssh_and_ftp_close_keeps_both_editors_available() {
+    use harbor_workspace::remote_files::editor::DocumentStatus;
+    let (ftp, data, ctx, mut workspace) = open_owned_ftp_document(FtpTlsMode::Explicit).await;
+    render(&mut workspace, &ctx, vec![Event::Text(" unsaved".into())]);
+    let ssh = crate::ui::gui_tests::remote_fixture::SshServer::start(true);
+    let config = ssh.config(99, true);
+    std::fs::create_dir_all(data.path().join("ssh")).unwrap();
+    std::fs::copy(&config.app_known_hosts, data.path().join("ssh/known_hosts")).unwrap();
+    let path = ssh.root.join("original.txt");
+    std::fs::write(&path, "original").unwrap();
+    workspace.start(config.session);
+    let tab = workspace.active;
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while workspace.tabs[tab].browser.as_ref().unwrap().loading {
+        workspace.tabs[tab].poll();
+        assert!(Instant::now() < deadline);
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    workspace.open_remote_editor(
+        workspace.tabs[tab].id,
+        RemotePath::from_bytes(path.to_str().unwrap().as_bytes().to_vec()).unwrap(),
+    );
+    while workspace.remote_editors[0].document.details().0 != DocumentStatus::Ready {
+        assert!(Instant::now() < deadline);
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
+    workspace.remote_editors[0]
+        .document
+        .set_text("edited")
+        .unwrap();
+    workspace.pending_remote_exit = true;
+    workspace.begin_ftp_document_close(None);
+    let shapes = render(&mut workspace, &ctx, vec![]);
+    assert!(find(&shapes, "Keep editing").is_some());
+    wait_for_text(&mut workspace, &ctx, "Cancel close").await;
+    assert!(ctx.memory(|m| m.top_modal_layer()).is_none());
+    // Raise the FTP document before activating its own cancellation control.
+    let ftp_window = egui::LayerId::new(
+        egui::Order::Middle,
+        Id::new(("ftp-editor", workspace.tabs[0].id)),
+    );
+    ctx.move_to_top(ftp_window);
+    let keep = wait_for_text(&mut workspace, &ctx, "Keep editing").await;
+    click(&mut workspace, &ctx, keep);
+    assert!(!workspace.pending_remote_exit);
+    assert!(
+        workspace.tabs[0]
+            .ftp
+            .as_ref()
+            .unwrap()
+            .has_pending_documents()
+    );
+    assert!(workspace.remote_editors[0].document.details().1);
+    assert_eq!(std::fs::read(path).unwrap(), b"original");
+    assert_eq!(
+        ftp.read_file("/fixture-note.txt").unwrap(),
+        b"Fixture original text"
+    );
 }

@@ -1,6 +1,8 @@
 #![cfg_attr(windows, windows_subsystem = "windows")]
 mod clipboard;
 mod devices;
+mod diagnostics;
+mod display;
 mod smartcard;
 use ironrdp_cliprdr as clipapi;
 use ironrdp_core as clipcore;
@@ -24,33 +26,8 @@ use std::{
 };
 use tokio::sync::{mpsc, watch};
 use wire::{Event, Input};
-struct Output(Mutex<std::io::Stdout>);
-impl Output {
-    fn event(&self, event: Event) -> Result<(), String> {
-        wire::write_json(
-            &mut *self.0.lock().unwrap_or_else(|p| p.into_inner()),
-            &event,
-        )
-        .map_err(|_| "Desktop parent output pipe closed".into())
-    }
-    fn frame(&self, image: &DecodedImage, revision: u64) -> Result<(), String> {
-        wire::dimensions(image.width(), image.height())?;
-        let mut bytes = zeroize::Zeroizing::new(Vec::with_capacity(image.data().len() + 12));
-        bytes.extend_from_slice(&image.width().to_be_bytes());
-        bytes.extend_from_slice(&image.height().to_be_bytes());
-        bytes.extend_from_slice(&revision.to_be_bytes());
-        bytes.extend_from_slice(image.data());
-        for alpha in bytes[12..].iter_mut().skip(3).step_by(4) {
-            *alpha = 255;
-        }
-        wire::write_packet(
-            &mut *self.0.lock().unwrap_or_else(|p| p.into_inner()),
-            2,
-            &bytes,
-        )
-        .map_err(|_| "Desktop parent frame pipe closed".into())
-    }
-}
+mod output;
+use output::{Damage, Output};
 #[derive(Default)]
 struct NoExternalAuthNetwork {
     requested: bool,
@@ -88,12 +65,15 @@ fn main() {
         }
         return;
     }
-    let out = Arc::new(Output(Mutex::new(std::io::stdout())));
+    let Ok(out) = Output::new(std::io::stdout()) else {
+        return;
+    };
+    let out = Arc::new(out);
     let message = match start(out.clone()) {
         Ok(()) => "Remote desktop ended".into(),
         Err(message) => message,
     };
-    let _ = out.event(Event::Disconnected { message });
+    out.finish(message);
 }
 fn start(out: Arc<Output>) -> Result<(), String> {
     out.event(Event::Ready {
@@ -149,11 +129,23 @@ fn start(out: Arc<Output>) -> Result<(), String> {
         .map_err(|_| "Cannot start RDP runtime")?;
     runtime.block_on(async {tokio::select! {result=connect(config,&mut input,&out)=>result,_=cancelled.changed()=>Err("Desktop parent closed the connection".into())}})
 }
-async fn answer(input: &mut mpsc::Receiver<Input>, id: u64, trust: bool) -> Result<Input, String> {
-    let value = input
-        .recv()
-        .await
-        .ok_or("Desktop parent closed the sign-in prompt")?;
+async fn answer(
+    input: &mut mpsc::Receiver<Input>,
+    id: u64,
+    trust: bool,
+    resize: &mut display::PendingResize,
+) -> Result<Input, String> {
+    let value = loop {
+        let message = input
+            .recv()
+            .await
+            .ok_or("Desktop parent closed the sign-in prompt")?;
+        if let Input::Resize { width, height } = message {
+            resize.request(width, height)?;
+        } else {
+            break message;
+        }
+    };
     match &value {
         Input::Trust { id: got, .. } if trust && *got == id => Ok(value),
         Input::Authenticate {
@@ -183,6 +175,7 @@ async fn connect(
     let mut pin = config.remembered_certificate.clone();
     let mut confirmation = None;
     let mut next_id = 1u64;
+    let mut resize = display::PendingResize::default();
     let serial = devices::BoundSerialMappings::new(&config.options.serial_mappings)?;
     let printer = devices::BoundPrinterMapping::new(config.options.printer_mapping.as_ref())?;
     for attempt in 0..3 {
@@ -209,6 +202,8 @@ async fn connect(
         .await
         .map_err(|_| "RDP TCP connection timed out")?
         .map_err(|_| "RDP TCP connection failed")?;
+        tcp.set_nodelay(true)
+            .map_err(|_| "Could not enable low-latency RDP transport")?;
         if config.connect_to.is_some() {
             let token = config
                 .carrier_token
@@ -227,6 +222,8 @@ async fn connect(
         if let Some(cluster) = config::cluster(&config.options) {
             connector = connector.with_cluster_data(cluster);
         }
+        let graphics_reset = display::GraphicsReset::default();
+        connector.attach_static_channel(display::channel(graphics_reset.clone()));
         devices::Channel::attach_with_smartcard(&mut connector, &config.options, &serial, &printer)
             .await?;
         let clip_actions = Arc::new(Mutex::new(std::collections::VecDeque::new()));
@@ -290,7 +287,7 @@ async fn connect(
                 let id = next_id;
                 next_id += 1;
                 out.event(Event::Certificate{id,host:config.host.clone(),port:config.port,fingerprint:observed.clone(),previous:config.remembered_certificate.clone(),changed:config.remembered_certificate.as_ref().is_some_and(|old|old!=&observed),reason:if config.remembered_certificate.is_some(){"The server certificate differs from the remembered certificate. Verify its new fingerprint before proceeding.".into()}else{"The certificate could not be validated against the system/custom certificate authorities and hostname. Verify its fingerprint before proceeding.".into()}})?;
-                let response = answer(input, id, true).await?;
+                let response = answer(input, id, true, &mut resize).await?;
                 let decision = match &response {
                     Input::Trust { decision, .. } => *decision,
                     _ => unreachable!(),
@@ -342,7 +339,7 @@ async fn connect(
         let mut probe = [0u8; 1];
         let mut response = tokio::select! {biased;
             peer=stream.read(&mut probe)=>return Err(match peer{Ok(0)|Err(_)=>"RDP server closed while waiting for sign-in",Ok(_)=>"RDP server sent unexpected data before sign-in"}.into()),
-            response=answer(input,id,false)=>response?,
+            response=answer(input,id,false,&mut resize)=>response?,
         };
         if let Input::Authenticate {
             user,
@@ -364,7 +361,41 @@ async fn connect(
         drop(response);
         let mut framed = TokioFramed::new(stream);
         let mut auth_network = NoExternalAuthNetwork::default();
-        let result=tokio::time::timeout(timeout,ironrdp_tokio::connect_finalize(upgraded,connector,&mut framed,&mut auth_network,config.host.clone().into(),public,None)).await.map_err(|_|"RDP authentication/session negotiation timed out")?.map_err(|_|if auth_network.requested{"This endpoint requires Kerberos network authentication; choose installed-client compatibility until that provider is available"}else{"RDP authentication or session negotiation failed; verify credentials and NLA support"})?.into_connected().map_err(|_|"RDP server requested a different destination; open it as a separate session so its certificate and credentials can be verified")?;
+        // Run the same negotiated CredSSP exchange explicitly, so a TLS EOF
+        // during sign-in is distinguished from one after NLA succeeded.
+        let deadline = tokio::time::Instant::now() + timeout;
+        let ironrdp_connector::ClientConnectorState::Credssp {
+            selected_protocol, ..
+        } = connector.state
+        else {
+            return Err("RDP sign-in protocol failed because NLA was not negotiated.".into());
+        };
+        let (sequence, request) = ironrdp_connector::credssp::CredsspSequence::init(
+            connector.config.credentials.clone(),
+            connector.config.domain.as_deref(),
+            selected_protocol,
+            config.host.clone().into(),
+            public,
+            None,
+        )
+        .map_err(|error| diagnostics::Stage::SignIn.failure(&error))?;
+        tokio::time::timeout_at(deadline, ironrdp_tokio::perform_credssp(
+            &mut framed, &mut auth_network, &mut ironrdp_core::WriteBuf::new(), sequence, request,
+        )).await.map_err(|_| diagnostics::Stage::SignIn.timeout())?.map_err(|error| {
+            if auth_network.requested {
+                "This endpoint requires Kerberos network authentication; choose installed-client compatibility until that provider is available".into()
+            } else {
+                diagnostics::Stage::SignIn.failure(&error)
+            }
+        })?;
+        connector.mark_credssp_as_done();
+        // The TLS public key was consumed by CredSSP above. Finalization skips
+        // the completed CredSSP stage and retains IronRDP's redirection handling.
+        let result = tokio::time::timeout_at(deadline, ironrdp_tokio::connect_finalize(
+            upgraded, connector, &mut framed, &mut auth_network, config.host.clone().into(), Vec::new(), None,
+        )).await.map_err(|_| diagnostics::Stage::DesktopSetup.timeout())?
+          .map_err(|error| diagnostics::Stage::DesktopSetup.failure(&error))?
+          .into_connected().map_err(|_| "RDP server requested a different destination; open it as a separate session so its certificate and credentials can be verified")?;
         if (config.options.printer_mapping.is_some() || config.options.smartcard_reader.is_some())
             && result
                 .static_channels
@@ -410,9 +441,11 @@ async fn connect(
             height: image.height(),
         })?;
         let (mut reader, mut writer) = ironrdp_tokio::split_tokio_framed(framed);
-        let mut tick = tokio::time::interval(Duration::from_millis(50));
+        let mut tick = tokio::time::interval(Duration::from_millis(16));
         tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
-        let mut dirty = true;
+        let mut damage = Damage::Full;
+        let mut resize_in_flight = None;
+        let mut fit_locally = false;
         let mut revision = 0u64;
         let mut held = HeldInput::default();
         let mut system_cursor = true;
@@ -492,6 +525,36 @@ async fn connect(
                         .map_err(|_| "RDP device transport closed")?;
                 }
             }
+            // The server can enter activation before its Deactivate All reaches
+            // us. Sending fast-path input in that window can silently lose it.
+            // Keep it in the bounded FIFO while the resize is in flight.
+            if resize_in_flight.is_some_and(|deadline| tokio::time::Instant::now() >= deadline) {
+                // Display Control has no rejection response. An endpoint can
+                // decline a layout and continue serving the original desktop.
+                resize_in_flight = None;
+                fit_locally = true;
+                out.event(Event::Status {
+                    message: "The server kept its desktop size; fitting the view locally".into(),
+                })?;
+            }
+            if let Some(result) =
+                resize.poll(|width, height| active.encode_resize(width, height, None, None))
+            {
+                match result {
+                    Ok(bytes) => {
+                        tokio::time::timeout(timeout, writer.write_all(&bytes))
+                            .await
+                            .map_err(|_| "RDP resize output timed out")?
+                            .map_err(|_| "RDP resize transport closed")?;
+                        resize_in_flight =
+                            Some(tokio::time::Instant::now() + Duration::from_secs(1));
+                    }
+                    Err(_) => out.event(Event::Status {
+                        message: "The server could not apply the requested display size".into(),
+                    })?,
+                }
+            }
+            let previous_extent = (image.width(), image.height());
             let outputs = tokio::select! {
                 packet = reader.read_pdu() => {
                     let (action, mut data) = packet.map_err(|_| "RDP server closed its transport")?;
@@ -502,18 +565,41 @@ async fn connect(
                     }
                     result.map_err(|_| "RDP server sent an unsupported or invalid display update")?
                 },
-                message=input.recv()=>{
+                message=input.recv(), if resize_in_flight.is_none()=>{
                     let message=message.ok_or("Desktop parent closed input")?;if matches!(&message,Input::Close){return Ok(());}
+                    if let Input::Resize {width, height} = message {
+                        if !fit_locally && (width, height) != (image.width(), image.height()) {
+                            resize.request(width, height)?;
+                        } else {
+                            resize = display::PendingResize::default();
+                        }
+                        continue;
+                    }
                     if let Input::Clipboard{text}=&message {
                         if !config.options.clipboard.to_remote()||text.len()>clipboard::MAX_TEXT{return Err("Clipboard upload is disabled or exceeds its text limit".into());}
                         *local_clipboard.lock().unwrap()=Some(zeroize::Zeroizing::new(text.clone()));
                         clip_actions.lock().unwrap().push_back(clipboard::Action::Offer);
                     }
-                    let events=inputs(&message,&mut held,&image,out)?;
+                    let events=inputs(&message,&mut held,&image)?;
                     encode_input(&mut active,&mut image,&events,input_flags)?
                 },
-                _=tick.tick()=>{if dirty{revision=revision.checked_add(1).ok_or("Desktop frame revisions exhausted")?;out.frame(&image,revision)?;dirty=false;}continue;}
+                _=tick.tick()=>{out.publish(&image,&mut damage,&mut revision)?;continue;}
             };
+            if graphics_reset.take() {
+                let extent = (image.width(), image.height());
+                wire::dimensions(extent.0, extent.1)?;
+                if extent != previous_extent {
+                    // A graphics reset can complete a requested layout without
+                    // a classic DeactivateAll / reactivation exchange.
+                    resize_in_flight = None;
+                    fit_locally = false;
+                    out.event(Event::Connected {
+                        width: extent.0,
+                        height: extent.1,
+                    })?;
+                }
+                damage = Damage::Full;
+            }
             for output in outputs {
                 match output {
                     ActiveStageOutput::ResponseFrame(bytes) => {
@@ -523,7 +609,9 @@ async fn connect(
                             .map_err(|_| "RDP output timed out")?
                             .map_err(|_| "RDP output transport closed")?
                     }
-                    ActiveStageOutput::GraphicsUpdate(_) => dirty = true,
+                    ActiveStageOutput::GraphicsUpdate(rect) => {
+                        damage.update(rect, image.width(), image.height())
+                    }
                     ActiveStageOutput::PointerPosition { x, y } => out.event(Event::Cursor {
                         x,
                         y,
@@ -556,7 +644,7 @@ async fn connect(
                                     if !active.reactivate(activation_factory.io_channel_id(),activation_factory.user_channel_id(),share_id,enable_server_pointer,pointer_software_rendering,static_channel_chunk_size){return Err("Invalid RDP reactivation channel size".to_string());}
                                     active.set_window_support_level(window_support_level);input_flags=flags;
                                     if image.width()!=desktop_size.width||image.height()!=desktop_size.height{image=DecodedImage::new(ironrdp_graphics::image_processing::PixelFormat::RgbA32,desktop_size.width,desktop_size.height);}
-                                    out.event(Event::Connected{width:image.width(),height:image.height()})?;dirty=true;break Ok(());
+                                    out.event(Event::Connected{width:image.width(),height:image.height()})?;resize_in_flight=None;fit_locally=false;damage=Damage::Full;break Ok(());
                                 },
                                 ironrdp_connector::connection_activation::ConnectionActivationState::Redirected{..}=>return Err("RDP server requested redirection during reactivation".into()),
                                 _=>{}
@@ -583,7 +671,6 @@ fn inputs(
     input: &Input,
     held: &mut HeldInput,
     image: &DecodedImage,
-    out: &Output,
 ) -> Result<Vec<FastPathInputEvent>, String> {
     let mut result = Vec::new();
     match input {
@@ -704,9 +791,6 @@ fn inputs(
             }
         }
         Input::Clipboard { .. } => {}
-        Input::Resize { .. } => out.event(Event::Status {
-            message: "The view fits the negotiated desktop with letterboxing".into(),
-        })?,
         _ => return Err("Unexpected desktop input for this connection stage".into()),
     }
     Ok(result)

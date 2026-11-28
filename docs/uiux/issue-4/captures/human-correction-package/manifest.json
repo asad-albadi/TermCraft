@@ -1,0 +1,104 @@
+{
+  "captured_on": "2026-11-27",
+  "platform": "Linux x86-64",
+  "source_commit": "9c6f10c23df3875a95b88d55748f470540080f58",
+  "workflow_run": 46037795885,
+  "native_job": 140637606384,
+  "artifact_id": 15218784955,
+  "artifact_name": "diagnostics-linux-amd64",
+  "qualification": "The archived core passed hosted X11, Wayland and lifecycle checks. An Alpine dependency pin blocked AppImage construction and the combined Linux candidate upload.",
+  "archive": "TermCraft-0.1.0-linux-x86_64.tar.gz",
+  "archive_sha256": "9a2fb17ee64fb47e985b34ab7e64eb4916596926cb212eda71f68306c6449ced",
+  "executable_sha256": "cf9405bba6c3bf659d712017e527ffe34c76b11bd6e1a12c35d8df6432d77fc5",
+  "snapshot_sha256": "7d841cfe88272e03fc45435ae69f96b376675e2f985109cacc6a34c3713e0964",
+  "width": 1920,
+  "height": 1080,
+  "scope": "Ubuntu 24.04.5 x86-64, unsigned Linux archive, Xvfb :95, software GL. Programmatic X11 scale overrides on one virtual display. Five reserved .example.test bookmarks with no remote connections.",
+  "captures": [
+    {
+      "file": "session-ssh-dark-fhd.png",
+      "sha256": "026daee457365141e7aaeb81a02a84a54c9c1a9ab282a8696c5fd05855d20c8a",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "scale_override": 1.0,
+      "observation": "SSH Connection shows host, username and port with the action row in view."
+    },
+    {
+      "file": "session-rdp-dark-fhd.png",
+      "sha256": "3fc434482ec8b22722659f3f800e9a7ce9903390a6f03d21d3e4bbbec600fb1d",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "scale_override": 1.0,
+      "observation": "RDP Connection shows host, username and port with security and display choices on separate tabs."
+    },
+    {
+      "file": "session-ssh-dark-150.png",
+      "sha256": "dbd709fac2fa9db348b604bd56d8ad3bbe9e31f7ba3e3125462415b95d28e448",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1280.0,
+        720.0
+      ],
+      "scale_override": 1.5,
+      "observation": "SSH Connection at an X11 scale override of 150%."
+    },
+    {
+      "file": "session-ssh-dark-200.png",
+      "sha256": "c02a62601391d5a614c7d6592ceaffa8562093820d512d199412b73221d573a3",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        960.0,
+        540.0
+      ],
+      "scale_override": 2.0,
+      "observation": "SSH Connection at an X11 scale override of 200%."
+    },
+    {
+      "file": "tools-dark-scrollbar-drag.png",
+      "sha256": "ac76168bab0893d41cbc64802a9ef621395e37ca0030ac6c338c92e906583c19",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "scale_override": 1.0,
+      "observation": "Tools scrolled using the held scrollbar thumb in the gutter at the right edge of the full content viewport."
+    },
+    {
+      "file": "games-dark-fhd.png",
+      "sha256": "fe28c3d18c3de47c956bb0e617eeb6c05acfee3244fc1eff5fd6ef41df915f63",
+      "physical_px": [
+        1920,
+        1080
+      ],
+      "logical_size": [
+        1920.0,
+        1080.0
+      ],
+      "scale_override": 1.0,
+      "observation": "Native games catalog on the full client background with a centered launcher grid."
+    }
+  ],
+  "gallery_manifest": "../../../../../shots/full-hd/capture-manifest.json"
+}
