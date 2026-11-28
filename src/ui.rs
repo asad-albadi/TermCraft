@@ -15,6 +15,7 @@ use std::{
 mod activity;
 mod appearance;
 mod broadcast;
+mod chrome;
 mod cli_dispatch;
 mod clipboard;
 #[cfg(all(test, unix))]
@@ -33,6 +34,7 @@ mod ftp_settings;
 mod games;
 mod highlighting;
 mod http_share;
+mod icons;
 mod layout;
 mod macro_events;
 mod managed_cron;
@@ -615,6 +617,8 @@ pub struct Workspace {
     session_form: Option<Session>,
     session_section: pages::SessionSection,
     settings_category: pages::SettingsCategory,
+    sidebar_connection: Option<u64>,
+    sidebar_remote_selected: bool,
     tools_category: tools::Category,
     servers_category: servers::Section,
     session_import: Option<session_import::State>,
@@ -755,6 +759,8 @@ impl Workspace {
             session_form: None,
             session_section: pages::SessionSection::Connection,
             settings_category: pages::SettingsCategory::Appearance,
+            sidebar_connection: None,
+            sidebar_remote_selected: false,
             tools_category: Default::default(),
             servers_category: Default::default(),
             session_import: None,
@@ -1255,329 +1261,8 @@ impl Workspace {
                 |binding| format!("{label} ({})", binding.chord.label()),
             )
     }
-    fn top(&mut self, root: &mut Ui) {
-        Panel::top("menus")
-            .frame(
-                Frame::new()
-                    .fill(mist(root))
-                    .inner_margin(Margin::symmetric(8, 0)),
-            )
-            .show(root, |ui| {
-                egui::MenuBar::new().ui(ui, |ui| {
-                    ui.horizontal_wrapped(|ui| {
-                        ui.menu_button("Sessions", |ui| {
-                            if ui.button("New session").clicked() {
-                                self.new_session("SSH");
-                                ui.close();
-                            }
-                            if ui.button("Start local terminal").clicked() {
-                                self.local();
-                                ui.close();
-                            }
-                            ui.separator();
-                            if ui.button("SSH keys and agents…").clicked() {
-                                self.ssh_keys.open = true;
-                                ui.close();
-                            }
-                            if ui.button("Credential vault…").clicked() {
-                                self.credentials.open = true;
-                                ui.close();
-                            }
-                            if ui.button("Shared session sources…").clicked() {
-                                self.shared_sources.manager = true;
-                                ui.close();
-                            }
-                            if ui.button("Import MobaXterm sessions…").clicked() {
-                                self.choose_session_import(session_import::Format::Moba, ui.ctx());
-                                ui.close();
-                            }
-                            if ui.button("Import PuTTY sessions…").clicked() {
-                                self.choose_session_import(session_import::Format::Putty, ui.ctx());
-                                ui.close();
-                            }
-                            if ui.button("Saved sessions").clicked() {
-                                self.page = Page::Home;
-                                ui.close();
-                            }
-                            if ui.button("Local files").clicked() {
-                                self.page = Page::Files;
-                                ui.close();
-                            }
-                        });
-                        ui.menu_button("View", |ui| {
-                            if ui.button("Home tab").clicked() {
-                                self.page = Page::Home;
-                                ui.close();
-                            }
-                            if ui
-                                .checkbox(
-                                    &mut self.store.preferences.sidebar_visible,
-                                    "Show sidebar",
-                                )
-                                .changed()
-                            {
-                                self.persist();
-                            }
-                            if ui
-                                .button(if self.windows.fullscreen(0) {
-                                    "Restore main window"
-                                } else {
-                                    "Fullscreen main window"
-                                })
-                                .clicked()
-                            {
-                                self.toggle_window_fullscreen(ui.ctx(), 0);
-                                ui.close();
-                            }
-                            if ui.button("Keyboard shortcuts…").clicked() {
-                                self.shortcut_editor_open = true;
-                                ui.close();
-                            }
-                            self.layout_picker(ui);
-                            self.broadcast_toggle(ui);
-                        });
-                        ui.menu_button("X server", |ui| {
-                            ui.label("Configure the managed X display or an installed X server.");
-                            if ui.button("X server settings").clicked() {
-                                self.page = Page::Servers;
-                                self.servers_category = servers::Section::Xserver;
-                                ui.close();
-                            }
-                        });
-                        ui.menu_button("Tools", |ui| {
-                            for (label, page) in [
-                                ("Tools and plugins", Page::Tools),
-                                ("Servers", Page::Servers),
-                                ("SSH tunneling", Page::Tunnels),
-                                ("Local files", Page::Files),
-                            ] {
-                                if ui.button(label).clicked() {
-                                    self.page = page;
-                                    ui.close();
-                                }
-                            }
-                        });
-                        ui.menu_button("Games", |ui| {
-                            self.games_menu(ui);
-                            ui.separator();
-                            self.screensaver_settings(ui);
-                        });
-                        ui.menu_button("Settings", |ui| {
-                            if ui.button("Configuration").clicked() {
-                                self.page = Page::Settings;
-                                ui.close();
-                            }
-                        });
-                        let macro_menu = if self.macro_recording() {
-                            "Macros · Recording"
-                        } else {
-                            "Macros"
-                        };
-                        ui.menu_button(macro_menu, |ui| {
-                            self.macro_controls(ui);
-                            if ui.button("Manage macros").clicked() {
-                                self.page = Page::Macros;
-                                ui.close();
-                            }
-                        });
-                        ui.menu_button("Help", |ui| {
-                            ui.label(crate::ui::fluent::emphasized(
-                                ui.ctx(),
-                                RichText::new("TermCraft personal workspace"),
-                            ));
-                            if ui.button("Feature parity and known differences").clicked() {
-                                self.parity_open = true;
-                                ui.close();
-                            }
-                            ui.hyperlink_to(
-                                "Original documentation",
-                                "https://mobaxterm.mobatek.net/documentation.html",
-                            );
-                            ui.label("Create a Session to connect to a remote host.");
-                            ui.label("Double-click a saved session or focus it and press Enter.");
-                            ui.label(self.shortcut_hint(Action::NewSession, "New session"));
-                            ui.label(self.shortcut_hint(Action::NewTerminal, "New local terminal"));
-                            ui.separator();
-                            ui.label("System clients provide remote protocols and X11.");
-                        });
-                        ui.separator();
-                        self.appearance_picker(ui);
-                    });
-                });
-            });
-        Panel::top("commands")
-            .frame(
-                Frame::new()
-                    .fill(mist(root))
-                    .stroke(Stroke::new(1., line(root)))
-                    .inner_margin(Margin::symmetric(8, 5)),
-            )
-            .show(root, |ui| {
-                ui.horizontal_wrapped(|ui| {
-                    ui.spacing_mut().item_spacing = vec2(4., 4.);
-                    if tool_button(
-                        ui,
-                        "desktop",
-                        "Session",
-                        &self.shortcut_hint(Action::NewSession, "New session"),
-                        None,
-                    )
-                    .clicked()
-                    {
-                        self.new_session("SSH");
-                    }
-                    if tool_button(ui, "desktop", "Servers", "Servers", None).clicked() {
-                        self.page = Page::Servers;
-                    }
-                    if tool_button(ui, "tools", "Tools", "Tools", None).clicked() {
-                        self.page = Page::Tools;
-                    }
-                    if tool_button(ui, "games", "Games", "Games", None).clicked() {
-                        self.games.play.open();
-                    }
-                    let sidebar = self.store.preferences.sidebar_visible;
-                    if tool_button(
-                        ui,
-                        "folder",
-                        "Sessions",
-                        &self.shortcut_hint(
-                            Action::ToggleSidebar,
-                            if sidebar {
-                                "Hide sessions sidebar"
-                            } else {
-                                "Show sessions sidebar"
-                            },
-                        ),
-                        Some(sidebar),
-                    )
-                    .clicked()
-                    {
-                        self.store.preferences.sidebar_visible = !sidebar;
-                        self.persist();
-                    }
-                    if tool_button(ui, "terminal", "Split", "Toggle split terminals", None)
-                        .clicked()
-                    {
-                        self.toggle_layout();
-                        if !self.tabs.is_empty() {
-                            self.page = Page::Terminal;
-                        }
-                    }
-                    if tool_button(
-                        ui,
-                        "terminal",
-                        "MultiExec",
-                        if self.broadcast {
-                            "Turn MultiExec off"
-                        } else {
-                            "Choose MultiExec targets"
-                        },
-                        Some(self.broadcast),
-                    )
-                    .clicked()
-                    {
-                        self.set_broadcast_enabled(!self.broadcast);
-                    }
-                    if tool_button(ui, "link", "Tunneling", "SSH tunneling", None).clicked() {
-                        self.page = Page::Tunnels;
-                    }
-                    if tool_button(
-                        ui,
-                        "folder",
-                        "Packages",
-                        "Manage TermCraft packages and inspect legacy packages",
-                        None,
-                    )
-                    .clicked()
-                    {
-                        self.page = Page::Tools;
-                        self.tools_category = tools::Category::Packages;
-                    }
-                    if tool_button(ui, "settings", "Settings", "Settings", None).clicked() {
-                        self.page = Page::Settings;
-                    }
-                    let help = tool_button(ui, "help", "Help", "Help and keyboard shortcuts", None);
-                    egui::Popup::menu(&help).show(|ui| {
-                        ui.set_max_width((ui.ctx().content_rect().width() - 32.).clamp(1., 320.));
-                        ui.label(crate::ui::fluent::emphasized(
-                            ui.ctx(),
-                            RichText::new("Keyboard shortcuts"),
-                        ));
-                        ui.label(self.shortcut_hint(Action::NewSession, "New session"));
-                        ui.label(self.shortcut_hint(Action::NewTerminal, "New local terminal"));
-                        ui.label("Double-click a saved session or focus it and press Enter.");
-                    });
-                    if tool_button(
-                        ui,
-                        "desktop",
-                        "X server",
-                        "Configure the system X server",
-                        None,
-                    )
-                    .clicked()
-                    {
-                        self.page = Page::Servers;
-                        self.servers_category = servers::Section::Xserver;
-                    }
-                    if tool_button(ui, "exit", "Exit", "Exit TermCraft", None).clicked() {
-                        ui.ctx().send_viewport_cmd(ViewportCommand::Close);
-                    }
-                });
-            });
-        Panel::bottom("status")
-            .frame(
-                Frame::new()
-                    .fill(mist(root))
-                    .inner_margin(Margin::symmetric(16, 7)),
-            )
-            .show(root, |ui| {
-                ui.horizontal(|ui| {
-                    let palette = fluent::palette(ui);
-                    let error = self.status_error;
-                    let text = if !error && self.status_time.elapsed() > Duration::from_secs(12) {
-                        "Ready"
-                    } else {
-                        &self.status
-                    };
-                    dot(
-                        ui,
-                        if error {
-                            palette.error
-                        } else {
-                            palette.secondary_text
-                        },
-                    );
-                    let summary = format!(
-                        "{} connections    •    {} saved sessions",
-                        self.tabs.iter().filter(|t| t.running()).count(),
-                        self.store.sessions.len()
-                    );
-                    ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                        ui.label(
-                            RichText::new(summary)
-                                .size(12.)
-                                .color(palette.secondary_text),
-                        );
-                        if let Some(diagnostic) = &self.settings_load_error {
-                            ui.colored_label(palette.error, "Settings damaged")
-                                .fluent_hint(diagnostic);
-                        }
-                        ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
-                            ui.add(
-                                Label::new(RichText::new(text).size(12.).color(if error {
-                                    palette.error
-                                } else {
-                                    palette.secondary_text
-                                }))
-                                .truncate(),
-                            )
-                            .fluent_hint(text);
-                        });
-                    });
-                });
-            });
-    }
     fn sidebar(&mut self, root: &mut Ui) {
+        self.sync_remote_sidebar();
         Panel::left("navigation-rail")
             .exact_size(48.)
             .resizable(false)
@@ -1613,8 +1298,8 @@ impl Workspace {
                                     accent(ui),
                                 );
                             }
-                            draw_icon(
-                                ui.painter(),
+                            icons::paint(
+                                ui,
                                 Rect::from_center_size(rect.center(), vec2(18., 18.)),
                                 kind,
                                 foreground,
@@ -1661,10 +1346,21 @@ impl Workspace {
                     .inner_margin(Margin::symmetric(10, 12)),
             )
             .show(root, |ui| {
-                ScrollArea::vertical()
-                    .id_salt("sessions")
-                    .auto_shrink([false, false])
-                    .show(ui, |ui| self.sidebar_contents(ui));
+                if self.sidebar_connection.is_some() {
+                    ui.horizontal(|ui| {
+                        ui.selectable_value(&mut self.sidebar_remote_selected, false, "Sessions");
+                        ui.selectable_value(&mut self.sidebar_remote_selected, true, "SFTP");
+                    });
+                    ui.separator();
+                }
+                if self.sidebar_remote_selected && self.sidebar_connection.is_some() {
+                    self.remote_files_panel(ui);
+                } else {
+                    ScrollArea::vertical()
+                        .id_salt("sessions")
+                        .auto_shrink([false, false])
+                        .show(ui, |ui| self.sidebar_contents(ui));
+                }
             });
         let new_width = panel.response.rect.width();
         // egui 0.36 uses a separate response for this panel's resize handle.
@@ -1930,14 +1626,15 @@ impl Workspace {
         Frame::new()
             .fill(mist(ui))
             .inner_margin(Margin {
-                left: 8,
-                right: 8,
-                top: 6,
+                left: 0,
+                right: 0,
+                top: 0,
                 bottom: 0,
             })
             .show(ui, |ui| {
                 ScrollArea::horizontal()
                     .id_salt("terminal-tabs")
+                    .scroll_bar_visibility(egui::scroll_area::ScrollBarVisibility::AlwaysHidden)
                     .auto_shrink([false, true])
                     .show(ui, |ui| {
                         ui.horizontal(|ui| {
@@ -1959,6 +1656,13 @@ impl Workspace {
                                     true,
                                     t.id,
                                 );
+                                let selection = Id::new("workspace-visible-tab");
+                                if selected
+                                    && ui.ctx().data(|d| d.get_temp::<u64>(selection)) != Some(t.id)
+                                {
+                                    response.scroll_to_me(None);
+                                    ui.ctx().data_mut(|d| d.insert_temp(selection, t.id));
+                                }
                                 context_actions(&response, |ui, focus_first| {
                                     if context_item(ui, "Rename tab…", focus_first) {
                                         action = Some((t.id, 0));
@@ -2181,8 +1885,6 @@ impl Workspace {
         CentralPanel::default()
             .frame(Frame::new().fill(content(root)).inner_margin(0))
             .show(root, |ui| {
-                self.tab_bar(ui);
-                self.remote_files_panel(ui);
                 self.set_shortcut_context(&ctx);
                 Frame::new()
                     .fill(content(ui))
@@ -2386,10 +2088,35 @@ fn saved_session_row(
         response.scroll_to_me(None);
     }
     let foreground = fluent::paint_control(ui, &response, rect, false, ControlKind::Flat);
+    let kind = if detail.contains("SSH") {
+        "ssh"
+    } else if detail.contains("SFTP") {
+        "sftp"
+    } else if detail.contains("FTP") {
+        "ftp"
+    } else if detail.contains("RDP") {
+        "rdp"
+    } else if detail.contains("VNC") {
+        "vnc"
+    } else if detail.contains("Serial") {
+        "serial"
+    } else if detail.contains("Browser") {
+        "browser"
+    } else if detail.contains("Mosh") {
+        "mosh"
+    } else {
+        "terminal"
+    };
+    icons::paint(
+        ui,
+        Rect::from_center_size(rect.left_center() + vec2(14., 0.), vec2(19., 19.)),
+        kind,
+        foreground,
+    );
     paint_ellipsized(
         ui,
-        rect.left_center() + vec2(8., 0.),
-        rect.width() - 16.,
+        rect.left_center() + vec2(30., 0.),
+        rect.width() - 38.,
         title,
         foreground,
     );
@@ -3081,6 +2808,42 @@ mod gui_tests {
         output
     }
 
+    pub(super) fn shell_pointer(pos: Pos2, pressed: bool) -> Event {
+        Event::PointerButton {
+            pos,
+            button: PointerButton::Primary,
+            pressed,
+            modifiers: Modifiers::NONE,
+        }
+    }
+
+    fn shell_key(key: Key, modifiers: Modifiers) -> Event {
+        Event::Key {
+            key,
+            physical_key: None,
+            pressed: true,
+            repeat: false,
+            modifiers,
+        }
+    }
+
+    pub(super) fn shell_control_position(output: &FullOutput, label: &str) -> Pos2 {
+        let update = output
+            .platform_output
+            .accesskit_update
+            .as_ref()
+            .expect("Enable accessibility before painting icon controls");
+        let bounds = update
+            .nodes
+            .iter()
+            .find_map(|(_, n)| (n.label() == Some(label)).then(|| n.bounds()).flatten())
+            .unwrap_or_else(|| panic!("Missing accessible control {label}"));
+        pos2(
+            ((bounds.x0 + bounds.x1) / 2.) as f32,
+            ((bounds.y0 + bounds.y1) / 2.) as f32,
+        )
+    }
+
     pub(super) fn shell_text_position(output: &FullOutput, text: &str) -> Pos2 {
         fn find(shape: &egui::Shape, text: &str) -> Option<Pos2> {
             match shape {
@@ -3196,11 +2959,26 @@ mod gui_tests {
     #[test]
     fn packages_opens_tools_and_wheel_reaches_runtime_providers() {
         let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
-        let size = vec2(640., 300.);
+        ctx.enable_accesskit();
+        let size = vec2(640., 480.);
         let draw = |workspace: &mut Workspace, events| {
             shell_frame(&ctx, size, 1., events, |ui| workspace.top(ui))
         };
         draw(&mut workspace, vec![]);
+        let output = draw(&mut workspace, vec![]);
+        let app = shell_control_position(&output, "App menu");
+        draw(
+            &mut workspace,
+            vec![Event::PointerMoved(app), shell_pointer(app, true)],
+        );
+        draw(&mut workspace, vec![shell_pointer(app, false)]);
+        let output = draw(&mut workspace, vec![]);
+        let commands = shell_text_position(&output, "Commands");
+        draw(
+            &mut workspace,
+            vec![Event::PointerMoved(commands), shell_pointer(commands, true)],
+        );
+        draw(&mut workspace, vec![shell_pointer(commands, false)]);
         let output = draw(&mut workspace, vec![]);
         let pos = shell_text_position(&output, "Packages");
         draw(
@@ -3269,33 +3047,47 @@ mod gui_tests {
 
     #[test]
     fn theme_is_in_the_menu_band_and_keyboard_selectable_at_main_minimum() {
-        let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
-        let size = vec2(640., 480.);
-        let mut draw = |events| shell_frame(&ctx, size, 2., events, |ui| workspace.top(ui));
-        draw(vec![]);
-        let output = draw(vec![]);
-        let menu = shell_text_position(&output, "View");
-        let theme = shell_text_position(&output, "Theme");
-        for label in ["Games", "Macros", "Help", "Settings", "System"] {
-            let position = shell_text_position(&output, label);
-            assert!((position.y - menu.y).abs() < 8.);
-        }
-        assert!(theme.x > menu.x && theme.x < shell_text_position(&output, "System").x);
-        assert!((theme.y - menu.y).abs() < 8.);
-        assert!(menu.y < 40.);
-        assert!(egui::containers::panel::PanelState::load(&ctx, Id::new("title")).is_none());
-
-        for _ in 0..9 {
-            draw(vec![shell_key(Key::Tab, Modifiers::NONE)]);
-        }
-        draw(vec![shell_key(Key::Enter, Modifiers::NONE)]);
-        let popup = draw(vec![]);
-        shell_text_position(&popup, "Dark");
-        for _ in 0..4 {
-            draw(vec![shell_key(Key::Tab, Modifiers::NONE)]);
-        }
-        draw(vec![shell_key(Key::Enter, Modifiers::NONE)]);
-        assert_eq!(workspace.store.preferences.appearance, Appearance::Dark);
+        let (ctx, _root, mut w) = super::terminal_review_tests::owned_workspace();
+        ctx.enable_accesskit();
+        let draw = |w: &mut Workspace, events| {
+            shell_frame(&ctx, vec2(640., 480.), 2., events, |ui| w.top(ui))
+        };
+        draw(&mut w, vec![]);
+        let out = draw(&mut w, vec![]);
+        let app = shell_control_position(&out, "App menu");
+        let theme = shell_control_position(&out, "Theme");
+        assert!((app.y - theme.y).abs() < 8. && theme.x > app.x && theme.y < 40.);
+        assert!(
+            egui::containers::panel::PanelState::load(&ctx, Id::new("workspace-bar"))
+                .unwrap()
+                .size()
+                .y
+                <= 48.
+        );
+        let activate = |w: &mut Workspace, label: &str| {
+            for _ in 0..40 {
+                let output = draw(w, vec![shell_key(Key::Tab, Modifiers::NONE)]);
+                let focused = ctx.memory(|m| m.focused());
+                let found = output
+                    .platform_output
+                    .accesskit_update
+                    .as_ref()
+                    .is_some_and(|u| {
+                        u.nodes.iter().any(|(id, node)| {
+                            Some(*id) == focused.map(|f| f.accesskit_id())
+                                && node.label() == Some(label)
+                        })
+                    });
+                if found {
+                    draw(w, vec![shell_key(Key::Enter, Modifiers::NONE)]);
+                    return;
+                }
+            }
+            panic!("Keyboard could not reach {label}");
+        };
+        activate(&mut w, "Theme");
+        activate(&mut w, "Dark");
+        assert_eq!(w.store.preferences.appearance, Appearance::Dark);
         assert_eq!(ctx.theme(), Theme::Dark);
     }
 
@@ -3335,79 +3127,81 @@ mod gui_tests {
     #[test]
     fn commands_wrap_without_losing_exit_or_x_server_at_main_minimum() {
         for scale in [1., 1.5, 2.] {
-            let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
-            let size = vec2(640., 480.);
-            let mut draw = |ui: &mut Ui| workspace.top(ui);
-            shell_frame(&ctx, size, scale, vec![], &mut draw);
-            let output = shell_frame(&ctx, size, scale, vec![], &mut draw);
-            assert_eq!(output.pixels_per_point, scale);
-            let screen = Rect::from_min_size(Pos2::ZERO, size);
+            let (ctx, _root, mut w) = super::terminal_review_tests::owned_workspace();
+            ctx.enable_accesskit();
+            let draw = |w: &mut Workspace, events| {
+                shell_frame(&ctx, vec2(640., 480.), scale, events, |ui| w.top(ui))
+            };
+            draw(&mut w, vec![]);
+            let out = draw(&mut w, vec![]);
+            assert_eq!(out.pixels_per_point, scale);
+            let bar = egui::containers::panel::PanelState::load(&ctx, Id::new("workspace-bar"))
+                .unwrap()
+                .size();
+            assert!(bar.y <= 48., "Chrome wrapped into another row: {bar:?}");
+            let click = |w: &mut Workspace, label: &str, icon: bool| {
+                let out = draw(w, vec![]);
+                let p = if icon {
+                    shell_control_position(&out, label)
+                } else {
+                    shell_text_position(&out, label)
+                };
+                draw(w, vec![Event::PointerMoved(p), shell_pointer(p, true)]);
+                draw(w, vec![shell_pointer(p, false)]);
+            };
+            click(&mut w, "App menu", true);
+            click(&mut w, "Commands", false);
+            let mut seen = std::collections::BTreeSet::new();
             let labels = [
-                "Session",
+                "New session",
                 "Servers",
                 "Tools",
                 "Games",
                 "Sessions",
-                "Split",
+                "Toggle split",
                 "MultiExec",
-                "Tunneling",
+                "SSH tunneling",
                 "Packages",
                 "Settings",
                 "Help",
                 "X server",
-                "Exit",
+                "Exit TermCraft",
             ];
-            for label in labels {
-                let position = shell_text_position(&output, label);
-                assert!(
-                    screen.contains(position),
-                    "{label} is outside the viewport at {scale}x: {position:?}"
+            for _ in 0..8 {
+                let out = draw(&mut w, vec![]);
+                for label in labels {
+                    for shape in &out.shapes {
+                        if let Shape::Text(t) = &shape.shape {
+                            let p = t.pos + t.galley.size() * 0.5;
+                            if t.galley.text() == label && shape.clip_rect.contains(p) {
+                                assert!(
+                                    Rect::from_min_size(Pos2::ZERO, vec2(640., 480.)).contains(p)
+                                );
+                                seen.insert(label);
+                            }
+                        }
+                    }
+                }
+                if seen.len() == labels.len() {
+                    break;
+                }
+                let p = shell_text_position(&out, "Packages");
+                draw(
+                    &mut w,
+                    vec![
+                        Event::PointerMoved(p),
+                        Event::MouseWheel {
+                            unit: egui::MouseWheelUnit::Point,
+                            delta: vec2(0., -85.),
+                            modifiers: Modifiers::NONE,
+                            phase: egui::TouchPhase::Move,
+                        },
+                    ],
                 );
             }
-            let position = shell_text_position(&output, "Exit");
-            let first = shell_text_position(&output, "Session");
-            assert!(
-                position.y > first.y + 20.,
-                "command tiles did not wrap at {scale}x"
-            );
-            shell_frame(
-                &ctx,
-                size,
-                scale,
-                vec![Event::PointerMoved(position), shell_pointer(position, true)],
-                &mut draw,
-            );
-            let output = shell_frame(
-                &ctx,
-                size,
-                scale,
-                vec![shell_pointer(position, false)],
-                &mut draw,
-            );
-            assert!(
-                output.viewport_output[&ViewportId::ROOT]
-                    .commands
-                    .contains(&ViewportCommand::Close)
-            );
-        }
-    }
-
-    pub(super) fn shell_pointer(pos: Pos2, pressed: bool) -> Event {
-        Event::PointerButton {
-            pos,
-            button: PointerButton::Primary,
-            pressed,
-            modifiers: Modifiers::NONE,
-        }
-    }
-
-    fn shell_key(key: Key, modifiers: Modifiers) -> Event {
-        Event::Key {
-            key,
-            physical_key: None,
-            pressed: true,
-            repeat: false,
-            modifiers,
+            for label in labels {
+                assert!(seen.contains(label), "Unavailable {label} at {scale}");
+            }
         }
     }
 

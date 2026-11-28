@@ -1,4 +1,5 @@
 use crate::ui::fluent::FluentTooltip;
+use crate::ui::icons;
 #[cfg(windows)]
 #[path = "windows_platform.rs"]
 mod windows_platform;
@@ -169,7 +170,7 @@ impl Comparison {
                 if let Some(cancel) = &self.cancel {
                     if cancel.load(Ordering::Relaxed) {
                         ui.label("Cancelling…");
-                    } else if ui.button("Cancel").clicked() {
+                    } else if icons::action(ui, "Cancel").clicked() {
                         cancel.store(true, Ordering::Relaxed);
                     }
                 }
@@ -383,7 +384,7 @@ impl Scan {
                         .desired_width(ui.available_width().clamp(1., 135.))
                         .char_limit(1800),
                 );
-                if ui.button("Check ports").clicked() {
+                if icons::action(ui, "Check ports").clicked() {
                     self.result = None;
                     let start = self.target().and_then(PortScan::start);
                     match start {
@@ -396,7 +397,7 @@ impl Scan {
         if let Some(handle) = &self.pending {
             ui.horizontal_wrapped(|ui| {
                 ui.spinner();
-                if ui.button("Cancel").clicked() {
+                if icons::action(ui, "Cancel").clicked() {
                     handle.cancel();
                 }
             });
@@ -521,7 +522,7 @@ impl Capture {
     fn render(&mut self, ui: &mut Ui) {
         ui.add_enabled_ui(!self.busy(), |ui| {
             ui.horizontal_wrapped(|ui| {
-                if ui.button("List capture interfaces").clicked() {
+                if icons::action(ui, "List capture interfaces").clicked() {
                     self.interface_error = None;
                     match start_job("capture-interfaces", enumerate_interfaces) {
                         Ok(job) => self.interface_job = Some(job),
@@ -565,7 +566,7 @@ impl Capture {
                 ui.end_row();
             });
             ui.horizontal_wrapped(|ui| {
-                if ui.button("Choose PCAP output…").clicked()
+                if icons::action(ui, "Choose PCAP output…").clicked()
                     && let Some(path) = rfd::FileDialog::new()
                         .set_file_name("capture.pcap")
                         .add_filter("PCAP", &["pcap"])
@@ -621,7 +622,7 @@ impl Capture {
                 }
                 if self.stopping {
                     ui.label("Stopping and saving…");
-                } else if ui.button("Stop and save").clicked() {
+                } else if icons::action(ui, "Stop and save").clicked() {
                     self.stopping = true;
                     handle.cancel();
                 }

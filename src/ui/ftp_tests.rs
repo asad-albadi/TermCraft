@@ -49,7 +49,13 @@ fn find(shapes: &[egui::epaint::ClippedShape], label: &str) -> Option<Pos2> {
     shapes
         .iter()
         .filter_map(|shape| position(&shape.shape, label))
-        .max_by(|left, right| left.y.total_cmp(&right.y))
+        .max_by(|left, right| {
+            if label == "Connect" {
+                left.x.total_cmp(&right.x)
+            } else {
+                left.y.total_cmp(&right.y)
+            }
+        })
 }
 
 fn click(workspace: &mut Workspace, ctx: &Context, position: Pos2) {

@@ -346,7 +346,7 @@ impl TransferUi {
         ready: bool,
         capabilities: harbor_workspace::remote_files::capabilities::RemoteCapabilities,
     ) {
-        ui.menu_button("Upload", |ui| {
+        super::icons::menu(ui, "upload", "Upload", |ui| {
             for folder in [false, true] {
                 if ui
                     .add_enabled(
@@ -385,10 +385,11 @@ impl TransferUi {
                 || (e.kind == EntryKind::Directory && capabilities.download_folders)
         });
         if ui
-            .add_enabled(
+            .add_enabled_ui(
                 ready && capabilities.download_files && selected_file && self.picker.is_none(),
-                Button::new("Download…"),
+                |ui| super::icons::button(ui, "download", "Download…", false),
             )
+            .inner
             .clicked()
         {
             let (tx, rx) = std::sync::mpsc::channel();
@@ -849,13 +850,7 @@ impl Workspace {
         }
         let id = tab.id;
         let mut edit_remote = None;
-        Panel::left(Id::new(("remote-files", id)))
-            .resizable(true)
-            .default_size(246.)
-            .min_size(200.)
-            .max_size(480.)
-            .frame(Frame::new().fill(mist(ui)).inner_margin(10))
-            .show(ui, |ui| {
+        ui.push_id(("remote-files",id),|ui| {
                 let tab = &mut self.tabs[self.active];
                 ui.horizontal(|ui| {
                     ui.strong("Remote files").fluent_hint(format!("{} · Embedded {}", tab.session.host, tab.session.remote_backend.label()));
@@ -907,7 +902,7 @@ impl Workspace {
                 ui.horizontal_wrapped(|ui| {
                     ui.spacing_mut().button_padding.x = 8.;
                     tab.transfer_ui.actions(ui,&path,ready,capabilities);
-                    ui.menu_button("More", |ui| {
+                    super::icons::menu(ui,"menu","Remote file actions", |ui| {
                         tab.transfer_ui.entry_actions(ui,&path,ready,capabilities);
                         ui.separator();
                         ui.menu_button("Shell integration", |ui| tab.shell_follow_controls(ui));
@@ -1110,10 +1105,61 @@ mod auth_tests {
 }
 #[cfg(test)]
 mod transfer_tests {
+
+    #[test]
+    fn sidebar_tabs_switch_without_changing_connection_or_remote_selection() {
+        use crate::ui::{
+            explorer_tests, gui_tests, pane_cleanup_tests::labels, terminal_review_tests,
+        };
+        let (ctx, _root, mut w) = terminal_review_tests::owned_workspace();
+        w.start(Session {
+            host: "127.0.0.1".into(),
+            port: 1,
+            ..Default::default()
+        });
+        let tab = &mut w.tabs[0];
+        drop(tab.ssh.take());
+        tab.ssh_connected = true;
+        let browser = tab.browser.as_mut().unwrap();
+        browser.loading = false;
+        browser.entries = explorer_tests::remote_samples();
+        let selected = browser.entries[1].clone();
+        tab.transfer_ui.selected = Some(selected.clone());
+        let id = tab.id;
+        let draw = |w: &mut Workspace, events| {
+            gui_tests::shell_frame(&ctx, vec2(1360., 900.), 1., events, |ui| w.render(ui))
+        };
+        draw(&mut w, vec![]);
+        draw(&mut w, vec![]);
+        let click = |w: &mut Workspace, label: &str| {
+            let out = draw(w, vec![]);
+            let p = gui_tests::shell_text_position(&out, label);
+            draw(
+                w,
+                vec![Event::PointerMoved(p), gui_tests::shell_pointer(p, true)],
+            );
+            draw(w, vec![gui_tests::shell_pointer(p, false)]);
+        };
+        click(&mut w, "Sessions");
+        assert!(labels(&draw(&mut w, vec![])).contains("Quick connect"));
+        click(&mut w, "SFTP");
+        assert!(labels(&draw(&mut w, vec![])).contains("photo.PNG"));
+        assert_eq!(w.tabs[0].id, id);
+        assert_eq!(
+            w.tabs[0].transfer_ui.selected.as_ref().unwrap().path,
+            selected.path
+        );
+        assert!(
+            egui::containers::panel::PanelState::load(&ctx, Id::new(("remote-files", id)))
+                .is_none()
+        );
+    }
+
     #[test]
     fn narrow_terminal_moves_commands_into_reachable_overflow() {
         use crate::ui::{gui_tests::shell_text_position, terminal_review_tests::owned_workspace};
         let (ctx, _root, mut workspace) = owned_workspace();
+        ctx.enable_accesskit();
         workspace.start(Session {
             host: "127.0.0.1".into(),
             port: 1,
@@ -1122,7 +1168,7 @@ mod transfer_tests {
         drop(workspace.tabs[0].ssh.take());
         let draw = |workspace: &mut Workspace, events| {
             super::super::gui_tests::shell_frame(&ctx, vec2(260., 640.), 1., events, |ui| {
-                workspace.terminals(ui)
+                workspace.connection_commands(ui)
             })
         };
         fn labels(output: &egui::FullOutput) -> String {
@@ -1155,7 +1201,7 @@ mod transfer_tests {
                 .any(|label| label == "Find" || label == "Reconnect"),
             "Commands crowd a narrow terminal: {text}"
         );
-        let more = shell_text_position(&output, "More");
+        let more = crate::ui::gui_tests::shell_control_position(&output, "Connection actions");
         for pressed in [true, false] {
             draw(
                 &mut workspace,
@@ -1354,7 +1400,7 @@ mod transfer_tests {
                 output = Some(frame);
             }
             let output = output.unwrap();
-            let panel_id = Id::new(("remote-files", workspace.tabs[0].id));
+            let panel_id = Id::new("sidebar");
             let initial_width = egui::containers::panel::PanelState::load(&ctx, panel_id)
                 .unwrap()
                 .size()

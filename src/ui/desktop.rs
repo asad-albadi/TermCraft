@@ -596,21 +596,6 @@ impl Workspace {
 }
 pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     let state = tab.desktop.as_mut().unwrap();
-    ui.horizontal_wrapped(|ui| {
-        ui.label(fluent::emphasized(ui.ctx(), RichText::new(&state.message)));
-        ui.small(format!("{} · embedded display", tab.session.protocol));
-    });
-    if state.options.clipboard != harbor_workspace::desktop::rdp_options::ClipboardPolicy::Disabled
-    {
-        ui.horizontal_wrapped(|ui| {
-            state.clipboard.controls(ui);
-            ui.small(if state.clipboard.ready {
-                "Text clipboard ready"
-            } else {
-                "Waiting for server clipboard channel…"
-            }).on_hover_text("Paste with Ctrl+V in the desktop. Clipboard directions follow the saved session settings.");
-        });
-    }
     if !state.error.is_empty() {
         ui.colored_label(ui.visuals().error_fg_color, &state.error);
     }
@@ -1802,5 +1787,26 @@ mod cursor_tests {
         let rect = cursor.rect(pos2(100., 200.), 2.);
         assert_eq!(rect.min, pos2(94., 196.));
         assert_eq!(rect.size(), vec2(16., 12.));
+    }
+}
+
+pub(super) fn toolbar(ui: &mut Ui, tab: &mut TerminalTab) {
+    let Some(state) = &mut tab.desktop else {
+        return;
+    };
+    ui.horizontal_wrapped(|ui| {
+        ui.label(fluent::emphasized(ui.ctx(), RichText::new(&state.message)));
+        ui.small(format!("{} · embedded display", tab.session.protocol));
+    });
+    if state.options.clipboard != harbor_workspace::desktop::rdp_options::ClipboardPolicy::Disabled
+    {
+        ui.horizontal_wrapped(|ui| {
+            state.clipboard.controls(ui);
+            ui.small(if state.clipboard.ready {
+                "Text clipboard ready"
+            } else {
+                "Waiting for server clipboard channel…"
+            }).on_hover_text("Paste with Ctrl+V in the desktop. Clipboard directions follow the saved session settings.");
+        });
     }
 }

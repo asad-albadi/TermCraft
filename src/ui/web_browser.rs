@@ -173,57 +173,6 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     if let Some(text) = browser.handle.take_copy() {
         ui.ctx().copy_text(text);
     }
-    let address_id = ui.make_persistent_id(("website-address", tab.id));
-    if !browser.address_dirty {
-        browser.address.clone_from(&state.address);
-    }
-    ui.add_enabled_ui(!state.closed, |ui| {
-        let narrow = ui.available_width() < 420.;
-        ui.horizontal_wrapped(|ui| {
-            if ui
-                .add_enabled(state.can_back, Button::new("Back"))
-                .clicked()
-            {
-                browser.send(Command::History(-1));
-            }
-            if ui
-                .add_enabled(state.can_forward, Button::new("Forward"))
-                .clicked()
-            {
-                browser.send(Command::History(1));
-            }
-            if state.loading {
-                if ui.button("Stop").clicked() {
-                    browser.send(Command::Stop);
-                }
-            } else if ui.button("Reload").clicked() {
-                browser.send(Command::Reload);
-            }
-            if narrow {
-                ui.end_row();
-            }
-            let response = ui.add(
-                crate::ui::fluent::singleline(&mut browser.address)
-                    .id(address_id)
-                    .char_limit(8192)
-                    .desired_width((ui.available_width() - 62.).max(1.)),
-            );
-            response.widget_info(|| {
-                WidgetInfo::labeled(WidgetType::TextEdit, response.enabled(), "Website address")
-            });
-            browser.address_dirty |= response.changed();
-            let go = ui.button("Go");
-            let submit = go.clicked()
-                || (response.lost_focus() && ui.input(|input| input.key_pressed(Key::Enter)));
-            if submit {
-                browser.send(Command::Navigate(browser.address.clone()));
-            }
-            if submit || (!response.has_focus() && !go.is_pointer_button_down_on()) {
-                browser.address_dirty = false;
-                browser.address.clone_from(&state.address);
-            }
-        });
-    });
     if let Some(error) = browser.input_error {
         ui.colored_label(ui.visuals().error_fg_color, error);
     } else if state.loading {
@@ -577,3 +526,63 @@ fn key_code(name: &str, key: Key) -> String {
 ))]
 #[path = "web_browser_tests.rs"]
 mod tests;
+
+pub(super) fn toolbar(ui: &mut Ui, tab: &mut TerminalTab) {
+    let Some(browser) = &mut tab.web_browser else {
+        return;
+    };
+    let state = browser.handle.state();
+    let address_id = ui.make_persistent_id(("website-address", tab.id));
+    if !browser.address_dirty {
+        browser.address.clone_from(&state.address);
+    }
+    ui.add_enabled_ui(!state.closed, |ui| {
+        ui.horizontal(|ui| {
+            if ui
+                .add_enabled_ui(state.can_back, |ui| {
+                    super::icons::button(ui, "back", "Back", false)
+                })
+                .inner
+                .clicked()
+            {
+                browser.send(Command::History(-1));
+            }
+            if ui
+                .add_enabled_ui(state.can_forward, |ui| {
+                    super::icons::button(ui, "forward", "Forward", false)
+                })
+                .inner
+                .clicked()
+            {
+                browser.send(Command::History(1));
+            }
+            if state.loading {
+                if super::icons::button(ui, "disconnect", "Stop", false).clicked() {
+                    browser.send(Command::Stop);
+                }
+            } else if super::icons::button(ui, "refresh", "Reload", false).clicked() {
+                browser.send(Command::Reload);
+            }
+            let response = ui.add(
+                crate::ui::fluent::singleline(&mut browser.address)
+                    .id(address_id)
+                    .char_limit(8192)
+                    .desired_width((ui.available_width() - 62.).max(1.)),
+            );
+            response.widget_info(|| {
+                WidgetInfo::labeled(WidgetType::TextEdit, response.enabled(), "Website address")
+            });
+            browser.address_dirty |= response.changed();
+            let go = ui.button("Go");
+            let submit = go.clicked()
+                || (response.lost_focus() && ui.input(|input| input.key_pressed(Key::Enter)));
+            if submit {
+                browser.send(Command::Navigate(browser.address.clone()));
+            }
+            if submit || (!response.has_focus() && !go.is_pointer_button_down_on()) {
+                browser.address_dirty = false;
+                browser.address.clone_from(&state.address);
+            }
+        });
+    });
+}

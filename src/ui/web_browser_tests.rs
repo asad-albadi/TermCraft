@@ -222,6 +222,7 @@ fn browser_output(
                     }
                 });
             }
+            toolbar(ui, tab);
             view(ui, tab);
         },
     )
@@ -242,14 +243,15 @@ fn narrow_browser_wraps_address_and_go_without_losing_input_focus() {
     };
     let fixture = fixture::Fixture::http(|_| fixture::Response::html("<title>Owned page</title>"));
     let (ctx, _root, mut w) = owned_workspace();
+    ctx.enable_accesskit();
     let tab = test_tab(&mut w, fixture.origin.clone());
     let size = vec2(300., 380.);
     render_browser_at(&ctx, tab, size, vec![], Some(true));
     let mut out = browser_output(&ctx, tab, size, vec![], Some(true));
     out.textures_delta.clear();
-    let back = crate::ui::gui_tests::shell_text_position(&out, "Back");
+    let back = crate::ui::gui_tests::shell_control_position(&out, "Back");
     let go = crate::ui::gui_tests::shell_text_position(&out, "Go");
-    assert!(go.x < size.x && go.y > back.y + 16.);
+    assert!(go.x < size.x && (go.y - back.y).abs() < 8.);
     render_browser_at(&ctx, tab, size, vec![Event::Text("/narrow".into())], None);
     assert!(
         tab.web_browser
@@ -472,8 +474,10 @@ fn embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_pain
         "The small Chromium viewport did not paint",
     );
     let small_width = tab.web_browser.as_ref().unwrap().viewport[0];
+    // The unified toolbar leaves a pixel-aligned canvas origin. Hit DOM pixel
+    // 289 directly; keep the exact coordinate, viewport and capture assertions.
     let click = || {
-        let pos = pos2(290., 115.);
+        let pos = pos2(289., 115.);
         [true, false]
             .into_iter()
             .map(|pressed| Event::PointerButton {
@@ -484,7 +488,7 @@ fn embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_pain
             })
             .collect()
     };
-    let pos = pos2(290., 115.);
+    let pos = pos2(289., 115.);
     render_browser_at(&ctx, tab, small, vec![Event::PointerMoved(pos)], None);
     render_browser_at(
         &ctx,
@@ -545,7 +549,17 @@ fn embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_pain
             .count()
     };
     assert_eq!(count("/click?"), 1);
-    assert!(fixture.saw(&format!("/click?side=right&x=289&width={width}")));
+    assert!(
+        fixture.saw(&format!("/click?side=right&x=289&width={width}")),
+        "Unexpected click coordinates: {:?}",
+        fixture
+            .requests
+            .lock()
+            .unwrap()
+            .iter()
+            .map(|r| r.target.clone())
+            .collect::<Vec<_>>()
+    );
 
     // Leave the large frame on screen while the renderer makes a round trip
     // through the small viewport. The old large frame has the same dimensions
@@ -618,4 +632,55 @@ fn embedded_browser_blocks_clicks_on_a_resizing_canvas_until_a_new_frame_is_pain
     );
     assert_eq!(count("/held"), 3);
     assert_eq!(count("/released?buttons=0"), 2);
+}
+
+#[test]
+fn unified_bar_can_close_the_last_embedded_browser_without_reusing_its_tab() {
+    let Some(_slot) = chromium_fixture_slot() else {
+        return;
+    };
+    let fixture =
+        fixture::Fixture::http(|_| fixture::Response::html("<title>Owned close fixture</title>"));
+    let (ctx, _root, mut w) = owned_workspace();
+    ctx.enable_accesskit();
+    test_tab(&mut w, fixture.origin.clone());
+    w.store.preferences.confirm_session_close = false;
+    render(&ctx, &mut w, vec![]);
+    let out = render(&ctx, &mut w, vec![]);
+    let bounds = out
+        .output
+        .platform_output
+        .accesskit_update
+        .as_ref()
+        .unwrap()
+        .nodes
+        .iter()
+        .find_map(|(_, n)| {
+            n.label()
+                .is_some_and(|s| s.starts_with("Close "))
+                .then(|| n.bounds())
+                .flatten()
+        })
+        .expect("Browser close button");
+    let p = pos2(
+        ((bounds.x0 + bounds.x1) / 2.) as f32,
+        ((bounds.y0 + bounds.y1) / 2.) as f32,
+    );
+    for pressed in [true, false] {
+        render(
+            &ctx,
+            &mut w,
+            vec![
+                Event::PointerMoved(p),
+                Event::PointerButton {
+                    pos: p,
+                    button: PointerButton::Primary,
+                    pressed,
+                    modifiers: Modifiers::NONE,
+                },
+            ],
+        );
+    }
+    assert!(w.tabs.is_empty());
+    render(&ctx, &mut w, vec![]);
 }

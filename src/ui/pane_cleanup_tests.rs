@@ -1,6 +1,6 @@
 use super::*;
 
-fn labels(output: &egui::FullOutput) -> String {
+pub(super) fn labels(output: &egui::FullOutput) -> String {
     fn text(shape: &egui::epaint::Shape, out: &mut String) {
         match shape {
             egui::epaint::Shape::Text(t) => {
@@ -147,4 +147,57 @@ fn sharing_folder_picker_does_not_overlap_the_next_form_row() {
             "Picker overlaps next form row at {width}: {browse:?}, {listen:?}"
         );
     }
+}
+
+#[test]
+fn remote_files_share_the_sidebar_instead_of_adding_a_second_panel() {
+    let (ctx, _root, mut w) = terminal_review_tests::owned_workspace();
+    w.start(Session {
+        host: "127.0.0.1".into(),
+        port: 1,
+        ..Default::default()
+    });
+    let tab = &mut w.tabs[0];
+    drop(tab.ssh.take());
+    tab.ssh_connected = true;
+    let browser = tab.browser.as_mut().unwrap();
+    browser.loading = false;
+    browser.entries = explorer_tests::remote_samples();
+    let draw = |w: &mut Workspace| {
+        gui_tests::shell_frame(&ctx, vec2(1360., 900.), 1., vec![], |ui| w.render(ui))
+    };
+    draw(&mut w);
+    let output = draw(&mut w);
+    let row = gui_tests::shell_text_position(&output, "photo.PNG");
+    assert!(
+        row.x < 340.,
+        "Remote browser still occupies a second column: {row:?}"
+    );
+    assert!(
+        !labels(&output).contains("Quick connect"),
+        "Both sidebar contents are visible together"
+    );
+}
+
+#[test]
+fn connected_workspace_bar_stays_one_row_at_the_minimum_window() {
+    let (ctx, _root, mut w) = terminal_review_tests::owned_workspace();
+    w.start(Session {
+        name: "A deliberately long active connection title for the compact tab strip".into(),
+        host: "127.0.0.1".into(),
+        port: 1,
+        ..Default::default()
+    });
+    drop(w.tabs[0].ssh.take());
+    for _ in 0..30 {
+        gui_tests::shell_frame(&ctx, vec2(640., 480.), 1., vec![], |ui| w.render(ui));
+    }
+    let height = egui::containers::panel::PanelState::load(&ctx, Id::new("workspace-bar"))
+        .unwrap()
+        .size()
+        .y;
+    assert!(
+        height <= 48.,
+        "Tab scrolling added another chrome row: {height}"
+    );
 }

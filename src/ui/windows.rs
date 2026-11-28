@@ -327,11 +327,63 @@ impl Workspace {
         active: u64,
         actions: &mut Vec<(u64, bool)>,
     ) {
-        ui.horizontal_wrapped(|ui| {
+        ui.horizontal(|ui| {
+            let ids = self.windows.terminals(window);
+            let width = (ui.available_width() - 160.).max(80.);
+            ui.allocate_ui_with_layout(
+                vec2(width, 38.),
+                Layout::left_to_right(Align::Center),
+                |ui| {
+                    ScrollArea::horizontal()
+                        .id_salt(("detached-tabs", window))
+                        .scroll_bar_visibility(egui::scroll_area::ScrollBarVisibility::AlwaysHidden)
+                        .auto_shrink([false, true])
+                        .show(ui, |ui| {
+                            ui.horizontal(|ui| {
+                                for id in &ids {
+                                    let running = self
+                                        .tabs
+                                        .iter()
+                                        .find(|t| t.id == *id)
+                                        .map(TerminalTab::running);
+                                    let (response, _) = workspace_tab(
+                                        ui,
+                                        &self.terminal_tab_label(*id),
+                                        active == *id,
+                                        running,
+                                        false,
+                                        *id,
+                                    );
+                                    if response.clicked() {
+                                        self.window_active.insert(window, *id);
+                                    }
+                                }
+                            })
+                        });
+                },
+            );
             if ui.button("Reattach").clicked() {
                 actions.push((active, false));
             }
             ui.menu_button("More", |ui| {
+                if let Some(index) = self.tabs.iter().position(|t| t.id == active) {
+                    if self.tabs[index].web_browser.is_some() {
+                        ui.menu_button("Browser navigation", |ui| {
+                            ui.set_min_width(300.);
+                            super::web_browser::toolbar(ui, &mut self.tabs[index]);
+                        });
+                    }
+                    if self.tabs[index].desktop.is_some() {
+                        ui.menu_button("Remote desktop controls", |ui| {
+                            super::desktop::toolbar(ui, &mut self.tabs[index])
+                        });
+                    }
+                    if self.tabs[index].session.protocol == "SFTP" {
+                        ui.menu_button("SFTP commands", |ui| {
+                            self.sftp_compatibility_commands(ui, index)
+                        });
+                    }
+                }
                 if let Some(tab) = self.tabs.iter().find(|t| t.id == active) {
                     super::pages::history_status(ui, tab);
                 }
@@ -405,20 +457,6 @@ impl Workspace {
                 if self.import_applying(){ui.disable();}
                 self.handle_shortcuts(&child_ctx, window);
                 self.restore_window_geometry(&child_ctx, window);
-                if ids.len()>1 {ScrollArea::horizontal()
-                    .id_salt(("detached-tabs", window))
-                    .auto_shrink([false, true])
-                    .show(ui, |ui| ui.horizontal(|ui| {
-                        for id in &ids {
-                            let running = self.tabs.iter().find(|tab| tab.id == *id).map(TerminalTab::running);
-                            let (response, _) = workspace_tab(
-                                ui, &self.terminal_tab_label(*id), active == *id, running, false, *id,
-                            );
-                            if response.clicked() {
-                                self.window_active.insert(window, *id);
-                            }
-                        }
-                    }));}
                 self.detached_commands(ui, class, window, active, &mut actions);
                 if self.window_close_prompt.contains(&window) { child_ctx.request_repaint(); return; }
                 if self.title_editor.as_ref().is_some_and(|(tab, _)| self.windows.window(*tab) == window) {

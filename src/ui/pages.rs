@@ -702,149 +702,6 @@ impl Workspace {
             return;
         }
         self.active = self.active.min(self.tabs.len() - 1);
-        if let Some(read) = &self.clipboard_read {
-            let title = self
-                .tabs
-                .iter()
-                .find(|t| t.id == read.source)
-                .map(|t| t.session.title())
-                .unwrap_or_else(|| "closed terminal".into());
-            let mut cancel = false;
-            ui.horizontal(|ui| {
-                ui.label(format!("Reading clipboard for {title}…"));
-                cancel = ui.button("Cancel clipboard read").clicked();
-            });
-            if cancel {
-                self.clipboard_read = None;
-            }
-        }
-        let mut layout_toggle = false;
-        let mut duplicate = false;
-        let mut reconnect = false;
-        let mut cancel_startup = false;
-        let mut save_output = false;
-        let mut log = false;
-        let mut copy = false;
-        let mut clear = false;
-        let compact_commands = ui.available_width() < 400.;
-        ui.horizontal(|ui| {
-            let index=self.active;
-            let t=&self.tabs[index];
-            dot(ui,if t.running(){ accent(ui) } else { muted(ui) });
-            let status = if t.terminal_starting(){ "Starting" } else if t.running(){ "Connected" } else { "Disconnected" };
-            if compact_commands {
-                ui.add_sized([(ui.available_width()-84.).max(20.),fluent::CONTROL_HEIGHT],Label::new(status).truncate())
-                    .fluent_hint(status);
-            } else { ui.label(status); }
-            ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                ui.menu_button("More", |ui| {
-                    if compact_commands {
-                        let t=&mut self.tabs[index];
-                        if t.session.protocol != "Browser" && ui.button("Find").clicked() {
-                            t.search_open = !t.search_open;
-                            ui.close();
-                        }
-                        if t.terminal_starting() {
-                            if ui.button("Cancel startup").clicked() { cancel_startup=true; ui.close(); }
-                        } else if ui.button("Reconnect").clicked() { reconnect=true; ui.close(); }
-                        ui.separator();
-                    }
-                    self.layout_picker(ui);
-                    layout_toggle=ui.button("Toggle split").clicked();
-                    let t=&mut self.tabs[index];
-                    if t.session.protocol=="SSH" {
-                        if let Some(browser)=&mut t.browser {ui.checkbox(&mut browser.visible,"Remote files");}
-                        else {ui.small("OpenSSH compatibility uses the saved session’s companion SFTP action for transfers.");}
-                    }
-                    if t.session.protocol != "Browser" {
-                        ui.menu_button("Terminal profile",|ui|{
-                            super::terminal_settings::overrides(ui,&mut t.session.terminal,&self.store.preferences.terminal_settings());
-                        });
-                        ui.menu_button("Keyword highlighting",|ui|{
-                            ui.selectable_value(&mut t.session.highlight_enabled,None,"Global");
-                            ui.selectable_value(&mut t.session.highlight_enabled,Some(true),"On");
-                            ui.selectable_value(&mut t.session.highlight_enabled,Some(false),"Off");
-                        });
-                        ui.small(format!("Open for {} seconds",t.started.elapsed().as_secs()));
-                        history_status(ui,t);
-                        copy = ui.button("Copy terminal output").clicked();
-                        save_output = ui.button("Save output to file").clicked();
-                        clear = ui.button("Clear screen").clicked();
-                        log = ui
-                            .button(if t.log.is_some() {
-                                "Stop live logging"
-                            } else {
-                                "Start live logging"
-                            })
-                            .clicked();
-                    }
-                    duplicate = ui.button("Duplicate session").clicked();
-                });
-                if !compact_commands {
-                    let t=&mut self.tabs[index];
-                    if t.terminal_starting() {
-                        cancel_startup = ui.button("Cancel startup").clicked();
-                    } else {
-                        reconnect = ui.button("Reconnect").clicked();
-                    }
-                    if t.session.protocol != "Browser" && ui.button("Find").clicked() {
-                        t.search_open = !t.search_open;
-                    }
-                }
-
-            });
-        });
-        if layout_toggle {
-            self.toggle_layout();
-        }
-        if cancel_startup {
-            let tab = &mut self.tabs[self.active];
-            if tab.pending_portable.take().is_some() {
-                tab.connection_status = "Portable Unix startup cancelled".into();
-            } else {
-                tab.pending_mosh = None;
-                tab.connection_status = "Mosh startup cancelled".into();
-            }
-        }
-        if reconnect {
-            self.reconnect_active();
-        }
-        if duplicate {
-            let s = self.tabs[self.active].session.clone();
-            let launch = self.tabs[self.active].launch.clone();
-            self.start_with_launch(s, launch);
-        }
-        if clear {
-            self.tabs[self.active].screen.clear();
-        }
-        if copy {
-            ui.ctx().copy_text(self.tabs[self.active].screen.plain());
-        }
-        if save_output {
-            if let Some(path) = rfd::FileDialog::new()
-                .set_file_name("terminal-output.txt")
-                .save_file()
-            {
-                match fs::write(path, self.tabs[self.active].screen.plain()) {
-                    Ok(()) => self.message("Terminal output saved"),
-                    Err(e) => self.message(e.to_string()),
-                }
-            }
-        }
-        if log {
-            let t = &mut self.tabs[self.active];
-            if t.log.is_some() {
-                t.log = None;
-            } else if let Some(path) = rfd::FileDialog::new()
-                .set_file_name("session.log")
-                .save_file()
-            {
-                match fs::OpenOptions::new().create(true).append(true).open(path) {
-                    Ok(f) => t.log = Some(f),
-                    Err(e) => self.message(e.to_string()),
-                }
-            }
-        }
         if self.tabs[self.active].session.protocol == "XDMCP" {
             let tab = &mut self.tabs[self.active];
             ui.label(&tab.connection_status);
@@ -864,56 +721,6 @@ impl Workspace {
             return;
         }
         self.tabs[self.active].search_ui(ui);
-        if self.tabs[self.active].session.protocol == "SFTP" {
-            let mut upload = false;
-            let mut download = false;
-            let mut list = false;
-            ui.horizontal(|ui| {
-                upload = ui.button("Upload file…").clicked();
-                download = ui.button("Download path").clicked();
-                ui.add(
-                    crate::ui::fluent::singleline(&mut self.tabs[self.active].remote_path)
-                        .hint_text("Remote file or directory")
-                        .desired_width(260.),
-                );
-                list = ui.button("List files").clicked();
-            });
-            if list {
-                self.tabs[self.active].send_generated_command(b"ls -la\n");
-            }
-            if upload {
-                if let Some(path) = rfd::FileDialog::new().pick_file() {
-                    match connection::sftp_quote_path(&path) {
-                        Ok(q) => {
-                            let mut command = b"put -p ".to_vec();
-                            command.extend(q);
-                            command.push(b'\n');
-                            self.tabs[self.active].send_generated_command(&command);
-                        }
-                        Err(e) => self.message(e),
-                    }
-                }
-            }
-            if download {
-                let remote = self.tabs[self.active].remote_path.clone();
-                if !remote.is_empty() {
-                    if let Some(dest) = rfd::FileDialog::new().pick_folder() {
-                        match (
-                            connection::sftp_quote(&remote),
-                            connection::sftp_quote_path(&dest),
-                        ) {
-                            (Ok(r), Ok(d)) => {
-                                let mut command = format!("get -pR {r} ").into_bytes();
-                                command.extend(d);
-                                command.push(b'\n');
-                                self.tabs[self.active].send_generated_command(&command);
-                            }
-                            (Err(e), _) | (_, Err(e)) => self.message(e),
-                        }
-                    }
-                }
-            }
-        }
         if !self.tabs[self.active].error.is_empty() {
             Frame::new()
                 .fill(ui.visuals().widgets.hovered.bg_fill)
@@ -946,6 +753,58 @@ impl Workspace {
         }
         self.collect_terminal_requests(ui.ctx());
     }
+    pub(super) fn sftp_compatibility_commands(&mut self, ui: &mut Ui, index: usize) {
+        if self.tabs[index].session.protocol == "SFTP" {
+            let mut upload = false;
+            let mut download = false;
+            let mut list = false;
+            ui.horizontal(|ui| {
+                upload = ui.button("Upload file…").clicked();
+                download = ui.button("Download path").clicked();
+                ui.add(
+                    crate::ui::fluent::singleline(&mut self.tabs[index].remote_path)
+                        .hint_text("Remote file or directory")
+                        .desired_width(260.),
+                );
+                list = ui.button("List files").clicked();
+            });
+            if list {
+                self.tabs[index].send_generated_command(b"ls -la\n");
+            }
+            if upload {
+                if let Some(path) = rfd::FileDialog::new().pick_file() {
+                    match connection::sftp_quote_path(&path) {
+                        Ok(q) => {
+                            let mut command = b"put -p ".to_vec();
+                            command.extend(q);
+                            command.push(b'\n');
+                            self.tabs[index].send_generated_command(&command);
+                        }
+                        Err(e) => self.message(e),
+                    }
+                }
+            }
+            if download {
+                let remote = self.tabs[index].remote_path.clone();
+                if !remote.is_empty() {
+                    if let Some(dest) = rfd::FileDialog::new().pick_folder() {
+                        match (
+                            connection::sftp_quote(&remote),
+                            connection::sftp_quote_path(&dest),
+                        ) {
+                            (Ok(r), Ok(d)) => {
+                                let mut command = format!("get -pR {r} ").into_bytes();
+                                command.extend(d);
+                                command.push(b'\n');
+                                self.tabs[index].send_generated_command(&command);
+                            }
+                            (Err(e), _) | (_, Err(e)) => self.message(e),
+                        }
+                    }
+                }
+            }
+        }
+    }
     pub(super) fn files_page(&mut self, ui: &mut Ui) {
         ui.heading("Local files");
         let mut go = false;
@@ -971,7 +830,7 @@ impl Workspace {
             r.widget_info(|| WidgetInfo::labeled(WidgetType::TextEdit, r.enabled(), "Folder path"));
             go = r.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
             go |= ui.button("Go").clicked();
-            if ui.button("Browse…").clicked() {
+            if icons::action(ui, "Browse…").clicked() {
                 if let Some(p) = rfd::FileDialog::new()
                     .set_directory(&self.files.path)
                     .pick_folder()
@@ -990,7 +849,7 @@ impl Workspace {
                 self.files.error = "That folder does not exist or cannot be opened.".into();
             }
         }
-        ui.horizontal_wrapped(|ui|{if ui.button("Refresh").clicked(){self.files.refresh();}if ui.button("New folder").clicked(){self.files.show_new=true;self.files.new_name.clear();}ui.menu_button("More",|ui|{if ui.add_enabled(self.files.selected.is_some(),Button::new("Copy")).clicked(){self.files.clipboard=self.files.selected.clone();}
+        ui.horizontal_wrapped(|ui|{if icons::action(ui,"Refresh").clicked(){self.files.refresh();}if icons::action(ui,"New folder").clicked(){self.files.show_new=true;self.files.new_name.clear();}ui.menu_button("More",|ui|{if ui.add_enabled(self.files.selected.is_some(),Button::new("Copy")).clicked(){self.files.clipboard=self.files.selected.clone();}
    if ui.add_enabled(self.files.clipboard.is_some(),Button::new("Paste copy")).clicked(){if let Some(from)=&self.files.clipboard{if from.is_file(){let to=self.files.path.join(from.file_name().unwrap());if to.exists(){self.files.error="A file with that name already exists. Rename it before copying.".into();}else{match copy_new_file(from,&to){Ok(_)=>self.files.refresh(),Err(e)=>self.files.error=e.to_string()}}}else{self.files.error="Folder copying is not supported yet. Open the system file manager for this operation.".into();}}}
    if ui.add_enabled(self.files.selected.is_some(),Button::new("Rename")).clicked(){self.files.error.clear();self.rename_file=self.files.selected.clone();self.rename_text=self.rename_file.as_ref().unwrap().file_name().unwrap().to_string_lossy().into();}
    if ui.add_enabled(self.files.selected.is_some(),Button::new("Delete")).clicked(){self.delete_file=self.files.selected.clone();}
@@ -1075,7 +934,7 @@ impl Workspace {
                             open = Some(entry.clone());
                             ui.close();
                         }
-                        if !entry.dir && ui.button("Edit as text").clicked() {
+                        if !entry.dir && icons::action(ui, "Edit as text").clicked() {
                             edit = Some(entry.path.clone());
                             ui.close();
                         }
@@ -1390,11 +1249,11 @@ impl Workspace {
                         );
                         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                             ui.menu_button("More", |ui| {
-                                if ui.button("Remove").clicked() {
+                                if icons::action(ui, "Remove").clicked() {
                                     remove = Some(i);
                                     ui.close();
                                 }
-                                if ui.button("Edit").clicked() {
+                                if icons::action(ui, "Edit").clicked() {
                                     edit = Some(i);
                                     ui.close();
                                 }
@@ -1501,7 +1360,7 @@ impl Workspace {
                 });
                 self.macro_controls(ui);
                 ui.menu_button("Library", |ui| {
-                    if ui.button("Import").clicked() {
+                    if icons::action(ui, "Import").clicked() {
                         if let Some(path) = rfd::FileDialog::new()
                             .add_filter("Macro JSON", &["json"])
                             .pick_file()
@@ -1520,7 +1379,7 @@ impl Workspace {
                             }
                         }
                     }
-                    if ui.button("Export").clicked() {
+                    if icons::action(ui, "Export").clicked() {
                         if let Some(path) = rfd::FileDialog::new()
                             .set_file_name("macros.json")
                             .save_file()
@@ -1583,11 +1442,11 @@ impl Workspace {
                         );
                         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
                             ui.menu_button("More", |ui| {
-                                if ui.button("Remove").clicked() {
+                                if icons::action(ui, "Remove").clicked() {
                                     remove = Some(index);
                                     ui.close();
                                 }
-                                if ui.button("Edit").clicked() {
+                                if icons::action(ui, "Edit").clicked() {
                                     edit = Some(index);
                                     ui.close();
                                 }
@@ -2025,8 +1884,8 @@ impl Workspace {
             }
             if self.settings_category == Storage {
                 surface(ui).show(ui,|ui|{ui.set_min_width(ui.available_width());ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Sessions and backups").size(18.)));ui.label(RichText::new("Session settings, folders, tunnels and macros are stored locally. Exported backups contain hostnames and key-file paths, but no passwords.").color(muted(ui)));ui.horizontal_wrapped(|ui|{
-    if ui.button("Export workspace").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("termcraft-workspace.json").save_file(){match self.store.save(&p){Ok(())=>self.message("Workspace exported"),Err(e)=>self.message(e)}}}
-    if ui.button("Import workspace").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Workspace JSON",&["json"]).pick_file(){match Store::load_bounded(&p, 16 * 1024 * 1024).and_then(|mut imported| { let mut macros = self.store.macros.clone(); macros.append(&mut imported.macros); super::macro_events::validate_library(&macros)?; imported.macros = macros; Ok(imported) }) { Ok(imported) => { self.store.sessions.extend(imported.sessions.into_iter().map(|mut session| {session.id=harbor_workspace::model::new_session_id();session})); self.store.tunnels.extend(imported.tunnels.into_iter().take(5_usize.saturating_sub(self.store.tunnels.len()))); self.store.macros = imported.macros; self.persist(); }, Err(error) => self.message(error) }}}
+    if icons::action(ui,"Export workspace").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("termcraft-workspace.json").save_file(){match self.store.save(&p){Ok(())=>self.message("Workspace exported"),Err(e)=>self.message(e)}}}
+    if icons::action(ui,"Import workspace").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Workspace JSON",&["json"]).pick_file(){match Store::load_bounded(&p, 16 * 1024 * 1024).and_then(|mut imported| { let mut macros = self.store.macros.clone(); macros.append(&mut imported.macros); super::macro_events::validate_library(&macros)?; imported.macros = macros; Ok(imported) }) { Ok(imported) => { self.store.sessions.extend(imported.sessions.into_iter().map(|mut session| {session.id=harbor_workspace::model::new_session_id();session})); self.store.tunnels.extend(imported.tunnels.into_iter().take(5_usize.saturating_sub(self.store.tunnels.len()))); self.store.macros = imported.macros; self.persist(); }, Err(error) => self.message(error) }}}
    });if !self.store_ok{ui.colored_label(ui.visuals().error_fg_color,"The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.settings_load_error=None;self.persist();},Err(e)=>self.message(e.to_string())}}}});
             }
             if self.settings_category == About {

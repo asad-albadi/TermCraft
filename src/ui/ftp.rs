@@ -309,7 +309,7 @@ impl State {
         let selected = self.selected.clone();
         ui.add_enabled_ui(available, |ui| {
             ui.horizontal_wrapped(|ui| {
-                if ui.button("Upload…").clicked() {
+                if super::icons::action(ui, "Upload…").clicked() {
                     self.file_dialog(None, page_path.clone(), false);
                 }
                 if let Some(entry) = &selected {
@@ -333,11 +333,11 @@ impl State {
                     }
                 }
                 ui.menu_button("More", |ui| {
-                    if ui.button("Upload folder…").clicked() {
+                    if super::icons::action(ui, "Upload folder…").clicked() {
                         self.file_dialog(None, page_path.clone(), true);
                         ui.close();
                     }
-                    if ui.button("New folder…").clicked() {
+                    if super::icons::action(ui, "New folder…").clicked() {
                         self.pending = Some(Pending::Mkdir {
                             directory: page_path.clone(),
                             name: String::new(),
@@ -345,14 +345,14 @@ impl State {
                         ui.close();
                     }
                     if let Some(entry) = &selected {
-                        if ui.button("Rename…").clicked() {
+                        if super::icons::action(ui, "Rename…").clicked() {
                             self.pending = Some(Pending::Rename {
                                 source: entry.path.clone(),
                                 name: String::new(),
                             });
                             ui.close();
                         }
-                        if ui.button("Delete…").clicked() {
+                        if super::icons::action(ui, "Delete…").clicked() {
                             self.pending = Some(Pending::Delete {
                                 path: entry.path.clone(),
                                 directory: entry.kind == EntryKind::Directory,
