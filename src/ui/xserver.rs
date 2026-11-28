@@ -117,6 +117,10 @@ impl Drop for Worker {
 }
 
 impl State {
+    pub(super) fn active(&self) -> bool {
+        self.worker.is_some() || self.display.is_some()
+    }
+
     pub(super) fn for_context(ctx: &Context) -> Self {
         Self {
             context: Some(ctx.clone()),

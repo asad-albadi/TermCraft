@@ -100,6 +100,7 @@ impl Workspace {
             );
             ui.small("Clients send Authorization: Bearer TOKEN. HTTP is not encrypted; use a trusted connection or a TLS reverse proxy.");
         }
+        ui.collapsing("Advanced sharing options", |ui| {
         ui.horizontal_wrapped(|ui| {
             ui.label("Request deadline");
             ui.add(
@@ -108,7 +109,7 @@ impl Workspace {
                     .suffix(" seconds"),
             );
         });
-        ui.small("GET/HEAD support byte ranges. PUT uploads are limited to 64 MiB and never replace existing files. Uploads require a filesystem with hard-link support; FAT/exFAT uploads are unavailable.");
+        ui.small("GET/HEAD support byte ranges. PUT uploads are limited to 64 MiB and never replace existing files. Uploads require a filesystem with hard-link support; FAT/exFAT uploads are unavailable.");        });
     }
 }
 

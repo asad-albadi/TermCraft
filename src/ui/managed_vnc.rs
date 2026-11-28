@@ -47,6 +47,17 @@ impl Default for ManagedVnc {
     }
 }
 impl ManagedVnc {
+    pub(super) fn active(&self) -> bool {
+        self.id
+            .and_then(|id| self.supervisor.status(id))
+            .is_some_and(|s| {
+                matches!(
+                    s.state,
+                    ServiceState::Starting | ServiceState::Running | ServiceState::Stopping
+                )
+            })
+    }
+
     pub(super) fn card(&mut self, ui: &mut Ui) {
         ui.add_space(17.);
         surface(ui).show(ui,|ui|{
@@ -72,7 +83,7 @@ impl ManagedVnc {
                     ui.label("Stop after");ui.add(DragValue::new(&mut self.lifetime).range(0..=86400).suffix(" seconds (0 = until stopped)"));ui.end_row();
                 });
                 #[cfg(target_os="macos")]ui.small("macOS 14 or later. Display ID 0 selects the primary display when Start is clicked; another ID selects only that display. Capture is limited to 5 frames/second. Start may request Screen Recording permission; remote control also requires Accessibility permission. Approve permissions yourself in macOS. The optional clipboard belongs to your entire macOS session.");
-                ui.small("Password: 1–8 printable ASCII bytes. Clipboard is limited to 8 KiB text and disabled by default. Browser viewer uses bundled noVNC, shares this server’s password/access, and stops with it. HTTPS is not available on this listener. Wayland sharing requires a desktop portal and PipeWire; permission is requested only when you start this source. One controlling client at a time; view-only servers allow multiple viewers.");
+                ui.menu_button("Viewer and clipboard help", |ui| { ui.set_max_width(340.); ui.small("Password: 1–8 printable ASCII bytes. Clipboard is limited to 8 KiB text and disabled by default. Browser viewer uses bundled noVNC, shares this server’s password/access, and stops with it. HTTPS is not available on this listener. Wayland sharing requires a desktop portal and PipeWire; permission is requested only when you start this source. One controlling client at a time; view-only servers allow multiple viewers."); });
             });
             if let Some(s)=status {
                 ui.label(format!("{:?}",s.state));

@@ -134,7 +134,7 @@ impl State {
 
     fn render(&mut self, ui: &mut Ui, registry: PluginRegistry) {
         self.poll(ui.ctx());
-        ui.collapsing("Plugins", |ui| {
+        ui.push_id("plugin-manager", |ui| {
             if !matches!((std::env::consts::OS, std::env::consts::ARCH), ("linux" | "windows", "x86_64")) {
                 ui.label("TermCraft plugins are available on x86-64 Linux and Windows.");
                 return;
@@ -475,6 +475,7 @@ int main(void) {
             }),
         );
         workspace.page = Page::Tools;
+        workspace.tools_category = super::super::tools::Category::Plugins;
         let plugin_root = workspace.store_path.with_file_name("plugins");
         let registry = PluginRegistry::new(plugin_root.clone());
         // Supply the result of the native picker/inspection boundary; every

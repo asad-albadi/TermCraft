@@ -24,10 +24,34 @@ use std::{
     time::Duration,
 };
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub(super) enum Category {
+    #[default]
+    Network,
+    Files,
+    Packages,
+    Plugins,
+    Runtime,
+    #[cfg(windows)]
+    Windows,
+}
+impl Category {
+    pub(super) const ALL: &'static [(Self, &'static str)] = &[
+        (Self::Network, "Network"),
+        (Self::Files, "Files"),
+        (Self::Packages, "Packages"),
+        (Self::Plugins, "Plugins"),
+        (Self::Runtime, "Runtime"),
+        #[cfg(windows)]
+        (Self::Windows, "Windows tools"),
+    ];
+}
+
 #[derive(Default)]
 pub(super) struct UiState {
     #[cfg(windows)]
     windows: windows_platform::State,
+    file_tool: usize,
     comparison: Comparison,
     image: Preview,
     scan: Scan,
@@ -35,17 +59,13 @@ pub(super) struct UiState {
 }
 
 impl UiState {
-    pub(super) fn render(&mut self, ui: &mut Ui) {
+    pub(super) fn poll(&mut self, ui: &mut Ui) {
         #[cfg(windows)]
-        self.windows.render(ui);
+        self.windows.poll();
         self.comparison.poll();
         self.image.poll(ui);
         self.scan.poll();
         self.capture.poll();
-        ui.collapsing("Compare files or folders", |ui| self.comparison.render(ui));
-        ui.collapsing("Image viewer", |ui| self.image.render(ui));
-        ui.collapsing("TCP port check", |ui| self.scan.render(ui));
-        ui.collapsing("Packet capture", |ui| self.capture.render(ui));
         if self.comparison.pending.is_some()
             || self.image.pending.is_some()
             || self.scan.pending.is_some()
@@ -53,6 +73,26 @@ impl UiState {
         {
             ui.ctx().request_repaint_after(Duration::from_millis(50));
         }
+    }
+    pub(super) fn files(&mut self, ui: &mut Ui) {
+        ui.horizontal_wrapped(|ui| {
+            ui.selectable_value(&mut self.file_tool, 0, "Compare files or folders");
+            ui.selectable_value(&mut self.file_tool, 1, "Image viewer");
+        });
+        ui.separator();
+        if self.file_tool == 0 {
+            self.comparison.render(ui);
+        } else {
+            self.image.render(ui);
+        }
+    }
+    pub(super) fn network(&mut self, ui: &mut Ui) {
+        ui.collapsing("TCP port check", |ui| self.scan.render(ui));
+        ui.collapsing("Packet capture", |ui| self.capture.render(ui));
+    }
+    #[cfg(windows)]
+    pub(super) fn windows(&mut self, ui: &mut Ui) {
+        self.windows.render(ui);
     }
 }
 

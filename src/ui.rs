@@ -42,6 +42,8 @@ mod managed_vnc;
 mod mosh_startup;
 mod packages;
 mod pages;
+#[cfg(test)]
+mod pane_cleanup_tests;
 mod plugins;
 mod rdp_settings;
 mod remote_editor;
@@ -613,6 +615,8 @@ pub struct Workspace {
     session_form: Option<Session>,
     session_section: pages::SessionSection,
     settings_category: pages::SettingsCategory,
+    tools_category: tools::Category,
+    servers_category: servers::Section,
     session_import: Option<session_import::State>,
     shared_sources: shared_sessions::State,
     session_groups: session_groups::State,
@@ -751,6 +755,8 @@ impl Workspace {
             session_form: None,
             session_section: pages::SessionSection::Connection,
             settings_category: pages::SettingsCategory::Appearance,
+            tools_category: Default::default(),
+            servers_category: Default::default(),
             session_import: None,
             shared_sources: Default::default(),
             session_groups: Default::default(),
@@ -1331,15 +1337,16 @@ impl Workspace {
                             self.broadcast_toggle(ui);
                         });
                         ui.menu_button("X server", |ui| {
-                            ui.label("Use an installed system X server.");
+                            ui.label("Configure the managed X display or an installed X server.");
                             if ui.button("X server settings").clicked() {
                                 self.page = Page::Servers;
+                                self.servers_category = servers::Section::Xserver;
                                 ui.close();
                             }
                         });
                         ui.menu_button("Tools", |ui| {
                             for (label, page) in [
-                                ("Network tools and plugins", Page::Tools),
+                                ("Tools and plugins", Page::Tools),
                                 ("Servers", Page::Servers),
                                 ("SSH tunneling", Page::Tunnels),
                                 ("Local files", Page::Files),
@@ -1484,6 +1491,7 @@ impl Workspace {
                     .clicked()
                     {
                         self.page = Page::Tools;
+                        self.tools_category = tools::Category::Packages;
                     }
                     if tool_button(ui, "settings", "Settings", "Settings", None).clicked() {
                         self.page = Page::Settings;
@@ -1509,6 +1517,7 @@ impl Workspace {
                     .clicked()
                     {
                         self.page = Page::Servers;
+                        self.servers_category = servers::Section::Xserver;
                     }
                     if tool_button(ui, "exit", "Exit", "Exit TermCraft", None).clicked() {
                         ui.ctx().send_viewport_cmd(ViewportCommand::Close);
@@ -3203,7 +3212,15 @@ mod gui_tests {
         let render = |workspace: &mut Workspace, events| {
             shell_frame(&ctx, size, 1., events, |ui| workspace.tools_page(ui))
         };
-        render(&mut workspace, vec![]);
+        assert_eq!(workspace.tools_category, tools::Category::Packages);
+        let out = render(&mut workspace, vec![]);
+        let runtime = shell_text_position(&out, "Runtime");
+        render(
+            &mut workspace,
+            vec![Event::PointerMoved(runtime), shell_pointer(runtime, true)],
+        );
+        render(&mut workspace, vec![shell_pointer(runtime, false)]);
+        assert_eq!(workspace.tools_category, tools::Category::Runtime);
         let mut reached = false;
         for _ in 0..60 {
             let out = render(

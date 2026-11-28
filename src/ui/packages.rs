@@ -459,6 +459,7 @@ mod tests {
             Ok((process, launch))
         }));
         workspace.page = Page::Tools;
+        workspace.tools_category = super::super::tools::Category::Packages;
         click_text(&ctx, &mut workspace, "Portable Unix");
         click_text(&ctx, &mut workspace, "Open Unix terminal");
         let portable = workspace.active;

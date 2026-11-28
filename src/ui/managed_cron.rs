@@ -128,6 +128,19 @@ pub(super) struct ManagedCron {
     error: Option<String>,
 }
 impl ManagedCron {
+    pub(super) fn active(&self) -> bool {
+        self.worker
+            .as_ref()
+            .and_then(|w| w.snapshot.try_lock().ok())
+            .and_then(|s| s.status.clone())
+            .is_some_and(|s| {
+                matches!(
+                    s.state,
+                    ServiceState::Starting | ServiceState::Running | ServiceState::Stopping
+                )
+            })
+    }
+
     fn send(&mut self, action: Action) {
         if self.worker.as_ref().unwrap().send.try_send(action).is_err() {
             self.error = Some("Scheduler is busy; try again shortly.".into());
@@ -196,7 +209,7 @@ impl ManagedCron {
         ui.ctx().request_repaint_after(Duration::from_millis(250));
         surface(ui).show(ui, |ui| {
             ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Cron scheduled commands").size(18.)));
-            ui.label("Runs only while this scheduler and workspace are open. Jobs run with your account’s full permissions. Stop cancels active jobs; closing the app stops scheduling.");
+            ui.colored_label(ui.visuals().warn_fg_color,"Jobs run with your account’s permissions while this workspace is open.");
             if let Some(status) = &snapshot.status {
                 ui.label(format!("Scheduler: {:?}", status.state));
                 if let Some(error) = &status.error {
@@ -223,8 +236,8 @@ impl ManagedCron {
                     ui.selectable_value(&mut self.timezone, CronTimezone::Utc, "UTC");
                     ui.selectable_value(&mut self.timezone, CronTimezone::SystemLocal, "System local");
                 });
-                ui.small("Five fields: minute hour day month weekday. Supports *, lists, ranges, steps, JAN–DEC and SUN–SAT. Sunday = 0 or 7; day and weekday use OR when neither starts with *. No @aliases, seconds, ?, L, W, #, or inline environment settings.");
-                ui.small("Missed minutes are skipped; restart checks the current minute once. A recorded attempt is never replayed after clock rollback. Local DST gaps are skipped; repeated local minutes can run twice at their distinct UTC instants. No overlap per job; at most 4 concurrent commands / 32 jobs.");
+                ui.menu_button("Schedule help", |ui| { ui.set_max_width(340.); ui.small("Five fields: minute hour day month weekday. Supports *, lists, ranges, steps, JAN–DEC and SUN–SAT. Sunday = 0 or 7; day and weekday use OR when neither starts with *. No @aliases, seconds, ?, L, W, #, or inline environment settings."); });
+                ui.menu_button("Scheduling behavior", |ui| { ui.set_max_width(340.); ui.small("Missed minutes are skipped; restart checks the current minute once. A recorded attempt is never replayed after clock rollback. Local DST gaps are skipped; repeated local minutes can run twice at their distinct UTC instants. No overlap per job; at most 4 concurrent commands / 32 jobs."); });
                 ui.horizontal_wrapped(|ui| {
                     for i in 0..self.jobs.len() {
                         if ui.selectable_label(self.selected == Some(i), &self.jobs[i].id).clicked() {
@@ -258,7 +271,8 @@ impl ManagedCron {
                     ui.checkbox(&mut self.enabled, "Allow scheduled runs");
                     ui.end_row();
                 });
-                ui.small("Commands and arguments are saved locally. Keep passwords and tokens out of arguments; use your command’s secure credential store. Output is discarded. Scripts require an explicitly chosen interpreter and script argument.");
+                ui.small("Keep passwords and tokens out of saved command arguments.");
+                ui.menu_button("Command help", |ui| { ui.set_max_width(340.); ui.small("Commands and arguments are saved locally. Keep passwords and tokens out of arguments; use your command’s secure credential store. Output is discarded. Scripts require an explicitly chosen interpreter and script argument."); });
                 ui.horizontal_wrapped(|ui| {
                     if ui.button("Save job and timezone").clicked() {
                         let job = CronJob {

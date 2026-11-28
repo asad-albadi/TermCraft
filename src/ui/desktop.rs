@@ -605,10 +605,10 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         ui.horizontal_wrapped(|ui| {
             state.clipboard.controls(ui);
             ui.small(if state.clipboard.ready {
-                "Text clipboard ready · paste with Ctrl+V in the desktop"
+                "Text clipboard ready"
             } else {
                 "Waiting for server clipboard channel…"
-            });
+            }).on_hover_text("Paste with Ctrl+V in the desktop. Clipboard directions follow the saved session settings.");
         });
     }
     if !state.error.is_empty() {

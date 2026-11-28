@@ -44,11 +44,23 @@ impl Default for ManagedServers {
 }
 
 impl ManagedServers {
-    pub(super) fn cards(&mut self, ui: &mut Ui) {
-        for form in &mut self.forms {
+    pub(super) fn card(&mut self, ui: &mut Ui, protocol: ServiceProtocol) {
+        if let Some(form) = self.forms.iter_mut().find(|form| form.protocol == protocol) {
             form.card(ui, &self.supervisor);
-            ui.add_space(17.);
         }
+    }
+    pub(super) fn active(&self, protocol: ServiceProtocol) -> bool {
+        self.forms
+            .iter()
+            .find(|form| form.protocol == protocol)
+            .and_then(|form| form.id)
+            .and_then(|id| self.supervisor.status(id))
+            .is_some_and(|s| {
+                matches!(
+                    s.state,
+                    ServiceState::Starting | ServiceState::Running | ServiceState::Stopping
+                )
+            })
     }
 }
 
@@ -114,11 +126,17 @@ impl Form {
                     });
                 });
                 ui.label(RichText::new(match self.protocol {
+                    ServiceProtocol::Ftp => "Credentials and files are sent without encryption.",
+                    ServiceProtocol::Nfs => "Clients share your account’s file access without password authentication or encryption.",
+                    ServiceProtocol::Tftp => "No authentication or encryption. Downloads are available to permitted clients.",
+                    _ => "Unencrypted shell access with your account’s permissions.",
+                }).color(ui.visuals().warn_fg_color));
+                ui.menu_button("Service details",|ui| { ui.set_max_width(330.); ui.label(match self.protocol {
                     ServiceProtocol::Ftp => "Clients sign in to browse or transfer files. FTP sends credentials and files in clear text.",
                     ServiceProtocol::Nfs => "NFSv3 /share over TCP. Use this port for both NFS and MOUNT; no portmapper. AUTH_SYS and anonymous clients share your account’s access without a password or encryption.",
                     ServiceProtocol::Tftp => "Clients can download files without signing in. Uploads are optional. Use octet mode.",
                     _ => "Signed-in clients can use the selected shell with your workspace account’s permissions. Telnet sends credentials and shell traffic in clear text.",
-                }).color(muted(ui)));
+                }); });
                 ui.add_space(5.);
                 ui.add_enabled_ui(!busy, |ui| self.fields(ui));
                 if let Some(address) = status.as_ref().and_then(|status| status.address).filter(|_| state == ServiceState::Running) {
@@ -168,8 +186,9 @@ impl Form {
         fluent::settings_grid(ui, "configuration", |ui| {
             if self.protocol == ServiceProtocol::Telnet {
                 let label = ui.label("Shell executable");
-                ui.horizontal_wrapped(|ui| {
-                    fluent::text_input(ui, label.id, &mut self.executable, "Absolute path", 300.)
+                ui.horizontal(|ui| {
+                    let width = (ui.available_width() - 90.).clamp(40., 300.);
+                    fluent::text_input(ui, label.id, &mut self.executable, "Absolute path", width)
                         .fluent_hint(&self.executable);
                     if ui.button("Browse").clicked() {
                         if let Some(path) = rfd::FileDialog::new().pick_file() {
@@ -179,8 +198,9 @@ impl Form {
                 });
             } else {
                 let label = ui.label("Shared folder");
-                ui.horizontal_wrapped(|ui| {
-                    fluent::text_input(ui, label.id, &mut self.root, "", 300.)
+                ui.horizontal(|ui| {
+                    let width = (ui.available_width() - 90.).clamp(40., 300.);
+                    fluent::text_input(ui, label.id, &mut self.root, "", width)
                         .fluent_hint(&self.root);
                     if ui.button("Browse").clicked() {
                         if let Some(path) = rfd::FileDialog::new().pick_folder() {
@@ -411,6 +431,26 @@ pub(super) mod tests {
     }
 
     pub(in crate::ui) fn click(ctx: &Context, workspace: &mut Workspace, label: &str) {
+        // Set this lifecycle fixture's selected service. Separate pointer tests
+        // exercise the service chooser itself and preserve drafts across views.
+        use super::super::servers::Section;
+        workspace.servers_category = if label.contains("SSH / SFTP") {
+            Section::Ssh
+        } else if label.contains("TFTP") {
+            Section::Tftp
+        } else if label.contains("FTP") {
+            Section::Ftp
+        } else if label.contains("NFS") {
+            Section::Nfs
+        } else if label.contains("Telnet") {
+            Section::Telnet
+        } else if label.contains("VNC") {
+            Section::Vnc
+        } else if label.contains("Iperf") {
+            Section::Iperf
+        } else {
+            workspace.servers_category
+        };
         ctx.enable_accesskit();
         let target = |output: &FullOutput| {
             let update = output.platform_output.accesskit_update.as_ref()?;
@@ -720,6 +760,12 @@ pub(super) mod tests {
         click(&ctx, &mut work, "Start FTP server");
         let first = wait_state(&ctx, &mut work, 0, ServiceState::Running);
         assert!(TcpStream::connect(first).is_ok());
+        work.servers_category = super::super::servers::Section::Http;
+        frame(&ctx, &mut work, vec![]);
+        assert!(
+            TcpStream::connect(first).is_ok(),
+            "Switching service views stopped the live listener"
+        );
         click(&ctx, &mut work, "Stop FTP server");
         assert_eq!(wait_state(&ctx, &mut work, 0, ServiceState::Stopped), first);
         assert!(TcpStream::connect(first).is_err());

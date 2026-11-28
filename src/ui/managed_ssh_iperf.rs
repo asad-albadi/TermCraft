@@ -74,8 +74,19 @@ impl Default for ManagedSshIperf {
     }
 }
 impl ManagedSshIperf {
+    #[cfg(test)]
     pub(super) fn cards(&mut self, ui: &mut Ui, data: &Path) {
-        surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("SSH / SFTP server").size(18.)));ui.label("Embedded encrypted service with a persistent workspace host key. Authorized usernames control service access; they do not create OS accounts.");
+        self.ssh_card(ui, data);
+        self.iperf_card(ui);
+    }
+    pub(super) fn active(&self, ssh: bool) -> bool {
+        active(
+            &self.supervisor,
+            if ssh { self.ssh.id } else { self.iperf.id },
+        )
+    }
+    pub(super) fn ssh_card(&mut self, ui: &mut Ui, data: &Path) {
+        surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("SSH / SFTP server").size(18.)));ui.menu_button("Service details",|ui|{ui.set_max_width(320.);ui.label("Embedded encrypted service with a persistent workspace host key. Authorized usernames control service access; they do not create OS accounts.");});
             let busy=active(&self.supervisor,self.ssh.id);
             ui.add_enabled_ui(!busy,|ui|{
                 fluent::settings_grid(ui, "ssh-service-form", |ui|{
@@ -85,12 +96,13 @@ impl ManagedSshIperf {
                     let label=ui.label("Password (optional with key)");super::managed_servers::service_password_field(ui, &mut self.ssh.password, ui.spacing().text_edit_width).labelled_by(label.id);ui.end_row();
                     ui.label("Authorized public keys");ui.add(TextEdit::multiline(&mut self.ssh.keys).desired_rows(2).hint_text("One OpenSSH public key per line"));ui.end_row();
                     ui.label("File access");ui.checkbox(&mut self.ssh.sftp,"Enable SFTP");ui.end_row();
-                    if self.ssh.sftp {ui.label("Shared folder");ui.horizontal_wrapped(|ui|{ui.add(crate::ui::fluent::singleline(&mut self.ssh.root));if ui.button("Browse").clicked(){if let Some(path)=rfd::FileDialog::new().pick_folder(){self.ssh.root=path.to_string_lossy().into_owned();}}});ui.end_row();ui.label("Permissions");ui.checkbox(&mut self.ssh.write,"Allow new uploads, renames and deletes");ui.end_row();}
+                    if self.ssh.sftp {ui.label("Shared folder");ui.horizontal(|ui|{let width=(ui.available_width()-90.).clamp(40.,300.);ui.add(crate::ui::fluent::singleline(&mut self.ssh.root).desired_width(width));if ui.button("Browse").clicked(){if let Some(path)=rfd::FileDialog::new().pick_folder(){self.ssh.root=path.to_string_lossy().into_owned();}}});ui.end_row();ui.label("Permissions");ui.checkbox(&mut self.ssh.write,"Allow new uploads, renames and deletes");ui.end_row();}
                     ui.label("Terminal access");ui.checkbox(&mut self.ssh.shell_enabled,"Allow shell with my account’s full permissions");ui.end_row();
                     if self.ssh.shell_enabled {ui.label("Shell executable");ui.add(crate::ui::fluent::singleline(&mut self.ssh.shell));ui.end_row();}
                     ui.label("Stop after");ui.add(DragValue::new(&mut self.ssh.lifetime).range(0..=86400).suffix(" seconds (0 = until stopped)"));ui.end_row();
                 });
-                ui.small("Uploads create new files (64 MiB maximum); existing files are never overwritten. Shell access has your full account authority and is not restricted to the shared folder.");
+                ui.menu_button("Limits and permissions",|ui|{ui.set_max_width(320.);ui.label("Uploads create new files (64 MiB maximum); existing files are never overwritten. Shell access has your full account authority and is not restricted to the shared folder.");});
+                if self.ssh.shell_enabled { ui.colored_label(ui.visuals().warn_fg_color,"Shell access is not restricted to the shared folder."); }
             });
             if controls(ui,&self.supervisor,self.ssh.id,&self.ssh.error,"SSH / SFTP") {
                 let result=(||{
@@ -101,8 +113,9 @@ impl ManagedSshIperf {
                 })();self.ssh.password.zeroize();match result{Ok(id)=>{self.ssh.id=Some(id);self.ssh.error=None;},Err(error)=>self.ssh.error=Some(error)}
             }
         });
-        ui.add_space(17.);
-        surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Iperf bandwidth server").size(18.)));ui.label("Owned foreground Iperf engine. Qualified packaged engines are checksum verified; installed compatibility engines require explicit selection.");
+    }
+    pub(super) fn iperf_card(&mut self, ui: &mut Ui) {
+        surface(ui).show(ui,|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Iperf bandwidth server").size(18.)));ui.menu_button("Engine details",|ui|{ui.set_max_width(320.);ui.label("Owned foreground Iperf engine. Qualified packaged engines are checksum verified; installed compatibility engines require explicit selection.");});
             let busy=active(&self.supervisor,self.iperf.id);ui.add_enabled_ui(!busy,|ui|{
                 fluent::settings_grid(ui, "iperf-service-form", |ui|{
                     ui.label("Version");ComboBox::from_id_salt("iperf-version").selected_text(if self.iperf.version==IperfVersion::Three{"Iperf 3"}else{"Iperf 2"}).show_ui(ui,|ui|{for(version,label,bind)in[(IperfVersion::Three,"Iperf 3","127.0.0.1:5201"),(IperfVersion::Two,"Iperf 2","127.0.0.1:5001")]{if ui.selectable_value(&mut self.iperf.version,version,label).clicked(){self.iperf.bind=bind.into();self.iperf.udp=false;}}});ui.end_row();
@@ -110,7 +123,7 @@ impl ManagedSshIperf {
                     if self.iperf.version==IperfVersion::Two {ui.label("Transport");ui.checkbox(&mut self.iperf.udp,"UDP server");ui.end_row();}
                     ui.label("Report interval");ui.add(DragValue::new(&mut self.iperf.interval).range(1..=60).suffix(" seconds"));ui.end_row();ui.label("Stop after");ui.add(DragValue::new(&mut self.iperf.lifetime).range(0..=86400).suffix(" seconds (0 = until stopped)"));ui.end_row();
                 });
-                ui.small("Iperf clients must use the selected major version and port. Iperf3 clients choose TCP or UDP. No authentication is provided by this bandwidth service.");
+                ui.colored_label(ui.visuals().warn_fg_color,"This bandwidth service has no authentication.");ui.menu_button("Client help",|ui|{ui.set_max_width(320.);ui.label("Iperf clients must use the selected major version and port. Iperf3 clients choose TCP or UDP.");});
             });
             if controls(ui,&self.supervisor,self.iperf.id,&self.iperf.error,"Iperf") {
                 let result=(||{let catalog=RuntimeCatalog::for_current_executable()?;let mut config=IperfServiceConfig::local(self.iperf.version,catalog.service_runtime_root());config.bind=self.iperf.bind.parse().map_err(|_|"Enter a listen IP address and nonzero port.".to_string())?;config.allow_non_loopback=self.iperf.network;config.allow_installed_provider=self.iperf.installed;config.udp=self.iperf.udp;config.interval_seconds=self.iperf.interval;config.lifetime=(self.iperf.lifetime!=0).then(||Duration::from_secs(self.iperf.lifetime as u64));self.supervisor.begin_iperf(config)})();match result{Ok(id)=>{self.iperf.id=Some(id);self.iperf.error=None;},Err(error)=>self.iperf.error=Some(error)}
@@ -145,8 +158,14 @@ fn controls(
         if let Some(error) = &status.error {
             ui.colored_label(ui.visuals().error_fg_color, error);
         }
-        for event in &status.log {
-            ui.small(*event);
+        if !status.log.is_empty() {
+            ui.collapsing("Service log", |ui| {
+                ScrollArea::vertical().max_height(120.).show(ui, |ui| {
+                    for event in &status.log {
+                        ui.small(*event);
+                    }
+                });
+            });
         }
     }
     if let Some(error) = error {

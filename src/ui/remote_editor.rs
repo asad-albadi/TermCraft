@@ -34,10 +34,7 @@ impl RemoteEditor {
         fluent::modeless(ctx, Id::new(("remote-editor", self.id)), if dirty { "SSH editor · Unsaved" } else { "SSH editor" }, size)
             .open(&mut open).show(ctx, |ui| {
                 ScrollArea::vertical().id_salt(("ssh-document-details",self.id)).max_height(size.body_height*0.45).show(ui, |ui| {
-                ui.label(&self.endpoint);
-                if ui.button("Compare recovery in active SSH session…").clicked() { self.recover_requested = true; }
-                ui.label(self.path.display());
-                ui.small("UTF-8 text · 2 MiB limit · local recovery snapshots are retained");
+                ui.label(self.path.display()).on_hover_text(&self.endpoint);
                 ui.label(match &status {
                     DocumentStatus::Opening => "Opening…",
                     DocumentStatus::Ready => "Ready",
@@ -51,14 +48,20 @@ impl RemoteEditor {
                     DocumentStatus::Disconnected => "This connection ended. Your saved recovery copy is on this computer. Open the file again after reconnecting; compare your edits before saving.",
                     DocumentStatus::Failed(message) => message,
                 });
+                let (remote_recovery, warning) = self.document.recovery_details();
+                ui.menu_button("Document details", |ui| {
+                ui.set_max_width(340.);
+                ui.label(&self.endpoint);
+                ui.small("UTF-8 text · 2 MiB limit · local recovery snapshots are retained");
+                if ui.button("Compare recovery in active SSH session…").clicked() { self.recover_requested = true; ui.close(); }
                 if let Some(path) = &recovery {
                     ui.horizontal_wrapped(|ui| {
                         ui.small(format!("Recovery: {}", path.display()));
                         if ui.small_button("Copy path").clicked() { ui.ctx().copy_text(path.display().to_string()); }
                     });
                 }
-                let (remote_recovery, warning) = self.document.recovery_details();
                 if let Some(path) = remote_recovery { ui.small(format!("Remote staging recovery: {}", path.display())); }
+                });
                 if let Some(warning) = warning { ui.colored_label(ui.visuals().warn_fg_color, warning); }
                 if let Some(error) = &self.error { ui.colored_label(ui.visuals().error_fg_color, error); }
                 });

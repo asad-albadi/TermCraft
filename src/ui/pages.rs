@@ -947,11 +947,7 @@ impl Workspace {
         self.collect_terminal_requests(ui.ctx());
     }
     pub(super) fn files_page(&mut self, ui: &mut Ui) {
-        page_heading(
-            ui,
-            "Local files",
-            "Browse your computer. Open, edit, copy, and organize files.",
-        );
+        ui.heading("Local files");
         let mut go = false;
         ui.horizontal_wrapped(|ui| {
             let parent = ui.button("↑").fluent_hint("Parent folder");
@@ -994,11 +990,11 @@ impl Workspace {
                 self.files.error = "That folder does not exist or cannot be opened.".into();
             }
         }
-        ui.horizontal_wrapped(|ui|{if ui.button("Refresh").clicked(){self.files.refresh();}if ui.button("New folder").clicked(){self.files.show_new=true;self.files.new_name.clear();}if ui.add_enabled(self.files.selected.is_some(),Button::new("Copy")).clicked(){self.files.clipboard=self.files.selected.clone();}
+        ui.horizontal_wrapped(|ui|{if ui.button("Refresh").clicked(){self.files.refresh();}if ui.button("New folder").clicked(){self.files.show_new=true;self.files.new_name.clear();}ui.menu_button("More",|ui|{if ui.add_enabled(self.files.selected.is_some(),Button::new("Copy")).clicked(){self.files.clipboard=self.files.selected.clone();}
    if ui.add_enabled(self.files.clipboard.is_some(),Button::new("Paste copy")).clicked(){if let Some(from)=&self.files.clipboard{if from.is_file(){let to=self.files.path.join(from.file_name().unwrap());if to.exists(){self.files.error="A file with that name already exists. Rename it before copying.".into();}else{match copy_new_file(from,&to){Ok(_)=>self.files.refresh(),Err(e)=>self.files.error=e.to_string()}}}else{self.files.error="Folder copying is not supported yet. Open the system file manager for this operation.".into();}}}
    if ui.add_enabled(self.files.selected.is_some(),Button::new("Rename")).clicked(){self.files.error.clear();self.rename_file=self.files.selected.clone();self.rename_text=self.rename_file.as_ref().unwrap().file_name().unwrap().to_string_lossy().into();}
    if ui.add_enabled(self.files.selected.is_some(),Button::new("Delete")).clicked(){self.delete_file=self.files.selected.clone();}
-   ui.add(crate::ui::fluent::singleline(&mut self.files.query).hint_text("Filter files").desired_width(170.));});
+   }); ui.add(crate::ui::fluent::singleline(&mut self.files.query).hint_text("Filter files").desired_width(170.));});
         if self.files.show_new {
             ui.horizontal_wrapped(|ui| {
                 ui.add(
@@ -1353,32 +1349,56 @@ impl Workspace {
                 surface(ui).show(ui, |ui| {
                     ui.horizontal_wrapped(|ui| {
                         icon(ui, "link", 25., accent(ui));
-                        ui.vertical(|ui| {
-                            ui.label(crate::ui::fluent::emphasized(
-                                ui.ctx(),
-                                RichText::new(&t.name).size(16.),
-                            ));
-                            ui.label(
-                                RichText::new(format!(
-                                    "{}  {}:{}  →  {}:{}  via {}",
+                        ui.allocate_ui_with_layout(
+                            vec2((ui.available_width() - 230.).max(80.), 52.),
+                            Layout::top_down(Align::Min),
+                            |ui| {
+                                ui.add(
+                                    Label::new(crate::ui::fluent::emphasized(
+                                        ui.ctx(),
+                                        RichText::new(&t.name).size(16.),
+                                    ))
+                                    .truncate(),
+                                )
+                                .on_hover_text(&t.name);
+                                ui.add(
+                                    Label::new(
+                                        RichText::new(format!(
+                                            "{}  {}:{}  →  {}:{}  via {}",
+                                            t.mode,
+                                            t.bind,
+                                            t.local_port,
+                                            t.destination,
+                                            t.remote_port,
+                                            t.host
+                                        ))
+                                        .color(muted(ui))
+                                        .size(12.),
+                                    )
+                                    .truncate(),
+                                )
+                                .on_hover_text(format!(
+                                    "{} {}:{} → {}:{} via {}",
                                     t.mode,
                                     t.bind,
                                     t.local_port,
                                     t.destination,
                                     t.remote_port,
                                     t.host
-                                ))
-                                .color(muted(ui))
-                                .size(12.),
-                            );
-                        });
+                                ));
+                            },
+                        );
                         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                            if ui.button("Remove").clicked() {
-                                remove = Some(i);
-                            }
-                            if ui.button("Edit").clicked() {
-                                edit = Some(i);
-                            }
+                            ui.menu_button("More", |ui| {
+                                if ui.button("Remove").clicked() {
+                                    remove = Some(i);
+                                    ui.close();
+                                }
+                                if ui.button("Edit").clicked() {
+                                    edit = Some(i);
+                                    ui.close();
+                                }
+                            });
                             if primary(ui, "Start").clicked() {
                                 run = Some(t.clone());
                             }
@@ -1458,61 +1478,65 @@ impl Workspace {
                 "Record and replay input in your terminal or embedded desktop.",
             );
             ui.horizontal_wrapped(|ui| {
-                if primary(ui, "New text macro").clicked() {
-                    self.macro_form = Macro {
-                        append_enter: true,
-                        ..Macro::default()
-                    };
-                    self.macro_editing = None;
-                    self.macro_open = true;
-                }
-                if ui.button("New event macro").clicked() {
-                    self.macro_form = Macro {
-                        script: Some(harbor_workspace::macros::Script {
-                            version: 1,
-                            events: Vec::new(),
-                        }),
-                        ..Macro::default()
-                    };
-                    self.macro_editing = None;
-                    self.macro_open = true;
-                }
+                ui.menu_button("New macro", |ui| {
+                    if ui.button("New text macro").clicked() {
+                        self.macro_form = Macro {
+                            append_enter: true,
+                            ..Macro::default()
+                        };
+                        self.macro_editing = None;
+                        self.macro_open = true;
+                    }
+                    if ui.button("New event macro").clicked() {
+                        self.macro_form = Macro {
+                            script: Some(harbor_workspace::macros::Script {
+                                version: 1,
+                                events: Vec::new(),
+                            }),
+                            ..Macro::default()
+                        };
+                        self.macro_editing = None;
+                        self.macro_open = true;
+                    }
+                });
                 self.macro_controls(ui);
-                if ui.button("Import").clicked() {
-                    if let Some(path) = rfd::FileDialog::new()
-                        .add_filter("Macro JSON", &["json"])
-                        .pick_file()
-                    {
-                        match super::macro_events::read_import(&path).and_then(|imported| {
-                            let mut values = self.store.macros.clone();
-                            values.extend(imported);
-                            super::macro_events::validate_library(&values)?;
-                            Ok(values)
-                        }) {
-                            Ok(values) => {
-                                self.store.macros = values;
-                                self.persist();
+                ui.menu_button("Library", |ui| {
+                    if ui.button("Import").clicked() {
+                        if let Some(path) = rfd::FileDialog::new()
+                            .add_filter("Macro JSON", &["json"])
+                            .pick_file()
+                        {
+                            match super::macro_events::read_import(&path).and_then(|imported| {
+                                let mut values = self.store.macros.clone();
+                                values.extend(imported);
+                                super::macro_events::validate_library(&values)?;
+                                Ok(values)
+                            }) {
+                                Ok(values) => {
+                                    self.store.macros = values;
+                                    self.persist();
+                                }
+                                Err(error) => self.message(error),
                             }
-                            Err(error) => self.message(error),
                         }
                     }
-                }
-                if ui.button("Export").clicked() {
-                    if let Some(path) = rfd::FileDialog::new()
-                        .set_file_name("macros.json")
-                        .save_file()
-                    {
-                        let result = serde_json::to_vec_pretty(&self.store.macros)
-                            .map_err(|error| error.to_string())
-                            .and_then(|bytes| {
-                                fs::write(path, bytes).map_err(|error| error.to_string())
-                            });
-                        match result {
-                            Ok(()) => self.message("Macros exported."),
-                            Err(error) => self.message(error),
+                    if ui.button("Export").clicked() {
+                        if let Some(path) = rfd::FileDialog::new()
+                            .set_file_name("macros.json")
+                            .save_file()
+                        {
+                            let result = serde_json::to_vec_pretty(&self.store.macros)
+                                .map_err(|error| error.to_string())
+                                .and_then(|bytes| {
+                                    fs::write(path, bytes).map_err(|error| error.to_string())
+                                });
+                            match result {
+                                Ok(()) => self.message("Macros exported."),
+                                Err(error) => self.message(error),
+                            }
                         }
                     }
-                }
+                });
             });
             ui.add_space(12.);
             if self.store.macros.is_empty() {
@@ -1530,27 +1554,44 @@ impl Workspace {
                 surface(ui).show(ui, |ui| {
                     ui.horizontal_wrapped(|ui| {
                         icon(ui, "macro", 24., accent(ui));
-                        ui.vertical(|ui| {
-                            ui.label(
-                                crate::ui::fluent::emphasized(ui.ctx(), RichText::new(&value.name))
-                                    .size(16.),
-                            );
-                            let description = value.script.as_ref().map_or_else(
-                                || value.text.lines().next().unwrap_or("").to_owned(),
-                                |script| format!("{} events", script.events.len()),
-                            );
-                            ui.add(
-                                Label::new(RichText::new(description).size(12.).color(muted(ui)))
+                        ui.allocate_ui_with_layout(
+                            vec2((ui.available_width() - 230.).max(80.), 52.),
+                            Layout::top_down(Align::Min),
+                            |ui| {
+                                ui.add(
+                                    Label::new(
+                                        crate::ui::fluent::emphasized(
+                                            ui.ctx(),
+                                            RichText::new(&value.name),
+                                        )
+                                        .size(16.),
+                                    )
                                     .truncate(),
-                            );
-                        });
+                                )
+                                .on_hover_text(&value.name);
+                                let description = value.script.as_ref().map_or_else(
+                                    || value.text.lines().next().unwrap_or("").to_owned(),
+                                    |script| format!("{} events", script.events.len()),
+                                );
+                                ui.add(
+                                    Label::new(
+                                        RichText::new(description).size(12.).color(muted(ui)),
+                                    )
+                                    .truncate(),
+                                );
+                            },
+                        );
                         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                            if ui.button("Remove").clicked() {
-                                remove = Some(index);
-                            }
-                            if ui.button("Edit").clicked() {
-                                edit = Some(index);
-                            }
+                            ui.menu_button("More", |ui| {
+                                if ui.button("Remove").clicked() {
+                                    remove = Some(index);
+                                    ui.close();
+                                }
+                                if ui.button("Edit").clicked() {
+                                    edit = Some(index);
+                                    ui.close();
+                                }
+                            });
                             if ui
                                 .add_enabled(
                                     self.tabs.get(self.active).is_some_and(|tab| {
@@ -1676,96 +1717,106 @@ impl Workspace {
         }
     }
     pub(super) fn tools_page(&mut self, ui: &mut Ui) {
-        fluent::page_scroll(ui, "tools_page", |ui| {
-            page_heading(
-                ui,
-                "Tools",
-                "Manage packages and plugins, compare files, and inspect network connections.",
-            );
-            self.portable_packages_section(ui);
-            self.plugins_section(ui);
-            ui.separator();
-            self.tools.render(ui);
-            ui.separator();
-            ui.label(fluent::emphasized(
-                ui.ctx(),
-                RichText::new("Network tools").size(18.),
-            ));
-            surface(ui).show(ui, |ui| {
+        ui.heading("Tools");
+        ui.horizontal_wrapped(|ui| {
+            for &(category, label) in tools::Category::ALL {
+                ui.selectable_value(&mut self.tools_category, category, label);
+            }
+        });
+        ui.separator();
+        self.tools.poll(ui);
+        let category = self.tools_category;
+        fluent::page_scroll(ui, &format!("tools-{category:?}"), |ui| match category {
+            tools::Category::Network => {
+                self.network_tools(ui);
+                self.tools.network(ui);
+            }
+            tools::Category::Files => self.tools.files(ui),
+            tools::Category::Packages => self.portable_packages_section(ui),
+            tools::Category::Plugins => self.plugins_section(ui),
+            tools::Category::Runtime => {
                 ui.horizontal_wrapped(|ui| {
-                    let host_label = ui.label("Host");
-                    fluent::text_input(ui, host_label.id, &mut self.diagnostic_host, "", 280.);
-                    if ui.button("DNS lookup").clicked() {
-                        let host = self.diagnostic_host.clone();
-                        if let Err(e) = validate_host(&host) {
-                            self.diagnostic_result = e;
-                        } else {
-                            let (tx, rx) = mpsc::channel();
-                            self.diagnostic_rx = Some(rx);
-                            std::thread::spawn(move || {
-                                use std::net::ToSocketAddrs;
-                                let result = (host.as_str(), 0)
-                                    .to_socket_addrs()
-                                    .map(|a| {
-                                        let mut ips =
-                                            a.map(|a| a.ip().to_string()).collect::<Vec<_>>();
-                                        ips.sort();
-                                        ips.dedup();
-                                        ips.join("\n")
-                                    })
-                                    .unwrap_or_else(|e| e.to_string());
-                                let _ = tx.send(result);
-                            });
-                        }
+                    if ui.button("SSH keys and agents…").clicked() {
+                        self.ssh_keys.open = true;
                     }
-                    if ui.button("Ping").clicked() {
-                        if validate_host(&self.diagnostic_host).is_ok() {
-                            let a = vec![
-                                if cfg!(windows) { "-n" } else { "-c" }.into(),
-                                "4".into(),
-                                self.diagnostic_host.clone(),
-                            ];
-                            self.start_tool("Ping", "ping", a);
-                        } else {
-                            self.diagnostic_result = "Enter a valid host first.".into();
-                        }
+                    if ui.button("X server settings").clicked() {
+                        self.page = Page::Servers;
+                        self.servers_category = servers::Section::Xserver;
                     }
-                    if ui.button("Test SSH port").clicked() {
-                        let host = self.diagnostic_host.clone();
+                });
+                runtime_providers(ui);
+            }
+            #[cfg(windows)]
+            tools::Category::Windows => self.tools.windows(ui),
+        });
+    }
+    fn network_tools(&mut self, ui: &mut Ui) {
+        surface(ui).show(ui, |ui| {
+            ui.horizontal_wrapped(|ui| {
+                let host_label = ui.label("Host");
+                fluent::text_input(ui, host_label.id, &mut self.diagnostic_host, "", 280.);
+                if ui.button("DNS lookup").clicked() {
+                    let host = self.diagnostic_host.clone();
+                    if let Err(e) = validate_host(&host) {
+                        self.diagnostic_result = e;
+                    } else {
                         let (tx, rx) = mpsc::channel();
                         self.diagnostic_rx = Some(rx);
                         std::thread::spawn(move || {
-                            use std::net::{TcpStream, ToSocketAddrs};
-                            let r = (host.as_str(), 22)
+                            use std::net::ToSocketAddrs;
+                            let result = (host.as_str(), 0)
                                 .to_socket_addrs()
-                                .and_then(|mut a| {
-                                    a.next()
-                                        .ok_or_else(|| std::io::Error::other("No address found"))
+                                .map(|a| {
+                                    let mut ips = a.map(|a| a.ip().to_string()).collect::<Vec<_>>();
+                                    ips.sort();
+                                    ips.dedup();
+                                    ips.join("\n")
                                 })
-                                .and_then(|a| {
-                                    TcpStream::connect_timeout(&a, Duration::from_secs(4))
-                                })
-                                .map(|_| format!("{host}:22 is reachable"))
-                                .unwrap_or_else(|e| format!("Connection failed: {e}"));
-                            let _ = tx.send(r);
+                                .unwrap_or_else(|e| e.to_string());
+                            let _ = tx.send(result);
                         });
                     }
-                });
-                if self.diagnostic_rx.is_some() {
-                    ui.spinner();
-                    ui.label("Checking…");
                 }
-                if !self.diagnostic_result.is_empty() {
-                    ui.add(
-                        Label::new(RichText::new(&self.diagnostic_result).monospace())
-                            .selectable(true),
-                    );
+                if ui.button("Ping").clicked() {
+                    if validate_host(&self.diagnostic_host).is_ok() {
+                        let a = vec![
+                            if cfg!(windows) { "-n" } else { "-c" }.into(),
+                            "4".into(),
+                            self.diagnostic_host.clone(),
+                        ];
+                        self.start_tool("Ping", "ping", a);
+                    } else {
+                        self.diagnostic_result = "Enter a valid host first.".into();
+                    }
+                }
+                if ui.button("Test SSH port").clicked() {
+                    let host = self.diagnostic_host.clone();
+                    let (tx, rx) = mpsc::channel();
+                    self.diagnostic_rx = Some(rx);
+                    std::thread::spawn(move || {
+                        use std::net::{TcpStream, ToSocketAddrs};
+                        let r = (host.as_str(), 22)
+                            .to_socket_addrs()
+                            .and_then(|mut a| {
+                                a.next()
+                                    .ok_or_else(|| std::io::Error::other("No address found"))
+                            })
+                            .and_then(|a| TcpStream::connect_timeout(&a, Duration::from_secs(4)))
+                            .map(|_| format!("{host}:22 is reachable"))
+                            .unwrap_or_else(|e| format!("Connection failed: {e}"));
+                        let _ = tx.send(r);
+                    });
                 }
             });
-            ui.add_space(16.);
-            ui.columns(2,|cols|{surface(&cols[0]).show(&mut cols[0],|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("SSH keys").size(17.)));ui.label(RichText::new("Create or import key bundles, inspect fingerprints, and manage system or TermCraft-owned agent identities.").color(muted(ui)));if ui.button("SSH keys and agents…").clicked(){self.ssh_keys.open=true;}});surface(&cols[1]).show(&mut cols[1],|ui|{ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("X11 display").size(17.)));let display=std::env::var("DISPLAY").unwrap_or_else(|_|"No DISPLAY configured".into());ui.label(RichText::new(display).monospace());ui.label(RichText::new("SSH can forward X11 to an available display. Start a packaged Xwayland display in Servers on supported installations.").color(muted(ui)));});});
-            ui.add_space(18.);
-            runtime_providers(ui);
+            if self.diagnostic_rx.is_some() {
+                ui.spinner();
+                ui.label("Checking…");
+            }
+            if !self.diagnostic_result.is_empty() {
+                ui.add(
+                    Label::new(RichText::new(&self.diagnostic_result).monospace()).selectable(true),
+                );
+            }
         });
     }
     pub(super) fn start_tool(&mut self, name: &str, program: &str, args: Vec<String>) {
@@ -1835,24 +1886,33 @@ impl Workspace {
                 }
             }
             if self.settings_category == Safety {
-                ui.label("Paste and session safety");
-                ui.checkbox(
-                    &mut self.store.preferences.paste.confirm_multiline,
-                    "Confirm multiline paste",
-                );
-                ui.horizontal_wrapped(|ui| {
-                    ui.label("Delay between pasted lines");
-                    ui.add(
-                        DragValue::new(&mut self.store.preferences.paste.line_delay_ms)
-                            .range(0..=5000)
-                            .suffix(" ms"),
+                surface(ui).show(ui, |ui| {
+                    ui.set_min_width(ui.available_width());
+                    ui.label(fluent::emphasized(
+                        ui.ctx(),
+                        RichText::new("Paste and session safety").size(18.),
+                    ));
+                    ui.checkbox(
+                        &mut self.store.preferences.paste.confirm_multiline,
+                        "Confirm multiline paste",
+                    );
+                    ui.horizontal_wrapped(|ui| {
+                        ui.label("Delay between pasted lines");
+                        ui.add(
+                            DragValue::new(&mut self.store.preferences.paste.line_delay_ms)
+                                .range(0..=5000)
+                                .suffix(" ms"),
+                        );
+                    });
+                    ui.checkbox(
+                        &mut self.store.preferences.confirm_session_close,
+                        "Confirm closing active sessions",
                     );
                 });
-                ui.checkbox(
-                    &mut self.store.preferences.confirm_session_close,
-                    "Confirm closing active sessions",
-                );
-                ui.label("Terminal clipboard and selection");
+                ui.add_space(12.);
+                surface(ui).show(ui, |ui| {
+                ui.set_min_width(ui.available_width());
+                ui.label(fluent::emphasized(ui.ctx(),RichText::new("Clipboard and selection").size(18.)));
                 ui.checkbox(
                     &mut self.store.preferences.clipboard.copy_on_select,
                     "Copy selection automatically on release",
@@ -1877,6 +1937,8 @@ impl Workspace {
                     ));
                 });
                 ui.menu_button("Selection help",|ui|{ui.label("Alt-drag selects a rectangle. Ctrl+Shift+C copies. Ctrl+Shift+V pastes. Hold Shift to select while a terminal program uses the mouse.");});
+                });
+                ui.add_space(12.);
                 if primary(ui, "Save preferences").clicked() {
                     self.persist();
                 }
@@ -1925,9 +1987,7 @@ impl Workspace {
                         );
                         ui.end_row();
                         ui.label("History memory");
-                        ui.label(
-                            "128 MiB per terminal; older lines expire when either limit is reached",
-                        );
+                        ui.label("128 MiB per terminal").on_hover_text("Older lines expire when either the line limit or memory limit is reached.");
                         ui.end_row();
                         ui.label("SSH keepalive interval");
                         ui.add(
@@ -1970,7 +2030,7 @@ impl Workspace {
    });if !self.store_ok{ui.colored_label(ui.visuals().error_fg_color,"The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.settings_load_error=None;self.persist();},Err(e)=>self.message(e.to_string())}}}});
             }
             if self.settings_category == About {
-                surface(ui).show(ui,|ui|{ui.set_min_width(ui.available_width());ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("About TermCraft").size(18.)));ui.label("An independently written Rust desktop remote workspace with a Fluent-inspired interface.");ui.label(RichText::new("Built with eframe/egui and OpenSSH. No original branding or bundled engines are reused.").size(12.).color(muted(ui)));ui.add_space(5.);ui.label(RichText::new("Original feature parity has not been established. Linux terminal operation is tested; Windows and macOS need platform validation. See Network tools for engine availability and known gaps.").size(12.).color(muted(ui)));});
+                surface(ui).show(ui,|ui|{ui.set_min_width(ui.available_width());ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("About TermCraft").size(18.)));ui.label("An independently written Rust desktop remote workspace with a Fluent-inspired interface.");ui.label(RichText::new("Built with eframe/egui and OpenSSH. No original branding or bundled engines are reused.").size(12.).color(muted(ui)));ui.add_space(5.);ui.label(RichText::new("Feature and platform qualification is tracked in the project checklists. See Tools → Runtime for engine availability.").size(12.).color(muted(ui)));});
             }
         });
     }

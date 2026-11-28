@@ -54,7 +54,7 @@ impl State {
             Err(e) => self.message = format!("Cannot start Windows operation: {e}"),
         }
     }
-    fn poll(&mut self) {
+    pub(super) fn poll(&mut self) {
         let ready = self.result.as_ref().and_then(|rx| match rx.try_recv() {
             Ok(value) => Some(value),
             Err(mpsc::TryRecvError::Disconnected) => {
