@@ -1,5 +1,7 @@
 # Issue 4 integrated verification
 
+**RDP latency correction:** sign-in is confirmed with a computer-qualified local account. The review now uses an optimized helper, bounded asynchronous frame output, dirty-region IPC and partial texture uploads. [Measurements, regression checks and remaining Windows acceptance](rdp-latency.md). Repeated display changes are covered by a stationary-pane regression; the owner must confirm the actual Windows symptoms are gone. PR #8 stays draft/unmerged.
+
 **Bundled browser review correction:** restored all 243 pinned Chromium files beside the current GUI/RDP helper and verified real renderer sandbox/cleanup. `TC-BROWSER-119` now identifies local runtime availability. [Evidence and unresolved Windows sign-in investigation](error-messages.md#bundled-browser-review-correction). No merge; owner checks remain open.
 
 **RDP sign-in diagnostic correction:** remote desktops now display failures once, retain safe stage/SSPI/NTSTATUS details, and distinguish explicit rejection, account policy, transport and desktop setup failures. [Follow-up and remaining Windows retry](error-messages.md#rdp-sign-in-follow-up). The actual reported Windows cause is not yet established; human retry remains open. No merge.

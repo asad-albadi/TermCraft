@@ -26,33 +26,8 @@ use std::{
 };
 use tokio::sync::{mpsc, watch};
 use wire::{Event, Input};
-struct Output(Mutex<std::io::Stdout>);
-impl Output {
-    fn event(&self, event: Event) -> Result<(), String> {
-        wire::write_json(
-            &mut *self.0.lock().unwrap_or_else(|p| p.into_inner()),
-            &event,
-        )
-        .map_err(|_| "Desktop parent output pipe closed".into())
-    }
-    fn frame(&self, image: &DecodedImage, revision: u64) -> Result<(), String> {
-        wire::dimensions(image.width(), image.height())?;
-        let mut bytes = zeroize::Zeroizing::new(Vec::with_capacity(image.data().len() + 12));
-        bytes.extend_from_slice(&image.width().to_be_bytes());
-        bytes.extend_from_slice(&image.height().to_be_bytes());
-        bytes.extend_from_slice(&revision.to_be_bytes());
-        bytes.extend_from_slice(image.data());
-        for alpha in bytes[12..].iter_mut().skip(3).step_by(4) {
-            *alpha = 255;
-        }
-        wire::write_packet(
-            &mut *self.0.lock().unwrap_or_else(|p| p.into_inner()),
-            2,
-            &bytes,
-        )
-        .map_err(|_| "Desktop parent frame pipe closed".into())
-    }
-}
+mod output;
+use output::{Damage, Output};
 #[derive(Default)]
 struct NoExternalAuthNetwork {
     requested: bool,
@@ -90,12 +65,15 @@ fn main() {
         }
         return;
     }
-    let out = Arc::new(Output(Mutex::new(std::io::stdout())));
+    let Ok(out) = Output::new(std::io::stdout()) else {
+        return;
+    };
+    let out = Arc::new(out);
     let message = match start(out.clone()) {
         Ok(()) => "Remote desktop ended".into(),
         Err(message) => message,
     };
-    let _ = out.event(Event::Disconnected { message });
+    out.finish(message);
 }
 fn start(out: Arc<Output>) -> Result<(), String> {
     out.event(Event::Ready {
@@ -464,7 +442,7 @@ async fn connect(
         let (mut reader, mut writer) = ironrdp_tokio::split_tokio_framed(framed);
         let mut tick = tokio::time::interval(Duration::from_millis(16));
         tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
-        let mut dirty = true;
+        let mut damage = Damage::Full;
         let mut resize_in_flight = None;
         let mut fit_locally = false;
         let mut revision = 0u64;
@@ -603,7 +581,7 @@ async fn connect(
                     let events=inputs(&message,&mut held,&image)?;
                     encode_input(&mut active,&mut image,&events,input_flags)?
                 },
-                _=tick.tick()=>{if dirty{revision=revision.checked_add(1).ok_or("Desktop frame revisions exhausted")?;out.frame(&image,revision)?;dirty=false;}continue;}
+                _=tick.tick()=>{out.publish(&image,&mut damage,&mut revision)?;continue;}
             };
             for output in outputs {
                 match output {
@@ -614,7 +592,9 @@ async fn connect(
                             .map_err(|_| "RDP output timed out")?
                             .map_err(|_| "RDP output transport closed")?
                     }
-                    ActiveStageOutput::GraphicsUpdate(_) => dirty = true,
+                    ActiveStageOutput::GraphicsUpdate(rect) => {
+                        damage.update(rect, image.width(), image.height())
+                    }
                     ActiveStageOutput::PointerPosition { x, y } => out.event(Event::Cursor {
                         x,
                         y,
@@ -647,7 +627,7 @@ async fn connect(
                                     if !active.reactivate(activation_factory.io_channel_id(),activation_factory.user_channel_id(),share_id,enable_server_pointer,pointer_software_rendering,static_channel_chunk_size){return Err("Invalid RDP reactivation channel size".to_string());}
                                     active.set_window_support_level(window_support_level);input_flags=flags;
                                     if image.width()!=desktop_size.width||image.height()!=desktop_size.height{image=DecodedImage::new(ironrdp_graphics::image_processing::PixelFormat::RgbA32,desktop_size.width,desktop_size.height);}
-                                    out.event(Event::Connected{width:image.width(),height:image.height()})?;resize_in_flight=None;fit_locally=false;dirty=true;break Ok(());
+                                    out.event(Event::Connected{width:image.width(),height:image.height()})?;resize_in_flight=None;fit_locally=false;damage=Damage::Full;break Ok(());
                                 },
                                 ironrdp_connector::connection_activation::ConnectionActivationState::Redirected{..}=>return Err("RDP server requested redirection during reactivation".into()),
                                 _=>{}

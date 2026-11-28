@@ -138,6 +138,8 @@ pub(super) struct State {
     pub frame: Option<Arc<Frame>>,
     texture: Option<TextureHandle>,
     texture_revision: u64,
+    texture_damage: Option<harbor_workspace::desktop::framebuffer::DamageRect>,
+    texture_full_pending: bool,
     pub form: Option<Form>,
     pub remember: Option<String>,
     focused: bool,
@@ -156,7 +158,8 @@ pub(super) struct State {
     pane_resize: resize::PaneResize,
 }
 impl State {
-    pub fn new(handle: DesktopSession, session: &Session) -> Self {
+    pub fn new(mut handle: DesktopSession, session: &Session) -> Self {
+        handle.set_partial_frames(true);
         Self {
             handle,
             protocol: session.protocol.clone(),
@@ -172,6 +175,8 @@ impl State {
             frame: None,
             texture: None,
             texture_revision: 0,
+            texture_damage: None,
+            texture_full_pending: true,
             form: None,
             remember: None,
             focused: false,
@@ -198,6 +203,31 @@ impl State {
             pane_resize: Default::default(),
         }
     }
+    fn accept_frame(&mut self, frame: Arc<Frame>) -> bool {
+        let changed = self
+            .frame
+            .as_ref()
+            .is_none_or(|old| old.revision != frame.revision);
+        self.frame = Some(frame);
+        self.texture_damage = None;
+        self.texture_full_pending = true;
+        changed
+    }
+    fn accept_patch(
+        &mut self,
+        patch: harbor_workspace::desktop::framebuffer::FramePatch,
+    ) -> Result<(), String> {
+        let frame = self
+            .frame
+            .as_mut()
+            .ok_or("Desktop damage arrived before its full framebuffer")?;
+        patch.apply(Arc::make_mut(frame))?;
+        self.texture_damage = Some(
+            self.texture_damage
+                .map_or(patch.rect, |old| old.union(patch.rect)),
+        );
+        Ok(())
+    }
     pub fn poll(&mut self) -> bool {
         self.flush_macro_release();
         let mut changed = false;
@@ -209,13 +239,11 @@ impl State {
                     self.error.clear();
                     self.message = format!("Connected · {}", self.protocol);
                 }
-                DesktopEvent::Frame(frame) => {
-                    changed |= self
-                        .frame
-                        .as_ref()
-                        .is_none_or(|old| old.revision != frame.revision);
-                    self.frame = Some(frame);
-                }
+                DesktopEvent::Frame(frame) => changed |= self.accept_frame(frame),
+                DesktopEvent::FramePatch(patch) => match self.accept_patch(patch) {
+                    Ok(()) => changed = true,
+                    Err(error) => self.error = error,
+                },
                 DesktopEvent::Certificate {
                     id,
                     fingerprint,
@@ -821,20 +849,45 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         return;
     };
     if state.texture.is_none() || state.texture_revision != frame.revision {
-        let image = ColorImage::from_rgba_unmultiplied(
-            [frame.width as usize, frame.height as usize],
-            &frame.pixels,
-        );
-        if let Some(texture) = &mut state.texture {
-            texture.set(image, TextureOptions::LINEAR);
+        let damage = if state.texture_full_pending {
+            None
         } else {
-            state.texture = Some(ui.ctx().load_texture(
-                format!("rdp-desktop-{}", tab.id),
+            state.texture_damage.take()
+        };
+        if let (Some(texture), Some(rect)) = (&mut state.texture, damage) {
+            let mut pixels =
+                Vec::with_capacity(usize::from(rect.width) * usize::from(rect.height) * 4);
+            for y in usize::from(rect.y)..usize::from(rect.y + rect.height) {
+                let start = (y * usize::from(frame.width) + usize::from(rect.x)) * 4;
+                pixels.extend_from_slice(&frame.pixels[start..start + usize::from(rect.width) * 4]);
+            }
+            let image = ColorImage::from_rgba_unmultiplied(
+                [rect.width as usize, rect.height as usize],
+                &pixels,
+            );
+            texture.set_partial(
+                [rect.x as usize, rect.y as usize],
                 image,
                 TextureOptions::LINEAR,
-            ));
+            );
+        } else {
+            state.texture_damage = None;
+            let image = ColorImage::from_rgba_unmultiplied(
+                [frame.width as usize, frame.height as usize],
+                &frame.pixels,
+            );
+            if let Some(texture) = &mut state.texture {
+                texture.set(image, TextureOptions::LINEAR);
+            } else {
+                state.texture = Some(ui.ctx().load_texture(
+                    format!("rdp-desktop-{}", tab.id),
+                    image,
+                    TextureOptions::LINEAR,
+                ));
+            }
         }
         state.texture_revision = frame.revision;
+        state.texture_full_pending = false;
     }
     let scale = (rect.width() / frame.width as f32).min(rect.height() / frame.height as f32);
     let remote = Rect::from_center_size(
@@ -1311,6 +1364,100 @@ mod tests {
         fullscreen
     }
     #[test]
+    fn replacement_frame_then_patch_before_paint_requires_full_texture_upload() {
+        use harbor_workspace::desktop::framebuffer::{DamageRect, FramePatch};
+        let (ctx, root, mut w) = owned_workspace();
+        crate::ui::terminal_review_tests::raw_terminal(&mut w, "texture fixture");
+        let session = Session {
+            protocol: "RDP".into(),
+            host: "localhost".into(),
+            view_only: true,
+            ..Default::default()
+        };
+        let handle = DesktopSession::connect(harbor_workspace::desktop::DesktopConfig::new(
+            9201,
+            session.clone(),
+            root.path().join("absent-texture-helper"),
+        ))
+        .unwrap();
+        w.tabs[0].process = None;
+        w.tabs[0].session = session.clone();
+        let mut state = State::new(handle, &session);
+        state.connected = true;
+        state.accept_frame(Arc::new(Frame {
+            width: 2,
+            height: 2,
+            revision: 1,
+            pixels: vec![255, 0, 0, 255].repeat(4),
+        }));
+        w.tabs[0].desktop = Some(state);
+        let draw = |w: &mut Workspace| {
+            ctx.run_ui(
+                RawInput {
+                    screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(800., 600.))),
+                    ..Default::default()
+                },
+                |ui| view(ui, &mut w.tabs[0]),
+            )
+        };
+        let mut initial = draw(&mut w);
+        initial.textures_delta.clear();
+        let state = w.tabs[0].desktop.as_mut().unwrap();
+        state.accept_frame(Arc::new(Frame {
+            width: 4,
+            height: 4,
+            revision: 2,
+            pixels: vec![0, 255, 0, 255].repeat(16),
+        }));
+        let patch = |revision| FramePatch {
+            width: 4,
+            height: 4,
+            revision,
+            rect: DamageRect {
+                x: 1,
+                y: 1,
+                width: 1,
+                height: 1,
+            },
+            pixels: vec![255, 0, 0, 255],
+        };
+        state.accept_patch(patch(3)).unwrap();
+        let mut full = draw(&mut w);
+        assert!(
+            full.textures_delta
+                .set
+                .iter()
+                .flat_map(|(_, d)| d)
+                .any(|d| {
+                    let egui::ImageData::Color(image) = &d.image;
+                    d.pos.is_none()
+                        && image.size == [4, 4]
+                        && image.pixels[0] == Color32::GREEN
+                        && image.pixels[5] == Color32::RED
+                })
+        );
+        full.textures_delta.clear();
+        w.tabs[0]
+            .desktop
+            .as_mut()
+            .unwrap()
+            .accept_patch(patch(4))
+            .unwrap();
+        let mut partial = draw(&mut w);
+        assert!(
+            partial
+                .textures_delta
+                .set
+                .iter()
+                .flat_map(|(_, d)| d)
+                .any(|d| {
+                    let egui::ImageData::Color(image) = &d.image;
+                    d.pos == Some([1, 1]) && image.size == [1, 1]
+                })
+        );
+        partial.textures_delta.clear();
+    }
+    #[test]
     fn failed_desktop_connection_paints_one_error_without_waiting_message() {
         let (ctx, root, mut w) = owned_workspace();
         crate::ui::terminal_review_tests::raw_terminal(&mut w, "error fixture");
@@ -1567,7 +1714,10 @@ mod tests {
             for (_, deltas) in &output.textures_delta.set {
                 for delta in deltas {
                     let egui::ImageData::Color(image) = &delta.image;
-                    if image.size == [640, 480] && image.pixels[0] == Color32::RED {
+                    if image.pixels.first() == Some(&Color32::RED)
+                        && (image.size == [640, 480]
+                            || (delta.pos == Some([0, 0]) && image.size == [64, 64]))
+                    {
                         painted = true;
                     }
                 }
@@ -1861,6 +2011,37 @@ mod tests {
             !std::fs::read_to_string(&w.store_path)
                 .unwrap()
                 .contains("fixture-password")
+        );
+        let prior_layouts = server
+            .observations()
+            .lines()
+            .filter(|s| s.starts_with("client_resize:"))
+            .count();
+        let mut partial = false;
+        for _ in 0..60 {
+            let mut out = paint_size(&ctx, &mut w, vec![], resized);
+            for (_, deltas) in &out.textures_delta.set {
+                for delta in deltas {
+                    let egui::ImageData::Color(image) = &delta.image;
+                    partial |= delta.pos.is_some() && image.size == [64, 64];
+                }
+            }
+            assert!(w.tabs[0].desktop.as_ref().unwrap().error.is_empty());
+            out.textures_delta.clear();
+            std::thread::sleep(Duration::from_millis(16));
+        }
+        assert!(
+            partial,
+            "ordinary bitmap changes must update only their texture region"
+        );
+        assert!(
+            server
+                .observations()
+                .lines()
+                .filter(|s| s.starts_with("client_resize:"))
+                .count()
+                <= prior_layouts + 1,
+            "a stationary pane repeatedly renegotiated its display"
         );
         w.force_close_tab(0);
     }

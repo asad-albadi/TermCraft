@@ -178,6 +178,7 @@ impl DesktopConfig {
 pub mod carrier;
 pub mod framebuffer;
 pub use framebuffer::Frame;
+use framebuffer::{FramePatch, FrameStore, FrameUpdate};
 pub enum DesktopEvent {
     CursorShape {
         width: u16,
@@ -194,6 +195,7 @@ pub enum DesktopEvent {
         height: u16,
     },
     Frame(Arc<Frame>),
+    FramePatch(FramePatch),
     Certificate {
         id: u64,
         host: String,
@@ -231,6 +233,7 @@ struct State {
     cursor: Option<(u16, u16, bool)>,
     frame_revision: u64,
     frame: Option<Arc<Frame>>,
+    rdp_frames: FrameStore,
     challenge: Option<(u64, bool)>,
     connected: bool,
     dimensions: (u16, u16),
@@ -332,6 +335,7 @@ pub struct DesktopSession {
     finished: Arc<AtomicBool>,
     closed: bool,
     notified: bool,
+    partial_frames: bool,
     clipboard: rdp_options::ClipboardPolicy,
     vnc: bool,
     view_only: bool,
@@ -402,6 +406,7 @@ impl DesktopSession {
             cursor: None,
             frame_revision: 0,
             frame: None,
+            rdp_frames: FrameStore::default(),
             challenge: None,
             connected: false,
             dimensions: (width, height),
@@ -447,6 +452,7 @@ impl DesktopSession {
             finished,
             closed: false,
             notified: false,
+            partial_frames: false,
             clipboard,
             vnc: false,
             view_only,
@@ -571,6 +577,10 @@ impl DesktopSession {
         self.input.send_ordered(DesktopInput::ReleaseAll)
     }
 
+    /// Opt into cropped updates before polling; snapshot-only callers retain complete frames.
+    pub fn set_partial_frames(&mut self, enabled: bool) {
+        self.partial_frames = enabled;
+    }
     pub fn poll(&mut self) -> Vec<DesktopEvent> {
         if self.closed {
             return Vec::new();
@@ -579,6 +589,18 @@ impl DesktopSession {
         let mut state = self.state.lock().unwrap_or_else(|p| p.into_inner());
         if let Some((x, y, visible)) = state.cursor.take() {
             events.push(DesktopEvent::Cursor { x, y, visible });
+        }
+        if let Some(update) = state.rdp_frames.take() {
+            events.push(match update {
+                FrameUpdate::Full(frame) => DesktopEvent::Frame(Arc::new(frame)),
+                FrameUpdate::Patch(patch) if self.partial_frames => DesktopEvent::FramePatch(patch),
+                FrameUpdate::Patch(_) => DesktopEvent::Frame(Arc::new(
+                    state
+                        .rdp_frames
+                        .snapshot()
+                        .expect("damage always has a canvas"),
+                )),
+            });
         }
         if let Some(frame) = state.frame.take() {
             events.push(DesktopEvent::Frame(frame));
@@ -599,6 +621,7 @@ impl DesktopSession {
         self.cancel.store(true, Ordering::Release);
         let mut state = self.state.lock().unwrap_or_else(|p| p.into_inner());
         state.frame = None;
+        state.rdp_frames.reset();
         state.challenge = None;
         state.connected = false;
     }
@@ -779,12 +802,40 @@ fn read_events(
             }
             state.frame_revision = revision;
             state.dimensions = (width, height);
-            state.frame = Some(Arc::new(Frame {
+            state.rdp_frames.full(Frame {
                 width,
                 height,
-                revision: u64::from_be_bytes(data[4..12].try_into().unwrap()),
+                revision,
                 pixels: data[12..].to_vec(),
-            }));
+            })?;
+            continue;
+        }
+        if kind == 3 {
+            if !ready || data.len() < 20 {
+                return Err("Invalid desktop damage packet".into());
+            }
+            let word = |i| u16::from_be_bytes([data[i], data[i + 1]]);
+            let (width, height) = (word(0), word(2));
+            let revision = u64::from_be_bytes(data[4..12].try_into().unwrap());
+            let rect = wire::damage::DamageRect {
+                x: word(12),
+                y: word(14),
+                width: word(16),
+                height: word(18),
+            };
+            let len = wire::patch_bounds(width, height, rect.x, rect.y, rect.width, rect.height)?;
+            let mut state = state.lock().unwrap_or_else(|p| p.into_inner());
+            if !state.connected || state.dimensions != (width, height) || data.len() != len + 20 {
+                return Err("Desktop damage does not match the connected framebuffer".into());
+            }
+            state.rdp_frames.patch(FramePatch {
+                width,
+                height,
+                revision,
+                rect,
+                pixels: data[20..].to_vec(),
+            })?;
+            state.frame_revision = revision;
             continue;
         }
         let message: wire::Event = serde_json::from_slice(&data)
@@ -817,6 +868,7 @@ fn read_events(
                 state.connected = true;
                 state.challenge = None;
                 state.dimensions = (width, height);
+                state.rdp_frames.reset();
                 DesktopEvent::Connected { width, height }
             }
             wire::Event::Certificate {
@@ -1113,4 +1165,85 @@ fn rdp_helper_launch_removes_loader_overrides() {
         .env("TERMCRAFT_OTHER_SETTING", "present");
     configure_rdp_command(&mut command);
     assert!(command.status().unwrap().success());
+}
+
+#[cfg(test)]
+mod damage_wire_tests {
+    use super::*;
+    fn exercise(x: u16, with_base: bool) -> (Result<(), String>, Arc<Mutex<State>>) {
+        let config:wire::Config=serde_json::from_value(serde_json::json!({"version":wire::VERSION,"host":"localhost","port":3389,"user":"fixture","width":4,"height":3,"timeout_secs":2})).unwrap();
+        let state = Arc::new(Mutex::new(State {
+            ready: false,
+            cursor: None,
+            frame_revision: 0,
+            frame: None,
+            rdp_frames: Default::default(),
+            challenge: None,
+            connected: false,
+            dimensions: (4, 3),
+            final_message: None,
+        }));
+        let mut stream = Vec::new();
+        wire::write_json(
+            &mut stream,
+            &wire::Event::Ready {
+                version: wire::VERSION,
+            },
+        )
+        .unwrap();
+        wire::write_json(
+            &mut stream,
+            &wire::Event::Connected {
+                width: 4,
+                height: 3,
+            },
+        )
+        .unwrap();
+        if with_base {
+            let mut full = Vec::new();
+            full.extend(4u16.to_be_bytes());
+            full.extend(3u16.to_be_bytes());
+            full.extend(1u64.to_be_bytes());
+            full.extend([0; 48]);
+            wire::write_packet(&mut stream, 2, &full).unwrap();
+        }
+        let mut patch = Vec::new();
+        patch.extend(4u16.to_be_bytes());
+        patch.extend(3u16.to_be_bytes());
+        patch.extend(2u64.to_be_bytes());
+        for v in [x, 1, 1, 1] {
+            patch.extend(v.to_be_bytes());
+        }
+        patch.extend([9, 8, 7, 255]);
+        wire::write_packet(&mut stream, 3, &patch).unwrap();
+        let (tx, _rx) = mpsc::sync_channel(32);
+        let result = read_events(
+            &mut std::io::Cursor::new(stream),
+            &config,
+            &tx,
+            &state,
+            &AtomicBool::new(false),
+        );
+        (result, state)
+    }
+    #[test]
+    fn private_damage_packet_updates_exact_pixel_and_keeps_complete_snapshot() {
+        let (result, state) = exercise(2, true);
+        assert!(result.unwrap_err().contains("transport closed"));
+        let mut s = state.lock().unwrap();
+        assert_eq!(s.frame_revision, 2);
+        let Some(FrameUpdate::Full(frame)) = s.rdp_frames.take() else {
+            panic!()
+        };
+        assert_eq!(&frame.pixels[24..28], &[9, 8, 7, 255]);
+        assert_eq!(frame.pixels.len(), 48);
+    }
+    #[test]
+    fn private_damage_packet_rejects_missing_base_and_out_of_bounds_geometry() {
+        let (result, state) = exercise(4, true);
+        assert!(result.unwrap_err().contains("rectangle"));
+        assert_eq!(state.lock().unwrap().frame_revision, 1);
+        let (result, _) = exercise(2, false);
+        assert!(result.unwrap_err().contains("before its full framebuffer"));
+    }
 }

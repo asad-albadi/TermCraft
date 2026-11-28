@@ -21,6 +21,7 @@ fn state() -> Arc<Mutex<State>> {
         cursor: None,
         frame_revision: 0,
         frame: None,
+        rdp_frames: Default::default(),
         challenge: None,
         connected: false,
         dimensions: (1, 1),

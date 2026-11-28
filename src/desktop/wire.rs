@@ -2,10 +2,13 @@
 use serde::{Deserialize, Serialize};
 use std::io::{self, Read, Write};
 use zeroize::{Zeroize, Zeroizing};
-pub const VERSION: u32 = 1;
+pub const VERSION: u32 = 2;
+#[path = "damage.rs"]
+pub mod damage;
+pub use damage::patch_bounds;
 pub const MAX_CONTROL: usize = 64 * 1024;
 pub const MAX_PIXELS: usize = 16 * 1024 * 1024;
-pub const MAX_FRAME: usize = MAX_PIXELS * 4 + 12;
+pub const MAX_FRAME: usize = MAX_PIXELS * 4 + 20;
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Config {
@@ -144,7 +147,7 @@ pub fn read_packet(reader: &mut impl Read) -> io::Result<(u8, Zeroizing<Vec<u8>>
     let length = u32::from_be_bytes(header[1..].try_into().unwrap()) as usize;
     let max = match header[0] {
         1 => MAX_CONTROL,
-        2 => MAX_FRAME,
+        2 | 3 => MAX_FRAME,
         _ => return Err(io::Error::other("Invalid desktop packet kind")),
     };
     if length == 0 || length > max {
@@ -155,7 +158,12 @@ pub fn read_packet(reader: &mut impl Read) -> io::Result<(u8, Zeroizing<Vec<u8>>
     Ok((header[0], bytes))
 }
 pub fn write_packet(writer: &mut impl Write, kind: u8, bytes: &[u8]) -> io::Result<()> {
-    if bytes.is_empty() || bytes.len() > if kind == 1 { MAX_CONTROL } else { MAX_FRAME } {
+    let max = match kind {
+        1 => MAX_CONTROL,
+        2 | 3 => MAX_FRAME,
+        _ => return Err(io::Error::other("Invalid desktop packet kind")),
+    };
+    if bytes.is_empty() || bytes.len() > max {
         return Err(io::Error::other("Desktop packet exceeds its bound"));
     }
     writer.write_all(&[kind])?;

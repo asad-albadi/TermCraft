@@ -1,5 +1,7 @@
 # App-wide error messages and codes
 
+**RDP latency correction:** sign-in is confirmed with a computer-qualified local account. The review now uses an optimized helper, bounded asynchronous frame output, dirty-region IPC and partial texture uploads. [Measurements, regression checks and remaining Windows acceptance](rdp-latency.md). Repeated display changes are covered by a stationary-pane regression; the owner must confirm the actual Windows symptoms are gone. PR #8 stays draft/unmerged.
+
 The owner requested meaningful messages and stable codes throughout TermCraft. This pass routes application-owned errors through one catalogue and one compact UI: an explanation beside a `TC-…` code; opening the code shows the suggested next step, bounded technical details and an explicit **Copy error details** action. Ordinary progress, successful operations, terminal command output and user cancellations remain ordinary messages.
 
 Existing connection forms, tabs, panels and confirmation flows retain their organization. The only presentation changes inside approved session dialogs are their error rows; validation stays alongside the form. No trust checks, overwrite consent, credential ownership, pending-operation cancellation or dirty-document close protections are bypassed.
@@ -164,9 +166,9 @@ Use a plain username with the separate Domain field, or leave Domain blank when 
 - [x] Seven stage-specific diagnostic categories, existing redaction and unknown-cause safety retained.
 - [x] Independent wrong-password endpoint reports the exact safe stage, SSPI and peer NTSTATUS, without credentials.
 - [x] Successful authentication, remote input, resizing and ignored-resize fallback remain covered.
-- [ ] Owner retry against the actual Windows endpoint and identification/resolution of its reported cause.
+- [x] Owner confirmed that a computer-qualified local account with Domain blank connects; performance is the active follow-up.
 
-The Windows host failure remains undiagnosed until the updated helper observes a retry. The wrong-password test validates the diagnostic path and does not prove that the owner's password was wrong. Close the older app, run the current review launcher and reconnect. If it still fails, open the code and copy its technical details. PR #8 remains draft and unmerged.
+The owner subsequently confirmed sign-in with a computer-qualified local account and empty Domain. The wrong-password test validates the diagnostic path and does not prove that the owner's password was wrong. Close the older app, run the current review launcher and reconnect. If it still fails, open the code and copy its technical details. PR #8 remains draft and unmerged.
 
 Final local checks: 11 real UI/input/ownership tests, 11 catalogue/redaction tests and 8 independent RDP/helper checks passed, including failed-password stage/status, successful sign-in, ordered input through resizing, ignored-resize fallback, certificate changes and shutdown. Six helper unit tests passed separately. Final native Wayland startup and protected-dialog checks passed. [Review component and source identities](rdp-signin-review-build.json).
 
@@ -179,4 +181,4 @@ Current checks: 12 catalogue/redaction tests, 9 UI/input/vault tests and the nat
 
 Keep the browser tree and RDP helper alongside the GUI on future review refreshes. The stable local review launcher selects the new payload; older directories remain intact. The new directory covers these two providers, not every production runtime.
 
-The owner's real Windows rejection remains under investigation. Nine same-identity, same-certificate comparisons across earlier/current helper revisions passed on an owned endpoint; they do not qualify the owner's Windows host. For a local account, the account domain is the Windows computer name rather than the network workgroup. Existing event4625's target account/domain and SubStatus can distinguish failures without guessing the password. [Microsoft event4625 field reference](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4625).
+The owner subsequently confirmed that a computer-qualified local account and empty Domain connect; performance remains under review. Nine same-identity, same-certificate comparisons across earlier/current helper revisions passed on an owned endpoint; they do not qualify the owner's Windows host. For a local account, the account domain is the Windows computer name rather than the network workgroup. Existing event4625's target account/domain and SubStatus can distinguish failures without guessing the password. [Microsoft event4625 field reference](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4625).
