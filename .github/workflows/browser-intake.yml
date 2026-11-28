@@ -1,0 +1,123 @@
+name: Windows browser intake diagnostics
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/browser-intake.yml
+      - scripts/browser-intake.py
+      - scripts/windows-browser-intake.py
+      - scripts/prepare-browser-qualification.py
+      - packaging/browser/windows-public-intake.json
+      - tests/release_browser_intake.py
+      - tests/release_browser_job.py
+      - tests/release_browser_qualification.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: browser-intake-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  inspect:
+    runs-on: windows-2025
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      CARGO_BUILD_JOBS: '2'
+      TERMCRAFT_TEST_BUNDLED_BROWSER: '1'
+      TERMCRAFT_REQUIRE_CHROMIUM: '1'
+    steps:
+      - name: Preserve source bytes in native checkout and private worktree
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify offline intake and native owned-job behavior
+        run: |
+          python -m unittest discover -s tests -p release_browser_intake.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s tests -p release_browser_job.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s tests -p release_browser_qualification.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Capture credits from the exact unapproved candidate
+        run: python scripts/browser-intake.py --candidate packaging/browser/windows-public-intake.json --output intake-evidence
+      - name: Prepare exact browser only inside a private source worktree
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $source = Join-Path $env:RUNNER_TEMP ('termcraft-browser-qualification-' + $env:GITHUB_RUN_ID + '-' + $env:GITHUB_RUN_ATTEMPT)
+          git worktree add --detach -- $source $env:GITHUB_SHA
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "QUALIFICATION_SOURCE=$source" >> $env:GITHUB_ENV
+          $archive = Join-Path $env:RUNNER_TEMP ('termcraft-browser-candidate-' + $env:GITHUB_RUN_ID + '-' + $env:GITHUB_RUN_ATTEMPT + '.zip')
+          $env:QUALIFICATION_ARCHIVE = $archive
+          @'
+          import importlib.util, json, os
+          from pathlib import Path
+          spec = importlib.util.spec_from_file_location('intake', 'scripts/browser-intake.py')
+          intake = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(intake)
+          candidate = json.loads(Path('packaging/browser/windows-public-intake.json').read_text())
+          intake.validate_candidate(candidate)
+          intake.download(candidate, Path(os.environ['QUALIFICATION_ARCHIVE']))
+          '@ | python -
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          try {
+            python scripts/prepare-browser-qualification.py --candidate packaging/browser/windows-public-intake.json --archive $archive --evidence intake-evidence --source $source
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } finally {
+            if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive }
+          }
+      - name: Provision pinned Rust and native TLS fixture command
+        shell: pwsh
+        run: |
+          rustup toolchain install 1.96.1 --profile minimal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $openssl = Join-Path $env:ProgramFiles 'Git/usr/bin/openssl.exe'
+          if (!(Test-Path -LiteralPath $openssl)) { throw 'Git for Windows OpenSSL is unavailable.' }
+          Split-Path $openssl | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          & $openssl version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run application browser workflows against exact private pin
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $evidence = Join-Path $env:GITHUB_WORKSPACE 'intake-evidence'
+          Push-Location -LiteralPath $env:QUALIFICATION_SOURCE
+          try {
+            cargo +1.96.1 fetch --locked 2>&1 | Tee-Object -FilePath (Join-Path $evidence 'cargo-fetch.log')
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            cargo +1.96.1 test --locked --test browser_session -- --include-ignored --test-threads=1 2>&1 | Tee-Object -FilePath (Join-Path $evidence 'browser-session.log')
+            $result = $LASTEXITCODE
+            @{
+              scope = 'qualification-only'
+              production_enrollment = $false
+              source_sha = (git rev-parse HEAD)
+              manifest_sha256 = (Get-FileHash -LiteralPath 'packaging/browser/runtime-manifest-windows.json' -Algorithm SHA256).Hash.ToLowerInvariant()
+              exit_code = $result
+              command = 'cargo +1.96.1 test --locked --test browser_session -- --include-ignored --test-threads=1'
+              limitations = 'Functional application browser tests only; no independent live sandbox-token/AppContainer observer, GUI lifecycle, signing or distribution approval.'
+            } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $evidence 'browser-session-result.json') -Encoding utf8
+            if ($result -ne 0) { exit $result }
+          } finally {
+            Pop-Location
+          }
+      - name: Retain diagnostic evidence
+        if: always() && !cancelled()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-browser-intake-diagnostics
+          path: intake-evidence/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Record diagnostic scope
+        if: always() && !cancelled()
+        shell: pwsh
+        run: |
+          'Private browser functional qualification only. Production runtime remains unapproved. Live sandbox-token/AppContainer observation, GUI lifecycle, signing and distribution review remain separate.' >> $env:GITHUB_STEP_SUMMARY

@@ -80,6 +80,49 @@ is not duplicated inside the browser payload. No host packages are installed.
 
 ## Updates and qualification
 
+### Public Windows candidate intake
+
+The separate [Windows browser intake workflow](../../.github/workflows/browser-intake.yml)
+can collect evidence from the exact public candidate in
+`windows-public-intake.json`. On a disposable native Windows host, run:
+
+```sh
+python scripts/browser-intake.py --candidate packaging/browser/windows-public-intake.json --output intake-evidence
+```
+
+The diagnostic verifies the pinned download, archive paths, complete file hashes
+and x64 PE headers before execution. It creates a new private profile and runs
+`chrome://credits/` with ordinary sandbox and certificate defaults inside an
+owned Windows job. The child is assigned while suspended, inherits only explicit
+standard handles, and is retired with its descendants on timeout or completion.
+An offline `--archive <zip> --inspect-only` run collects inventory without executing
+the candidate; it does not establish native behavior.
+
+Outputs include the exact input inventory, captured HTML, process cleanup and
+scope record. The HTML check rejects known placeholders and incomplete output;
+it does **not** prove all required notices are complete or establish legal
+redistribution approval. This candidate's recipe also enables codec options
+that require their own distribution review. Archive intake and credits capture
+do not qualify the application's private runtime snapshot, native sandbox,
+AppContainer registration cleanup, relocated package or lifecycle behavior.
+
+The workflow can then prepare a **private detached source worktree** and run
+the application's five browser-session cases against the exact candidate. The
+private copy gets a test-only compiled pin; the production checkout stays
+unapproved and untouched. The preparation receipt binds the original and test
+pin hashes, captured credits, archive inventory, source commit and complete
+manifest diff. The bundled provider is required, so installed browsers cannot
+silently satisfy these cases. Functional tests do not independently observe
+live sandbox tokens or AppContainer registrations and are not GUI package or
+lifecycle qualification.
+
+Both the intake record and the production Windows runtime manifest remain
+unapproved. This diagnostic cannot enroll a production payload, create a tag
+or publish a release. Review source-matched notices and the full native
+packaged behavior before preparing a separate runtime approval.
+
+### Enrolled runtime updates
+
 Release maintainers own browser security updates. Before each shipping release,
 check the current supported Chromium security release and distribution advisories,
 refresh the signed archive/dependency pins and notices, verify the enrolled distro
