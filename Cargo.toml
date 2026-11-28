@@ -39,7 +39,7 @@ unicode-segmentation = "=1.13.3"
 smol_str = "=0.2.2"
 regex = "=1.12.2"
 encoding_rs = "=0.8.35"
-url = "=2.5.8"
+url = "=2.5.9"
 ureq = { version = "=3.5.2", default-features = false, features = ["rustls", "platform-verifier"] }
 base64 = "=0.22.1"
 tempfile = "=3.27.0"

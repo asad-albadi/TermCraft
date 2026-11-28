@@ -932,11 +932,11 @@ mod tests {
                     }
                     assert_eq!(
                         defs.families[&egui::FontFamily::Name("DejaVu Sans Mono".into())],
-                        ["terminal"]
+                        ["terminal", "jetbrains-nerd"]
                     );
                     assert_eq!(
                         defs.families[&egui::FontFamily::Name("Liberation Sans".into())],
-                        ["interface"]
+                        ["interface", "jetbrains-nerd"]
                     );
                     assert!(fonts.has_glyphs(&egui::FontId::proportional(14.), "ملف مثال"));
                 });

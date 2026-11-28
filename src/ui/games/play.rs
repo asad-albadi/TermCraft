@@ -1799,6 +1799,31 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
             }
         }
         GameScene::Puzzle(p::PuzzleScene::Solo(s)) => {
+            let topology = match play.session.as_ref().and_then(GameSession::configuration) {
+                Some(p::PuzzleConfig::SoloVariant(c)) => solo_variant_name(c),
+                _ => "Regular",
+            };
+            ui.label(format!(
+                "{topology} Solo{}",
+                if s.diagonal {
+                    " · both long diagonals"
+                } else {
+                    ""
+                }
+            ));
+            if !s.cages.is_empty() {
+                ui.label("White outlines mark regions. Orange cages contain distinct digits adding to their small sum.");
+            }
+            ui.label(format!(
+                "Difficulty: {:?}{} · {}",
+                s.certificate.achieved,
+                if s.certificate.easier_fallback {
+                    " (simpler than requested)"
+                } else {
+                    ""
+                },
+                symmetry_name(s.symmetry)
+            ));
             let labels = s
                 .digits
                 .iter()
@@ -1993,31 +2018,6 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                     }
                 }
             }
-            let topology = match play.session.as_ref().and_then(GameSession::configuration) {
-                Some(p::PuzzleConfig::SoloVariant(c)) => solo_variant_name(c),
-                _ => "Regular",
-            };
-            ui.label(format!(
-                "{topology} Solo{}",
-                if s.diagonal {
-                    " · both long diagonals"
-                } else {
-                    ""
-                }
-            ));
-            if !s.cages.is_empty() {
-                ui.label("White outlines mark regions. Orange cages contain distinct digits adding to their small sum.");
-            }
-            ui.label(format!(
-                "Difficulty: {:?}{} · {}",
-                s.certificate.achieved,
-                if s.certificate.easier_fallback {
-                    " (simpler than requested)"
-                } else {
-                    ""
-                },
-                symmetry_name(s.symmetry)
-            ));
         }
         GameScene::Terminal(t::TerminalScene::Sudoku(s)) => {
             let labels = s
@@ -4022,11 +4022,17 @@ mod options_ui_tests {
             expected
         );
         assert_eq!(painted_lines(&out, Stroke::new(1.5, palette(5))).len(), 36);
-        assert!(
-            painted_texts(&out)
+        let metadata = painted_texts(&out);
+        for label in ["Jigsaw", "Difficulty:"] {
+            let (position, _) = metadata
                 .iter()
-                .any(|(_, t)| t.contains("Jigsaw"))
-        );
+                .find(|(_, text)| text.contains(label))
+                .unwrap();
+            assert!(
+                position.y >= 0. && position.y < r.top(),
+                "{label} stays visible above the fitted board"
+            );
+        }
         assert!(
             !play
                 .session

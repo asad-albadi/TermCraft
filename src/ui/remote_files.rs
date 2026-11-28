@@ -1132,7 +1132,14 @@ mod transfer_tests {
         draw(&mut w, vec![]);
         draw(&mut w, vec![]);
         let click = |w: &mut Workspace, label: &str| {
-            let out = draw(w, vec![]);
+            let mut out = draw(w, vec![]);
+            // The menu and command bands also say Sessions. Hit the actual
+            // sidebar tab rather than a same-named application command.
+            let sidebar = egui::containers::panel::PanelState::load(&ctx, Id::new("sidebar"))
+                .unwrap()
+                .outer_rect;
+            out.shapes
+                .retain(|shape| sidebar.contains_rect(shape.shape.visual_bounding_rect()));
             let p = gui_tests::shell_text_position(&out, label);
             draw(
                 w,
@@ -1141,7 +1148,8 @@ mod transfer_tests {
             draw(w, vec![gui_tests::shell_pointer(p, false)]);
         };
         click(&mut w, "Sessions");
-        assert!(labels(&draw(&mut w, vec![])).contains("Quick connect"));
+        assert!(!w.sidebar_remote_selected);
+        assert!(labels(&draw(&mut w, vec![])).contains("Create your first session"));
         click(&mut w, "SFTP");
         assert!(labels(&draw(&mut w, vec![])).contains("photo.PNG"));
         assert_eq!(w.tabs[0].id, id);
