@@ -1885,6 +1885,7 @@ impl Workspace {
         CentralPanel::default()
             .frame(Frame::new().fill(content(root)).inner_margin(0))
             .show(root, |ui| {
+                self.tab_bar(ui);
                 self.set_shortcut_context(&ctx);
                 Frame::new()
                     .fill(content(ui))
@@ -2959,26 +2960,11 @@ mod gui_tests {
     #[test]
     fn packages_opens_tools_and_wheel_reaches_runtime_providers() {
         let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
-        ctx.enable_accesskit();
-        let size = vec2(640., 480.);
+        let size = vec2(640., 300.);
         let draw = |workspace: &mut Workspace, events| {
             shell_frame(&ctx, size, 1., events, |ui| workspace.top(ui))
         };
         draw(&mut workspace, vec![]);
-        let output = draw(&mut workspace, vec![]);
-        let app = shell_control_position(&output, "App menu");
-        draw(
-            &mut workspace,
-            vec![Event::PointerMoved(app), shell_pointer(app, true)],
-        );
-        draw(&mut workspace, vec![shell_pointer(app, false)]);
-        let output = draw(&mut workspace, vec![]);
-        let commands = shell_text_position(&output, "Commands");
-        draw(
-            &mut workspace,
-            vec![Event::PointerMoved(commands), shell_pointer(commands, true)],
-        );
-        draw(&mut workspace, vec![shell_pointer(commands, false)]);
         let output = draw(&mut workspace, vec![]);
         let pos = shell_text_position(&output, "Packages");
         draw(
@@ -3047,47 +3033,33 @@ mod gui_tests {
 
     #[test]
     fn theme_is_in_the_menu_band_and_keyboard_selectable_at_main_minimum() {
-        let (ctx, _root, mut w) = super::terminal_review_tests::owned_workspace();
-        ctx.enable_accesskit();
-        let draw = |w: &mut Workspace, events| {
-            shell_frame(&ctx, vec2(640., 480.), 2., events, |ui| w.top(ui))
-        };
-        draw(&mut w, vec![]);
-        let out = draw(&mut w, vec![]);
-        let app = shell_control_position(&out, "App menu");
-        let theme = shell_control_position(&out, "Theme");
-        assert!((app.y - theme.y).abs() < 8. && theme.x > app.x && theme.y < 40.);
-        assert!(
-            egui::containers::panel::PanelState::load(&ctx, Id::new("workspace-bar"))
-                .unwrap()
-                .size()
-                .y
-                <= 48.
-        );
-        let activate = |w: &mut Workspace, label: &str| {
-            for _ in 0..40 {
-                let output = draw(w, vec![shell_key(Key::Tab, Modifiers::NONE)]);
-                let focused = ctx.memory(|m| m.focused());
-                let found = output
-                    .platform_output
-                    .accesskit_update
-                    .as_ref()
-                    .is_some_and(|u| {
-                        u.nodes.iter().any(|(id, node)| {
-                            Some(*id) == focused.map(|f| f.accesskit_id())
-                                && node.label() == Some(label)
-                        })
-                    });
-                if found {
-                    draw(w, vec![shell_key(Key::Enter, Modifiers::NONE)]);
-                    return;
-                }
-            }
-            panic!("Keyboard could not reach {label}");
-        };
-        activate(&mut w, "Theme");
-        activate(&mut w, "Dark");
-        assert_eq!(w.store.preferences.appearance, Appearance::Dark);
+        let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
+        let size = vec2(640., 480.);
+        let mut draw = |events| shell_frame(&ctx, size, 2., events, |ui| workspace.top(ui));
+        draw(vec![]);
+        let output = draw(vec![]);
+        let menu = shell_text_position(&output, "View");
+        let theme = shell_text_position(&output, "Theme");
+        for label in ["Games", "Macros", "Help", "Settings", "System"] {
+            let position = shell_text_position(&output, label);
+            assert!((position.y - menu.y).abs() < 8.);
+        }
+        assert!(theme.x > menu.x && theme.x < shell_text_position(&output, "System").x);
+        assert!((theme.y - menu.y).abs() < 8.);
+        assert!(menu.y < 40.);
+        assert!(egui::containers::panel::PanelState::load(&ctx, Id::new("title")).is_none());
+
+        for _ in 0..9 {
+            draw(vec![shell_key(Key::Tab, Modifiers::NONE)]);
+        }
+        draw(vec![shell_key(Key::Enter, Modifiers::NONE)]);
+        let popup = draw(vec![]);
+        shell_text_position(&popup, "Dark");
+        for _ in 0..4 {
+            draw(vec![shell_key(Key::Tab, Modifiers::NONE)]);
+        }
+        draw(vec![shell_key(Key::Enter, Modifiers::NONE)]);
+        assert_eq!(workspace.store.preferences.appearance, Appearance::Dark);
         assert_eq!(ctx.theme(), Theme::Dark);
     }
 
@@ -3127,81 +3099,60 @@ mod gui_tests {
     #[test]
     fn commands_wrap_without_losing_exit_or_x_server_at_main_minimum() {
         for scale in [1., 1.5, 2.] {
-            let (ctx, _root, mut w) = super::terminal_review_tests::owned_workspace();
-            ctx.enable_accesskit();
-            let draw = |w: &mut Workspace, events| {
-                shell_frame(&ctx, vec2(640., 480.), scale, events, |ui| w.top(ui))
-            };
-            draw(&mut w, vec![]);
-            let out = draw(&mut w, vec![]);
-            assert_eq!(out.pixels_per_point, scale);
-            let bar = egui::containers::panel::PanelState::load(&ctx, Id::new("workspace-bar"))
-                .unwrap()
-                .size();
-            assert!(bar.y <= 48., "Chrome wrapped into another row: {bar:?}");
-            let click = |w: &mut Workspace, label: &str, icon: bool| {
-                let out = draw(w, vec![]);
-                let p = if icon {
-                    shell_control_position(&out, label)
-                } else {
-                    shell_text_position(&out, label)
-                };
-                draw(w, vec![Event::PointerMoved(p), shell_pointer(p, true)]);
-                draw(w, vec![shell_pointer(p, false)]);
-            };
-            click(&mut w, "App menu", true);
-            click(&mut w, "Commands", false);
-            let mut seen = std::collections::BTreeSet::new();
+            let (ctx, _root, mut workspace) = super::terminal_review_tests::owned_workspace();
+            let size = vec2(640., 480.);
+            let mut draw = |ui: &mut Ui| workspace.top(ui);
+            shell_frame(&ctx, size, scale, vec![], &mut draw);
+            let output = shell_frame(&ctx, size, scale, vec![], &mut draw);
+            assert_eq!(output.pixels_per_point, scale);
+            let screen = Rect::from_min_size(Pos2::ZERO, size);
             let labels = [
-                "New session",
+                "Session",
                 "Servers",
                 "Tools",
                 "Games",
                 "Sessions",
-                "Toggle split",
+                "Split",
                 "MultiExec",
-                "SSH tunneling",
+                "Tunneling",
                 "Packages",
                 "Settings",
                 "Help",
                 "X server",
-                "Exit TermCraft",
+                "Exit",
             ];
-            for _ in 0..8 {
-                let out = draw(&mut w, vec![]);
-                for label in labels {
-                    for shape in &out.shapes {
-                        if let Shape::Text(t) = &shape.shape {
-                            let p = t.pos + t.galley.size() * 0.5;
-                            if t.galley.text() == label && shape.clip_rect.contains(p) {
-                                assert!(
-                                    Rect::from_min_size(Pos2::ZERO, vec2(640., 480.)).contains(p)
-                                );
-                                seen.insert(label);
-                            }
-                        }
-                    }
-                }
-                if seen.len() == labels.len() {
-                    break;
-                }
-                let p = shell_text_position(&out, "Packages");
-                draw(
-                    &mut w,
-                    vec![
-                        Event::PointerMoved(p),
-                        Event::MouseWheel {
-                            unit: egui::MouseWheelUnit::Point,
-                            delta: vec2(0., -85.),
-                            modifiers: Modifiers::NONE,
-                            phase: egui::TouchPhase::Move,
-                        },
-                    ],
+            for label in labels {
+                let position = shell_text_position(&output, label);
+                assert!(
+                    screen.contains(position),
+                    "{label} is outside the viewport at {scale}x: {position:?}"
                 );
             }
-            for label in labels {
-                assert!(seen.contains(label), "Unavailable {label} at {scale}");
-            }
+            let position = shell_text_position(&output, "Exit");
+            let first = shell_text_position(&output, "Session");
+            assert!(
+                position.y > first.y + 20.,
+                "command tiles did not wrap at {scale}x"
+            );
+            shell_frame(
+                &ctx,
+                size,
+                scale,
+                vec![Event::PointerMoved(position), shell_pointer(position, true)],
+                &mut draw,
+            );
+            let output = shell_frame(
+                &ctx,
+                size,
+                scale,
+                vec![shell_pointer(position, false)],
+                &mut draw,
+            );
+            assert!(
+                output.viewport_output[&ViewportId::ROOT]
+                    .commands
+                    .contains(&ViewportCommand::Close)
+            );
         }
     }
 

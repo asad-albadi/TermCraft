@@ -1,5 +1,12 @@
 # Issue #4 component and acceptance checklist
 
+## Owner correction: terminal controls, separate app bars
+
+The owner clarified that “one row” refers to controls **inside the terminal pane/window**, not the app menus, toolbar or connection tabs. The combined app bar has been reverted: menus/theme and labelled command tiles are separate again, and connection tabs have their own strip. The terminal’s status/title, primary actions and secondary action menu occupy one row above its content. Detached tabs are separate from their one-row window controls. Secondary actions remain reachable without adding permanent rows.
+
+The sidebar Sessions/SFTP tab arrangement, new themed icons and other pane cleanups are retained. Approved session create/edit sources and shared styling remain unchanged. Earlier `05a2234` packages and unified-bar pictures below are historical and do **not** show this correction. PR #8 remains draft and unmerged; owner human checks and explicit merge approval are still required.
+
+
 Windows 11 desktop Fluent, retaining the owner’s preference for Fluent 1 over Fluent 2. The boxes in the component sections record software disposition. Each corresponding route, retained behavior and level of evidence appears in the [validation record](validation.md). The verification section tracks independent gates. Human acceptance is outstanding. Feature parity remains 46/60.
 
 **Human review rejected an earlier build on 2026-11-27.** The previous checks below record technical work on that build, not acceptance. [Correction checklist](human-review-correction.md) is active: simplify session creation and terminal/sidebar controls, provide help on demand, fix viewport scrollbars and organize settings/games/detached layouts. The corrected implementation, scoped independent review and final three-platform CI/package checks are recorded in that checklist. Owner acceptance remains open.

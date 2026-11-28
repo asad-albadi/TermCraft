@@ -1,5 +1,12 @@
 # Issue 4 integrated verification
 
+## Owner correction: terminal controls, separate app bars
+
+The owner clarified that “one row” refers to controls **inside the terminal pane/window**, not the app menus, toolbar or connection tabs. The combined app bar has been reverted: menus/theme and labelled command tiles are separate again, and connection tabs have their own strip. The terminal’s status/title, primary actions and secondary action menu occupy one row above its content. Detached tabs are separate from their one-row window controls. Secondary actions remain reachable without adding permanent rows.
+
+The sidebar Sessions/SFTP tab arrangement, new themed icons and other pane cleanups are retained. Approved session create/edit sources and shared styling remain unchanged. Earlier `05a2234` packages and unified-bar pictures below are historical and do **not** show this correction. PR #8 remains draft and unmerged; owner human checks and explicit merge approval are still required.
+
+
 **Human-review correction active:** the owner rejected the previous UI as cluttered and inconsistent. Evidence below applies to the recorded earlier sources; it does not qualify the pending correction or establish human acceptance. See [active correction checklist](human-review-correction.md).
 
 Production UI source is `5575601`. The native package at `c2dded6` includes the subsequent test-only service-button correction. The 36ba3ba inventory and captures predate a focused detached-client contrast correction. Windows 11 desktop Fluent is the visual reference. The [screen inventory](screen-audit.md) and [dialog inventory](dialog-audit.md) record the original defects and point to each owning module. The tables below record the resulting changes, retained behaviors and evidence for those same routes. Native images and runtime identities are listed in [the capture manifest](captures/manifest.json).
@@ -163,3 +170,19 @@ The [current inventory](all-pane-cleanup.md) records every remaining surface’s
 All three platform jobs passed in [source CI](https://github.com/asad-albadi/TermCraft/actions/runs/46102916112). Local scoped checks passed 91 cases with one explicitly ignored pinned archive fixture; overlapping follow-ups passed 11 bar/keyboard/sidebar/browser-close cases, eight detached cases and 11 cases with required real Chromium. The long-title minimum bar was observed at 61 points before correction, then passed a dedicated regression and native inspection at 46 points. All three native package jobs, repeated regressions and aggregate verification passed in [the candidate workflow](https://github.com/asad-albadi/TermCraft/actions/runs/46102912942).
 
 Earlier `efddce1` runs were cancelled as superseded by the owner’s explicit “one bar for everything” steering. No cancelled/failed run is called green. The new Linux runtime was extracted separately and the launcher atomically updated only after source, payload and archive-bound startup/Wayland/lifecycle verification. The old db07 runtime remains preserved and historical. [All platform build identities](all-pane-builds.json). Feature parity stays 46/60, and owner human acceptance and merge approval remain open.
+
+## Terminal-row correction verification
+
+The owner clarified the row scope after reviewing the combined app bar. The initial regression failed because the separate `menus` panel was missing. The correction restores menus/theme, labelled app toolbar and connection tabs, while keeping the terminal controls in one row at 260, 640 and 1,200 points. The focused run passed 11 checks (including five FTP cases); protected session hashes and formatting passed. Native development previews at Full HD and minimum size are recorded in [the correction gallery](captures/terminal-control-row/README.md). Their binary uses the documented verified cached pre-adapter dependency set; these are not new production packages.
+
+Two broader local harness attempts were interrupted by SIGTERM (exit 143) without a test assertion failure. They are not claimed complete. The SSH-service test at the second interruption passed independently (1/1). Hosted CI for the correction remains authoritative for the complete current platform configuration. Earlier `05a2234` CI/packages remain historical and are not relabelled as this correction.
+
+For the corrected local Linux UI review build, close any older instance and run:
+
+```bash
+"/home/asad/.codex/worktrees/termcraft-issue-3/app/target/issue-4/run-terminal-row-review"
+```
+
+This separate launcher preserves the previous qualified package and launcher. It uses X11 when available for the cached native adapter. Owner acceptance remains open; no merge is authorized.
+
+Final current-source follow-up with `TERMCRAFT_REQUIRE_CHROMIUM=1`: **13 passed, 0 failed**. This includes the terminal row at all three widths, narrow overflow activation, real FTP editing/close protection, real Chromium rendering/input, redirects, queue saturation, resizing/stale-input protection and last-browser-tab close.

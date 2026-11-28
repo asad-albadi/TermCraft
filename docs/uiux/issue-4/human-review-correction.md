@@ -1,5 +1,12 @@
 # Human-review correction — 2026-11-27
 
+## Owner correction: terminal controls, separate app bars
+
+The owner clarified that “one row” refers to controls **inside the terminal pane/window**, not the app menus, toolbar or connection tabs. The combined app bar has been reverted: menus/theme and labelled command tiles are separate again, and connection tabs have their own strip. The terminal’s status/title, primary actions and secondary action menu occupy one row above its content. Detached tabs are separate from their one-row window controls. Secondary actions remain reachable without adding permanent rows.
+
+The sidebar Sessions/SFTP tab arrangement, new themed icons and other pane cleanups are retained. Approved session create/edit sources and shared styling remain unchanged. Earlier `05a2234` packages and unified-bar pictures below are historical and do **not** show this correction. PR #8 remains draft and unmerged; owner human checks and explicit merge approval are still required.
+
+
 **Latest owner-directed pass:** [all remaining panes, the single combined bar, the shared SFTP sidebar and icons](all-pane-cleanup.md), source `05a2234`. The approved session create/edit dialogs remain unchanged. [Current native previews](captures/unified-workspace/README.md). All three source-platform CI jobs, all three unsigned package jobs and aggregate verification passed. [Verified build identities](all-pane-builds.json) and the [current Linux command](all-pane-cleanup.md) are available. Historical entries below retain their own source/build identities. Owner human checks and explicit merge approval remain open.
 
 

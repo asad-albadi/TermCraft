@@ -329,7 +329,7 @@ impl Workspace {
     ) {
         ui.horizontal(|ui| {
             let ids = self.windows.terminals(window);
-            let width = (ui.available_width() - 160.).max(80.);
+            let width = ui.available_width().max(80.);
             ui.allocate_ui_with_layout(
                 vec2(width, 38.),
                 Layout::left_to_right(Align::Center),
@@ -362,6 +362,8 @@ impl Workspace {
                         });
                 },
             );
+        });
+        ui.horizontal(|ui| {
             if ui.button("Reattach").clicked() {
                 actions.push((active, false));
             }

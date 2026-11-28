@@ -392,3 +392,72 @@ pub(super) fn semantic(label: &str) -> &'static str {
     }
     "settings"
 }
+
+pub(super) fn tile(
+    ui: &mut Ui,
+    kind: &str,
+    label: &str,
+    hint: &str,
+    selected: Option<bool>,
+) -> Response {
+    let font = FontId::proportional(12.);
+    let width = (ui
+        .painter()
+        .layout_no_wrap(label.into(), font.clone(), ink(ui))
+        .size()
+        .x
+        + 16.)
+        .max(56.);
+    let (rect, response) = ui.allocate_exact_size(vec2(width, 56.), Sense::click());
+    let foreground = fluent::paint_control(
+        ui,
+        &response,
+        rect,
+        selected.unwrap_or(false),
+        ControlKind::Flat,
+    );
+    let foreground = if response.enabled() {
+        foreground
+    } else {
+        fluent::palette(ui).secondary_text
+    };
+    if let Some(selected) = selected {
+        response.widget_info(|| {
+            WidgetInfo::selected(WidgetType::Checkbox, response.enabled(), selected, hint)
+        });
+        if selected && response.enabled() {
+            let mark = Rect::from_center_size(rect.center_bottom() - vec2(0., 3.), vec2(18., 2.));
+            ui.painter().rect_filled(mark, 1., accent(ui));
+        }
+    } else {
+        response.widget_info(|| WidgetInfo::labeled(WidgetType::Button, response.enabled(), hint));
+    }
+    paint(
+        ui,
+        Rect::from_center_size(rect.center_top() + vec2(0., 18.), vec2(23., 23.)),
+        match label {
+            "Session" => "session",
+            "Servers" => "servers",
+            "Sessions" => "sessions",
+            "Split" => "split",
+            "MultiExec" => "broadcast",
+            "Tunneling" => "tunnel",
+            "Packages" => "packages",
+            "X server" => "xserver",
+            _ => kind,
+        },
+        foreground,
+    );
+    ui.painter().text(
+        rect.center_bottom() - vec2(0., 13.),
+        Align2::CENTER_CENTER,
+        label,
+        font,
+        foreground,
+    );
+    if response.enabled() {
+        response.fluent_hint(hint)
+    } else {
+        response.disabled_hint(hint)
+    }
+}

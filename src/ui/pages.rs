@@ -720,6 +720,7 @@ impl Workspace {
             ui.small("The remote desktop opens in its own owned X display window. Closing this session stops only that display.");
             return;
         }
+        self.connection_commands(ui);
         self.tabs[self.active].search_ui(ui);
         if !self.tabs[self.active].error.is_empty() {
             Frame::new()

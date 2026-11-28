@@ -189,15 +189,29 @@ fn connected_workspace_bar_stays_one_row_at_the_minimum_window() {
         ..Default::default()
     });
     drop(w.tabs[0].ssh.take());
-    for _ in 0..30 {
+    for _ in 0..3 {
         gui_tests::shell_frame(&ctx, vec2(640., 480.), 1., vec![], |ui| w.render(ui));
     }
-    let height = egui::containers::panel::PanelState::load(&ctx, Id::new("workspace-bar"))
-        .unwrap()
-        .size()
-        .y;
     assert!(
-        height <= 48.,
-        "Tab scrolling added another chrome row: {height}"
+        egui::containers::panel::PanelState::load(&ctx, Id::new("menus")).is_some(),
+        "App menus were combined with the connection tabs"
     );
+    assert!(
+        egui::containers::panel::PanelState::load(&ctx, Id::new("commands")).is_some(),
+        "The separate app toolbar is missing"
+    );
+    for width in [260., 640., 1200.] {
+        let mut height = 0.;
+        for _ in 0..3 {
+            gui_tests::shell_frame(&ctx, vec2(width, 480.), 1., vec![], |ui| {
+                let start = ui.cursor().top();
+                w.connection_commands(ui);
+                height = ui.cursor().top() - start;
+            });
+        }
+        assert!(
+            height <= 40.,
+            "Terminal controls wrapped at {width}: {height}"
+        );
+    }
 }

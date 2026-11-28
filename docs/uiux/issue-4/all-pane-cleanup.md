@@ -1,5 +1,12 @@
 # Remaining panes and panels cleanup
 
+## Owner correction: terminal controls, separate app bars
+
+The owner clarified that “one row” refers to controls **inside the terminal pane/window**, not the app menus, toolbar or connection tabs. The combined app bar has been reverted: menus/theme and labelled command tiles are separate again, and connection tabs have their own strip. The terminal’s status/title, primary actions and secondary action menu occupy one row above its content. Detached tabs are separate from their one-row window controls. Secondary actions remain reachable without adding permanent rows.
+
+The sidebar Sessions/SFTP tab arrangement, new themed icons and other pane cleanups are retained. Approved session create/edit sources and shared styling remain unchanged. Earlier `05a2234` packages and unified-bar pictures below are historical and do **not** show this correction. PR #8 remains draft and unmerged; owner human checks and explicit merge approval are still required.
+
+
 Continue the approved issue #4 design: everyday actions and data first, clear task sections, aligned forms, details/help on demand, full-width scroll viewports with content clearance. Preserve all behavior, trust/credential decisions, active-operation cancellation and pending-work protection. The owner explicitly approved session create/edit dialogs; their implementation and shared styling are protected. PR #8 stays draft and unmerged until full human checks and explicit approval.
 
 **Current delivery:** UI source `05a2234` passed all three [platform CI jobs](https://github.com/asad-albadi/TermCraft/actions/runs/46102916112), all three unsigned package jobs and aggregate checks in [the candidate workflow](https://github.com/asad-albadi/TermCraft/actions/runs/46102912942). All six distribution payload hashes, each platform’s 646 Git build inputs and every manifest file were verified. Linux startup, Wayland and lifecycle records bind to its exact archive hash. [Complete build identities and limits](all-pane-builds.json) · [Current native previews](captures/unified-workspace/README.md). Owner acceptance remains open.
