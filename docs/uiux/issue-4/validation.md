@@ -183,6 +183,10 @@ For the corrected local Linux UI review build, close any older instance and run:
 "/home/asad/.codex/worktrees/termcraft-issue-3/app/target/issue-4/run-terminal-row-review"
 ```
 
-This separate launcher preserves the previous qualified package and launcher. It uses X11 when available for the cached native adapter. Owner acceptance remains open; no merge is authorized.
+This separate launcher preserves the previous qualified package and launcher. It preserves the desktop’s display environment so the native adapter can select Wayland or X11. Owner acceptance remains open; no merge is authorized.
 
 Final current-source follow-up with `TERMCRAFT_REQUIRE_CHROMIUM=1`: **13 passed, 0 failed**. This includes the terminal row at all three widths, narrow overflow activation, real FTP editing/close protection, real Chromium rendering/input, redirects, queue saturation, resizing/stale-input protection and last-browser-tab close.
+
+### Review launcher Wayland correction
+
+The first local review launcher incorrectly removed `WAYLAND_DISPLAY` whenever `DISPLAY` was set. On the owner’s Wayland desktop, `DISPLAY=:0` did not identify an accessible X server, causing `XOpenDisplayFailed`. Removing that override lets the existing native adapter choose Wayland. The unchanged corrected-UI binary started successfully on the current desktop using a separate empty review data directory and saved a screenshot, then exited normally. The actual fixed launcher was also exercised in screenshot mode; no owner workspace data was changed.
