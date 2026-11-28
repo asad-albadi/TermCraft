@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "scope": "qualification-only",
+  "approved": false,
+  "platform": "windows",
+  "architecture": "x86_64",
+  "version": "158.0.8127.88",
+  "executable": "chrome.exe",
+  "archive_name": "ungoogled-chromium_158.0.8127.88-1.1_windows_x64.zip",
+  "archive_root": "ungoogled-chromium_158.0.8127.88-1.1_windows_x64",
+  "archive_url": "https://github.com/ungoogled-software/ungoogled-chromium-windows/releases/download/158.0.8127.88-1.1/ungoogled-chromium_158.0.8127.88-1.1_windows_x64.zip",
+  "archive_sha256": "655e039901f3efe9e8b6308397ab9f528ae86617bce844125626d24b82494633",
+  "archive_size": 204309857,
+  "source_revision": "6661c751b20f9f8a75732e2818a430d6e7a30286",
+  "source_url": "https://github.com/ungoogled-software/ungoogled-chromium-windows/tree/6661c751b20f9f8a75732e2818a430d6e7a30286",
+  "qualification_limit": "Collect exact input inventory and native credits only. Not a runtime approval, packaged sandbox/cleanup qualification, signing decision or redistribution permission."
+}

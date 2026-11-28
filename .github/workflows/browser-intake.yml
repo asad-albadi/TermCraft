@@ -1,0 +1,53 @@
+name: Windows browser intake diagnostics
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/browser-intake.yml
+      - scripts/browser-intake.py
+      - scripts/windows-browser-intake.py
+      - packaging/browser/windows-public-intake.json
+      - tests/release_browser_intake.py
+      - tests/release_browser_job.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: browser-intake-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  inspect:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify offline intake and native owned-job behavior
+        run: |
+          python -m unittest discover -s tests -p release_browser_intake.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s tests -p release_browser_job.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Capture credits from the exact unapproved candidate
+        run: python scripts/browser-intake.py --candidate packaging/browser/windows-public-intake.json --output intake-evidence
+      - name: Retain diagnostic evidence
+        if: always() && !cancelled()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-browser-intake-diagnostics
+          path: intake-evidence/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Record diagnostic scope
+        if: always() && !cancelled()
+        shell: pwsh
+        run: |
+          'Diagnostic intake only. Runtime remains unapproved; this is not complete native distribution qualification.' >> $env:GITHUB_STEP_SUMMARY
