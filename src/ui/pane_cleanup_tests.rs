@@ -215,3 +215,67 @@ fn connected_workspace_bar_stays_one_row_at_the_minimum_window() {
         );
     }
 }
+
+#[cfg(unix)]
+#[test]
+fn terminal_cursor_blinks_resets_on_input_and_respects_hidden_mode() {
+    let (ctx, _root, mut w) = terminal_review_tests::owned_workspace();
+    let terminal = terminal_review_tests::raw_terminal(&mut w, "cursor fixture");
+    let input = Id::new(("terminal-input", terminal));
+    let mut preferences = w.store.preferences.clone();
+    preferences.reduced_motion = false;
+    ctx.memory_mut(|m| m.request_focus(input));
+    let draw = |w: &mut Workspace, time, events, reduced_motion| {
+        let mut preferences = preferences.clone();
+        preferences.reduced_motion = reduced_motion;
+        let mut color = Color32::TRANSPARENT;
+        let mut output = ctx.run_ui(
+            RawInput {
+                screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(640., 480.))),
+                time: Some(time),
+                focused: true,
+                events,
+                ..Default::default()
+            },
+            |ui| {
+                color = accent(ui);
+                super::pages::terminal_view(ui, &mut w.tabs[0], &preferences);
+            },
+        );
+        fn cursor(shape: &Shape, color: Color32) -> bool {
+            match shape {
+                Shape::Rect(r) => r.stroke.width == 1.5 && r.stroke.color == color,
+                Shape::Vec(shapes) => shapes.iter().any(|s| cursor(s, color)),
+                _ => false,
+            }
+        }
+        output.textures_delta.clear();
+        output.shapes.iter().any(|s| cursor(&s.shape, color))
+    };
+    assert!(draw(&mut w, 1., vec![], false));
+    assert!(
+        !draw(&mut w, 1.7, vec![], false),
+        "Focused terminal cursor never enters its hidden blink phase"
+    );
+    assert!(
+        draw(&mut w, 1.8, vec![Event::Text("x".into())], false),
+        "Typing should reveal the cursor immediately"
+    );
+    w.tabs[0].screen.feed(b"\x1b[?25l");
+    assert!(
+        !draw(&mut w, 1.9, vec![], false),
+        "Remote cursor hiding must be respected"
+    );
+    w.tabs[0].screen.feed(b"\x1b[?25h");
+    ctx.memory_mut(|m| m.surrender_focus(input));
+    assert!(
+        draw(&mut w, 2.6, vec![], false),
+        "Unfocused cursor should remain steady"
+    );
+    ctx.memory_mut(|m| m.request_focus(input));
+    assert!(draw(&mut w, 3., vec![], true));
+    assert!(
+        draw(&mut w, 3.7, vec![], true),
+        "Reduced motion should keep the cursor steady"
+    );
+}

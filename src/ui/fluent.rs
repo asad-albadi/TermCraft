@@ -159,6 +159,12 @@ fn install_interface_faces(
             "../../assets/Terminal.ttf"
         ))),
     );
+    fonts.font_data.insert(
+        "jetbrains-nerd".into(),
+        std::sync::Arc::new(FontData::from_static(include_bytes!(
+            "../../assets/JetBrainsMonoNerdFontMono-Regular.ttf"
+        ))),
+    );
     fonts
         .families
         .get_mut(&FontFamily::Proportional)
@@ -168,14 +174,23 @@ fn install_interface_faces(
         .families
         .get_mut(&FontFamily::Monospace)
         .unwrap()
-        .insert(0, "terminal".into());
+        .insert(0, "jetbrains-nerd".into());
+    fonts
+        .families
+        .get_mut(&FontFamily::Monospace)
+        .unwrap()
+        .insert(1, "terminal".into());
+    fonts.families.insert(
+        FontFamily::Name("JetBrains Mono Nerd Font".into()),
+        vec!["jetbrains-nerd".into(), "terminal".into()],
+    );
     fonts.families.insert(
         FontFamily::Name("DejaVu Sans Mono".into()),
-        vec!["terminal".into()],
+        vec!["terminal".into(), "jetbrains-nerd".into()],
     );
     fonts.families.insert(
         FontFamily::Name("Liberation Sans".into()),
-        vec!["interface".into()],
+        vec!["interface".into(), "jetbrains-nerd".into()],
     );
     for (key, bytes) in [
         (
@@ -801,6 +816,30 @@ mod tests {
     use egui::{Event, Key, Modifiers, PointerButton, Pos2, RawInput, ViewportId};
 
     #[test]
+    fn terminal_fonts_cover_shell_prompt_icons() {
+        let ctx = Context::default();
+        install_fonts(&ctx);
+        let mut output = ctx.run_ui(Default::default(), |ui| {
+            ui.fonts_mut(|fonts| {
+                for family in [
+                    egui::FontFamily::Monospace,
+                    egui::FontFamily::Name("JetBrains Mono Nerd Font".into()),
+                    egui::FontFamily::Name("DejaVu Sans Mono".into()),
+                    egui::FontFamily::Name("Liberation Sans".into()),
+                ] {
+                    let font = egui::FontId::new(14., family);
+                    assert!(
+                        fonts
+                            .has_glyphs(&font, "\u{e0b0}\u{f07b}\u{f120}\u{f015}\u{f013}\u{f0201}"),
+                        "Missing shell-prompt icons in {font:?}"
+                    );
+                }
+            });
+        });
+        output.textures_delta.clear();
+    }
+
+    #[test]
     fn interface_fallback_covers_filename_glyphs_without_changing_terminal_family() {
         let ctx = Context::default();
         install_fonts(&ctx);
@@ -809,7 +848,7 @@ mod tests {
                 let definitions = fonts.definitions();
                 assert_eq!(
                     definitions.families[&egui::FontFamily::Monospace][0],
-                    "terminal"
+                    "jetbrains-nerd"
                 );
                 let cjk_installed = definitions.font_data.contains_key("System CJK");
                 for family in [

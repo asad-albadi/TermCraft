@@ -53,6 +53,7 @@ impl TerminalTab {
 }
 pub(super) fn font_family(font: TerminalFont) -> FontFamily {
     match font {
+        TerminalFont::JetBrainsMonoNerd => FontFamily::Name("JetBrains Mono Nerd Font".into()),
         TerminalFont::DejaVuSansMono => FontFamily::Name("DejaVu Sans Mono".into()),
         TerminalFont::LiberationSans => FontFamily::Name("Liberation Sans".into()),
         TerminalFont::MonospaceFallback => FontFamily::Monospace,
@@ -104,6 +105,7 @@ impl ProfileEditor {
 fn fonts(ui: &mut Ui, value: &mut TerminalFont) {
     ui.horizontal_wrapped(|ui| {
         for (font, label) in [
+            (TerminalFont::JetBrainsMonoNerd, "JetBrains Mono Nerd Font"),
             (TerminalFont::DejaVuSansMono, "DejaVu Sans Mono"),
             (TerminalFont::LiberationSans, "Liberation Sans"),
             (TerminalFont::MonospaceFallback, "Monospace fallback"),

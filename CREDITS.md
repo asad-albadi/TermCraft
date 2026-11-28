@@ -56,3 +56,9 @@ noVNC 1.7.0 by the noVNC authors, primarily Mozilla Public License 2.0; its inco
 Local original-package inspection uses zip 9.8.2 (MIT) and lzma-rs 0.3.0 (MIT), with CRC/crc-catalog (MIT OR Apache-2.0), typed-path (MIT OR Apache-2.0), constant_time_eq (CC0-1.0 OR MIT-0 OR Apache-2.0), and zeroize_derive (MIT OR Apache-2.0) as pinned in Cargo.lock. These independently implemented codecs decode user-selected archive bytes; original packages, executables, DLLs and other vendor assets are not bundled. Dependency source and licenses are recorded under `docs/parity-evidence/legacy-package-import/`.
 
 The optional Linux XDMCP clipboard engine derives from X.Org Xephyr 21.1.26 with a small session-readiness patch and xtrans 1.6.0 headers. Its pinned build inputs, patch, rebuild script and notices are recorded in `packaging/x11/xdmcp/readiness`; it is distinct from the unchanged stock Xephyr used when the host keyboard is inherited and clipboard is disabled. Native platform qualification is not inferred from this Linux build.
+
+Terminal coding font: JetBrains Mono Nerd Font Mono Regular, from Nerd Fonts v3.4.0 (upstream revision `fa7b859994228a9c8759f99c55a8d31ee92a1b5e`). The unmodified patched font is bundled under SIL OFL 1.1 with `assets/JetBrainsMono-OFL.txt` and the upstream `assets/NerdFonts-LICENSE`. The Mono variant supplies fixed-width Powerline/Nerd Font symbols used by modern shell prompts. Existing explicitly selected terminal faces are retained and gain this glyph fallback.
+
+| Font asset | SHA-256 |
+| --- | --- |
+| JetBrainsMonoNerdFontMono-Regular.ttf | f01031f40e48dc29e1112e6b0b0450a2c6cd097f3f35cfff05c55cb311f8034c |

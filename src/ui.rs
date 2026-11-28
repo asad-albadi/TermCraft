@@ -61,6 +61,7 @@ mod shortcuts;
 mod ssh_key_tests;
 mod ssh_keys;
 mod ssh_options;
+mod terminal_cursor;
 mod terminal_mouse;
 mod terminal_output;
 mod terminal_selection;

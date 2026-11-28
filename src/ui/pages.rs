@@ -1980,6 +1980,7 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
         t.screen.resize(cols, rows);
         t.resize_transport();
     }
+    let cursor_on = super::terminal_cursor::visible(ui, t, p);
     let dark = ui.visuals().dark_mode;
     let palette = if dark {
         &t.terminal_settings.dark_palette
@@ -2114,7 +2115,7 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
                     clicked |= label.clicked();
                     hovered |= label.hovered();
                     any_selection |= label.dragged();
-                    if index == hist + t.screen.row && t.screen.cursor_visible && t.running() {
+                    if index == hist + t.screen.row && cursor_on {
                         let cursor = Rect::from_min_size(
                             label.rect.min
                                 + vec2(t.screen.col.min(t.screen.cols - 1) as f32 * cell_width, 0.),
@@ -2509,7 +2510,8 @@ fn terminal_layout_profile(
         let measured = measure.is_some();
         if let Some(measure) = &mut measure {
             let known_monospace = font.family == FontFamily::Monospace
-                || font.family == FontFamily::Name("DejaVu Sans Mono".into());
+                || font.family == FontFamily::Name("DejaVu Sans Mono".into())
+                || font.family == FontFamily::Name("JetBrains Mono Nerd Font".into());
             if !c.text.is_ascii() || c.text.len() != 1 || !known_monospace {
                 advance = measure(&c.text, &cell_font);
                 let target = cell_width * c.width.max(1) as f32;

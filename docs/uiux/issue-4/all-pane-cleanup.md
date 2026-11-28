@@ -1,5 +1,7 @@
 # Remaining panes and panels cleanup
 
+**Latest terminal correction:** focused cursors now blink on a 600 ms half-cycle, restart visible on input/focus/movement, respect remote hiding and stay steady with reduced motion. JetBrains Mono Nerd Font Mono is bundled as the default for unspecified profiles and as the icon fallback for existing font choices; explicitly saved choices are preserved. Font registration/choice are owner-authorized exceptions to the earlier font-source hold. Dialog organization remains unchanged. [Native symbol and cursor evidence](captures/terminal-font-cursor/README.md). The same local review launcher now selects this build. PR #8 stays draft and unmerged.
+
 **Latest icon correction:** the owner explicitly requested replacing the old glyphs in the session-type selector. All thirteen protocols now use distinct themed vector icons. This is an icon-only exception to the earlier dialog-source hold: layout, form fields, labels, selection and footer behavior stay intact. [Current native dark/light previews](captures/session-protocol-icons/README.md). The local Linux review launcher now selects this build and preserves Wayland. PR #8 remains draft and unmerged.
 
 ## Owner correction: terminal controls, separate app bars
