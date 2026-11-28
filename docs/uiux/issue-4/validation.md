@@ -212,3 +212,7 @@ See [the code guide and coverage record](error-messages.md). Final current-sourc
 The real refused-connection regression first exposed a backend that discarded the TCP cause, then a post-exit resize that overwrote the error. TCP errors now retain their endpoint and OS explanation; finished transports are not resized. Graceful exits and ordinary cancellations remain informational. Dialog-scope normalization against `5f6d3f2` confirms that fields, navigation, styling and layout sources outside the requested error presentation are preserved; the resize fix is separately covered by the live endpoint regression.
 
 This is the fresh current-library/local UI review build, using the documented cached pre-adapter GUI dependency set. Hosted platform CI and owner human acceptance are separate. PR #8 stays draft and unmerged.
+
+## Complete RDP UI review directory
+
+[The RDP correction record](error-messages.md#rdp-review-build-correction) documents helper selection and component identity. The local review directory now includes the matching verified RDP helper beside the GUI. Resolver4/4, catalogue10/10, scopedUI10/10, helper Ready/version1 and independent endpoint4/4 passed. The helper came from qualified source05a2234 with unchanged engine inputs; GUI and helper have separate recorded hashes. The launcher selects this complete review directory. No merge or production release is authorized.

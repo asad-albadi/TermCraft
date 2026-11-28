@@ -169,7 +169,21 @@ impl Diagnostic {
         let contains = |needles: &[&str]| needles.iter().any(|s| lower.contains(s));
         // Recognize reported causes only. Unknown or localized provider errors retain
         // their domain code and original explanation; numeric OS codes are not guessed.
-        let (suffix, title, next) = if contains(&[
+        let (suffix, title, next) = if context == Context::Rdp
+            && lower.starts_with("rdp helper is missing from this termcraft build.")
+        {
+            (
+                "119",
+                "RDP support is missing from this TermCraft build.",
+                "Use a complete TermCraft build containing its RDP helper. The missing component is on this computer; changing the remote Windows settings will not fix it.",
+            )
+        } else if context == Context::Rdp && lower.starts_with("rdp helper could not start.") {
+            (
+                "120",
+                "The local RDP helper could not start.",
+                "Check that the helper included with TermCraft can run and its required system libraries are available. Copy the details if the problem continues.",
+            )
+        } else if contains(&[
             "host key mismatch",
             "host key has changed",
             "host identification has changed",
@@ -414,6 +428,25 @@ pub fn sanitize(raw: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn missing_rdp_helper_is_not_a_remote_file_or_server_failure() {
+        let d = Diagnostic::new(
+            Context::Rdp,
+            "RDP helper is missing from this TermCraft build. Expected helper: /review/termcraft-rdp-engine. No such file or directory (os error 2)",
+        );
+        assert_eq!(d.code, "TC-RDP-119");
+        assert!(d.summary.contains("RDP support"));
+        assert!(d.next_step.contains("on this computer"));
+        let loader = Diagnostic::new(
+            Context::Rdp,
+            "RDP helper could not start. Helper: /review/termcraft-rdp-engine. No such file or directory (os error 2)",
+        );
+        assert_eq!(loader.code, "TC-RDP-120");
+        assert_eq!(
+            Diagnostic::new(Context::Rdp, "CA file: No such file or directory").code,
+            "TC-RDP-106"
+        );
+    }
     #[test]
     fn windows_and_unix_causes_share_codes_without_guessing_numeric_os_errors() {
         for text in [

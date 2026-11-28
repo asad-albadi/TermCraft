@@ -1,4 +1,5 @@
 //! In-app desktop sessions with an owned headless protocol worker.
+mod engine_path;
 mod loader_env;
 pub mod rdp_options;
 pub mod vnc;
@@ -167,19 +168,11 @@ impl DesktopConfig {
         }
     }
     pub fn default_engine_path() -> PathBuf {
-        let name = if cfg!(windows) {
-            "termcraft-rdp-engine.exe"
-        } else {
-            "termcraft-rdp-engine"
-        };
-        if cfg!(debug_assertions) {
-            return PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                .join("engines/rdp/target/debug")
-                .join(name);
-        }
-        std::env::current_exe()
-            .map(|exe| exe.with_file_name(name))
-            .unwrap_or_default()
+        engine_path::resolve(
+            std::env::current_exe().ok().as_deref(),
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")),
+            cfg!(debug_assertions),
+        )
     }
 }
 pub mod carrier;
@@ -632,6 +625,11 @@ fn supervise(
     } else {
         None
     };
+    if let Err(error) = std::fs::metadata(&path) {
+        if error.kind() == std::io::ErrorKind::NotFound {
+            return Err(engine_path::launch_error(&path, &error));
+        }
+    }
     // Development fixtures name their own helper. Installed releases accept only
     // the declared engine next to the application.
     let verified = if cfg!(debug_assertions) {
@@ -650,7 +648,7 @@ fn supervise(
             let (command, image) = helper.sealed_command()?;
             (command, Some(image))
         }
-        None => (Command::new(path), None),
+        None => (Command::new(&path), None),
     };
     #[cfg(target_os = "macos")]
     let (mut command, _snapshot) = match verified {
@@ -658,7 +656,7 @@ fn supervise(
             let (command, snapshot) = helper.snapshot_command()?;
             (command, Some(snapshot))
         }
-        None => (Command::new(path), None),
+        None => (Command::new(&path), None),
     };
     #[cfg(not(any(target_os = "linux", target_os = "macos")))]
     let mut command = Command::new(verified.as_ref().map_or(&path, |helper| &helper.path));
@@ -668,17 +666,9 @@ fn supervise(
         use std::os::windows::process::CommandExt;
         command.creation_flags(windows_sys::Win32::System::Threading::CREATE_NO_WINDOW);
     }
-    let mut child = command.spawn().map_err(|error| {
-        if cfg!(debug_assertions) {
-            format!(
-                "Development RDP helper could not start: {error}. Build it with scripts/run-dev.sh."
-            )
-        } else {
-            format!(
-                "Packaged RDP helper could not start: {error}. Check the declared system libraries."
-            )
-        }
-    })?;
+    let mut child = command
+        .spawn()
+        .map_err(|error| engine_path::launch_error(&path, &error))?;
     #[cfg(target_os = "linux")]
     drop(_image);
     #[cfg(windows)]

@@ -127,7 +127,7 @@ RUSTUP_TOOLCHAIN=1.96.1 ./scripts/run-dev.sh
 
 Rust 1.96.1 is the verified Linux toolchain. Release packaging tools require Python 3.11 or newer. Builds need a native C/C++ toolchain and the platform development libraries used by eframe/egui and the selected providers. A graphical desktop and working OpenGL drivers are required. Tests also need their documented endpoint fixtures; some Linux tests require OpenSSH tools and a C compiler. See [development notes](DESIGN.md) and the [validation evidence](PARITY_PROGRESS.md).
 
-The development script builds both the GUI and its independently locked RDP helper. After dependencies have been downloaded, set `TERMCRAFT_OFFLINE=1` to use Cargo's cache.
+The development script builds both the GUI and its independently locked RDP helper. When relocating a development review build, keep the matching `termcraft-rdp-engine` beside the GUI; the app prefers that adjacent helper before the source-tree fallback. After dependencies have been downloaded, set `TERMCRAFT_OFFLINE=1` to use Cargo's cache.
 
 For a native release build:
 

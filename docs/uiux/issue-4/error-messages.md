@@ -28,6 +28,8 @@ Existing connection forms, tabs, panels and confirmation flows retain their orga
 | `116` | Invalid settings/input reported by the operation |
 | `117` | Remote-file version conflict |
 | `118` | Network/route unavailable |
+| `119` | Local RDP helper missing from the application build |
+| `120` | Local RDP helper exists but cannot start |
 
 Examples: `TC-SSH-101` asks the user to check the host/port and whether its service is running; `TC-START-114` asks the user to launch from an available graphical desktop; `TC-TRANSFER-117` asks them to compare local and remote versions before replacing anything. Certificate/host-key errors require verifying identity, never weakening verification.
 
@@ -129,3 +131,13 @@ Presentation/notification call sites by source file (including feature-specific 
 | `src/ui/windows_platform.rs` | 1 |
 | `src/ui/xdmcp.rs` | 2 |
 | `src/ui/xserver.rs` | 4 |
+
+## RDP review-build correction
+
+The first local UI review directory omitted the RDP helper. Development lookup also assumed the source-tree helper existed, so the application reported a generic missing-file error when opening RDP. Development builds now prefer an adjacent helper, falling back to the source-tree build only when no adjacent component is present. Release lookup and manifest verification remain in force.
+
+The corrected local review directory contains both the current GUI and `termcraft-rdp-engine`, plus notices. The helper is the previously qualified Linux component from source `05a2234`, artifact `15246857366`; its package-manifest SHA-256 was verified and all engine sources, lockfile and referenced options/wire/loader inputs remain unchanged. It is not relabelled as a newly compiled engine. Any later review-bundle refresh must retain the matching helper.
+
+Missing helpers produce `TC-RDP-119` with a local-build explanation; existing helpers that fail to launch produce `TC-RDP-120`. A missing loader is distinguished from a missing executable. Missing CA files retain their separate error classification.
+
+Validation: resolver/error-format tests **4/4**, updated catalogue **10/10**, scoped UI **10/10**, helper startup/private protocol **PASS**, and **4/4** endpoint checks for actual adjacent lookup, frame/input, certificate-change resolution and transport/helper shutdown. The independent endpoint fixture was rebuilt from current source after an old local fixture lacked the current CA layout; TLS checks and endpoint assertions were retained. The review launcher uses the new directory and preserves Wayland. Full platform/release qualification and owner human checks remain separate. PR #8 stays draft and unmerged.
