@@ -148,7 +148,7 @@ impl Form {
                     });
                 }
                 if let Some(error) = self.error.as_ref().or_else(|| status.as_ref().and_then(|status| status.error.as_ref())) {
-                    ui.colored_label(ui.visuals().error_fg_color, error);
+                    crate::ui::errors::show(ui, crate::ui::errors::Domain::Server, error);
                 }
                 if busy {
                     ui.ctx().request_repaint_after(Duration::from_millis(125));

@@ -403,7 +403,10 @@ impl Workspace {
         ids.sort_unstable();
         ids.dedup();
         if after.len > MAX_AFTER_PASTE {
-            self.message("Too much typed input followed the paste; the paste was cancelled.");
+            self.error_in(
+                errors::Domain::Clipboard,
+                "Too much typed input followed the paste; the paste was cancelled.",
+            );
             return;
         }
         if self.pending_paste.is_some() {
@@ -415,11 +418,14 @@ impl Workspace {
             .filter_map(|id| self.tabs.iter().find(|t| t.id == *id))
             .collect();
         if targets.len() != ids.len() {
-            self.message("Paste cancelled: an original target has closed.");
+            self.error_in(
+                errors::Domain::Clipboard,
+                "Paste cancelled: an original target has closed.",
+            );
             return;
         }
         if targets.len() > 1 && targets.iter().any(|t| !t.broadcast_allowed()) {
-            self.message("Paste cancelled: compatibility clients require private input because their authentication is not observable.");
+            self.error_in(errors::Domain::Clipboard,"Paste cancelled: compatibility clients require private input because their authentication is not observable.");
             return;
         }
         if targets.is_empty()
@@ -429,7 +435,7 @@ impl Workspace {
                     || t.ssh.is_some() && (!t.ssh_connected || t.auth.is_some())
             })
         {
-            self.message("Paste was not started: every target must be connected and ready, with no paste already active.");
+            self.error_in(errors::Domain::Clipboard,"Paste was not started: every target must be connected and ready, with no paste already active.");
             return;
         }
         if text
@@ -438,7 +444,8 @@ impl Workspace {
             .saturating_mul(targets.len())
             > 16 * 1024 * 1024
         {
-            self.message(
+            self.error_in(
+                errors::Domain::Clipboard,
                 "Paste target batch exceeds 16 MiB. Select fewer targets or paste less text.",
             );
             return;
@@ -451,7 +458,7 @@ impl Workspace {
                 .encode(&text)
                 .and_then(|_| after.validate_for(tab))
             {
-                self.message(error);
+                self.error_in(errors::Domain::Clipboard, error);
                 return;
             }
             let settings = harbor_workspace::terminal::paste::PasteSettings {
@@ -465,7 +472,7 @@ impl Workspace {
                     jobs.push((tab.id, c));
                 }
                 PasteDecision::Reject(error) => {
-                    self.message(error);
+                    self.error_in(errors::Domain::Clipboard, error);
                     return;
                 }
             }

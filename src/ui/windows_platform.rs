@@ -22,6 +22,7 @@ pub(super) struct State {
     result: Option<Receiver<Result<ResultView, String>>>,
     cancel: Option<Arc<AtomicBool>>,
     message: String,
+    message_error: bool,
     listing: Option<(RegistryPath, Listing)>,
     selected: Option<(String, RegistryValue)>,
     edit: String,
@@ -50,8 +51,12 @@ impl State {
                 self.result = Some(rx);
                 self.cancel = Some(cancel);
                 self.message = "Working…".into();
+                self.message_error = false;
             }
-            Err(e) => self.message = format!("Cannot start Windows operation: {e}"),
+            Err(e) => {
+                self.message = format!("Cannot start Windows operation: {e}");
+                self.message_error = true;
+            }
         }
     }
     pub(super) fn poll(&mut self) {
@@ -63,8 +68,13 @@ impl State {
             Err(_) => None,
         });
         if let Some(value) = ready {
+            let cancelled = self
+                .cancel
+                .as_ref()
+                .is_some_and(|flag| flag.load(Ordering::Relaxed));
             self.result = None;
             self.cancel = None;
+            self.message_error = false;
             match value {
                 Ok(ResultView::Message(s)) => self.message = s,
                 Ok(ResultView::Listing(path, listing)) => {
@@ -73,7 +83,11 @@ impl State {
                     self.preview = None;
                     self.message = "Read complete".into();
                 }
-                Err(error) => self.message = error,
+                Err(error) => {
+                    self.message_error =
+                        !(cancelled && error.to_ascii_lowercase().contains("cancel"));
+                    self.message = error;
+                }
             }
         }
     }
@@ -88,7 +102,10 @@ impl State {
                         .map(|listing| ResultView::Listing(path, listing))
                 });
             }
-            Err(error) => self.message = error,
+            Err(error) => {
+                self.message = error;
+                self.message_error = true;
+            }
         }
     }
     pub(super) fn render(&mut self, ui: &mut Ui) {
@@ -116,12 +133,12 @@ impl State {
      });
     }
     if let Some(address)=navigate{self.address=address;self.browse();}
-    if let Some((name,value))=choose{self.edit_kind=value.kind;match value.edit_text(){Ok(text)=>{self.edit=text;self.selected=Some((name,value));},Err(error)=>{self.message=error;self.selected=None;}};self.preview=None;}
+    if let Some((name,value))=choose{self.edit_kind=value.kind;match value.edit_text(){Ok(text)=>{self.edit=text;self.selected=Some((name,value));},Err(error)=>{self.message=error;self.message_error=true;self.selected=None;}};self.preview=None;}
     if self.write_enabled && let Some((name,old))=self.selected.clone(){
      ui.label(format!("Existing value: {} [{}]",if name.is_empty(){"(Default)"}else{&name},old.type_name()));
      egui::ComboBox::from_id_salt("registry-type").selected_text(RegistryValue{kind:self.edit_kind,bytes:vec![]}.type_name()).show_ui(ui,|ui|{for (kind,label) in [(1,"REG_SZ"),(2,"REG_EXPAND_SZ"),(7,"REG_MULTI_SZ (JSON string array)"),(4,"REG_DWORD (decimal)"),(11,"REG_QWORD (decimal)"),(3,"REG_BINARY (hex bytes)"),(0,"REG_NONE (hex bytes)")]{if ui.selectable_value(&mut self.edit_kind,kind,label).changed(){self.preview=None;}}});
      if ui.add(egui::TextEdit::multiline(&mut self.edit).desired_rows(3)).changed(){self.preview=None;}
-     if ui.button("Preview value change").clicked(){match RegistryValue::parse_text(self.edit_kind,&self.edit){Ok(replacement)=>{if let Some((path,_))=&self.listing{self.preview=Some(ConfirmedWrite{path:path.clone(),name,expected:old,replacement});}},Err(error)=>self.message=error}}
+     if ui.button("Preview value change").clicked(){match RegistryValue::parse_text(self.edit_kind,&self.edit){Ok(replacement)=>{if let Some((path,_))=&self.listing{self.preview=Some(ConfirmedWrite{path:path.clone(),name,expected:old,replacement});}},Err(error)=>{self.message=error;self.message_error=true;}}}
     }
    });
    if self.write_enabled && let Some(preview)=self.preview.clone(){
@@ -133,12 +150,17 @@ impl State {
     });
    }
   });
-        ui.label(&self.message);
+        if self.message_error {
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Tools, &self.message);
+        } else {
+            ui.label(&self.message);
+        }
         if self.result.is_some() {
             if ui.button("Cancel / stop waiting").clicked() {
                 if let Some(cancel) = &self.cancel {
                     cancel.store(true, Ordering::Relaxed);
                 }
+                self.message_error = false;
                 self.message="Cancellation requested. A registry write already applied cannot be undone by cancellation.".into();
             }
             ui.ctx().request_repaint_after(Duration::from_millis(50));

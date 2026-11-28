@@ -167,6 +167,10 @@ Use `--data-dir /path/to/workspace` to choose an independent workspace. Eligible
 
 Read the [privacy policy](PRIVACY.md) for network activity, credentials, retained files and deletion details.
 
+## Troubleshooting
+
+Application errors include a stable `TC-…` code. Select the code for a suggested next step, technical details and **Copy error details**. Recognized credentials are redacted from reports. See the [error-code guide](docs/uiux/issue-4/error-messages.md).
+
 ## Development
 
 ```sh

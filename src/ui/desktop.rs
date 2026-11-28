@@ -597,7 +597,11 @@ impl Workspace {
 pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     let state = tab.desktop.as_mut().unwrap();
     if !state.error.is_empty() {
-        ui.colored_label(ui.visuals().error_fg_color, &state.error);
+        crate::ui::errors::show(
+            ui,
+            crate::ui::errors::protocol(&tab.session.protocol),
+            &state.error,
+        );
     }
     let mut answer = None;
     let mut vault_use = false;

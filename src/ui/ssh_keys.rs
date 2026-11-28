@@ -381,7 +381,11 @@ impl Workspace {
             |ui| {
                 fluent::dialog_body(ui, size, |ui| {
                     if !self.ssh_keys.error.is_empty() {
-                        ui.colored_label(ui.visuals().error_fg_color, &self.ssh_keys.error);
+                        crate::ui::errors::show(
+                            ui,
+                            crate::ui::errors::Domain::Keys,
+                            &self.ssh_keys.error,
+                        );
                     }
                     ui.label(&self.ssh_keys.status);
                     if busy {

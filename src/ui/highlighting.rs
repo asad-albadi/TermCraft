@@ -97,7 +97,7 @@ impl Workspace {
             });
             if let Some(index)=remove {editor.rules.remove(index);}
             if ui.add_enabled(editor.rules.len()<MAX_RULES,Button::new("Add rule")).clicked(){editor.rules.push(HighlightRule::default());}
-            if !editor.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&editor.error);}
+            if !editor.error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Highlight, &editor.error);}
             ui.horizontal(|ui|{save=primary(ui,"Save highlighting").clicked();cancel=ui.button("Cancel").clicked();});
         });
         if save {

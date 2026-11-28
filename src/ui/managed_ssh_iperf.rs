@@ -156,7 +156,7 @@ fn controls(
             ui.monospace(address.to_string());
         }
         if let Some(error) = &status.error {
-            ui.colored_label(ui.visuals().error_fg_color, error);
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Server, error);
         }
         if !status.log.is_empty() {
             ui.collapsing("Service log", |ui| {
@@ -169,7 +169,7 @@ fn controls(
         }
     }
     if let Some(error) = error {
-        ui.colored_label(ui.visuals().error_fg_color, error);
+        crate::ui::errors::show(ui, crate::ui::errors::Domain::Server, error);
     }
     if active(supervisor, id) {
         ui.ctx().request_repaint_after(Duration::from_millis(125));

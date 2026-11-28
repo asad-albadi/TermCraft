@@ -862,7 +862,7 @@ fn puzzle_options(ui: &mut Ui, play: &mut PlayState) {
         });
         if let Some(updated) = topology_update { draft = updated; }
         if let Err(error) = draft.validate() {
-            ui.colored_label(ui.visuals().error_fg_color, error);
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Game, error);
         }
         ui.label("Your current board is kept if a new board cannot be made. Try another seed or simpler settings if generation cannot finish.");
         play.draft = Some(draft);
@@ -1176,7 +1176,10 @@ _=>{}}});
                 controls(ui,play,id);
                 ScrollArea::both().show(ui,|ui|{draw_scene(ui,play);});
                 if outcome!=GameOutcome::Playing{ui.strong("Game finished — Undo, Reset or New game to continue.");}
-                if !play.message.is_empty(){ui.label(RichText::new(&play.message).color(ui.visuals().warn_fg_color));}
+                if !play.message.is_empty(){
+                    if play.message.starts_with("Game saved") || play.message.starts_with("Game loaded") || play.message.starts_with("Earlier game state saved") {ui.label(&play.message);}
+                    else {crate::ui::errors::warning(ui,crate::ui::errors::Domain::Game,&play.message);}
+                }
             }
         });});
         // Let focused controls and popups consume their events first. Only the

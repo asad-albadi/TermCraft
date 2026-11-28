@@ -25,6 +25,7 @@ mod desktop;
 mod desktop_gateway;
 #[cfg(test)]
 mod dialog_tests;
+mod errors;
 mod explorer;
 #[cfg(test)]
 mod explorer_tests;
@@ -396,10 +397,21 @@ impl TerminalTab {
                         message,
                     } if connection == self.id => {
                         self.ssh_connected = false;
+                        let normal = matches!(
+                            message.as_str(),
+                            "Connection ended"
+                                | "Connection cancelled"
+                                | "Process ended with status 0"
+                        );
+                        self.connection_status = if normal {
+                            message.clone()
+                        } else {
+                            "Disconnected".into()
+                        };
                         self.waiting_for_x11 = false;
                         self.output_ended = true;
                         self.auth = None;
-                        self.error = message;
+                        self.error = if normal { String::new() } else { message };
                         if let Some(browser) = &mut self.browser {
                             browser.loading = false;
                         }
@@ -679,6 +691,7 @@ pub struct Workspace {
     status: String,
     status_time: Instant,
     status_error: bool,
+    status_context: errors::Domain,
     quick_host: String,
     quick_protocol: String,
     layout_state: harbor_workspace::workspace::layout::LayoutState,
@@ -821,6 +834,7 @@ impl Workspace {
             status: "Ready".into(),
             status_time: Instant::now(),
             status_error: false,
+            status_context: errors::Domain::App,
             quick_host: String::new(),
             quick_protocol: "SSH".into(),
             layout_state: harbor_workspace::workspace::layout::LayoutState::default(),
@@ -856,8 +870,14 @@ impl Workspace {
         self.status_error = false;
     }
     fn error_message(&mut self, message: impl Into<String>) {
+        self.error_in(errors::Domain::App, message);
+    }
+    fn error_in(&mut self, context: errors::Domain, message: impl Into<String>) {
+        let message = message.into();
+        let cancelled = errors::cancelled(&message);
         self.message(message);
-        self.status_error = true;
+        self.status_context = context;
+        self.status_error = !cancelled;
     }
     fn persist(&mut self) {
         if self.import_applying() {
@@ -865,7 +885,8 @@ impl Workspace {
             return;
         }
         if !self.store_ok {
-            self.error_message(
+            self.error_in(
+                errors::Domain::Settings,
                 "Settings are damaged; export a backup before resetting them in Settings.",
             );
             return;
@@ -873,7 +894,10 @@ impl Workspace {
         self.shared_sources.dirty = true;
         match self.store.save(&self.store_path) {
             Ok(()) => self.message("Workspace saved"),
-            Err(e) => self.error_message(format!("Could not save workspace: {e}")),
+            Err(e) => self.error_in(
+                errors::Domain::Settings,
+                format!("Could not save workspace: {e}"),
+            ),
         }
     }
     fn open_session_form(&mut self, session: Session) {
@@ -1124,7 +1148,7 @@ impl Workspace {
             }
         }
         if !tab.error.is_empty() {
-            self.error_message(tab.error.clone());
+            self.error_in(errors::protocol(&tab.session.protocol), tab.error.clone());
         }
         tab.resize_transport();
         self.tabs.push(tab);
@@ -1941,7 +1965,14 @@ impl Workspace {
                             ctx.send_viewport_cmd(ViewportCommand::Close);
                         }
                         Err(e) => {
-                            eprintln!("Screenshot failed: {e}");
+                            eprintln!(
+                                "{}",
+                                harbor_workspace::diagnostics::Diagnostic::new(
+                                    errors::Domain::Files,
+                                    &format!("Screenshot failed: {e}")
+                                )
+                                .report()
+                            );
                             ctx.send_viewport_cmd(ViewportCommand::Close);
                         }
                     }

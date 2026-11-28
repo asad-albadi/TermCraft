@@ -81,7 +81,7 @@ impl State {
             {
                 Ok(items) => items.iter().find(|item| item.id == recommended.id),
                 Err(error) => {
-                    ui.colored_label(ui.visuals().error_fg_color, error.to_string());
+                    crate::ui::errors::show(ui, crate::ui::errors::Domain::Package, error.to_string());
                     return;
                 }
             };

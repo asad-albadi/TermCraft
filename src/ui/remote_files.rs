@@ -547,7 +547,7 @@ impl TransferUi {
                 }
             });
             if let Some(error) = &self.error {
-                ui.colored_label(ui.visuals().error_fg_color, error);
+                crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error);
             }
             ui.horizontal_wrapped(|ui| {
                 if ui
@@ -924,11 +924,11 @@ impl Workspace {
                         .fluent_hint("Replacement is enabled for transfers. Uncheck to preserve conflicting destination files.");
                 }
                 if let Some(error) = &tab.transfer_ui.error {
-                    ui.colored_label(ui.visuals().error_fg_color,error);
+                    crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error);
                 }
                 let browser = tab.browser.as_ref().unwrap();
                 if browser.loading { ui.horizontal(|ui| { ui.spinner(); ui.label("Loading files…"); }); }
-                if let Some(error) = &browser.error { ui.colored_label(ui.visuals().error_fg_color,error); }
+                if let Some(error) = &browser.error { crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error); }
                 if !tab.transfer_ui.events.is_empty() {
                     let active = tab.transfer_ui.events.iter().filter(|e|e.outcome.is_none()).count();
                     let attention = tab.transfer_ui.events.iter().any(|e|!matches!(e.outcome,Some(TransferOutcome::Completed)));
@@ -1001,7 +1001,7 @@ impl Workspace {
                                     && browser.error.is_none()
                                 {
                                     ui.label(
-                                        RichText::new("This directory is empty.").color(muted(ui)),
+                                        RichText::new(if tab.ssh_connected {"This directory is empty."} else {"Connect or reconnect to browse remote files."}).color(muted(ui)),
                                     );
                                 }
                             });

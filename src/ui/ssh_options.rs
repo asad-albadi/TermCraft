@@ -39,7 +39,7 @@ pub(super) fn session(ui: &mut Ui, s: &mut Session, defaults: &SshDefaults) {
             ui.checkbox(&mut proxy.authenticate,"Require proxy sign-in");
             ui.small("Proxy sign-in happens before SSH encryption; use a trusted proxy/network. Credentials can be saved in the vault from the sign-in prompt. Typed proxy settings require embedded SSH.");
         }
-        if let Err(message)=options.validate(defaults) { ui.colored_label(Color32::from_rgb(180,42,42),message); }
+        if let Err(message)=options.validate(defaults) { crate::ui::errors::show(ui,crate::ui::errors::Domain::Ssh,message); }
         let fingerprint=serde_json::to_string(&(s.clone(),defaults)).unwrap_or_default();
         let state=ui.ctx().data_mut(|data|data.get_temp_mut_or_default::<std::sync::Arc<std::sync::Mutex<Preview>>>(Id::new("ssh-config-preview")).clone());
         let mut preview=state.lock().unwrap_or_else(|p|p.into_inner());
@@ -52,9 +52,9 @@ pub(super) fn session(ui: &mut Ui, s: &mut Session, defaults: &SshDefaults) {
             Ok(resolved)=>{
                 ui.label(format!("{}@{}:{} · {} gateway(s) · timeout {}s · keepalive {}",resolved.session.user,resolved.session.host,resolved.session.port,resolved.gateways.len(),resolved.connect_timeout_secs,resolved.keepalive_secs.map(|n|format!("{n}s")).unwrap_or_else(||"disabled".into())));
                 for field in &resolved.report.fields {ui.small(format!("{} · {}:{} · {}",field.field,field.source,field.line,if field.applied {"candidate"}else{"session/earlier value takes precedence"}));}
-                for field in &resolved.report.unsupported {ui.colored_label(Color32::from_rgb(180,42,42),format!("Unsupported: {} · {}:{}",field.field,field.source,field.line));}
+                for field in &resolved.report.unsupported {crate::ui::errors::show(ui,crate::ui::errors::Domain::Ssh,format!("Unsupported: {} · {}:{}",field.field,field.source,field.line));}
                 if resolved.report.requires_compatibility() {ui.label("Choose OpenSSH compatibility to use this file's native semantics.");if ui.button("Use OpenSSH compatibility").clicked(){s.ssh_engine=SshEngine::OpenSsh;s.ssh_options.prefer_config=false;}}
-            },Err(message)=>{ui.colored_label(Color32::from_rgb(180,42,42),message);}
+            },Err(message)=>{crate::ui::errors::show(ui,crate::ui::errors::Domain::Ssh,message);}
         }}else{ui.small("Settings changed; preview again for current values.");}}
     });
 }

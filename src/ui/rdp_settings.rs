@@ -238,7 +238,7 @@ pub(super) fn session(ui: &mut Ui, session: &mut Session, section: super::pages:
         harbor_workspace::connection::freerdp_arguments(session).map(|_| ())
     };
     if let Err(error) = result {
-        ui.colored_label(ui.visuals().error_fg_color, error);
+        crate::ui::errors::show(ui, crate::ui::errors::Domain::Rdp, error);
     }
 }
 #[cfg(test)]

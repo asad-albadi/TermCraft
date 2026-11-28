@@ -133,7 +133,10 @@ impl Workspace {
             })
         {
             self.clipboard_busy.store(false, Ordering::Release);
-            self.message("Clipboard paste was not requested: its original targets are not ready.");
+            self.error_in(
+                errors::Domain::Clipboard,
+                "Clipboard paste was not requested: its original targets are not ready.",
+            );
             return;
         }
         let (send, rx) = mpsc::sync_channel(1);
@@ -164,7 +167,10 @@ impl Workspace {
             }
             Err(_) => {
                 self.clipboard_busy.store(false, Ordering::Release);
-                self.message("Could not start the clipboard reader. Use keyboard paste.");
+                self.error_in(
+                    errors::Domain::Clipboard,
+                    "Could not start the clipboard reader. Use keyboard paste.",
+                );
             }
         }
     }
@@ -182,12 +188,18 @@ impl Workspace {
         };
         let pending = self.clipboard_read.take().unwrap();
         if !self.tabs.iter().any(|t| t.id == pending.source) {
-            self.message("Clipboard result discarded: its original terminal has closed.");
+            self.error_in(
+                errors::Domain::Clipboard,
+                "Clipboard result discarded: its original terminal has closed.",
+            );
             return;
         }
         match result {
             Ok(text) => self.queue_paste_to(pending.targets, text, Vec::new()),
-            Err(error) => self.message(error.chars().take(512).collect::<String>()),
+            Err(error) => self.error_in(
+                errors::Domain::Clipboard,
+                error.chars().take(512).collect::<String>(),
+            ),
         }
     }
 }

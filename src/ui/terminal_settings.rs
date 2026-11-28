@@ -20,7 +20,7 @@ impl TerminalTab {
         self.terminal_settings = settings;
     }
     pub(super) fn resize_transport(&mut self) {
-        if let Some(legacy) = &self.legacy {
+        if let Some(legacy) = self.legacy.as_ref().filter(|legacy| !legacy.is_finished()) {
             if let Err(error) = legacy.resize(self.screen.cols as u16, self.screen.rows as u16) {
                 self.error = error;
             }
@@ -28,7 +28,7 @@ impl TerminalTab {
         if let Some(process) = &self.process {
             process.resize(self.screen.cols as u16, self.screen.rows as u16);
         }
-        if let Some(ssh) = &self.ssh {
+        if let Some(ssh) = self.ssh.as_ref().filter(|ssh| !ssh.is_finished()) {
             if let Err(error) = ssh.try_send(harbor_workspace::ssh::ConnectionCommand::Resize {
                 cols: self.screen.cols as u32,
                 rows: self.screen.rows as u32,
@@ -268,7 +268,7 @@ impl Workspace {
                 ui.label("Backspace sends");backspace(ui,&mut editor.settings.backspace);dimensions(ui,&mut editor.settings.dimensions);
                 ui.push_id("light",|ui|{CollapsingHeader::new("Light palette").show(ui,|ui|palette(ui,&mut editor.settings.light_palette));});ui.push_id("dark",|ui|{CollapsingHeader::new("Dark palette").show(ui,|ui|palette(ui,&mut editor.settings.dark_palette));});
             });
-            if !editor.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&editor.error);}
+            if !editor.error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Session, &editor.error);}
             ui.horizontal_wrapped(|ui|{save=primary(ui,"Save global profile").clicked();cancel=ui.button("Cancel").clicked();});
         });
         if save {

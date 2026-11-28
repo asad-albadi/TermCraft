@@ -146,7 +146,7 @@ impl State {
             if let Some(result) = &self.status {
                 match result {
                     Ok(status) => { ui.label(status); }
-                    Err(error) => { ui.colored_label(ui.visuals().error_fg_color, error); }
+                    Err(error) => { crate::ui::errors::show(ui, crate::ui::errors::Domain::Plugin, error); }
                 }
             }
             if let Some(job) = &self.job {

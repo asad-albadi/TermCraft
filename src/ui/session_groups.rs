@@ -101,7 +101,16 @@ impl Workspace {
             self.message("No saved sessions found in that folder.");
             return;
         }
-        self.message(format!("{} launches submitted; {} failed. Authentication and remote connection results appear in each tab.",report.accepted.len(),report.failed.len()));
+        let summary = format!(
+            "{} launches submitted; {} failed. Authentication and remote connection results appear in each tab.",
+            report.accepted.len(),
+            report.failed.len()
+        );
+        if report.failed.is_empty() {
+            self.message(summary);
+        } else {
+            self.error_in(errors::Domain::Session, summary);
+        }
         self.session_groups.folder = folder.into();
         self.session_groups.report = Some(report);
     }
@@ -123,7 +132,7 @@ impl Workspace {
         let spec = match spec {
             Ok(s) => s,
             Err(e) => {
-                self.message(e);
+                self.error_in(errors::Domain::Shortcut, e);
                 return;
             }
         };
@@ -160,7 +169,10 @@ impl Workspace {
             });
         match spawned {
             Ok(_) => self.session_groups.shortcut = Some(rx),
-            Err(e) => self.message(format!("Could not start shortcut dialog: {e}")),
+            Err(e) => self.error_in(
+                errors::Domain::Shortcut,
+                format!("Could not start shortcut dialog: {e}"),
+            ),
         }
     }
     pub(super) fn session_group_windows(&mut self, ctx: &Context) {
@@ -182,7 +194,10 @@ impl Workspace {
                     self.message(format!("Launch shortcut saved: {}", path.display()))
                 }
                 Ok(None) => self.message("Shortcut creation canceled."),
-                Err(e) => self.message(format!("Shortcut was not saved: {e}")),
+                Err(e) => self.error_in(
+                    errors::Domain::Shortcut,
+                    format!("Shortcut was not saved: {e}"),
+                ),
             }
         }
         if let Some(report) = &self.session_groups.report {
@@ -194,7 +209,7 @@ impl Workspace {
                     ui.strong(&self.session_groups.folder);
                     ui.label(format!("{} submitted · {} failed", report.accepted.len(), report.failed.len()));
                     ui.label("Submitted sessions connect independently. Check each tab for authentication or later connection failures.");
-                    for failure in &report.failed { ui.label(format!("{}: {}", failure.name, failure.error)); }
+                    for failure in &report.failed { crate::ui::errors::show(ui,crate::ui::errors::Domain::Session,format!("{}: {}", failure.name, failure.error)); }
                 });
                 close = ui.button("Close").clicked();
             });

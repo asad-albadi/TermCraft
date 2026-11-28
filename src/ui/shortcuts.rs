@@ -502,8 +502,8 @@ impl Workspace {
             ui.label("Changes save immediately. Terminal history shortcuts scroll locally. Text fields, authentication and remote desktop capture suppress application actions.");
             ui.small("Native clipboard events keep their platform meaning. Command means Ctrl on Windows/Linux and Cmd on macOS.");
             if let Some(action)=self.shortcut_capture {ui.label(format!("Press a new shortcut for {}",action.label()));if ui.button("Cancel key capture").clicked(){self.shortcut_capture=None;}}
-            if let Err(error)=self.store.preferences.shortcuts.validate(){ui.colored_label(ui.visuals().error_fg_color,error.0);}
-            if !self.shortcut_error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&self.shortcut_error);}
+            if let Err(error)=self.store.preferences.shortcuts.validate(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Shortcut, error.0);}
+            if !self.shortcut_error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Shortcut, &self.shortcut_error);}
             fluent::dialog_body(ui,size,|ui|{Grid::new("shortcut-bindings").num_columns(4).show(ui,|ui| {
                 for action in Action::ALL {
                     ui.label(action.label());

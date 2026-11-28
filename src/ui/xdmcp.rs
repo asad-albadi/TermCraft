@@ -296,7 +296,7 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
         }
     }
     if !state.error.is_empty() {
-        ui.colored_label(ui.visuals().error_fg_color, &state.error);
+        crate::ui::errors::show(ui, crate::ui::errors::Domain::X11, &state.error);
     }
     ui.small(format!(
         "Selected endpoint: {}",
@@ -461,7 +461,11 @@ pub(super) fn settings(ui: &mut Ui, s: &mut Session, state: &mut State) {
     });
     s.xdmcp_options.advertise_address = state.advertise.parse().ok();
     if !state.advertise.is_empty() && s.xdmcp_options.advertise_address.is_none() {
-        ui.colored_label(Color32::RED, "Enter a valid local IPv4 address");
+        crate::ui::errors::show(
+            ui,
+            crate::ui::errors::Domain::X11,
+            "Enter a valid local IPv4 address",
+        );
     }
     if cfg!(all(windows, target_arch = "x86_64")) {
         ui.checkbox(

@@ -1020,11 +1020,14 @@ impl Workspace {
             return;
         }
         if let Err(error) = config.validate() {
-            self.message(error);
+            self.error_in(errors::Domain::Shared, error);
             return;
         }
         if self.store.shared_sources.len() >= 32 {
-            self.message("At most 32 shared sources can be active");
+            self.error_in(
+                errors::Domain::Shared,
+                "At most 32 shared sources can be active",
+            );
             return;
         }
         let id = config.id.clone();
@@ -1152,7 +1155,7 @@ impl Workspace {
                     self.persist();
                 }
             }
-            Err(error) => self.message(error),
+            Err(error) => self.error_in(errors::Domain::Shared, error),
         }
     }
 }
@@ -1176,8 +1179,7 @@ impl Workspace {
                 .default_open(true)
                 .show(ui, |ui| {
                     if !r.error.is_empty() {
-                        ui.add(Label::new(&r.error).truncate())
-                            .fluent_hint(&r.error);
+                        crate::ui::errors::show(ui, crate::ui::errors::Domain::Shared, &r.error);
                     }
                     ui.horizontal_wrapped(|ui| {
                         if ui
@@ -1311,7 +1313,7 @@ impl Workspace {
       ui.label(&cfg.name);if ui.add_enabled(!saving,Button::new("Refresh")).clicked(){refresh=Some(cfg.id.clone());}
       if ui.add_enabled(!saving,Button::new("Edit…")).clicked(){edit=Some(cfg.clone());}
       if ui.add_enabled(!saving,Button::new("Remove source")).clicked(){remove=Some(cfg.id.clone());}
-     });if let Some(r)=self.shared_sources.runtime.get(&cfg.id){ui.label(&r.status);if !r.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&r.error);}}});
+     });if let Some(r)=self.shared_sources.runtime.get(&cfg.id){ui.label(&r.status);if !r.error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Shared, &r.error);}}});
     }
    });
    add = ui.button("Add shared source…").clicked();
@@ -1388,7 +1390,10 @@ impl Workspace {
         }) {
             drop(cleanup);
         } else {
-            self.message("Source removed; its private cache cleanup could not start.");
+            self.error_in(
+                errors::Domain::Shared,
+                "Source removed; its private cache cleanup could not start.",
+            );
         }
     }
     fn shared_source_draft(&mut self, ctx: &Context) {
@@ -1422,7 +1427,7 @@ impl Workspace {
      }
     }
     ui.horizontal_wrapped(|ui|{ui.label("Format");ui.selectable_value(&mut draft.format,SharedFormat::Workspace,"TermCraft JSON");ui.selectable_value(&mut draft.format,SharedFormat::Moba,"Moba SSH");ui.selectable_value(&mut draft.format,SharedFormat::Putty,"PuTTY SSH .reg");});
-    if !draft.error.is_empty(){ui.colored_label(ui.visuals().error_fg_color,&draft.error);}
+    if !draft.error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Shared, &draft.error);}
    });
                 });
                 ui.horizontal_wrapped(|ui| {

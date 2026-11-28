@@ -20,7 +20,10 @@ impl Workspace {
             return;
         }
         if self.http_auth_enabled && self.http_auth_token.is_empty() {
-            self.message("Enter an access token before starting authenticated sharing");
+            self.error_in(
+                errors::Domain::Server,
+                "Enter an access token before starting authenticated sharing",
+            );
             return;
         }
         let mut config = harbor_workspace::http_server::HttpShareConfig::new(
@@ -54,7 +57,10 @@ impl Workspace {
                 self.http_start = Some(Pending { result, cancel });
                 self.message("Starting HTTP sharing…");
             }
-            Err(error) => self.message(format!("Could not start HTTP sharing: {error}")),
+            Err(error) => self.error_in(
+                errors::Domain::Server,
+                format!("Could not start HTTP sharing: {error}"),
+            ),
         }
     }
     pub(super) fn poll_http_start(&mut self) {
@@ -77,7 +83,10 @@ impl Workspace {
                     self.http_log.clear();
                     self.message("HTTP sharing started");
                 }
-                Err(error) => self.message(format!("Could not start HTTP sharing: {error}")),
+                Err(error) => self.error_in(
+                    errors::Domain::Server,
+                    format!("Could not start HTTP sharing: {error}"),
+                ),
             }
         }
     }

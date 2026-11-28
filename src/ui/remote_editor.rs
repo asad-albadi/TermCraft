@@ -35,7 +35,11 @@ impl RemoteEditor {
             .open(&mut open).show(ctx, |ui| {
                 ScrollArea::vertical().id_salt(("ssh-document-details",self.id)).max_height(size.body_height*0.45).show(ui, |ui| {
                 ui.label(self.path.display()).on_hover_text(&self.endpoint);
-                ui.label(match &status {
+                match &status {
+                    DocumentStatus::Failed(message)=>{crate::ui::errors::show(ui,crate::ui::errors::Domain::Transfer,message);},
+                    DocumentStatus::Indeterminate(message)=>{crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,message);},
+                    DocumentStatus::Conflict=>{crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,"The remote file changed. Compare your edits with the remote version before choosing whether to replace it.");},
+                    _=>{                ui.label(match &status {
                     DocumentStatus::Opening => "Opening…",
                     DocumentStatus::Ready => "Ready",
                     DocumentStatus::Recovering => "Writing local recovery snapshot…",
@@ -47,7 +51,8 @@ impl RemoteEditor {
                     DocumentStatus::Cancelled => "Operation cancelled. A save may already have reached the server; compare the remote version before retrying. Local recovery is retained.",
                     DocumentStatus::Disconnected => "This connection ended. Your saved recovery copy is on this computer. Open the file again after reconnecting; compare your edits before saving.",
                     DocumentStatus::Failed(message) => message,
-                });
+                });},
+                }
                 let (remote_recovery, warning) = self.document.recovery_details();
                 ui.menu_button("Document details", |ui| {
                 ui.set_max_width(340.);
@@ -62,8 +67,8 @@ impl RemoteEditor {
                 }
                 if let Some(path) = remote_recovery { ui.small(format!("Remote staging recovery: {}", path.display())); }
                 });
-                if let Some(warning) = warning { ui.colored_label(ui.visuals().warn_fg_color, warning); }
-                if let Some(error) = &self.error { ui.colored_label(ui.visuals().error_fg_color, error); }
+                if let Some(warning) = warning { crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,warning); }
+                if let Some(error) = &self.error { crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error); }
                 });
                 ui.horizontal_wrapped(|ui| {
                     if status.busy() && status != DocumentStatus::Committing && ui.button("Cancel operation").clicked() { self.document.cancel_operation(); }
@@ -168,7 +173,7 @@ impl Workspace {
             });
         match result {
             Ok(editor) => self.remote_editors.push(editor),
-            Err(error) => self.message(error),
+            Err(error) => self.error_in(errors::Domain::Transfer, error),
         }
     }
     fn ftp_documents_block_close(&self, connection: Option<u64>) -> bool {
@@ -374,7 +379,7 @@ impl Workspace {
                         for editor in self.remote_editors.iter_mut().filter(|e| connection.is_none_or(|id| e.connection == id)) {
                             if editor.document.details().1 { if let Err(e) = editor.document.save(SavePolicy::VerifyUnchanged) { errors.push(e); } }
                         }
-                        if !errors.is_empty() { self.message(errors.join("; ")); }
+                        if !errors.is_empty() { self.error_in(errors::Domain::Transfer,errors.join("; ")); }
                     }
                     discard = ui.add_enabled(!busy, Button::new("Discard edits and close")).clicked();
                     cancel = ui.button("Cancel close").clicked();

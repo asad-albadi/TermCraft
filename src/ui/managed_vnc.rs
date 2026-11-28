@@ -89,7 +89,7 @@ impl ManagedVnc {
                 ui.label(format!("{:?}",s.state));
                 if s.state==ServiceState::Running {if let Some(address)=s.address{ui.monospace(address.to_string());}}
                 if s.state==ServiceState::Running { if let Some(mut address)=s.browser_address { if address.ip().is_unspecified() { address.set_ip(if address.is_ipv4() { std::net::Ipv4Addr::LOCALHOST.into() } else { std::net::Ipv6Addr::LOCALHOST.into() }); } let url=format!("http://{address}/");ui.hyperlink_to(&url,&url);ui.small("Use this listener’s literal interface IP for access from another computer. Custom hostnames and reverse proxy origins are not accepted."); } }
-                if let Some(error)=s.error{ui.colored_label(ui.visuals().error_fg_color,error);}
+                if let Some(error)=s.error{crate::ui::errors::show(ui, crate::ui::errors::Domain::Vnc, error);}
                 if busy {ui.ctx().request_repaint_after(Duration::from_millis(50));if ui.button("Stop VNC server").clicked(){let _=self.supervisor.stop(s.id);}}
             }
             if !busy&&ui.button("Start VNC server").clicked(){
@@ -105,7 +105,7 @@ impl ManagedVnc {
                     self.supervisor.begin_vnc(config)
                 })();self.password.zeroize();match result{Ok(id)=>{self.id=Some(id);self.error=None},Err(e)=>self.error=Some(e)}
             }
-            if let Some(error)=&self.error{ui.colored_label(ui.visuals().error_fg_color,error);}
+            if let Some(error)=&self.error{crate::ui::errors::show(ui, crate::ui::errors::Domain::Vnc, error);}
         });
     }
 }

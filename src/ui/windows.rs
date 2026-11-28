@@ -468,7 +468,7 @@ impl Workspace {
                 if let Some(index) = self.tabs.iter().position(|t| t.id == active) {
                     super::remote_files::authentication_ui(ui,&mut self.tabs[index]);
                     self.tabs[index].search_ui(ui);
-                    if !self.tabs[index].error.is_empty() { ui.colored_label(ui.visuals().error_fg_color, &self.tabs[index].error); }
+                    if !self.tabs[index].error.is_empty() { crate::ui::errors::show(ui, crate::ui::errors::protocol(&self.tabs[index].session.protocol), &self.tabs[index].error); }
                     let bytes = super::pages::terminal_view(ui, &mut self.tabs[index], &prefs);
                     self.mark_painted_terminal(&child_ctx,active,window);
                     self.dispatch_keyboard(active, &bytes);

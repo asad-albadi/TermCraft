@@ -139,7 +139,7 @@ pub(super) fn settings(ui: &mut Ui, session: &mut Session) {
 
 pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     let Some(browser) = &mut tab.web_browser else {
-        ui.colored_label(ui.visuals().error_fg_color, &tab.error);
+        crate::ui::errors::show(ui, crate::ui::errors::Domain::Browser, &tab.error);
         return;
     };
     let state = browser.handle.state();
@@ -174,7 +174,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         ui.ctx().copy_text(text);
     }
     if let Some(error) = browser.input_error {
-        ui.colored_label(ui.visuals().error_fg_color, error);
+        crate::ui::errors::show(ui, crate::ui::errors::Domain::Browser, error);
     } else if state.loading {
         ui.horizontal(|ui| {
             ui.spinner();
@@ -184,7 +184,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
         ui.add(Label::new(&state.title).truncate());
     }
     if let Some(error) = &state.error {
-        ui.colored_label(ui.visuals().error_fg_color, error);
+        crate::ui::errors::show(ui, crate::ui::errors::Domain::Browser, error);
     }
     if let Some(notice) = &state.notice {
         ui.small(notice);

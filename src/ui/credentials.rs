@@ -310,7 +310,10 @@ impl Workspace {
     }
     pub(super) fn request_vault(&mut self, request: Request, ctx: &Context) {
         if self.credentials.queue.len() >= 32 {
-            self.message("Vault request queue is full; this credential was not saved or used.");
+            self.error_in(
+                errors::Domain::Vault,
+                "Vault request queue is full; this credential was not saved or used.",
+            );
             return;
         }
         self.credentials.queue.push_back(request);
@@ -500,7 +503,7 @@ impl Workspace {
                             continue;
                         };
                         if !self.vault_unlocked() {
-                            self.message("Credential was not saved because the vault is locked. Unlock it before choosing Save in vault.");
+                            self.error_in(errors::Domain::Vault,"Credential was not saved because the vault is locked. Unlock it before choosing Save in vault.");
                             self.credentials.open = true;
                             continue;
                         }
@@ -510,7 +513,8 @@ impl Workspace {
                             | CredentialBinding::Proxy { .. } => 2,
                         };
                         if values.len() != expected {
-                            self.message(
+                            self.error_in(
+                                errors::Domain::Vault,
                                 "Credential field count does not match its authentication method.",
                             );
                             continue;
@@ -519,7 +523,10 @@ impl Workspace {
                         let packed = match serde_json::to_string(&values) {
                             Ok(s) => Secret::new(s),
                             Err(_) => {
-                                self.message("Credential could not be encoded.");
+                                self.error_in(
+                                    errors::Domain::Vault,
+                                    "Credential could not be encoded.",
+                                );
                                 continue;
                             }
                         };
@@ -689,7 +696,11 @@ impl Workspace {
                         ui.label("Locked. Passwords are saved only when you choose Save in vault.");
                     }
                     if !self.credentials.error.is_empty() {
-                        ui.colored_label(ui.visuals().error_fg_color, &self.credentials.error);
+                        crate::ui::errors::show(
+                            ui,
+                            crate::ui::errors::Domain::Vault,
+                            &self.credentials.error,
+                        );
                     }
                     if self.credentials.job.is_none() {
                         if let Some(editor) = &mut self.credentials.editor {

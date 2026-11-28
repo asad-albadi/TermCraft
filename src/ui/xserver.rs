@@ -568,7 +568,7 @@ impl Workspace {
             if tab.error.is_empty() {
                 self.queue_startup_macro(id);
             } else {
-                self.message(self.tabs[index].error.clone());
+                self.error_in(errors::Domain::X11, self.tabs[index].error.clone());
             }
         }
     }
@@ -638,9 +638,9 @@ impl Workspace {
                                 macos_display_snapshot(ui, report);
                                 #[cfg(not(target_os = "macos"))]
                                 ui.label(format!("Screen {}×{} · resolution change {}", report.dimensions[0], report.dimensions[1], if report.randr_change.is_some() { "verified with event; initial size restored" } else { "unavailable or unverified" }));
-                                for error in &report.errors { ui.colored_label(ui.visuals().warn_fg_color, error); }
+                                for error in &report.errors { crate::ui::errors::warning(ui, crate::ui::errors::Domain::X11, error); }
                             }
-                            Err(error) => { ui.label(format!("Graphics capability check failed: {error}")); }
+                            Err(error) => { crate::ui::errors::show(ui,crate::ui::errors::Domain::X11,format!("Graphics capability check failed: {error}")); }
                         }
                     }
                     ui.label(format!(
@@ -740,7 +740,7 @@ impl Workspace {
                 state.start(ui.ctx());
             }
             if let Some(error) = &state.error {
-                ui.colored_label(ui.visuals().error_fg_color, error);
+                crate::ui::errors::show(ui, crate::ui::errors::Domain::X11, error);
             }
         });
     }

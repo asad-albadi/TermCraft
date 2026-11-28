@@ -224,7 +224,7 @@ impl Workspace {
             return;
         };
         if let Err(error) = self.queue_named_macro(id, &name) {
-            self.message(format!("Startup macro: {error}"));
+            self.error_in(errors::Domain::Macro, format!("Startup macro: {error}"));
         }
     }
 
@@ -313,7 +313,7 @@ impl Workspace {
             let id = self.tabs[index].id;
             if let Err(error) = self.poll_macro(index, ctx) {
                 self.cancel_macro(id);
-                self.message(error);
+                self.error_in(errors::Domain::Macro, error);
             }
         }
     }
@@ -521,7 +521,7 @@ impl Workspace {
         {
             match self.start_macro_recording(self.active) {
                 Ok(()) => self.page = Page::Terminal,
-                Err(error) => self.message(error),
+                Err(error) => self.error_in(errors::Domain::Macro, error),
             }
             ui.close();
         }
@@ -554,7 +554,7 @@ impl Workspace {
     pub(super) fn finish_macro_recording(&mut self, index: usize) {
         let capture = std::mem::take(self.tabs[index].capture());
         if let Some(error) = capture.error {
-            self.message(error);
+            self.error_in(errors::Domain::Macro, error);
         }
         if let Some(recorder) = capture.recorder {
             self.macro_form = Macro {

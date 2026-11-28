@@ -580,7 +580,11 @@ impl Workspace {
                 ui.add_space(8.);
                 ui.checkbox(&mut self.save_session, "Save this session");
                 if !self.form_error.is_empty() {
-                    ui.colored_label(super::fluent::palette(ui).error, &self.form_error);
+                    crate::ui::errors::show(
+                        ui,
+                        crate::ui::errors::Domain::Session,
+                        &self.form_error,
+                    );
                 }
                 ui.separator();
                 let [launch, store, safe] =
@@ -706,7 +710,11 @@ impl Workspace {
             let tab = &mut self.tabs[self.active];
             ui.label(&tab.connection_status);
             if !tab.error.is_empty() {
-                ui.colored_label(Color32::RED, &tab.error);
+                crate::ui::errors::show(
+                    ui,
+                    crate::ui::errors::protocol(&tab.session.protocol),
+                    &tab.error,
+                );
             }
             if tab
                 .xdmcp
@@ -728,7 +736,11 @@ impl Workspace {
                 .corner_radius(super::fluent::CONTROL_RADIUS)
                 .inner_margin(12)
                 .show(ui, |ui| {
-                    ui.label(&self.tabs[self.active].error);
+                    crate::ui::errors::show(
+                        ui,
+                        crate::ui::errors::protocol(&self.tabs[self.active].session.protocol),
+                        &self.tabs[self.active].error,
+                    );
                 });
         }
         if !self.tabs[self.active].running() {
@@ -781,7 +793,7 @@ impl Workspace {
                             command.push(b'\n');
                             self.tabs[index].send_generated_command(&command);
                         }
-                        Err(e) => self.message(e),
+                        Err(e) => self.error_in(errors::Domain::Transfer, e),
                     }
                 }
             }
@@ -799,7 +811,7 @@ impl Workspace {
                                 command.push(b'\n');
                                 self.tabs[index].send_generated_command(&command);
                             }
-                            (Err(e), _) | (_, Err(e)) => self.message(e),
+                            (Err(e), _) | (_, Err(e)) => self.error_in(errors::Domain::Transfer, e),
                         }
                     }
                 }
@@ -881,7 +893,7 @@ impl Workspace {
             });
         }
         if !self.files.error.is_empty() {
-            ui.colored_label(ui.visuals().error_fg_color, &self.files.error);
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Files, &self.files.error);
         }
         ui.separator();
         let mut open = None;
@@ -971,15 +983,20 @@ impl Workspace {
                             dirty: false,
                         })
                     }
-                    Err(_) => self.message("This file is not UTF-8 text. Use Open in system app."),
+                    Err(_) => self.error_in(
+                        errors::Domain::Files,
+                        "This file is not UTF-8 text. Use Open in system app.",
+                    ),
                 },
-                _ => self
-                    .message("This file is too large for the text editor. Use Open in system app."),
+                _ => self.error_in(
+                    errors::Domain::Files,
+                    "This file is too large for the text editor. Use Open in system app.",
+                ),
             }
         }
         if let Some(p) = system {
             if let Err(e) = connection::open_path(&p) {
-                self.message(e);
+                self.error_in(errors::Domain::Files, e);
             }
         }
     }
@@ -1050,7 +1067,11 @@ impl Workspace {
                 );
                 fluent::select_name_on_entry(ui, &field, ui.id(), &self.rename_text);
                 if !self.files.error.is_empty() {
-                    ui.colored_label(super::fluent::palette(ui).error, &self.files.error);
+                    crate::ui::errors::show(
+                        ui,
+                        crate::ui::errors::Domain::Files,
+                        &self.files.error,
+                    );
                 }
                 let [commit, safe] = fluent::dialog_actions(ui, ["Rename", "Cancel"], Some(0));
                 rename = commit.clicked();
@@ -1099,7 +1120,7 @@ impl Workspace {
                     ui.label(RichText::new("UTF-8 text").color(muted(ui)));
                 });
                 if !editor.error.is_empty() {
-                    ui.colored_label(ui.visuals().error_fg_color, &editor.error);
+                    crate::ui::errors::show(ui, crate::ui::errors::Domain::Files, &editor.error);
                 }
                 ScrollArea::both().show(ui, |ui| {
                     let response = ui.add(
@@ -1126,7 +1147,11 @@ impl Workspace {
                     |ui| {
                         ui.label(editor.path.display().to_string());
                         if !editor.error.is_empty() {
-                            ui.colored_label(ui.visuals().error_fg_color, &editor.error);
+                            crate::ui::errors::show(
+                                ui,
+                                crate::ui::errors::Domain::Files,
+                                &editor.error,
+                            );
                         }
                         ui.horizontal_wrapped(|ui| {
                             save = ui.button("Save and close").clicked();
@@ -1296,7 +1321,7 @@ impl Workspace {
                         );
                         self.tabs[self.active].screen.feed(b"SSH tunnel\r\nAuthenticate below if requested. Keep this tab open to keep forwarding active.\r\n");
                     }
-                    Err(e) => self.message(e),
+                    Err(e) => self.error_in(errors::Domain::Tunnel, e),
                 }
             }
         });
@@ -1309,7 +1334,7 @@ impl Workspace {
         let mut save = false;
         let mut cancel = false;
         let size = fluent::dialog_size(ctx, 520., 138.);
-        fluent::modeless(ctx, Id::new("Configure SSH tunnel"), "Configure SSH tunnel", size).open(&mut open).collapsible(false).show(ctx,|ui|{fluent::dialog_body(ui,size,|ui|{let t=&mut self.tunnel_form;ui.horizontal(|ui|{for mode in ["Local","Remote","Dynamic"]{ui.selectable_value(&mut t.mode,mode.into(),mode);}});ui.label(RichText::new(match t.mode.as_str(){"Remote"=>"Listen on the SSH server and forward to a destination from your computer.","Dynamic"=>"Create a local SOCKS proxy through the SSH server.",_=>"Listen on your computer and reach a destination from the SSH server."}).color(muted(ui)).size(12.));fluent::settings_grid(ui, "tunnel_fields", |ui|{let name=fluent::field(ui,"Name",&mut t.name,"Tunnel name",390.);fluent::focus_on_entry(ui,&name,ui.id());ui.end_row();field(ui,"SSH server",&mut t.host,"bastion.example.com");field(ui,"SSH username",&mut t.user,"");ui.label("SSH port");ui.add(DragValue::new(&mut t.ssh_port).range(1..=65535));ui.end_row();field(ui,"Private key",&mut t.key,"Optional key file");field(ui,"Listen address",&mut t.bind,"127.0.0.1");ui.label("Listen port");ui.add(DragValue::new(&mut t.local_port).range(1..=65535));ui.end_row();if t.mode!="Dynamic"{field(ui,"Destination",&mut t.destination,"localhost");ui.label("Destination port");ui.add(DragValue::new(&mut t.remote_port).range(1..=65535));ui.end_row();}});});if !self.form_error.is_empty(){ui.colored_label(super::fluent::palette(ui).error,&self.form_error);}ui.horizontal(|ui|{cancel=ui.button("Cancel").clicked();save=primary(ui,"Save tunnel").clicked();});});
+        fluent::modeless(ctx, Id::new("Configure SSH tunnel"), "Configure SSH tunnel", size).open(&mut open).collapsible(false).show(ctx,|ui|{fluent::dialog_body(ui,size,|ui|{let t=&mut self.tunnel_form;ui.horizontal(|ui|{for mode in ["Local","Remote","Dynamic"]{ui.selectable_value(&mut t.mode,mode.into(),mode);}});ui.label(RichText::new(match t.mode.as_str(){"Remote"=>"Listen on the SSH server and forward to a destination from your computer.","Dynamic"=>"Create a local SOCKS proxy through the SSH server.",_=>"Listen on your computer and reach a destination from the SSH server."}).color(muted(ui)).size(12.));fluent::settings_grid(ui, "tunnel_fields", |ui|{let name=fluent::field(ui,"Name",&mut t.name,"Tunnel name",390.);fluent::focus_on_entry(ui,&name,ui.id());ui.end_row();field(ui,"SSH server",&mut t.host,"bastion.example.com");field(ui,"SSH username",&mut t.user,"");ui.label("SSH port");ui.add(DragValue::new(&mut t.ssh_port).range(1..=65535));ui.end_row();field(ui,"Private key",&mut t.key,"Optional key file");field(ui,"Listen address",&mut t.bind,"127.0.0.1");ui.label("Listen port");ui.add(DragValue::new(&mut t.local_port).range(1..=65535));ui.end_row();if t.mode!="Dynamic"{field(ui,"Destination",&mut t.destination,"localhost");ui.label("Destination port");ui.add(DragValue::new(&mut t.remote_port).range(1..=65535));ui.end_row();}});});if !self.form_error.is_empty(){crate::ui::errors::show(ui, crate::ui::errors::Domain::Tunnel, &self.form_error);}ui.horizontal(|ui|{cancel=ui.button("Cancel").clicked();save=primary(ui,"Save tunnel").clicked();});});
         if !open || cancel {
             self.tunnel_open = false;
             self.form_error.clear();
@@ -1376,7 +1401,7 @@ impl Workspace {
                                     self.store.macros = values;
                                     self.persist();
                                 }
-                                Err(error) => self.message(error),
+                                Err(error) => self.error_in(errors::Domain::Macro, error),
                             }
                         }
                     }
@@ -1392,7 +1417,7 @@ impl Workspace {
                                 });
                             match result {
                                 Ok(()) => self.message("Macros exported."),
-                                Err(error) => self.message(error),
+                                Err(error) => self.error_in(errors::Domain::Macro, error),
                             }
                         }
                     }
@@ -1485,7 +1510,7 @@ impl Workspace {
                 if attached {
                     self.message("Remove this macro from session startup before deleting it.");
                 } else if let Err(error) = super::macro_events::validate_library(&values) {
-                    self.message(error);
+                    self.error_in(errors::Domain::Macro, error);
                 } else {
                     self.store.macros = values;
                     self.persist();
@@ -1494,7 +1519,7 @@ impl Workspace {
             if let Some(value) = run {
                 match self.queue_macro(self.tabs[self.active].id, &value) {
                     Ok(()) => self.page = Page::Terminal,
-                    Err(error) => self.message(error),
+                    Err(error) => self.error_in(errors::Domain::Macro, error),
                 }
             }
         });
@@ -1532,7 +1557,11 @@ impl Workspace {
                     }
                 });
                 if !self.macro_error.is_empty() {
-                    ui.colored_label(ui.visuals().error_fg_color, &self.macro_error);
+                    crate::ui::errors::show(
+                        ui,
+                        crate::ui::errors::Domain::Macro,
+                        &self.macro_error,
+                    );
                 }
                 ui.horizontal_wrapped(|ui| {
                     save = primary(ui, "Save macro").clicked();
@@ -1885,9 +1914,9 @@ impl Workspace {
             }
             if self.settings_category == Storage {
                 surface(ui).show(ui,|ui|{ui.set_min_width(ui.available_width());ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("Sessions and backups").size(18.)));ui.label(RichText::new("Session settings, folders, tunnels and macros are stored locally. Exported backups contain hostnames and key-file paths, but no passwords.").color(muted(ui)));ui.horizontal_wrapped(|ui|{
-    if icons::action(ui,"Export workspace").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("termcraft-workspace.json").save_file(){match self.store.save(&p){Ok(())=>self.message("Workspace exported"),Err(e)=>self.message(e)}}}
-    if icons::action(ui,"Import workspace").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Workspace JSON",&["json"]).pick_file(){match Store::load_bounded(&p, 16 * 1024 * 1024).and_then(|mut imported| { let mut macros = self.store.macros.clone(); macros.append(&mut imported.macros); super::macro_events::validate_library(&macros)?; imported.macros = macros; Ok(imported) }) { Ok(imported) => { self.store.sessions.extend(imported.sessions.into_iter().map(|mut session| {session.id=harbor_workspace::model::new_session_id();session})); self.store.tunnels.extend(imported.tunnels.into_iter().take(5_usize.saturating_sub(self.store.tunnels.len()))); self.store.macros = imported.macros; self.persist(); }, Err(error) => self.message(error) }}}
-   });if !self.store_ok{ui.colored_label(ui.visuals().error_fg_color,"The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.settings_load_error=None;self.persist();},Err(e)=>self.message(e.to_string())}}}});
+    if icons::action(ui,"Export workspace").clicked(){if let Some(p)=rfd::FileDialog::new().set_file_name("termcraft-workspace.json").save_file(){match self.store.save(&p){Ok(())=>self.message("Workspace exported"),Err(e)=>self.error_in(errors::Domain::Settings,e)}}}
+    if icons::action(ui,"Import workspace").clicked(){if let Some(p)=rfd::FileDialog::new().add_filter("Workspace JSON",&["json"]).pick_file(){match Store::load_bounded(&p, 16 * 1024 * 1024).and_then(|mut imported| { let mut macros = self.store.macros.clone(); macros.append(&mut imported.macros); super::macro_events::validate_library(&macros)?; imported.macros = macros; Ok(imported) }) { Ok(imported) => { self.store.sessions.extend(imported.sessions.into_iter().map(|mut session| {session.id=harbor_workspace::model::new_session_id();session})); self.store.tunnels.extend(imported.tunnels.into_iter().take(5_usize.saturating_sub(self.store.tunnels.len()))); self.store.macros = imported.macros; self.persist(); }, Err(error) => self.error_in(errors::Domain::Settings,error) }}}
+   });if !self.store_ok{crate::ui::errors::show(ui, crate::ui::errors::Domain::Settings, "The settings file is damaged. Automatic saving is disabled to preserve it.");if ui.button("Back up damaged file and start fresh").clicked(){match fs::copy(&self.store_path,self.store_path.with_extension("damaged-backup.json")){Ok(_)=>{self.store_ok=true;self.settings_load_error=None;self.persist();},Err(e)=>self.error_in(errors::Domain::Settings,e.to_string())}}}});
             }
             if self.settings_category == About {
                 surface(ui).show(ui,|ui|{ui.set_min_width(ui.available_width());ui.label(crate::ui::fluent::emphasized(ui.ctx(), RichText::new("About TermCraft").size(18.)));ui.label("An independently written Rust desktop remote workspace with a Fluent-inspired interface.");ui.label(RichText::new("Built with eframe/egui and OpenSSH. No original branding or bundled engines are reused.").size(12.).color(muted(ui)));ui.add_space(5.);ui.label(RichText::new("Feature and platform qualification is tracked in the project checklists. See Tools → Runtime for engine availability.").size(12.).color(muted(ui)));});
@@ -1921,7 +1950,11 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
     if t.gateway.is_some() && t.desktop.is_none() && t.process.is_none() && t.legacy.is_none() {
         ui.label(&t.connection_status);
         if !t.error.is_empty() {
-            ui.colored_label(ui.visuals().error_fg_color, &t.error);
+            crate::ui::errors::show(
+                ui,
+                crate::ui::errors::protocol(&t.session.protocol),
+                &t.error,
+            );
         }
         super::remote_files::authentication_ui(ui, t);
         return Vec::new();
@@ -1937,8 +1970,9 @@ pub(super) fn terminal_view(ui: &mut Ui, t: &mut TerminalTab, p: &Preferences) -
     t.apply_terminal_preferences(p);
     t.highlights.update(&p.highlight_rules);
     if let Some(error) = &t.highlights.error {
-        ui.colored_label(
-            ui.visuals().error_fg_color,
+        crate::ui::errors::show(
+            ui,
+            crate::ui::errors::Domain::Session,
             format!("Highlight settings rejected; retaining the previous valid rules: {error}"),
         );
     }

@@ -329,19 +329,24 @@ impl Workspace {
                                 .color(palette.secondary_text),
                         );
                         if let Some(diagnostic) = &self.settings_load_error {
-                            ui.colored_label(palette.error, "Settings damaged")
-                                .fluent_hint(diagnostic);
+                            crate::ui::errors::compact(
+                                ui,
+                                crate::ui::errors::Domain::Settings,
+                                &format!("Settings damaged\n{diagnostic}"),
+                            );
                         }
                         ui.with_layout(Layout::left_to_right(Align::Center), |ui| {
-                            ui.add(
-                                Label::new(RichText::new(text).size(12.).color(if error {
-                                    palette.error
-                                } else {
-                                    palette.secondary_text
-                                }))
-                                .truncate(),
-                            )
-                            .fluent_hint(text);
+                            if error {
+                                crate::ui::errors::compact(ui, self.status_context, text);
+                            } else {
+                                ui.add(
+                                    Label::new(
+                                        RichText::new(text).size(12.).color(palette.secondary_text),
+                                    )
+                                    .truncate(),
+                                )
+                                .fluent_hint(text);
+                            }
                         });
                     });
                 });
@@ -465,7 +470,7 @@ impl Workspace {
             {
                 match fs::write(path, self.tabs[self.active].screen.plain()) {
                     Ok(()) => self.message("Terminal output saved"),
-                    Err(e) => self.message(e.to_string()),
+                    Err(e) => self.error_in(errors::Domain::Files, e.to_string()),
                 }
             }
         }
@@ -479,7 +484,7 @@ impl Workspace {
             {
                 match fs::OpenOptions::new().create(true).append(true).open(path) {
                     Ok(f) => t.log = Some(f),
-                    Err(e) => self.message(e.to_string()),
+                    Err(e) => self.error_in(errors::Domain::Files, e.to_string()),
                 }
             }
         }

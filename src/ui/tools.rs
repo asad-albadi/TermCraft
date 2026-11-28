@@ -178,7 +178,7 @@ impl Comparison {
         }
         match self.result.as_ref() {
             Some(Err(error)) => {
-                ui.colored_label(ui.visuals().error_fg_color, error);
+                crate::ui::errors::show(ui, crate::ui::errors::Domain::Tools, error);
             }
             Some(Ok(ComparisonResult::Files(diff))) => render_file_diff(ui, diff),
             Some(Ok(ComparisonResult::Folders(diff))) => render_folder_diff(ui, diff),
@@ -328,7 +328,7 @@ impl Preview {
         }
         match self.result.as_ref() {
             Some(Err(error)) => {
-                ui.colored_label(ui.visuals().error_fg_color, error);
+                crate::ui::errors::show(ui, crate::ui::errors::Domain::Tools, error);
             }
             Some(Ok(texture)) => {
                 let size = texture.size_vec2();
@@ -404,7 +404,7 @@ impl Scan {
         }
         match self.result.as_ref() {
             Some(Err(error)) => {
-                ui.colored_label(ui.visuals().error_fg_color, error);
+                crate::ui::errors::show(ui, crate::ui::errors::Domain::Tools, error);
             }
             Some(Ok(report)) => {
                 ui.label(format!("Results for {}", report.address));
@@ -603,7 +603,7 @@ impl Capture {
             }
         });
         if let Some(error) = &self.interface_error {
-            ui.colored_label(ui.visuals().error_fg_color, error);
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Tools, error);
         }
         if self.interface_job.is_some() {
             ui.spinner();
@@ -630,7 +630,7 @@ impl Capture {
         }
         match self.result.as_ref() {
             Some(Err(error)) => {
-                ui.colored_label(ui.visuals().error_fg_color, error);
+                crate::ui::errors::show(ui, crate::ui::errors::Domain::Tools, error);
             }
             Some(Ok(report)) => {
                 let reason = match report.reason {

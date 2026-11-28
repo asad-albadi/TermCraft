@@ -213,7 +213,7 @@ impl ManagedCron {
             if let Some(status) = &snapshot.status {
                 ui.label(format!("Scheduler: {:?}", status.state));
                 if let Some(error) = &status.error {
-                    ui.colored_label(ui.visuals().error_fg_color, error);
+                    crate::ui::errors::show(ui, crate::ui::errors::Domain::Scheduler, error);
                 }
             }
             ui.horizontal_wrapped(|ui| {
@@ -302,7 +302,7 @@ impl ManagedCron {
                 }
             }
             for error in [&self.error, &snapshot.error].into_iter().flatten() {
-                ui.colored_label(ui.visuals().error_fg_color, error);
+                crate::ui::errors::show(ui, crate::ui::errors::Domain::Scheduler, error);
             }
         });
     }

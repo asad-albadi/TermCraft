@@ -357,7 +357,11 @@ impl Workspace {
                         });
                     }
                     if !state.error.is_empty() {
-                        ui.colored_label(ui.visuals().error_fg_color, &state.error);
+                        crate::ui::errors::show(
+                            ui,
+                            crate::ui::errors::Domain::Import,
+                            &state.error,
+                        );
                     }
                     if let Some(summary) = &state.applied {
                         ui.label(format!(

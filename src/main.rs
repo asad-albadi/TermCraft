@@ -1,5 +1,18 @@
 mod ui;
-fn main() -> eframe::Result {
+fn main() {
+    if let Err(error) = run() {
+        eprintln!(
+            "{}",
+            harbor_workspace::diagnostics::Diagnostic::new(
+                harbor_workspace::diagnostics::Context::Startup,
+                &error.to_string()
+            )
+            .report()
+        );
+        std::process::exit(1);
+    }
+}
+fn run() -> eframe::Result {
     if let Some(code) = harbor_workspace::x11::capability_probe_entry() {
         std::process::exit(code);
     }
@@ -26,7 +39,14 @@ fn main() -> eframe::Result {
         ipc::{Binding, InstanceBroker},
     };
     let mut invocation = Cli::parse_invocation(std::env::args().skip(1)).unwrap_or_else(|error| {
-        eprintln!("{error}\nUse --help for usage.");
+        eprintln!(
+            "{}",
+            harbor_workspace::diagnostics::Diagnostic::new(
+                harbor_workspace::diagnostics::Context::CommandLine,
+                &error.to_string()
+            )
+            .report()
+        );
         std::process::exit(2)
     });
     if matches!(invocation.action, CliAction::Help) {
@@ -34,7 +54,14 @@ fn main() -> eframe::Result {
         return Ok(());
     }
     let base = std::env::current_dir().unwrap_or_else(|error| {
-        eprintln!("Cannot resolve working directory: {error}");
+        eprintln!(
+            "{}",
+            harbor_workspace::diagnostics::Diagnostic::new(
+                harbor_workspace::diagnostics::Context::Startup,
+                &format!("Cannot resolve working directory: {error}")
+            )
+            .report()
+        );
         std::process::exit(1)
     });
     invocation.action.absolute_paths(&base);
@@ -56,7 +83,14 @@ fn main() -> eframe::Result {
     };
     let primary = if screenshot.is_none() {
         match InstanceBroker::bind(&data_dir).unwrap_or_else(|error| {
-            eprintln!("Cannot open workspace dispatcher: {error}");
+            eprintln!(
+                "{}",
+                harbor_workspace::diagnostics::Diagnostic::new(
+                    harbor_workspace::diagnostics::Context::Startup,
+                    &format!("Cannot open workspace dispatcher: {error}")
+                )
+                .report()
+            );
             std::process::exit(1)
         }) {
             Binding::Primary(primary) => Some(primary),
@@ -67,7 +101,14 @@ fn main() -> eframe::Result {
                         receipt.id
                     ),
                     Err(error) => {
-                        eprintln!("Launch request failed: {error}");
+                        eprintln!(
+                            "{}",
+                            harbor_workspace::diagnostics::Diagnostic::new(
+                                harbor_workspace::diagnostics::Context::CommandLine,
+                                &format!("Launch request failed: {error}")
+                            )
+                            .report()
+                        );
                         std::process::exit(1)
                     }
                 }

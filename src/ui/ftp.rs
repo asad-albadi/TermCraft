@@ -269,7 +269,7 @@ impl State {
             self.disconnect();
         }
         if let Some(error) = &self.message {
-            ui.colored_label(ui.visuals().error_fg_color, error);
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error);
         }
         if self.actor.as_ref().is_some_and(FtpWorkspace::ready) {
             self.browser(ui);
@@ -370,7 +370,7 @@ impl State {
             ui.spinner();
         }
         if let Some(error) = &actor.browser.error {
-            ui.colored_label(ui.visuals().error_fg_color, error);
+            crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error);
         }
         let reserve = if self.pending.is_some() { 220. } else { 0. }
             + if self.transfers.is_empty() { 0. } else { 175. };
@@ -815,7 +815,11 @@ impl Editor {
             .open(&mut open).show(ctx, |ui| {
                 ScrollArea::vertical().id_salt(("ftp-document-details",connection)).max_height(size.body_height*0.45).show(ui, |ui| {
                 ui.label(self.path.display());
-                ui.label(match &status {
+                match &status {
+                    DocumentStatus::Failed(message)=>{crate::ui::errors::show(ui,crate::ui::errors::Domain::Transfer,message);},
+                    DocumentStatus::Indeterminate(message)=>{crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,message);},
+                    DocumentStatus::Conflict=>{crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,"The remote file changed. Compare your edits with the remote version before choosing whether to replace it.");},
+                    _=>{                ui.label(match &status {
                     DocumentStatus::Opening => "Opening…",
                     DocumentStatus::Ready => "Ready",
                     DocumentStatus::Recovering => "Saving a local recovery copy…",
@@ -826,7 +830,8 @@ impl Editor {
                     DocumentStatus::Conflict => "The remote file changed. Your edits are still in this window.",
                     DocumentStatus::Cancelled => "Operation cancelled.",
                     DocumentStatus::Disconnected => "Connection ended. Local recovery is available.",
-                });
+                });},
+                }
                 let (staging, warning) = self.document.recovery_details();
                 ui.menu_button("Document details", |ui| {
                 ui.set_max_width(340.);
@@ -839,8 +844,8 @@ impl Editor {
                 }
                 if let Some(path) = staging { ui.small(format!("Remote staging: {}", path.display())); }
                 });
-                if let Some(warning) = warning { ui.colored_label(ui.visuals().warn_fg_color, warning); }
-                if let Some(error) = &self.error { ui.colored_label(ui.visuals().error_fg_color, error); }
+                if let Some(warning) = warning { crate::ui::errors::warning(ui,crate::ui::errors::Domain::Transfer,warning); }
+                if let Some(error) = &self.error { crate::ui::errors::show(ui, crate::ui::errors::Domain::Transfer, error); }
                 });
                 if *comparison_dismissed && ui.button("Compare retained FTP edits…").clicked() { *comparison_dismissed = false; }
                 ui.horizontal_wrapped(|ui| {
