@@ -1,5 +1,7 @@
 # Issue #4 component and acceptance checklist
 
+**Latest icon correction:** the owner explicitly requested replacing the old glyphs in the session-type selector. All thirteen protocols now use distinct themed vector icons. This is an icon-only exception to the earlier dialog-source hold: layout, form fields, labels, selection and footer behavior stay intact. [Current native dark/light previews](captures/session-protocol-icons/README.md). The local Linux review launcher now selects this build and preserves Wayland. PR #8 remains draft and unmerged.
+
 ## Owner correction: terminal controls, separate app bars
 
 The owner clarified that “one row” refers to controls **inside the terminal pane/window**, not the app menus, toolbar or connection tabs. The combined app bar has been reverted: menus/theme and labelled command tiles are separate again, and connection tabs have their own strip. The terminal’s status/title, primary actions and secondary action menu occupy one row above its content. Detached tabs are separate from their one-row window controls. Secondary actions remain reachable without adding permanent rows.

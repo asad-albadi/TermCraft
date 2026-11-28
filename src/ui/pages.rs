@@ -182,15 +182,15 @@ fn protocol_choices(ui: &mut Ui, current: &str) -> Option<&'static str> {
     let mut chosen = None;
     ui.horizontal_wrapped(|ui| {
         for protocol in PROTOCOLS {
-            let kind = match *protocol {
-                "SSH" | "SFTP" => "lock",
-                "RDP" | "VNC" | "XDMCP" => "desktop",
-                "Serial" => "serial",
-                "FTP" => "folder",
-                "Browser" => "link",
-                _ => "terminal",
-            };
-            if tool_button(ui, kind, protocol, protocol, Some(current == *protocol)).clicked() {
+            if icons::tile(
+                ui,
+                &protocol.to_ascii_lowercase(),
+                protocol,
+                protocol,
+                Some(current == *protocol),
+            )
+            .clicked()
+            {
                 chosen = Some(*protocol);
             }
         }

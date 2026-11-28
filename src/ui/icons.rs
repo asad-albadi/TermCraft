@@ -66,6 +66,12 @@ pub(super) fn paint(ui: &Ui, rect: Rect, kind: &str, foreground: Color32) {
                 segment((2., 2.), (10., 10.));
                 segment((10., 2.), (2., 10.));
             }
+            "bolt" => {
+                p.add(PathShape::line(
+                    vec![b(8., 1.), b(3., 6.), b(8., 6.), b(4., 11.)],
+                    pen,
+                ));
+            }
             "~" => {
                 p.add(PathShape::line(
                     vec![b(1., 7.), b(3., 4.), b(8., 8.), b(11., 5.)],
@@ -79,17 +85,24 @@ pub(super) fn paint(ui: &Ui, rect: Rect, kind: &str, foreground: Color32) {
         }
     };
     match kind {
-        "session" | "ssh" | "terminal" | "mosh" => {
+        "session" | "ssh" | "terminal" | "mosh" | "telnet" | "rlogin" | "rsh" | "local" => {
             outline((2., 3.), (21., 18.));
             line((5., 7.), (9., 10.));
             line((9., 10.), (5., 13.));
             line((12., 13.), (17., 13.));
-            badge(match kind {
-                "session" => "+",
-                "ssh" => "⌑",
-                "mosh" => "~",
-                _ => "›",
-            });
+            if kind == "local" {
+                p.line_segment([q(5., 21.), q(19., 21.)], Stroke::new(1.5, accent));
+            } else {
+                badge(match kind {
+                    "session" => "+",
+                    "ssh" => "⌑",
+                    "mosh" => "~",
+                    "telnet" => "⇄",
+                    "rlogin" => "↗",
+                    "rsh" => "bolt",
+                    _ => "›",
+                });
+            }
         }
         "servers" => {
             for y in [3., 10., 17.] {
@@ -115,7 +128,7 @@ pub(super) fn paint(ui: &Ui, rect: Rect, kind: &str, foreground: Color32) {
                 accent.gamma_multiply(0.15),
             );
             match kind {
-                "sftp" => badge("⇄"),
+                "sftp" => badge("⌑"),
                 "ftp" => badge("↧"),
                 "packages" => {
                     line((7., 12.), (17., 12.));
@@ -125,14 +138,14 @@ pub(super) fn paint(ui: &Ui, rect: Rect, kind: &str, foreground: Color32) {
                 _ => {}
             }
         }
-        "rdp" | "vnc" | "desktop" | "xserver" => {
+        "rdp" | "vnc" | "desktop" | "xserver" | "xdmcp" => {
             outline((2., 3.), (22., 17.));
             line((12., 17.), (12., 21.));
             line((7., 21.), (17., 21.));
             match kind {
                 "rdp" => badge("↗"),
                 "vnc" => badge("◉"),
-                "xserver" => badge("X"),
+                "xserver" | "xdmcp" => badge("X"),
                 _ => {}
             }
         }
