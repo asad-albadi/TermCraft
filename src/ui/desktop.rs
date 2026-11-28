@@ -610,6 +610,9 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
             crate::ui::errors::protocol(&tab.session.protocol),
             &state.error,
         );
+        if !state.connected && state.form.is_none() && state.handle.is_finished() {
+            return;
+        }
     }
     let mut answer = None;
     let mut vault_use = false;
@@ -1306,6 +1309,53 @@ mod tests {
             output.textures_delta.clear();
         }
         fullscreen
+    }
+    #[test]
+    fn failed_desktop_connection_paints_one_error_without_waiting_message() {
+        let (ctx, root, mut w) = owned_workspace();
+        crate::ui::terminal_review_tests::raw_terminal(&mut w, "error fixture");
+        let session = Session {
+            protocol: "RDP".into(),
+            host: "localhost".into(),
+            ..Default::default()
+        };
+        let config = harbor_workspace::desktop::DesktopConfig::new(
+            9101,
+            session.clone(),
+            root.path().join("absent-rdp-helper"),
+        );
+        w.tabs[0].process = None;
+        w.tabs[0].session = session.clone();
+        w.tabs[0].desktop = Some(State::new(
+            DesktopSession::connect(config).unwrap(),
+            &session,
+        ));
+        let end = Instant::now() + Duration::from_secs(3);
+        while w.tabs[0].desktop.as_ref().unwrap().error.is_empty() {
+            w.tabs[0].poll();
+            assert!(Instant::now() < end);
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        let diagnostic = harbor_workspace::diagnostics::Diagnostic::new(
+            harbor_workspace::diagnostics::Context::Rdp,
+            &w.tabs[0].error,
+        );
+        let mut first = paint(&ctx, &mut w, vec![]);
+        first.textures_delta.clear();
+        let mut out = paint(&ctx, &mut w, vec![]);
+        assert_eq!(
+            out.shapes
+                .iter()
+                .filter(|s| text(&s.shape, &diagnostic.code).is_some())
+                .count(),
+            1
+        );
+        assert!(
+            !out.shapes
+                .iter()
+                .any(|s| text(&s.shape, "Waiting for the remote desktop…").is_some())
+        );
+        out.textures_delta.clear();
     }
     #[test]
     fn remote_motion_coalescing_preserves_button_and_key_boundaries() {

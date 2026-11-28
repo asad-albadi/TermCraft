@@ -753,7 +753,7 @@ impl Workspace {
         }
         self.connection_commands(ui);
         self.tabs[self.active].search_ui(ui);
-        if !self.tabs[self.active].error.is_empty() {
+        if !self.tabs[self.active].error.is_empty() && self.tabs[self.active].desktop.is_none() {
             Frame::new()
                 .fill(ui.visuals().widgets.hovered.bg_fill)
                 .corner_radius(super::fluent::CONTROL_RADIUS)

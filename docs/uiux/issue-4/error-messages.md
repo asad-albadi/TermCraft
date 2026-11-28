@@ -30,6 +30,13 @@ Existing connection forms, tabs, panels and confirmation flows retain their orga
 | `118` | Network/route unavailable |
 | `119` | Local RDP helper missing from the application build |
 | `120` | Local RDP helper exists but cannot start |
+| `121` | RDP server explicitly rejected sign-in |
+| `122` | RDP sign-in blocked by an account/server policy |
+| `123` | Transport failed during RDP sign-in |
+| `124` | Secure RDP sign-in protocol could not complete |
+| `125` | Transport failed during remote desktop setup |
+| `126` | Remote desktop setup protocol could not complete |
+| `127` | Older helper omitted the failing sign-in/setup stage |
 
 Examples: `TC-SSH-101` asks the user to check the host/port and whether its service is running; `TC-START-114` asks the user to launch from an available graphical desktop; `TC-TRANSFER-117` asks them to compare local and remote versions before replacing anything. Certificate/host-key errors require verifying identity, never weakening verification.
 
@@ -141,3 +148,24 @@ The corrected local review directory contains both the current GUI and `termcraf
 Missing helpers produce `TC-RDP-119` with a local-build explanation; existing helpers that fail to launch produce `TC-RDP-120`. A missing loader is distinguished from a missing executable. Missing CA files retain their separate error classification.
 
 Validation: resolver/error-format tests **4/4**, updated catalogue **10/10**, scoped UI **10/10**, helper startup/private protocol **PASS**, and **4/4** endpoint checks for actual adjacent lookup, frame/input, certificate-change resolution and transport/helper shutdown. The independent endpoint fixture was rebuilt from current source after an old local fixture lacked the current CA layout; TLS checks and endpoint assertions were retained. The review launcher uses the new directory and preserves Wayland. Full platform/release qualification and owner human checks remain separate. PR #8 stays draft and unmerged.
+
+
+## RDP sign-in follow-up
+
+The owner reported a failure immediately after submitting the password. The prior helper discarded the connector error and combined secure sign-in with desktop setup, so the reported message did not establish whether credentials were rejected. It also appeared twice because both the workspace/detached wrapper and the remote desktop pane rendered the copied error.
+
+The remote desktop pane now owns its failure display. Attached and detached wrappers defer to it; failed connections no longer paint “Waiting for the remote desktop”. Successful or pending sign-in forms retain their existing layout.
+
+The helper now reports the secure sign-in and desktop setup stages separately, retaining TLS/NLA verification and a shared negotiation deadline. Diagnostic details use locally defined labels, numeric SSPI/NTSTATUS/RDP values and pinned implementation locations. They omit raw provider descriptions, account identities, passwords, tokens and packet data. Unknown status values remain protocol failures; they are not guessed to mean a bad password. Desktop-setup access denial retains its desktop stage instead of being mislabeled as a sign-in rejection.
+
+Use a plain username with the separate Domain field, or leave Domain blank when using `COMPUTER\username`, `DOMAIN\username` or an account UPN. Combining a qualified username with a separate domain can fail locally before server authentication.
+
+- [x] Single attached/detached desktop failure owner, with an actual workspace rendering regression.
+- [x] Seven stage-specific diagnostic categories, existing redaction and unknown-cause safety retained.
+- [x] Independent wrong-password endpoint reports the exact safe stage, SSPI and peer NTSTATUS, without credentials.
+- [x] Successful authentication, remote input, resizing and ignored-resize fallback remain covered.
+- [ ] Owner retry against the actual Windows endpoint and identification/resolution of its reported cause.
+
+The Windows host failure remains undiagnosed until the updated helper observes a retry. The wrong-password test validates the diagnostic path and does not prove that the owner's password was wrong. Close the older app, run the current review launcher and reconnect. If it still fails, open the code and copy its technical details. PR #8 remains draft and unmerged.
+
+Final local checks: 11 real UI/input/ownership tests, 11 catalogue/redaction tests and 8 independent RDP/helper checks passed, including failed-password stage/status, successful sign-in, ordered input through resizing, ignored-resize fallback, certificate changes and shutdown. Six helper unit tests passed separately. Final native Wayland startup and protected-dialog checks passed. [Review component and source identities](rdp-signin-review-build.json).

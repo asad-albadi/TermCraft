@@ -1,5 +1,7 @@
 # Issue #4 component and acceptance checklist
 
+**RDP sign-in diagnostic correction:** remote desktops now display failures once, retain safe stage/SSPI/NTSTATUS details, and distinguish explicit rejection, account policy, transport and desktop setup failures. [Follow-up and remaining Windows retry](error-messages.md#rdp-sign-in-follow-up). The actual reported Windows cause is not yet established; human retry remains open. No merge.
+
 **Games and remote desktop follow-up:** all thirteen boards now center and fit both window dimensions. Embedded desktops default to Inherit pane size, retain fixed resolution, negotiate supported remote resizing, and reduce local input/frame batching. [Behavior, validation and review command](games-and-desktop-resizing.md). PR #8 remains draft and unmerged pending owner human checks.
 
 **RDP review fix:** the review directory now includes its verified, matching RDP helper. Development builds prefer the helper beside the GUI, and dedicated `TC-RDP-119` / `120` messages distinguish missing local support from a local launch failure. Actual frame/input, certificate-change and shutdown checks passed against a current local endpoint. [Details](error-messages.md#rdp-review-build-correction). The launcher is updated; PR #8 remains draft and unmerged.

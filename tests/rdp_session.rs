@@ -136,6 +136,44 @@ fn rdp_frame_updates_render_inside_workspace() {
     windows,
     ignore = "requires the native RDP software endpoint and OpenSSL"
 )]
+fn unsuccessful_nla_reports_a_safe_sign_in_diagnostic_before_desktop_setup() {
+    let server = rdp_server::Server::start();
+    let mut session = DesktopSession::connect(server.config(8144)).unwrap();
+    let mut submitted = false;
+    until(&mut session, |session, event| match event {
+        DesktopEvent::Authentication { id, .. } => {
+            session
+                .send(DesktopInput::Authenticate {
+                    id,
+                    user: "fixture-user".into(),
+                    password: harbor_workspace::credentials::Secret::new(
+                        "intentionally-incorrect-test-password",
+                    ),
+                    domain: String::new(),
+                })
+                .unwrap();
+            submitted = true;
+            false
+        }
+        DesktopEvent::Connected { .. } | DesktopEvent::Frame(_) => {
+            panic!("Incorrect password opened a desktop")
+        }
+        DesktopEvent::Disconnected { message } => {
+            assert!(submitted);
+            assert_eq!(
+                message,
+                "RDP sign-in rejected (CredSSP, SSPI InvalidToken 0x80090308, NTSTATUS 0xC007030C)"
+            );
+            true
+        }
+        _ => false,
+    });
+}
+#[test]
+#[cfg_attr(
+    windows,
+    ignore = "requires the native RDP software endpoint and OpenSSL"
+)]
 fn client_resize_negotiates_and_returns_a_pane_sized_frame() {
     let server = rdp_server::Server::start();
     let mut session = DesktopSession::connect(server.config(8141)).unwrap();

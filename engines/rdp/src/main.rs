@@ -1,6 +1,7 @@
 #![cfg_attr(windows, windows_subsystem = "windows")]
 mod clipboard;
 mod devices;
+mod diagnostics;
 mod display;
 mod smartcard;
 use ironrdp_cliprdr as clipapi;
@@ -381,7 +382,41 @@ async fn connect(
         drop(response);
         let mut framed = TokioFramed::new(stream);
         let mut auth_network = NoExternalAuthNetwork::default();
-        let result=tokio::time::timeout(timeout,ironrdp_tokio::connect_finalize(upgraded,connector,&mut framed,&mut auth_network,config.host.clone().into(),public,None)).await.map_err(|_|"RDP authentication/session negotiation timed out")?.map_err(|_|if auth_network.requested{"This endpoint requires Kerberos network authentication; choose installed-client compatibility until that provider is available"}else{"RDP authentication or session negotiation failed; verify credentials and NLA support"})?.into_connected().map_err(|_|"RDP server requested a different destination; open it as a separate session so its certificate and credentials can be verified")?;
+        // Run the same negotiated CredSSP exchange explicitly, so a TLS EOF
+        // during sign-in is distinguished from one after NLA succeeded.
+        let deadline = tokio::time::Instant::now() + timeout;
+        let ironrdp_connector::ClientConnectorState::Credssp {
+            selected_protocol, ..
+        } = connector.state
+        else {
+            return Err("RDP sign-in protocol failed because NLA was not negotiated.".into());
+        };
+        let (sequence, request) = ironrdp_connector::credssp::CredsspSequence::init(
+            connector.config.credentials.clone(),
+            connector.config.domain.as_deref(),
+            selected_protocol,
+            config.host.clone().into(),
+            public,
+            None,
+        )
+        .map_err(|error| diagnostics::Stage::SignIn.failure(&error))?;
+        tokio::time::timeout_at(deadline, ironrdp_tokio::perform_credssp(
+            &mut framed, &mut auth_network, &mut ironrdp_core::WriteBuf::new(), sequence, request,
+        )).await.map_err(|_| diagnostics::Stage::SignIn.timeout())?.map_err(|error| {
+            if auth_network.requested {
+                "This endpoint requires Kerberos network authentication; choose installed-client compatibility until that provider is available".into()
+            } else {
+                diagnostics::Stage::SignIn.failure(&error)
+            }
+        })?;
+        connector.mark_credssp_as_done();
+        // The TLS public key was consumed by CredSSP above. Finalization skips
+        // the completed CredSSP stage and retains IronRDP's redirection handling.
+        let result = tokio::time::timeout_at(deadline, ironrdp_tokio::connect_finalize(
+            upgraded, connector, &mut framed, &mut auth_network, config.host.clone().into(), Vec::new(), None,
+        )).await.map_err(|_| diagnostics::Stage::DesktopSetup.timeout())?
+          .map_err(|error| diagnostics::Stage::DesktopSetup.failure(&error))?
+          .into_connected().map_err(|_| "RDP server requested a different destination; open it as a separate session so its certificate and credentials can be verified")?;
         if (config.options.printer_mapping.is_some() || config.options.smartcard_reader.is_some())
             && result
                 .static_channels

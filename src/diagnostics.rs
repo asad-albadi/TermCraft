@@ -183,6 +183,50 @@ impl Diagnostic {
                 "The local RDP helper could not start.",
                 "Check that the helper included with TermCraft can run and its required system libraries are available. Copy the details if the problem continues.",
             )
+        } else if context == Context::Rdp && lower.starts_with("rdp sign-in rejected") {
+            (
+                "121",
+                "The RDP server rejected sign-in.",
+                "Use a plain username with the Domain field, or leave Domain blank for COMPUTER\\username, DOMAIN\\username or an account UPN. Check the password and the server's account status.",
+            )
+        } else if context == Context::Rdp && lower.starts_with("rdp sign-in policy") {
+            (
+                "122",
+                "The RDP server blocked sign-in under its account policy.",
+                "Check Remote Desktop logon permission and the account restrictions, expiry or lockout reported in the details. Repeated password attempts will not resolve a policy restriction.",
+            )
+        } else if context == Context::Rdp && lower.starts_with("rdp sign-in transport") {
+            (
+                "123",
+                "The connection ended during RDP sign-in.",
+                "Reconnect and check the network, gateway and server logs. This transport failure does not establish that the password is wrong.",
+            )
+        } else if context == Context::Rdp && lower.starts_with("rdp sign-in protocol") {
+            (
+                "124",
+                "RDP secure sign-in could not complete.",
+                "Use a plain username with Domain, or leave Domain blank for a qualified account name. Copy the stage and status details if sign-in still fails; keep TLS and NLA enabled.",
+            )
+        } else if context == Context::Rdp && lower.starts_with("rdp desktop setup transport") {
+            (
+                "125",
+                "The connection ended while setting up the remote desktop.",
+                "Reconnect and check the server and gateway logs. Sign-in and desktop setup are separate stages; the details identify where the connection ended.",
+            )
+        } else if context == Context::Rdp && lower.starts_with("rdp desktop setup protocol") {
+            (
+                "126",
+                "The remote desktop setup could not complete.",
+                "Copy the stage and protocol details for support. Check the server's session and display policies; changing the password may not resolve a desktop setup failure.",
+            )
+        } else if context == Context::Rdp
+            && lower.starts_with("rdp authentication or session negotiation failed")
+        {
+            (
+                "127",
+                "RDP sign-in or desktop setup did not complete.",
+                "This older helper did not report the failing stage. Retry with the current complete TermCraft build and copy the new error details; this message alone does not prove that the password is wrong.",
+            )
         } else if contains(&[
             "host key mismatch",
             "host key has changed",
@@ -428,6 +472,28 @@ pub fn sanitize(raw: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn rdp_signin_failure_codes_distinguish_rejection_from_setup() {
+        for (message, suffix) in [
+            ("RDP sign-in rejected: status 0xC000006D", "121"),
+            ("RDP sign-in policy: status 0xC000015B", "122"),
+            ("RDP sign-in transport: connection closed", "123"),
+            ("RDP sign-in protocol: CredSSP invalid token", "124"),
+            ("RDP desktop setup transport: peer closed", "125"),
+            ("RDP desktop setup protocol: decode failure", "126"),
+            (
+                "RDP authentication or session negotiation failed; verify credentials and NLA support",
+                "127",
+            ),
+        ] {
+            let d = Diagnostic::new(Context::Rdp, message);
+            assert_eq!(d.code, format!("TC-RDP-{suffix}"));
+            assert_eq!(d.details, message);
+            if suffix != "121" {
+                assert!(!d.summary.contains("password is incorrect"));
+            }
+        }
+    }
     #[test]
     fn missing_rdp_helper_is_not_a_remote_file_or_server_failure() {
         let d = Diagnostic::new(
