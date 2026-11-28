@@ -106,10 +106,20 @@ that require their own distribution review. Archive intake and credits capture
 do not qualify the application's private runtime snapshot, native sandbox,
 AppContainer registration cleanup, relocated package or lifecycle behavior.
 
+The workflow can then prepare a **private detached source worktree** and run
+the application's five browser-session cases against the exact candidate. The
+private copy gets a test-only compiled pin; the production checkout stays
+unapproved and untouched. The preparation receipt binds the original and test
+pin hashes, captured credits, archive inventory, source commit and complete
+manifest diff. The bundled provider is required, so installed browsers cannot
+silently satisfy these cases. Functional tests do not independently observe
+live sandbox tokens or AppContainer registrations and are not GUI package or
+lifecycle qualification.
+
 Both the intake record and the production Windows runtime manifest remain
-unapproved. An intake run cannot enroll a payload, alter a compiled manifest,
-create a tag or publish a release. Review source-matched notices and the full
-native packaged behavior before preparing a separate runtime approval.
+unapproved. This diagnostic cannot enroll a production payload, create a tag
+or publish a release. Review source-matched notices and the full native
+packaged behavior before preparing a separate runtime approval.
 
 ### Enrolled runtime updates
 
