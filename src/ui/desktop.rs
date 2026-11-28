@@ -1,4 +1,5 @@
 use super::*;
+mod resize;
 use harbor_workspace::desktop::{DesktopEvent, DesktopInput, DesktopSession, Frame, TrustDecision};
 use harbor_workspace::macros::Action as MacroInput;
 use std::{
@@ -150,6 +151,9 @@ pub(super) struct State {
     clipboard: ClipboardState,
     options: harbor_workspace::desktop::rdp_options::RdpOptions,
     pub canvas_rect: Option<Rect>,
+    inherit_pane: bool,
+    fixed_size: (u32, u32),
+    pane_resize: resize::PaneResize,
 }
 impl State {
     pub fn new(handle: DesktopSession, session: &Session) -> Self {
@@ -188,6 +192,10 @@ impl State {
                 session.rdp_options.clone()
             },
             canvas_rect: None,
+            inherit_pane: session.desktop_size_mode
+                == harbor_workspace::model::DesktopSizeMode::InheritPane,
+            fixed_size: (session.width, session.height),
+            pane_resize: Default::default(),
         }
     }
     pub fn poll(&mut self) -> bool {
@@ -778,6 +786,24 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     }
     let available = ui.available_size().max(vec2(1., 1.));
     let (rect, _) = ui.allocate_exact_size(available, Sense::hover());
+    if state.connected && state.form.is_none() && !tab.session.view_only {
+        let now = Instant::now();
+        let (width, height, density) = if state.inherit_pane {
+            (rect.width(), rect.height(), ui.ctx().pixels_per_point())
+        } else {
+            (state.fixed_size.0 as f32, state.fixed_size.1 as f32, 1.)
+        };
+        if let Some((width, height)) = state.pane_resize.observe(width, height, density, now) {
+            // A full bounded input queue is retried; resizing never displaces key releases.
+            if state
+                .handle
+                .send(DesktopInput::Resize { width, height })
+                .is_ok()
+            {
+                state.pane_resize.sent((width, height), now);
+            }
+        }
+    }
     ui.painter()
         .rect_filled(rect, 0., ui.visuals().extreme_bg_color);
     let Some(frame) = state.frame.clone() else {
@@ -788,7 +814,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
             FontId::proportional(15.),
             ui.visuals().weak_text_color(),
         );
-        ui.ctx().request_repaint_after(Duration::from_millis(50));
+        ui.ctx().request_repaint_after(Duration::from_millis(16));
         return;
     };
     if state.texture.is_none() || state.texture_revision != frame.revision {
@@ -871,7 +897,7 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
     } else {
         ui.input(|i| i.events.clone())
     };
-    for event in events {
+    for event in coalesce_pointer_motion(events) {
         match event {
             Event::PointerMoved(position)
                 if allowed
@@ -1086,8 +1112,25 @@ pub(super) fn view(ui: &mut Ui, tab: &mut TerminalTab) {
             }
         }
     }
-    ui.ctx().request_repaint_after(Duration::from_millis(50));
+    ui.ctx().request_repaint_after(Duration::from_millis(16));
 }
+// Keep the latest motion in each uninterrupted run; never move a button/key event
+// across motion. This prevents high-polling mice from filling the ordered queue.
+fn coalesce_pointer_motion(events: Vec<Event>) -> Vec<Event> {
+    let mut result = Vec::with_capacity(events.len());
+    for event in events {
+        if matches!(event, Event::PointerMoved(_))
+            && result
+                .last()
+                .is_some_and(|last| matches!(last, Event::PointerMoved(_)))
+        {
+            result.pop();
+        }
+        result.push(event);
+    }
+    result
+}
+
 fn point(rect: Rect, frame: &Frame, position: Pos2) -> (u16, u16) {
     (
         ((position.x - rect.left()) / rect.width() * frame.width as f32)
@@ -1263,6 +1306,30 @@ mod tests {
             output.textures_delta.clear();
         }
         fullscreen
+    }
+    #[test]
+    fn remote_motion_coalescing_preserves_button_and_key_boundaries() {
+        let button = Event::PointerButton {
+            pos: pos2(2., 2.),
+            button: PointerButton::Primary,
+            pressed: true,
+            modifiers: Modifiers::NONE,
+        };
+        let events = coalesce_pointer_motion(vec![
+            Event::PointerMoved(pos2(1., 1.)),
+            Event::PointerMoved(pos2(2., 2.)),
+            button.clone(),
+            Event::PointerMoved(pos2(3., 3.)),
+            Event::PointerMoved(pos2(4., 4.)),
+            Event::Text("a".into()),
+            Event::PointerMoved(pos2(5., 5.)),
+        ]);
+        assert_eq!(events.len(), 5);
+        assert_eq!(events[0], Event::PointerMoved(pos2(2., 2.)));
+        assert_eq!(events[1], button);
+        assert_eq!(events[2], Event::PointerMoved(pos2(4., 4.)));
+        assert_eq!(events[3], Event::Text("a".into()));
+        assert_eq!(events[4], Event::PointerMoved(pos2(5., 5.)));
     }
     #[test]
     fn real_rdp_vault_save_use_delete_and_session_fullscreen() {

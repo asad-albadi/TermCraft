@@ -240,13 +240,14 @@ struct State {
 struct InputControl {
     epoch: AtomicU64,
     release: AtomicBool,
+    ready: tokio::sync::Notify,
 }
 struct QueuedInput {
     epoch: u64,
     input: DesktopInput,
 }
 struct InputQueue {
-    tx: mpsc::SyncSender<QueuedInput>,
+    tx: Option<mpsc::SyncSender<QueuedInput>>,
     control: Arc<InputControl>,
 }
 struct InputReceiver {
@@ -258,7 +259,7 @@ fn input_channel() -> (InputQueue, InputReceiver) {
     let control = Arc::new(InputControl::default());
     (
         InputQueue {
-            tx,
+            tx: Some(tx),
             control: control.clone(),
         },
         InputReceiver { rx, control },
@@ -277,6 +278,7 @@ impl InputQueue {
                 })
                 .map_err(|_| "Desktop input generations exhausted")?;
             self.control.release.store(true, Ordering::Release);
+            self.control.ready.notify_one();
             return Ok(());
         }
         self.send_ordered(input)
@@ -285,8 +287,18 @@ impl InputQueue {
     fn send_ordered(&self, input: DesktopInput) -> Result<(), String> {
         let epoch = self.control.epoch.load(Ordering::Acquire);
         self.tx
+            .as_ref()
+            .expect("input sender is dropped only when the queue is dropped")
             .try_send(QueuedInput { epoch, input })
-            .map_err(|_| INPUT_QUEUE_BUSY.into())
+            .map_err(|_| INPUT_QUEUE_BUSY.to_owned())?;
+        self.control.ready.notify_one();
+        Ok(())
+    }
+}
+impl Drop for InputQueue {
+    fn drop(&mut self) {
+        drop(self.tx.take());
+        self.control.ready.notify_one();
     }
 }
 fn flush_release(writer: &mut impl std::io::Write, input: &InputReceiver) -> std::io::Result<()> {
@@ -453,10 +465,6 @@ impl DesktopSession {
                 {
                     return Err("Unsupported VNC key".into());
                 }
-                DesktopInput::Resize { .. } => return Err(
-                    "This VNC transport supports server-driven resize; the canvas scales locally"
-                        .into(),
-                ),
                 _ => {}
             }
         }

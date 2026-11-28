@@ -1475,6 +1475,26 @@ fn board_keyboard_focus(ui: &Ui, play: &mut PlayState, response: &egui::Response
         )
     });
 }
+// Boards consume the visible remainder of the game surface. The enclosing
+// scroll areas may offer unbounded content height, so intersect their clip.
+fn fitted_board_rect(available: Rect, proportions: Vec2) -> Rect {
+    let scale = (available.width() / proportions.x)
+        .min(available.height() / proportions.y)
+        .max(0.);
+    Rect::from_center_size(available.center(), proportions * scale)
+}
+fn allocate_board(ui: &mut Ui, proportions: Vec2, sense: Sense) -> (Rect, Response) {
+    let offered = ui.available_rect_before_wrap();
+    let extent = offered
+        .max
+        .min(ui.clip_rect().max)
+        .max(offered.min + vec2(1., 1.));
+    let available = Rect::from_min_max(offered.min, extent);
+    let (id, _) = ui.allocate_space(available.size());
+    let rect = fitted_board_rect(available, proportions);
+    let response = ui.interact(rect, id, sense);
+    (rect, response)
+}
 fn board(
     ui: &mut Ui,
     play: &mut PlayState,
@@ -1483,20 +1503,18 @@ fn board(
     labels: &[String],
     colours: &[Color32],
 ) -> Option<(usize, PointerButton)> {
-    board_with_minimum(ui, play, (w, h), labels, colours, 24.)
+    board_grid(ui, play, (w, h), labels, colours)
 }
-fn board_with_minimum(
+fn board_grid(
     ui: &mut Ui,
     play: &mut PlayState,
     dimensions: (usize, usize),
     labels: &[String],
     colours: &[Color32],
-    minimum: f32,
 ) -> Option<(usize, PointerButton)> {
     let (w, h) = dimensions;
-    let size = (ui.available_width().min(880.) / w as f32).clamp(minimum, 38.);
-    let (rect, response) =
-        ui.allocate_exact_size(vec2(size * w as f32, size * h as f32), egui::Sense::click());
+    let (rect, response) = allocate_board(ui, vec2(w as f32, h as f32), Sense::click());
+    let size = rect.width() / w as f32;
     play.board = Some(rect);
     board_keyboard_focus(ui, play, &response);
     for i in 0..w * h {
@@ -1519,7 +1537,7 @@ fn board_with_minimum(
                 r.center(),
                 Align2::CENTER_CENTER,
                 label,
-                FontId::monospace((size * 0.50).max(9.)),
+                FontId::monospace(size * 0.50),
                 foreground,
             );
         }
@@ -1803,16 +1821,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                     }
                 })
                 .collect::<Vec<_>>();
-            // Cages need a top strip for sums and room for pencil notes.
-            // The surrounding scroll area keeps this legible on narrow views.
-            board_with_minimum(
-                ui,
-                play,
-                (s.width, s.height),
-                &labels,
-                &colours,
-                if s.cages.is_empty() { 24. } else { 38. },
-            );
+            board_grid(ui, play, (s.width, s.height), &labels, &colours);
             let r = play.board.unwrap();
             let size = r.width() / s.width as f32;
             if !s.cages.is_empty() {
@@ -1847,10 +1856,12 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                                 vec2((slot % cols) as f32 + 0.5, (slot / cols) as f32 + 0.5)
                                     * (size / cols as f32)
                             } else {
-                                vec2(4., 14.)
+                                vec2(4., 14.) * (size / 38.).min(1.)
                                     + vec2(
-                                        ((slot % cols) as f32 + 0.5) * ((size - 8.) / cols as f32),
-                                        ((slot / cols) as f32 + 0.5) * ((size - 16.) / cols as f32),
+                                        ((slot % cols) as f32 + 0.5)
+                                            * ((size - 8. * (size / 38.).min(1.)) / cols as f32),
+                                        ((slot / cols) as f32 + 0.5)
+                                            * ((size - 16. * (size / 38.).min(1.)) / cols as f32),
                                     )
                             };
                         ui.painter().text(
@@ -1860,7 +1871,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                             FontId::monospace(if s.cages.is_empty() {
                                 size / cols as f32 * 0.7
                             } else {
-                                (size - 16.) / cols as f32 * 0.85
+                                (size - 16. * (size / 38.).min(1.)) / cols as f32 * 0.85
                             }),
                             Color32::WHITE,
                         );
@@ -1897,7 +1908,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                     let right = x + 1 == s.width || !cage.cells.contains(&(i + 1));
                     let bottom = y + 1 == s.height || !cage.cells.contains(&(i + s.width));
                     let left = x == 0 || !cage.cells.contains(&i.saturating_sub(1));
-                    let inset = 4.;
+                    let inset = 4. * (size / 38.).min(1.);
                     // Offset each contour edge inward. Concave corners extend
                     // into the neighbouring cell so every cage stays closed.
                     let has = |dx: isize, dy: isize| {
@@ -1957,14 +1968,14 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                 if let Some(&anchor) = cage.cells.iter().min() {
                     let pos = r.min
                         + vec2(
-                            (anchor % s.width) as f32 * size + 6.,
-                            (anchor / s.width) as f32 * size + 5.,
+                            (anchor % s.width) as f32 * size + 6. * (size / 38.).min(1.),
+                            (anchor / s.width) as f32 * size + 5. * (size / 38.).min(1.),
                         );
                     ui.painter().text(
                         pos,
                         Align2::LEFT_TOP,
                         cage.sum.to_string(),
-                        FontId::monospace(9.),
+                        FontId::monospace(9. * (size / 38.).min(1.)),
                         palette(2),
                     );
                 }
@@ -2138,8 +2149,9 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
             }
         }
         GameScene::Puzzle(p::PuzzleScene::Untangle(s)) => {
-            let side = ui.available_width().min(520.).max(150.);
-            let (rect, response) = ui.allocate_exact_size(vec2(side, side), egui::Sense::drag());
+            let (rect, response) = allocate_board(ui, vec2(1., 1.), Sense::drag());
+            let side = rect.width();
+            let point_radius = (9. * side / 520.).max(4.);
             play.board = Some(rect);
             board_keyboard_focus(ui, play, &response);
             let pos = |x: i32, y: i32| {
@@ -2173,7 +2185,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
                         .vertices
                         .iter()
                         .enumerate()
-                        .filter(|(_, v)| pos(v.0, v.1).distance(p) < 20.)
+                        .filter(|(_, v)| pos(v.0, v.1).distance(p) < point_radius.max(20.))
                         .min_by(|a, b| {
                             pos(a.1.0, a.1.1)
                                 .distance(p)
@@ -2210,7 +2222,7 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
             for (i, &(x, y)) in vertices.iter().enumerate() {
                 ui.painter().circle_filled(
                     pos(x, y),
-                    9.,
+                    point_radius,
                     if Some(i) == play.dragging || i == play.selected {
                         palette(5)
                     } else {
@@ -2304,53 +2316,82 @@ fn draw_scene(ui: &mut Ui, play: &mut PlayState) {
             if ui.button("Draw from stock").clicked() {
                 play.terminal(t::TerminalInput::Draw)
             }
-            ui.horizontal(|ui| {
-                for i in 0..4 {
-                    if ui
-                        .button(format!(
-                            "Reserve {}: {}",
-                            i + 1,
-                            s.reserve[i].map_or("—".into(), card)
-                        ))
-                        .clicked()
-                    {
-                        pile_select(play, t::CardPile::Reserve(i))
-                    }
-                }
-            });
-            ui.horizontal(|ui| {
-                for i in 0..4 {
-                    if ui
-                        .button(format!("Foundation {}: {}", i + 1, s.foundations[i]))
-                        .clicked()
-                    {
-                        pile_select(play, t::CardPile::Foundation(i))
-                    }
-                }
-            });
-            if ui
-                .button(format!(
-                    "Waste: {}",
-                    s.waste.last().copied().map_or("—".into(), card)
-                ))
-                .clicked()
-            {
-                pile_select(play, t::CardPile::Waste)
-            }
             ui.add(egui::Slider::new(&mut play.count, 1..=13).text("Cards to move"));
             ui.label(format!("Selected source: {:?}. Keyboard pile {}: reserves 1–4, foundations 5–8, waste 9, columns 10 onward. Select a destination pile; click source again to clear.",play.source,play.selected+1));
-            ui.horizontal_top(|ui| {
-                for (i, column) in s.tableau.iter().enumerate() {
-                    ui.vertical(|ui| {
-                        if ui.button(format!("Column {}", i + 1)).clicked() {
-                            pile_select(play, t::CardPile::Tableau(i))
-                        }
-                        for &c in column {
-                            ui.label(card(c));
-                        }
-                    });
+            let columns = s.tableau.len().max(8) as f32;
+            let rows = s.tableau.iter().map(Vec::len).max().unwrap_or(0) as f32;
+            let design = vec2(columns * 110., 148. + rows * 24.);
+            let (rect, response) = allocate_board(ui, design, Sense::click());
+            play.board = Some(rect);
+            board_keyboard_focus(ui, play, &response);
+            let scale = rect.width() / design.x;
+            let pile_rect = |x: f32, y: f32, height: f32| {
+                Rect::from_min_size(rect.min + vec2(x, y) * scale, vec2(106., height) * scale)
+            };
+            let pile_button =
+                |ui: &mut Ui, play: &mut PlayState, r: Rect, label: String, pile: t::CardPile| {
+                    let selected = play.source == Some(pile);
+                    if ui
+                        .put(
+                            r,
+                            egui::Button::new(RichText::new(label).size(12. * scale))
+                                .selected(selected),
+                        )
+                        .clicked()
+                    {
+                        pile_select(play, pile);
+                    }
+                };
+            for i in 0..4 {
+                pile_button(
+                    ui,
+                    play,
+                    pile_rect(i as f32 * 110., 0., 52.),
+                    format!(
+                        "Reserve {}: {}",
+                        i + 1,
+                        s.reserve[i].map_or("—".into(), card)
+                    ),
+                    t::CardPile::Reserve(i),
+                );
+                pile_button(
+                    ui,
+                    play,
+                    pile_rect((i + 4) as f32 * 110., 0., 52.),
+                    format!("Foundation {}: {}", i + 1, s.foundations[i]),
+                    t::CardPile::Foundation(i),
+                );
+            }
+            pile_button(
+                ui,
+                play,
+                pile_rect(0., 60., 46.),
+                format!(
+                    "Waste: {}",
+                    s.waste.last().copied().map_or("—".into(), card)
+                ),
+                t::CardPile::Waste,
+            );
+            for (i, column) in s.tableau.iter().enumerate() {
+                pile_button(
+                    ui,
+                    play,
+                    pile_rect(i as f32 * 110., 116., 28.),
+                    format!("Column {}", i + 1),
+                    t::CardPile::Tableau(i),
+                );
+                for (j, &c) in column.iter().enumerate() {
+                    let r = pile_rect(i as f32 * 110., 148. + j as f32 * 24., 22.);
+                    ui.painter().rect_filled(r, 2. * scale, palette(0));
+                    ui.painter().text(
+                        r.center(),
+                        Align2::CENTER_CENTER,
+                        card(c),
+                        FontId::monospace(16. * scale),
+                        ink(ui),
+                    );
                 }
-            });
+            }
         }
     }
 }
@@ -2712,6 +2753,166 @@ mod tests {
         );
     }
 
+    #[test]
+    fn large_untangle_points_accept_drag_from_their_visible_edge() {
+        let ctx = Context::default();
+        let mut play = PlayState::default();
+        play.start(GameId::Untangle, 1);
+        let draw = |play: &mut PlayState, events| {
+            let mut out = ctx.run_ui(
+                RawInput {
+                    screen_rect: Some(Rect::from_min_size(Pos2::ZERO, vec2(5000., 3000.))),
+                    events,
+                    ..Default::default()
+                },
+                |ui| draw_scene(ui, play),
+            );
+            out.textures_delta.clear();
+        };
+        draw(&mut play, vec![]);
+        draw(&mut play, vec![]);
+        let GameScene::Puzzle(p::PuzzleScene::Untangle(scene)) =
+            play.session.as_ref().unwrap().scene()
+        else {
+            panic!()
+        };
+        let r = play.board.unwrap();
+        let (x, y) = scene.vertices[0];
+        let center = r.min
+            + vec2(
+                x as f32 / scene.extent as f32 * r.width(),
+                y as f32 / scene.extent as f32 * r.height(),
+            );
+        let edge = center + vec2(30., 0.);
+        assert!(30. < 9. * r.width() / 520.);
+        draw(&mut play, vec![Event::PointerMoved(edge)]);
+        draw(
+            &mut play,
+            vec![
+                Event::PointerButton {
+                    pos: edge,
+                    button: PointerButton::Primary,
+                    pressed: true,
+                    modifiers: Modifiers::NONE,
+                },
+                Event::PointerMoved(edge + vec2(15., 0.)),
+            ],
+        );
+        assert_eq!(play.dragging, Some(0));
+    }
+    #[test]
+    fn game_board_fit_uses_both_axes_and_centers_without_fixed_caps() {
+        for size in [vec2(320., 480.), vec2(1600., 900.), vec2(1200., 240.)] {
+            let available = Rect::from_min_size(pos2(37., 51.), size);
+            for aspect in [
+                vec2(9., 9.),
+                vec2(30., 16.),
+                vec2(10., 20.),
+                vec2(880., 340.),
+            ] {
+                let r = fitted_board_rect(available, aspect);
+                assert!(r.is_finite() && available.contains_rect(r));
+                assert!(r.center().distance(available.center()) < 0.001);
+                assert!((r.width() / r.height() - aspect.x / aspect.y).abs() < 0.001);
+                assert!((r.width() - size.x).abs() < 0.001 || (r.height() - size.y).abs() < 0.001);
+            }
+        }
+        let r = fitted_board_rect(
+            Rect::from_min_size(Pos2::ZERO, vec2(1600., 900.)),
+            vec2(9., 9.),
+        );
+        assert_eq!(r.size(), vec2(900., 900.));
+    }
+    #[test]
+    fn all_game_boards_fit_visible_width_and_height_including_cards_and_untangle() {
+        for spec in GameRegistry::catalog() {
+            let ctx = Context::default();
+            let mut play = PlayState::default();
+            play.start(spec.id, 1);
+            let saved = play.session.as_ref().unwrap().save_bytes().unwrap();
+            for size in [vec2(480., 600.), vec2(1600., 1000.), vec2(1200., 400.)] {
+                let mut out = ctx.run_ui(
+                    RawInput {
+                        screen_rect: Some(Rect::from_min_size(Pos2::ZERO, size)),
+                        ..Default::default()
+                    },
+                    |ui| draw_scene(ui, &mut play),
+                );
+                out.textures_delta.clear();
+                let r = play
+                    .board
+                    .expect("every game exposes its active board bounds");
+                assert!(r.is_finite() && r.is_positive(), "{:?}: {r:?}", spec.id);
+                assert!(
+                    r.left() >= -0.01
+                        && r.top() >= -0.01
+                        && r.right() <= size.x + 0.01
+                        && r.bottom() <= size.y + 0.01,
+                    "{:?}: {r:?} in {size:?}",
+                    spec.id
+                );
+                assert!(
+                    (r.center().x - size.x / 2.).abs() < 1.,
+                    "{:?}: {r:?}",
+                    spec.id
+                );
+                assert_eq!(
+                    play.session.as_ref().unwrap().save_bytes().unwrap(),
+                    saved,
+                    "resizing must not change game/save state"
+                );
+            }
+        }
+    }
+    #[test]
+    fn fitted_soliterm_pile_buttons_still_transfer_cards_with_pointer() {
+        let ctx = Context::default();
+        let mut play = PlayState::default();
+        play.start(GameId::Soliterm, 1);
+        let original = play.session.as_ref().unwrap().scene();
+        let size = vec2(1200., 800.);
+        let render = |play: &mut PlayState, events| {
+            let mut out = ctx.run_ui(
+                RawInput {
+                    screen_rect: Some(Rect::from_min_size(Pos2::ZERO, size)),
+                    events,
+                    ..Default::default()
+                },
+                |ui| draw_scene(ui, play),
+            );
+            out.textures_delta.clear();
+        };
+        render(&mut play, vec![]);
+        let board = play.board.unwrap();
+        let scale = board.width() / 880.;
+        for (x, y) in [(53., 130.), (53., 26.)] {
+            let pos = board.min + vec2(x, y) * scale;
+            render(
+                &mut play,
+                vec![
+                    Event::PointerMoved(pos),
+                    Event::PointerButton {
+                        pos,
+                        button: PointerButton::Primary,
+                        pressed: true,
+                        modifiers: Modifiers::NONE,
+                    },
+                ],
+            );
+            render(
+                &mut play,
+                vec![Event::PointerButton {
+                    pos,
+                    button: PointerButton::Primary,
+                    pressed: false,
+                    modifiers: Modifiers::NONE,
+                }],
+            );
+        }
+        assert_ne!(play.session.as_ref().unwrap().scene(), original);
+        assert!(play.session.as_mut().unwrap().undo());
+        assert_eq!(play.session.as_ref().unwrap().scene(), original);
+    }
     #[test]
     fn cards_keyboard_source_and_destination_apply_a_real_transfer() {
         let mut play = PlayState::default();
@@ -3858,8 +4059,8 @@ mod options_ui_tests {
         assert!(compact_play.start_config(0, advanced_preset("3x3 Killer")));
         let _compact = painted_scene(&mut compact_play, 220.);
         assert!(
-            compact_play.board.unwrap().width() / 9. >= 38.,
-            "cages retain readable sums and notes through horizontal scrolling"
+            compact_play.board.unwrap().width() <= 220.,
+            "cage boards fit the available width"
         );
         let lines = painted_lines(&out, Stroke::new(1.2, palette(2)));
         let texts = painted_texts(&out);

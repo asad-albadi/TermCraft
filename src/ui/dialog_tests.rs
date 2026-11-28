@@ -653,3 +653,51 @@ fn input_safety_category_persists_changes_through_save_preferences() {
         !original
     );
 }
+
+#[test]
+fn desktop_size_mode_switch_keeps_fixed_dimensions_and_default_pane_choice() {
+    use super::gui_tests::shell_pointer;
+    use harbor_workspace::model::DesktopSizeMode;
+    for protocol in ["RDP", "VNC"] {
+        let (ctx, _root, mut workspace) = owned_workspace();
+        workspace.new_session(protocol);
+        let session = workspace.session_form.as_mut().unwrap();
+        session.width = 1600;
+        session.height = 900;
+        session.vnc_options.embedded = true;
+        workspace.session_section = if protocol == "RDP" {
+            pages::SessionSection::Display
+        } else {
+            pages::SessionSection::Advanced
+        };
+        let draw = |workspace: &mut Workspace, events| {
+            shell_frame(&ctx, vec2(1280., 900.), 1., events, |ui| {
+                workspace.session_dialog(ui.ctx())
+            })
+        };
+        let click = |workspace: &mut Workspace, label: &str| {
+            draw(workspace, vec![]);
+            let pos = shell_text_position(&draw(workspace, vec![]), label);
+            draw(
+                workspace,
+                vec![Event::PointerMoved(pos), shell_pointer(pos, true)],
+            );
+            draw(workspace, vec![shell_pointer(pos, false)]);
+        };
+        draw(&mut workspace, vec![]);
+        assert_eq!(
+            workspace.session_form.as_ref().unwrap().desktop_size_mode,
+            DesktopSizeMode::InheritPane
+        );
+        click(&mut workspace, "Fixed resolution");
+        assert_eq!(
+            workspace.session_form.as_ref().unwrap().desktop_size_mode,
+            DesktopSizeMode::Fixed
+        );
+        shell_text_position(&draw(&mut workspace, vec![]), "1600");
+        click(&mut workspace, "Inherit pane size");
+        let session = workspace.session_form.as_ref().unwrap();
+        assert_eq!(session.desktop_size_mode, DesktopSizeMode::InheritPane);
+        assert_eq!((session.width, session.height), (1600, 900));
+    }
+}

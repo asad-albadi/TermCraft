@@ -1,5 +1,7 @@
 # Issue 4 integrated verification
 
+**Games and remote desktop follow-up:** all thirteen boards now center and fit both window dimensions. Embedded desktops default to Inherit pane size, retain fixed resolution, negotiate supported remote resizing, and reduce local input/frame batching. [Behavior, validation and review command](games-and-desktop-resizing.md). PR #8 remains draft and unmerged pending owner human checks.
+
 ## Owner correction: terminal controls, separate app bars
 
 The owner clarified that “one row” refers to controls **inside the terminal pane/window**, not the app menus, toolbar or connection tabs. The combined app bar has been reverted: menus/theme and labelled command tiles are separate again, and connection tabs have their own strip. The terminal’s status/title, primary actions and secondary action menu occupy one row above its content. Detached tabs are separate from their one-row window controls. Secondary actions remain reachable without adding permanent rows.

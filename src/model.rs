@@ -124,6 +124,13 @@ impl DesktopEngine {
         *self == Self::Embedded
     }
 }
+/// Embedded desktops follow the visible pane unless an explicit fixed size is chosen.
+#[derive(Clone, Copy, Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
+pub enum DesktopSizeMode {
+    #[default]
+    InheritPane,
+    Fixed,
+}
 #[derive(Clone, Copy, Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub enum AgentMode {
     #[default]
@@ -232,6 +239,7 @@ pub struct Session {
     pub view_only: bool,
     pub width: u32,
     pub height: u32,
+    pub desktop_size_mode: DesktopSizeMode,
     pub highlight_enabled: Option<bool>,
     pub terminal: crate::terminal::settings::TerminalOverrides,
 }
@@ -278,6 +286,7 @@ impl Default for Session {
             view_only: false,
             width: 1280,
             height: 800,
+            desktop_size_mode: DesktopSizeMode::InheritPane,
         }
     }
 }
@@ -675,4 +684,23 @@ pub fn managed_service_defaults(
         Cron => (0, 0), // Scheduler has no listener; active until explicitly stopped.
     };
     (([127, 0, 0, 1], port).into(), lifetime)
+}
+
+#[cfg(test)]
+mod desktop_size_tests {
+    use super::*;
+    #[test]
+    fn legacy_desktop_size_defaults_to_pane_without_losing_fixed_choice() {
+        let old: Session = serde_json::from_str(r#"{"width":1600,"height":900}"#).unwrap();
+        assert_eq!(old.desktop_size_mode, DesktopSizeMode::InheritPane);
+        assert_eq!((old.width, old.height), (1600, 900));
+        let fixed = Session {
+            desktop_size_mode: DesktopSizeMode::Fixed,
+            ..old
+        };
+        let restored: Session =
+            serde_json::from_slice(&serde_json::to_vec(&fixed).unwrap()).unwrap();
+        assert_eq!(restored.desktop_size_mode, DesktopSizeMode::Fixed);
+        assert_eq!((restored.width, restored.height), (1600, 900));
+    }
 }

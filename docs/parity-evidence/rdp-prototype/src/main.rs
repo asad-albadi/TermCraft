@@ -34,6 +34,7 @@ struct Handler(
     bool,
     Option<Arc<Mutex<server::DesktopSize>>>,
     Option<server::DesktopSize>,
+    Option<Arc<Mutex<Option<server::DesktopSize>>>>,
 );
 impl Handler {
     fn record(&self, event: String) {
@@ -59,6 +60,7 @@ impl RdpServerInputHandler for Handler {
     }
 }
 struct Updates {
+    requested: Option<Arc<Mutex<Option<server::DesktopSize>>>>,
     cursor: bool,
     phase: u8,
     resize: Option<server::DesktopSize>,
@@ -70,6 +72,14 @@ impl RdpServerDisplayUpdates for Updates {
     async fn next_update(&mut self) -> anyhow::Result<Option<DisplayUpdate>> {
         tokio::time::sleep(Duration::from_millis(30)).await;
         self.phase = self.phase.saturating_add(1);
+        let request = self
+            .requested
+            .as_ref()
+            .and_then(|slot| slot.lock().unwrap().take());
+        if let (Some(target), Some(dimensions)) = (request, &self.dimensions) {
+            *dimensions.lock().unwrap() = target;
+            return Ok(Some(DisplayUpdate::Resize(target)));
+        }
         if let Some(target) = self.resize {
             if self.phase >= 4 && self.resize_gate.as_ref().is_none_or(|path| path.is_file()) {
                 if let Some(dimensions) = &self.dimensions {
@@ -120,8 +130,27 @@ impl RdpServerDisplay for Handler {
             height: 480,
         }
     }
+    fn request_layout(&mut self, layout: ironrdp_displaycontrol::pdu::DisplayControlMonitorLayout) {
+        if let [monitor] = layout.monitors() {
+            let (width, height) = monitor.dimensions();
+            if monitor.is_primary()
+                && (200..=8192).contains(&width)
+                && (200..=8192).contains(&height)
+            {
+                self.record(format!("client_resize:{width}x{height}"));
+                if let Some(requested) = &self.5 {
+                    *requested.lock().unwrap() = Some(server::DesktopSize {
+                        width: width as u16,
+                        height: height as u16,
+                    });
+                }
+            }
+        }
+    }
+
     async fn updates(&mut self) -> anyhow::Result<Box<dyn RdpServerDisplayUpdates>> {
         Ok(Box::new(Updates {
+            requested: self.5.clone(),
             cursor: self.2,
             phase: 0,
             resize: self.4,
@@ -396,6 +425,7 @@ fn fixture() -> anyhow::Result<()> {
     let key = root.join("server.key");
     let cursor = args.get(4).is_some_and(|s| s == "cursor");
     let resize = args.get(4).is_some_and(|s| s == "resize");
+    let ignore_layout = args.get(4).is_some_and(|s| s == "ignore-layout");
     let shrink = args.get(4).is_some_and(|s| s == "shrink");
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
@@ -439,6 +469,7 @@ fn fixture() -> anyhow::Result<()> {
                     } else {
                         None
                     },
+                    (!ignore_layout).then(Default::default),
                 );
                 let events = handler.0.clone();
                 let mut server = server::RdpServer::builder()

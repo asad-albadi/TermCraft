@@ -478,7 +478,30 @@ impl Workspace {
                 );
             });
         }
-        if section == Display && s.protocol == "RDP" {
+        if (section == Display
+            && s.protocol == "RDP"
+            && s.desktop_engine == harbor_workspace::model::DesktopEngine::Embedded)
+            || (section == Advanced && s.protocol == "VNC" && s.vnc_options.embedded)
+        {
+            use harbor_workspace::model::DesktopSizeMode;
+            ui.horizontal_wrapped(|ui| {
+                ui.label("Desktop size");
+                ui.selectable_value(&mut s.desktop_size_mode, DesktopSizeMode::InheritPane, "Inherit pane size")
+                    .fluent_hint("Follow the pane in physical pixels when the server supports resizing. View-only connections fit the existing desktop.");
+                ui.selectable_value(&mut s.desktop_size_mode, DesktopSizeMode::Fixed, "Fixed resolution");
+            });
+            if s.desktop_size_mode == DesktopSizeMode::Fixed {
+                ui.horizontal_wrapped(|ui| {
+                    ui.add(DragValue::new(&mut s.width).range(200..=8192));
+                    ui.label("×");
+                    ui.add(DragValue::new(&mut s.height).range(200..=8192));
+                });
+            }
+        }
+        if section == Display
+            && s.protocol == "RDP"
+            && s.desktop_engine == harbor_workspace::model::DesktopEngine::External
+        {
             ui.horizontal_wrapped(|ui| {
                 ui.label("Desktop size");
                 ui.add(DragValue::new(&mut s.width).range(200..=8192));
@@ -501,7 +524,7 @@ impl Workspace {
                     .fluent_hint("Enter fullscreen when the connected desktop is first displayed.");
                 ui.checkbox(&mut s.view_only, "View only");
             });
-            ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. The view fits server dimensions; server-driven resize is supported."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. The view fits the negotiated desktop."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));
+            ui.label(RichText::new(if s.protocol=="VNC"&&s.vnc_options.embedded{"VNC opens inside the workspace. Server resizing depends on remote support. The view always fits proportionally."}else if s.protocol=="RDP"&&s.desktop_engine==harbor_workspace::model::DesktopEngine::Embedded{"RDP opens inside the workspace using NLA and verified TLS. Server resizing depends on remote support. The view always fits proportionally."}else{"Opens in an installed desktop client: Windows Remote Desktop, FreeRDP, TigerVNC, or macOS Screen Sharing."}).size(12.).color(muted(ui)));
         }
         if section == Advanced && s.protocol == "Browser" {
             super::web_browser::settings(ui, s);

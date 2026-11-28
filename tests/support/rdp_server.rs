@@ -80,6 +80,9 @@ impl Server {
     pub fn with_resize() -> Self {
         Self::start_mode("127.0.0.1:0".parse().unwrap(), "resize")
     }
+    pub fn ignoring_client_resize() -> Self {
+        Self::start_mode("127.0.0.1:0".parse().unwrap(), "ignore-layout")
+    }
     pub fn with_shrink() -> Self {
         Self::start_mode("127.0.0.1:0".parse().unwrap(), "shrink")
     }

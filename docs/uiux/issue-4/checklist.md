@@ -1,5 +1,7 @@
 # Issue #4 component and acceptance checklist
 
+**Games and remote desktop follow-up:** all thirteen boards now center and fit both window dimensions. Embedded desktops default to Inherit pane size, retain fixed resolution, negotiate supported remote resizing, and reduce local input/frame batching. [Behavior, validation and review command](games-and-desktop-resizing.md). PR #8 remains draft and unmerged pending owner human checks.
+
 **RDP review fix:** the review directory now includes its verified, matching RDP helper. Development builds prefer the helper beside the GUI, and dedicated `TC-RDP-119` / `120` messages distinguish missing local support from a local launch failure. Actual frame/input, certificate-change and shutdown checks passed against a current local endpoint. [Details](error-messages.md#rdp-review-build-correction). The launcher is updated; PR #8 remains draft and unmerged.
 
 **Latest app-wide error pass:** application-owned failure surfaces use stable `TC-…` codes, readable explanations, suggested next steps and explicit copying of redacted technical detail. Errors retain their feature context; ordinary progress, successful actions and cancellation remain ordinary messages. A real SSH cause-loss bug was fixed in TCP error reporting and post-exit resizing. Approved session dialog structure is retained, with only error feedback changed for this request. [Guide, coverage and code catalogue](error-messages.md). PR #8 remains draft and unmerged pending owner checks.
